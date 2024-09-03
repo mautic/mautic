@@ -9,7 +9,7 @@ return [
     'services' => [
         'integrations' => [
             'mautic.integration.constantcontact' => [
-                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration::class,
+                'class'     => MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -18,7 +18,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -30,7 +30,7 @@ return [
                 ],
             ],
             'mautic.integration.icontact' => [
-                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration::class,
+                'class'     => MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -39,7 +39,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -51,7 +51,7 @@ return [
                 ],
             ],
             'mautic.integration.mailchimp' => [
-                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration::class,
+                'class'     => MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -60,7 +60,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',

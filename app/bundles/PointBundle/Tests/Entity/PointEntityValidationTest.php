@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Entity;
 
 use Doctrine\Persistence\Mapping\MappingException;
-use Exception;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
@@ -86,9 +85,9 @@ class PointEntityValidationTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<mixed>>
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function deltaScenariosProvider(): iterable
+    public static function deltaScenariosProvider(): iterable
     {
         yield 'within range positive number' => [3000, ''];
         yield 'within range negative number' => [-7857, ''];
@@ -110,8 +109,6 @@ class PointEntityValidationTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         self::assertTrue($this->client->getResponse()->isOk());
-
-        $this->em->clear();
 
         $response = $this->client->getResponse()->getContent();
         self::assertStringContainsString($errorMessage, (string) $response);

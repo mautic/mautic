@@ -17,42 +17,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     public function __construct(
-        EventCollector $eventCollector,
-        TranslatorInterface $translator,
-        EntityManagerInterface $entityManager,
-        RouterInterface $router
+        private EventCollector $eventCollector,
+        private TranslatorInterface $translator,
+        private EntityManagerInterface $entityManager,
+        private RouterInterface $router
     ) {
-        $this->eventCollector = $eventCollector;
-        $this->translator     = $translator;
-        $this->entityManager  = $entityManager;
-        $this->router         = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -63,7 +36,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
         $this->addTimelineEvents($event, 'campaign.event.scheduled', $this->translator->trans('mautic.campaign.scheduled'));
@@ -72,7 +45,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Update records after lead merge.
      */
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         /** @var LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
@@ -88,7 +61,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param string $eventTypeKey
      * @param string $eventTypeName
      */
-    private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
         $event->addSerializerGroup('campaignList');
@@ -112,19 +85,19 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             foreach ($logs['results'] as $log) {
                 $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
-                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : '@MauticCampaign/SubscribedEvents\Timeline/index.html.twig';
+                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : '@MauticCampaign/SubscribedEvents/Timeline/index.html.twig';
 
                 $label = $log['event_name'].' / '.$log['campaign_name'];
 
                 if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
                     // Note as cancelled
                     $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
-                        .'" class="fa fa-calendar-times-o text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
+                        .'" class="ri-calendar-close-fill text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
                 }
 
                 if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed']) || !empty($log['fail_reason'])) {
                     $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error')
-                        .'" class="fa fa-warning text-danger"></i>';
+                        .'" class="ri-alert-line text-danger"></i>';
                 }
 
                 $extra = [
@@ -150,7 +123,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'timestamp'       => $log['dateTriggered'],
                         'extra'           => $extra,
                         'contentTemplate' => $template,
-                        'icon'            => 'fa-clock-o',
+                        'icon'            => 'ri-time-line',
                         'contactId'       => $log['lead_id'],
                     ]
                 );

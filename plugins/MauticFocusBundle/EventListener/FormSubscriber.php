@@ -9,20 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FocusModel
-     */
-    private $model;
-
-    public function __construct(FocusModel $model)
-    {
-        $this->model = $model;
+    public function __construct(
+        private FocusModel $model
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE   => ['onFormPostSave', 0],
@@ -33,7 +25,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onFormPostSave(Events\FormEvent $event)
+    public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
 
@@ -61,7 +53,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onFormDelete(Events\FormEvent $event)
+    public function onFormDelete(Events\FormEvent $event): void
     {
         $form   = $event->getForm();
         $formId = $form->deletedId;

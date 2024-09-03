@@ -3,9 +3,7 @@
 namespace Mautic\ReportBundle;
 
 /**
- * Class ReportEvents.
- *
- * Events available for ReportBundle
+ * Events available for ReportBundle.
  */
 final class ReportEvents
 {
@@ -99,4 +97,23 @@ final class ReportEvents
      * @var string
      */
     public const REPORT_SCHEDULE_SEND = 'mautic.report_schedule_send';
+
+    /**
+     * The mautic.report_on_column_collect event is dispatched during the report building to allow
+     * bundles to add the columns of mapped objects.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\ColumnCollectEvent instance.
+     *
+     * @var string
+     */
+    public const REPORT_ON_COLUMN_COLLECT = 'mautic.report_on_column_collect';
+
+    /**
+     * The mautic.report_cleanup event is dispatched to cleanup report files after they had been sent via email.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\PermanentReportFileCreated instance.
+     *
+     * @var string
+     */
+    public const REPORT_PERMANENT_FILE_CREATED = 'mautic.report_permanent_file_created';
 }

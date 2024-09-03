@@ -39,7 +39,7 @@ class FieldPaginationController extends CommonController
             /** @var ConfigFormSyncInterface $integrationObject */
             $integrationObject        = $integrationsHelper->getIntegration($integration);
             $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
 
@@ -70,7 +70,7 @@ class FieldPaginationController extends CommonController
         );
 
         $html = $this->render(
-            'Integrations/Config/field_mapping.html.twig',
+            '@Integrations/Config/field_mapping.html.twig',
             [
                 'form'        => $form->createView(),
                 'integration' => $integration,
@@ -81,7 +81,7 @@ class FieldPaginationController extends CommonController
 
         $prefix   = "integration_config[featureSettings][sync][fieldMappings][$object]";
         $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-        if ('_' == substr($idPrefix, -1)) {
+        if (str_ends_with($idPrefix, '_')) {
             $idPrefix = substr($idPrefix, 0, -1);
         }
 

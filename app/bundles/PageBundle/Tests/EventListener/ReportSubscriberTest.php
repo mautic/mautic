@@ -2,10 +2,9 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use DateTime;
-use Doctrine\DBAL\Driver\PDOStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -22,22 +21,19 @@ class ReportSubscriberTest extends TestCase
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyReportData;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
      * @var HitRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $hitRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var ReportSubscriber
-     */
-    private $subscriber;
+    private ReportSubscriber $subscriber;
 
     public function setUp(): void
     {
@@ -55,17 +51,7 @@ class ReportSubscriberTest extends TestCase
 
     public function testOnReportBuilderAddsPageAndPageHitReports(): void
     {
-        $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
-                'checkContext',
-                'addGraph',
-                'getStandardColumns',
-                'getCategoryColumns',
-                'getCampaignByChannelColumns',
-                'addTable',
-            ])
-            ->getMock();
+        $mockEvent = $this->createMock(ReportBuilderEvent::class);
 
         $mockEvent->expects($this->once())
             ->method('getStandardColumns')
@@ -88,7 +74,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
+            ->willReturnCallback(function () use (&$setTables): void {
                 $args = func_get_args();
 
                 $setTables[] = $args;
@@ -96,7 +82,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(9))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs) {
+            ->willReturnCallback(function () use (&$setGraphs): void {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;
@@ -251,7 +237,7 @@ class ReportSubscriberTest extends TestCase
             ->onlyMethods(['expr', 'execute'])
             ->getMock();
 
-        $mockStmt = $this->getMockBuilder(PDOStatement::class)
+        $mockStmt = $this->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['fetchAllAssociative'])
             ->getMock();
@@ -311,8 +297,8 @@ class ReportSubscriberTest extends TestCase
         $graphOptions = [
             'chartQuery' => $mockChartQuery,
             'translator' => $this->translator,
-            'dateFrom'   => new DateTime(),
-            'dateTo'     => new DateTime(),
+            'dateFrom'   => new \DateTime(),
+            'dateTo'     => new \DateTime(),
         ];
 
         $mockEvent->expects($this->once())
@@ -352,8 +338,8 @@ class ReportSubscriberTest extends TestCase
             ->willReturn(
                 [
                     [
-                        'from'  => new DateTime(),
-                        'till'  => new DateTime(),
+                        'from'  => new \DateTime(),
+                        'till'  => new \DateTime(),
                         'label' => 'My Chart',
                     ],
                 ]

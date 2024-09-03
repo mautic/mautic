@@ -5,6 +5,9 @@ Mautic.formOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
 
+    Mautic.toggleThemeSelectorVisibility();
+    mQuery('#mauticform_renderStyle_0, #mauticform_renderStyle_1').on('change', Mautic.toggleThemeSelectorVisibility);
+
     Mautic.formBuilderNewComponentInit();
     Mautic.iniNewConditionalField();
 
@@ -100,12 +103,14 @@ Mautic.formOnLoad = function (container) {
 };
 
 Mautic.formBuilderNewComponentInit = function () {
-    mQuery('select.form-builder-new-component').change(function (e) {
-        mQuery(this).find('option:selected');
-        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+    mQuery('select.form-builder-new-component:not(.initialized)').change(function (e) {
+        const select = mQuery(this);
+        select.addClass('initialized');
+        select.find('option:selected');
+        Mautic.ajaxifyModal(select.find('option:selected'));
         // Reset the dropdown
-        mQuery(this).val('');
-        mQuery(this).trigger('chosen:updated');
+        select.val('');
+        select.chosen('destroy').chosen();
     });
 };
 
@@ -379,4 +384,19 @@ Mautic.selectFormType = function(formType) {
 
     mQuery('.form-type-modal').remove();
     mQuery('.form-type-modal-backdrop').remove();
+};
+
+/**
+ * Toggles theme selection field visibility and manages theme selection
+ */
+Mautic.toggleThemeSelectorVisibility = function () {
+    var selectField = mQuery('#mauticform_template');
+    var chosenContainer = mQuery('#mauticform_template_chosen');
+
+    if (mQuery('#mauticform_renderStyle_0').prop('checked')) {
+        selectField.val('').trigger('chosen:updated');
+        chosenContainer.addClass('chosen-disabled');
+    } else {
+        chosenContainer.removeClass('chosen-disabled');
+    }
 };

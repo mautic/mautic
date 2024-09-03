@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
+use GuzzleHttp\Exception\GuzzleException;
+
 abstract class AbstractRemoteDataLookup extends AbstractLookup
 {
     /**
@@ -19,8 +21,6 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     abstract protected function getUrl();
 
     /**
-     * @param $response
-     *
      * @return mixed
      */
     abstract protected function parseResponse($response);
@@ -61,7 +61,7 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
                 ]);
 
             $this->parseResponse($response->getBody());
-        } catch (\Exception $exception) {
+        } catch (GuzzleException $exception) {
             if ($this->logger) {
                 $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
             }

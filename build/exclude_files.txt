@@ -26,10 +26,8 @@ bin/phpunit
 bin/security-checker
 bin/simple-phpunit
 build/*
-index_dev.php
 modified_files.txt
-package-lock.json
-package.json
+node_modules/*
 phpstan*.neon
 rector.php
 tests/*

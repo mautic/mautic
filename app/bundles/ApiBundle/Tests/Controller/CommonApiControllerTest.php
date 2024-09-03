@@ -2,10 +2,14 @@
 
 namespace Mautic\ApiBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -13,48 +17,49 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
-    public function testAddAliasIfNotPresentWithOneColumnWithoutAlias()
+    public function testAddAliasIfNotPresentWithOneColumnWithoutAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['dateAdded', 'f']);
 
         $this->assertEquals('f.dateAdded', $result);
     }
 
-    public function testAddAliasIfNotPresentWithOneColumnWithDifferentAlias()
+    public function testAddAliasIfNotPresentWithOneColumnWithDifferentAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['s.date_submitted', 'fs']);
 
         $this->assertEquals('s.date_submitted', $result);
     }
 
-    public function testAddAliasIfNotPresentWithOneColumnWithAlias()
+    public function testAddAliasIfNotPresentWithOneColumnWithAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['f.dateAdded', 'f']);
 
         $this->assertEquals('f.dateAdded', $result);
     }
 
-    public function testAddAliasIfNotPresentWithTwoColumnsWithAlias()
+    public function testAddAliasIfNotPresentWithTwoColumnsWithAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['f.dateAdded, f.dateModified', 'f']);
 
         $this->assertEquals('f.dateAdded,f.dateModified', $result);
     }
 
-    public function testAddAliasIfNotPresentWithTwoColumnsWithoutAlias()
+    public function testAddAliasIfNotPresentWithTwoColumnsWithoutAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['dateAdded, dateModified', 'f']);
 
         $this->assertEquals('f.dateAdded,f.dateModified', $result);
     }
 
-    public function testgetWhereFromRequestWithNoWhere()
+    public function testgetWhereFromRequestWithNoWhere(): void
     {
         $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
@@ -65,7 +70,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals([], $result);
     }
 
-    public function testgetWhereFromRequestWithSomeWhere()
+    public function testgetWhereFromRequestWithSomeWhere(): void
     {
         $where = [
             [
@@ -97,7 +102,12 @@ class CommonApiControllerTest extends CampaignTestAbstract
             $this->createMock(Router::class),
             $this->createMock(FormFactoryInterface::class),
             $this->createMock(AppVersion::class),
-            $this->createMock(RequestStack::class)
+            $this->createMock(RequestStack::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(ModelFactory::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(CoreParametersHelper::class),
+            $this->createMock(MauticFactory::class)
         );
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
@@ -109,7 +119,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), ) extends CommonApiController {
+        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class), $this->createMock(MauticFactory::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors

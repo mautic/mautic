@@ -2,23 +2,31 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @extends CommonApiController<Campaign>
@@ -27,14 +35,10 @@ class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    private MembershipManager $membershipManager;
-
     /**
      * @var CampaignModel|null
      */
-    protected $model = null;
-
-    private RequestStack $requestStack;
+    protected $model;
 
     public function __construct(
         CorePermissions $security,
@@ -43,18 +47,17 @@ class CampaignApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        RequestStack $requestStack,
-        MembershipManager $membershipManager,
+        private RequestStack $requestStack,
+        private MembershipManager $membershipManager,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory,
+        private ValidatorInterface $validator,
+        private EventModel $eventModel
     ) {
-        $this->requestStack      = $requestStack;
-        $this->membershipManager = $membershipManager;
-
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
-    }
-
-    public function initialize(ControllerEvent $event)
-    {
-        $campaignModel = $this->getModel('campaign');
+        $campaignModel = $modelFactory->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);
 
         $this->model             = $campaignModel;
@@ -64,7 +67,7 @@ class CampaignApiController extends CommonApiController
         $this->permissionBase    = 'campaign:campaigns';
         $this->serializerGroups  = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -73,7 +76,7 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -106,7 +109,7 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -130,12 +133,8 @@ class CampaignApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Campaign &$entity
-     * @param $parameters
-     * @param $form
-     * @param string $action
+     * @param string   $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -218,6 +217,34 @@ class CampaignApiController extends CommonApiController
             $this->model->setEvents($entity, $parameters['events'], $parameters['canvasSettings'], $deletedEvents);
         }
 
+        /** @var array<ConstraintViolationListInterface<ConstraintViolationInterface>> $eventViolations */
+        $eventViolations = array_filter(
+            array_map(
+                fn (Event $event) => $this->validator->validate($event),
+                $entity->getEvents()->toArray()
+            ),
+            fn ($error) => $error->count() > 0
+        );
+
+        if (count($eventViolations) > 0) {
+            $errors = [];
+            foreach ($eventViolations as $violationList) {
+                foreach ($violationList as $violation) {
+                    \assert($violation instanceof ConstraintViolationInterface);
+                    $errors[] = [
+                        'code'    => $violation->getCode(),
+                        'message' => $violation->getMessage(),
+                        'details' => $violation->getPropertyPath(),
+                        'type'    => 'validation',
+                    ];
+                }
+            }
+
+            $view = $this->view(['errors' => $errors], Response::HTTP_UNPROCESSABLE_ENTITY);
+
+            return $this->handleView($view);
+        }
+
         // Persist to the database before building connection so that IDs are available
         $this->model->saveEntity($entity);
 
@@ -227,9 +254,7 @@ class CampaignApiController extends CommonApiController
         }
 
         if (Request::METHOD_PUT === $method && !empty($deletedEvents)) {
-            $campaignEventModel = $this->getModel('campaign.event');
-            \assert($campaignEventModel instanceof EventModel);
-            $campaignEventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
+            $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
 
@@ -237,10 +262,8 @@ class CampaignApiController extends CommonApiController
      * Change the array structure.
      *
      * @param array $events
-     *
-     * @return array
      */
-    public function modifyCampaignEventArray($events)
+    public function modifyCampaignEventArray($events): array
     {
         $updatedEvents = [];
 
@@ -258,9 +281,7 @@ class CampaignApiController extends CommonApiController
     /**
      * Obtains a list of campaign contacts.
      *
-     * @param $id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getContactsAction(Request $request, $id)
     {
@@ -323,7 +344,7 @@ class CampaignApiController extends CommonApiController
         $this->model->saveEntity($entity);
 
         $headers = [];
-        //return the newly created entities location if applicable
+        // return the newly created entities location if applicable
 
         $route               = 'mautic_api_campaigns_getone';
         $headers['Location'] = $this->generateUrl(

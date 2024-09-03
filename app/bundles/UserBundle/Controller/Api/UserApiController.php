@@ -2,21 +2,25 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @extends CommonApiController<User>
@@ -26,9 +30,7 @@ class UserApiController extends CommonApiController
     /**
      * @var UserModel|null
      */
-    protected $model = null;
-
-    private UserPasswordEncoderInterface $encoder;
+    protected $model;
 
     public function __construct(
         CorePermissions $security,
@@ -37,16 +39,15 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        UserPasswordEncoderInterface $encoder,
-        RequestStack $requestStack
+        private UserPasswordHasherInterface $hasher,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
     ) {
-        $this->encoder = $encoder;
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
-    }
-
-    public function initialize(ControllerEvent $event)
-    {
-        $userModel = $this->getModel('user.user');
+        $userModel     = $modelFactory->getModel('user.user');
         \assert($userModel instanceof UserModel);
 
         $this->model            = $userModel;
@@ -55,15 +56,16 @@ class UserApiController extends CommonApiController
         $this->entityNameMulti  = 'users';
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
         $this->dataInputMasks   = ['signature' => 'html'];
-        parent::initialize($event);
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * Obtains the logged in user's data.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function getSelfAction()
     {
@@ -88,7 +90,7 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
+            $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
         }
 
         return $this->processForm($request, $entity, $parameters, 'POST');
@@ -99,7 +101,7 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -114,32 +116,32 @@ class UserApiController extends CommonApiController
         }
 
         if (null === $entity) {
-            if ('PATCH' === $method ||
-                ('PUT' === $method && !$this->security->isGranted('user:users:create'))
+            if ('PATCH' === $method
+                || ('PUT' === $method && !$this->security->isGranted('user:users:create'))
             ) {
-                //PATCH requires that an entity exists or must have create access for PUT
+                // PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
             } else {
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
-                    $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
+                    $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
                 }
             }
         } else {
-            //Changing passwords via API is forbidden
+            // Changing passwords via API is forbidden
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
             if ('PATCH' == $method) {
-                //PATCH will accept a diff so just remove the entities
+                // PATCH will accept a diff so just remove the entities
 
-                //Changing username via API is forbidden
+                // Changing username via API is forbidden
                 if (!empty($parameters['username'])) {
                     unset($parameters['username']);
                 }
             } else {
-                //PUT requires the entire entity so overwrite the username with the original
+                // PUT requires the entire entity so overwrite the username with the original
                 $parameters['username'] = $entity->getUsername();
                 $parameters['role']     = $entity->getRole()->getId();
             }
@@ -161,7 +163,7 @@ class UserApiController extends CommonApiController
                     }
                 }
 
-                $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword, true));
+                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
                 break;
         }
     }
@@ -171,7 +173,7 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -200,7 +202,7 @@ class UserApiController extends CommonApiController
     /**
      * Obtains a list of roles for user edits.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getRolesAction(Request $request)
     {

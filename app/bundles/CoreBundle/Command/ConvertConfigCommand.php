@@ -13,19 +13,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConvertConfigCommand extends Command
 {
-    private PathsHelper $pathsHelper;
-
-    public function __construct(PathsHelper $pathsHelper)
-    {
+    public function __construct(
+        private PathsHelper $pathsHelper
+    ) {
         parent::__construct();
-
-        $this->pathsHelper = $pathsHelper;
     }
 
     protected function configure()
     {
         $this->setName('mautic:theme:json-config')
-            ->setDescription('Converts theme config to JSON from PHP')
             ->setDefinition([
                 new InputOption(
                     'theme', null, InputOption::VALUE_REQUIRED,
@@ -63,7 +59,7 @@ EOT
         if (empty($themePath)) {
             $output->writeln("\n\n<error>The specified theme ($theme) does not exist.</error>");
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $jsonConfigPath = $themePath.'/config.json';
@@ -71,7 +67,7 @@ EOT
         if (file_exists($jsonConfigPath)) {
             $output->writeln("\n\n<error>The specified theme ($theme) already has a JSON config file.");
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $configPath = $themePath.'/config.php';
@@ -79,7 +75,7 @@ EOT
         if (!file_exists($configPath)) {
             $output->writeln("\n\n<error>The php config file for the specified theme ($theme) could not be found.</error>");
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $config = include $configPath;
@@ -87,7 +83,7 @@ EOT
         if (!is_array($config) || !array_key_exists('name', $config)) {
             $output->writeln("\n\n<error>The php config file for the specified theme ($theme) is not a valid config file.</error>");
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $jsonConfig = json_encode($config, JSON_PRETTY_PRINT);
@@ -95,7 +91,7 @@ EOT
         if (!file_put_contents($jsonConfigPath, $jsonConfig)) {
             $output->writeln("\n\n<error>Error writing json config file for the specified theme ($theme).</error>");
 
-            return 1;
+            return Command::FAILURE;
         } else {
             $output->writeln("\n\n<info>Successfully wrote json config file for the specified theme ($theme).</info>");
         }
@@ -110,6 +106,8 @@ EOT
             $output->writeln("\n\n<info>PHP config file for theme ($theme) was preserved.</info>");
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Converts theme config to JSON from PHP';
 }

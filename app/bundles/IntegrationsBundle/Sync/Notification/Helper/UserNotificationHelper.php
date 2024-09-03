@@ -4,27 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
-use DateTime;
 use Doctrine\ORM\ORMException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 
 class UserNotificationHelper
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
-
-    /**
-     * @var UserNotificationBuilder
-     */
-    private $userNotificationBuilder;
-
-    public function __construct(Writer $writer, UserNotificationBuilder $userNotificationBuilder)
-    {
-        $this->writer                  = $writer;
-        $this->userNotificationBuilder = $userNotificationBuilder;
+    public function __construct(
+        private Writer $writer,
+        private UserNotificationBuilder $userNotificationBuilder
+    ) {
     }
 
     /**
@@ -39,7 +28,7 @@ class UserNotificationHelper
         int $id,
         string $linkText,
         string $deduplicateValue = null,
-        DateTime $deduplicateDateTimeFrom = null
+        \DateTime $deduplicateDateTimeFrom = null
     ): void {
         $link    = $this->userNotificationBuilder->buildLink($mauticObject, $id, $linkText);
         $userIds = $this->userNotificationBuilder->getUserIds($mauticObject, $id);

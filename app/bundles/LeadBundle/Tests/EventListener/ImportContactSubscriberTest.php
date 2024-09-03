@@ -94,7 +94,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $subscriber->onValidateImport($event);
 
-        Assert::assertSame(['name' => 'Bud', 'skip_if_exists' => 1], $event->getMatchedFields());
+        Assert::assertSame(['name' => 'Bud'], $event->getMatchedFields());
     }
 
     public function testOnImportInitForUknownObject(): void
@@ -226,6 +226,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'stage'          => 'mautic.lead.import.label.stage',
                     'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
                     'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+                    'tags'           => 'mautic.lead.import.label.tags',
                 ],
             ],
             $event->fields

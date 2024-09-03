@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\DBAL\DBALException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,19 +16,17 @@ class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;
 
-    private IpAddressModel $ipAddressModel;
-
-    public function __construct(IpAddressModel $ipAddressModel, PathsHelper $pathsHelper)
-    {
-        $this->ipAddressModel = $ipAddressModel;
-
-        parent::__construct($pathsHelper);
+    public function __construct(
+        private IpAddressModel $ipAddressModel,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure(): void
     {
         $this->setName('mautic:unusedip:delete')
-            ->setDescription('Deletes IP addresses that are not used in any other database table')
             ->addOption(
                 '--limit',
                 '-l',
@@ -49,21 +47,23 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         try {
-            $limit       = $input->getOption('limit');
+            $limit       = $input->getOption('limit') ?? self::DEFAULT_LIMIT;
             $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
-        } catch (DBALException $e) {
+        } catch (\Doctrine\DBAL\Exception $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
             $this->completeRun();
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Deletes IP addresses that are not used in any other database table';
 }

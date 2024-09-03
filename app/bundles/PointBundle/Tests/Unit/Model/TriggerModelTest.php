@@ -6,7 +6,10 @@ namespace Mautic\PointBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,7 +23,9 @@ use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerModelTest extends \PHPUnit\Framework\TestCase
@@ -28,52 +33,49 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var IpLookupHelper|MockObject
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var LeadModel|MockObject
      */
-    private $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var TriggerEventModel|MockObject
      */
-    private $triggerEventModel;
+    private MockObject $triggerEventModel;
 
     /**
      * @var MauticFactory|MockObject
      */
-    private $mauticFactory;
+    private MockObject $mauticFactory;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var EntityManager|MockObject
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var TriggerEventRepository|MockObject
      */
-    private $triggerEventRepository;
+    private MockObject $triggerEventRepository;
 
-    /**
-     * @var TriggerModel
-     */
-    private $triggerModel;
+    private TriggerModel $triggerModel;
 
     /**
      * @var ContactTracker
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     public function setUp(): void
     {
@@ -92,12 +94,22 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->triggerEventModel,
             $this->mauticFactory,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
 
-        $this->triggerModel->setDispatcher($this->dispatcher);
-        $this->triggerModel->setTranslator($this->translator);
-        $this->triggerModel->setEntityManager($this->entityManager);
+        // reset private static property events in TriggerModel
+        $reflectionClass = new \ReflectionClass(TriggerModel::class);
+        $property        = $reflectionClass->getProperty('events');
+        $property->setAccessible(true);
+        $property->setValue(null, []);
     }
 
     public function testTriggerEvent(): void

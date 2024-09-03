@@ -2,35 +2,37 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use function assert;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\UserBundle\Exception\WeakPasswordException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception as Exception;
+use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SecurityController extends CommonController implements EventSubscriberInterface
 {
     public function onRequest(RequestEvent $event): void
     {
         $controller = $event->getRequest()->attributes->get('_controller');
-        assert(is_string($controller));
+        \assert(is_string($controller));
 
-        if (false === strpos($controller, self::class)) {
+        if (!str_contains($controller, self::class)) {
             return;
         }
 
         $authChecker = $this->get('security.authorization_checker');
-        assert($authChecker instanceof AuthorizationCheckerInterface);
+        \assert($authChecker instanceof AuthorizationCheckerInterface);
 
-        //redirect user if they are already authenticated
-        if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY') ||
-            $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
+        // redirect user if they are already authenticated
+        if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY')
+            || $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
             $event->setResponse(new RedirectResponse($redirectUrl));
@@ -42,7 +44,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper)
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -74,7 +76,11 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {
-            if (($error instanceof Exception\BadCredentialsException)) {
+            if ($error instanceof WeakPasswordException) {
+                $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
+
+                return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
+            } elseif ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
@@ -82,7 +88,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $msg = $error->getMessage();
             }
 
-            $this->addFlashMessage($msg, [], 'error', null, false);
+            $this->addFlashMessage($msg, [], FlashBag::LEVEL_ERROR, null, false);
         }
         $request->query->set('tmpl', 'login');
 
@@ -106,30 +112,22 @@ class SecurityController extends CommonController implements EventSubscriberInte
     /**
      * Do nothing.
      */
-    public function loginCheckAction()
+    public function loginCheckAction(): void
     {
     }
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @param $integration
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginAction($integration)
+    public function ssoLoginAction($integration): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('login'));
     }
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @param $integration
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginCheckAction($integration)
+    public function ssoLoginCheckAction($integration): RedirectResponse
     {
         // The plugin should be handling this in it's listener
 

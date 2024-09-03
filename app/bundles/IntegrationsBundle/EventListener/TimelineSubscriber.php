@@ -12,13 +12,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TimelineSubscriber implements EventSubscriberInterface
 {
-    private LeadEventLogRepository $eventLogRepository;
-    private TranslatorInterface $translator;
-
-    public function __construct(LeadEventLogRepository $eventLogRepository, TranslatorInterface $translator)
-    {
-        $this->eventLogRepository = $eventLogRepository;
-        $this->translator         = $translator;
+    public function __construct(
+        private LeadEventLogRepository $eventLogRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -76,9 +73,9 @@ class TimelineSubscriber implements EventSubscriberInterface
                 ]
             ),
             'timestamp'       => $log['date_added'],
-            'icon'            => 'fa-refresh',
+            'icon'            => 'ri-refresh-line',
             'contactId'       => $log['lead_id'],
-            'contentTemplate' => 'Integrations/Timeline/index.html.twig',
+            'contentTemplate' => '@Integrations/Timeline/index.html.twig',
             'extra'           => $properties,
         ];
     }

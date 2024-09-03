@@ -9,10 +9,7 @@ class OpenedHelper extends AbstractHelper
 {
     public const NAME = 'email-opened';
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -20,7 +17,7 @@ class OpenedHelper extends AbstractHelper
     /**
      * @throws \Exception
      */
-    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection)
+    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection): void
     {
         $query = $this->getQuery($fromDateTime, $toDateTime);
         $q     = $query->prepareTimeDataQuery('email_stats', 'date_read', $options->getFilters());

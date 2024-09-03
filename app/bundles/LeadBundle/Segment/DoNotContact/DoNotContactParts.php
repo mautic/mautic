@@ -10,36 +10,27 @@ class DoNotContactParts
 
     private int $type = DoNotContact::UNSUBSCRIBED;
 
-    /**
-     * @param string $field
-     */
-    public function __construct($field)
+    public function __construct(?string $field)
     {
-        if (false !== strpos($field, '_manual')) {
+        if ($field && str_contains($field, '_manual')) {
             $this->type = DoNotContact::MANUAL;
         }
 
-        if (false !== strpos($field, '_bounced')) {
+        if ($field && str_contains($field, '_bounced')) {
             $this->type = DoNotContact::BOUNCED;
         }
 
-        if (false !== strpos($field, '_sms')) {
+        if ($field && str_contains($field, '_sms')) {
             $this->channel = 'sms';
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getChannel()
+    public function getChannel(): string
     {
         return $this->channel;
     }
 
-    /**
-     * @return int
-     */
-    public function getParameterType()
+    public function getParameterType(): int
     {
         return $this->type;
     }

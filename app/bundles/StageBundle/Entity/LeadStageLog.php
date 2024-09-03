@@ -4,12 +4,12 @@ namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
-/**
- * Class LeadStageLog.
- */
 class LeadStageLog
 {
+    public const TABLE_NAME = 'stage_lead_action_log';
+
     /**
      * @var Stage
      **/
@@ -21,7 +21,7 @@ class LeadStageLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -30,12 +30,12 @@ class LeadStageLog
      **/
     private $dateFired;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('stage_lead_action_log')
-            ->setCustomRepositoryClass('Mautic\StageBundle\Entity\LeadStageLogRepository');
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(LeadStageLogRepository::class);
 
         $builder->createManyToOne('stage', 'Stage')
             ->isPrimaryKey()
@@ -63,13 +63,13 @@ class LeadStageLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired($dateFired)
+    public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
     }
 
     /**
-     * @return mixed
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -77,9 +77,9 @@ class LeadStageLog
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param IpAddress $ipAddress
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress($ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
@@ -95,7 +95,7 @@ class LeadStageLog
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -111,7 +111,7 @@ class LeadStageLog
     /**
      * @param mixed $stage
      */
-    public function setStage($stage)
+    public function setStage($stage): void
     {
         $this->stage = $stage;
     }

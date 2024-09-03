@@ -4,6 +4,7 @@ namespace Mautic\ChannelBundle\Command;
 
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,15 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
-    private TranslatorInterface $translator;
-    private MessageQueueModel $messageQueueModel;
-
-    public function __construct(TranslatorInterface $translator, MessageQueueModel $messageQueueModel, PathsHelper $pathsHelper)
-    {
-        $this->translator        = $translator;
-        $this->messageQueueModel = $messageQueueModel;
-
-        parent::__construct($pathsHelper);
+    public function __construct(
+        private TranslatorInterface $translator,
+        private MessageQueueModel $messageQueueModel,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
@@ -33,7 +32,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                     'mautic:campaigns:messages',
                 ]
             )
-            ->setDescription('Process sending of messages queue.')
             ->addOption(
                 '--channel',
                 '-c',
@@ -56,7 +54,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         $key        = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $output->writeln('<info>'.$this->translator->trans('mautic.campaign.command.process.messages').'</info>');
@@ -73,6 +71,8 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Process sending of messages queue.';
 }

@@ -9,25 +9,17 @@ use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
 class DoctrineEventsSubscriber implements EventSubscriber
 {
-    /**
-     * @var string
-     */
-    private $tablePrefix;
-
-    /**
-     * @var array
-     */
-    private $deprecatedEntityTables = [];
+    private array $deprecatedEntityTables = [];
 
     /**
      * @param string $tablePrefix
      */
-    public function __construct($tablePrefix)
-    {
-        $this->tablePrefix = $tablePrefix;
+    public function __construct(
+        private $tablePrefix
+    ) {
     }
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             'loadClassMetadata',
@@ -35,9 +27,9 @@ class DoctrineEventsSubscriber implements EventSubscriber
         ];
     }
 
-    public function loadClassMetadata(LoadClassMetadataEventArgs $args)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
     {
-        //in the installer
+        // in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
             return;
         } elseif (empty($this->tablePrefix)) {
@@ -52,8 +44,8 @@ class DoctrineEventsSubscriber implements EventSubscriber
             return;
         }
 
-        if (false !== strpos($classMetadata->namespace, 'Mautic')) {
-            //if in the installer, use the prefix set by it rather than what is cached
+        if (str_contains($classMetadata->namespace, 'Mautic')) {
+            // if in the installer, use the prefix set by it rather than what is cached
 
             // Prefix indexes
             $uniqueConstraints = [];
@@ -115,7 +107,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
         }
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema = $args->getSchema();
         $tables = $schema->getTables();

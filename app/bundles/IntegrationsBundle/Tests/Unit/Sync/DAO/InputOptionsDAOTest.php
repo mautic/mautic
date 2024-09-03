@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
@@ -70,8 +68,8 @@ class InputOptionsDAOTest extends TestCase
     {
         $mauticObjectIds      = new ObjectIdsDAO();
         $integrationObjectIds = new ObjectIdsDAO();
-        $start                = new DateTimeImmutable('2019-09-12T12:01:20', new DateTimeZone('UTC'));
-        $end                  = new DateTimeImmutable('2019-10-12T12:01:20', new DateTimeZone('UTC'));
+        $start                = new \DateTimeImmutable('2019-09-12T12:01:20', new \DateTimeZone('UTC'));
+        $end                  = new \DateTimeImmutable('2019-10-12T12:01:20', new \DateTimeZone('UTC'));
         $options              = ['custom1' => 1, 'custom2' => 2];
         $inputOptionsDAO      = new InputOptionsDAO(
             [

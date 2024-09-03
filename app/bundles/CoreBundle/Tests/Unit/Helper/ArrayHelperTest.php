@@ -54,9 +54,9 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return \Generator<mixed[]>
      */
-    public function removeEmptyValuesProvider(): \Generator
+    public static function removeEmptyValuesProvider(): \Generator
     {
-        $object = new \StdClass();
+        $object = new \stdClass();
         yield [[null], []];
         yield [[], []];
         yield [[123], [123]];

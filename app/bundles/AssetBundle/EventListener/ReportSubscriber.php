@@ -14,28 +14,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_ASSET          = 'assets';
+
     public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var DownloadRepository
-     */
-    private $downloadRepository;
-
-    public function __construct(CompanyReportData $companyReportData, DownloadRepository $downloadRepository)
-    {
-        $this->companyReportData  = $companyReportData;
-        $this->downloadRepository = $downloadRepository;
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private DownloadRepository $downloadRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -47,7 +35,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_ASSET, self::CONTEXT_ASSET_DOWNLOAD])) {
             return;
@@ -123,6 +111,26 @@ class ReportSubscriber implements EventSubscriberInterface
                     'label' => 'mautic.report.field.source_id',
                     'type'  => 'int',
                 ],
+                $downloadPrefix.'utm_campaign' => [
+                    'label' => 'mautic.report.field.utm_campaign',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_content' => [
+                    'label' => 'mautic.report.field.utm_content',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_medium' => [
+                    'label' => 'mautic.report.field.utm_medium',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_source' => [
+                    'label' => 'mautic.report.field.utm_source',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_term' => [
+                    'label' => 'mautic.report.field.utm_term',
+                    'type'  => 'string',
+                ],
             ];
 
             $companyColumns = $this->companyReportData->getCompanyData();
@@ -155,7 +163,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_ASSET, self::CONTEXT_ASSET_DOWNLOAD])) {
             return;
@@ -191,7 +199,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext(self::CONTEXT_ASSET_DOWNLOAD)) {
@@ -225,7 +233,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-download';
+                    $graphData['iconClass'] = 'ri-download-line';
                     $graphData['link']      = 'mautic_asset_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -236,7 +244,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-download';
+                    $graphData['iconClass'] = 'ri-download-line';
                     $graphData['link']      = 'mautic_asset_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -245,7 +253,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-globe';
+                    $graphData['iconClass'] = 'ri-earth-line';
                     $event->setGraph($g, $graphData);
                     break;
             }

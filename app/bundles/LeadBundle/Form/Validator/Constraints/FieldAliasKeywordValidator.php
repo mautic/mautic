@@ -22,46 +22,24 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         'company_id',
     ];
 
-    private ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var FieldAliasHelper
-     */
-    private $aliasHelper;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator, ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
-    {
-        $this->listModel                      = $listModel;
-        $this->aliasHelper                    = $aliasHelper;
-        $this->em                             = $em;
-        $this->translator                     = $translator;
-        $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
+    public function __construct(
+        private ListModel $listModel,
+        private FieldAliasHelper $aliasHelper,
+        private EntityManager $em,
+        private TranslatorInterface $translator,
+        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary
+    ) {
     }
 
     /**
      * @param LeadField $field
      */
-    public function validate($field, Constraint $constraint)
+    public function validate($field, Constraint $constraint): void
     {
         $oldValue = $this->em->getUnitOfWork()->getOriginalEntityData($field);
         $this->aliasHelper->makeAliasUnique($field);
 
-        //If empty it's a new object else it's an edit
+        // If empty it's a new object else it's an edit
         if (empty($oldValue) || (!empty($oldValue) && is_array($oldValue) && $oldValue['alias'] != $field->getAlias())) {
             if (in_array($field->getAlias(), self::RESTRICTED_ALIASES)) {
                 $this->context->addViolation(

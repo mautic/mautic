@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
@@ -74,7 +78,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -107,7 +111,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException should not have been thrown');
         }
     }
@@ -173,7 +177,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -215,7 +219,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -231,12 +235,12 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing E\\\'lse\' and BillingCountry =  \'Some\\\\Where E\\\'lse\' and BillingCity =  \'Some\\\\Where E\\\'lse\' and BillingState =  \'Some\\\\Where E\\\'lse\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
@@ -258,13 +262,13 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that a backslash and an html entity of single quote are escaped for SF queries
      *
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue
      */
-    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly()
+    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -280,12 +284,12 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing\\\' E\\\'lse\' and BillingCountry =  \'Some\\\\Where\\\' E\\\'lse\' and BillingCity =  \'Some\\\\Where\\\' E\\\'lse\' and BillingState =  \'Some\\\\Where\\\' E\\\'lse\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
@@ -311,7 +315,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -325,17 +329,24 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             );
 
         $integration->expects($this->exactly(1))
+            ->method('getFieldsForQuery')
+            ->willReturn([]);
+
+        $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Contact where email = \'con\\\\tact\\\'email@email.com\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
+
+        $integration->method('getFieldsForQuery')
+            ->willReturn([]);
 
         $api = new SalesforceApi($integration);
 
@@ -353,7 +364,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -367,17 +378,24 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             );
 
         $integration->expects($this->exactly(1))
+            ->method('getFieldsForQuery')
+            ->willReturn([]);
+
+        $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Lead where email = \'con\\\\tact\\\'email@email.com\' and ConvertedContactId = NULL',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
+
+        $integration->method('getFieldsForQuery')
+            ->willReturn([]);
 
         $api = new SalesforceApi($integration);
 
@@ -386,5 +404,143 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 'Email' => 'con\\tact\'email@email.com',
             ],
         ]);
+    }
+
+    public function testHandleDeletesGracefullyWithHasOptedOutOfEmailAsMissingField(): void
+    {
+        /**
+         * @phpstan-ignore-next-line
+         */
+        $cache = $this->createMock(CacheStorageHelper::class);
+
+        $cache
+            ->method('get')
+            ->withAnyParameters()
+            ->willReturn('2019-05-22 19:36:30');
+
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'mergeConfigToFeatureSettings',
+                'makeRequest',
+                'getQueryUrl',
+                'getIntegrationSettings',
+                'getFieldsForQuery',
+                'getApiUrl',
+                'getCache',
+                'getTranslator',
+                'upsertUnreadAdminsNotification',
+            ])
+            ->getMock();
+
+        $integration
+            ->expects($this->atLeastOnce())
+            ->method('getCache')
+            ->willReturn($cache);
+
+        $integration->method('getFieldsForQuery')
+            ->with('Lead')
+            ->willReturn(['firstname', 'lastname', 'HasOptedOutOfEmail']);
+
+        $translator = $this->createMock(TranslatorInterface::class);
+
+        $integration->method('getTranslator')->willReturn($translator);
+
+        $this->expectException(ApiErrorException::class);
+        $integration->expects($this->atLeastOnce())
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'errorCode' => 'FATAL_ERROR',
+                        'message'   => "ERROR at Row1\nNo such column 'HasOptedOutOfEmail' on entity 'Lead'",
+                    ],
+                ]
+            );
+
+        $params['start']    = '2019-05-22 19:36:30';
+        $params['end']      = '2030-05-22 19:36:30';
+
+        $api = new SalesforceApi($integration);
+
+        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
+
+        $api->getLeads($params, 'Lead');
+    }
+
+    public function testHandleDeletesGracefully(): void
+    {
+        /**
+         * @phpstan-ignore-next-line
+         */
+        $cache = $this->createMock(CacheStorageHelper::class);
+
+        $cache
+            ->method('get')
+            ->withAnyParameters()
+            ->willReturn('2019-05-22 19:36:30');
+
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'mergeConfigToFeatureSettings',
+                'makeRequest',
+                'getQueryUrl',
+                'getIntegrationSettings',
+                'getFieldsForQuery',
+                'getApiUrl',
+                'getCache',
+                'getTranslator',
+                'upsertUnreadAdminsNotification',
+                'getEntityManager',
+            ])
+            ->getMock();
+
+        $integration
+            ->expects($this->atLeastOnce())
+            ->method('getCache')
+            ->willReturn($cache);
+
+        $integration->method('getFieldsForQuery')
+            ->with('Lead')
+            ->willReturn(['firstname', 'lastname', 'extraField']);
+
+        $integration->expects($this->never())->method('upsertUnreadAdminsNotification');
+
+        $entityManager = $this
+            ->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entity = $this
+            ->getMockBuilder(Integration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getFeatureSettings', 'setFeatureSettings'])
+            ->getMock();
+
+        $integration->method('getEntityManager')->willReturn($entityManager);
+        $integration->method('getIntegrationSettings')->willReturn($entity);
+        $entity->method('getFeatureSettings')->willReturn(['leadFields' => ['extraField__Lead' => '']]);
+
+        $this->expectException(ApiErrorException::class);
+        $integration->expects($this->atLeastOnce())
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'errorCode' => 'FATAL_ERROR',
+                        'message'   => "ERROR at Row1\nNo such column 'extraField' on entity 'Lead'",
+                    ],
+                ]
+            );
+
+        $params['start']    = '2019-05-22 19:36:30';
+        $params['end']      = '2030-05-22 19:36:30';
+
+        $api = new SalesforceApi($integration);
+
+        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
+
+        $api->getLeads($params, 'Lead');
     }
 }

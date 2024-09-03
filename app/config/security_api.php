@@ -9,7 +9,7 @@ $container->loadFromExtension('fos_oauth_server', [
     'service'             => [
         'user_provider' => 'mautic.user.provider',
         'options'       => [
-            //'supported_scopes' => 'user'
+            // 'supported_scopes' => 'user'
             'access_token_lifetime'  => '%env(int:MAUTIC_API_OAUTH2_ACCESS_TOKEN_LIFETIME)%',
             'refresh_token_lifetime' => '%env(int:MAUTIC_API_OAUTH2_REFRESH_TOKEN_LIFETIME)%',
         ],

@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Tag as BaseTag;
 
 class Tag extends BaseTag
 {
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('lead_tags')

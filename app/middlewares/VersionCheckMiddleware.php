@@ -43,7 +43,7 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
      *
      * {@inheritdoc}
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true)
     {
         // Are we running the minimum version?
         if (version_compare(PHP_VERSION, $this->minimumPHPVersion, 'lt')) {
@@ -58,9 +58,6 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
         return $this->app->handle($request, $type, $catch);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

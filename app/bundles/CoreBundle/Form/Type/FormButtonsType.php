@@ -11,14 +11,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class FormButtonsType.
+ * @extends AbstractType<mixed>
  */
 class FormButtonsType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($options['pre_extra_buttons'] as $btn) {
             $type = (empty($btn['type'])) ? ButtonType::class : SubmitType::class;
@@ -99,27 +96,24 @@ class FormButtonsType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
                 'apply_text'         => 'mautic.core.form.apply',
-                'apply_icon'         => 'fa fa-check text-success',
+                'apply_icon'         => 'ri-check-line',
                 'apply_class'        => 'btn btn-default btn-apply',
                 'apply_onclick'      => false,
                 'apply_attr'         => [],
                 'apply_type'         => SubmitType::class,
                 'save_text'          => 'mautic.core.form.saveandclose',
-                'save_icon'          => 'fa fa-save text-success',
+                'save_icon'          => 'ri-save-line',
                 'save_class'         => 'btn btn-default btn-save',
                 'save_onclick'       => false,
                 'save_attr'          => [],
                 'save_type'          => SubmitType::class,
                 'cancel_text'        => 'mautic.core.form.cancel',
-                'cancel_icon'        => 'fa fa-times text-danger',
+                'cancel_icon'        => 'ri-close-line',
                 'cancel_class'       => 'btn btn-default btn-cancel',
                 'cancel_onclick'     => false,
                 'cancel_attr'        => [],
@@ -134,10 +128,7 @@ class FormButtonsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['containerClass'] = $options['container_class'];
     }

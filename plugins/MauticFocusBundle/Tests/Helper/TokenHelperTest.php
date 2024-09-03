@@ -17,22 +17,19 @@ class TokenHelperTest extends TestCase
     /**
      * @var FocusModel|MockObject
      */
-    private $model;
+    private MockObject $model;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private $router;
+    private MockObject $router;
 
     /**
      * @var CorePermissions|MockObject
      */
-    private $security;
+    private MockObject $security;
 
-    /**
-     * @var TokenHelper
-     */
-    private $helper;
+    private TokenHelper $helper;
 
     protected function setUp(): void
     {
@@ -96,7 +93,7 @@ class TokenHelperTest extends TestCase
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
             ->with(
-            'focus:items:viewown',
+                'focus:items:viewown',
                 'focus:items:viewother',
                 $focusItem->getCreatedBy()
             )

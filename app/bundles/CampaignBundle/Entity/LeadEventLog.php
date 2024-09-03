@@ -10,18 +10,20 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
 class LeadEventLog implements ChannelInterface
 {
+    public const TABLE_NAME = 'campaign_lead_event_log';
+
     /**
-     * @var int|null
+     * @var string|null
      */
     private $id;
 
     /**
-     * @var Event|null
+     * @var Event
      */
     private $event;
 
     /**
-     * @var LeadEntity|null
+     * @var LeadEntity
      */
     private $lead;
 
@@ -61,7 +63,7 @@ class LeadEventLog implements ChannelInterface
     private $metadata = [];
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $nonActionPathTaken = false;
 
@@ -97,12 +99,12 @@ class LeadEventLog implements ChannelInterface
      */
     private $rescheduleInterval;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaign_lead_event_log')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadEventLogRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(LeadEventLogRepository::class)
             ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
@@ -117,7 +119,7 @@ class LeadEventLog implements ChannelInterface
 
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('log')
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('event_id', 'id', false, false)
             ->build();
 
         $builder->addLead(false, 'CASCADE');
@@ -170,7 +172,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaignEventLog')
             ->addProperties(
@@ -208,12 +210,9 @@ class LeadEventLog implements ChannelInterface
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -419,7 +418,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @param mixed[] $metadata
      */
-    public function appendToMetadata($metadata)
+    public function appendToMetadata($metadata): void
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline BC for <2.14
@@ -456,14 +455,10 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param string $channel
-     *
-     * @return LeadEventLog|$this
      */
-    public function setChannel($channel)
+    public function setChannel($channel): void
     {
         $this->channel = $channel;
-
-        return $this;
     }
 
     /**
@@ -476,14 +471,10 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param int|null $channelId
-     *
-     * @return LeadEventLog
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): void
     {
         $this->channelId = $channelId;
-
-        return $this;
     }
 
     /**
@@ -524,20 +515,14 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFailed()
+    public function isFailed(): bool
     {
         $log = $this->getFailedLog();
 
         return !empty($log);
     }
 
-    /**
-     * @return bool
-     */
-    public function isSuccess()
+    public function isSuccess(): bool
     {
         return !$this->isFailed();
     }

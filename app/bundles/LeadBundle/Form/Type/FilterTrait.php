@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -26,15 +25,15 @@ trait FilterTrait
      */
     protected $connection;
 
-    public function setConnection(Connection $connection)
+    public function setConnection(Connection $connection): void
     {
         $this->connection = $connection;
     }
 
     /**
-     * @param $eventName
+     * @param string $eventName
      */
-    public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
+    public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null): void
     {
         $data    = $event->getData();
         $form    = $event->getForm();
@@ -52,7 +51,7 @@ trait FilterTrait
         $attr        = ['class' => 'form-control filter-value'];
         $displayType = HiddenType::class;
         $displayAttr = [];
-        $operator    = isset($data['operator']) ? $data['operator'] : '';
+        $operator    = $data['operator'] ?? '';
         $field       = [];
 
         if (isset($options['fields']['behaviors'][$fieldName])) {
@@ -88,7 +87,7 @@ trait FilterTrait
                 }
 
                 $customOptions['choices']                   = $options['lists'];
-                $customOptions['multiple']                  = true;
+                $customOptions['multiple']                  = in_array($data['operator'], ['in', '!in']);
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;
                 break;
@@ -206,7 +205,7 @@ trait FilterTrait
                 $type                                       = ChoiceType::class;
                 $customOptions['choices']                   = $options[$choiceKey];
                 $customOptions['choice_translation_domain'] = false;
-                $customOptions['multiple']                  = (in_array($operator, ['in', '!in']));
+                $customOptions['multiple']                  = in_array($operator, ['in', '!in']);
 
                 if ($customOptions['multiple']) {
                     array_unshift($customOptions['choices'], ['' => '']);
@@ -231,9 +230,9 @@ trait FilterTrait
                         'class'                => 'form-control',
                         'data-toggle'          => 'field-lookup',
                         'data-target'          => $data['field'],
-                        'data-action'          => isset($field['properties']['data-action']) ? $field['properties']['data-action'] : 'lead:fieldList',
-                        'data-lookup-callback' => isset($field['properties']['data-lookup-callback']) ? $field['properties']['data-lookup-callback'] : 'updateLookupListFilter',
-                        'data-callback'        => isset($field['properties']['callback']) ? $field['properties']['callback'] : 'activateFieldTypeahead',
+                        'data-action'          => $field['properties']['data-action'] ?? 'lead:fieldList',
+                        'data-lookup-callback' => $field['properties']['data-lookup-callback'] ?? 'updateLookupListFilter',
+                        'data-callback'        => $field['properties']['callback'] ?? 'activateFieldTypeahead',
                         'placeholder'          => $translator->trans(
                             'mautic.lead.list.form.filtervalue'
                         ),
@@ -267,14 +266,9 @@ trait FilterTrait
                 $choices = [];
                 if (!empty($field['properties']['list'])) {
                     $list    = $field['properties']['list'];
-                    $choices =
-                        ArrayHelper::flipArray(
-                            ('boolean' === $fieldType)
-                                ?
-                                FormFieldHelper::parseBooleanList($list)
-                                :
-                                FormFieldHelper::parseList($list)
-                        );
+                    $choices = ('boolean' === $fieldType)
+                        ? FormFieldHelper::parseBooleanList($list)
+                        : FormFieldHelper::parseList($list);
                 }
 
                 if ('select' === $fieldType) {
@@ -287,13 +281,13 @@ trait FilterTrait
                 $customOptions['choices']                   = $choices;
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;
-            break;
+                break;
             case 'lookup':
                 $attr = array_merge(
                     $attr,
                     [
                         'data-toggle' => 'field-lookup',
-                        'data-target' => isset($data['field']) ? $data['field'] : '',
+                        'data-target' => $data['field'] ?? '',
                         'data-action' => 'lead:fieldList',
                         'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
                     ]
@@ -320,7 +314,7 @@ trait FilterTrait
                 // Let's add a custom valdiator to test the regex
                 $customOptions['constraints'][] =
                     new Callback(
-                        function ($regex, ExecutionContextInterface $context) {
+                        function ($regex, ExecutionContextInterface $context): void {
                             // Let's test the regex's syntax by making a fake query
                             try {
                                 $qb = $this->connection->createQueryBuilder();
@@ -329,8 +323,8 @@ trait FilterTrait
                                     ->where('l.id REGEXP :regex')
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
-                                $qb->execute()->fetchAllAssociative();
-                            } catch (\Exception $exception) {
+                                $qb->executeQuery()->fetchAllAssociative();
+                            } catch (\Exception) {
                                 $context->buildViolation('mautic.core.regex.invalid')->addViolation();
                             }
                         }
@@ -353,13 +347,17 @@ trait FilterTrait
                 ]
             );
         } else {
-            if (!empty($customOptions['constraints'])) {
-                foreach ($customOptions['constraints'] as $i => $constraint) {
-                    if ('NotBlank' === get_class($constraint)) {
-                        array_splice($customOptions['constraints'], $i, 1);
-                    }
+            foreach ($customOptions['constraints'] as $i => $constraint) {
+                if (NotBlank::class === $constraint::class) {
+                    array_splice($customOptions['constraints'], $i, 1);
                 }
             }
+
+            if (in_array($data['operator'], ['empty', '!empty'])) {
+                // @see Symfony\Component\Form\Extension\Core\Type\ChoiceType::configureOptions
+                $data['filter'] = null;
+            }
+
             $form->add(
                 'filter',
                 $type,
@@ -399,7 +397,7 @@ trait FilterTrait
             ]
         );
 
-        if (FormEvents::PRE_SUBMIT == $eventName) {
+        if (FormEvents::PRE_SUBMIT === $eventName) {
             $event->setData($data);
         }
     }

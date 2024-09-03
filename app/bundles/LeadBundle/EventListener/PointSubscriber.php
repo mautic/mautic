@@ -12,33 +12,29 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    public function __construct(LeadModel $leadModel)
-    {
-        $this->leadModel = $leadModel;
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            PointEvents::TRIGGER_ON_BUILD         => ['onTriggerBuild', 0],
-            PointEvents::TRIGGER_ON_EVENT_EXECUTE => ['onTriggerExecute', 0],
+            PointEvents::TRIGGER_ON_BUILD                => ['onTriggerBuild', 0],
+            PointEvents::TRIGGER_ON_EVENT_EXECUTE        => ['onTriggerExecute', 0],
+            PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
         ];
     }
 
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $event->addEvent(
             'lead.changelists',
             [
-                'group'    => 'mautic.lead.point.trigger',
-                'label'    => 'mautic.lead.point.trigger.changelists',
-                'callback' => ['\\Mautic\\LeadBundle\\Helper\\PointEventHelper', 'changeLists'],
-                'formType' => ListActionType::class,
+                'group'       => 'mautic.lead.point.trigger',
+                'label'       => 'mautic.lead.point.trigger.changelists',
+                'eventName'   => PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE,
+                'formType'    => ListActionType::class,
             ]
         );
 
@@ -63,6 +59,25 @@ class PointSubscriber implements EventSubscriberInterface
         $addTags    = $properties['add_tags'] ?: [];
         $removeTags = $properties['remove_tags'] ?: [];
 
-        $this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags);
+        if ($this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags)) {
+            $event->setSucceded();
+        }
+    }
+
+    public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
+    {
+        $lead = $event->getLead();
+
+        $properties = $event->getTriggerEvent()->getProperties();
+        $addTo      = $properties['addToLists'];
+        $removeFrom = $properties['removeFromLists'];
+
+        if (!empty($addTo)) {
+            $this->leadModel->addToLists($lead, $addTo);
+        }
+
+        if (!empty($removeFrom)) {
+            $this->leadModel->removeFromLists($lead, $removeFrom);
+        }
     }
 }

@@ -33,27 +33,18 @@ class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth2_three_legged';
 
-    /**
-     * @var CredentialsInterface
-     */
-    private $credentials;
+    private ?AuthCredentialsInterface $credentials = null;
 
-    /**
-     * @var ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|ConfigTokenFactoryInterface
-     */
-    private $config;
+    private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|null $config = null;
 
-    /**
-     * @var Client
-     */
-    private $reAuthClient;
+    private ?Client $reAuthClient = null;
 
     /**
      * Cache of initialized clients.
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
     public function getAuthType(): string
     {
@@ -73,19 +64,24 @@ class HttpFactory implements AuthProviderInterface
         }
 
         // Return cached initialized client if there is one.
-        if (!empty($this->initializedClients[$credentials->getClientId()])) {
+        if (isset($this->initializedClients[$credentials->getClientId()])) {
             return $this->initializedClients[$credentials->getClientId()];
         }
 
         $this->credentials = $credentials;
         $this->config      = $config;
 
-        $this->initializedClients[$credentials->getClientId()] = new Client(
-            [
-                'handler' => $this->getStackHandler(),
-                'auth'    => 'oauth',
-            ]
-        );
+        $options = [
+            'handler' => $this->getStackHandler(),
+            'auth'    => 'oauth',
+        ];
+
+        // Set up base URI if it's configured.
+        if (method_exists($credentials, 'getBaseUri') && ($baseUri = $credentials->getBaseUri()) !== null) {
+            $options['base_uri'] = $baseUri;
+        }
+
+        $this->initializedClients[$credentials->getClientId()] = new Client($options);
 
         return $this->initializedClients[$credentials->getClientId()];
     }
@@ -132,11 +128,9 @@ class HttpFactory implements AuthProviderInterface
             return $this->reAuthClient;
         }
 
-        $this->reAuthClient = new Client(
-            [
-                'base_uri' => $this->credentials->getTokenUrl(),
-            ]
-        );
+        $this->reAuthClient = new Client([
+            'base_uri' => $this->credentials->getTokenUrl(),
+        ]);
 
         return $this->reAuthClient;
     }
@@ -150,11 +144,11 @@ class HttpFactory implements AuthProviderInterface
         ];
 
         if ($this->credentials instanceof ScopeInterface) {
-            $config['scope']  = $this->credentials->getScope();
+            $config['scope'] = $this->credentials->getScope();
         }
 
         if ($this->credentials instanceof RedirectUriInterface) {
-            $config['redirect_uri']  = $this->credentials->getRedirectUri();
+            $config['redirect_uri'] = $this->credentials->getRedirectUri();
         }
 
         if ($this->credentials instanceof CodeInterface) {

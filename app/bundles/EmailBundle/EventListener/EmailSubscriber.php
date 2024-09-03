@@ -2,76 +2,48 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
-use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    public const PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
+    public const PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
+    public const PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
+    public const PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private const RETRY_COUNT = 3;
 
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        EmailModel $emailModel,
-        TranslatorInterface $translator,
-        EntityManager $entityManager
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private EmailModel $emailModel,
+        private TranslatorInterface $translator
     ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->emailModel     = $emailModel;
-        $this->translator     = $translator;
-        $this->entityManager  = $entityManager;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
+            EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
+            EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
-            EmailEvents::ON_TRANSPORT_WEBHOOK => ['onTransportWebhook', -255],
         ];
     }
 
     /**
      * Add an entry to the audit log.
      */
-    public function onEmailPostSave(Events\EmailEvent $event)
+    public function onEmailPostSave(Events\EmailEvent $event): void
     {
         $email = $event->getEmail();
         if ($details = $event->getChanges()) {
@@ -88,9 +60,29 @@ class EmailSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Add preheader text to email body.
+     */
+    public function onEmailSendAddPreheaderText(Events\EmailSendEvent $event): void
+    {
+        $email = $event->getEmail();
+        $html  = $event->getContent();
+
+        if ($email && $email->getPreheaderText()) {
+            $preheaderTextElement = self::PREHEADER_HTML_ELEMENT_BEFORE.$email->getPreheaderText().self::PREHEADER_HTML_ELEMENT_AFTER;
+            $preheaderExists      = preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $html, $preheaderMatches);
+            if ($preheaderExists) {
+                $html = preg_replace(self::PREHEADER_HTML_REPLACE_PATTERN, $preheaderTextElement, $html);
+            } elseif (preg_match('/(<body[^\>]*>)/i', $html, $contentMatches)) {
+                $html = str_ireplace($contentMatches[0], $contentMatches[0]."\n".$preheaderTextElement, $html);
+            }
+            $event->setContent($html);
+        }
+    }
+
+    /**
      * Add a delete entry to the audit log.
      */
-    public function onEmailDelete(Events\EmailEvent $event)
+    public function onEmailDelete(Events\EmailEvent $event): void
     {
         $email = $event->getEmail();
         $log   = [
@@ -107,12 +99,13 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Process if an email has failed.
      */
-    public function onEmailFailed(Events\QueueEmailEvent $event)
+    public function onEmailFailed(Events\QueueEmailEvent $event): void
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
 
             if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
@@ -126,39 +119,33 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Process if an email is resent.
      */
-    public function onEmailResend(Events\QueueEmailEvent $event)
+    public function onEmailResend(Events\QueueEmailEvent $event): void
     {
         $message = $event->getMessage();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
-            if (null !== $stat) {
-                $stat->upRetryCount();
-
-                $retries = $stat->getRetryCount();
-                if ($retries > 3) {
-                    //tried too many times so just fail
-                    $reason = $this->translator->trans('mautic.email.dnc.retries', [
-                        '%subject%' => EmojiHelper::toShort($message->getSubject()),
-                    ]);
-                    $this->emailModel->setDoNotContact($stat, $reason);
-                } else {
-                    //set it to try again
-                    $event->tryAgain();
-                }
-
-                $this->entityManager->persist($stat);
-                $this->entityManager->flush();
-            }
+        if (empty($message->getLeadIdHash())) {
+            return;
         }
-    }
 
-    /**
-     * This is default handling of email transport webhook requests.
-     * For custom handling (queues) for specific transport use the same listener with priority higher than -255.
-     */
-    public function onTransportWebhook(TransportWebhookEvent $event)
-    {
-        $event->getTransport()->processCallbackRequest($event->getRequest());
+        $stat = $this->emailModel->getEmailStatus($message->getLeadIdHash());
+
+        if (!$stat) {
+            return;
+        }
+
+        $stat->upRetryCount();
+
+        if ($stat->getRetryCount() > self::RETRY_COUNT) {
+            // tried too many times so just fail
+            $reason = $this->translator->trans('mautic.email.dnc.retries', [
+                '%subject%' => EmojiHelper::toShort($message->getSubject()),
+            ]);
+            $this->emailModel->setDoNotContact($stat, $reason);
+        } else {
+            // set it to try again
+            $event->tryAgain();
+        }
+
+        $this->emailModel->saveEmailStat($stat);
     }
 }

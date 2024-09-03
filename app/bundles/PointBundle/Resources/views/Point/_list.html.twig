@@ -1,6 +1,6 @@
 {% if items|length > 0 %}
     <div class="table-responsive page-list">
-        <table class="table table-hover table-striped table-bordered point-list" id="pointTable">
+        <table class="table table-hover point-list" id="pointTable">
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -25,6 +25,13 @@
                         'orderBy': 'cat.title',
                         'text': 'mautic.core.category',
                         'class': 'visible-md visible-lg col-point-category',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'point',
+                        'orderBy': 'pl.name',
+                        'text': 'mautic.point.thead.group',
+                        'class': 'visible-md visible-lg col-point-group',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -78,11 +85,13 @@
                     <td class="visible-md visible-lg">
                         {% set category = item.category %}
                         {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : 'inherit' %}
-                        <span style="white-space: nowrap;">
-                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
-                          <span>{{ catName }}</span>
-                        </span>
+                        {% set color = category ? '#' ~ category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set group = item.group %}
+                        {% set groupName = group.name|default('mautic.point.group.form.nogroup'|trans) %}
+                        {{ groupName }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.delta }}</td>
                     <td>{{ actions[item.type].label|default('')|trans }}</td>

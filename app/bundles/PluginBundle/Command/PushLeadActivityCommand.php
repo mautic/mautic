@@ -11,15 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PushLeadActivityCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private IntegrationHelper $integrationHelper;
-
-    public function __construct(TranslatorInterface $translator, IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private IntegrationHelper $integrationHelper
+    ) {
         parent::__construct();
-
-        $this->translator        = $translator;
-        $this->integrationHelper = $integrationHelper;
     }
 
     protected function configure()
@@ -31,7 +27,6 @@ class PushLeadActivityCommand extends Command
                     'mautic:integration:pushactivity',
                 ]
             )
-            ->setDescription('Push lead activity to integration.')
             ->addOption(
                 '--integration',
                 '-i',
@@ -75,7 +70,7 @@ class PushLeadActivityCommand extends Command
             $endDate = date('c');
         }
 
-        if ($integration && $startDate && $endDate) {
+        if ($integration) {
             $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
 
             if (null !== $integrationObject && method_exists($integrationObject, 'pushLeadActivity')) {
@@ -90,6 +85,8 @@ class PushLeadActivityCommand extends Command
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Push lead activity to integration.';
 }

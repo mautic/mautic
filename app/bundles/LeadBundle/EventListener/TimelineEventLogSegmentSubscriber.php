@@ -18,35 +18,17 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * TimelineEventLogSegmentSubscriber constructor.
-     */
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
-        UserHelper $userHelper,
+        private UserHelper $userHelper,
         Translator $translator,
-        EntityManagerInterface $em
+        private EntityManagerInterface $em
     ) {
         $this->eventLogRepository = $eventLogRepository;
-        $this->userHelper         = $userHelper;
         $this->translator         = $translator;
-        $this->em                 = $em;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_LIST_CHANGE       => 'onChange',
@@ -55,7 +37,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onChange(ListChangeEvent $event)
+    public function onChange(ListChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
             return;
@@ -64,23 +46,24 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             [$contact],
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,
             'segment_membership',
             'mautic.lead.timeline.segment_membership',
-            'fa-pie-chart',
+            'ri-pie-chart-line',
             'lead',
             'segment'
         );
     }
 
-    public function onBatchChange(ListChangeEvent $event)
+    public function onBatchChange(ListChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
             return;
@@ -89,14 +72,12 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             $contacts,
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
-    /**
-     * @param $action
-     */
-    private function writeEntries(array $contacts, LeadList $segment, $action)
+    private function writeEntries(array $contacts, LeadList $segment, $action, \DateTime $date = null): void
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];
@@ -105,7 +86,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         foreach ($contacts as $key => $contact) {
             if (!$contact instanceof Lead) {
                 $id                      = is_array($contact) ? $contact['id'] : $contact;
-                $contact                 = $this->em->getReference('MauticLeadBundle:Lead', $id);
+                $contact                 = $this->em->getReference(Lead::class, $id);
                 $contacts[$key]          = $contact;
                 $detachContactReferences = true;
             }
@@ -124,11 +105,15 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
                     ]
                 );
 
+            if ($date) {
+                $log->setDateAdded($date);
+            }
+
             $logs[] = $log;
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
 
         if ($detachContactReferences) {
             foreach ($contacts as $contact) {

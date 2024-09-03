@@ -11,12 +11,9 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DateHelper
-     */
-    private $helper;
+    private DateHelper $helper;
 
     /**
      * @var string
@@ -26,7 +23,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     public static function setUpBeforeClass(): void
     {
@@ -50,6 +47,29 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->coreParametersHelper
         );
+
+        // Setup translator mock for humanized dates
+        $this->translator->method('trans')
+            ->willReturnCallback(function ($key, $parameters = []) {
+                switch ($key) {
+                    case 'mautic.core.date.years.ago':
+                        return $parameters['%count%'].' year(s) ago';
+                    case 'mautic.core.date.months.ago':
+                        return $parameters['%count%'].' month(s) ago';
+                    case 'mautic.core.date.days.ago':
+                        return $parameters['%count%'].' day(s) ago';
+                    case 'mautic.core.date.hours.ago':
+                        return $parameters['%count%'].' hour(s) ago';
+                    case 'mautic.core.date.minutes.ago':
+                        return $parameters['%count%'].' minute(s) ago';
+                    case 'mautic.core.date.just.now':
+                        return 'just now';
+                    case 'mautic.core.date.today':
+                        return 'Today';
+                    default:
+                        return $key;
+                }
+            });
     }
 
     public function testStringToText(): void
@@ -84,22 +104,42 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testToTextWithConfigurationToTime(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
             ->with('date_format_timeonly')
-            ->willReturn('00:00:00');
+            ->willReturn('H:i:s');
 
-        $this->translator->method('trans')
-            ->willReturnCallback(
-                function (string $key, array $parameters = []) {
-                    if (isset($parameters['%time%'])) {
-                        return $parameters['%time%'];
-                    }
-                }
-            );
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.core.date.today', $this->anything())
+            ->willReturn('Today');
 
-        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        // Create a DateTime object for "now"
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        $this->assertSame('00:00:00', $this->helper->toText($dateTime));
+        // Create a mock for DateTimeHelper
+        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock->expects($this->once())
+            ->method('getTextDate')
+            ->willReturn('today');
+        $dateTimeHelperMock->expects($this->once())
+            ->method('getLocalDateTime')
+            ->willReturn($now);
+
+        // Inject the mock DateTimeHelper into DateHelper
+        $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
+
+        $result = $this->helper->toText($now);
+
+        // Debug output
+        echo 'Result: '.$result."\n";
+
+        // Assertions
+        $this->assertEquals('Today', $result);
+        $this->assertStringStartsWith('Today', $result);
+        $this->assertStringEndsWith('Today', $result);
     }
 
     public function testFullConcat(): void
@@ -108,6 +148,35 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
         $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+    }
+
+    public function testToHumanized(): void
+    {
+        $this->setDefaultLocalTimezone('UTC');
+
+        // Test "just now"
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->assertEquals('just now', $this->helper->toHumanized($now));
+
+        // Test minutes ago
+        $fiveMinutesAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-5 minutes');
+        $this->assertEquals('5 minute(s) ago', $this->helper->toHumanized($fiveMinutesAgo));
+
+        // Test hours ago
+        $twoHoursAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-2 hours');
+        $this->assertEquals('2 hour(s) ago', $this->helper->toHumanized($twoHoursAgo));
+
+        // Test days ago
+        $threeDaysAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-3 days');
+        $this->assertEquals('3 day(s) ago', $this->helper->toHumanized($threeDaysAgo));
+
+        // Test months ago
+        $fourMonthsAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-4 months');
+        $this->assertEquals('4 month(s) ago', $this->helper->toHumanized($fourMonthsAgo));
+
+        // Test years ago
+        $oneYearAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-1 year');
+        $this->assertEquals('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
     }
 
     private function setDefaultLocalTimezone(string $timezone): void

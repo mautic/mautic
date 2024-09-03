@@ -11,11 +11,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CampaignLeadSourceType.
+ * @extends AbstractType<mixed>
  */
 class CampaignLeadSourceType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $sourceType    = $options['data']['sourceType'];
         $sourceChoices = $options['source_choices'] ?? [];
@@ -81,10 +81,10 @@ class CampaignLeadSourceType extends AbstractType
         $update = !empty($options['data'][$sourceType]);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
-            $btnIcon  = 'fa fa-pencil';
+            $btnIcon  = 'ri-edit-line';
         } else {
             $btnValue = 'mautic.core.form.add';
-            $btnIcon  = 'fa fa-plus';
+            $btnIcon  = 'ri-add-line';
         }
 
         $builder->add('buttons', FormButtonsType::class, [
@@ -96,7 +96,7 @@ class CampaignLeadSourceType extends AbstractType
         ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['source_choices']);
     }

@@ -43,8 +43,10 @@ return [
             'items' => [
                 'mautic.api.client.menu.index' => [
                     'route'     => 'mautic_client_index',
-                    'iconClass' => 'fa-puzzle-piece',
                     'access'    => 'api:clients:view',
+                    'parent'    => 'mautic.core.integrations',
+                    'iconClass' => 'ri-terminal-box-line',
+                    'priority'  => 17,
                     'checks'    => [
                         'parameters' => [
                             'api_enabled' => true,
@@ -58,12 +60,12 @@ return [
     'services' => [
         'helpers' => [
             'mautic.api.helper.entity_result' => [
-                'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,
+                'class' => Mautic\ApiBundle\Helper\EntityResultHelper::class,
             ],
         ],
         'other' => [
             'mautic.api.oauth.event_listener' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\PreAuthorizationEventListener',
+                'class'     => Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.security',
@@ -84,22 +86,10 @@ return [
                     ],
                 ],
             ],
-            'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
-            'jms_serializer.metadata.annotation_driver'               => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
-            'jms_serializer.metadata.api_metadata_driver'             => [
-                'class' => 'Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver',
-            ],
-            'mautic.validator.oauthcallback' => [
-                'class' => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
+            'fos_oauth_server.security.authentication.listener.class' => Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener::class,
+            'mautic.validator.oauthcallback'                          => [
+                'class' => Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class,
                 'tag'   => 'validator.constraint_validator',
-            ],
-        ],
-        'models' => [
-            'mautic.api.model.client' => [
-                'class'     => 'Mautic\ApiBundle\Model\ClientModel',
-                'arguments' => [
-                    'request_stack',
-                ],
             ],
         ],
     ],

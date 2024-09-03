@@ -11,20 +11,10 @@ use Psr\Log\LoggerInterface;
 
 class DoctrineGeneratedColumnsListener
 {
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    protected $generatedColumnsProvider;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    public function __construct(GeneratedColumnsProviderInterface $generatedColumnsProvider, LoggerInterface $logger)
-    {
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->logger                   = $logger;
+    public function __construct(
+        protected GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        protected LoggerInterface $logger
+    ) {
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args): void
@@ -55,7 +45,7 @@ class DoctrineGeneratedColumnsListener
 
                 $table->addIndex($generatedColumn->getIndexColumns(), $generatedColumn->getIndexName());
             } catch (\Exception $e) {
-                //table doesn't exist or something bad happened so oh well
+                // table doesn't exist or something bad happened so oh well
                 $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
             }
         }

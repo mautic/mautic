@@ -2,6 +2,9 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -9,13 +12,12 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\UserBundle\Entity\User;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,7 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,111 +35,24 @@ class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    protected ModelFactory $modelFactory;
-
-    /**
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    protected Translator $translator;
-
-    private ?RequestStack $requestStack = null;
-
-    /**
-     * Remove this whenever you move all required services to constructor.
-     */
-    protected ?CorePermissions $security = null;
-
-    /**
-     * Remove this whenever you move all required services to constructor.
-     */
-    private ?ExportHelper $exportHelper = null;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
+    protected ?\Mautic\UserBundle\Entity\User $user;
 
     /**
      * @param ModelFactory<object> $modelFactory
-     * @required
      */
-    public function setModelFactory(ModelFactory $modelFactory): void
-    {
-        $this->modelFactory = $modelFactory;
-    }
-
-    public function setUser(User $user)
-    {
-        $this->user = $user;
-    }
-
-    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function setTranslator(Translator $translator)
-    {
-        $this->translator = $translator;
-    }
-
-    public function setFlashBag(FlashBag $flashBag)
-    {
-        $this->flashBag = $flashBag;
-    }
-
-    /**
-     * @required
-     */
-    public function setRequestStack(RequestStack $requestStack): void
-    {
-        $this->requestStack = $requestStack;
-    }
-
-    /**
-     * @required
-     */
-    public function setSecurity(CorePermissions $security): void
-    {
-        $this->security = $security;
-    }
-
-    /**
-     * @required
-     */
-    public function setExportHelper(ExportHelper $exportHelper): void
-    {
-        $this->exportHelper = $exportHelper;
+    public function __construct(
+        protected ManagerRegistry $doctrine,
+        protected MauticFactory $factory,
+        protected ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected Translator $translator,
+        private FlashBag $flashBag,
+        private ?RequestStack $requestStack,
+        protected ?CorePermissions $security
+    ) {
+        $this->user                 = $userHelper->getUser();
     }
 
     protected function getCurrentRequest(): Request
@@ -146,25 +60,16 @@ class CommonController extends AbstractController implements MauticController
         $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
 
         if (null === $request) {
-            throw new RuntimeException('Request is not set.');
+            throw new \RuntimeException('Request is not set.');
         }
 
         return $request;
     }
 
-    public function initialize(ControllerEvent $event)
-    {
-        // the method to initialize controllers
-    }
-
     /**
      * Check if a security level is granted.
-     *
-     * @param $level
-     *
-     * @return bool
      */
-    protected function accessGranted($level)
+    protected function accessGranted($level): bool
     {
         return in_array($level, $this->getPermissions());
     }
@@ -172,10 +77,8 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Override this method in your controller
      * for easy access to the permissions.
-     *
-     * @return array
      */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         return [];
     }
@@ -214,12 +117,12 @@ class CommonController extends AbstractController implements MauticController
      * Determines if ajax content should be returned or direct content (page refresh).
      *
      * @param array $args
-     *
-     * @return JsonResponse|Response
      */
-    public function delegateView($args)
+    public function delegateView($args): Response
     {
         $request = $this->getCurrentRequest();
+        $bundle  = $request->query->get('bundle');
+        $bundle  = $bundle ? strtolower(InputHelper::alphanum($bundle)) : '';
 
         // Used for error handling
         defined('MAUTIC_DELEGATE_VIEW') || define('MAUTIC_DELEGATE_VIEW', 1);
@@ -228,7 +131,7 @@ class CommonController extends AbstractController implements MauticController
             $args = [
                 'contentTemplate' => $args,
                 'passthroughVars' => [
-                    'mauticContent' => strtolower(InputHelper::alphanum($request->query->get('bundle'))),
+                    'mauticContent' => $bundle,
                 ],
             ];
         }
@@ -245,7 +148,7 @@ class CommonController extends AbstractController implements MauticController
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];
             } else {
-                $mauticContent = strtolower(InputHelper::alphanum($request->query->get('bundle')));
+                $mauticContent = $bundle;
             }
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }
@@ -254,11 +157,25 @@ class CommonController extends AbstractController implements MauticController
             return $this->ajaxAction($request, $args);
         }
 
-        $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : [];
+        $parameters = $args['viewParameters'] ?? [];
         $template   = $args['contentTemplate'];
 
-        $code     = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
+        $code     = $args['responseCode'] ?? 200;
         $response = new Response('', $code);
+
+        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
+            $event = $this->dispatcher->dispatch(
+                new CustomTemplateEvent($request, $template, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
+            );
+
+            $template   = $event->getTemplate();
+            $parameters = $event->getVars();
+        }
+
+        $parameters['mauticTemplate'] = $template;
+
+        $parameters['mauticTemplateVars'] = $parameters;
 
         return $this->render($template, $parameters, $response);
     }
@@ -267,9 +184,7 @@ class CommonController extends AbstractController implements MauticController
      * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
      * refresh.
      *
-     * @param $url
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function delegateRedirect($url)
     {
@@ -285,7 +200,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper)
     {
@@ -314,10 +229,9 @@ class CommonController extends AbstractController implements MauticController
         $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_dashboard_index');
         $flashes   = array_key_exists('flashes', $args) ? $args['flashes'] : [];
 
-        //forward the controller by default
+        // forward the controller by default
         $args['forwardController'] = (array_key_exists('forwardController', $args)) ? $args['forwardController'] : true;
 
-        //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
                 $this->addFlashMessage(
@@ -334,12 +248,12 @@ class CommonController extends AbstractController implements MauticController
         }
 
         if (!$request->isXmlHttpRequest() || !empty($args['ignoreAjax'])) {
-            $code = (isset($args['responseCode'])) ? $args['responseCode'] : 302;
+            $code = $args['responseCode'] ?? 302;
 
             return $this->redirect($returnUrl, $code);
         }
 
-        //load by ajax
+        // load by ajax
         return $this->ajaxAction($request, $args);
     }
 
@@ -347,10 +261,8 @@ class CommonController extends AbstractController implements MauticController
      * Generates html for ajax request.
      *
      * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
-     *
-     * @return Response
      */
-    public function ajaxAction(Request $request, $args = [])
+    public function ajaxAction(Request $request, $args = []): Response
     {
         defined('MAUTIC_AJAX_VIEW') || define('MAUTIC_AJAX_VIEW', 1);
 
@@ -367,7 +279,7 @@ class CommonController extends AbstractController implements MauticController
             return new JsonResponse($passthrough);
         }
 
-        //set the route to the returnUrl
+        // set the route to the returnUrl
         if (empty($passthrough['route']) && !empty($args['returnUrl'])) {
             $passthrough['route'] = $args['returnUrl'];
         }
@@ -388,27 +300,27 @@ class CommonController extends AbstractController implements MauticController
                         '_route_params' => $routeParams,
                     ]
                 );
-            } catch (\Exception $e) {
-                //do nothing
+            } catch (\Exception) {
+                // do nothing
             }
 
-            //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
+            // breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
             $request->query->set('overrideRouteUri', $passthrough['route']);
             if ($ajaxRouteName) {
                 if (isset($routeParams['objectAction'])) {
-                    //action urls share same route name so tack on the action to differentiate
+                    // action urls share same route name so tack on the action to differentiate
                     $ajaxRouteName .= "|{$routeParams['objectAction']}";
                 }
                 $request->query->set('overrideRouteName', $ajaxRouteName);
             }
         }
 
-        //Ajax call so respond with json
+        // Ajax call so respond with json
         $newContent = '';
         if ($contentTemplate) {
             if ($forward) {
-                //the content is from another controller action so we must retrieve the response from it instead of
-                //directly parsing the template
+                // the content is from another controller action so we must retrieve the response from it instead of
+                // directly parsing the template
                 $query              = ['ignoreAjax' => true, 'request' => $request, 'subrequest' => true];
                 $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
                 if ($newContentResponse instanceof RedirectResponse) {
@@ -425,21 +337,21 @@ class CommonController extends AbstractController implements MauticController
             }
         }
 
-        //there was a redirect within the controller leading to a double call of this function so just return the content
-        //to prevent newContent from being json
+        // there was a redirect within the controller leading to a double call of this function so just return the content
+        // to prevent newContent from being json
         if ($request->get('ignoreAjax', false)) {
             return new Response($newContent, $code);
         }
 
-        //render flashes
+        // render flashes
         $passthrough['flashes'] = $this->getFlashContent();
 
         if (!defined('MAUTIC_INSTALLER')) {
-            // Prevent error in case installer is loaded via index_dev.php
+            // Prevent error in case installer is loaded via dev environment
             $passthrough['notifications'] = $this->getNotificationContent();
         }
 
-        $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $request->get('tmpl', 'index');
+        $tmpl = $parameters['tmpl'] ?? $request->get('tmpl', 'index');
         if ('index' == $tmpl) {
             $updatedContent = [];
             if (!empty($newContent)) {
@@ -451,7 +363,7 @@ class CommonController extends AbstractController implements MauticController
                 $updatedContent
             );
         } else {
-            //just retrieve the content
+            // just retrieve the content
             $dataArray = array_merge(
                 $passthrough,
                 ['newContent' => $newContent]
@@ -522,7 +434,7 @@ class CommonController extends AbstractController implements MauticController
      * @param bool   $batch Flag if a batch action is being performed
      * @param string $msg   Message that is logged
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
+     * @return JsonResponse|RedirectResponse|array
      *
      * @throws AccessDeniedHttpException
      */
@@ -582,10 +494,8 @@ class CommonController extends AbstractController implements MauticController
      * Returns a json encoded access denied error for modal windows.
      *
      * @param string $msg
-     *
-     * @return JsonResponse
      */
-    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied')
+    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied'): JsonResponse
     {
         return new JsonResponse([
             'error' => $this->translator->trans($msg, [], 'flashes'),
@@ -603,7 +513,7 @@ class CommonController extends AbstractController implements MauticController
 
         $session = $request->getSession();
 
-        if (null === $name) {
+        if (empty($name)) {
             $name = InputHelper::clean($request->query->get('name'));
         }
         $name = 'mautic.'.$name;
@@ -659,12 +569,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders notification info for ajax.
-     *
-     * @param Request $request
-     *
-     * @return array
      */
-    protected function getNotificationContent(Request $request = null)
+    protected function getNotificationContent(Request $request = null): array
     {
         if (null === $request) {
             $request = $this->getCurrentRequest();
@@ -691,15 +597,11 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param           $message
-     * @param null      $type
      * @param bool|true $isRead
-     * @param null      $header
-     * @param null      $iconClass
      *
      * @deprecated Will be removed in Mautic 3.0 as unused.
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null): void
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');
@@ -720,22 +622,21 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * @param array|\Iterator $toExport
-     * @param                 $type
-     * @param                 $filename
      *
      * @return StreamedResponse
      */
-    public function exportResultsAs($toExport, $type, $filename)
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper)
     {
-        $exportHelper = $this->exportHelper;
-
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
 
         $dateFormat = $this->coreParametersHelper->get('date_format_dateonly');
         $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $filename   = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+        $filename   = strtolower($filename.'_'.(new \DateTime())->format($dateFormat).'.'.$type);
+        if (empty($toExport)) {
+            $toExport[] = [$this->translator->trans('mautic.core.noresults.header')];
+        }
 
         return $exportHelper->exportDataAs($toExport, $type, $filename);
     }

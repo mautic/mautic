@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class TriggerEventController.
- */
 class TriggerEventController extends CommonFormController
 {
     /**
@@ -41,10 +38,10 @@ class TriggerEventController extends CommonFormController
             ];
         }
 
-        //ajax only for form fields
-        if (!$eventType ||
-            !$request->isXmlHttpRequest() ||
-            !$this->security->isGranted([
+        // ajax only for form fields
+        if (!$eventType
+            || !$request->isXmlHttpRequest()
+            || !$this->security->isGranted([
                 'point:triggers:edit',
                 'point:triggers:create',
             ], 'MATCH_ONE')
@@ -52,7 +49,7 @@ class TriggerEventController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        //fire the builder event
+        // fire the builder event
         /** @var TriggerModel $pointTriggerModel */
         $pointTriggerModel = $this->getModel('point.trigger');
         \assert($pointTriggerModel instanceof TriggerModel);
@@ -64,22 +61,22 @@ class TriggerEventController extends CommonFormController
         $form->get('triggerId')->setData($triggerId);
         $triggerEvent['settings'] = $events[$eventType];
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
 
-                    //save the properties to session
+                    // save the properties to session
                     $actions            = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
                     $formData           = $form->getData();
                     $triggerEvent       = array_merge($triggerEvent, $formData);
                     $triggerEvent['id'] = $keyId;
                     if (empty($triggerEvent['name'])) {
-                        //set it to the event default
+                        // set it to the event default
                         $triggerEvent['name'] = $this->translator->trans($triggerEvent['settings']['label']);
                     }
                     $actions[$keyId] = $triggerEvent;
@@ -109,7 +106,7 @@ class TriggerEventController extends CommonFormController
         ];
 
         if (!empty($keyId)) {
-            //prevent undefined errors
+            // prevent undefined errors
             $entity       = new TriggerEvent();
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
@@ -126,7 +123,7 @@ class TriggerEventController extends CommonFormController
         }
 
         if ($closeModal) {
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
@@ -164,10 +161,10 @@ class TriggerEventController extends CommonFormController
             $events                   = $pointTriggerModel->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
-            //ajax only for form fields
-            if (!$eventType ||
-                !$request->isXmlHttpRequest() ||
-                !$this->security->isGranted([
+            // ajax only for form fields
+            if (!$eventType
+                || !$request->isXmlHttpRequest()
+                || !$this->security->isGranted([
                     'point:triggers:edit',
                     'point:triggers:create',
                 ], 'MATCH_ONE')
@@ -180,28 +177,29 @@ class TriggerEventController extends CommonFormController
                 'settings' => $triggerEvent['settings'],
             ]);
             $form->get('triggerId')->setData($triggerId);
-            //Check for a submitted form and process it
+            // Check for a submitted form and process it
             if ('POST' == $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
 
-                        //form is valid so process the data
+                        // form is valid so process the data
 
-                        //save the properties to session
+                        // save the properties to session
                         $session  = $request->getSession();
                         $events   = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
+                        /** @var array<mixed> $formData */
                         $formData = $form->getData();
-                        //overwrite with updated data
+                        // overwrite with updated data
                         $triggerEvent = array_merge($events[$objectId], $formData);
                         if (empty($triggerEvent['name'])) {
-                            //set it to the event default
+                            // set it to the event default
                             $triggerEvent['name'] = $this->translator->trans($triggerEvent['settings']['label']);
                         }
                         $events[$objectId] = $triggerEvent;
                         $session->set('mautic.point.'.$triggerId.'.triggerevents.modified', $events);
 
-                        //generate HTML for the field
+                        // generate HTML for the field
                         $keyId = $objectId;
                     }
                 }
@@ -229,7 +227,7 @@ class TriggerEventController extends CommonFormController
             if (!empty($keyId)) {
                 $passthroughVars['eventId'] = $keyId;
 
-                //prevent undefined errors
+                // prevent undefined errors
                 $entity       = new TriggerEvent();
                 $blank        = $entity->convertToArray();
                 $triggerEvent = array_merge($blank, $triggerEvent);
@@ -245,7 +243,7 @@ class TriggerEventController extends CommonFormController
             }
 
             if ($closeModal) {
-                //just close the modal
+                // just close the modal
                 $passthroughVars['closeModal'] = 1;
 
                 return new JsonResponse($passthroughVars);
@@ -275,9 +273,9 @@ class TriggerEventController extends CommonFormController
         $events    = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $delete    = $session->get('mautic.point.'.$triggerId.'.triggerevents.deleted', []);
 
-        //ajax only for form fields
-        if (!$request->isXmlHttpRequest() ||
-            !$this->security->isGranted([
+        // ajax only for form fields
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted([
                 'point:triggers:edit',
                 'point:triggers:create',
             ], 'MATCH_ONE')
@@ -288,7 +286,7 @@ class TriggerEventController extends CommonFormController
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
 
         if ('POST' == $request->getMethod() && null !== $triggerEvent) {
-            //add the field to the delete list
+            // add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
                 $session->set('mautic.point.'.$triggerId.'.triggerevents.deleted', $delete);
@@ -297,7 +295,7 @@ class TriggerEventController extends CommonFormController
             $template = (empty($triggerEvent['settings']['template'])) ? '@MauticPoint/Event/generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
-            //prevent undefined errors
+            // prevent undefined errors
             $entity       = new TriggerEvent();
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
@@ -336,9 +334,9 @@ class TriggerEventController extends CommonFormController
         $events    = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $delete    = $session->get('mautic.point.'.$triggerId.'.triggerevents.deleted', []);
 
-        //ajax only for form fields
-        if (!$request->isXmlHttpRequest() ||
-            !$this->security->isGranted([
+        // ajax only for form fields
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted([
                 'point:triggers:edit',
                 'point:triggers:create',
             ], 'MATCH_ONE')
@@ -349,7 +347,7 @@ class TriggerEventController extends CommonFormController
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
 
         if ('POST' === $request->getMethod() && null !== $triggerEvent) {
-            //add the field to the delete list
+            // add the field to the delete list
             if (in_array($objectId, $delete)) {
                 $key = array_search($objectId, $delete);
                 unset($delete[$key]);
@@ -359,7 +357,7 @@ class TriggerEventController extends CommonFormController
             $template = (empty($triggerEvent['settings']['template'])) ? '@MauticPoint/Event/generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
-            //prevent undefined errors
+            // prevent undefined errors
             $entity       = new TriggerEvent();
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);

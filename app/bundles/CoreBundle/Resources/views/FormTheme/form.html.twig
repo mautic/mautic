@@ -1,4 +1,4 @@
-{% extends 'MauticCoreBundle:Default:' ~ (useSlim is defined and useSlim is not empty ? 'slim' : 'content') ~ '.html.twig' %}
+{% extends '@MauticCore/Default/' ~ (useSlim is defined and useSlim is not empty ? 'slim' : 'content') ~ '.html.twig' %}
 
 {% if entity is not defined %}
     {% set entity = form.vars.data %}

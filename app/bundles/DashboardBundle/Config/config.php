@@ -34,25 +34,15 @@ return [
             'items'    => [
                 'mautic.dashboard.menu.index' => [
                     'route'     => 'mautic_dashboard_index',
-                    'iconClass' => 'fa-th-large',
+                    'iconClass' => 'ri-funds-fill',
                 ],
             ],
         ],
     ],
     'services' => [
-        'models' => [
-            'mautic.dashboard.model.dashboard' => [
-                'class'     => 'Mautic\DashboardBundle\Model\DashboardModel',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                    'symfony.filesystem',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.dashboard.widget' => [
-                'class'     => \Mautic\DashboardBundle\Dashboard\Widget::class,
+                'class'     => Mautic\DashboardBundle\Dashboard\Widget::class,
                 'arguments' => [
                     'mautic.dashboard.model.dashboard',
                     'mautic.helper.user',
@@ -62,7 +52,7 @@ return [
         ],
     ],
     'parameters' => [
-        'dashboard_import_dir'      => '%kernel.project_dir%/media/dashboards',
-        'dashboard_import_user_dir' => null,
+        'dashboard_import_dir'      => '%mautic.application_dir%/app/assets/dashboards',
+        'dashboard_import_user_dir' => '%mautic.application_dir%/media/dashboards',
     ],
 ];

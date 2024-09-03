@@ -21,17 +21,12 @@ return [
                     'integration' => '.+',
                 ],
             ],
-            'mautic_integration.pipedrive.webhook' => [
-                'path'       => '/plugin/pipedrive/webhook',
-                'controller' => 'MauticPlugin\MauticCrmBundle\Controller\PipedriveController::webhookAction',
-                'method'     => 'POST',
-            ],
         ],
     ],
     'services' => [
         'integrations' => [
             'mautic.integration.hubspot' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -53,7 +48,7 @@ return [
                 ],
             ],
             'mautic.integration.salesforce' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -74,7 +69,7 @@ return [
                 ],
             ],
             'mautic.integration.sugarcrm' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -96,7 +91,7 @@ return [
                 ],
             ],
             'mautic.integration.vtiger' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -117,7 +112,7 @@ return [
                 ],
             ],
             'mautic.integration.zoho' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -138,7 +133,7 @@ return [
                 ],
             ],
             'mautic.integration.dynamics' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -159,7 +154,7 @@ return [
                 ],
             ],
             'mautic.integration.connectwise' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -177,71 +172,14 @@ return [
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
-                ],
-            ],
-            'mautic.integration.pipedrive' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'session',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'monolog.logger.mautic',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
-                    'mautic_integration.service.transport',
-                    'mautic_integration.pipedrive.export.lead',
                 ],
             ],
         ],
         'other' => [
             'mautic_integration.service.transport' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\Services\Transport',
+                'class'     => MauticPlugin\MauticCrmBundle\Services\Transport::class,
                 'arguments' => [
                     'mautic.http.client',
-                ],
-            ],
-            'mautic_integration.pipedrive.import.owner' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\OwnerImport::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic_integration.pipedrive.import.company' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\CompanyImport::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.company',
-                ],
-            ],
-            'mautic_integration.pipedrive.import.lead' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\LeadImport::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                ],
-            ],
-            'mautic_integration.pipedrive.export.company' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic_integration.pipedrive.export.lead' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic_integration.pipedrive.export.company',
                 ],
             ],
         ],

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
@@ -19,27 +21,28 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private MockObject $connection;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
-        $this->connection          = $this->createMock(Connection::class);
+        $this->connection          = $this->getMockedConnection();
         $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
 
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
@@ -250,14 +253,14 @@ final class MauticReportBuilderTest extends TestCase
                     'label' => 'Tag',
                     'type'  => 'multiselect',
                     'list'  => [
-                            1 => 'A',
-                            2 => 'B',
-                            3 => 'C',
-                        ],
+                        1 => 'A',
+                        2 => 'B',
+                        3 => 'C',
+                    ],
                     'operators' => [
-                            'in'    => 'mautic.core.operator.in',
-                            'notIn' => 'mautic.core.operator.notin',
-                        ],
+                        'in'    => 'mautic.core.operator.in',
+                        'notIn' => 'mautic.core.operator.notin',
+                    ],
                     'alias' => 'tag',
                 ],
             ],
@@ -266,6 +269,35 @@ final class MauticReportBuilderTest extends TestCase
         Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
             SELECT `l`.`id`, `l`.`email` WHERE (l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))
         ')), $query->getSql());
+    }
+
+    public function testApplyTagFilter(): void
+    {
+        $filters = [
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['1', '2'],
+                'condition' => 'in',
+            ],
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['3'],
+                'condition' => 'notIn',
+            ],
+            [
+                'column'    => 'unicorn',
+                'glue'      => 'and',
+                'value'     => ['3'],
+                'condition' => 'notIn',
+            ],
+        ];
+
+        $builder   = $this->buildBuilder(new Report());
+        $groupExpr = CompositeExpression::and($builder->getTagCondition($filters[0]), $builder->getTagCondition($filters[1]));
+        Assert::assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
+        Assert::assertNull($builder->getTagCondition($filters[2]));
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder

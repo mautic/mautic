@@ -11,35 +11,14 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
     public function __construct(
-        StageModel $stageModel,
-        CorePermissions $security,
-        Environment $twig
+        private StageModel $stageModel,
+        private CorePermissions $security,
+        private Environment $twig
     ) {
-        $this->stageModel = $stageModel;
-        $this->security   = $security;
-        $this->twig       = $twig;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -47,7 +26,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         if ($this->security->isGranted('stage:stages:view')) {
             $str = $event->getSearchString();
@@ -66,7 +45,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit       = $this->security->isGranted('stage:stages:edit');
                 foreach ($items as $item) {
                     $stagesResults[] = $this->twig->render(
-                        '@MauticStage/SubscribedEvents\Search/global.html.twig',
+                        '@MauticStage/SubscribedEvents/Search/global.html.twig',
                         [
                             'item'    => $item,
                             'canEdit' => $canEdit,
@@ -75,7 +54,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if ($stageCount > 5) {
                     $stagesResults[] = $this->twig->render(
-                        '@MauticStage/SubscribedEvents\Search/global.html.twig',
+                        '@MauticStage/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -89,7 +68,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('stage:stages:view')) {
             $event->addCommands(

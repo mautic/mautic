@@ -7,17 +7,12 @@ use Symfony\Component\Intl\Locales;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    /**
-     * @var array
-     */
-    private static $types = [
+    private static array $types = [
         'text' => [
             'properties' => [],
         ],
         'textarea' => [
-            'properties' => [
-                'allowHtml' => [],
-            ],
+            'properties' => [],
         ],
         'multiselect' => [
             'properties' => [
@@ -71,6 +66,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'email' => [
             'properties' => [],
         ],
+        'html' => [
+            'properties' => [],
+        ],
         'number' => [
             'properties' => [
                 'roundmode' => [],
@@ -97,7 +95,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Set the translation key prefix.
      */
-    public function setTranslationKeyPrefix()
+    public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.lead.field.type.';
     }
@@ -110,24 +108,18 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return self::$types;
     }
 
-    /**
-     * @return array
-     */
-    public static function getListTypes()
+    public static function getListTypes(): array
     {
         return ['select', 'multiselect', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
     }
 
     /**
-     * @param $type
-     * @param $properties
-     *
      * @return array{0: bool, 1:string}
      */
-    public static function validateProperties($type, &$properties)
+    public static function validateProperties($type, &$properties): array
     {
         if (!array_key_exists($type, self::$types)) {
-            //ensure the field type is supported
+            // ensure the field type is supported
             return [false, 'mautic.lead.field.typenotrecognized'];
         }
 
@@ -138,7 +130,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             }
 
             if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {
-                //ensure requirements are met
+                // ensure requirements are met
                 return [false, $fieldType['properties'][$key]['error_msg']];
             }
         }
@@ -147,26 +139,31 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public static function getCountryChoices()
+    public static function getCountryChoices(): array
     {
-        $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
-        $countries   = json_decode($countryJson);
+        $customFile = $_ENV['MAUTIC_UPLOAD_DIR'].'/countries.json';
+        $listFile   = file_exists($customFile) ? $customFile : __DIR__.'/../../CoreBundle/Assets/json/countries.json';
+        $json       = file_get_contents($listFile);
+        $countries  = json_decode($json);
 
         return array_combine($countries, $countries);
     }
 
     /**
-     * @return array
+     * @return array<string, array<string, string>>
      */
-    public static function getRegionChoices()
+    public static function getRegionChoices(): array
     {
-        $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
-        $regions    = json_decode($regionJson);
-        $choices    = [];
+        $customFile = $_ENV['MAUTIC_UPLOAD_DIR'].'/regions.json';
+        $listFile   = file_exists($customFile) ? $customFile : __DIR__.'/../../CoreBundle/Assets/json/regions.json';
+        $json       = file_get_contents($listFile);
+        $regions    = json_decode($json);
 
-        foreach ($regions as $country => &$regionGroup) {
+        $choices = [];
+
+        foreach ($regions as $country => $regionGroup) {
             $choices[$country] = array_combine($regionGroup, $regionGroup);
         }
 
@@ -177,7 +174,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      * Symfony deprecated and changed Symfony\Component\Form\Extension\Core\Type\TimezoneType::getTimezones to private
      * in 3.0 - so duplicated code here.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public static function getTimezonesChoices()
     {
@@ -210,19 +207,17 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get locale choices.
      *
-     * @return array<string,string>
+     * @return array<string, string>
      */
-    public static function getLocaleChoices()
+    public static function getLocaleChoices(): array
     {
         return array_flip(Locales::getNames());
     }
 
     /**
      * Get date field choices.
-     *
-     * @return array
      */
-    public function getDateChoices()
+    public function getDateChoices(): array
     {
         return [
             'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),

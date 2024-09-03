@@ -7,11 +7,8 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateCommand;
-use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
 
 final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
@@ -30,10 +27,8 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
     public function testDeduplicateCommandWithUniqueEmail(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
-        \assert($contactRepository instanceof LeadRepository);
 
-        $contactDeduper = self::$container->get('mautic.lead.deduper');
-        \assert($contactDeduper instanceof ContactDeduper);
+        $contactDeduper = static::getContainer()->get('mautic.lead.deduper');
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
@@ -55,18 +50,16 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
             'The deduper should see and process only 2 duplicated contacts. The third is unique.'
         );
 
-        $output = $this->runCommand(DeduplicateCommand::NAME);
+        $output = $this->testSymfonyCommand(DeduplicateCommand::NAME);
 
-        Assert::assertSame(3, $contactRepository->count([]), $output);
+        Assert::assertSame(3, $contactRepository->count([]), $output->getDisplay());
     }
 
     public function testDeduplicateCommandWithAnotherUniqueFieldAndAnd(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
-        \assert($contactRepository instanceof LeadRepository);
 
         $fieldRepository = $this->em->getRepository(LeadField::class);
-        \assert($fieldRepository instanceof LeadFieldRepository);
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
@@ -89,18 +82,16 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(8, $contactRepository->count([]));
 
-        $output = $this->runCommand(DeduplicateCommand::NAME);
+        $output = $this->testSymfonyCommand(DeduplicateCommand::NAME);
 
-        Assert::assertSame(5, $contactRepository->count([]), $output);
+        Assert::assertSame(5, $contactRepository->count([]), $output->getDisplay());
     }
 
     public function testDeduplicateCommandWithAnotherUniqueFieldAndOr(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
-        \assert($contactRepository instanceof LeadRepository);
 
         $fieldRepository = $this->em->getRepository(LeadField::class);
-        \assert($fieldRepository instanceof LeadFieldRepository);
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
@@ -123,9 +114,9 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(8, $contactRepository->count([]));
 
-        $output = $this->runCommand(DeduplicateCommand::NAME);
+        $output = $this->testSymfonyCommand(DeduplicateCommand::NAME);
 
-        Assert::assertSame(3, $contactRepository->count([]), $output);
+        Assert::assertSame(3, $contactRepository->count([]), $output->getDisplay());
     }
 
     private function saveContact(string $email, string $phone = null): Lead

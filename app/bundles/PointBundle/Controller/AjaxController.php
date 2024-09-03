@@ -9,15 +9,9 @@ use Mautic\PointBundle\Form\Type\PointActionType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function reorderTriggerEventsAction(Request $request)
+    public function reorderTriggerEventsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray   = ['success' => 0];
         $session     = $request->getSession();
@@ -34,10 +28,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory)
+    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray = [
             'success' => 0,
@@ -46,7 +37,7 @@ class AjaxController extends CommonAjaxController
         $type = InputHelper::clean($request->request->get('actionType'));
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
             /** @var \Mautic\PointBundle\Model\PointModel $model */
             $model   = $this->getModel('point');
             $actions = $model->getPointActions();
@@ -65,7 +56,7 @@ class AjaxController extends CommonAjaxController
                     'formThemes' => $themes,
                 ]);
 
-                //replace pointaction with point
+                // replace pointaction with point
                 $html                 = str_replace('pointaction', 'point', $html);
                 $dataArray['html']    = $html;
                 $dataArray['success'] = 1;

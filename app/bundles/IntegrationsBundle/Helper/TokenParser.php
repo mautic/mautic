@@ -63,13 +63,6 @@ class TokenParser
         return $tokens;
     }
 
-    /**
-     * @param $integrationObjectName
-     * @param $integration
-     * @param $default
-     * @param $linkText
-     * @param $baseURL
-     */
     public function buildTokenWithDefaultOptions($integrationObjectName, $integration, $default, $linkText, $baseURL): string
     {
         return sprintf(

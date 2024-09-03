@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,6 +18,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 trait RepositoryConfiguratorTrait
 {
+    use MockedConnectionTrait;
+
     /**
      * @var MockObject&EntityManagerInterface
      */
@@ -39,7 +41,7 @@ trait RepositoryConfiguratorTrait
     private $connection;
 
     /**
-     * @var MockObject&Result<mixed>
+     * @var MockObject&Result
      */
     private $result;
 
@@ -51,7 +53,7 @@ trait RepositoryConfiguratorTrait
         $this->classMetadata   = $this->createMock(ClassMetadata::class);
         $this->entityManager   = $this->createMock(EntityManagerInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->connection      = $this->createMock(Connection::class);
+        $this->connection      = $this->getMockedConnection();
         $this->result          = $this->createMock(Result::class);
 
         $this->configureMocks($entityClass);

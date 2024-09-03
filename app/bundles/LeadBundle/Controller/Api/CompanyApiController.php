@@ -2,15 +2,26 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Company>
@@ -23,11 +34,11 @@ class CompanyApiController extends CommonApiController
     /**
      * @var CompanyModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $companyModel = $this->getModel('lead.company');
+        $companyModel = $modelFactory->getModel('lead.company');
         \assert($companyModel instanceof CompanyModel);
 
         $this->model              = $companyModel;
@@ -35,14 +46,14 @@ class CompanyApiController extends CommonApiController
         $this->entityNameOne      = 'company';
         $this->entityNameMulti    = 'companies';
         $this->serializerGroups[] = 'companyDetails';
-        $this->setCleaningRules('company');
-        parent::initialize($event);
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * If an existing company is matched, it'll be merged. Otherwise it'll be created.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function newEntityAction(Request $request)
     {
@@ -52,7 +63,7 @@ class CompanyApiController extends CommonApiController
         if (empty($parameters['force'])) {
             $leadCompanyModel = $this->getModel('lead.company');
             \assert($leadCompanyModel instanceof CompanyModel);
-            list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
+            [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
 
             if (count($companyEntities)) {
                 return $this->editEntityAction($request, $company['id']);
@@ -63,11 +74,7 @@ class CompanyApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   &$entity
-     * @param        $parameters
-     * @param        $form
      * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
@@ -81,7 +88,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId Company ID
      * @param int $contactId Contact ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -110,7 +117,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId List ID
      * @param int $contactId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
