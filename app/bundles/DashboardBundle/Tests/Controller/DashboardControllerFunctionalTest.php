@@ -41,7 +41,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
         Assert::assertJson($content);
@@ -85,7 +85,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
         Assert::assertJson($content);
