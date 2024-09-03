@@ -129,6 +129,9 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @return array<string, array<string>>
+     */
     public function urlFormatProvider(): array
     {
         return [
@@ -188,6 +191,9 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @return array<string, array<string>>
+     */
     public function emailFormatProvider(): array
     {
         return [
