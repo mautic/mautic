@@ -2,31 +2,31 @@
 
 namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class PluginFactory implements SecurityFactoryInterface
+class PluginFactory implements AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string|array
     {
-        $providerId = 'security.authentication.provider.mautic.'.$id;
+        $providerId = 'security.authentication.provider.mautic.'.$firewallName;
         $container->setDefinition($providerId, new ChildDefinition('mautic.user.preauth_authenticator'))
-            ->replaceArgument(3, new Reference($userProvider))
-            ->replaceArgument(4, $id);
+            ->replaceArgument(3, new Reference($userProviderId))
+            ->replaceArgument(4, $firewallName);
 
-        $listenerId = 'security.authentication.listener.mautic.'.$id;
+        $listenerId = 'security.authentication.listener.mautic.'.$firewallName;
         $container->setDefinition($listenerId, new ChildDefinition('mautic.security.authentication_listener'))
-            ->replaceArgument(5, $id);
+            ->replaceArgument(5, $firewallName);
 
-        return [$providerId, $listenerId, $defaultEntryPoint];
+        return [$providerId, $listenerId];
     }
 
-    public function getPosition(): string
+    public function getPriority(): int
     {
-        return 'pre_auth';
+        return 0;
     }
 
     public function getKey(): string
