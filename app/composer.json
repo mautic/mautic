@@ -96,7 +96,7 @@
     "gaufrette/extras": "^0.1.0",
     "gaufrette/aws-s3-adapter": "^0.4.0",
     "matomo/device-detector": "^4.0",
-    "symfony/lock": "^5.1",
+    "symfony/lock": "^6.4",
     "composer/package-versions-deprecated": "1.11.99.1",
     "phpoffice/phpspreadsheet": "^1.15 < 1.28",
     "predis/predis": "^1.1",
