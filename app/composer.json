@@ -58,7 +58,7 @@
     "symfony/doctrine-bridge": "^6.4",
     "symfony/monolog-bridge": "^6.4",
     "symfony/polyfill-mbstring": "~1.0",
-    "symfony/security-acl": "~3.0.0",
+    "symfony/security-acl": "^3.3",
     "symfony/css-selector": "^6.4",
     "symfony/http-client": "^6.4",
     "doctrine/doctrine-bundle": "^2.7",
@@ -127,6 +127,10 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/oauth2-php"
     }
   ],
   "minimum-stability": "dev",
