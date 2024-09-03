@@ -204,7 +204,7 @@ var Mautic = {
             mQuery('#new').click();
         });
 
-        Mautic.addKeyboardShortcut('del', 'Delete  current resource', function(e) {
+        Mautic.addKeyboardShortcut(['del', 'meta+backspace'], 'Delete current resource', function(e) {
             mQuery('#delete').click();
         });
 
