@@ -119,38 +119,4 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
             \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
         ];
     }
-
-    public function testUrlFormat(): void
-    {
-        $url      = 'http://example.com';
-        $result   = $this->formatterHelper->_($url, 'url');
-        $expected = '<a href="http://example.com" target="_new">http://example.com</a>';
-        $this->assertEquals($expected, $result);
-
-        $maliciousUrl = 'http://example.com"><script>alert("XSS")</script>';
-        $result       = $this->formatterHelper->_($maliciousUrl, 'url');
-        $expected     = '<a href="http://example.com&quot;&gt;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;" target="_new">http://example.com&quot;&gt;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;</a>';
-        $this->assertEquals($expected, $result);
-    }
-
-    public function testEmailFormat(): void
-    {
-        $email    = 'user@example.com';
-        $result   = $this->formatterHelper->_($email, 'email');
-        $expected = '<a href="mailto:user@example.com">user@example.com</a>';
-        $this->assertEquals($expected, $result);
-
-        $maliciousEmail = 'user@example.com"><script>alert("XSS")</script>';
-        $result         = $this->formatterHelper->_($maliciousEmail, 'email');
-        $expected       = '<a href="mailto:user@example.com&quot;&gt;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;">user@example.com&quot;&gt;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;</a>';
-        $this->assertEquals($expected, $result);
-    }
-
-    public function testArrayFormat(): void
-    {
-        $input    = ['<script>alert("XSS")</script>'];
-        $result   = $this->formatterHelper->_($input, 'array');
-        $expected = '&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;';
-        $this->assertEquals($expected, $result);
-    }
 }

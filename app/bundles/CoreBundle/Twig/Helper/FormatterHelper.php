@@ -47,7 +47,7 @@ final class FormatterHelper
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
                     } else {
-                        $stringParts[] = InputHelper::clean($v);
+                        $stringParts[] = $v;
                     }
                 }
                 if (1 === $round) {
@@ -66,12 +66,10 @@ final class FormatterHelper
                 $string = $this->dateHelper->toDate($val, 'utc');
                 break;
             case 'url':
-                $encodedVal = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
-                $string     = ($textOnly) ? $encodedVal : '<a href="'.$encodedVal.'" target="_new">'.$encodedVal.'</a>';
+                $string = ($textOnly) ? $val : '<a href="'.$val.'" target="_new">'.$val.'</a>';
                 break;
             case 'email':
-                $encodedVal = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
-                $string     = ($textOnly) ? $encodedVal : '<a href="mailto:'.$encodedVal.'">'.$encodedVal.'</a>';
+                $string = ($textOnly) ? $val : '<a href="mailto:'.$val.'">'.$val.'</a>';
                 break;
             case 'int':
                 $string = strval((int) $val);

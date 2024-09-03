@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -493,7 +492,7 @@ class Hit
      */
     public function setReferer($referer)
     {
-        $this->referer = InputHelper::url($referer);
+        $this->referer = $referer;
 
         return $this;
     }
@@ -517,7 +516,7 @@ class Hit
      */
     public function setUrl($url)
     {
-        $this->url = InputHelper::url($url);
+        $this->url = $url;
 
         return $this;
     }
@@ -566,7 +565,7 @@ class Hit
      */
     public function setUserAgent($userAgent)
     {
-        $this->userAgent = InputHelper::clean($userAgent);
+        $this->userAgent = $userAgent;
 
         return $this;
     }
@@ -590,7 +589,7 @@ class Hit
      */
     public function setRemoteHost($remoteHost)
     {
-        $this->remoteHost = InputHelper::url($remoteHost);
+        $this->remoteHost = $remoteHost;
 
         return $this;
     }
@@ -698,9 +697,6 @@ class Hit
      */
     public function setBrowserLanguages($browserLanguages)
     {
-        foreach ($browserLanguages as $key => $language) {
-            $browserLanguages[$key] = InputHelper::clean($language);
-        }
         $this->browserLanguages = $browserLanguages;
 
         return $this;
