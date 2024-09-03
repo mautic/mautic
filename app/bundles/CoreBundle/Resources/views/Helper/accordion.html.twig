@@ -11,7 +11,7 @@
             </a>
 
             <div id="collapse{{ item.id }}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{ item.id }}">
-                <div class="accordion-content{% if item.padding_inline is defined and not item.padding_inline %} pi-0{% endif %}">
+                <div class="accordion-content">
                     {{ item.content|raw }}
                 </div>
             </div>
