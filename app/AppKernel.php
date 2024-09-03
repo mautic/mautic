@@ -195,7 +195,6 @@ class AppKernel extends Kernel
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
-            $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
             $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
 
