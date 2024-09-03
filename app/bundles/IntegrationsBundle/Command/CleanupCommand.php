@@ -12,6 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CleanupCommand extends Command
 {
+    protected static $defaultDescription = 'Delete records from field changes which are invalid';
     public const NAME = 'mautic:integrations:cleanup';
 
     public function __construct(private FieldChangeRepository $fieldChangeRepository)
@@ -21,13 +22,12 @@ class CleanupCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME)
-            ->setDescription('Delete records from field changes which are invalid');
+        $this->setName(self::NAME);
 
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 

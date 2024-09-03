@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CampaignDeleteEventLogsCommand extends Command
 {
+    protected static $defaultDescription = 'Delete campaign event logs';
     /**
      * @var string
      */
@@ -28,7 +29,6 @@ class CampaignDeleteEventLogsCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::COMMAND_NAME)
-            ->setDescription('Delete campaign event logs')
             ->addArgument(
                 'campaign_event_ids',
                 InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
@@ -57,6 +57,6 @@ class CampaignDeleteEventLogsCommand extends Command
             $this->eventModel->deleteEventsByEventIds($eventIds);
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 }

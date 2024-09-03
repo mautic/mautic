@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AnonymizeIpCommand extends Command
 {
+    protected static $defaultDescription = 'Delete all stored ip addresses.';
     /**
      * @var string
      */
@@ -26,8 +27,7 @@ class AnonymizeIpCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Delete all stored ip addresses.');
+        $this->setName(self::COMMAND_NAME);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -43,7 +43,7 @@ class AnonymizeIpCommand extends Command
             return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $e->getMessage()), $output);
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     private function exitWithError(string $message, OutputInterface $output): int
