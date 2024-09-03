@@ -774,6 +774,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
+                'iconClass' => 'ri-mail-open-line ',
             ],
             $choices['behaviors']['lead_email_received']
         );
@@ -788,7 +789,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
         );
