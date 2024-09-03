@@ -78,47 +78,9 @@
         </div>
         <div class="">
           <hr />
-          {% set shortcuts = {
-            'contacts': {
-              'a': 'mautic.core.keyboard.quick_add_contact',
-              'v': 'mautic.core.keyboard.toggle_view',
-            },
-            'emails': {
-              's' : 'mautic.core.keyboard.send_example',
-            },
-          } %}
-          <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
-            {% for section, shortcut_list in shortcuts %}
-              <li class="panel">
-                <a role="button" id="heading{{section}}" class="accordion-heading collapsed" data-toggle="collapse"
-                  data-parent="#accordion" href="#collapse{{section}}" aria-expanded="false"
-                  aria-controls="collapse{{section}}">
-                  <i class="ri-arrow-down-s-line accordion-arrow"></i>
-                  <span class="accordion-title">{{ ('mautic.core.keyboard.section.' ~ section)|trans }}</span>
-                </a>
-                <div id="collapse{{section}}" class="collapse accordion-wrapper" role="tabpanel"
-                  aria-labelledby="heading{{section}}">
-                  <div class="accordion-content col-xs-12">
-                    <table class="shortcut-table bsv-xs">
-                      {% for key, description in shortcut_list %}
-                        <tr class="mb-xs">
-                          <td class="shortcut-description">
-                            {{ description | trans }}
-                          </td>
-                          <td class="shortcut-keys text-right">
-                            {% set keys = key|split('+') %}
-                            {% for k in keys %}
-                              <kbd>{{ k }}</kbd>
-                            {% endfor %}
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    </table>
-                  </div>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
+
+          {{ include('@MauticLead/KeyboardShortcuts/lead_shortcuts.html.twig', ignore_missing = true) }}
+
         </div>
 
       </div>
