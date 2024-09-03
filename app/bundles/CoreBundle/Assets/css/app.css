@@ -1807,7 +1807,6 @@ kbd {
   aspect-ratio: 1/1;
   align-items: center;
   justify-content: center;
-  border-radius: 20px;
 }
 .btn-group > .btn.active.btn-yes,
 .btn-group > .btn.active.btn-no {
@@ -3308,6 +3307,9 @@ ul.dropdown-menu-form {
   overflow-y: auto;
 }
 .dropdown-toggle {
+  aspect-ratio: 1 / 1;
+  justify-content: center;
+  align-items: center;
   outline: 2px solid transparent;
   outline-offset: -2px;
 }
