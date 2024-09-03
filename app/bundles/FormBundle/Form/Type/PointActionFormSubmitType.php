@@ -23,7 +23,7 @@ class PointActionFormSubmitType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pointaction_formsubmit';
     }

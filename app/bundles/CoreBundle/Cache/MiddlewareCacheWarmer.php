@@ -24,7 +24,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     /**
      * @inerhitDoc
      */
-    public function warmUp(string $cacheDirectory)
+    public function warmUp(string $cacheDirectory): array
     {
         $this->cacheFile = sprintf('%s/middlewares.cache.php', $cacheDirectory);
         $this->createCacheFile($cacheDirectory);

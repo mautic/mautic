@@ -60,7 +60,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'iplookup_download_data_store_button';
     }

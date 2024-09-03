@@ -128,7 +128,7 @@ class SubmitActionEmailType extends AbstractType
         $this->addToBcBccFields($builder);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'form_submitaction_sendemail';
     }

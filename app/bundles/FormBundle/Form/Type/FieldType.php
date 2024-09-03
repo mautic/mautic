@@ -615,7 +615,7 @@ class FieldType extends AbstractType
         $resolver->setDefined(['customParameters']);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'formfield';
     }

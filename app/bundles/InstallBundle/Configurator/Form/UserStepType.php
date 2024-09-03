@@ -170,7 +170,7 @@ class UserStepType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'install_user_step';
     }

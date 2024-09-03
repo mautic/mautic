@@ -225,7 +225,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
         $view->vars['mailbox'] = $options['mailbox'];
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'monitored_mailboxes';
     }
