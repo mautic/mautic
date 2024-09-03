@@ -641,8 +641,10 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
 
+    let labelPrefix = ' (' + fieldObject.charAt(0).toUpperCase() + fieldObject.slice(1) + ')';
+
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
-    prototypeStr = prototypeStr.replace(/__label__/g, label);
+    prototypeStr = prototypeStr.replace(/__label__/g, label + labelPrefix);
 
     // Convert to DOM
     prototype = mQuery(prototypeStr);

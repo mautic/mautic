@@ -26,12 +26,8 @@
             </div>
         </div>
         <div class="panel-body">
-            <div class="col-xs-2 col-sm-1 ai-center d-flex">
-                <i class="object-icon ma-a fa-2x {{ objectIconClass }}" aria-hidden="true"></i>
-            </div>
-
             <div class="col-xs-6 col-sm-2 field-name">
-                <span><i class="filter-type-icon {{ filterTypeIconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+                <span><i class="filter-type-icon {{ filterTypeIconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }} ({{  object|capitalize }}){% endif %}</span>
             </div>
 
             <div class="col-xs-6 col-sm-3 padding-none">
