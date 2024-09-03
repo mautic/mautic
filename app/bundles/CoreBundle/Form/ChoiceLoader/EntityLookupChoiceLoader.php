@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
@@ -45,10 +46,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $this->options = $options;
     }
 
-    /**
-     * @return ArrayChoiceList
-     */
-    public function loadChoiceList($value = null)
+    public function loadChoiceList($value = null): ChoiceListInterface
     {
         return new ArrayChoiceList($this->getChoices(null, true));
     }
@@ -57,20 +55,16 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      * Validate submitted values.
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
-     *
-     * @return array
      */
-    public function loadChoicesForValues(array $values, $value = null)
+    public function loadChoicesForValues(array $values, $value = null): array
     {
         return $values;
     }
 
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
-     *
-     * @return array
      */
-    public function loadValuesForChoices(array $choices, $value = null)
+    public function loadValuesForChoices(array $choices, $value = null): array
     {
         return $choices;
     }

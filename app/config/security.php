@@ -3,34 +3,34 @@
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
-        'anonymous' => 'lazy',
+        'lazy' => true,
         'context'   => 'mautic',
         'security'  => false,
     ],
     'dev' => [
         'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
         'security'  => true,
-        'anonymous' => 'lazy',
+        'lazy' => true,
     ],
     'login' => [
         'pattern'   => '^/s/login$',
-        'anonymous' => 'lazy',
+        'lazy' => true,
         'context'   => 'mautic',
     ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
-        'anonymous'          => 'lazy',
+        'lazy'          => true,
         'mautic_plugin_auth' => true,
         'context'            => 'mautic',
     ],
     'saml_login' => [
         'pattern'   => '^/s/saml/login$',
-        'anonymous' => 'lazy',
+        'lazy' => true,
         'context'   => 'mautic',
     ],
     'saml_discovery' => [
         'pattern'   => '^/saml/discovery$',
-        'anonymous' => 'lazy',
+        'lazy' => true,
         'context'   => 'mautic',
     ],
     'oauth2_token' => [
@@ -44,7 +44,7 @@ $firewalls = [
             'check_path' => '/oauth/v2/authorize_login_check',
             'login_path' => '/oauth/v2/authorize_login',
         ],
-        'anonymous' => 'lazy',
+        'lazy' => true,
     ],
     'api' => [
         'pattern'            => '^/api',
@@ -67,7 +67,7 @@ $firewalls = [
             'check_path'      => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
         ],
         'form_login' => [
-            'csrf_token_generator' => 'security.csrf.token_manager',
+            'enable_csrf' => true,
             'success_handler'      => 'mautic.security.authentication_handler',
             'failure_handler'      => 'mautic.security.authentication_handler',
             'login_path'           => '/s/login',
@@ -84,17 +84,15 @@ $firewalls = [
             'domain'   => '%mautic.rememberme_domain%',
             'samesite' => 'lax',
         ],
-        'guard' => [
-            'authenticators' => [
-                'mautic.user.form_guard_authenticator',
-            ],
+        'custom_authenticators' => [
+            'mautic.user.form_guard_authenticator',
         ],
         'fos_oauth'     => true,
         'context'       => 'mautic',
     ],
     'public' => [
         'pattern'   => '^/',
-        'anonymous' => 'lazy',
+        'lazy' => true,
         'context'   => 'mautic',
     ],
 ];
@@ -111,7 +109,7 @@ $container->loadFromExtension(
                 'id' => 'mautic.user.provider',
             ],
         ],
-        'encoders' => [
+        'password_hashers' => [
             Symfony\Component\Security\Core\User\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
