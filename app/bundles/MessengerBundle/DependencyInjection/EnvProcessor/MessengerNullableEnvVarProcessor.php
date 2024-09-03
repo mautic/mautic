@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 
 class MessengerNullableEnvVarProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv(string $prefix, string $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): string
     {
         return $getEnv($name) ?: 'null://';
     }

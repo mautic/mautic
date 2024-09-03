@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 
 class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv($prefix, $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): string
     {
         $env = $getEnv($name);
         try {
@@ -21,7 +21,7 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
         }
     }
 
-    public static function getProvidedTypes()
+    public static function getProvidedTypes(): array
     {
         return [
             'mailer'         => 'string',
