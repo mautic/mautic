@@ -1,0 +1,30 @@
+{% set emailsContent %}
+    {% set emails_shortcuts = {
+        's': 'mautic.core.keyboard.send_example',
+    } %}
+    <table class="shortcut-table bsv-xs">
+    {% for key, description in emails_shortcuts %}
+        <tr class="mb-xs">
+        <td class="shortcut-description">
+            {{ description | trans }}
+        </td>
+        <td class="shortcut-keys text-right">
+            {% set keys = key|split('+') %}
+            {% for k in keys %}
+            <kbd>{{ k }}</kbd>
+            {% endfor %}
+        </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endset %}
+
+{% include '@MauticCore/Helper/accordion.html.twig' with {
+    'items': [
+        {
+            'id': 'emails',
+            'title': 'mautic.email.emails',
+            'content': emailsContent,
+        }
+    ]
+} %}
