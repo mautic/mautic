@@ -13,39 +13,39 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title" id="keyboardShortcutsModalLabel">
-          {{ "mautic.core.keyboard.shortcuts" | trans }}
+          {{ "mautic.keyboard.shortcuts" | trans }}
         </h4>
       </div>
       <div class="modal-body row">
         <div class="col-md-12">
           {% set shortcuts = {
             'navigation': {
-              'g+d': 'mautic.core.keyboard.load_dashboard',
-              'g+c': 'mautic.core.keyboard.load_contacts',
-              'g+e': 'mautic.core.keyboard.load_emails',
-              'g+f': 'mautic.core.keyboard.load_forms',
-              'g+s': 'mautic.core.keyboard.load_segments',
-              'g+p': 'mautic.core.keyboard.load_landing_pages',
+              'g+d': 'mautic.keyboard.load_dashboard',
+              'g+c': 'mautic.keyboard.load_contacts',
+              'g+e': 'mautic.keyboard.load_emails',
+              'g+f': 'mautic.keyboard.load_forms',
+              'g+s': 'mautic.keyboard.load_segments',
+              'g+p': 'mautic.keyboard.load_landing_pages',
             },
             'functions': {
-              '/' : 'mautic.core.keyboard.list_search',
-              'f+/': 'mautic.core.keyboard.global_search',
-              'f+n': 'mautic.core.keyboard.show_notifications',
-              'f+m': 'mautic.core.keyboard.open_settings',
+              '/' : 'mautic.keyboard.list_search',
+              'f+/': 'mautic.keyboard.global_search',
+              'f+n': 'mautic.keyboard.show_notifications',
+              'f+m': 'mautic.keyboard.open_settings',
             },
             'actions': {
-              'e' : 'mautic.core.keyboard.edit',
-              'c' : 'mautic.core.keyboard.create',
-              '⌘+Enter' : 'mautic.core.keyboard.save',
-              'g+i' : 'mautic.core.keyboard.back',
-              'Del / ⌘+⌫' : 'mautic.core.keyboard.delete',
+              'e' : 'mautic.keyboard.edit',
+              'c' : 'mautic.keyboard.create',
+              '⌘+Enter' : 'mautic.keyboard.save',
+              'g+i' : 'mautic.keyboard.back',
+              'Del / ⌘+⌫' : 'mautic.keyboard.delete',
             } } %}
           <h4 class="fw-sb">
-            {{ "mautic.core.keyboard.section.global" | trans }}
+            {{ "mautic.keyboard.section.global" | trans }}
           </h4>
           {% for section, shortcut_list in shortcuts %}
             <h5 class="mb-xs mt-md fw-sb">
-              {{ ('mautic.core.keyboard.section.' ~ section)|trans }}
+              {{ ('mautic.keyboard.section.' ~ section)|trans }}
             </h5>
             <table class="shortcut-table bsv-xs">
               {% for key, description in shortcut_list %}
@@ -63,9 +63,9 @@
                         {% for k in keys %}
                             {% set title = '' %}
                             {% if k == '⌫' %}
-                                {% set title = 'mautic.core.keyboard.backspace'|trans %}
+                                {% set title = 'mautic.keyboard.backspace'|trans %}
                             {% elseif k == '⌘' %}
-                                {% set title = 'mautic.core.keyboard.command'|trans %}
+                                {% set title = 'mautic.keyboard.command'|trans %}
                             {% endif %}
                             <kbd{% if title %} title="{{ title }}" data-toggle="tooltip"{% endif %}>{{ k }}</kbd>
                         {% endfor %}
@@ -78,21 +78,21 @@
         </div>
         <div class="">
           <hr />
-
-          {{ include('@MauticLead/KeyboardShortcuts/lead_shortcuts.html.twig', ignore_missing = true) }}
-          {{ include('@MauticEmail/KeyboardShortcuts/emails_shortcuts.html.twig', ignore_missing = true) }}
-
+          <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+            {{ include('@MauticLead/KeyboardShortcuts/lead_shortcuts.html.twig', ignore_missing = true) }}
+            {{ include('@MauticEmail/KeyboardShortcuts/emails_shortcuts.html.twig', ignore_missing = true) }}
+          </ul>
         </div>
 
       </div>
       <div class="alert alert-info col-xs-12">
         <div class="d-flex jc-space-between ai-center small">
-          <div> <strong class="mr-xs">{{ 'mautic.core.keyboard.tip'|trans }}</strong><kbd>⌘</kbd> <i class="ri-arrow-right-line"></i> <kbd>Ctrl</kbd></div>
+          <div> <strong class="mr-xs">{{ 'mautic.keyboard.tip'|trans }}</strong><kbd>⌘</kbd> <i class="ri-arrow-right-line"></i> <kbd>Ctrl</kbd></div>
         </div>
       </div>
       <div class="modal-footer">
         <p>
-          {{ 'mautic.core.keyboard.press_to_view'|trans({'%shift%': '', '%question%': '<kbd>?</kbd>'})|raw }}
+          {{ 'mautic.keyboard.press_to_view'|trans({'%shift%': '', '%question%': '<kbd>?</kbd>'})|raw }}
         </p>
       </div>
     </div>

@@ -1,31 +1,8 @@
-{% set contactsContent %}
-    {% set contacts_shortcuts = {
-        'a': 'mautic.core.keyboard.quick_add_contact',
-        'v': 'mautic.core.keyboard.toggle_view',
-    } %}
-    <table class="shortcut-table bsv-xs">
-    {% for key, description in contacts_shortcuts %}
-        <tr class="mb-xs">
-        <td class="shortcut-description">
-            {{ description | trans }}
-        </td>
-        <td class="shortcut-keys text-right">
-            {% set keys = key|split('+') %}
-            {% for k in keys %}
-            <kbd>{{ k }}</kbd>
-            {% endfor %}
-        </td>
-        </tr>
-    {% endfor %}
-    </table>
-{% endset %}
-
-{% include '@MauticCore/Helper/accordion.html.twig' with {
-    'items': [
-        {
-            'id': 'contacts',
-            'title': 'mautic.lead.leads',
-            'content': contactsContent,
-        }
-    ]
+{% set shortcuts = {
+    'contacts': {
+      'a': 'mautic.keyboard.quick_add_contact',
+      'v': 'mautic.keyboard.toggle_view',
+    },
 } %}
+
+{% include '@MauticCore/Helper/keyboard_shortcuts_helper.html.twig' with {'shortcuts': shortcuts} %}
