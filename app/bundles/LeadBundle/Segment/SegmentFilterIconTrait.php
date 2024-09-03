@@ -90,7 +90,7 @@ trait SegmentFilterIconTrait
             'lead_asset_download'     => 'ri-download-2-line',
             'sessions'                => 'ri-timer-line',
             'notification'            => 'ri-notification-3-line',
-            'lead_email_received'     => 'ri-mail-open-line ',
+            'lead_email_received'     => 'ri-mail-open-line',
             'lead_email_read_date'    => 'ri-mail-open-line',
             'lead_email_read_count'   => 'ri-mail-open-line',
             'lead_email_sent_date'    => 'ri-send-plane-2-line',
