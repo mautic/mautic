@@ -196,18 +196,6 @@ var Mautic = {
             mQuery('#list-search').focus();
         });
 
-        Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
-            if (mQuery('.btn-undo').length) {
-                mQuery('.btn-undo').click();
-            }
-        });
-
-        Mautic.addKeyboardShortcut('mod+shift+z', 'Redo change', function (e) {
-            if (mQuery('.btn-redo').length) {
-                mQuery('.btn-redo').click();
-            }
-        });
-
         Mautic.addKeyboardShortcut('e', 'Edit current resource', function(e) {
             mQuery('#edit').click();
         });
