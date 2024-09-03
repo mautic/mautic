@@ -20,10 +20,8 @@ class ReloadFacade
      * and do all those actions.
      *
      * Returns humanly understandable message about its doings.
-     *
-     * @return string
      */
-    public function reloadPlugins()
+    public function reloadPlugins(): string
     {
         $plugins                 = $this->pluginModel->getAllPluginsConfig();
         $pluginMetadata          = $this->pluginModel->getPluginsMetadata();

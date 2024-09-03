@@ -295,7 +295,7 @@ class AppKernel extends Kernel
         return dirname(__DIR__);
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         if (null === $this->projectDir) {
             $r = new \ReflectionObject($this);

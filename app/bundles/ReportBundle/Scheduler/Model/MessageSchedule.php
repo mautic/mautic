@@ -22,10 +22,8 @@ class MessageSchedule
      * @deprecated 2.15.2 to be removed in 3.0. Use getMessageForAttachedFile or getMessageForLinkedFile
      *
      * @param string $filePath
-     *
-     * @return string
      */
-    public function getMessage(Report $report, $filePath)
+    public function getMessage(Report $report, $filePath): string
     {
         $link = $this->router->generate('mautic_report_view', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -65,10 +63,7 @@ class MessageSchedule
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getSubject(Report $report)
+    public function getSubject(Report $report): string
     {
         $date = new \DateTime();
 

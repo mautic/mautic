@@ -58,7 +58,7 @@ class ReportGenerator
      *
      * @return \Symfony\Component\Form\FormInterface<Report>
      */
-    public function getForm(Report $entity, $options)
+    public function getForm(Report $entity, $options): \Symfony\Component\Form\FormInterface
     {
         return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }

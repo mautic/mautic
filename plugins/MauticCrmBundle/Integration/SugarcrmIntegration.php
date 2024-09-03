@@ -151,10 +151,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return sprintf('%s/%s', $this->keys['sugarcrm_url'], $apiUrl);
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }

@@ -24,18 +24,12 @@ class PluginFactory implements SecurityFactoryInterface
         return [$providerId, $listenerId, $defaultEntryPoint];
     }
 
-    /**
-     * @return string
-     */
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'pre_auth';
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return 'mautic_plugin_auth';
     }
