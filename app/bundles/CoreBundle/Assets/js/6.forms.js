@@ -46,56 +46,55 @@ Mautic.renameFormElements = function(container, oldIdPrefix, oldNamePrefix, newI
 Mautic.ajaxifyForm = function (formName) {
     Mautic.initializeFormFieldVisibilitySwitcher(formName);
 
-    //prevent enter submitting form and instead jump to next line
+    // Prevent enter from submitting form and instead jump to next line
     var form = 'form[name="' + formName + '"]';
+
+    // Handle Command+Enter (Mac) or Control+Enter (Windows/Linux) for form submission
+    Mautic.addKeyboardShortcut(['meta+enter', 'ctrl+enter'], 'Submit form', function(e) {
+        if (MauticVars.formSubmitInProgress) {
+            return false;
+        }
+
+        // Find save button first then apply
+        var saveButton = mQuery(form).find('button.btn-save');
+        var applyButton = mQuery(form).find('button.btn-apply');
+
+        var modalParent = mQuery(form).closest('.modal');
+        var inMain = mQuery(modalParent).length > 0 ? false : true;
+
+        if (mQuery(saveButton).length) {
+            if (inMain) {
+                if (mQuery(form).find('button.btn-save.btn-copy').length) {
+                    mQuery(mQuery(form).find('button.btn-save.btn-copy')).trigger('click');
+                    return;
+                }
+            } else {
+                if (mQuery(modalParent).find('button.btn-save.btn-copy').length) {
+                    mQuery(mQuery(modalParent).find('button.btn-save.btn-copy')).trigger('click');
+                    return;
+                }
+            }
+            mQuery(saveButton).trigger('click');
+        } else if (mQuery(applyButton).length) {
+            if (inMain) {
+                if (mQuery(form).find('button.btn-apply.btn-copy').length) {
+                    mQuery(mQuery(form).find('button.btn-apply.btn-copy')).trigger('click');
+                    return;
+                }
+            } else {
+                if (mQuery(modalParent).find('button.btn-apply.btn-copy').length) {
+                    mQuery(mQuery(modalParent).find('button.btn-apply.btn-copy')).trigger('click');
+                    return;
+                }
+            }
+            mQuery(applyButton).trigger('click');
+        }
+    });
+
+    // Handle Enter key for jumping to the next input
     mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
     mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
-        if(e.keyCode == 13 && (e.metaKey || e.ctrlKey)) {
-            if (MauticVars.formSubmitInProgress) {
-                return false;
-            }
-
-            // Find save button first then apply
-            var saveButton = mQuery(form).find('button.btn-save');
-            var applyButton = mQuery(form).find('button.btn-apply');
-
-            var modalParent = mQuery(form).closest('.modal');
-            var inMain      = mQuery(modalParent).length > 0 ? false : true;
-
-            if (mQuery(saveButton).length) {
-                if (inMain) {
-                    if (mQuery(form).find('button.btn-save.btn-copy').length) {
-                        mQuery(mQuery(form).find('button.btn-save.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                } else {
-                    if (mQuery(modalParent).find('button.btn-save.btn-copy').length) {
-                        mQuery(mQuery(modalParent).find('button.btn-save.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                }
-
-                mQuery(saveButton).trigger('click');
-            } else if (mQuery(applyButton).length) {
-                if (inMain) {
-                    if (mQuery(form).find('button.btn-apply.btn-copy').length) {
-                        mQuery(mQuery(form).find('button.btn-apply.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                } else {
-                    if (mQuery(modalParent).find('button.btn-apply.btn-copy').length) {
-                        mQuery(mQuery(modalParent).find('button.btn-apply.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                }
-
-                mQuery(applyButton).trigger('click');
-            }
-        } else if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
+        if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
             var inputs = mQuery(this).parents('form').eq(0).find(':input');
             if (inputs[inputs.index(this) + 1] != null) {
                 inputs[inputs.index(this) + 1].focus();
