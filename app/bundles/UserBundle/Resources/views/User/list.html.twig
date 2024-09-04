@@ -23,6 +23,26 @@
             'searchValue' : searchValue,
             'searchHelp'  : 'mautic.user.user.help.searchcommands',
             'action'      : currentRoute,
+			'quickFilters': [
+				{
+					'search': 'is:admin',
+					'label': 'mautic.user.role.form.isadmin',
+					'tooltip': 'mautic.core.search.quickfilter.is_admin',
+					'icon': 'ri-admin-line'
+				},
+				{
+					'search': 'is:published',
+					'label': 'mautic.core.form.active',
+					'tooltip': 'mautic.core.search.quickfilter.is_published',
+					'icon': 'ri-check-line'
+				},
+				{
+					'search': 'is:unpublished',
+					'label': 'mautic.core.form.inactive',
+					'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+					'icon': 'ri-close-line'
+				}
+			]
         }) -}}
 		<div class="page-list">
 			{{ block('listResults') }}

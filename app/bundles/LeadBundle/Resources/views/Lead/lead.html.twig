@@ -153,11 +153,9 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    {% if devices %}
                         <li>
                             <a href="#devices" class="group" data-toggle="tab">{{ 'mautic.lead.devices'|trans }}</a>
                         </li>
-                    {% endif %}
                     <li>
                         <a href="#lead-stats" class="group" data-toggle="tab">{{ 'mautic.lead.stats'|trans }}</a>
                     </li>
@@ -209,11 +207,13 @@
                             </div>
                         </div>
                     {% endfor %}
-                    {% if devices %}
                         <div class="tab-pane fade bdr-w-0" id="devices">
-                            {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
+                            {% if devices %}
+                                {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
+                            {% else %}
+                                {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.devices'}) }}
+                            {% endif %}
                         </div>
-                    {% endif %}
                     <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
                         <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                     </div>
@@ -253,7 +253,6 @@
                     </div>
                 </div>
             {% endif %}
-            
         </div>
 
         <div class="pa-md">
@@ -275,7 +274,7 @@
                         {{ 'mautic.lead.lead.tab.notes'|trans }}
                     </a>
                 </li>
-                {% if not isAnonymous and socialProfiles is not empty %}
+                {% if not isAnonymous %}
                     <li class="">
                         <a href="#social-container" role="tab" data-toggle="tab">
                         <span size="sm" class="label label-primary mr-sm" id="SocialCount">
@@ -301,7 +300,6 @@
                         {{ 'mautic.lead.lead.tab.auditlog'|trans }}
                     </a>
                 </li>
-                {% if places %}
                     <li class="">
                         <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
                         <span size="sm" class="label label-primary mr-sm" id="PlaceCount">
@@ -310,7 +308,6 @@
                             {{ 'mautic.lead.lead.tab.places'|trans }}
                         </a>
                     </li>
-                {% endif %}
                 {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
@@ -330,7 +327,7 @@
                 <!--/ #notes-container -->
 
                 <!-- #social-container -->
-                {% if not isAnonymous and socialProfiles is not empty %}
+                {% if not isAnonymous %}
                     <div class="tab-pane fade bdr-w-0" id="social-container">
                         {{ include('@MauticLead/Social/index.html.twig', {
                             'lead': lead,
@@ -364,17 +361,19 @@
                 <!-- end: custom content -->
 
                 <!-- #place-container -->
-                {% if places %}
                     <div class="tab-pane fade bdr-w-0" id="place-container">
+                        {% if not places and not configGetParameter('ip_lookup_auth') %}
+                            {{ include('@MauticCore/Helper/no_information.html.twig', {
+                                'tip': 'mautic.contact.noinformation.places'
+                            }) }}
+                        {% endif %}
                         {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
                     </div>
-                {% endif %}
                 <!--/ #place-container -->
             </div>
             <!--/ end: tab-content -->
         </div>
 
-        
     </div>
     <!--/ left section -->
 
@@ -472,13 +471,15 @@
         </div>
         <!--/ form HTML -->
 
-        {% if upcomingEvents %}
             <hr class="hr-w-2" style="width:50%">
 
             <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
                 <div class="panel-heading">
                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                 </div>
+                {% if not upcomingEvents %}
+                    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.upcoming'}) }}
+                {% endif %}
                 <div class="panel-body pt-sm">
                     <ul class="media-list media-list-feed">
                         {% for event in upcomingEvents %}
@@ -508,7 +509,7 @@
                     </ul>
                 </div>
             </div>
-        {% endif %}
+
         <div class="pa-sm">
             {% for tag in lead.tags %}
                 <div id="tagLabel{{ tag.id }}">
