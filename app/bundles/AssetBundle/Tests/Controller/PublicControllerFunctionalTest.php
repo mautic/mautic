@@ -4,7 +4,6 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
-use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends AbstractAssetTest
 {

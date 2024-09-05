@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This test is breaking other tests, so running it in a separate process.

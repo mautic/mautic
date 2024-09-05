@@ -19,6 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateCustomFieldCommand extends Command
 {
     protected static $defaultDescription = 'Create custom field column in the background';
+
     public function __construct(private BackgroundService $backgroundService, private TranslatorInterface $translator)
     {
         parent::__construct();

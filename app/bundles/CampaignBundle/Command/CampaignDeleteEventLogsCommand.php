@@ -57,6 +57,6 @@ class CampaignDeleteEventLogsCommand extends Command
             $this->eventModel->deleteEventsByEventIds($eventIds);
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }

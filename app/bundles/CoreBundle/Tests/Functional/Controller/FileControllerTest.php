@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Response;
 
 class FileControllerTest extends MauticMysqlTestCase
 {

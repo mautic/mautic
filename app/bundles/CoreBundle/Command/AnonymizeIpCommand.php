@@ -43,7 +43,7 @@ class AnonymizeIpCommand extends Command
             return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $e->getMessage()), $output);
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     private function exitWithError(string $message, OutputInterface $output): int

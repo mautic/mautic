@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 final class UpdateControllerTest extends MauticMysqlTestCase
 {

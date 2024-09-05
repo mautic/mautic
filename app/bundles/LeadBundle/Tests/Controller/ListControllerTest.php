@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use Symfony\Component\HttpFoundation\Response;
 
 class ListControllerTest extends MauticMysqlTestCase
 {
