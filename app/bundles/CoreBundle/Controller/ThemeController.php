@@ -204,7 +204,7 @@ class ThemeController extends FormController
             $themeNames = json_decode($request->query->get('ids', '{}'));
 
             foreach ($themeNames as $themeName) {
-                $flashes = $this->deleteTheme($themeHelper, $themeName);
+                $flashes[] = $this->deleteTheme($themeHelper, $themeName)[0];
             }
         }
 
