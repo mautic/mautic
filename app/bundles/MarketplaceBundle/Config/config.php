@@ -29,14 +29,14 @@ return [
                 'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RemoveController::viewAction',
                 'method'     => 'GET|POST',
             ],
+            RouteProvider::ROUTE_RATE_PACKAGE => [
+                'path'       => '/marketplace/rate/package/{vendor}/{package}',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RateController::rateAction',
+                'method'     => 'GET',
+            ],
             RouteProvider::ROUTE_CLEAR_CACHE => [
                 'path'       => '/marketplace/clear/cache',
                 'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
-                'method'     => 'GET',
-            ],
-            RouteProvider::ROUTE_RATE_PACKAGE => [
-                'path'       => '/marketplace/rate/package',
-                'controller' => 'Mautic\MarketplaceBundle\Controller\RatingController::rateAction',
                 'method'     => 'GET',
             ],
         ],
