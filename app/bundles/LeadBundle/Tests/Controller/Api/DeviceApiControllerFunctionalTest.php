@@ -28,6 +28,6 @@ class DeviceApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
     }
 }

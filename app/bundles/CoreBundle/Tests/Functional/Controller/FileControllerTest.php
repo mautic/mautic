@@ -18,7 +18,7 @@ class FileControllerTest extends MauticMysqlTestCase
         $image = $this->createUploadFile('png-test.png', 'tmp-png-test.png');
         $this->client->request('POST', 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         Assert::assertEquals(true, $responseData['uploaded']);
         Assert::arrayHasKey('url');
@@ -34,7 +34,7 @@ class FileControllerTest extends MauticMysqlTestCase
 
         $this->client->request('POST', 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         Assert::assertEquals(false, $responseData['uploaded']);
         Assert::assertEquals('The uploaded image does not have an allowed mime type', $responseData['error']['message']);

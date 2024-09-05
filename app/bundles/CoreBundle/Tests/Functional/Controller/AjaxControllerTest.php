@@ -38,7 +38,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', 's/ajax?action=core:updateRunChecks');
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
         Assert::assertStringContainsString('Great! You are running the current version of Mautic.', $response->getContent());
     }
 

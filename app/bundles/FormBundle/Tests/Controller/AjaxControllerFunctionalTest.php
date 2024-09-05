@@ -22,7 +22,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $payload        = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         // Assert some random fields exist.
         Assert::assertSame(

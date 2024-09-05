@@ -206,7 +206,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                  * @param FormInterface<FormInterface<mixed>>|string $child
                                  * @param mixed[]                                    $options
                                  */
-                                public function add($child, $type = null, array $options = [])
+                                public function add($child, string $type = null, array $options = [])
                                 {
                                     ++$this->addMethodCallCounter;
 

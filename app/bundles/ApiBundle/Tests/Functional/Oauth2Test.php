@@ -47,7 +47,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(400, $response->getStatusCode(), $response->getContent());
+        self::assertResponseStatusCodeSame(400, $response->getContent());
         Assert::assertSame(
             '{"errors":[{"message":"The client credentials are invalid","code":400,"type":"invalid_client"}]}',
             $response->getContent()
@@ -73,7 +73,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(401, $response->getStatusCode(), $response->getContent());
+        self::assertResponseStatusCodeSame(401, $response->getContent());
         Assert::assertSame('{"errors":[{"message":"The access token provided is invalid.","code":401,"type":"invalid_grant"}]}', $response->getContent());
     }
 
@@ -110,7 +110,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
         $payload     = json_decode($response->getContent(), true);
         $accessToken = $payload['access_token'];
         Assert::assertNotEmpty($accessToken);
@@ -127,7 +127,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('"users":[', $response->getContent());
     }
 }
