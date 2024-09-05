@@ -16,6 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AnalyseCustomFieldCommand extends Command
 {
+    protected static $defaultDescription = 'Analyse actual usage of custom columns in leads table.';
     public function __construct(private FieldModel $fieldModel, private LeadModel $leadModel, private TranslatorInterface $translator)
     {
         parent::__construct();
@@ -28,7 +29,6 @@ class AnalyseCustomFieldCommand extends Command
     {
         $this
             ->setName('mautic:fields:analyse')
-            ->setDescription('Analyse actual usage of custom columns in leads table.')
             ->addOption(
                 'display-table',
                 't',
@@ -48,7 +48,7 @@ class AnalyseCustomFieldCommand extends Command
         if (empty($fieldDetails)) {
             $output->writeln('No custom field(s) to analyse!!!');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $results = $this->leadModel->getCustomLeadFieldLength(array_keys($fieldDetails));
@@ -98,7 +98,7 @@ class AnalyseCustomFieldCommand extends Command
             }
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**
