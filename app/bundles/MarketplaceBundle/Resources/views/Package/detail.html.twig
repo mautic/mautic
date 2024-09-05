@@ -38,7 +38,7 @@
         'data-toggle': 'ajaxmodal',
         'data-target': '#MauticSharedModal',
         'data-header': 'mautic.marketipace.rate.package.header'|trans,
-        'href': path('mautic_marketplace_rate_package', {'objectId': packageDetail.packageBase.name}),
+        'href': path('mautic_marketplace_rate_package', {'vendor': packageDetail.packageBase.getVendorName(), 'package': packageDetail.packageBase.getPackageName()}),
     },
     'btnText': 'mautic.marketipace.rate.package'|trans,
     'iconClass': 'ri-mail-send-line',
