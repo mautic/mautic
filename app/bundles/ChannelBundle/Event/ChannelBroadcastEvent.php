@@ -46,18 +46,18 @@ class ChannelBroadcastEvent extends Event
         /**
          * Specific channel.
          */
-        protected $channel,
+        protected string $channel,
         /**
          * Specific ID of a specific channel.
          */
-        protected $id,
+        protected string|int $id,
         protected OutputInterface $output
     )
     {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getChannel()
     {
@@ -65,7 +65,7 @@ class ChannelBroadcastEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return string|int
      */
     public function getId()
     {

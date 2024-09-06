@@ -789,6 +789,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        \assert($integrationEntityRepo instanceof IntegrationEntityRepository);
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated = $totalErrors = 0;
@@ -816,11 +817,11 @@ class ZohoIntegration extends CrmAbstractIntegration
             $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, 0, $params['start'], $params['end'], ['Contacts', 'Leads'])
         );
         $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, 0, $params['start'], $params['end']);
-        $totalCount    = $totalToCreate + $totalToUpdate;
+        $totalCount    = is_array($totalToCreate) ? count($totalToCreate) + $totalToUpdate : $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
-            if ($totalToUpdate + $totalToCreate) {
+            if ($totalCount) {
                 $output = new ConsoleOutput();
                 $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
                 $progress = new ProgressBar($output, $totalCount);

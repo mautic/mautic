@@ -20,7 +20,7 @@ class ApiMetadataDriver implements DriverInterface
 
     private string $defaultVersion = '1.0';
 
-    private $currentPropertyName;
+    private ?string $currentPropertyName = null;
 
     /**
      * @throws \ReflectionException

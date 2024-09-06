@@ -29,7 +29,7 @@ class TokenHelper
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $token = '{focus='.$id.'}';
-                $focus = $this->model->getEntity($id);
+                $focus = $this->model->getEntity((int) $id);
                 if (null !== $focus
                     && (
                         $focus->isPublished()

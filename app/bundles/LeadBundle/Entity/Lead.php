@@ -109,7 +109,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $pointsChangeLog;
 
-    private $actualPoints;
+    private ?int $actualPoints;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
@@ -850,7 +850,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get points.
      *
-     * @return int
+     * @return ?int
      */
     public function getPoints()
     {

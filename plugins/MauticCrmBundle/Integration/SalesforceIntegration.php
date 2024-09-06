@@ -1146,11 +1146,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fromDate,
             $toDate
         ) : 0;
-        $totalCount    = $totalToProcess = $totalToCreate + $totalToUpdate;
+        $totalCount = $totalToProcess = is_array($totalToCreate) ? count($totalToCreate) + $totalToUpdate : $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
-            if ($totalToUpdate + $totalToCreate) {
+            if ($totalCount) {
                 $output = new ConsoleOutput();
                 $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
                 $progress = new ProgressBar($output, $totalCount);
@@ -1213,7 +1213,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // If there is still room - grab Mautic leads to create if the Lead object is enabled
             $sfEntityRecords = [];
-            if ('Lead' === $sfObject && (null === $limit || $limit > 0) && !empty($mauticLeadFieldString)) {
+            if ('Lead' === $sfObject && $limit > 0 && !empty($mauticLeadFieldString)) {
                 try {
                     $sfEntityRecords = $this->getMauticContactsToCreate(
                         $checkEmailsInSF,
@@ -2713,11 +2713,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
             'company'
         );
 
-        $totalCount = $totalToProcess = $totalToCreate + $totalToUpdate;
+        $totalCount = $totalToProcess = is_array($totalToCreate) ? count($totalToCreate) + $totalToUpdate : $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
-            if ($totalToUpdate + $totalToCreate) {
+            if ($totalCount) {
                 $output = new ConsoleOutput();
                 $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
                 $progress = new ProgressBar($output, $totalCount);
@@ -2754,7 +2754,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // If there is still room - grab Mautic companies to create if the Lead object is enabled
             $sfEntityRecords = [];
-            if ((null === $limit || $limit > 0) && !empty($mauticCompanyFieldString)) {
+            if ($limit > 0 && !empty($mauticCompanyFieldString)) {
                 $this->getMauticEntitesToCreate(
                     $checkCompaniesInSF,
                     $mauticCompanyFieldString,

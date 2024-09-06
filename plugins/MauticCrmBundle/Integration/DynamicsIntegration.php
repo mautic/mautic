@@ -700,6 +700,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $object                = 'contacts';
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        \assert($integrationEntityRepo instanceof IntegrationEntityRepository);
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
@@ -725,11 +726,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $progress      = false;
         $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
         $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, 0, $params['start'], $params['end']);
-        $totalCount    = $totalToCreate + $totalToUpdate;
+        $totalCount    = is_array($totalToCreate) ? count($totalToCreate) + $totalToUpdate : $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
-            if ($totalToUpdate + $totalToCreate) {
+            if ($totalCount) {
                 $output = new ConsoleOutput();
                 $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
                 $output->writeln('<info>This could take some time. Please wait until the process is completed</info>');

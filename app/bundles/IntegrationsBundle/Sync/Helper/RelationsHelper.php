@@ -13,6 +13,9 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class RelationsHelper
 {
+    /**
+     * @var ObjectDAO[]
+     */
     private array $objectsToSynchronize = [];
 
     public function __construct(

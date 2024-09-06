@@ -103,7 +103,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the cache timeout.
      *
-     * @param string $cacheTimeout
+     * @param int $cacheTimeout
      */
     public function setCacheTimeout($cacheTimeout): void
     {
