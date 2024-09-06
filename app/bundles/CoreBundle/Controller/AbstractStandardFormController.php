@@ -640,10 +640,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Provide the direction for default ordering.
-     *
-     * @return string
      */
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'ASC';
     }
