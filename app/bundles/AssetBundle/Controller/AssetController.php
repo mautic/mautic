@@ -658,10 +658,8 @@ class AssetController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request, AssetModel $model)
+    public function batchDeleteAction(Request $request, AssetModel $model): Response
     {
         $page      = $request->getSession()->get('mautic.asset.page', 1);
         $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);

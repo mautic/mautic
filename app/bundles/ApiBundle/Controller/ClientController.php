@@ -145,10 +145,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * @param int $clientId
-     *
-     * @return Response
      */
-    public function revokeAction(Request $request, $clientId)
+    public function revokeAction(Request $request, $clientId): Response
     {
         $success = 0;
         $flashes = [];

@@ -514,10 +514,8 @@ class CategoryController extends AbstractFormController
      * Deletes a group of entities.
      *
      * @param string $bundle
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request, $bundle)
+    public function batchDeleteAction(Request $request, $bundle): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);

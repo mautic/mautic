@@ -247,10 +247,8 @@ class DashboardController extends AbstractFormController
      * Deletes entity if exists.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$request->isXmlHttpRequest()) {
             throw new BadRequestHttpException();

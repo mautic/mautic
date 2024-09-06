@@ -1062,10 +1062,8 @@ class FormController extends CommonFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
@@ -1150,7 +1148,7 @@ class FormController extends CommonFormController
         $this->alreadyMappedFieldCollector->removeAllForForm((string) $sessionId);
     }
 
-    public function batchRebuildHtmlAction(Request $request)
+    public function batchRebuildHtmlAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
