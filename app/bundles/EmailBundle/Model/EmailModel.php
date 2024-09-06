@@ -2319,6 +2319,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param array<int> $ids
+     *
      * @return array<Email>
      */
     public function getByIds(array $ids): iterable

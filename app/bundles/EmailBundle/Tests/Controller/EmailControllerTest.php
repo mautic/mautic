@@ -34,7 +34,7 @@ use Twig\Environment;
 class EmailControllerTest extends TestCase
 {
     /**
-     * @var MockObject|Translator
+     * @var string
      */
     public const NEW_CATEGORY_TITLE = 'New category';
     private MockObject $translatorMock;

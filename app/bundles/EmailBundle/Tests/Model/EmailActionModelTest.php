@@ -116,6 +116,9 @@ class EmailActionModelTest extends TestCase
             ->willReturn($allow);
     }
 
+    /**
+     * @param array<Email> $emails
+     */
     protected function configureRepositoryToReturn(array $emails): void
     {
         $this
@@ -127,6 +130,9 @@ class EmailActionModelTest extends TestCase
             ->willReturn($emails);
     }
 
+    /**
+     * @param array<Email> $emails
+     */
     protected function configureModelToSave(array $emails): void
     {
         $this
@@ -136,6 +142,9 @@ class EmailActionModelTest extends TestCase
             ->with($emails);
     }
 
+    /**
+     * @param array<Email> $emails
+     */
     protected function tryToSetCategory(array $emails, Category $newCategory): void
     {
         $this
