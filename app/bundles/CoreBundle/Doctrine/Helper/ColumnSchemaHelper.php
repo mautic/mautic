@@ -209,7 +209,6 @@ class ColumnSchemaHelper
      *
      * @param bool|false $throwException
      *
-     *
      * @throws SchemaException
      */
     public function checkTableExists($table, $throwException = false): bool

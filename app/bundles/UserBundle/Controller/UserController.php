@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -433,7 +434,7 @@ class UserController extends FormController
      *
      * @param int $objectId
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId): \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId): Response|RedirectResponse
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -550,7 +551,7 @@ class UserController extends FormController
     /**
      * Deletes a group of entities.
      */
-    public function batchDeleteAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.user.page', 1);
         $returnUrl = $this->generateUrl('mautic_user_index', ['page' => $page]);

@@ -52,8 +52,7 @@ class ChannelBroadcastEvent extends Event
          */
         protected string|int $id,
         protected OutputInterface $output
-    )
-    {
+    ) {
     }
 
     /**

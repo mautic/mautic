@@ -1177,7 +1177,7 @@ class LeadController extends FormController
     /**
      * Deletes a group of entities.
      */
-    public function batchDeleteAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1367,7 +1367,7 @@ class LeadController extends FormController
     /**
      * @param int $objectId
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 

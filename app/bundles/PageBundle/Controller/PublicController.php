@@ -629,7 +629,7 @@ class PublicController extends AbstractFormController
     /**
      * Track video views.
      */
-    public function hitVideoAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+    public function hitVideoAction(Request $request): JsonResponse|Response
     {
         // Only track XMLHttpRequests, because the hit should only come from there
         if ($request->isXmlHttpRequest()) {

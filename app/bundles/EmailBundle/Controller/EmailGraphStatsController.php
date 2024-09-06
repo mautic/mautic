@@ -20,7 +20,6 @@ class EmailGraphStatsController extends AbstractController
      * @param string $dateFrom
      * @param string $dateTo
      *
-     *
      * @throws \Exception
      */
     public function viewAction(

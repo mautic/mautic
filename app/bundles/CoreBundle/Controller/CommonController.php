@@ -200,7 +200,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
      */
-    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): RedirectResponse
     {
         return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
     }
@@ -208,7 +208,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects /s and /s/ to /s/dashboard.
      */
-    public function redirectSecureRootAction(): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function redirectSecureRootAction(): RedirectResponse
     {
         return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
@@ -218,7 +218,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
      */
-    public function postActionRedirect(array $args = []): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+    public function postActionRedirect(array $args = []): RedirectResponse|Response
     {
         $request = $this->getCurrentRequest();
 
@@ -617,7 +617,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param array|\Iterator $toExport
      */
-    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));

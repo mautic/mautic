@@ -626,7 +626,7 @@ class SmsController extends FormController
     /**
      * Deletes a group of entities.
      */
-    public function batchDeleteAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.sms.page', 1);
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);

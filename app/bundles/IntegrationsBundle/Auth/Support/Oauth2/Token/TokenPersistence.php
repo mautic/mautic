@@ -22,7 +22,6 @@ class TokenPersistence implements TokenPersistenceInterface
     /**
      * Restore the token data into the give token.
      *
-     *
      * @return TokenInterface|IntegrationToken Restored token
      */
     public function restoreToken(TokenInterface $token): TokenInterface

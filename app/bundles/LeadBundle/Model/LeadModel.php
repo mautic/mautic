@@ -1619,7 +1619,7 @@ class LeadModel extends FormModel
             $val = InputHelper::_($val, 'string');
         });
         // Remove any tags that became empty after filtering
-        $tags = array_filter($tags, fn($tag) => strlen($tag) > 0);
+        $tags = array_filter($tags, fn ($tag) => strlen($tag) > 0);
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1659,7 +1659,7 @@ class LeadModel extends FormModel
                 $val = InputHelper::_($val, 'string');
             });
             // Remove any tags that became empty after filtering
-            $removeTags = array_filter($removeTags, fn($tag) => strlen($tag) > 0);
+            $removeTags = array_filter($removeTags, fn ($tag) => strlen($tag) > 0);
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
