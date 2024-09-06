@@ -299,9 +299,10 @@ class ReportModel extends FormModel
                 continue;
             }
             if (isset($data['label'])) {
+                $columnIndex = str_contains($column, '.') ? substr(strrchr($column, '.'), 1) : $column;
                 $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
-                $return->choices[$column]     = $data['label'];
-                $return->definitions[$column] = $data;
+                $return->choices[$columnIndex] = $data['label'];
+                $return->definitions[$column]  = $data;
             }
         }
 
