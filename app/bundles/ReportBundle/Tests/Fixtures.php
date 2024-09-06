@@ -230,8 +230,8 @@ class Fixtures
     {
         $list          = new \stdClass();
         $list->choices = [
-            'alias'       => 'Alias',
-            'description' => 'Description',
+            'a.alias'       => 'Alias',
+            'a.description' => 'Description',
         ];
         $list->choiceHtml  = '<option value="a.alias">Alias</option>\n<option value="a.description">Description</option>\n';
         $list->definitions = [
