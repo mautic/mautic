@@ -9,24 +9,18 @@ class ChannelBroadcastEvent extends Event
 {
     /**
      * Number of contacts successfully processed and/or failed per channel.
-     *
-     * @var array
      */
-    protected $results = [];
+    protected array $results = [];
 
     /**
      * Min contact ID filter can be used for process parallelization.
-     *
-     * @var int
      */
-    private $minContactIdFilter;
+    private ?int $minContactIdFilter = null;
 
     /**
      * Max contact ID filter can be used for process parallelization.
-     *
-     * @var int
      */
-    private $maxContactIdFilter;
+    private ?int $maxContactIdFilter = null;
 
     /**
      * How many contacts to load from the database.
@@ -46,7 +40,7 @@ class ChannelBroadcastEvent extends Event
         /**
          * Specific channel.
          */
-        protected string $channel,
+        protected ?string $channel,
         /**
          * Specific ID of a specific channel.
          */
@@ -55,28 +49,17 @@ class ChannelBroadcastEvent extends Event
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getChannel()
+    public function getChannel(): ?string
     {
         return $this->channel;
     }
 
-    /**
-     * @return string|int
-     */
-    public function getId()
+    public function getId(): string|int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $channelLabel
-     * @param int    $successCount
-     * @param int    $failedCount
-     */
-    public function setResults($channelLabel, $successCount, $failedCount = 0, array $failedRecipientsByList = []): void
+    public function setResults(string $channelLabel, int $successCount, int $failedCount = 0, array $failedRecipientsByList = []): void
     {
         $this->results[$channelLabel] = [
             'success'                => (int) $successCount,
@@ -85,15 +68,12 @@ class ChannelBroadcastEvent extends Event
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }
 
-    public function checkContext($channel): bool
+    public function checkContext(string $channel): bool
     {
         if ($this->channel && $this->channel !== $channel) {
             return false;
@@ -102,50 +82,32 @@ class ChannelBroadcastEvent extends Event
         return true;
     }
 
-    /**
-     * @return OutputInterface
-     */
-    public function getOutput()
+    public function getOutput(): OutputInterface
     {
         return $this->output;
     }
 
-    /**
-     * @param int $minContactIdFilter
-     */
-    public function setMinContactIdFilter($minContactIdFilter): void
+    public function setMinContactIdFilter(int $minContactIdFilter): void
     {
         $this->minContactIdFilter = $minContactIdFilter;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMinContactIdFilter()
+    public function getMinContactIdFilter(): ?int
     {
         return $this->minContactIdFilter;
     }
 
-    /**
-     * @param int $maxContactIdFilter
-     */
-    public function setMaxContactIdFilter($maxContactIdFilter): void
+    public function setMaxContactIdFilter(int $maxContactIdFilter): void
     {
         $this->maxContactIdFilter = $maxContactIdFilter;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMaxContactIdFilter()
+    public function getMaxContactIdFilter(): ?int
     {
         return $this->maxContactIdFilter;
     }
 
-    /**
-     * @param int $limit
-     */
-    public function setLimit($limit): void
+    public function setLimit(int $limit): void
     {
         $this->limit = $limit;
     }
@@ -155,10 +117,7 @@ class ChannelBroadcastEvent extends Event
         return $this->limit;
     }
 
-    /**
-     * @param int $batch
-     */
-    public function setBatch($batch): void
+    public function setBatch(int $batch): void
     {
         $this->batch = $batch;
     }
