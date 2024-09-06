@@ -7,6 +7,15 @@
                     <i class="ri-more-2-fill"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
+                    <li class="small fw-sb text-muted ma-md ellipsis">
+                        {% if widget.isCached %}
+                            <i class="ri-history-line mr-xs"></i>
+                            {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
+                        {% else %}
+                            <i class="ri-flashlight-line mr-xs"></i>
+                            {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
+                        {% endif %}
+                    </li>
                     <li>
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
                             data-toggle="ajaxmodal"
@@ -15,22 +24,10 @@
                             <i class="ri-edit-line"></i> Edit
                         </a>
                     </li>
-                    <li role="separator" class="divider"></li>
-                    <li  class="dropdown-header">
-                        {{ 'mautic.dashboard.widget.load.time'|trans({'%time%': (widget.loadTime * 1000)|round(1)}) }}
-                    </li>
-                    <li  class="dropdown-header">
-                        {% if widget.isCached %}
-                            {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
-                        {% else %}
-                            {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
-                        {% endif %}
-                    </li>
-                    <li role="separator" class="divider"></li>
                     <li>
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
                             data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
-                            class="remove-widget">
+                            class="remove-widget danger">
                             <i class="ri-close-line"></i> Remove
                         </a>
                     </li>

@@ -1358,6 +1358,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "cjavad",
+      "name": "Javad Shafique",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22474016?v=4",
+      "profile": "http://javad.sh",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
