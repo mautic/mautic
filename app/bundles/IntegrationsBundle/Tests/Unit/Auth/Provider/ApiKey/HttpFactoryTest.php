@@ -100,7 +100,6 @@ class HttpFactoryTest extends TestCase
         };
 
         $factory = new HttpFactory();
-
         $client  = $factory->getClient($credentials);
         $headers = $client->getConfig('headers');
 
