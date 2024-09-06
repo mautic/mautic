@@ -101,7 +101,7 @@ class MailHelper
      */
     protected $internalSend = false;
 
-    protected ?string $idHash;
+    protected ?string $idHash = null;
 
     /**
      * @var bool

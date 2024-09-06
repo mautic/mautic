@@ -109,7 +109,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $pointsChangeLog;
 
-    private ?int $actualPoints;
+    private ?int $actualPoints = null;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>

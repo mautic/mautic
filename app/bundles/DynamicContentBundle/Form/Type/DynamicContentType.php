@@ -41,7 +41,7 @@ class DynamicContentType extends AbstractType
     /**
      * @var mixed[]
      */
-    private array $fieldChoices;
+    private array $fieldChoices = [];
 
     /**
      * @var mixed[]
