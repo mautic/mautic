@@ -649,10 +649,7 @@ class CommonController extends AbstractController implements MauticController
         return $data->getDataForExport($start, $model, $args, $resultsCallback);
     }
 
-    /**
-     * @return string
-     */
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'ASC';
     }

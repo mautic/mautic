@@ -12,11 +12,10 @@ use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromStrictScalarReturnsRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromBooleanStrictReturnsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
@@ -61,7 +60,7 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
         ],
 
-        ReturnTypeFromStrictBoolReturnExprRector::class => [
+        BoolReturnTypeFromBooleanStrictReturnsRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
             // requires quite a refactoring
             __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
@@ -116,7 +115,8 @@ return static function (RectorConfig $rectorConfig): void {
     // Define what single rules will be applied
     $rectorConfig->rules([
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
+        Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromBooleanConstReturnsRector::class,
+        Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictScalarReturnsRector::class,
 
         Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
         NumericReturnTypeFromStrictScalarReturnsRector::class,
@@ -126,14 +126,13 @@ return static function (RectorConfig $rectorConfig): void {
         ReturnTypeFromStrictParamRector::class,
         ReturnTypeFromStrictTernaryRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
-        BoolReturnTypeFromStrictScalarReturnsRector::class,
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
         TypedPropertyFromStrictSetUpRector::class,
         RemoveUnusedVariableAssignRector::class,
         RemoveUselessVarTagRector::class,
         SimplifyUselessVariableRector::class,
-        ReturnTypeFromStrictBoolReturnExprRector::class,
+        BoolReturnTypeFromBooleanStrictReturnsRector::class,
         ReturnTypeFromStrictConstantReturnRector::class,
         ReturnTypeFromReturnDirectArrayRector::class,
     ]);
