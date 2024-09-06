@@ -1,5 +1,5 @@
 <li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+    <a class="dropdown-toggle" data-toggle="dropdown" id="admin-menu" href="#">
         <i class="ri-settings-5-line ri-xl"></i>
     </a>
     <ul class="dropdown-menu dropdown-menu-right">
@@ -10,7 +10,7 @@
                         {% set extras = child.getExtras() %}
                         {% set labelAttributes = child.getLabelAttributes() %}
                         {% set labelClasses = (labelAttributes.class is not defined) ? 'nav-item-name' : labelAttributes.class ~ ' nav-item-name' %}
-                        
+
                         {% if child.hasChildren() and child.getDisplayChildren() %}
                             <div class="dropdown-header">
                                 {% if extras.iconClass is defined and extras.iconClass is not empty %}
@@ -25,7 +25,7 @@
                                         {% set extras = grandchild.getExtras() %}
                                         {% set url = grandchild.getUri() %}
                                         {% set url = (url is empty) ? 'javascript:void(0);' : url %}
-                                        
+
                                         <a href="{{ url }}"{{ parseMenuAttributes(linkAttributes) }} data-toggle="ajax">
                                             {% if extras.iconClass is defined and extras.iconClass is not empty %}
                                                 <i class="icon {{ extras.iconClass }}"></i>
@@ -39,7 +39,7 @@
                             {% set linkAttributes = child.getLinkAttributes() %}
                             {% set url = child.getUri() %}
                             {% set url = (url is empty) ? 'javascript:void(0);' : url %}
-                            
+
                             <a href="{{ url }}"{{ parseMenuAttributes(linkAttributes) }} data-toggle="ajax">
                                 {% if extras.iconClass is defined and extras.iconClass is not empty %}
                                     <i class="icon {{ extras.iconClass }}"></i>
