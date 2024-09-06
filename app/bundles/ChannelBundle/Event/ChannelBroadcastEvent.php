@@ -37,14 +37,8 @@ class ChannelBroadcastEvent extends Event
     private ?int $threadId = null;
 
     public function __construct(
-        /**
-         * Specific channel.
-         */
-        protected ?string $channel,
-        /**
-         * Specific ID of a specific channel.
-         */
-        protected string|int $id,
+        protected ?string $channel, // Specific channel.
+        protected string|int|null $id, // Specific ID of a specific channel.
         protected OutputInterface $output
     ) {
     }
@@ -54,7 +48,7 @@ class ChannelBroadcastEvent extends Event
         return $this->channel;
     }
 
-    public function getId(): string|int
+    public function getId(): string|int|null
     {
         return $this->id;
     }
