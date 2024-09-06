@@ -299,10 +299,9 @@ class ReportModel extends FormModel
                 continue;
             }
             if (isset($data['label'])) {
-                $columnIndex = str_contains($column, '.') ? substr(strrchr($column, '.'), 1) : $column;
                 $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
-                $return->choices[$columnIndex] = $data['label'];
-                $return->definitions[$column]  = $data;
+                $return->choices[$column]          = $data['label'];
+                $return->definitions[$column]      = $data;
             }
         }
 
@@ -662,9 +661,15 @@ class ReportModel extends FormModel
      */
     private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
     {
+        $allowedChoices = [];
+        foreach ($allowedColumns->choices as $column => $allowedColumn) {
+            $columnIndex                  = str_contains($column, '.') ? substr(strrchr($column, '.'), 1) : $column;
+            $allowedChoices[$columnIndex] = $allowedColumn;
+        }
+
         $hasOrderBy = false;
         foreach ($orderBys as $key => $orderBy) {
-            if ($this->orderByIsValid($orderBy, $allowedColumns)) {
+            if ($this->orderByIsValid($orderBy, $allowedChoices)) {
                 $hasOrderBy = true;
                 continue;
             }
@@ -680,7 +685,7 @@ class ReportModel extends FormModel
     /**
      * Check if order by is valid.
      */
-    private function orderByIsValid(string $order, \stdClass $allowedColumns): bool
+    private function orderByIsValid(string $order, array $allowedColumns): bool
     {
         if (empty($order)) {
             return false;
@@ -695,7 +700,7 @@ class ReportModel extends FormModel
             $oderByDirection = $orderTemp[1];
         }
 
-        if (!array_key_exists($orderBy, $allowedColumns->choices) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
+        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
             return false;
         }
 
