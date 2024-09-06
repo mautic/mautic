@@ -432,10 +432,8 @@ class UserController extends FormController
      * Contacts a user.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId)
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId): \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -551,10 +549,8 @@ class UserController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $page      = $request->getSession()->get('mautic.user.page', 1);
         $returnUrl = $this->generateUrl('mautic_user_index', ['page' => $page]);

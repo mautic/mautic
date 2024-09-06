@@ -17,10 +17,7 @@ class DateTimeHelper
 
     private string $format;
 
-    /**
-     * @var string
-     */
-    private $timezone;
+    private ?string $timezone = null;
 
     private \DateTimeZone $utc;
 

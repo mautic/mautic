@@ -51,7 +51,7 @@ class ModelFactory
     /**
      * Check if a model exists.
      */
-    public function hasModel($modelNameKey)
+    public function hasModel($modelNameKey): bool
     {
         try {
             $this->getModel($modelNameKey);

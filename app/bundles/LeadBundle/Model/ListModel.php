@@ -1103,10 +1103,8 @@ class ListModel extends FormModel
 
     /**
      * @param $segmentId *
-     *
-     * @return array
      */
-    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name'): array
     {
         $filter = [
             'force'  => [

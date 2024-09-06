@@ -37,10 +37,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
         return 'https://login.mailchimp.com/oauth2/authorize';
     }
 
-    /**
-     * @return array
-     */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return (empty($this->keys['client_id'])) ?
             [

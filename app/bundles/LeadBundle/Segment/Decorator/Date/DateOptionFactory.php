@@ -31,10 +31,7 @@ class DateOptionFactory
     ) {
     }
 
-    /**
-     * @return FilterDecoratorInterface
-     */
-    public function getDateOption(ContactSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getDateOption(ContactSegmentFilterCrate $leadSegmentFilterCrate): FilterDecoratorInterface
     {
         $originalValue        = $leadSegmentFilterCrate->getFilter();
         $relativeDateStrings  = $this->relativeDate->getRelativeDateStrings();

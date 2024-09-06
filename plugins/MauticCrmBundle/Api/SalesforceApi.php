@@ -612,7 +612,7 @@ class SalesforceApi extends CrmApi
     /**
      * @return array<mixed>
      */
-    private function parseMissingField(string $errorMessage)
+    private function parseMissingField(string $errorMessage): array
     {
         $matches = [];
         preg_match(self::REGEXP_MISSING_FIELD, $errorMessage, $matches);

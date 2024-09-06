@@ -90,7 +90,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return AbstractCommonModel<object>
      */
-    protected function getModel($modelNameKey)
+    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -199,10 +199,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
-     *
-     * @return RedirectResponse
      */
-    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper)
+    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
     }
@@ -210,7 +208,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects /s and /s/ to /s/dashboard.
      */
-    public function redirectSecureRootAction()
+    public function redirectSecureRootAction(): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
@@ -219,10 +217,8 @@ class CommonController extends AbstractController implements MauticController
      * Redirects controller if not ajax or retrieves html output for ajax request.
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
-     *
-     * @return Response
      */
-    public function postActionRedirect(array $args = [])
+    public function postActionRedirect(array $args = []): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $request = $this->getCurrentRequest();
 
@@ -559,10 +555,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders flashes' HTML.
-     *
-     * @return string
      */
-    protected function getFlashContent()
+    protected function getFlashContent(): string
     {
         return $this->renderView('@MauticCore/Notification/flash_messages.html.twig');
     }
@@ -622,10 +616,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * @param array|\Iterator $toExport
-     *
-     * @return StreamedResponse
      */
-    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper)
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));

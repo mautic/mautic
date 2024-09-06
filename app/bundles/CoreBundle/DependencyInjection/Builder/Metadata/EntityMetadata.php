@@ -8,10 +8,7 @@ use Symfony\Component\Finder\Finder;
 
 class EntityMetadata
 {
-    /**
-     * @var array
-     */
-    private $ormConfig = [];
+    private array $ormConfig = [];
 
     private array $serializerConfig = [];
 

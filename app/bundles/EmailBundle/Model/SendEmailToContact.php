@@ -22,20 +22,11 @@ class SendEmailToContact
 
     private array $failedContacts = [];
 
-    /**
-     * @var array
-     */
-    private $errorMessages = [];
+    private array $errorMessages = [];
 
-    /**
-     * @var array
-     */
-    private $badEmails = [];
+    private array $badEmails = [];
 
-    /**
-     * @var array
-     */
-    private $emailSentCounts = [];
+    private array $emailSentCounts = [];
 
     /**
      * @var array|null
@@ -51,10 +42,7 @@ class SendEmailToContact
 
     private int $statBatchCounter = 0;
 
-    /**
-     * @var array
-     */
-    private $contact = [];
+    private array $contact = [];
 
     public function __construct(
         private MailHelper $mailer,

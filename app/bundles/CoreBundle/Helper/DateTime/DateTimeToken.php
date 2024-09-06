@@ -19,16 +19,14 @@ class DateTimeToken
     {
         $tokens = [];
         preg_match_all('/{today(.*?)}/', $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $modifier) {
-                $token = $matches[0][$key];
+        foreach ($matches[1] as $key => $modifier) {
+            $token = $matches[0][$key];
 
-                if (isset($tokens[$token])) {
-                    continue;
-                }
-
-                $tokens[$token] = $this->getToday($modifier, $contactTimezone);
+            if (isset($tokens[$token])) {
+                continue;
             }
+
+            $tokens[$token] = $this->getToday($modifier, $contactTimezone);
         }
 
         return $tokens;

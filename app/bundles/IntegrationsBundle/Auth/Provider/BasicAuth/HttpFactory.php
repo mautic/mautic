@@ -31,8 +31,6 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param CredentialsInterface|AuthCredentialsInterface $credentials
-     *
      * @throws PluginNotConfiguredException
      */
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface

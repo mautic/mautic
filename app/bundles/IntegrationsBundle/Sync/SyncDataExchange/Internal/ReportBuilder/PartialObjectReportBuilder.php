@@ -21,10 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PartialObjectReportBuilder
 {
-    /**
-     * @var array
-     */
-    private $reportObjects = [];
+    private array $reportObjects = [];
 
     private array $lastProcessedTrackedId = [];
 

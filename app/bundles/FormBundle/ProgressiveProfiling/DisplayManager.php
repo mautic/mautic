@@ -16,10 +16,7 @@ class DisplayManager
         $this->displayCounter = new DisplayCounter($form);
     }
 
-    /**
-     * @return bool
-     */
-    public function showForField(Field $field)
+    public function showForField(Field $field): bool
     {
         if (in_array($field->getType(), $this->viewOnlyFields)) {
             return true;

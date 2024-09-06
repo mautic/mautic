@@ -20,7 +20,6 @@ class EmailGraphStatsController extends AbstractController
      * @param string $dateFrom
      * @param string $dateTo
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
      * @throws \Exception
      */

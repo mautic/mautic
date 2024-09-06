@@ -79,9 +79,6 @@ class HttpFactory implements AuthProviderInterface
         return $credentials instanceof HeaderCredentialsInterface || $credentials instanceof ParameterCredentialsInterface;
     }
 
-    /**
-     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
-     */
     private function credentialsAreConfigured(AuthCredentialsInterface $credentials): bool
     {
         return !empty($credentials->getApiKey());

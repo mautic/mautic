@@ -101,9 +101,6 @@ class MailHelper
      */
     protected $internalSend = false;
 
-    /**
-     * @var null
-     */
     protected $idHash;
 
     /**
@@ -865,10 +862,8 @@ class MailHelper
 
     /**
      * Set to address(es).
-     *
-     * @return bool
      */
-    public function setTo($addresses, $name = null)
+    public function setTo($addresses, $name = null): bool
     {
         $name = $this->cleanName($name);
 
@@ -905,10 +900,8 @@ class MailHelper
      *
      * @param string      $address
      * @param string|null $name
-     *
-     * @return bool
      */
-    public function addTo($address, $name = null)
+    public function addTo($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients();
 
@@ -931,10 +924,8 @@ class MailHelper
      * @param ?string               $name
      *
      * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
-     *
-     * @return bool
      */
-    public function setCc($addresses, $name = null)
+    public function setCc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
@@ -960,10 +951,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addCc($address, $name = null)
+    public function addCc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'cc');
 
@@ -985,10 +974,8 @@ class MailHelper
      * @param ?string               $name
      *
      * //TODO: same bug for the name as the one we have in setCc
-     *
-     * @return bool
      */
-    public function setBcc($addresses, $name = null)
+    public function setBcc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
@@ -1015,10 +1002,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addBcc($address, $name = null)
+    public function addBcc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'bcc');
 

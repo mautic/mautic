@@ -701,10 +701,7 @@ class LeadModel extends FormModel
         ]);
     }
 
-    /**
-     * @return bool
-     */
-    public function canEditContact(Lead $contact)
+    public function canEditContact(Lead $contact): bool
     {
         return $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
     }

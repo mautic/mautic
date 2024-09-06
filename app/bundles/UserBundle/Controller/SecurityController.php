@@ -41,8 +41,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
     /**
      * Generates login form and processes login.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
     {

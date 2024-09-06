@@ -48,11 +48,10 @@ class InstallController extends CommonController
      *
      * @param int $index The step number to process
      *
-     * @return JsonResponse|Response
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0)
+    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
@@ -234,7 +233,6 @@ class InstallController extends CommonController
     /**
      * Controller action for the final step.
      *
-     * @return JsonResponse|Response
      *
      * @throws \Exception
      */

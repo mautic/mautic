@@ -208,7 +208,7 @@ class Widget extends FormEntity
     /**
      * Get cache timeout.
      *
-     * @return int (minutes)
+     * @return ?int (minutes)
      */
     public function getCacheTimeout()
     {
@@ -218,7 +218,7 @@ class Widget extends FormEntity
     /**
      * Set cache timeout.
      *
-     * @param int $cacheTimeout (minutes)
+     * @param ?int $cacheTimeout (minutes)
      *
      * @return Widget
      */

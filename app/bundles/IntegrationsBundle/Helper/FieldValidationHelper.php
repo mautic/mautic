@@ -63,7 +63,7 @@ class FieldValidationHelper
         $hasMissingFields  = false;
         $errorsOnGivenPage = false;
 
-        if (!$hasMissingFields && !empty($missingFields)) {
+        if (!empty($missingFields)) {
             $hasMissingFields = true;
         }
 

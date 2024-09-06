@@ -23,7 +23,7 @@ class ParameterLoader
     /**
      * @var array<string, mixed>
      */
-    private static $defaultParameters = [];
+    private static array $defaultParameters = [];
 
     public function __construct(
         private string $rootPath = __DIR__.'/../../../'

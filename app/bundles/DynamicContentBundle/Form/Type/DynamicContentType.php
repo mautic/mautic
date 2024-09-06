@@ -38,7 +38,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DynamicContentType extends AbstractType
 {
-    private $fieldChoices;
+    private array $fieldChoices;
 
     /**
      * @var mixed[]

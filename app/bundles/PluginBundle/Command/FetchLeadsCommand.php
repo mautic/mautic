@@ -94,7 +94,7 @@ class FetchLeadsCommand extends Command
         $startDate = !$startDate ? date('c', strtotime('-'.$interval)) : date('c', strtotime($startDate));
         $endDate   = !$endDate ? date('c') : date('c', strtotime($endDate));
 
-        if (!$startDate || !$endDate) {
+        if (!$endDate) {
             $output->writeln(sprintf('<info>Invalid date rage given %s -> %s</info>', $startDate, $endDate));
 
             return 255;

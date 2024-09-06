@@ -16,7 +16,7 @@ class AuthController extends FormController
      *
      * @return JsonResponse
      */
-    public function authCallbackAction(Request $request, $integration)
+    public function authCallbackAction(Request $request, $integration): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
         $session = $request->getSession();

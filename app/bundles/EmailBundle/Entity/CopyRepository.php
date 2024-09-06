@@ -16,7 +16,7 @@ class CopyRepository extends CommonRepository
      * @param string $body
      * @param string $bodyText
      */
-    public function saveCopy($hash, $subject, $body, $bodyText)
+    public function saveCopy($hash, $subject, $body, $bodyText): bool
     {
         $db = $this->getEntityManager()->getConnection();
 

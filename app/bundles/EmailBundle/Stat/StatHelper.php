@@ -13,12 +13,9 @@ class StatHelper
      *
      * @var Reference[]
      */
-    private $stats = [];
+    private array $stats = [];
 
-    /**
-     * @var array
-     */
-    private $deleteUs = [];
+    private array $deleteUs = [];
 
     public function __construct(
         private EmailStatModel $emailStatModel

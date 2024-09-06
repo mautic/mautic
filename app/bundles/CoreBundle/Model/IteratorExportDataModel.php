@@ -14,7 +14,7 @@ class IteratorExportDataModel implements \Iterator
 
     private $data;
 
-    private $totalResult;
+    private int $totalResult;
 
     /**
      * @param AbstractCommonModel<T> $model

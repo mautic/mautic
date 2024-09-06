@@ -58,9 +58,6 @@ class DefaultController extends CommonController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
     public function notificationsAction(): \Symfony\Component\HttpFoundation\Response
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */

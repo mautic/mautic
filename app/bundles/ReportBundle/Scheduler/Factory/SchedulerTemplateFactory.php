@@ -13,11 +13,9 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 class SchedulerTemplateFactory
 {
     /**
-     * @return BuilderInterface
-     *
      * @throws NotSupportedScheduleTypeException
      */
-    public function getBuilder(SchedulerInterface $scheduler)
+    public function getBuilder(SchedulerInterface $scheduler): BuilderInterface
     {
         if ($scheduler->isScheduledNow()) {
             return new SchedulerNowBuilder();

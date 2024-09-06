@@ -30,7 +30,7 @@ final class AssetsHelper
     /**
      * @var array<mixed, mixed>
      */
-    private $assets = [
+    private array $assets = [
         self::CONTEXT_APP => [],
     ];
 

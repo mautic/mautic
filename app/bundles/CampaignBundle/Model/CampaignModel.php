@@ -213,10 +213,7 @@ class CampaignModel extends CommonFormModel
         }
     }
 
-    /**
-     * @return array
-     */
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
+    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -581,10 +578,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Saves a campaign lead, logs the error if saving fails.
-     *
-     * @return bool
      */
-    public function saveCampaignLead(CampaignLead $campaignLead)
+    public function saveCampaignLead(CampaignLead $campaignLead): bool
     {
         try {
             $this->getCampaignLeadRepository()->saveEntity($campaignLead);

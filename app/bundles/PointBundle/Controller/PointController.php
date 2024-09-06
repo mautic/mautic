@@ -420,10 +420,8 @@ class PointController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $page      = $request->getSession()->get('mautic.point.page', 1);
         $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $page]);

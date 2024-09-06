@@ -28,8 +28,6 @@ abstract class AbstractClientFactory implements AuthProviderInterface
     }
 
     /**
-     * @param AuthCredentialsInterface|CredentialsInterface $credentials
-     *
      * @throws PluginNotConfiguredException
      */
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface

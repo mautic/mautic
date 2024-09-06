@@ -298,7 +298,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->themeHelpers[$theme];
     }
 
-    public function install($zipFile)
+    public function install($zipFile): bool
     {
         if (false === $this->filesystem->exists($zipFile)) {
             throw new FileNotFoundException();

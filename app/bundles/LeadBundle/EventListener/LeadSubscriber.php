@@ -41,7 +41,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var string[]
      */
-    private $preventLoop = [];
+    private array $preventLoop = [];
 
     /**
      * @var int|null
