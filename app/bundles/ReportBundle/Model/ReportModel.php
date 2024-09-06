@@ -684,6 +684,8 @@ class ReportModel extends FormModel
 
     /**
      * Check if order by is valid.
+     *
+     * @param array<string, string> $allowedColumns
      */
     private function orderByIsValid(string $order, array $allowedColumns): bool
     {
