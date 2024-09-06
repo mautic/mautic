@@ -8,6 +8,8 @@ class IteratorExportDataModel implements \Iterator
 {
     private int $position = 0;
 
+    private $callback;
+
     private int $total = 0;
 
     private $data = 0;
@@ -23,9 +25,10 @@ class IteratorExportDataModel implements \Iterator
     public function __construct(
         private AbstractCommonModel $model,
         private array $args,
-        private callable $callback,
+        callable $callback,
         private bool $skipOrdering = false
     ) {
+        $this->callback = $callback;
     }
 
     /**
