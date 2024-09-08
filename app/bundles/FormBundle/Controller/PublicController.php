@@ -402,17 +402,27 @@ class PublicController extends CommonFormController
      */
     private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
     {
-        if (empty($this->tokens)) {
-            if ($lead = $submissionEvent->getLead()) {
-                $this->tokens = array_merge(
-                    $submissionEvent->getTokens(),
-                    TokenHelper::findLeadTokens(
-                        $string,
-                        $lead->getProfileFields()
-                    )
-                );
-            }
+        if (count($this->tokens)) {
+            return $this->tokens;
         }
+
+        if ($lead = $submissionEvent->getLead()) {
+            $this->tokens = array_merge(
+                $submissionEvent->getTokens(),
+                TokenHelper::findLeadTokens(
+                    $string,
+                    $lead->getProfileFields()
+                )
+            );
+        }
+
+        /** @var \Mautic\PageBundle\Helper\TokenHelper */
+        $pageTokenHelper = $this->factory->get('mautic.page.helper.token');
+
+        $this->tokens = array_merge(
+            $this->tokens,
+            $pageTokenHelper->findPageTokens($string)
+        );
 
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
     }
