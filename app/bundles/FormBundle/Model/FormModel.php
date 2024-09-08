@@ -770,7 +770,7 @@ class FormModel extends CommonFormModel
             }
 
             // prevent empty fields from getting parsed as now
-            if (empty($token)) {
+            if (empty(trim($token))) {
                 continue;
             }
 
@@ -792,7 +792,7 @@ class FormModel extends CommonFormModel
 
             // Ensure we fail gracefully, which means the default value remains unchanged
             try {
-                $value = (new \DateTime($token))->format($format);
+                $value = (new \DateTime(trim($token)))->format($format);
             } catch (\Exception $e) {
                 continue;
             }
