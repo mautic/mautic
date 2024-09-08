@@ -378,6 +378,8 @@ class FormModel extends CommonFormModel
             $cachedHtml = $this->generateHtml($form, $useCache);
         }
 
+        $this->populateDateTimeValues($form, $cachedHtml);
+
         if (!$form->getInKioskMode()) {
             $this->populateValuesWithLead($form, $cachedHtml);
         }
@@ -726,6 +728,76 @@ class FormModel extends CommonFormModel
 
                 $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }
+        }
+    }
+
+    /**
+     * Replaces strings the PHP date string parser understands with
+     * the actual time in date, datetime and hidden fields.
+     *
+     * Hidden fields must end with `|date` to prevent replacing
+     * strings by a date time representation by accident.
+     */
+    public function populateDateTimeValues(Form $form, &$formHtml): void
+    {
+        $formName       = $form->generateFormName();
+        $fields         = $form->getFields();
+        $autoFillFields = [];
+
+        /** @var Field $field */
+        foreach ($fields as $key => $field) {
+            if (in_array($field->getType(), ['date', 'datetime', 'hidden'])) {
+                $autoFillFields[$key] = $field;
+            }
+        }
+
+        foreach ($autoFillFields as $field) {
+            $fieldType = $field->getType();
+            $token     = $field->getDefaultValue();
+
+            switch ($fieldType) {
+                case 'date':
+                    $format = 'Y-m-d';
+                    break;
+                case 'datetime':
+                case 'hidden':
+                    $format = 'Y-m-d\TH:i';
+                    break;
+
+                default:
+                    continue 2;
+                    break;
+            }
+
+            // prevent empty fields from getting parsed as now
+            if (empty($token)) {
+                continue;
+            }
+
+            if ('hidden' === $fieldType) {
+                /* $pattern:
+                        ^([^\|]+) => match any char, except pipe
+                        \|date    => then look for `|date`
+                */
+                preg_match('/^([^\|]+)\|date$/', $token, $matches);
+
+                // prevent accidental parsing of hidden input values as date
+                if (empty($matches)) {
+                    continue;
+                }
+
+                $token = $matches[1];
+                unset($matches);
+            }
+
+            // Ensure we fail gracefully, which means the default value remains unchanged
+            try {
+                $value = (new \DateTime($token))->format($format);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
         }
     }
 

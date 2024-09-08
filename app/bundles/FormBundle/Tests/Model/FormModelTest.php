@@ -533,6 +533,75 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testPopulateDateTimeValues(): void
+    {
+        $formHtml  = '<html>';
+        $form      = new Form();
+        $dateField = new Field();
+        $dateField->setType('date');
+        $dateField->setDefaultValue('now');
+        $form->addField(1, $dateField);
+
+        $dateTimeField = new Field();
+        $dateTimeField->setType('datetime');
+        $dateTimeField->setDefaultValue('2024-09-09 +2 days 6am');
+        $form->addField(2, $dateTimeField);
+
+        $hiddenField = new Field();
+        $hiddenField->setType('hidden');
+        $hiddenField->setDefaultValue('may 4th 1977|date');
+        $form->addField(3, $hiddenField);
+
+        $this->fieldHelper->expects($this->exactly(3))
+            ->method('populateField')
+            ->withConsecutive(
+                [$dateField, (new \DateTime())->format('Y-m-d'), 'form-', $formHtml],
+                [$dateTimeField, '2024-09-11T06:00', 'form-', $formHtml],
+                [$hiddenField, '1977-05-04T00:00', 'form-', $formHtml]
+            );
+
+        $this->formModel->populateDateTimeValues($form, $formHtml);
+    }
+
+    /**
+     * Tests that default values aren't replaced by date/date time values by accident.
+     */
+    public function testSkippingPopulateDateTimeValues(): void
+    {
+        $formHtml = '<html>';
+        $form     = new Form();
+
+        $invalidDateField = new Field();
+        $invalidDateField->setType('date');
+        $invalidDateField->setDefaultValue('wrongFormat');
+        $form->addField(1, $invalidDateField);
+
+        $emptyDateField = new Field();
+        $emptyDateField->setType('date');
+        $emptyDateField->setDefaultValue('');
+        $form->addField(2, $emptyDateField);
+
+        $hiddenField = new Field();
+        $hiddenField->setType('hidden');
+        $hiddenField->setDefaultValue('someHiddenValue');
+        $form->addField(3, $hiddenField);
+
+        $hiddenNowField = new Field();
+        $hiddenNowField->setType('hidden');
+        $hiddenNowField->setDefaultValue('now');
+        $form->addField(4, $hiddenNowField);
+
+        $hiddenPipeDateField = new Field();
+        $hiddenPipeDateField->setType('hidden');
+        $hiddenPipeDateField->setDefaultValue('|date');
+        $form->addField(5, $hiddenPipeDateField);
+
+        $this->fieldHelper->expects($this->never())
+            ->method('populateField');
+
+        $this->formModel->populateDateTimeValues($form, $formHtml);
+    }
+
     public function testPopulateValuesWithLeadWithoutAutofill(): void
     {
         $formHtml   = '<html>';
