@@ -738,7 +738,7 @@ class FormModel extends CommonFormModel
      * Hidden fields must end with `|date` to prevent replacing
      * strings by a date time representation by accident.
      */
-    public function populateDateTimeValues(Form $form, &$formHtml): void
+    public function populateDateTimeValues(Form $form, string &$formHtml): void
     {
         $formName       = $form->generateFormName();
         $fields         = $form->getFields();
@@ -766,7 +766,6 @@ class FormModel extends CommonFormModel
 
                 default:
                     continue 2;
-                    break;
             }
 
             // prevent empty fields from getting parsed as now
