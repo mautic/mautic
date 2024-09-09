@@ -46,11 +46,11 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame([
             // no., event_type, event_name,      email,       points_delta, group_name
-            ['1', 'test type', 'Adjust points', 'test1@example.com', '5', 'Group A'],
-            ['2', 'test type', 'Adjust points', 'test2@example.com', '15', 'Group A'],
-            ['3', 'test type', 'Adjust points', 'test2@example.com', '1', 'Group B'],
-            ['4', 'test type', 'Adjust points', 'test3@example.com', '10', 'Group A'],
-            ['5', 'test type', 'Adjust points', 'test3@example.com', '2', 'Group B'],
+            ['1', 'test type', 'Adjust points', 'test2@example.com', '15', 'Group A'],
+            ['2', 'test type', 'Adjust points', 'test3@example.com', '10', 'Group A'],
+            ['3', 'test type', 'Adjust points', 'test1@example.com', '5', 'Group A'],
+            ['4', 'test type', 'Adjust points', 'test3@example.com', '2', 'Group B'],
+            ['5', 'test type', 'Adjust points', 'test2@example.com', '1', 'Group B'],
         ], array_slice($crawlerReportTable, 1, 5));
 
         // -- test API report data
@@ -61,23 +61,9 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
             [
                 'type'        => 'test type',
                 'event_name'  => 'Adjust points',
-                'email'       => 'test1@example.com',
-                'delta'       => '5',
-                'group_name'  => 'Group A',
-            ],
-            [
-                'type'        => 'test type',
-                'event_name'  => 'Adjust points',
                 'email'       => 'test2@example.com',
                 'delta'       => '15',
                 'group_name'  => 'Group A',
-            ],
-            [
-                'type'        => 'test type',
-                'event_name'  => 'Adjust points',
-                'email'       => 'test2@example.com',
-                'delta'       => '1',
-                'group_name'  => 'Group B',
             ],
             [
                 'type'        => 'test type',
@@ -89,8 +75,22 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
             [
                 'type'        => 'test type',
                 'event_name'  => 'Adjust points',
+                'email'       => 'test1@example.com',
+                'delta'       => '5',
+                'group_name'  => 'Group A',
+            ],
+            [
+                'type'        => 'test type',
+                'event_name'  => 'Adjust points',
                 'email'       => 'test3@example.com',
                 'delta'       => '2',
+                'group_name'  => 'Group B',
+            ],
+            [
+                'type'        => 'test type',
+                'event_name'  => 'Adjust points',
+                'email'       => 'test2@example.com',
+                'delta'       => '1',
                 'group_name'  => 'Group B',
             ],
         ], $result['data']);
@@ -120,11 +120,11 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame([
             // no., group_name, group_score, email
-            ['1', 'Group A', '5', 'test1@example.com'],
-            ['2', 'Group A', '15', 'test2@example.com'],
-            ['3', 'Group B', '1', 'test2@example.com'],
-            ['4', 'Group A', '10', 'test3@example.com'],
-            ['5', 'Group B', '2', 'test3@example.com'],
+            ['1', 'Group A', '15', 'test2@example.com'],
+            ['2', 'Group A', '10', 'test3@example.com'],
+            ['3', 'Group A', '5', 'test1@example.com'],
+            ['4', 'Group B', '2', 'test3@example.com'],
+            ['5', 'Group B', '1', 'test2@example.com'],
         ], array_slice($crawlerReportTable, 1, 5));
 
         // -- test API report data
@@ -135,17 +135,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([
             [
                 'group_name'   => 'Group A',
-                'group_score'  => '5',
-                'email'        => 'test1@example.com',
-            ],
-            [
-                'group_name'   => 'Group A',
                 'group_score'  => '15',
-                'email'        => 'test2@example.com',
-            ],
-            [
-                'group_name'   => 'Group B',
-                'group_score'  => '1',
                 'email'        => 'test2@example.com',
             ],
             [
@@ -154,9 +144,19 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
                 'email'        => 'test3@example.com',
             ],
             [
+                'group_name'   => 'Group A',
+                'group_score'  => '5',
+                'email'        => 'test1@example.com',
+            ],
+            [
                 'group_name'   => 'Group B',
                 'group_score'  => '2',
                 'email'        => 'test3@example.com',
+            ],
+            [
+                'group_name'   => 'Group B',
+                'group_score'  => '1',
+                'email'        => 'test2@example.com',
             ],
         ], $result['data']);
     }
