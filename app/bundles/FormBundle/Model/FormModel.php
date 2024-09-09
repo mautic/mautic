@@ -745,8 +745,8 @@ class FormModel extends CommonFormModel
         $autoFillFields = array_filter($fields->toArray(), fn ($field) => in_array($field->getType(), ['date', 'datetime', 'hidden']));
 
         foreach ($autoFillFields as $field) {
-            $fieldType = $field->getType();
-            $token     = $field->getDefaultValue();
+            $fieldType      = $field->getType();
+            $dateTimeString = $field->getDefaultValue();
 
             switch ($fieldType) {
                 case 'date':
@@ -762,7 +762,7 @@ class FormModel extends CommonFormModel
             }
 
             // prevent empty fields from getting parsed as now
-            if (empty(trim($token))) {
+            if (empty(trim($dateTimeString))) {
                 continue;
             }
 
@@ -771,19 +771,19 @@ class FormModel extends CommonFormModel
                         ^([^\|]+) => match any char, except pipe
                         \|date    => then look for `|date`
                 */
-                preg_match('/^([^\|]+)\|date$/', $token, $matches);
+                preg_match('/^([^\|]+)\|date$/', $dateTimeString, $matches);
 
                 // prevent accidental parsing of hidden input values as date
                 if (empty($matches)) {
                     continue;
                 }
 
-                $token = $matches[1];
+                $dateTimeString = $matches[1];
             }
 
             // Ensure we fail gracefully, which means the default value remains unchanged
             try {
-                $value = (new \DateTime(trim($token)))->format($format);
+                $value = (new \DateTime(trim($dateTimeString)))->format($format);
             } catch (\Exception) {
                 continue;
             }
