@@ -786,7 +786,6 @@ class FormModel extends CommonFormModel
                 }
 
                 $token = $matches[1];
-                unset($matches);
             }
 
             // Ensure we fail gracefully, which means the default value remains unchanged
