@@ -50,7 +50,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<array<string,string>>
      */
     public function validFieldDataProvider(): array
     {
@@ -98,7 +98,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<array<string,string>>
      */
     public function invalidFieldDataProvider(): array
     {
@@ -153,9 +153,9 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
+     * @return array<array<int,string>>
      */
-    public static function fieldProvider()
+    public static function fieldProvider(): array
     {
         return [
             [
@@ -224,13 +224,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $type
-     *
-     * @return Field
-     */
-    protected static function getField($name, $type)
+    protected static function getField($name, $type): Field
     {
         $field = new Field();
 
@@ -241,12 +235,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         return $field;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private static function getAliasFromName($name)
+    private static function getAliasFromName($name): string
     {
         return strtolower(str_replace(' ', '', $name));
     }
