@@ -1,0 +1,7 @@
+{% set shortcuts = {
+    'emails': {
+        's' : 'mautic.keyboard.send_example',
+      },
+  } %}
+
+  {% include '@MauticCore/Helper/keyboard_shortcuts_helper.html.twig' with {'shortcuts': shortcuts} %}
