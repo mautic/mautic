@@ -378,7 +378,7 @@ class FormModel extends CommonFormModel
             $cachedHtml = $this->generateHtml($form, $useCache);
         }
 
-        $this->populateDateTimeValues($form, $cachedHtml);
+        $cachedHtml = $this->populateDateTimeValues($form, $cachedHtml);
 
         if (!$form->getInKioskMode()) {
             $this->populateValuesWithLead($form, $cachedHtml);
@@ -738,7 +738,7 @@ class FormModel extends CommonFormModel
      * Hidden fields must end with `|date` to prevent replacing
      * strings by a date time representation by accident.
      */
-    public function populateDateTimeValues(Form $form, string &$formHtml): void
+    public function populateDateTimeValues(Form $form, string $formHtml): string
     {
         $formName       = $form->generateFormName();
         $fields         = $form->getFields();
@@ -789,6 +789,8 @@ class FormModel extends CommonFormModel
             }
 
             $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
+
+            return $formHtml;
         }
     }
 
