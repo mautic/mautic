@@ -11,6 +11,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,7 @@ class PublicController extends CommonFormController
     /**
      * @return RedirectResponse|Response
      */
-    public function submitAction(Request $request, DateHelper $dateTemplateHelper)
+    public function submitAction(Request $request, DateHelper $dateTemplateHelper, PageTokenHelper $pageTokenHelper)
     {
         if ('POST' !== $request->getMethod()) {
             return $this->accessDenied();
@@ -130,7 +131,7 @@ class PublicController extends CommonFormController
 
         if (isset($submissionEvent) && !empty($postActionProperty)) {
             // Replace post action property with tokens to support custom redirects, etc
-            $postActionProperty = $this->replacePostSubmitTokens($postActionProperty, $submissionEvent);
+            $postActionProperty = $this->replacePostSubmitTokens($postActionProperty, $submissionEvent, $pageTokenHelper);
         }
 
         if ($messengerMode || $isAjax) {
@@ -400,7 +401,7 @@ class PublicController extends CommonFormController
     /**
      * @return string|string[]
      */
-    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent, PageTokenHelper $pageTokenHelper): string|array
     {
         if (count($this->tokens)) {
             return $this->tokens;
@@ -415,9 +416,6 @@ class PublicController extends CommonFormController
                 )
             );
         }
-
-        /** @var \Mautic\PageBundle\Helper\TokenHelper */
-        $pageTokenHelper = $this->factory->get('mautic.page.helper.token');
 
         $this->tokens = array_merge(
             $this->tokens,
