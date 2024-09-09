@@ -742,7 +742,7 @@ class FormModel extends CommonFormModel
     {
         $formName       = $form->generateFormName();
         $fields         = $form->getFields();
-        $autoFillFields = array_filter($fields, fn($field) => in_array($field->getType(), ['date', 'datetime', 'hidden']));
+        $autoFillFields = array_filter($fields->toArray(), fn ($field) => in_array($field->getType(), ['date', 'datetime', 'hidden']));
 
         foreach ($autoFillFields as $field) {
             $fieldType = $field->getType();
