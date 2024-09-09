@@ -12,7 +12,10 @@
                             data-toggle="ajaxmodal"
                             data-target="#MauticSharedModal"
                             data-header="{{ 'mautic.dashboard.widget.header.edit'|trans }}">
-                            <i class="ri-edit-line"></i> Edit
+                            <span>
+                                <i class="ri-edit-line"></i>
+                                {{'mautic.core.form.edit'|trans}}
+                            </span>
                         </a>
                     </li>
                     <li role="separator" class="divider"></li>
@@ -31,7 +34,10 @@
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
                             data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
                             class="remove-widget">
-                            <i class="ri-close-line"></i> Remove
+                            <span>
+                                <i class="ri-close-line"></i>
+                                {{'mautic.core.remove'|trans}}
+                            </span>
                         </a>
                     </li>
                 </ul>

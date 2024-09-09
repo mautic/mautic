@@ -57,7 +57,7 @@ class DateAnniversary implements FilterDecoratorInterface, ContactDecoratorForei
             $date->modify($relativeFilter);
         }
 
-        return $date->toLocalString('%-m-d');
+        return $date->toLocalString('%-m-d%');
     }
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
