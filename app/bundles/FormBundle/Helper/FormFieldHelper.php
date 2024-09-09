@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EqualTo;
@@ -163,6 +164,69 @@ class FormFieldHelper extends AbstractFormFieldHelper
         }
 
         return $errors;
+    }
+
+    /**
+     * Replaces strings the PHP date string parser understands with
+     * the actual time in date, datetime and hidden fields.
+     *
+     * Hidden fields must end with `|date` to prevent replacing
+     * strings by a date time representation by accident.
+     */
+    public function populateDateTimeValues(Form $form, string $formHtml): string
+    {
+        $formName       = $form->generateFormName();
+        $fields         = $form->getFields();
+        $autoFillFields = array_filter($fields->toArray(), fn ($field) => in_array($field->getType(), ['date', 'datetime', 'hidden']));
+
+        foreach ($autoFillFields as $field) {
+            $fieldType      = $field->getType();
+            $dateTimeString = $field->getDefaultValue();
+
+            switch ($fieldType) {
+                case 'date':
+                    $format = 'Y-m-d';
+                    break;
+                case 'datetime':
+                case 'hidden':
+                    $format = 'Y-m-d\TH:i';
+                    break;
+
+                default:
+                    continue 2;
+            }
+
+            // prevent empty fields from getting parsed as now
+            if (empty(trim($dateTimeString))) {
+                continue;
+            }
+
+            if ('hidden' === $fieldType) {
+                /* $pattern:
+                        ^([^\|]+) => match any char, except pipe
+                        \|date    => then look for `|date`
+                */
+                preg_match('/^([^\|]+)\|date$/', $dateTimeString, $matches);
+
+                // prevent accidental parsing of hidden input values as date
+                if (empty($matches)) {
+                    continue;
+                }
+
+                $dateTimeString = $matches[1];
+            }
+
+            // Ensure we fail gracefully, which means the default value remains unchanged
+            try {
+                $value = (new \DateTime(trim($dateTimeString)))->format($format);
+            } catch (\Exception) {
+                continue;
+            }
+
+            $this->populateField($field, $value, $formName, $formHtml);
+        }
+
+        return $formHtml;
     }
 
     /**

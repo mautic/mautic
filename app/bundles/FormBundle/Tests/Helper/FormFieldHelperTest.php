@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -25,6 +26,120 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->fixture = new FormFieldHelper($translatorMock, $validatorMock);
+    }
+
+    /**
+     * @dataProvider validFieldDataProvider
+     */
+    public function testPopulateDateTimeValues(string $type, string $defaultValue, string $expected, string $msg): void
+    {
+        $form = new Form();
+        $form->setName('mautic');
+
+        $field = new Field();
+        $field->setType($type);
+        $field->setDefaultValue($defaultValue);
+        $field->setAlias('fieldalias');
+        $form->addField(1, $field);
+
+        $fieldHtml = "<input value=\"{$field->getDefaultValue()}\" id=\"mauticform_input_mautic_fieldalias\">";
+
+        $actual = $this->fixture->populateDateTimeValues($form, $fieldHtml);
+
+        $this->assertEquals($expected, $actual, $msg);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function validFieldDataProvider(): array
+    {
+        return [
+            [
+                'type'         => 'date',
+                'defaultValue' => 'now',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value="'.(new \DateTime())->format('Y-m-d').'"/>',
+                'msg'          => '`now` should be parsed into the current date format',
+            ],
+            [
+                'type'         => 'datetime',
+                'defaultValue' => '2024-09-09 +2 days 6am',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value="2024-09-11T06:00"/>',
+                'msg'          => '`2024-09-09 +2 days 6am` should be parsed into the correct date time format',
+            ],
+            [
+                'type'         => 'hidden',
+                'defaultValue' => 'may 4th 1977|date',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value="1977-05-04T00:00"/>',
+                'msg'          => 'hidden field value with `|date` should be parsed into the correct date time format',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidFieldDataProvider
+     */
+    public function testSkippingPopulateDateTimeValues(string $type, string $defaultValue, string $expected, string $msg): void
+    {
+        $form = new Form();
+        $form->setName('mautic');
+
+        $field = new Field();
+        $field->setType($type);
+        $field->setDefaultValue($defaultValue);
+        $field->setAlias('fieldalias');
+        $form->addField(1, $field);
+
+        $fieldHtml = "<input id=\"mauticform_input_mautic_fieldalias\" value=\"{$field->getDefaultValue()}\"/>";
+
+        $actual = $this->fixture->populateDateTimeValues($form, $fieldHtml);
+
+        $this->assertEquals($expected, $actual, $msg);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function invalidFieldDataProvider(): array
+    {
+        return [
+            [
+                'type'         => 'date',
+                'defaultValue' => 'wrongFormat',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value="wrongFormat"/>',
+                'msg'          => 'Arbitrary strings should not get parsed in date fields',
+            ],
+            [
+                'type'         => 'date',
+                'defaultValue' => '',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value=""/>',
+                'msg'          => 'Empty strings should not get parsed in date fields',
+            ],
+            [
+                'type'         => 'hidden',
+                'defaultValue' => '',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value=""/>',
+                'msg'          => 'Empty strings should not get parsed in hidden fields',
+            ],
+            [
+                'type'         => 'hidden',
+                'defaultValue' => 'someHiddenValue',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value="someHiddenValue"/>',
+                'msg'          => 'Arbitrary strings should not get parsed in hidden fields',
+            ],
+            [
+                'type'         => 'hidden',
+                'defaultValue' => 'now',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value="now"/>',
+                'msg'          => 'Valid date strings should not get parsed in hidden fields without `|date` present',
+            ],
+            [
+                'type'         => 'hidden',
+                'defaultValue' => '|date',
+                'expected'     => '<input id="mauticform_input_mautic_fieldalias" value="|date"/>',
+                'msg'          => 'Empty date strings should not get parsed in hidden fields, even if `|date` is present',
+            ],
+        ];
     }
 
     /**
