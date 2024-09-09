@@ -300,8 +300,8 @@ class ReportModel extends FormModel
             }
             if (isset($data['label'])) {
                 $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
-                $return->choices[$column]          = $data['label'];
-                $return->definitions[$column]      = $data;
+                $return->choices[$column]     = $data['label'];
+                $return->definitions[$column] = $data;
             }
         }
 
@@ -661,14 +661,9 @@ class ReportModel extends FormModel
      */
     private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
     {
-        $allowedChoices = [];
-        foreach ($allowedColumns->choices as $column => $allowedColumn) {
-            $allowedChoices[$column] = $allowedColumn;
-        }
-
         $hasOrderBy = false;
         foreach ($orderBys as $key => $orderBy) {
-            if ($this->orderByIsValid($orderBy, $allowedChoices)) {
+            if ($this->orderByIsValid($orderBy, $allowedColumns->choices)) {
                 $hasOrderBy = true;
                 continue;
             }
