@@ -224,33 +224,33 @@
     {% set labelAttributes = labelAttributes|merge({
             'for': firstId,
     }) %}
-    <label {{ macros.tag_attr(labelAttributes) }} >{{ field.label }}</label>
+    <label {{ macros.tag_attr(labelAttributes) }} >{{ field.label|purify }}</label>
   {% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
   {% for listValue, listLabel in list|default([]) %}
     {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
     {% set checkboxBrackets = ('checkbox' == type) ? '[]' : '' %}
-    {% set inputAttributes = inputAttributes|merge({
+    {% set listInputAttributes = inputAttributes|merge({
             'name': 'mauticform[' ~ field.alias ~ ']' ~ checkboxBrackets,
             'id': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
             'type': type,
             'value': listValue|e,
     }) %}
     {% if field.defaultValue == listValue %}
-      {% set inputAttributes = inputAttributes|merge({
+      {% set listInputAttributes = listInputAttributes|merge({
               'checked': 'checked',
       }) %}
     {% endif %}
 
     {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}
 
-    <input {{ macros.tag_attr(inputAttributes) }}  />
+    <input {{ macros.tag_attr(listInputAttributes) }}  />
     {% set optionLabelAttr = optionLabelAttr|merge({
             'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
             'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
     }) %}
-    <label {{ macros.tag_attr(optionLabelAttr) }} >{{ listLabel }}</label>
+    <label {{ macros.tag_attr(optionLabelAttr) }} >{{ listLabel|purify }}</label>
 
     {% if wrapDiv %}</div>{% endif %}
   {% endfor %}

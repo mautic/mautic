@@ -1,6 +1,6 @@
 type: php
 docroot: ""
-php_version: "8.2"
+php_version: "8.3"
 webserver_type: apache-fpm
 router_http_port: "80"
 router_https_port: "443"
@@ -13,10 +13,11 @@ provider: default
 upload_dir: "media/files, media/images" # Specify the directories containing user-generated uploads
 use_dns_when_possible: true
 composer_version: "2"
-webimage_extra_packages: [php8.2-imap]
+webimage_extra_packages: [php8.3-imap]
 hooks:
   post-start:
     # Fix line endings on Windows
     - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh
     - exec: sed -i -e 's/\r$//' ./.git/hooks/*
+    - exec: "chmod +x ./.ddev/mautic-setup.sh"
     - exec: "yes | ./.ddev/mautic-setup.sh"

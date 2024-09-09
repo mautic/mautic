@@ -125,7 +125,7 @@
 
 {% if inForm is defined and true == inForm %}
   <div {{ macros.tag_attr(containerAttributes) }} >
-      <label class="text-muted">{{ field.label }}</label>
+      <label class="text-muted">{{ field.label|purify }}</label>
   </div>
 {% else %}
   {% set inputAttributes = inputAttributes|merge({

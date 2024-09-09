@@ -124,5 +124,5 @@
         'value': '1',
 }) %}
 <div macros.tag_attr(containerAttributes) >
-  <button {{ macros.tag_attr(inputAttributes) }} >{{ field.label }}</button>
+  <button {{ macros.tag_attr(inputAttributes) }} >{{ field.label|purify }}</button>
 </div>

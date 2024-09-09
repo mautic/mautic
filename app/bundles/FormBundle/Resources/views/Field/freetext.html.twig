@@ -185,7 +185,7 @@
 {# end: field_helper #}
 
 <div {{ macros.tag_attr(containerAttributes) }} >
-  {% if field.showLabel %}<h3 {{ macros.tag_attr(labelAttributes) }} >{{ field.label }}</h3>{% endif %}
+  {% if field.showLabel %}<h3 {{ macros.tag_attr(labelAttributes) }} >{{ field.label|purify }}</h3>{% endif %}
   <div {{ macros.tag_attr(inputAttributes) }} >
     {{ field.properties.text|raw }}
   </div>

@@ -1,6 +1,6 @@
 {
     "name": "Default",
-    "description": "Mautic's default layout.",
+    "description": "Start with a dashboard of 5 widgets that provide an overview of your marketing activities and performance metrics.",
     "widgets":
     [
         {

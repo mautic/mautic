@@ -227,7 +227,7 @@
 {%- endmacro -%}
 
 <div {{ macros.tag_attr(containerAttributes) }} >
-  {% if field.showLabel -%}<label {{ macros.tag_attr(labelAttributes) }} >{{ field.label }}</label>{% endif %}
+  {% if field.showLabel -%}<label {{ macros.tag_attr(labelAttributes) }} >{{ field.label|purify }}</label>{% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
   <select {{ macros.tag_attr(inputAttributes) }} >

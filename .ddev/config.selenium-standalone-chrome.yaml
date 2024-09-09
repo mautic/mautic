@@ -1,0 +1,13 @@
+# ddev get ddev/ddev-selenium-standalone-chrome
+#
+# This file comes from https://github.com/ddev/ddev-selenium-standalone-chrome
+#
+web_environment:
+  - BROWSERTEST_OUTPUT_DIRECTORY=/tmp
+  - BROWSERTEST_OUTPUT_BASE_URL=${DDEV_PRIMARY_URL}
+  - SIMPLETEST_BASE_URL=http://web
+  - SIMPLETEST_DB=mysql://db:db@db/test
+  # Use disable-dev-shm-usage instead of setting shm_usage
+  # https://developers.google.com/web/tools/puppeteer/troubleshooting#tips
+  # The format of chromeOptions is defined at https://chromedriver.chromium.org/capabilities
+  - MINK_DRIVER_ARGS_WEBDRIVER=[\"chrome\", {\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false,\"args\":[\"--disable-gpu\",\"--headless\", \"--no-sandbox\", \"--disable-dev-shm-usage\"]}}, \"http://selenium-chrome:4444/wd/hub\"]

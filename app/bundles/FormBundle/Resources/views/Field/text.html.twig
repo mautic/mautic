@@ -138,7 +138,7 @@
 {# end: field_helper #}
 
 <div {{ macros.tag_attr(containerAttributes) }} >
-  {% if field.showLabel %}<label {{ macros.tag_attr(labelAttributes) }} >{{ field.label }}</label>{% endif %}
+  {% if field.showLabel %}<label {{ macros.tag_attr(labelAttributes) }} >{{ field.label|purify }}</label>{% endif %}
 
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
@@ -146,6 +146,9 @@
     <textarea {{ macros.tag_attr(inputAttributes) }} >{{ field.defaultValue }}</textarea>
   {% elseif 'number' == field.type %}
       <input type="{{ containerType }}" {{ macros.tag_attr(inputAttributes) }} step="{{ step }}"/>
+  {% elseif 'companyLookup' == field.type %}
+      <input class="{{ defaultInputClass }}" placeholder="start typing" data-toggle="field-company-lookup" data-set-id="mauticform_input{{ formName }}_{{ field.alias }}" type="search"  dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="191"/>
+      <input type="number" {{ macros.tag_attr(inputAttributes) }} style="display: none;">
   {% else %}
     <input type="{{ containerType }}" {{ macros.tag_attr(inputAttributes) }}  />
   {% endif %}
