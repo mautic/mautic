@@ -4,6 +4,10 @@
 
 {% block headerTitle %}{{ item.name }}{% endblock %}
 
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+{% endblock %}
+
 {% block actions %}
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'item': item,
@@ -30,9 +34,6 @@
                   <div class="box-layout">
                       <div class="col-xs-10">
                           <div class="text-muted">{{ item.description|purify }}</div>
-                      </div>
-                      <div class="col-xs-2 text-right">
-                          {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
                       </div>
                   </div>
               </div>
