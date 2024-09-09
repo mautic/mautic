@@ -792,7 +792,7 @@ class FormModel extends CommonFormModel
             // Ensure we fail gracefully, which means the default value remains unchanged
             try {
                 $value = (new \DateTime(trim($token)))->format($format);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 continue;
             }
 
