@@ -28,25 +28,13 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
     public function testRedirectPostAction(): void
     {
-        // Create the test page via API.
-        $payload = [
-            'isPublished'  => true,
-            'title'        => 'Test',
-            'alias'        => 'test-form-redirect-target-page',
-            'language'     => 'en',
-            'redirectType' => null,
-            'redirectUrl'  => null,
-            'template'     => 'blank',
-            'customHtml'   => '<!DOCTYPE html><html><head></head><body>Test</body></html>',
-        ];
-
-        $this->client->request(Request::METHOD_POST, '/api/pages/new', $payload);
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-
-        $response = json_decode($clientResponse->getContent(), true);
-        $pageId   = $response['page']['id'];
+        $page = new Page();
+        $page->setTitle('Test');
+        $page->setAlias('test-form-redirect-target-page');
+        $page->setCustomHtml('<!DOCTYPE html><html><head></head><body>Test</body></html>');
+        $this->em->persist($page);
+        $this->em->flush();
+        $pageId = $page->getId();
 
         // Create the test form via API.
         $payload = [
