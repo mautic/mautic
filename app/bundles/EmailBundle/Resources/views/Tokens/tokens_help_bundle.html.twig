@@ -1,5 +1,7 @@
-<!-- Email specific tokens -->
-<li class="panel">
+<h4 class="pa-md mt-lg fw-sb">Email specific</h4>
+<ul id="emailTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
+  <!-- Email specific tokens -->
+  <li class="panel">
     <a role="button" id="headingEmailTokens" class="accordion-heading collapsed" data-toggle="collapse"
       data-parent="#tokensAccordion" href="#collapseEmailTokens" aria-expanded="false"
       aria-controls="collapseEmailTokens">
@@ -25,13 +27,8 @@
             <td>{{ 'mautic.placeholder_tokens.email.subject'|trans }}</td>
             <td><code>{subject}</code></td>
           </tr>
-          <tr>
-            <td>{{ 'mautic.placeholder_tokens.email.tracking_pixel'|trans }}</td>
-            <td><code>{tracking_pixel}</code></td>
-          </tr>
-          <tr>
-            <td>{{ 'mautic.placeholder_tokens.email.unsubscribe_text'|trans }}</td>
-            <td><code>{unsubscribe_text}</code></td>
+          <td>{{ 'mautic.placeholder_tokens.email.unsubscribe_text'|trans }}</td>
+          <td><code>{unsubscribe_text}</code></td>
           </tr>
           <tr>
             <td>{{ 'mautic.placeholder_tokens.email.webview_text'|trans }}</td>
@@ -45,3 +42,4 @@
       </table>
     </div>
   </li>
+</ul>
