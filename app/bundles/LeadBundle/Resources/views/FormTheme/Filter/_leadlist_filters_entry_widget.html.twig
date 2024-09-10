@@ -27,7 +27,8 @@
         </div>
         <div class="panel-body">
             <div class="col-xs-6 col-sm-2 field-name">
-                <span><i class="filter-type-icon {{ filterTypeIconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }} ({{  object|capitalize }}){% endif %}</span>
+                {% set objectLable = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans  %}
+                <span><i class="filter-type-icon {{ filterTypeIconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %} {{ 'mautic.lead_list.filter.field.label'|trans({'%object%': objectLable, '%field%': fields[object][filterType]['label'] })|raw}}{% endif %}</span>
             </div>
 
             <div class="col-xs-6 col-sm-3 padding-none">

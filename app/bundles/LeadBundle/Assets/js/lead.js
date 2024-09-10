@@ -631,7 +631,6 @@ Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, r
 Mautic.addLeadListFilter = function (elId, elObj) {
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
-    var label = filterOption.text();
 
     const filterTypeIcon = filterOption.data('field-icon');
 
@@ -642,11 +641,10 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     var prototypeStr = mQuery('.available-filters').data('prototype');
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
-
-    let labelPrefix = ' (' + fieldObject.charAt(0).toUpperCase() + fieldObject.slice(1) + ')';
+    var label = filterOption.data('field-label');
 
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
-    prototypeStr = prototypeStr.replace(/__label__/g, label + labelPrefix);
+    prototypeStr = prototypeStr.replace(/__label__/g, label);
 
     // Convert to DOM
     prototype = mQuery(prototypeStr);
