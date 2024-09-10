@@ -7240,7 +7240,6 @@ ul.media-list.media-list-feed div.media-body {
   background-color: var(--layer);
   z-index: 2;
   position: relative;
-  padding: 0px 3px;
   border-radius: 0 3px 3px 0;
   aspect-ratio: 1 / 1;
   color: var(--icon-interactive);
