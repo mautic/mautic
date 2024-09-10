@@ -5120,6 +5120,18 @@ lesshat-selector { -lh-property: 0 ;
     border-bottom: 1px solid #ebedf0;
   }
 }
+.bsa-xs {
+  border-spacing: 5px;
+  border-collapse: separate;
+}
+.bsv-xs {
+  border-spacing: 0 5px;
+  border-collapse: separate;
+}
+.bsh-xs {
+  border-spacing: 5px 0;
+  border-collapse: separate;
+}
 .bg-picture {
   position: relative;
   min-height: 260px;
@@ -6771,6 +6783,7 @@ a.inline-token .text-muted {
   padding: 0;
   border: 0;
   margin: 0;
+  margin-bottom: -1px;
   font-family: inherit;
   font-size: 100%;
   vertical-align: baseline;
@@ -6855,12 +6868,15 @@ a.inline-token .text-muted {
 .accordion-title {
   font-weight: 400;
   line-height: 1.42857;
+  color: var(--text-primary);
   z-index: 1;
   inline-size: 100%;
   padding-inline-start: var(--layout-density-padding-inline-local);
   text-align: start;
 }
 .accordion-content {
+  display: flex;
+  flex-direction: column;
   padding-inline: var(--layout-density-padding-inline-local);
   margin-block: 20px;
   margin-block-end: 25px;

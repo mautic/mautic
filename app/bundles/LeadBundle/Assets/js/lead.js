@@ -14,14 +14,16 @@ Mautic.leadOnLoad = function (container, response) {
         }
     }, 'contact pages');
 
-    Mautic.addKeyboardShortcut('t', 'Activate Table View', function(e) {
-        mQuery('#table-view').click();
+    Mautic.addKeyboardShortcut('v', 'Toggle View', function(e) {
+        if (mQuery('.shuffle-grid').length) {
+            // If the card view is currently active, switch to table view
+            mQuery('#table-view').click();
+        } else {
+            // If the table view is currently active, switch to card view
+            mQuery('#card-view').click();
+        }
     }, 'contact pages');
-
-    Mautic.addKeyboardShortcut('c', 'Activate Card View', function(e) {
-        mQuery('#card-view').click();
-    }, 'contact pages');
-
+    
     //Prevent single combo keys from initiating within lead note
     Mousetrap.stopCallback = function(e, element, combo) {
         if (element.id == 'leadnote_text' && combo != 'mod+enter') {
