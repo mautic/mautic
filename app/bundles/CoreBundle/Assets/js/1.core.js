@@ -57,7 +57,7 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    initializeCodeBlocks();
+    Mautic.initializeCodeBlocks();
 });
 
 mQuery(document).ready(function() {
