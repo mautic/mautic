@@ -462,5 +462,11 @@
 
 /// Underlines
 :root[enable-underlines="true"] {
-    a { text-decoration: underline; }
+    a {
+        &,
+        &:hover,
+        &:focus {
+            text-decoration: underline;
+        }
+    }
 }

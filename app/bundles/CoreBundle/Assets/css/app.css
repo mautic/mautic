@@ -7612,6 +7612,8 @@ ul.media-list.media-list-feed div.media-body {
 :root[reduce-transparency="true"] {
   --layer-translucent: var(--layer);
 }
-:root[enable-underlines="true"] a {
+:root[enable-underlines="true"] a,
+:root[enable-underlines="true"] a:hover,
+:root[enable-underlines="true"] a:focus {
   text-decoration: underline;
 }
