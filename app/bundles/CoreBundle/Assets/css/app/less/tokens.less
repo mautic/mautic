@@ -5,7 +5,7 @@
 @secondary-color: #fdb933;
 @border-radius: 0px;
 
- 
+
 
 // Themes
 /// Light theme
@@ -88,7 +88,7 @@
     --icon-primary: #161616;
     --icon-secondary: #525252;
     --icon-on-color: contrast(@primary-60);
-    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d); 
+    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d);
     --icon-interactive: var(--primary-60);
     --icon-inverse: #ffffff;
     --icon-disabled: #16161640;
@@ -458,5 +458,35 @@
 @media (prefers-reduced-transparency: reduce) {
 :root {
     --layer-translucent: var(--layer);
+    }
+}
+
+// Handle alternate layer colors automatically
+.modal-content,
+.tile,
+.nav-tabs-contained + .tab-content,
+.nav-tabs-contained + form > .tab-content {
+    > * {
+        /// Layer
+        --layer: var(--layer-alternate);
+        --layer-hover: var(--layer-hover-alternate);
+        --layer-active: var(--layer-active-alternate);
+        --layer-selected: var(--layer-selected-alternate);
+        --layer-selected-hover: var(--layer-selected-hover-alternate);
+
+        /// Layer accent
+        --layer-accent: var(--layer-accent-alternate);
+        --layer-accent-hover: var(--layer-accent-hover-alternate);
+        --layer-accent-active: var(--layer-accent-active-alternate);
+
+        /// Field
+        --field: var(--field-alternate);
+        --field-hover: var(--field-hover-alternate);
+
+        /// Border
+        --border-subtle: var(--border-subtle-alternate);
+        --border-subtle-selected: var(--border-subtle-selected-alternate);
+        --border-strong: var(--border-strong-alternate);
+        --border-tile: var(--border-tile-alternate);
     }
 }
