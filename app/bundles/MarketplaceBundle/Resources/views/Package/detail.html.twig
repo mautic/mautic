@@ -37,7 +37,7 @@
         'id': 'ratePackage',
         'data-toggle': 'ajaxmodal',
         'data-target': '#MauticSharedModal',
-        'data-header': 'mautic.marketipace.rate.package.header'|trans,
+        'data-header': 'mautic.marketipace.rate.package'|trans,
         'href': path('mautic_marketplace_rate_package', {'vendor': packageDetail.packageBase.getVendorName(), 'package': packageDetail.packageBase.getPackageName()}),
     },
     'btnText': 'mautic.marketipace.rate.package'|trans,
@@ -204,6 +204,36 @@
         {% endfor %}
     </table>
     </div>
+
+    <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">{% trans %}marketplace.reviews{% endtrans %}</div>
+        </div>
+            {% for review in packageDetail.reviews %}
+            <div class="row">
+                <div class="col-md-2">
+                    <ul class="list-inline pt-lg pl-lg pr-lg">
+                        {% for i in 1..5 %}
+                            <li>
+                                {% if i <= review.rating %}
+                                    <i class="ri-star-fill text-warning"></i>
+                                {% else %}
+                                    <i class="ri-star-line text-muted"></i>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-10">
+                    <blockquote>
+                        <p>{{ review.review}}</p>
+                        <footer>{{ review.username }}</footer>
+                    </blockquote>
+                </div>
+            </div>
+            <hr/>
+            {% endfor %}
+        </div>
 </div>
 
 <div class="col-md-3 panel pb-lg">

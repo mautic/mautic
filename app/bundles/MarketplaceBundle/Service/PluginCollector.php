@@ -26,14 +26,14 @@ class PluginCollector
 
     public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
     {
-        $allowlist = $this->allowlist->getAllowList();
+        // $allowlist = $this->allowlist->getAllowList();
 
-        if (!empty($allowlist)) {
-            $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
-            $payload                   = $this->getAllowlistedPackages($page, $limit);
-        } else {
+        // if (!empty($allowlist)) {
+        //     $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
+        //     $payload                   = $this->getAllowlistedPackages($page, $limit);
+        // } else {
             $payload = $this->connection->getPlugins($page, $limit, $query);
-        }
+        // }
 
         $this->total = (int) $payload['total'];
 
