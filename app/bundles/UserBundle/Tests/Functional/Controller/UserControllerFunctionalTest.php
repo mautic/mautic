@@ -59,9 +59,9 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $data
      *
-     * @dataProvider dataForUserCreation
+     * @dataProvider dataNewUserForPasswordField
      */
-    public function testNewUserCreation(array $data, string $message): void
+    public function testNewUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/new');
 
@@ -82,7 +82,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */
-    public function dataForUserCreation(): iterable
+    public function dataNewUserForPasswordField(): iterable
     {
         yield 'Blank' => [
             [
@@ -92,6 +92,52 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
             'Password cannot be blank.',
         ];
 
+        yield 'Do not match with confirm' => [
+            [
+                'user[plainPassword][password]' => 'same',
+            ],
+            'Passwords do not match.',
+        ];
+
+        yield 'Minimum length' => [
+            [
+                'user[plainPassword][password]' => 'same',
+                'user[plainPassword][confirm]'  => 'same',
+            ],
+            'Password must be at least 6 characters.',
+        ];
+
+        yield 'No stronger' => [
+            [
+                'user[plainPassword][password]' => 'same123',
+                'user[plainPassword][confirm]'  => 'same123',
+            ],
+            'Please enter a stronger password. Your password must use a combination of upper and lower case, special characters and numbers.',
+        ];
+    }
+
+    /**
+     * @param array<string, string> $data
+     *
+     * @dataProvider dataForEditUserForPasswordField
+     */
+    public function testEditUserForPasswordField(array $data, string $message): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/edit/1');
+
+        $form = $crawler->selectButton('Save')->form($data);
+
+        $this->client->submit($form);
+
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array<int, string|array<string, string>>>
+     */
+    public function dataForEditUserForPasswordField(): iterable
+    {
         yield 'Do not match with confirm' => [
             [
                 'user[plainPassword][password]' => 'same',
