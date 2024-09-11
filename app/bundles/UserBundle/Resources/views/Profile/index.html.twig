@@ -6,14 +6,16 @@
 {% block content %}
 
 <!-- start: box layout -->
-<div class="box-layout">
+<div class="container">
     <!-- step container -->
+     <div class="row">
     <div class="col-md-3 height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
+
             {% if me.getId() %}
             <div class="media">
                 <div class="pull-left">
-                    <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}" alt="" width="65px">
+                    <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}"
+                        alt="" width="65px">
                 </div>
                 <div class="media-body">
                     <h4>{{ me.getName() }}</h4>
@@ -39,39 +41,47 @@
                 {% endif %}
 
                 <li class="list-group-item">
-                    <a href="#accessibility" class="steps" data-toggle="tab">{% trans %}mautic.user.account.accessibility{% endtrans %}</a>
+                    <a href="#accessibility" class="list-group-item-text steps" data-toggle="tab">{% trans
+                        %}mautic.user.account.accessibility{% endtrans %}</a>
                 </li>
             </ul>
-        </div>
+
     </div>
     <!--/ step container -->
 
     <!-- container -->
-    <div class="col-md-9 height-auto bdr-l">
+    <div class="col-md-9 height-auto">
         <div class="tab-content">
             <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
                 {{ form_start(userForm) }}
-                <div class="pa-md bg-light-xs bdr-b">
+                <div class="row pa-md bg-light-xs bdr-b">
                     <h4 class="fw-sb">{% trans %}mautic.user.account.header.details{% endtrans %}</h4>
                 </div>
-                <div class="pa-md">
+                <div class="row">
                     <div class="col-md-6">
-                        <h3 id="personal-info" class="pt-20">{% trans %}mautic.user.config.title.get_to_know_you{% endtrans %}</h3>
-                        <div class="text-muted small description pb-20">{% trans %}mautic.user.config.personalize.interface.helper{% endtrans %}</div>
+                        <h3 id="personal-info" class="pt-20">{% trans %}mautic.user.config.title.get_to_know_you{%
+                            endtrans %}</h3>
+                        <div class="text-muted small description pb-20">{% trans
+                            %}mautic.user.config.personalize.interface.helper{% endtrans %}</div>
                         {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
                         {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
-                        {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
+                        {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound)
+                        }}
                         {{ form_row(userForm.signature) }}
 
                         <h3 id="locale" class="pt-20">{% trans %}mautic.user.config.title.locale{% endtrans %}</h3>
-                        <div class="text-muted small description pb-20">{% trans %}mautic.user.config.region.preferences.helper{% endtrans %}</div>
+                        <div class="text-muted small description pb-20">{% trans
+                            %}mautic.user.config.region.preferences.helper{% endtrans %}</div>
                         {{ form_row(userForm.timezone) }}
                         {{ form_row(userForm.locale) }}
                     </div>
                     <div class="col-md-6">
-                        <h3 id="security" class="pt-20">{% trans %}mautic.user.config.title.account_data_security{% endtrans %}</h3>
-                        <div class="text-muted small description pb-20">{% trans %}mautic.user.config.account.security.helper{% endtrans %}</div>
-                        {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
+                        <h3 id="security" class="pt-20">{% trans %}mautic.user.config.title.account_data_security{%
+                            endtrans %}</h3>
+                        <div class="text-muted small description pb-20">{% trans
+                            %}mautic.user.config.account.security.helper{% endtrans %}</div>
+                        {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound)
+                        }}
                         {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
                         {{ form_row(userForm.plainPassword.password) }}
                         {{ form_row(userForm.plainPassword.confirm) }}
@@ -81,56 +91,126 @@
             </div>
 
             {% if permissions.apiAccess is defined and permissions.apiAccess %}
-                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="clients">
-                    <div class="pa-md bg-light-xs bdr-b">
-                        <h4 class="fw-sb">{% trans %}mautic.user.account.header.authorizedclients{% endtrans %}</h4>
-                    </div>
-                    <div class="pa-md">
-                        {{ authorizedClients|raw }}
-                    </div>
+            <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="clients">
+                <div class="row pa-md bg-light-xs bdr-b">
+                    <h4 class="fw-sb">{% trans %}mautic.user.account.header.authorizedclients{% endtrans %}</h4>
                 </div>
+                <div class="row">
+                    {{ authorizedClients|raw }}
+                </div>
+            </div>
             {% endif %}
 
             <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="accessibility">
-                <div class="pa-md bg-light-xs bdr-b">
+                <div class="row pa-md bg-light-xs bdr-b">
                     <h4 class="fw-sb">{{ 'mautic.user.account.accessibility'|trans }}</h4>
                 </div>
-                <div class="pa-md">
-                    <div class="col-md-7">
-                        <div class="row">
+                <div class="row">
+                    <div class="col-xs-12">
                             <h3 class="pt-20 mb-md">{{ 'mautic.user.account.accessibility.appearance'|trans }}</h3>
                             <h4>{{ 'mautic.user.account.accessibility.smooth_color_transitions'|trans }}</h4>
-                            <div class="help-block">{{ 'mautic.user.account.accessibility.smooth_color_transitions_help'|trans }}</div>
-                            <div class="btn-group">
-                                <button data-attribute-toggle="reduce-motion" class="btn btn-tertiary mt-sm">{{ 'mautic.user.account.accessibility.toggle_motion'|trans }}</button>
+                            <div class="help-block">{{
+                                'mautic.user.account.accessibility.smooth_color_transitions_help'|trans }}</div>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="transitions-enabled" name="reduce-motion" value="false"
+                                        data-attribute-toggle="reduce-motion" data-attribute-value="false" checked>
+                                    <label for="transitions-enabled">
+                                        <strong>Enabled</strong>
+                                        <div class="description text-help">Transitions remain activated for a smooth
+                                            experience</div>
+                                    </label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="transitions-disabled" name="reduce-motion" value="true"
+                                        data-attribute-toggle="reduce-motion" data-attribute-value="true">
+                                    <label for="transitions-disabled">
+                                        <strong>Disabled</strong>
+                                        <div class="description text-help">Prevents transitions to have instant
+                                            interface feedback</div>
+                                    </label>
+                                </div>
                             </div>
-                            <hr>
-                            <h4>{{ 'mautic.user.account.accessibility.borders_outline_style'|trans }}</h4>
-                            <div class="help-block">{{ 'mautic.user.account.accessibility.borders_outline_style_help'|trans }}</div>
-                            <div class="btn-group">
-                                <button data-attribute-toggle="contrast-borders" class="btn btn-tertiary mt-sm">{{ 'mautic.user.account.accessibility.toggle_borders'|trans }}</button>
+
+                        <hr>
+
+                        <h4>{{ 'mautic.user.account.accessibility.borders_outline_style'|trans }}</h4>
+                        <div class="help-block">{{ 'mautic.user.account.accessibility.borders_outline_style_help'|trans
+                            }}</div>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="borders-disabled" name="contrast-borders" value="false"
+                                    data-attribute-toggle="contrast-borders" data-attribute-value="false" checked>
+                                <label for="borders-disabled">
+                                    <strong>Disabled</strong>
+                                    <div class="description text-help">Default appearance without additional borders
+                                    </div>
+                                </label>
                             </div>
-                            <hr>
-                            <h4>{{ 'mautic.user.account.accessibility.reduce_transparency_blur'|trans }}</h4>
-                            <div class="help-block">{{ 'mautic.user.account.accessibility.reduce_transparency_blur_help'|trans }}</div>
-                            <div class="btn-group">
-                                <button data-attribute-toggle="reduce-transparency" class="btn">{{ 'mautic.user.account.accessibility.toggle_transparency_blur'|trans }}</button>
+                            <div class="radio-option">
+                                <input type="radio" id="borders-enabled" name="contrast-borders" value="true"
+                                    data-attribute-toggle="contrast-borders" data-attribute-value="true">
+                                <label for="borders-enabled">
+                                    <strong>Enabled</strong>
+                                    <div class="description text-help">Strong borders around clickable elements and
+                                        dashed outline style</div>
+                                </label>
                             </div>
                         </div>
                         <hr>
-                        <div class="row">
-                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.accessibility.content'|trans }}</h3>
-                            <h4>{{ 'mautic.user.account.accessibility.link_underlines'|trans }}</h4>
-                            <div class="help-block">{{ 'mautic.user.account.accessibility.link_underlines_help'|trans }}</div>
-                            <div class="btn-group">
-                                <button data-attribute-toggle="enable-underlines" class="btn btn-tertiary mt-sm">{{ 'mautic.user.account.accessibility.toggle_underlines'|trans }}</button>
+                        <h4>{{ 'mautic.user.account.accessibility.reduce_transparency_blur'|trans }}</h4>
+                        <div class="help-block">{{
+                            'mautic.user.account.accessibility.reduce_transparency_blur_help'|trans }}</div>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="transparency-normal" name="reduce-transparency" value="false"
+                                    data-attribute-toggle="reduce-transparency" data-attribute-value="false" checked>
+                                <label for="transparency-normal">
+                                    <strong>Normal</strong>
+                                    <div class="description text-help">Default transparency and blur effects</div>
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="transparency-reduced" name="reduce-transparency" value="true"
+                                    data-attribute-toggle="reduce-transparency" data-attribute-value="true">
+                                <label for="transparency-reduced">
+                                    <strong>Reduced</strong>
+                                    <div class="description text-help">Reduced transparency and blur for improved
+                                        readability</div>
+                                </label>
                             </div>
                         </div>
-                    </div>                    
+                        <hr>
+                        <h3 class="pt-20 mb-md">{{ 'mautic.user.account.accessibility.content'|trans }}</h3>
+                        <h4>{{ 'mautic.user.account.accessibility.link_underlines'|trans }}</h4>
+                        <div class="help-block">{{ 'mautic.user.account.accessibility.link_underlines_help'|trans }}
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="underlines-disabled" name="enable-underlines" value="false"
+                                    data-attribute-toggle="enable-underlines" data-attribute-value="false" checked>
+                                <label for="underlines-disabled">
+                                    <strong>Disabled</strong>
+                                    <div class="description text-help">Links without underlines</div>
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="underlines-enabled" name="enable-underlines" value="true"
+                                    data-attribute-toggle="enable-underlines" data-attribute-value="true">
+                                <label for="underlines-enabled">
+                                    <strong>Enabled</strong>
+                                    <div class="description text-help">Underlines visible on links adjacent to text
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!--/ end: container -->
+    </div>
+</div>
+<!--/ end: container -->
 </div>
 {% endblock %}
