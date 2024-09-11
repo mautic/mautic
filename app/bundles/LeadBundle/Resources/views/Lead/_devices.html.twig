@@ -18,7 +18,7 @@
       {% for device in devices %}
           <tr>
               <td>
-                  <i class="fa fa-fw fa-{{ 'smartphone' == device.device ? 'mobile' : device.device }}"></i>
+                  <i class="fa ri-fw ri-{{ device.device }}-line"></i>
               </td>
               <td>{{ translatorConditional('mautic.lead.device.' ~ device['device'], device['device']|title) }}</td>
               <td>{{ device['device_os_name'] }}</td>

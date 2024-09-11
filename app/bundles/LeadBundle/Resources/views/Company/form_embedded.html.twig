@@ -6,7 +6,7 @@
 #}
 {{ form_start(form) }}
     <div class="box-layout">
-        <ul class="nav nav-tabs pr-md pl-md mt-10">
+        <ul class="nav nav-tabs nav-tabs-contained mt-10">
             {% for g in groups %}
                 {% if fields[g] is not empty %}
                     <li class="{% if loop.first %}active{% endif %}">
