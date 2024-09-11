@@ -323,6 +323,14 @@ return [
         ],
     ],
     'services' => [
+        'controllers' => [
+            'mautic.lead.controller.ajax' => [
+                'class'     => \Mautic\LeadBundle\Controller\AjaxController::class,
+                'arguments' => [
+                    'mautic.lead.provider.typeOperator',
+                ],
+            ],
+        ],
         'events' => [
             'mautic.lead.serializer.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\SerializerSubscriber::class,

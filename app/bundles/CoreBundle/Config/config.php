@@ -198,6 +198,24 @@ return [
                     ],
                 ],
             ],
+            'mautic.form.type.entity_lookup' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,
+                'arguments' => [
+                    'mautic.model.factory',
+                    'translator',
+                    'database_connection',
+                    'router',
+                ],
+            ],
+            'mautic.form.type.dynamic_content_filter' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
+                'arguments' => [
+                    'mautic.integrations.helper.builder_integrations',
+                ],
+            ],
+            'mautic.form.type.absolute_relative_date_filter_type' => [
+                'class' => \Mautic\CoreBundle\Form\Type\AbsoluteRelativeDateFilterType::class,
+            ],
         ],
         'helpers' => [
             'mautic.helper.app_version' => [

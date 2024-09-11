@@ -2,11 +2,15 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\AbsoluteRelativeDateFilterType;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -21,10 +25,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class CampaignEventLeadFieldValueType extends AbstractType
 {
     public function __construct(
-        protected Translator $translator,
-        protected LeadModel $leadModel,
-        protected FieldModel $fieldModel,
+        private TranslatorInterface $translator,
+        private FieldModel $fieldModel,
+        private TypeOperatorProviderInterface $typeOperatorProvider
     ) {
+        $this->typeOperatorProvider->setContext('campaign');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -54,81 +59,16 @@ class CampaignEventLeadFieldValueType extends AbstractType
             ]
         );
 
-        // function to add 'template' choice field dynamically
         $func = function (FormEvent $e): void {
-            $data = $e->getData();
-            $form = $e->getForm();
-
+            $data        = $e->getData();
+            $form        = $e->getForm();
             $fieldValues = null;
-            $fieldType   = null;
+            $fieldType   = '';
             $choiceAttr  = [];
-            $operator    = '=';
+            $operator    = $data['operator'] ?? '=';
 
             if (isset($data['field'])) {
-                $field    = $this->fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
-                $operator = $data['operator'];
-
-                if ($field) {
-                    $properties = $field->getProperties();
-                    $fieldType  = $field->getType();
-                    if (!empty($properties['list'])) {
-                        // Lookup/Select options
-                        $fieldValues = FormFieldHelper::parseList($properties['list']);
-                    } elseif (!empty($properties) && 'boolean' == $fieldType) {
-                        // Boolean options
-                        $fieldValues = [
-                            0 => $properties['no'],
-                            1 => $properties['yes'],
-                        ];
-                    } else {
-                        switch ($fieldType) {
-                            case 'country':
-                                $fieldValues = FormFieldHelper::getCountryChoices();
-                                break;
-                            case 'region':
-                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getRegionChoices());
-                                break;
-                            case 'timezone':
-                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getTimezonesChoices());
-                                break;
-                            case 'locale':
-                                // Locales are flipped. And yes, we will flip the array again below.
-                                $fieldValues = array_flip(FormFieldHelper::getLocaleChoices());
-                                break;
-                            case 'date':
-                            case 'datetime':
-                                if ('date' === $operator) {
-                                    $fieldHelper = new FormFieldHelper();
-                                    $fieldHelper->setTranslator($this->translator);
-                                    $fieldValues = $fieldHelper->getDateChoices();
-                                    $customText  = $this->translator->trans('mautic.campaign.event.timed.choice.custom');
-                                    $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
-                                    $fieldValues = array_merge(
-                                        [
-                                            $customValue => $customText,
-                                        ],
-                                        $fieldValues
-                                    );
-
-                                    $choiceAttr = function ($value, $key, $index) use ($customValue): array {
-                                        if ($customValue === $value) {
-                                            return ['data-custom' => 1];
-                                        }
-
-                                        return [];
-                                    };
-                                }
-                                break;
-                            case 'boolean':
-                            case 'lookup':
-                            case 'select':
-                            case 'radio':
-                                if (!empty($properties)) {
-                                    $fieldValues = $properties;
-                                }
-                        }
-                    }
-                }
+                list($fieldType, $fieldValues, $choiceAttr) = $this->getFieldData($data, $operator);
             }
 
             $supportsValue   = !in_array($operator, ['empty', '!empty']);
@@ -194,17 +134,16 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'operator',
                 ChoiceType::class,
                 [
-                    'choices'           => $this->leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
-                    'label'             => 'mautic.lead.lead.submitaction.operator',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => [
+                    'choices'    => $this->typeOperatorProvider->getOperatorsForFieldType($fieldType, ['date']),
+                    'label'      => 'mautic.lead.lead.submitaction.operator',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'onchange' => 'Mautic.updateLeadFieldValues(this)',
                     ],
                 ]
             );
         };
 
-        // Register the function above as EventListener on PreSet and PreBind
         $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
@@ -212,5 +151,86 @@ class CampaignEventLeadFieldValueType extends AbstractType
     public function getBlockPrefix(): string
     {
         return 'campaignevent_lead_field_value';
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return array<mixed>
+     */
+    public function getFieldData(array $data, string $operator): array
+    {
+        $fieldType   = '';
+        $choiceAttr  = [];
+        $fieldValues = null;
+
+        $field = $this->fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
+        if ($field) {
+            $properties = $field->getProperties();
+            $fieldType  = $field->getType();
+            if (!empty($properties['list'])) {
+                // Lookup/Select options
+                $fieldValues = FormFieldHelper::parseList($properties['list']);
+            } elseif (!empty($properties) && 'boolean' == $fieldType) {
+                // Boolean options
+                $fieldValues = [
+                    0 => $properties['no'],
+                    1 => $properties['yes'],
+                ];
+            } else {
+                switch ($fieldType) {
+                    case 'country':
+                        $fieldValues = FormFieldHelper::getCountryChoices();
+                        break;
+                    case 'region':
+                        $fieldValues = ArrayHelper::flatten(FormFieldHelper::getRegionChoices());
+                        break;
+                    case 'timezone':
+                        $fieldValues = ArrayHelper::flatten(FormFieldHelper::getTimezonesChoices());
+                        break;
+                    case 'locale':
+                        // Locales are flipped. And yes, we will flip the array again below.
+                        $fieldValues = array_flip(FormFieldHelper::getLocaleChoices());
+                        break;
+                    case 'date':
+                    case 'datetime':
+                        if ('date' === $operator) {
+                            $fieldHelper = new FormFieldHelper();
+                            $fieldHelper->setTranslator($this->translator);
+                            $fieldValues = $fieldHelper->getDateChoices();
+                            $customText  = $this->translator->trans('mautic.campaign.event.timed.choice.custom');
+                            $customValue = (empty($data['value']) || isset($fieldValues[$data['value']]))
+                                            ? 'custom'
+                                            : $data['value'];
+                            $fieldValues = array_merge(
+                                [
+                                    $customValue => $customText,
+                                ],
+                                $fieldValues
+                            );
+
+                            $choiceAttr = function ($value) use ($customValue) {
+                                if ($customValue === $value) {
+                                    return ['data-custom' => 1];
+                                }
+
+                                return [];
+                            };
+                        }
+                        break;
+                    case 'boolean':
+                    case 'lookup':
+                    case 'select':
+                    case 'radio':
+                        if (!empty($properties)) {
+                            $fieldValues = $properties;
+                        }
+                        break;
+                    default:
+                }
+            }
+        }
+
+        return [$fieldType, $fieldValues, $choiceAttr];
     }
 }

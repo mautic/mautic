@@ -43,6 +43,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\PointBundle\Model\PointGroupModel;
@@ -50,6 +51,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
+    use ParseDateFilterValueTrait;
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     private ?array $fields = null;
@@ -522,16 +524,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $operators = OperatorOptions::getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
                 $value     = $event->getConfig()['value'];
+                $operator  = $event->getConfig()['operator'];
                 $fields    = $this->getFields($lead);
 
-                $fieldValue = isset($fields[$field]) ? CustomFieldHelper::fieldValueTransfomer($fields[$field], $value) : $value;
-                $result     = $this->leadFieldModel->getRepository()->compareValue(
-                    $lead->getId(),
-                    $field,
-                    $fieldValue,
-                    $operators[$event->getConfig()['operator']]['expr'],
-                    $fields[$field]['type'] ?? null
-                );
+                $value      = $this->parseDateFilterValue($value, $operator);
             }
         } elseif ($event->checkContext('lead.dnc')) {
             $channels  = $event->getConfig()['channels'];

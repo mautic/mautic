@@ -389,6 +389,12 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateDateTimeInputs(this, 'time');
     });
 
+    if (mQuery(container + " .input-daterange").length) {
+        const fromDateId = mQuery(container + " .input-daterange .daterange_date_from").attr('id');
+        const toDateId = mQuery(container + " .input-daterange .daterange_date_to").attr('id');
+        Mautic.initFilterDateRangePicker(container + ' #' + fromDateId, container + ' #' + toDateId);
+    }
+
     // Initialize callback options
     mQuery(container + " *[data-onload-callback]").each(function() {
         var callback = function(el) {

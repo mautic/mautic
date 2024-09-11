@@ -45,10 +45,10 @@ class DateRangeType extends AbstractType
             'date_from',
             TextType::class,
             [
-                'label'      => 'mautic.core.date.from',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'       => 'mautic.core.date.from',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control daterange_date_from'],
+                'required'    => false,
                 'data'       => $dateFrom->format($humanFormat),
             ]
         );
@@ -63,10 +63,10 @@ class DateRangeType extends AbstractType
             'date_to',
             TextType::class,
             [
-                'label'      => 'mautic.core.date.to',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'       => 'mautic.core.date.to',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control daterange_date_to'],
+                'required'    => false,
                 'data'       => $dateTo->format($humanFormat),
             ]
         );

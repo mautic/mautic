@@ -1807,9 +1807,10 @@ Mautic.lazyLoadContactStatsOnLeadLoad = function() {
         return;
     }
 
-    const contactStatsUrl = container.data('target-url');
-    mQuery.get(contactStatsUrl, function(response) {
-        response.target = containerId;
-        Mautic.processPageContent(response);
-    });
+Mautic.absoluteRelativeDateFilterToggleType = function(element) {
+    const $toggle = mQuery(element),
+        $form = $toggle.closest('.properties-form'),
+        value = $toggle.val();
+    $form.find('.absolute-date').toggleClass('hide', value === 'relative');
+    $form.find('.relative-date').toggleClass('hide', value === 'absolute');
 };

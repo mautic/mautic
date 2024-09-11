@@ -40,7 +40,12 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         return $this->getOperatorChoiceList(['exclude' => $operators]);
     }
 
-    public function getOperatorsForFieldType(string $fieldType): array
+    /**
+     * @param array<string> $overrideHiddenOperators
+     *
+     * @return mixed[]|\mixed[][]
+     */
+    public function getOperatorsForFieldType(string $fieldType, array $overrideHiddenOperators = []): array
     {
         // If we already processed this
         if (isset($this->cachedTypeOperatorsChoices[$fieldType])) {
@@ -50,9 +55,15 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         $typeOperators = $this->getAllTypeOperators();
 
         if (array_key_exists($fieldType, $typeOperators)) {
-            $this->cachedTypeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators[$fieldType]);
+            $typeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList(
+                $typeOperators[$fieldType],
+                $overrideHiddenOperators
+            );
         } else {
-            $this->cachedTypeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators['default']);
+            $typeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList(
+                $typeOperators['default'],
+                $overrideHiddenOperators
+            );
         }
 
         return $this->cachedTypeOperatorsChoices[$fieldType];

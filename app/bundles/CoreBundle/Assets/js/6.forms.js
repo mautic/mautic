@@ -670,8 +670,17 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
     var fieldOperator = mQuery('#'+fieldPrefix+'operator').val();
 
     Mautic.ajaxActionRequest(action, {'alias': fieldAlias, 'operator': fieldOperator, 'changed': fieldType}, function(response) {
-        if (typeof response.options != 'undefined') {
-            var valueField = mQuery('#'+fieldPrefix+'value');
+            let shouldApplySelect2 = false
+            if(response.field_html) {
+                let fieldHtml = response.field_html;
+                fieldHtml = fieldHtml.replaceAll(/campaignevent_update_lead_campaigns\[/g, 'campaignevent[properties][');
+                fieldHtml = fieldHtml.replaceAll('campaignevent_update_lead_campaigns', 'campaignevent_properties');
+                mQuery('#lead-value-field').html(fieldHtml);
+                shouldApplySelect2 = fieldHtml.includes('<select');
+            }
+
+            const selector = '#' + fieldPrefix + 'value';
+            var valueField = mQuery(selector);
             var valueFieldAttrs = {
                 'class': valueField.attr('class'),
                 'id': valueField.attr('id'),
@@ -685,82 +694,20 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                 Mautic.destroyChosen(valueField);
             }
 
-            if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number') {
-                var newValueField = mQuery('<select/>')
-                    .attr('class', valueFieldAttrs['class'])
-                    .attr('id', valueFieldAttrs['id'])
-                    .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
+            if (shouldApplySelect2) {
+                Mautic.activateChosenSelect(valueField);
+            }
 
-                var multiple = (fieldOperator === 'in' || fieldOperator === '!in');
-                if (multiple) {
-                    newValueField.attr('multiple', 'multiple');
-
-                    // Update the name
-                    var newName =  newValueField.attr('name') + '[]';
-                    newValueField.attr('name', newName);
-                    newValueField.attr('data-placeholder', mauticLang['chosenChooseMore']);
-                }
-
-                mQuery.each(response.options, function(value, optgroup) {
-                    if (typeof optgroup === 'object') {
-                        var optgroupEl = mQuery('<optgroup/>').attr('label', value);
-                        mQuery.each(optgroup, function(optVal, label) {
-                            var option = Mautic.createOption(optVal, label);
-
-                            if (response.optionsAttr && response.optionsAttr[optVal]) {
-                                mQuery.each(response.optionsAttr[optVal], function(optAttr, optVal) {
-                                    option.attr(optAttr, optVal);
-                                });
-                            }
-
-                            optgroupEl.append(option)
-                        });
-                        newValueField.append(optgroupEl);
-                    } else {
-                        var option = Mautic.createOption(value, optgroup);
-
-                        if (response.optionsAttr && response.optionsAttr[value]) {
-                            mQuery.each(response.optionsAttr[value], function(optAttr, optVal) {
-                                option.attr(optAttr, optVal);
-                            });
-                        }
-
-                        newValueField.append(option);
-                    }
-                });
-                newValueField.val(valueFieldAttrs['value']);
-                valueField.replaceWith(newValueField);
-
-                Mautic.activateChosenSelect(newValueField);
-            } else {
-                var newValueField = mQuery('<input/>')
-                    .attr('type', 'text')
-                    .attr('class', valueFieldAttrs['class'])
-                    .attr('id', valueFieldAttrs['id'])
-                    .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
-
-                if (response.disabled) {
-                    newValueField.attr('value', '');
-                    newValueField.prop('disabled', true);
-                }
-
-                valueField.replaceWith(newValueField);
-
-                if (response.fieldType == 'date' || response.fieldType == 'datetime') {
-                    Mautic.activateDateTimeInputs(newValueField, response.fieldType);
-                }
+            if (response.fieldType == 'date' || response.fieldType == 'datetime') {
+                Mautic.initCampaignEventDateTimePicker(selector, fieldOperator, response.fieldType);
             }
 
             if (valueOnChange && typeof valueOnChange == 'function') {
-                mQuery('#'+fieldPrefix+'value').on('change', function () {
+                mQuery(selector).on('change', function () {
                     if (typeof valueOnChangeArguments != 'object') {
                         valueOnChangeArguments = [];
                     }
-                    valueOnChangeArguments.unshift(mQuery('#'+fieldPrefix+'value'));
+                    valueOnChangeArguments.unshift(mQuery(selector));
 
                     valueOnChange.apply(null, valueOnChangeArguments);
                 });
@@ -793,7 +740,56 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                 operatorField.replaceWith(newOperatorField);
                 Mautic.activateChosenSelect(newOperatorField);
             }
-        }
+
         Mautic.removeLabelLoadingIndicator();
     }, false, false, "POST");
 };
+
+Mautic.initCampaignEventDateTimePicker = function(selector, fieldOperator, fieldType) {
+    switch (fieldOperator) {
+        case 'between':
+        case '!between':
+            const selectorFromDate = selector + '_date_from';
+            const selectorToDate = selector + '_date_to';
+            Mautic.initFilterDateRangePicker(selectorFromDate, selectorToDate);
+            break;
+        case 'lt':
+        case 'lte':
+        case 'gt':
+        case 'gte':
+            Mautic.activateDateTimeInputs(mQuery(selector+'_absoluteDate'), fieldType);
+            break;
+        default:
+            Mautic.activateDateTimeInputs(mQuery(selector), fieldType);
+    }
+}
+
+Mautic.initFilterDateRangePicker = function(selectorFromDate, selectorToDate) {
+    const dateFrom = mQuery(selectorFromDate);
+    const dateTo = mQuery(selectorToDate);
+
+    const config = {
+        format: 'M j, Y',
+        timepicker: false,
+        scrollMonth: false,
+        scrollInput: false
+    };
+
+    dateFrom.datetimepicker({
+        ...config,
+        onShow: function () {
+            this.setOptions({
+                maxDate: dateTo.val() ? new Date(dateTo.val()) : false
+            });
+        }
+    });
+
+    dateTo.datetimepicker({
+        ...config,
+        onShow: function () {
+            this.setOptions({
+                minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
+            });
+        },
+    });
+}

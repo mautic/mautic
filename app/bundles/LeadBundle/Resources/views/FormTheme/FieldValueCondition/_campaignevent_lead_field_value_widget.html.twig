@@ -3,11 +3,11 @@
     <div class="col-xs-4">
         {{ form_row(form.field) }}
     </div>
-    <div class="col-xs-4">
-        {{ form_row(form.operator) }}
+    <div class="col-xs-3">
+        <?php echo $view['form']->row($form['operator']); ?>
     </div>
-    <div class="col-xs-4">
-        {{ form_row(form.value) }}
+    <div id="lead-value-field" class="col-xs-5 properties-form">
+        <?php echo $view['form']->row($form['value']); ?>
     </div>
 </div>
 

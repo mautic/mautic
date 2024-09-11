@@ -9,12 +9,14 @@ use DeviceDetector\Parser\OperatingSystem;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Form\Type\AbsoluteRelativeDateFilterType;
 use Mautic\CoreBundle\Form\Type\AlertType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -70,6 +72,21 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         // Subscribe basic field types.
         foreach ($this->typeOperators as $typeName => $operatorOptions) {
             $event->setOperatorsForFieldType($typeName, $operatorOptions);
+        }
+
+        $dateOperators    = $this->typeOperators['date'];
+        $numbereOperators = $this->typeOperators['number'];
+
+        if ('segment' === $event->getContext() || 'campaign' === $event->getContext()) {
+            $dateOperators['include'][] = OperatorOptions::IN_LAST;
+            $dateOperators['include'][] = OperatorOptions::IN_NEXT;
+            $dateOperators['include'][] = OperatorOptions::BETWEEN;
+            $dateOperators['include'][] = OperatorOptions::NOT_BETWEEN;
+        }
+
+        if ('segment' === $event->getContext()) {
+            $numbereOperators['include'][] = OperatorOptions::BETWEEN;
+            $numbereOperators['include'][] = OperatorOptions::NOT_BETWEEN;
         }
 
         // Subscribe aliases

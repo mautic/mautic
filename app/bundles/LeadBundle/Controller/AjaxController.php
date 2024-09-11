@@ -14,8 +14,12 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Event\ListTypeaheadEvent;
+use Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
@@ -23,6 +27,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
@@ -36,6 +41,13 @@ class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
+    public function __construct(private TypeOperatorProviderInterface $typeOperatorProvider)
+    {
+    }
+
+    /**
+     * @return JsonResponse
+     */
     public function userListAction(Request $request): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
@@ -701,87 +713,42 @@ class AjaxController extends CommonAjaxController
         $alias     = InputHelper::clean($request->request->get('alias'));
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
-        $dataArray = ['success' => 0, 'options' => null, 'optionsAttr' => [], 'operators' => null, 'disabled' => false];
+        $dataArray = [
+            'success'     => 1,
+            'operators'   => null,
+        ];
         $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
         if ($leadField) {
-            $options       = null;
-            $leadFieldType = $leadField->getType();
-
-            $properties = $leadField->getProperties();
-            if (!empty($properties['list'])) {
-                // Lookup/Select options
-                $options = FormFieldHelper::parseList($properties['list']);
-            } elseif (!empty($properties) && 'boolean' == $leadFieldType) {
-                // Boolean options
-                $options = [
-                    0 => $properties['no'],
-                    1 => $properties['yes'],
-                ];
-            } else {
-                switch ($leadFieldType) {
-                    case 'country':
-                        $options = FormFieldHelper::getCountryChoices();
-                        break;
-                    case 'region':
-                        $options = FormFieldHelper::getRegionChoices();
-                        break;
-                    case 'timezone':
-                        $options = FormFieldHelper::getTimezonesChoices();
-                        break;
-                    case 'locale':
-                        $options = array_flip(FormFieldHelper::getLocaleChoices());
-                        break;
-                    case 'date':
-                    case 'datetime':
-                        if ('date' == $operator) {
-                            $fieldHelper = new FormFieldHelper();
-                            $fieldHelper->setTranslator($this->translator);
-                            $options = $fieldHelper->getDateChoices();
-                            $options = array_merge(
-                                [
-                                    'custom' => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),
-                                ],
-                                $options
-                            );
-
-                            $dataArray['optionsAttr']['custom'] = [
-                                'data-custom' => 1,
-                            ];
-                        }
-                        break;
-                    default:
-                        $options = (!empty($properties)) ? $properties : [];
-                }
-            }
-
+            $leadFieldType          = $leadField->getType();
             $dataArray['fieldType'] = $leadFieldType;
-            $dataArray['options']   = $options;
 
             if ('field' === $changed) {
-                $dataArray['operators'] = $leadModel->getOperatorsForFieldType($leadFieldType, ['date']);
+                $this->typeOperatorProvider->setContext('campaign');
+                $dataArray['operators'] = $this->typeOperatorProvider
+                    ->getOperatorsForFieldType($leadFieldType, ['date']);
                 foreach ($dataArray['operators'] as $value => $label) {
                     $dataArray['operators'][$value] = $this->translator->trans($label);
                 }
-                $operator = array_key_first($dataArray['operators']);
-            }
 
-            $disabled = false;
-            switch ($operator) {
-                case 'empty':
-                case '!empty':
-                    $disabled             = true;
-                    $dataArray['options'] = null;
-                    break;
-                case 'regexp':
-                case '!regexp':
-                    $dataArray['options'] = null;
-                    break;
+                reset($dataArray['operators']);
+
+                if (!in_array($operator, array_values($dataArray['operators']))) {
+                    $operator = key($dataArray['operators']);
+                }
             }
-            $dataArray['disabled'] = $disabled;
         }
 
-        $dataArray['success'] = 1;
+        $form = $this->container->get('form.factory')
+            ->createNamed('campaignevent_update_lead_campaigns', CampaignEventLeadFieldValueType::class, [
+            'operator'         => $operator,
+            'field'            => $alias,
+        ]);
+
+        $dataArray['field_html'] = $this->renderView(
+            'MauticLeadBundle:FormTheme\ContactCampaignsCondition:campaignevent_update_lead_campaigns_widget.html.php',
+            ['form' => $form->createView()]
+        );
 
         return $this->sendJsonResponse($dataArray);
     }

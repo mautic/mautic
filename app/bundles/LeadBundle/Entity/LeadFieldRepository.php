@@ -8,6 +8,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
  * @extends CommonRepository<LeadField>
@@ -224,7 +225,9 @@ class LeadFieldRepository extends CommonRepository
      */
     public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $connection = $this->_em->getConnection();
+        $q          = new QueryBuilder($connection);
+
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -315,6 +318,26 @@ class LeadFieldRepository extends CommonRepository
                 $q->where($expr)
                     ->setParameter('lead', (int) $lead)
                     ->setParameter('values', $values, ArrayParameterType::STRING);
+            } elseif ('between' === $operatorExpr || 'notBetween' === $operatorExpr) {
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead')
+                );
+
+                $dates = [];
+                foreach ($value as $dateKey => $stringDateHuman) {
+                    $date            = \DateTime::createFromFormat('M j, Y', $stringDateHuman);
+                    $time            = 'date_from' === $dateKey ? ' 00:00:00' : ' 23:59:59';
+                    $dates[$dateKey] = $date->format('Y-m-d').$time;
+                }
+
+                $expr->add(
+                    $q->expr()->$operatorExpr($property, [':date_from', ':date_to'])
+                );
+
+                $q->where($expr)
+                    ->setParameter('lead', (int) $lead)
+                    ->setParameter('date_from', $dates['date_from'])
+                    ->setParameter('date_to', $dates['date_to']);
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')

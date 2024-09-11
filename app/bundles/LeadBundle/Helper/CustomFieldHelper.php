@@ -45,9 +45,9 @@ class CustomFieldHelper
      */
     public static function fieldValueTransfomer(array $field, $value, DateTimeHelper $dateTimeHelper = null)
     {
-        if (null === $value) {
-            // do not transform null values
-            return null;
+        if (null === $value || is_array($value)) {
+            // do not transform null and array values
+            return $value;
         }
 
         $type = $field['type'];

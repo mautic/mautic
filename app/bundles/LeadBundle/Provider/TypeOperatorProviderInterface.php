@@ -23,11 +23,13 @@ interface TypeOperatorProviderInterface
     public function getOperatorsExcluding(array $operators): array;
 
     /**
+     * @param string[] $overrideHiddenOperators
+     *
      * @return mixed[]
      *
      * @throws OperatorsNotFoundException
      */
-    public function getOperatorsForFieldType(string $fieldType): array;
+    public function getOperatorsForFieldType(string $fieldType, array $overrideHiddenOperators = []): array;
 
     /**
      * @return mixed[]
