@@ -57,6 +57,66 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param array<string, string> $data
+     *
+     * @dataProvider dataForUserCreation
+     */
+    public function testNewUserCreation(array $data, string $message): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/new');
+
+        $formData = [
+            'user[firstName]' => 'John',
+            'user[lastName]'  => 'Doe',
+            'user[email]'     => 'john.doe@example.com',
+        ];
+
+        $form = $crawler->selectButton('Save')->form($formData + $data);
+
+        $this->client->submit($form);
+
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array<int, string|array<string, string>>>
+     */
+    public function dataForUserCreation(): iterable
+    {
+        yield 'Blank' => [
+            [
+                'user[plainPassword][password]' => '',
+                'user[plainPassword][confirm]'  => '',
+            ],
+            'Password cannot be blank.',
+        ];
+
+        yield 'Do not match with confirm' => [
+            [
+                'user[plainPassword][password]' => 'same',
+            ],
+            'Passwords do not match.',
+        ];
+
+        yield 'Minimum length' => [
+            [
+                'user[plainPassword][password]' => 'same',
+                'user[plainPassword][confirm]'  => 'same',
+            ],
+            'Password must be at least 6 characters.',
+        ];
+
+        yield 'No stronger' => [
+            [
+                'user[plainPassword][password]' => 'same123',
+                'user[plainPassword][confirm]'  => 'same123',
+            ],
+            'Please enter a stronger password. Your password must use a combination of upper and lower case, special characters and numbers.',
+        ];
+    }
+
+    /**
      * @param array<mixed> $details
      */
     public function auditLogSetter(
