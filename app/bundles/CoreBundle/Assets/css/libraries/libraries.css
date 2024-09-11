@@ -6112,6 +6112,16 @@ button.close {
   -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-340px + (40px * 5)));
   transform: scale(0.8) rotateY(45deg) translateZ(calc(-340px + (40px * 5)));
 }
+.modal .modal-dialog {
+  top: 45%;
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+  transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+}
+.modal.fade .modal-dialog {
+  transition: var(--transition-all-productive);
+}
 /*
 * Remix Icon v4.3.0
 * https://remixicon.com
