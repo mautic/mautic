@@ -435,6 +435,7 @@
 --border-radius-sm: clamp(0px, @border-radius, 7px);
 --border-radius-md: clamp(0px, calc(1.8 * @border-radius), 14px);
 --border-radius-lg: clamp(0px, calc(2.6 * @border-radius), 21px);
+--outline-style: solid;
 }
 
 //
@@ -448,9 +449,10 @@
 
 /// High contrast
 :root[contrast-borders="true"] {
-    outline-style: dotted;
---border-no-color: var(--border-strong);
---border-bottom: 1px solid var(--border-strong);
+    a {.outline();}
+    --outline-style: dashed;
+    --border-no-color: var(--border-strong);
+    --border-bottom: 1px;
 }
 
 /// No transparency and blur
