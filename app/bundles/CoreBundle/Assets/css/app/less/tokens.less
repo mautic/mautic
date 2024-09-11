@@ -37,6 +37,7 @@
     --layer-selected-inverse: #161616;
     --layer-selected-disabled: #8d8d8d;
     --layer-translucent: #ffffffcc;
+    --layer-translucent-inverse: rgba(0, 0, 0, 0.7);
 
     /// Layer accent
     --layer-accent: #e0e0e0;
@@ -213,6 +214,7 @@
     --layer-selected-inverse: #f4f4f4;
     --layer-selected-disabled: #6f6f6f;
     --layer-translucent: #000000cc;
+    --layer-translucent-inverse: #ffffffcc;
 
     /// Layer accent
     --layer-accent: #393939;
@@ -458,6 +460,7 @@
 /// No transparency and blur
 :root[reduce-transparency="true"] {
     --layer-translucent: var(--layer);
+    --layer-translucent-inverse: var(--layer-selected-inverse);
 }
 
 /// Underlines

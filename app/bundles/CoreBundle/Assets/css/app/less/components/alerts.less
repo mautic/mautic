@@ -47,7 +47,7 @@
   .alert { background-color: var(--layer-alternate); }
 }
 
-.alert-success { 
+.alert-success {
   border-color: var(--support-success);
 
   &:not([class*="col-"]):before {
@@ -96,8 +96,8 @@
 }
 
 .alert-growl {
-  background: rgba(0, 0, 0, .7);
-  color: #FFFFFF;
+  background: var(--layer-translucent-inverse);
+  color: var(--text-inverse);
   border-radius: 0;
   border-left: 4px solid var(--border-interactive);
   border-top: none;
@@ -161,7 +161,7 @@
 
 .alert-growl .close {
   font-size: (@font-size-base);
-  color: #fff;
+  color: var(--text-inverse);
   margin-left: 10px;
   font-weight: normal;
 }
