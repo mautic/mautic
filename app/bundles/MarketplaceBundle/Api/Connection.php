@@ -8,15 +8,13 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Mautic\MarketplaceBundle\Exception\ApiException;
-use Mautic\MarketplaceBundle\Service\Config;
 use Psr\Log\LoggerInterface;
 
 class Connection
 {
     public function __construct(
         private ClientInterface $httpClient,
-        private LoggerInterface $logger,
-        private Config $config
+        private LoggerInterface $logger
     ) {
     }
 
@@ -25,13 +23,9 @@ class Connection
      */
     public function getPlugins(int $page, int $limit, string $query = ''): array
     {
-        return $this->makeRequest(sprintf('%s/rest/v1/rpc/get_data_with_total?apikey=%s&_limit=%s&_offset=%s&_type=mautic-plugin&_query=%s',
-            $this->config->getSupabaseUrl(),
-            $this->config->getSupabaseApiKey(),
-            $limit,
-            ($page - 1) * $limit,
-            $query
-        ));
+        $offset = ($page - 1) * $limit;
+
+        return $this->makeRequest("https://mau.tc/api-marketplace-packages?_limit={$limit}&_offset={$offset}&_type=&_query={$query}");
     }
 
     /**
@@ -39,11 +33,7 @@ class Connection
      */
     public function getPackage(string $pluginName): array
     {
-        return $this->makeRequest(sprintf('%s/rest/v1/rpc/get_pack?apikey=%s&packag_name=%s',
-            $this->config->getSupabaseUrl(),
-            $this->config->getSupabaseApiKey(),
-            $pluginName,
-        ));
+        return $this->makeRequest("https://mau.tc/api-marketplace-package?packag_name={$pluginName}");
     }
 
     public function makeRequest(string $url): array

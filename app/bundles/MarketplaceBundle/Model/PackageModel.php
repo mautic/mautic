@@ -18,10 +18,11 @@ class PackageModel
 
     public function getPackageDetail(string $name): PackageDetail
     {
-        $allowlist      = $this->allowlist->getAllowList();
-        $allowedPackage = $allowlist->findPackageByName($name);
+        // $allowlist      = $this->allowlist->getAllowList();
+        // $allowedPackage = $allowlist->findPackageByName($name);
         $payload        = $this->connection->getPackage($name);
 
-        return PackageDetail::fromArray($payload['package'] + $allowedPackage->toArray());
+        // return PackageDetail::fromArray($payload['package'] + $allowedPackage->toArray());
+        return PackageDetail::fromArray($payload['package']);
     }
 }
