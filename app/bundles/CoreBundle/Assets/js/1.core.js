@@ -61,9 +61,8 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
-
+    // Load user preferences for UI saved previously
     const prefix = 'm-toggle-setting-';
-
     Object.keys(localStorage)
         .filter(key => key.startsWith(prefix))
         .forEach(setting => {
@@ -72,16 +71,21 @@ mQuery( document ).ready(function() {
 
             if (value) {
                 document.documentElement.setAttribute(attributeName, value);
+                // Set the correct radio button
+                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${value}"]`);
+                if (radio) radio.checked = true;
             }
         });
 
-    document.querySelectorAll('[data-attribute-toggle]').forEach(element => {
-        const attributeName = element.dataset.attributeToggle;
-        element.addEventListener('click', function() {
-            const currentValue = document.documentElement.getAttribute(attributeName);
-            const newValue = currentValue !== 'true';
-            document.documentElement.setAttribute(attributeName, newValue);
-            localStorage.setItem(`${prefix}${attributeName}`, newValue);
+    // Handle radio button changes
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const attributeName = this.dataset.attributeToggle;
+                const newValue = this.dataset.attributeValue;
+                document.documentElement.setAttribute(attributeName, newValue);
+                localStorage.setItem(`${prefix}${attributeName}`, newValue);
+            }
         });
     });
 
