@@ -71,9 +71,6 @@ mQuery( document ).ready(function() {
 
             if (value) {
                 document.documentElement.setAttribute(attributeName, value);
-                // Set the correct radio button
-                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${value}"]`);
-                if (radio) radio.checked = true;
             }
         });
 
