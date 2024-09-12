@@ -54,7 +54,10 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activeForm}) }}
+{{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+    'entity': activeForm,
+    'status': 'available'
+}) -}}
 {% endblock %}
 
 {% block content %}

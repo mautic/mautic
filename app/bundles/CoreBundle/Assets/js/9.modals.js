@@ -309,6 +309,7 @@ Mautic.showConfirmation = function (el) {
     var confirmHeaderDiv = mQuery("<div />").attr({"class": "modal-header"});
     confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(message));
     var confirmButton = mQuery('<button type="button" />')
+        .attr("id", "confirm")
         .addClass(confirmBtnClass)
         .css("marginRight", "5px")
         .css("marginLeft", "5px")
