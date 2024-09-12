@@ -31,5 +31,9 @@
   {% if isIndex %}
         </div>
     </div>
+
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.points.decay', 'mautic.protip.points.reduce', 'mautic.protip.points.limit'])
+  }) }}
   {% endif %}
 {% endblock %}
