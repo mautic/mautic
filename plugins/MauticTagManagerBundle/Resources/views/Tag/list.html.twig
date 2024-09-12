@@ -151,4 +151,7 @@
             {% endif %}
         </div>
     </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+        tip: random(['mautic.protip.tags.segmentation', 'mautic.protip.tags.multivalue', 'mautic.protip.tags.creation'])
+    }) }}
 {% endblock %}
