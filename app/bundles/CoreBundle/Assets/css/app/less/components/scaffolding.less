@@ -1,6 +1,10 @@
 // Scaffolding
 // --------------------------------------------------
 
+body {
+  color: var(--text-primary);
+}
+
 // Horizontal rules
 
 hr,
@@ -64,11 +68,12 @@ hr,
 
 a {
   transition: var(--transition-all-productive);
+  color: var(--link-primary);
+
   &:hover {
+    color: var(--link-primary-hover);
     cursor: pointer;
   }
   &:hover,
-  &:focus {
-    text-decoration: none;
-  }
+  &:focus {text-decoration: none;}
 }
