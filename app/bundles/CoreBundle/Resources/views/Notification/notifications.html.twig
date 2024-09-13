@@ -20,8 +20,10 @@
                         updateMessage: updateMessage
                     }) }}
                     {% set class = notifications is not empty ? ' hide' : '' %}
-                    <div class="{{ class }} mautibot-image notification-empty" id="notificationMautibot">
-                        <img class="img img-responsive" src="{{ mautibotGetImage('wave') }}" />
+                    <div class="{{ class }} mautibot-image pa-lg d-flex fd-column ai-center jc-center" id="notificationMautibot">
+                        <div class="fs-30">🦄</div>
+                        <div class="text-muted fw-sb">{{'mautic.core.notifications.empty'|trans}}</div>
+                        <div class="text-muted">{{'mautic.core.notifications.empty_extra'|trans}}</div>
                     </div>
                 </div>
             </div>
