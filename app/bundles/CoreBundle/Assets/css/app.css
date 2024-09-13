@@ -1146,6 +1146,9 @@ a.text-google:focus {
 .text-disabled {
   color: var(--text-disabled);
 }
+.text-helper {
+  color: var(--text-helper);
+}
 blockquote {
   padding-left: 40px;
   border-width: 0px;
@@ -5835,6 +5838,10 @@ lesshat-selector { -lh-property: 0 ;
 }
 .pl-160 {
   padding-left: var(--spacing-13) !important;
+}
+.pi-16,
+.pi-md {
+  padding-inline: var(--spacing-05) !important;
 }
 .w-44 {
   width: 44px;
