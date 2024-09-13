@@ -2317,29 +2317,4 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         return $url;
     }
-
-    /**
-     * @param array<int> $ids
-     *
-     * @return array<Email>
-     */
-    public function getByIds(array $ids): iterable
-    {
-        return $this->getEntities([
-            'filter' => [
-                'force' => [
-                    [
-                        'column' => 'l.id',
-                        'expr'   => 'in',
-                        'value'  => $ids,
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function canEdit(Email $email): bool
-    {
-        return $this->security->hasEntityAccess('email:emails:editown', 'email:emails:editother', $email->getCreatedBy());
-    }
 }
