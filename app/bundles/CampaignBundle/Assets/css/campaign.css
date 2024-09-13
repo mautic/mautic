@@ -431,3 +431,11 @@
     line-height: 250px;
     font-size: 24px;
 }
+
+.campaign-event-stat {
+    padding: 4px;
+}
+
+.campaign-event-stat-divider {
+    padding: 0 4px;
+}
