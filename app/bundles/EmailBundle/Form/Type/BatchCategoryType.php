@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
@@ -24,17 +25,16 @@ class BatchCategoryType extends AbstractType
             'newCategory',
             EntityType::class,
             [
-                'class'                    => Category::class,
-                'choice_label'             => 'title',
-                'placeholder'              => 'mautic.email.category.batch.choose',
-                'required'                 => true,
-                'label_attr'               => ['class' => 'control-label'],
-                'attr'                     => ['class' => 'form-control'],
-                'query_builder'            => function (CategoryRepository $cr): QueryBuilder {
-                    return $cr->createQueryBuilder('c')
-                        ->orderBy('c.title', 'ASC')
-                        ->where('c.bundle = :bundle')
-                        ->setParameter('bundle', 'email');
+                'class'         => Category::class,
+                'choice_label'  => 'title',
+                'required'      => true,
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => ['class' => 'form-control'],
+                'query_builder' => function (CategoryRepository $cr): QueryBuilder {
+                    $qb =$cr->createQueryBuilder('c');
+                    return  $qb->orderBy('c.title', 'ASC')
+                        ->where($qb->expr()->in('c.bundle', ':bundles'))
+                        ->setParameter('bundles', ['email', 'global'], ArrayParameterType::INTEGER);
                 },
             ]
         );
