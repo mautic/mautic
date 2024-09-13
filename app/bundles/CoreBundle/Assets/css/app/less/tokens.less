@@ -465,11 +465,12 @@
 
 /// Underlines
 :root[enable-underlines="true"] {
-    a {
+    p a,
+    .alert a,
+    .list-group-item-text,
+    .accordion-title,
+    td a:not(.label):not([class*="dropdown-"]):not(.dropdown-menu a) {
         &,
-        &:hover,
-        &:focus {
-            text-decoration: underline;
-        }
+        &:hover {text-decoration: underline;}
     }
 }

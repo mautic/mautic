@@ -7615,8 +7615,15 @@ ul.media-list.media-list-feed div.media-body {
   --layer-translucent: var(--layer);
   --layer-translucent-inverse: var(--layer-selected-inverse);
 }
-:root[enable-underlines="true"] a,
-:root[enable-underlines="true"] a:hover,
-:root[enable-underlines="true"] a:focus {
+:root[enable-underlines="true"] p a,
+:root[enable-underlines="true"] .alert a,
+:root[enable-underlines="true"] .list-group-item-text,
+:root[enable-underlines="true"] .accordion-title,
+:root[enable-underlines="true"] td a:not(.label):not([class*="dropdown-"]):not(.dropdown-menu a),
+:root[enable-underlines="true"] p a:hover,
+:root[enable-underlines="true"] .alert a:hover,
+:root[enable-underlines="true"] .list-group-item-text:hover,
+:root[enable-underlines="true"] .accordion-title:hover,
+:root[enable-underlines="true"] td a:not(.label):not([class*="dropdown-"]):not(.dropdown-menu a):hover {
   text-decoration: underline;
 }
