@@ -32,7 +32,8 @@ class BatchCategoryType extends AbstractType
                 'attr'          => ['class' => 'form-control'],
                 'query_builder' => function (CategoryRepository $cr): QueryBuilder {
                     $qb =$cr->createQueryBuilder('c');
-                    return  $qb->orderBy('c.title', 'ASC')
+
+                    return $qb->orderBy('c.title', 'ASC')
                         ->where($qb->expr()->in('c.bundle', ':bundles'))
                         ->setParameter('bundles', ['email', 'global'], ArrayParameterType::INTEGER);
                 },
