@@ -11,32 +11,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(RouterInterface $router, TranslatorInterface $translator)
-    {
-        $this->router     = $router;
-        $this->translator = $translator;
+    public function __construct(
+        private RouterInterface $router,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectContactBulkButtons', 0],
         ];
     }
 
-    public function injectContactBulkButtons(CustomButtonEvent $event)
+    public function injectContactBulkButtons(CustomButtonEvent $event): void
     {
-        if (0 === strpos($event->getRoute(), 'mautic_contact_')) {
+        if (str_starts_with($event->getRoute(), 'mautic_contact_')) {
             $event->addButton(
                 [
                     'attr' => [
@@ -47,7 +37,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         'data-header' => $this->translator->trans('mautic.lead.batch.categories'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.lead.batch.categories'),
-                    'iconClass' => 'fa fa-cogs',
+                    'iconClass' => 'ri-folder-line',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );

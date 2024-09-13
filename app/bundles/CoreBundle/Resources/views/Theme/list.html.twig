@@ -4,9 +4,9 @@
 
     {% if items|length %}
         <div class="table-responsive">
-            <table class="table table-hover table-striped table-bordered theme-list" id="themeTable">
+            <table class="table table-hover theme-list" id="themeTable">
                 <thead>
-                    <tr>   
+                    <tr>
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'checkall': 'true',
                             'target'  : '#themeTable',
@@ -34,17 +34,50 @@
                 <tbody>
                     {% for k, item in items %}
                         {% set thumbnailUrl = asset('themes/' ~ k ~ '/thumbnail.png') %}
-                        {% set hasThumbnail =  (item['dir'] ~ '/thumbnail.png') is file  %}
+                        {% set hasThumbnail = (item['dir'] ~ '/thumbnail.png') is file %}
+                        {% set visibilityButton = [] %}
+                        {% set visibilityCss = '' %}
+
+                        {% if item.visibility is defined %}
+                            {% set btnText         = 'mautic.core.theme.hide' %}
+                            {% set iconClass       = 'ri-eye-off-line' %}
+                            {% set message         = 'mautic.core.theme.form.confirm.hide' %}
+                            {% set confirmBtnClass = '' %}
+
+                            {% if item.visibility.hidden|default(false) %}
+                                {% set btnText         = 'mautic.core.theme.unhide' %}
+                                {% set iconClass       = 'ri-eye-line' %}
+                                {% set message         = 'mautic.core.theme.form.confirm.unhide' %}
+                                {% set confirmBtnClass = 'btn btn-success' %}
+                                {% set visibilityCss   = 'disabled-row' %}
+                            {% endif %}
+
+                            {% set visibilityButton = {
+                                'attr': {
+                                    'data-toggle': 'confirmation',
+                                    'href': path('mautic_themes_action', {'objectAction': 'visibility', 'objectId': k}),
+                                    'data-message': message|trans({'%theme%': item.name ~ ' (' ~ k ~ ')'}),
+                                    'data-confirm-text': btnText|trans,
+                                    'data-confirm-callback': 'executeAction',
+                                    'data-cancel-text': 'mautic.core.form.cancel'|trans,
+                                    'data-confirm-btn-class': confirmBtnClass,
+                                },
+                                'btnText': btnText|trans,
+                                'iconClass': iconClass,
+                                'priority': -1,
+                            } %}
+                        {% endif %}
+
                         <tr>
                             <td>
                                 {% set item = item|merge({id: item.key}) %}
                                 {% set previewButtonSettings = {
                                     'attr': {
                                         'data-toggle': 'modal',
-                                        'data-target': '#theme-' ~ k,   
+                                        'data-target': '#theme-' ~ k,
                                     },
                                     'btnText': 'mautic.asset.asset.preview'|trans,
-                                    'iconClass': 'fa fa-image',
+                                    'iconClass': 'ri-image-line',
                                     } %}
                                 {% set previewButton = hasThumbnail ? previewButtonSettings : [] %}
                                 {% set deleteButton = {
@@ -61,16 +94,17 @@
                                         'customButtons': [
                                             {
                                                 'attr': {
-                                                    'href': path('mautic_themes_action', { 
+                                                    'href': path('mautic_themes_action', {
                                                         objectAction: 'download',
                                                         objectId: k
                                                     }),
                                                     'data-toggle': '0',
                                                 },
                                                 'btnText': 'mautic.core.download'|trans,
-                                                'iconClass': 'fa fa-download',
+                                                'iconClass': 'ri-download-line',
                                             },
                                             previewButton,
+                                            visibilityButton,
                                         ],
                                     }
                                 ) }}
@@ -93,12 +127,12 @@
                                 </div>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="{{ visibilityCss }}">
                                 <div>
                                     {{ item['name']|e }} ({{ item['key']|e }})
                                 </div>
                             </td>
-                            <td>
+                            <td class="{{ visibilityCss }}">
                                 <div>
                                     {% if item['config']['authorUrl'] is defined and item['config']['authorUrl'] is not empty and item['config']['author'] is defined %}
                                         <a href="{{ inputUrl(item['config']['authorUrl']) }}" target="_blank">
@@ -109,23 +143,25 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td class="visible-md visible-lg">
+                            <td class="visible-md visible-lg {{ visibilityCss }}">
+                                <div class="d-flex ai-center gap-xs">
                                     {% for builder in item['config']['builder'] %}
                                     <span style="white-space: nowrap;">
-                                        <span class="label label-primary pa-4">{{ builder }}</span>
+                                        <span class="label label-primary">{{ builder }}</span>
                                     </span>
                                 {% endfor %}
                                 {% if item['config']['features'] is defined and item['config']['features'] is not empty %}
                                     {% for feature in item['config']['features'] %}
-                                        <span style="white-space: nowrap;">
-                                            <span class="label label-default pa-4">
+
+                                            <span class="label label-gray">
                                                 {{ ('mautic.core.theme.feature.' ~ feature|e)|trans }}
                                             </span>
-                                        </span>
+
                                     {% endfor %}
                                 {% endif %}
+                                </div>
                             </td>
-                        <tr>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

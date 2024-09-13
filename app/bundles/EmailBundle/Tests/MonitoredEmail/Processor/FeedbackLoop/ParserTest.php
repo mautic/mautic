@@ -11,9 +11,9 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that an email is found inside a feedback report
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser::parse
      */
-    public function testEmailIsFoundInFeedbackLoopEmail()
+    public function testEmailIsFoundInFeedbackLoopEmail(): void
     {
         $message            = new Message();
         $message->fblReport = <<<'BODY'
@@ -42,9 +42,9 @@ BODY;
     /**
      * @testdox Test that an exception is thrown if no feedback report is found
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser::parse
      */
-    public function testExceptionIsThrownWithFblNotFound()
+    public function testExceptionIsThrownWithFblNotFound(): void
     {
         $this->expectException(FeedbackLoopNotFound::class);
 

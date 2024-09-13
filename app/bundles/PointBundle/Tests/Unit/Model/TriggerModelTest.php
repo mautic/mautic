@@ -33,52 +33,49 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var IpLookupHelper|MockObject
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var LeadModel|MockObject
      */
-    private $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var TriggerEventModel|MockObject
      */
-    private $triggerEventModel;
+    private MockObject $triggerEventModel;
 
     /**
      * @var MauticFactory|MockObject
      */
-    private $mauticFactory;
+    private MockObject $mauticFactory;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var EntityManager|MockObject
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var TriggerEventRepository|MockObject
      */
-    private $triggerEventRepository;
+    private MockObject $triggerEventRepository;
 
-    /**
-     * @var TriggerModel
-     */
-    private $triggerModel;
+    private TriggerModel $triggerModel;
 
     /**
      * @var ContactTracker
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     public function setUp(): void
     {

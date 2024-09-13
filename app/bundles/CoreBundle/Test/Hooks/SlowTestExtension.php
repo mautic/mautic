@@ -31,10 +31,16 @@ class SlowTestExtension implements AfterTestHook, AfterLastTestHook
      */
     private $classes = [];
 
+    /**
+     * @var float
+     */
+    private $started;
+
     public function __construct()
     {
         $this->enabled   = (bool) getenv('MAUTIC_TEST_LOG_SLOW_TESTS');
         $this->threshold = (float) (getenv('MAUTIC_TEST_SLOW_TESTS_THRESHOLD') ?: 2);
+        $this->started   = microtime(true);
     }
 
     public function executeAfterTest(string $test, float $time): void
@@ -42,6 +48,9 @@ class SlowTestExtension implements AfterTestHook, AfterLastTestHook
         if (!$this->enabled) {
             return;
         }
+
+        $time            = microtime(true) - $this->started;
+        $this->started   = microtime(true);
 
         if ($time <= $this->threshold) {
             return;

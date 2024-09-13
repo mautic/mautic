@@ -10,33 +10,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(Connection $db, TranslatorInterface $translator)
-    {
-        $this->db         = $db;
-        $this->translator = $translator;
+    public function __construct(
+        private Connection $db,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', 0],
         ];
     }
 
-    public function onDataCleanup(MaintenanceEvent $event)
+    public function onDataCleanup(MaintenanceEvent $event): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
@@ -56,7 +43,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                     ));
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
-            $rows = $qb->execute()->fetchOne();
+            $rows = $qb->executeQuery()->fetchOne();
         } else {
             $qb->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
               ->where($qb->expr()->lte('l.last_active', ':date'));
@@ -77,7 +64,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
             $qb2 = $this->db->createQueryBuilder();
             while (true) {
-                $leadsIds = array_column($qb->execute()->fetchAllAssociative(), 'id');
+                $leadsIds = array_column($qb->executeQuery()->fetchAllAssociative(), 'id');
                 if (0 === sizeof($leadsIds)) {
                     break;
                 }
@@ -87,7 +74,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                           $qb2->expr()->eq(
                               'id', $leadId
                           )
-                      )->execute();
+                      )->executeStatement();
                 }
             }
         }

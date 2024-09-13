@@ -51,11 +51,11 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- container -->
-      <div class="col-md-9 bg-white height-auto">
+      <div class="col-md-9 height-auto">
           <div class="row">
               <div class="col-xs-12">
                   <!-- tabs controls -->
-                  <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                  <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active">
                           <a href="#theme-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
                       </li>
@@ -92,11 +92,11 @@
               </div>
           </div>
       </div>
-      <div class="col-md-3 bg-white height-auto bdr-l">
+      <div class="col-md-3 height-auto bdr-l">
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.title) }}
               {% if isVariant %}
-                  {{ form_row(form.template) }}
+                  
                   {{ form_row(form.variantSettings) }}
               {% else %}
                   {{ form_row(form.alias) }}
@@ -111,8 +111,8 @@
                   {{ form_row(form.isPreferenceCenter) }}
               {% endif %}
 
-              {{ form_row(form.publishUp) }}
-              {{ form_row(form.publishDown) }}
+              {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+    	      {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
 
               {% if not isVariant %}
                   {{ form_row(form.redirectType) }}

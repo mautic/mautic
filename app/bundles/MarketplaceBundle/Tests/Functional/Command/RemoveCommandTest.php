@@ -17,7 +17,8 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     /**
      * @var MockObject&LoggerInterface
      */
-    private $logger;
+    private MockObject $logger;
+
     private string $packageName;
 
     public function setUp(): void

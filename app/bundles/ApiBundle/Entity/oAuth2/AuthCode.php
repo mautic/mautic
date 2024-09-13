@@ -6,12 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AuthCode as BaseAuthCode;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class AuthCode.
- */
 class AuthCode extends BaseAuthCode
 {
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -26,7 +23,7 @@ class AuthCode extends BaseAuthCode
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('user', \Mautic\UserBundle\Entity\User::class)
             ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
             ->build();
 
