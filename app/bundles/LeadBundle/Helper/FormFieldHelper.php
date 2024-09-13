@@ -123,15 +123,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
             return [false, 'mautic.lead.field.typenotrecognized'];
         }
 
-        $fieldType = self::$types[$type];
-        foreach ($properties as $key => $value) {
-            if (!array_key_exists($key, $fieldType['properties'])) {
-                unset($properties[$key]);
-            }
-
-            if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {
-                // ensure requirements are met
-                return [false, $fieldType['properties'][$key]['error_msg']];
+        $fieldType = self::$types[$type]['properties'];
+        foreach ($fieldType as $key => $property) {
+            if (!empty($property['required']) && !array_key_exists($key, $properties)) {
+                return [false, $property['error_msg']];
             }
         }
 
