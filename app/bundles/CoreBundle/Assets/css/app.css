@@ -1336,7 +1336,8 @@ kbd {
 .alert.alert-danger.notification:before {
   position: absolute;
   top: 20px;
-  right: 0;
+  left: 10px;
+  font-size: 18px;
 }
 .alert.alert-success.notification .close,
 .alert.alert-info.notification .close,
@@ -1344,7 +1345,7 @@ kbd {
 .alert.alert-danger.notification .close {
   position: absolute;
   top: 10px;
-  right: 30px;
+  right: 0;
 }
 .alert:has(.btn) {
   align-items: center;
