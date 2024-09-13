@@ -643,11 +643,7 @@ class LeadModel extends FormModel
                 $results = $this->em->getRepository(User::class)->getUserList($filter, $limit, $start, ['lead' => 'leads']);
                 break;
             case 'contact':
-                $fetchResults = $this->getEntities([
-                    'start'          => $start,
-                    'limit'          => $limit,
-                    'filter'         => ['string' => $filter],
-                ]);
+                $fetchResults = $this->getEntities(['start' => $start, 'limit' => $limit, 'filter' => $filter]);
 
                 $results = [];
 
@@ -1623,8 +1619,10 @@ class LeadModel extends FormModel
 
         array_walk($tags, function (&$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
-            $val = InputHelper::clean($val);
+            $val = InputHelper::_($val, 'string');
         });
+        // Remove any tags that became empty after filtering
+        $tags = array_filter($tags, 'strlen');
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1661,8 +1659,10 @@ class LeadModel extends FormModel
 
             array_walk($removeTags, function (&$val): void {
                 $val = html_entity_decode(trim($val), ENT_QUOTES);
-                $val = InputHelper::clean($val);
+                $val = InputHelper::_($val, 'string');
             });
+            // Remove any tags that became empty after filtering
+            $removeTags = array_filter($removeTags, 'strlen');
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);

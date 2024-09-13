@@ -26,7 +26,7 @@
             'iconClass': 'ri-spy-line',
         }]) %}
     {% endif %}
-    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <div id="page-list-wrapper">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue|default(''),
             'searchHelp': 'mautic.lead.lead.help.searchcommands',

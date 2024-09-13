@@ -47,8 +47,6 @@ class CompanyApiController extends CommonApiController
         $this->serializerGroups[] = 'companyDetails';
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
-
-        $this->setCleaningRules('company');
     }
 
     public function getNewEntity(array $params)

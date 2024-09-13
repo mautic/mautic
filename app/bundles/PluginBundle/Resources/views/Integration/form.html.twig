@@ -45,7 +45,7 @@
 {%- endif -%}
 
 <!-- tabs controls -->
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs nav-tabs-line">
     <li class="{% if 'details-container' == activeTab %}active{% endif %}" id="details-tab">
         <a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.plugin.integration.tab.details'|trans }}</a>
     </li>
@@ -55,7 +55,7 @@
             <a href="#features-container" role="tab" data-toggle="tab">
                 {{- 'mautic.plugin.integration.tab.features'|trans -}}
                 {%- if (hasSupportedFeatures and formContainsErrors(form.supportedFeatures)) or (hasFeatureSettings and formContainsErrors(form.featureSettings, ['leadFields'])) -%}
-                    <i class="fa fa-fw fa-warning text-danger"></i>
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
                 {%- endif -%}
             </a>
         </li>
@@ -66,7 +66,7 @@
             <a href="#fields-container" role="tab" data-toggle="tab">
                 {{- 'mautic.plugin.integration.tab.fieldmapping'|trans -}}
                 {%- if hasLeadFieldErrors -%}
-                    <i class="fa fa-fw fa-warning text-danger"></i>
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
                 {%- endif -%}
             </a>
         </li>
@@ -77,7 +77,7 @@
             <a href="#company-fields-container" role="tab" data-toggle="tab">
                 {{- 'mautic.plugin.integration.tab.companyfieldmapping'|trans -}}
                 {%- if hasCompanyFieldErrors -%}
-                    <i class="fa fa-fw fa-warning text-danger"></i>
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
                 {% endif %}
             </a>
         </li>

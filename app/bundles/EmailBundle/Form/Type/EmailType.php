@@ -102,7 +102,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                     'tooltip'  => 'mautic.email.from_email.tooltip',
                 ],
                 'required' => false,
@@ -117,7 +117,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
                 ],
                 'required' => false,
@@ -132,7 +132,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                     'tooltip'  => 'mautic.email.bcc.tooltip',
                 ],
                 'required' => false,
@@ -493,6 +493,38 @@ class EmailType extends AbstractType
                     ],
                 ],
             ]
+        );
+
+        $builder->add(
+            $builder->create(
+                'preheaderText',
+                TextType::class,
+                [
+                    'label'      => 'mautic.email.preheader_text',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.email.preheader_text.tooltip',
+                    ],
+                    'required'    => false,
+                ]
+            )
+        );
+
+        $builder->add(
+            $builder->create(
+                'preheaderText',
+                TextType::class,
+                [
+                    'label'      => 'mautic.email.preheader_text',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.email.preheader_text.tooltip',
+                    ],
+                    'required'    => false,
+                ]
+            )
         );
 
         if (!empty($options['update_select'])) {

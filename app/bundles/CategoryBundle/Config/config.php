@@ -41,8 +41,9 @@ return [
             'mautic.category.menu.index' => [
                 'route'     => 'mautic_category_index',
                 'access'    => 'category:categories:view',
-                'iconClass' => 'ri-folder-settings-fill',
+                'iconClass' => 'ri-folder-6-line',
                 'id'        => 'mautic_category_index',
+                'parent'    => 'mautic.core.general',
                 'priority'  => 20,
             ],
         ],

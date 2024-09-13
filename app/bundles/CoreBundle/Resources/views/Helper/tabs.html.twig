@@ -17,14 +17,14 @@
            style="border-radius: 0;"
             {% if button.attr is not empty %}{{ button.attr }}{% endif %}
         >
-            <i class="fa fa-fw {{ button.icon }}"></i>{{ button.text }}
+            <i class="ri-fw {{ button.icon }}"></i>{{ button.text }}
         </a>
     {% if button.extra is not empty %}{{ button.extra }}{% endif %}
     </div>
     {% endif %}
     <ul{{ (deletable is defined and deletable is string) ? ' data-delete-action="' ~ deletable ~ '" ' : '' }}
         {{ (sortable is defined and sortable is string) ? ' data-sort-action="' ~ sortable ~ '" ' : '' }}
-            class="{{ (deletable is defined and deletable is not empty) ? 'nav-deletable ' : '' }}nav nav-tabs {{ (vertical is not empty) ? 'tabs-' ~ vertical ~ ' pt-0 bdr-b-wdh-0  bdr-r-wdh-0' : 'tabs-horizontal' }}{{ sortable is defined and sortable is not empty ? ' sortable' : '' }}">
+            class="{{ (deletable is defined and deletable is not empty) ? 'nav-deletable ' : '' }}nav nav-tabs nav-tabs-contained {{ (vertical is not empty) ? 'tabs-' ~ vertical ~ ' pt-0 bdr-b-wdh-0  bdr-r-wdh-0' : 'tabs-horizontal' }}{{ sortable is defined and sortable is not empty ? ' sortable' : '' }}">
         {% for tabKey, tab in tabs %}
             {% set class = (tab.class is defined and tab.class is not empty) ? ' ' ~ tab.class : '' %}
             {% if tab.attr is defined and tab.attr is iterable %}
@@ -37,16 +37,16 @@
             {% set attr = (tab.attr is defined and tab.attr is not empty) ? ' ' ~ tab['attr'] : '' %}
             {% if tab['icon'] is not defined %}
                 {% if tab.published is defined and tab['published'] is not empty %}
-                    {% set tab = tab|merge({'icon': 'fa-check-circle text-success'}) %}
+                    {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-success'}) %}
                 {% else %}
-                    {% set tab = tab|merge({'icon': 'fa-check-circle text-muted'}) %}
+                    {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-muted'}) %}
                 {% endif %}
             {% endif %}
             <li data-tab-id="{{ tab['id'] }}" class="{% if tab['active'] is not empty %}active{% endif %}{{ class }}"{{ attr }}>
                 <a href="#{{ tab['id'] }}" role="tab" data-toggle="tab" class="{{ class }}">
                     <span>{{ tab['name'] }}</span>
                     {% if tab.icon is not empty %}
-                        <i class="fa fa-fw {{ tab['icon'] }}"></i>
+                        <i class="ri-fw {{ tab['icon'] }}"></i>
                     {% endif %}
                 </a>
             </li>
