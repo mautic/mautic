@@ -39,11 +39,10 @@ class EmailActionModelTest extends TestCase
     {
         parent::setUp();
 
-        $this->emailModelMock            = $this->createMock(EmailModel::class);
-        $this->emailRepositoryMock       = $this->createMock(EmailRepository::class);
-        $this->corePermissionsMock       = $this->createMock(CorePermissions::class);
-
-        $this->emailActionModel = new EmailActionModel(
+        $this->emailModelMock      = $this->createMock(EmailModel::class);
+        $this->emailRepositoryMock = $this->createMock(EmailRepository::class);
+        $this->corePermissionsMock = $this->createMock(CorePermissions::class);
+        $this->emailActionModel    = new EmailActionModel(
             $this->emailModelMock,
             $this->emailRepositoryMock,
             $this->corePermissionsMock
@@ -70,9 +69,6 @@ class EmailActionModelTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
     public function testDoesntSetNewCategoryForNonEditableEmails(): void
     {
         $oldCategory = new Category();
@@ -110,8 +106,7 @@ class EmailActionModelTest extends TestCase
 
     private function configurePermissionToAllowEdition(bool $allow): void
     {
-        $this
-            ->corePermissionsMock
+        $this->corePermissionsMock
             ->method('hasEntityAccess')
             ->willReturn($allow);
     }
@@ -121,8 +116,7 @@ class EmailActionModelTest extends TestCase
      */
     protected function configureRepositoryToReturn(array $emails): void
     {
-        $this
-            ->emailRepositoryMock
+        $this->emailRepositoryMock
             ->method('findBy')
             ->with(
                 ['id' => array_map(fn (Email $email) => $email->getId(), $emails)]
@@ -135,8 +129,7 @@ class EmailActionModelTest extends TestCase
      */
     protected function configureModelToSave(array $emails): void
     {
-        $this
-            ->emailModelMock
+        $this->emailModelMock
             ->expects($this->once())
             ->method('saveEntities')
             ->with($emails);
@@ -147,8 +140,7 @@ class EmailActionModelTest extends TestCase
      */
     protected function tryToSetCategory(array $emails, Category $newCategory): void
     {
-        $this
-            ->emailActionModel
+        $this->emailActionModel
             ->setCategory(
                 array_map(fn (Email $email) => $email->getId(), $emails),
                 $newCategory
