@@ -11,6 +11,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,7 @@ class PublicController extends CommonFormController
     /**
      * @return RedirectResponse|Response
      */
-    public function submitAction(Request $request, DateHelper $dateTemplateHelper)
+    public function submitAction(Request $request, DateHelper $dateTemplateHelper, PageTokenHelper $pageTokenHelper)
     {
         if ('POST' !== $request->getMethod()) {
             return $this->accessDenied();
@@ -130,7 +131,7 @@ class PublicController extends CommonFormController
 
         if (isset($submissionEvent) && !empty($postActionProperty)) {
             // Replace post action property with tokens to support custom redirects, etc
-            $postActionProperty = $this->replacePostSubmitTokens($postActionProperty, $submissionEvent);
+            $postActionProperty = $this->replacePostSubmitTokens($postActionProperty, $submissionEvent, $pageTokenHelper);
         }
 
         if ($messengerMode || $isAjax) {
@@ -400,19 +401,26 @@ class PublicController extends CommonFormController
     /**
      * @return string|string[]
      */
-    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent, PageTokenHelper $pageTokenHelper): string|array
     {
-        if (empty($this->tokens)) {
-            if ($lead = $submissionEvent->getLead()) {
-                $this->tokens = array_merge(
-                    $submissionEvent->getTokens(),
-                    TokenHelper::findLeadTokens(
-                        $string,
-                        $lead->getProfileFields()
-                    )
-                );
-            }
+        if (count($this->tokens)) {
+            return $this->tokens;
         }
+
+        if ($lead = $submissionEvent->getLead()) {
+            $this->tokens = array_merge(
+                $submissionEvent->getTokens(),
+                TokenHelper::findLeadTokens(
+                    $string,
+                    $lead->getProfileFields()
+                )
+            );
+        }
+
+        $this->tokens = array_merge(
+            $this->tokens,
+            $pageTokenHelper->findPageTokens($string)
+        );
 
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
     }

@@ -2770,6 +2770,14 @@ ul.dropdown-menu-form {
 .nav-tabs.nav-tabs-contained > li.active > a {
   background-color: var(--layer);
 }
+.nav-tabs.nav-tabs-contained > li.disabled {
+  cursor: not-allowed;
+  color: var(--text-disabled);
+}
+.nav-tabs.nav-tabs-contained > li.disabled > a {
+  background-color: var(--button-disabled);
+  pointer-events: none;
+}
 @media (min-width: 1200px) {
   .nav-tabs {
     flex-wrap: nowrap;
@@ -5861,6 +5869,10 @@ lesshat-selector { -lh-property: 0 ;
 }
 .pl-160 {
   padding-left: var(--spacing-13) !important;
+}
+.pi-16,
+.pi-md {
+  padding-inline: var(--spacing-05) !important;
 }
 .w-44 {
   width: 44px;
