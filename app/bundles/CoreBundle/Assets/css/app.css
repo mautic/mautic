@@ -2704,10 +2704,8 @@ ul.dropdown-menu-form {
   border-top-right-radius: var(--border-radius-sm);
   border-top-left-radius: var(--border-radius-sm);
   display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
+  flex-wrap: wrap;
   text-wrap: nowrap;
-  margin-bottom: -1px;
 }
 .nav-tabs > li > a {
   line-height: 20px;
@@ -2774,6 +2772,11 @@ ul.dropdown-menu-form {
 .nav-tabs.nav-tabs-contained > li.disabled > a {
   background-color: var(--button-disabled);
   pointer-events: none;
+}
+@media (min-width: 1200px) {
+  .nav-tabs {
+    flex-wrap: nowrap;
+  }
 }
 /*
 .tab-content {
