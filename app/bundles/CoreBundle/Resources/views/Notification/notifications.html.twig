@@ -9,7 +9,9 @@
             <div class="panel-heading pt-sm">
                 <div class="panel-title notification notification-title">
                     <h6 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
+                        {% if notifications is not empty %}
                         <a href="javascript:void(0);" class="btn-link btn-nospin pull-right" onclick="Mautic.clearNotification(0);">{% trans %}mautic.core.notifications.clearall{% endtrans %}</a>
+                        {% endif %}
                     </h6>
                 </div>
             </div>
