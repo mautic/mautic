@@ -855,7 +855,6 @@ a {
 a:hover {
   color: var(--link-primary-hover);
   cursor: pointer;
-  outline: 2px solid transparent;
 }
 a:hover,
 a:focus {
