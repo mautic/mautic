@@ -416,31 +416,32 @@ Mautic.cloneReportRow = function (containerId) {
     var newContainer = mQuery('#report_filters').find('> .panel.in-group').last();
 
     // Extract index from new container ID
-    var newContainerId = newContainer.attr('id'); // e.g., 'report_filters_4_container'
+    var newContainerId = newContainer.attr('id');
     var idParts = newContainerId.split('_');
-    var index = idParts[2]; // Assuming ID is 'report_filters_{index}_container'
+    var index = idParts[2];
 
     // Set the 'glue' value
     newContainer.find('.filter-glue').val(glue);
 
     // Set the 'column' value and trigger 'change' to update dependent fields
     var columnSelect = newContainer.find('.filter-columns');
-    columnSelect.val(column).trigger('change');
+    columnSelect.val(column);
 
-    // After triggering 'change', the condition and value inputs may have been replaced
-    // So we need to get new references to them
-    var conditionSelect = newContainer.find('.filter-condition');
-    var newValueInput = newContainer.find('.filter-value');
+    // Destroy any previous Chosen instance before reinitializing
+    Mautic.destroyChosen(columnSelect);
+    columnSelect.trigger('change'); // This ensures all related elements are properly set.
 
     // Set the 'condition' value
+    var conditionSelect = newContainer.find('.filter-condition');
     conditionSelect.val(condition);
 
     // Set the 'value' field
+    var newValueInput = newContainer.find('.filter-value');
     if (newValueInput.is('select')) {
         newValueInput.val(value);
-        // Reinitialize Chosen if the select has options
+        Mautic.destroyChosen(newValueInput); // Destroy chosen instance on the value select
         if (newValueInput.find('option').length > 0) {
-            Mautic.activateChosenSelect(newValueInput);
+            Mautic.activateChosenSelect(newValueInput); // Reinitialize Chosen after destruction
         }
     } else if (newValueInput.is('input')) {
         newValueInput.val(value);
@@ -457,7 +458,7 @@ Mautic.cloneReportRow = function (containerId) {
         newContainer.find('[name*="[dynamic]"][value="1"]').prop('checked', false).parent().removeClass('active');
     }
 
-    // Re-initialize any necessary JavaScript components
+    // Re-initialize Chosen for all relevant elements in the new container
     Mautic.activateChosenSelect(columnSelect);
     Mautic.activateChosenSelect(conditionSelect);
     newContainer.find("*[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
