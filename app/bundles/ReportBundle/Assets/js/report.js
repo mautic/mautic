@@ -383,3 +383,83 @@ Mautic.getHighestIndex = function (selector) {
 
     return parseInt(highestIndex);
 };
+
+Mautic.cloneReportRow = function (containerId) {
+    // Get the existing filter container
+    var container = mQuery('#' + containerId);
+
+    // Extract values from the existing filter
+    var glue = container.find('.filter-glue').val();
+    var column = container.find('.filter-columns').val();
+    var condition = container.find('.filter-condition').val();
+
+    // Handle the value field, considering different input types
+    var valueInput = container.find('.filter-value');
+    var value;
+    if (valueInput.is('select')) {
+        value = valueInput.val();
+    } else if (valueInput.is('input')) {
+        value = valueInput.val();
+    } else if (valueInput.is(':radio')) {
+        value = container.find('.filter-value:checked').val();
+    } else {
+        value = valueInput.val();
+    }
+
+    // Get the dynamic option
+    var dynamic = container.find('[name*="[dynamic]"]:checked').val();
+
+    // Add a new filter row using the existing add function
+    Mautic.addReportRow('report_filters');
+
+    // Get the new container by finding the last filter container
+    var newContainer = mQuery('#report_filters').find('> .panel.in-group').last();
+
+    // Extract index from new container ID
+    var newContainerId = newContainer.attr('id'); // e.g., 'report_filters_4_container'
+    var idParts = newContainerId.split('_');
+    var index = idParts[2]; // Assuming ID is 'report_filters_{index}_container'
+
+    // Set the 'glue' value
+    newContainer.find('.filter-glue').val(glue);
+
+    // Set the 'column' value and trigger 'change' to update dependent fields
+    var columnSelect = newContainer.find('.filter-columns');
+    columnSelect.val(column).trigger('change');
+
+    // After triggering 'change', the condition and value inputs may have been replaced
+    // So we need to get new references to them
+    var conditionSelect = newContainer.find('.filter-condition');
+    var newValueInput = newContainer.find('.filter-value');
+
+    // Set the 'condition' value
+    conditionSelect.val(condition);
+
+    // Set the 'value' field
+    if (newValueInput.is('select')) {
+        newValueInput.val(value);
+        // Reinitialize Chosen if the select has options
+        if (newValueInput.find('option').length > 0) {
+            Mautic.activateChosenSelect(newValueInput);
+        }
+    } else if (newValueInput.is('input')) {
+        newValueInput.val(value);
+    } else if (newValueInput.is(':radio')) {
+        newContainer.find('.filter-value[value="' + value + '"]').prop('checked', true).parent().addClass('active');
+    }
+
+    // Set the dynamic option
+    if (dynamic == '1') {
+        newContainer.find('[name*="[dynamic]"][value="1"]').prop('checked', true).parent().addClass('active');
+        newContainer.find('[name*="[dynamic]"][value="0"]').prop('checked', false).parent().removeClass('active');
+    } else {
+        newContainer.find('[name*="[dynamic]"][value="0"]').prop('checked', true).parent().addClass('active');
+        newContainer.find('[name*="[dynamic]"][value="1"]').prop('checked', false).parent().removeClass('active');
+    }
+
+    // Re-initialize any necessary JavaScript components
+    Mautic.activateChosenSelect(columnSelect);
+    Mautic.activateChosenSelect(conditionSelect);
+    newContainer.find("*[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+};
+

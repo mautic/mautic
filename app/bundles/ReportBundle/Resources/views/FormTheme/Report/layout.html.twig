@@ -160,8 +160,15 @@
             <div class="choice-wrapper col-xs-2">
                 {{ form_row(form.vars.form.children.dynamic) }}
             </div>
-            <div class="col-xs-1 mt-lg">
-                <button type="button" class="btn btn-danger" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-subtract-line"></i></button>
+            <div class="col-xs-2 mt-lg">
+                <!-- Clone Button -->
+                <button type="button" class="btn btn-default" onclick="Mautic.cloneReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="Clone Filter">
+                    <i class="ri-file-copy-line"></i>
+                </button>
+                <!-- Remove Button -->
+                <button type="button" class="btn btn-danger" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}">
+                    <i class="ri-subtract-line"></i>
+                </button>
             </div>
         </div>
     </div>
