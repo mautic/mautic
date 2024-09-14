@@ -391,7 +391,7 @@ Mautic.cloneReportRow = function (containerId) {
     // Extract values from the existing filter
     var glue = container.find('.filter-glue').val();
     var column = container.find('.filter-columns').val();
-    var condition = container.find('.filter-condition').val(); // Extract current condition value
+    var condition = container.find('.filter-condition').val(); // Extract the current condition value
 
     // Handle the value field, considering different input types
     var valueInput = container.find('.filter-value');
@@ -427,17 +427,19 @@ Mautic.cloneReportRow = function (containerId) {
     var columnSelect = newContainer.find('.filter-columns');
     columnSelect.val(column).trigger('change'); // Trigger change event to update dependent fields
 
-    // Handle Chosen for column select
+    // Set the 'condition' value before initializing Chosen
+    var conditionSelect = newContainer.find('.filter-condition');
+    conditionSelect.val(condition); // Set the cloned condition value
+
+    // Handle Chosen for column and condition select
     Mautic.destroyChosen(columnSelect);
     Mautic.activateChosenSelect(columnSelect);
 
-    // Set the 'condition' value (delayed to ensure options are fully populated)
-    var conditionSelect = newContainer.find('.filter-condition');
+    // Handle condition select separately with a slight delay to ensure Chosen works properly
     setTimeout(function() {
-        conditionSelect.val(condition); // Manually set the condition
-        Mautic.destroyChosen(conditionSelect); // Destroy existing Chosen instance
-        Mautic.activateChosenSelect(conditionSelect); // Reinitialize Chosen after setting the value
-    }, 0); // Slight delay to ensure the select options are rendered
+        Mautic.destroyChosen(conditionSelect);
+        Mautic.activateChosenSelect(conditionSelect);
+    }, 100); // A slight delay ensures the DOM is ready
 
     // Set the 'value' field
     var newValueInput = newContainer.find('.filter-value');
@@ -465,3 +467,4 @@ Mautic.cloneReportRow = function (containerId) {
     // Reinitialize tooltips
     newContainer.find("*[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 };
+
