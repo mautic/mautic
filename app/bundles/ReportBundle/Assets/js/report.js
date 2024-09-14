@@ -431,24 +431,29 @@ Mautic.cloneReportRow = function (containerId) {
     var conditionSelect = newContainer.find('.filter-condition');
     conditionSelect.val(condition); // Set the cloned condition value
 
-    // Handle Chosen for column and condition select
-    Mautic.destroyChosen(columnSelect);
-    Mautic.activateChosenSelect(columnSelect);
+    // Ensure the select field has options before initializing Chosen
+    var initializeChosenWhenReady = function(selectElement) {
+        // Use a longer timeout to ensure the options are fully rendered
+        setTimeout(function() {
+            if (selectElement.find('option').length > 0) {
+                Mautic.destroyChosen(selectElement); // Destroy previous Chosen instance
+                Mautic.activateChosenSelect(selectElement); // Reinitialize Chosen
+            } else {
+                // Retry after another delay if options are not ready yet
+                initializeChosenWhenReady(selectElement);
+            }
+        }, 200); // Delay of 200ms to ensure DOM is fully ready
+    };
 
-    // Handle condition select separately with a slight delay to ensure Chosen works properly
-    setTimeout(function() {
-        Mautic.destroyChosen(conditionSelect);
-        Mautic.activateChosenSelect(conditionSelect);
-    }, 100); // A slight delay ensures the DOM is ready
+    // Initialize Chosen for column select and condition select
+    initializeChosenWhenReady(columnSelect);
+    initializeChosenWhenReady(conditionSelect);
 
     // Set the 'value' field
     var newValueInput = newContainer.find('.filter-value');
     if (newValueInput.is('select')) {
         newValueInput.val(value);
-        Mautic.destroyChosen(newValueInput);
-        if (newValueInput.find('option').length > 0) {
-            Mautic.activateChosenSelect(newValueInput);
-        }
+        initializeChosenWhenReady(newValueInput); // Reinitialize Chosen for the value field
     } else if (newValueInput.is('input')) {
         newValueInput.val(value);
     } else if (newValueInput.is(':radio')) {
@@ -467,4 +472,3 @@ Mautic.cloneReportRow = function (containerId) {
     // Reinitialize tooltips
     newContainer.find("*[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 };
-
