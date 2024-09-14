@@ -391,7 +391,6 @@ Mautic.cloneReportRow = function (containerId) {
     // Extract values from the existing filter
     var glue = container.find('.filter-glue').val();
     var column = container.find('.filter-columns').val();
-    var condition = container.find('.filter-condition').val(); // Extract the current condition value
 
     // Handle the value field, considering different input types
     var valueInput = container.find('.filter-value');
@@ -427,10 +426,6 @@ Mautic.cloneReportRow = function (containerId) {
     var columnSelect = newContainer.find('.filter-columns');
     columnSelect.val(column).trigger('change'); // Trigger change event to update dependent fields
 
-    // Set the 'condition' value before initializing Chosen
-    var conditionSelect = newContainer.find('.filter-condition');
-    conditionSelect.val(condition); // Set the cloned condition value
-
     // Ensure the select field has options before initializing Chosen
     var initializeChosenWhenReady = function(selectElement) {
         // Use a longer timeout to ensure the options are fully rendered
@@ -445,9 +440,8 @@ Mautic.cloneReportRow = function (containerId) {
         }, 200); // Delay of 200ms to ensure DOM is fully ready
     };
 
-    // Initialize Chosen for column select and condition select
+    // Initialize Chosen for the column select
     initializeChosenWhenReady(columnSelect);
-    initializeChosenWhenReady(conditionSelect);
 
     // Set the 'value' field
     var newValueInput = newContainer.find('.filter-value');
