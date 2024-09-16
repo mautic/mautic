@@ -489,15 +489,15 @@ Mautic.toggleYesNoButtonClass = function (changedId) {
     var isExtraButton = mQuery(changedId).parent().hasClass('btn-extra');
 
     if (isExtraButton) {
-        mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-default');
+        mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-ghost');
     } else {
         //change the other
         var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
         var otherLabel = mQuery(changedId).parent().parent().find(otherButton);
 
         if (mQuery(changedId).prop('checked')) {
-            var thisRemove = 'btn-default',
-                otherAdd = 'btn-default';
+            var thisRemove = 'btn-ghost',
+                otherAdd = 'btn-ghost';
             if (isYesButton) {
                 var thisAdd = 'btn-success',
                     otherRemove = 'btn-danger';
@@ -506,7 +506,7 @@ Mautic.toggleYesNoButtonClass = function (changedId) {
                     otherRemove = 'btn-success';
             }
         } else {
-            var thisAdd = 'btn-default';
+            var thisAdd = 'btn-ghost';
             if (isYesButton) {
                 var thisAdd = 'btn-success',
                     otherRemove = 'btn-danger';
