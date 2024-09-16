@@ -125,7 +125,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
         $fieldType = self::$types[$type]['properties'];
         foreach ($fieldType as $key => $property) {
-            if (!empty($property['required']) && !array_key_exists($key, $properties)) {
+            $value = array_key_exists($key, $properties) ? $properties[$key] : null;
+            if (!empty($property['required']) && empty($value)) {
                 return [false, $property['error_msg']];
             }
         }
