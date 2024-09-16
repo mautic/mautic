@@ -51,20 +51,20 @@
                 <td class="shortcut-keys text-right">
                   {% set parts = key|split(' / ') %}
                   {% for part in parts %}
-                  {% if not loop.first %}
-                  / <!-- Add the separator outside of the <kbd> tags -->
-                  {% endif %}
-                  {% set keys = part|split('+') %}
-                  {% for k in keys %}
-                  {% set title = '' %}
-                  {% if k == '⌫' %}
-                  {% set title = 'mautic.keyboard.backspace'|trans %}
-                  {% elseif k == '⌘' %}
-                  {% set title = 'mautic.keyboard.command'|trans %}
-                  {% endif %}
+                    {% if not loop.first %}
+                      / <!-- Add the separator outside of the <kbd> tags -->
+                    {% endif %}
+                    {% set keys = part|split('+') %}
+                    {% for k in keys %}
+                      {% set title = '' %}
+                      {% if k == '⌫' %}
+                        {% set title = 'mautic.keyboard.backspace'|trans %}
+                      {% elseif k == '⌘' %}
+                        {% set title = 'mautic.keyboard.command'|trans %}
+                     {% endif %}
                   <kbd{% if title %} title="{{ title }}" data-toggle="tooltip" {% endif %}>{{ k }}</kbd>
                     {% endfor %}
-                    {% endfor %}
+                  {% endfor %}
                 </td>
               </tr>
               {% endfor %}
