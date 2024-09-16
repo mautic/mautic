@@ -60,7 +60,11 @@ mQuery( document ).ajaxStop(function(event) {
     initializeCodeBlocks();
 });
 
-mQuery( document ).ready(function() {
+/**
+ * Applies user interface preferences from localStorage to the HTML element.
+ * Runs immediately to set attributes based on 'm-toggle-setting-' prefixed items.
+ */
+(function() {
     // Load user preferences for UI saved previously
     const prefix = 'm-toggle-setting-';
     Object.keys(localStorage)
@@ -73,19 +77,9 @@ mQuery( document ).ready(function() {
                 document.documentElement.setAttribute(attributeName, value);
             }
         });
+})();
 
-    // Handle radio button changes
-    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                const attributeName = this.dataset.attributeToggle;
-                const newValue = this.dataset.attributeValue;
-                document.documentElement.setAttribute(attributeName, newValue);
-                localStorage.setItem(`${prefix}${attributeName}`, newValue);
-            }
-        });
-    });
-
+mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
