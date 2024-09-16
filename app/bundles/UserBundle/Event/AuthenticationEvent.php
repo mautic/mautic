@@ -123,10 +123,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get the username used.
-     *
-     * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->token->getUserIdentifier();
     }

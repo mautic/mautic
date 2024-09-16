@@ -189,7 +189,7 @@ class EmailSendType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'emailsend_list';
     }

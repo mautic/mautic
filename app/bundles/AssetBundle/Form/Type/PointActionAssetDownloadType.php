@@ -33,7 +33,7 @@ class PointActionAssetDownloadType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pointaction_assetdownload';
     }

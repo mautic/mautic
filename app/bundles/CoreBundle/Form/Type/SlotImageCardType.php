@@ -112,7 +112,7 @@ class SlotImageCardType extends SlotType
     /**
      * @return string
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'slot_imagecard';
     }

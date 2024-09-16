@@ -8,7 +8,7 @@ class CircularDependency extends Constraint
 {
     public $message;
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return CircularDependencyValidator::class;
     }

@@ -13,13 +13,13 @@ final class UpdateControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', 's/update');
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testSchemaActionRendersSuccessfully(): void
     {
         $this->client->request('GET', 's/update/schema');
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 }

@@ -11,12 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class YesNoButtonGroupType extends AbstractType
 {
-    public function getParent()
+    public function getParent(): ?string
     {
         return ButtonGroupType::class;
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'yesno_button_group';
     }

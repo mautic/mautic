@@ -57,7 +57,7 @@ class FormSubmitActionUserEmailType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'email_submitaction_useremail';
     }

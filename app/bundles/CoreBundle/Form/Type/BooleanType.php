@@ -21,7 +21,7 @@ class BooleanType extends AbstractType
         ]);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return YesNoButtonGroupType::class;
     }

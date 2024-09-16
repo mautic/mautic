@@ -33,10 +33,8 @@ class UserProvider implements UserProviderInterface
 
     /**
      * @param string $username
-     *
-     * @return User
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): \Mautic\UserBundle\Entity\User
     {
         return $this->loadUserByIdentifier($username);
     }
