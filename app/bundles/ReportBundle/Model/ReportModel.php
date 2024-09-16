@@ -519,7 +519,7 @@ class ReportModel extends FormModel
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
-        $order = str_replace('-', '.', $parts['orderBy']);
+        $order = $parts['orderBy'];
         $query->resetQueryPart('orderBy');
 
         if (empty($options['ignoreGraphData'])) {

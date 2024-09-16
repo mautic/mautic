@@ -25,8 +25,8 @@
                                 {% if columns[key] is defined %}
                                     {# order by alias if exists, if not then by column name #}
                                     {%- set orderBy = (columns[key].alias is defined and columns[key].alias starts with 'channel.')
-                                        ? columns[key].alias|replace({'.': '-'})
-                                        : key|replace({'.': '-'})
+                                        ? columns[key].alias
+                                        : key
                                     -%}
 
                                     {{ include('@MauticCore/Helper/tableheader.html.twig', {

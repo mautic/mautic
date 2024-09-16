@@ -12,6 +12,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
@@ -51,6 +52,33 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
 
         Assert::assertTrue($this->client->getResponse()->isOk());
+    }
+
+    public function testReportTableOrderColumn(): void
+    {
+        $page  = $this->createPage('test page 1');
+        $page2 = $this->createPage('test page 2');
+        $page3 = $this->createPage('test page 3');
+        $this->createHit($page);
+        $this->createHit($page2);
+        $this->createHit($page3);
+        $this->createHit(null);
+
+        $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
+            'mautic.page.table.most.visited.unique',
+            'mautic.page.table.most.visited',
+        ]);
+
+        $crawler = $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderBy=p.id');
+
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+        $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
+
+        $this->assertSame([
+            ['test page 1', '0'],
+            ['test page 2', '0'],
+            ['test page 3', '0'],
+        ], array_slice($crawlerReportTable, 1, 3));
     }
 
     public function testCreatingNewReportAndClone(): void
@@ -447,6 +475,11 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+    }
+
+    private function domTableToArray(Crawler $crawler): array
+    {
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
     }
 
     /**
