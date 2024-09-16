@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -73,12 +64,12 @@ EOT
         $options     = $input->getOptions();
         $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
         $skipClear   = $input->getOption('do-not-clear');
-        $quiet       = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
+        $quiet       = (bool) $input->getOption('quiet');
         $timeout     = $input->getOption('clear-timeout');
         $queueMode   = $this->parametersHelper->get('mailer_spool_type');
         $lockName    = $input->getOption('lock-name') ?? '';
 
-        if ('file' != $queueMode) {
+        if ('file' !== $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
             return 0;
@@ -158,7 +149,7 @@ EOT
         }
 
         //now process new emails
-        if (!$quiet) {
+        if ($quiet) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
 

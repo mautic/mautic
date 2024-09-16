@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -52,11 +43,11 @@ class ConfigType extends AbstractType
                 [
                     'mailer_from_email'      => 'email',
                     'mailer_return_path'     => 'email',
-                    'default_signature_text' => 'html',
-                    'unsubscribe_text'       => 'html',
-                    'unsubscribe_message'    => 'html',
-                    'resubscribe_message'    => 'html',
-                    'webview_text'           => 'html',
+                    'default_signature_text' => 'strict_html',
+                    'unsubscribe_text'       => 'strict_html',
+                    'unsubscribe_message'    => 'strict_html',
+                    'resubscribe_message'    => 'strict_html',
+                    'webview_text'           => 'strict_html',
                     // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
                 ]
@@ -212,7 +203,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],
@@ -235,7 +226,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],

@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
 class ContactSegmentFilterCrate
 {
-    const CONTACT_OBJECT = 'lead';
-    const COMPANY_OBJECT = 'company';
+    const CONTACT_OBJECT   = 'lead';
+    const COMPANY_OBJECT   = 'company';
+    const BEHAVIORS_OBJECT = 'behaviors';
 
     /**
      * @var string|null
@@ -97,6 +89,11 @@ class ContactSegmentFilterCrate
     public function isCompanyType()
     {
         return self::COMPANY_OBJECT === $this->object;
+    }
+
+    public function isBehaviorsType(): bool
+    {
+        return self::BEHAVIORS_OBJECT === $this->object;
     }
 
     /**
@@ -207,5 +204,10 @@ class ContactSegmentFilterCrate
     public function getNullValue()
     {
         return $this->nullValue;
+    }
+
+    public function getObject(): ?string
+    {
+        return $this->object;
     }
 }

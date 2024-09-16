@@ -30,19 +30,17 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event->addExpression(
-            new CompositeExpression(
-                CompositeExpression::TYPE_OR,
-                [
-                    $event->getQueryBuilder()->expr()->isNull('l.'.$event->getFilter()->getField()),
-                    $event->getQueryBuilder()->expr()->eq(
-                        'l.'.$event->getFilter()->getField(),
-                        $event->getQueryBuilder()->expr()->literal('')
-                    ),
-                ]
-            )
-        );
+        $leadsTableAlias = $event->getLeadsTableAlias();
+        $filter          = $event->getFilter();
+        $field           = $leadsTableAlias.'.'.$filter->getField();
+        $expr            = $event->getQueryBuilder()->expr();
+        $parts           = [$expr->isNull($field)];
 
+        if ($filter->doesColumnSupportEmptyValue()) {
+            $parts[] = $expr->eq($field, $expr->literal(''));
+        }
+
+        $event->addExpression(new CompositeExpression(CompositeExpression::TYPE_OR, $parts));
         $event->stopPropagation();
     }
 
@@ -52,19 +50,17 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event->addExpression(
-            new CompositeExpression(
-                CompositeExpression::TYPE_AND,
-                [
-                    $event->getQueryBuilder()->expr()->isNotNull('l.'.$event->getFilter()->getField()),
-                    $event->getQueryBuilder()->expr()->neq(
-                        'l.'.$event->getFilter()->getField(),
-                        $event->getQueryBuilder()->expr()->literal('')
-                    ),
-                ]
-            )
-        );
+        $leadsTableAlias = $event->getLeadsTableAlias();
+        $filter          = $event->getFilter();
+        $field           = $leadsTableAlias.'.'.$filter->getField();
+        $expr            = $event->getQueryBuilder()->expr();
+        $parts           = [$expr->isNotNull($field)];
 
+        if ($filter->doesColumnSupportEmptyValue()) {
+            $parts[] = $expr->neq($field, $expr->literal(''));
+        }
+
+        $event->addExpression(new CompositeExpression(CompositeExpression::TYPE_AND, $parts));
         $event->stopPropagation();
     }
 
@@ -79,11 +75,13 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             return;
         }
 
+        $leadsTableAlias = $event->getLeadsTableAlias();
+
         $event->addExpression(
             $event->getQueryBuilder()->expr()->orX(
-                $event->getQueryBuilder()->expr()->isNull('l.'.$event->getFilter()->getField()),
+                $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
                 $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
-                    'l.'.$event->getFilter()->getField(),
+                    $leadsTableAlias.'.'.$event->getFilter()->getField(),
                     $event->getParameterHolder()
                 )
             )
@@ -98,11 +96,13 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             return;
         }
 
+        $leadsTableAlias = $event->getLeadsTableAlias();
+
         $operator    = 'multiselect' === $event->getFilter()->getOperator() ? 'regexp' : 'notRegexp';
         $expressions = [];
 
         foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $event->getQueryBuilder()->expr()->$operator('l.'.$event->getFilter()->getField(), $parameter);
+            $expressions[] = $event->getQueryBuilder()->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
         }
 
         $event->addExpression($event->getQueryBuilder()->expr()->andX($expressions));
@@ -128,9 +128,11 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             return;
         }
 
+        $leadsTableAlias = $event->getLeadsTableAlias();
+
         $event->addExpression(
             $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
-                'l.'.$event->getFilter()->getField(),
+                $leadsTableAlias.'.'.$event->getFilter()->getField(),
                 $event->getParameterHolder()
             )
         );

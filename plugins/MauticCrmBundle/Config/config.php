@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',
@@ -237,13 +228,10 @@ return [
             ],
         ],
         'other' => [
-            'mautic_integration.pipedrive.guzzle.client' => [
-                'class' => 'GuzzleHttp\Client',
-            ],
             'mautic_integration.service.transport' => [
                 'class'     => 'MauticPlugin\MauticCrmBundle\Services\Transport',
                 'arguments' => [
-                    'mautic_integration.pipedrive.guzzle.client',
+                    'mautic.http.client',
                 ],
             ],
             'mautic_integration.pipedrive.import.owner' => [

@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'sysinfo');
-$view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.header.index'));
 ?>
 
 <!-- start: box layout -->
@@ -23,6 +15,11 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
                 <li role="presentation" class="list-group-item in active">
                     <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.sysinfo.tab.phpinfo'); ?>
+                    </a>
+                </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.recommendations'); ?>
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
@@ -53,6 +50,25 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
             <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     <?php echo $phpInfo; ?>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <?php if (empty($recommendations) && empty($requirement)) : ?>
+                        <div class="alert alert-info">
+                            <?php echo $view['translator']->trans('mautic.sysinfo.no.recommendations'); ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php foreach ($requirements as $requirement): ?>
+                        <div class="alert alert-danger">
+                            <?php echo $requirement; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php foreach ($recommendations as $recommendation): ?>
+                        <div class="alert alert-warning">
+                            <?php echo $recommendation; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">

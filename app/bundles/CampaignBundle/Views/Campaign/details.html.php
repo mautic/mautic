@@ -232,7 +232,7 @@ switch (true) {
             <?php endif; ?>
             <!--/ #events-container -->
             <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container" data-target-url="<?php
-                    echo $view['router']->url(
+                    echo $view['router']->path(
                         'mautic_campaign_contacts',
                         ['objectId' => $campaign->getId(), 'page' => $app->getSession()->get('mautic.campaign.contact.page', 1)]
                     );

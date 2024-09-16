@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -28,6 +19,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -126,19 +118,28 @@ class PublicController extends CommonFormController
     {
         // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model      = $this->getModel('email');
-        $translator = $this->get('translator');
-        $stat       = $model->getEmailStatus($idHash);
-        $message    = '';
-        $email      = null;
-        $lead       = null;
-        $template   = null;
-        $session    = $this->get('session');
+        $model                 = $this->getModel('email');
+        $translator            = $this->get('translator');
+        $stat                  = $model->getEmailStatus($idHash);
+        $message               = '';
+        $email                 = null;
+        $lead                  = null;
+        $template              = null;
+        $session               = $this->get('session');
+        $isOneClickUnsubscribe = $this->request->isMethod(Request::METHOD_POST) && 'One-Click' === $this->request->get('List-Unsubscribe');
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
         if (!empty($stat)) {
+            if ($isOneClickUnsubscribe) {
+                // RFC 8058 One-Click unsubscribe
+                $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
+                $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+
+                return new Response($unsubscribeComment);
+            }
+
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
                 if ('mautic_code_mode' === $template) {
@@ -153,6 +154,10 @@ class PublicController extends CommonFormController
                     $formModel    = $this->getModel('form');
                     $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
+            }
+        } else {
+            if ($isOneClickUnsubscribe) {
+                return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
             }
         }
 
@@ -372,7 +377,7 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
+        $template = (!empty($email) && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
         $theme = $this->factory->getTheme($template);
 
@@ -447,7 +452,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->isPublished() || !$emailEntity->isPublicPreview()))
+            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->getIsPublished() || !$emailEntity->isPublicPreview()))
             || (!$this->get('mautic.security')->isAnonymous()
                 && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',

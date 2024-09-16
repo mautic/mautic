@@ -46,4 +46,9 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
     {
         return $this->translations;
     }
+
+    public function hasTranslation(string $key): bool
+    {
+        return isset($this->translations[$key]);
+    }
 }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -53,7 +44,6 @@ final class ObjectMappingRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->queryBuilder  = new QueryBuilder($this->entityManager);

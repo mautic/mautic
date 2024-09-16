@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -26,6 +17,10 @@ class MonitoringController extends FormController
      */
     public function indexAction($page = 1)
     {
+        if (!$this->get('mautic.security')->isGranted('mauticSocial:monitoring:view')) {
+            return $this->accessDenied();
+        }
+
         $session = $this->get('session');
 
         $this->setListFilters();

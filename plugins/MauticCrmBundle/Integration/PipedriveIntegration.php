@@ -24,8 +24,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * @deprecated will be removed in Mautic 5. See DEPRECATION_MESSAGE below.
+ */
 class PipedriveIntegration extends CrmAbstractIntegration
 {
+    public const DEPRECATION_MESSAGE = 'The Pipedrive plugin is deprecated and will be removed in Mautic 5. See <a href="https://www.mautic.org/blog/integrator/exciting-news-new-integration-plugin-pipedrive-crm" target=”_blank”>the announcement</a> for more details.';
+
     const INTEGRATION_NAME         = 'Pipedrive';
     const PERSON_ENTITY_TYPE       = 'person';
     const LEAD_ENTITY_TYPE         = 'lead';
@@ -350,12 +355,13 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
         if ('authorization' == $section) {
             return [
+                '<b>'.PipedriveIntegration::DEPRECATION_MESSAGE.'</b><br><br>'.
                 $translator->trans('mautic.pipedrive.webhook_callback').$router->generate(
                     'mautic_integration.pipedrive.webhook',
                     [],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 ),
-                'info',
+                'warning',
             ];
         }
 

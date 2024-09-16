@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
@@ -63,7 +54,7 @@ $firewalls = [
         'http_basic'         => true,
     ],
     'main' => [
-        'pattern'       => '^/s/',
+        'pattern'       => '^/(s/|elfinder|efconnect)',
         'light_saml_sp' => [
             'provider'        => 'user_provider',
             'success_handler' => 'mautic.security.authentication_handler',
@@ -92,7 +83,7 @@ $firewalls = [
         ],
         'remember_me' => [
             'secret'   => '%mautic.rememberme_key%',
-            'lifetime' => (int) $container->getParameter('mautic.rememberme_lifetime'),
+            'lifetime' => '%mautic.rememberme_lifetime%',
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
         ],
@@ -134,8 +125,6 @@ $container->loadFromExtension(
         'firewalls'      => $firewalls,
         'access_control' => [
             ['path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY'],
-            ['path' => '^/efconnect', 'roles' => 'IS_AUTHENTICATED_FULLY'],
-            ['path' => '^/elfinder', 'roles' => 'IS_AUTHENTICATED_FULLY'],
         ],
     ]
 );

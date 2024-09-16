@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Mautic\UserBundle\Form\Type\PermissionListType;
@@ -508,7 +499,8 @@ abstract class AbstractPermissions
             PermissionListType::class,
             [
                 'choices'           => $choices,
-                'label'             => "mautic.$bundle.permissions.$level",
+                'choices_as_values' => true,
+                'label'             => $this->getLabel($bundle, $level),
                 'data'              => (!empty($data[$level]) ? $data[$level] : []),
                 'bundle'            => $bundle,
                 'level'             => $level,

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -25,7 +16,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function checkIframeAvailabilityAction(Request $request): JsonResponse
     {
-        $url = $request->request->get('website');
+        $url = $request->query->get('website');
 
         /** @var IframeAvailabilityChecker $availabilityChecker */
         $availabilityChecker = $this->get('mautic.focus.helper.iframe_availability_checker');

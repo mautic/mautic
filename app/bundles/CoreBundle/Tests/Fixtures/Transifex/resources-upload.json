@@ -1,0 +1,37 @@
+{
+    "data": {
+        "attributes": {
+            "date_created": "XXXX-XX-XXTXX:XX:XXZ",
+            "date_modified": "XXXX-XX-XXTXX:XX:XXZ",
+            "details": {
+                "strings_created": 0,
+                "strings_deleted": 0,
+                "strings_skipped": 0,
+                "strings_updated": 0
+            },
+            "errors": [
+                {
+                    "code": "parse_error",
+                    "detail": "Could not decode JSON object"
+                }
+            ],
+            "status": "done"
+        },
+        "id": "4abfc726-6a27-4c33-9d99-e5254c8df748",
+        "links": {
+            "self": "/resource_strings_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748"
+        },
+        "relationships": {
+            "resource": {
+                "data": {
+                    "id": "o:mautic:p:mautic:r:resource_slug",
+                    "type": "resources"
+                },
+                "links": {
+                    "related": "/resources/o:mautic:p:mautic:r:resource_slug"
+                }
+            }
+        },
+        "type": "resource_strings_async_uploads"
+    }
+}

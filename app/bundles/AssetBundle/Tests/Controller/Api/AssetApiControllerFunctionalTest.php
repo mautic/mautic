@@ -1,15 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- */
-
 namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -31,6 +21,19 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('application/pdf', $response['asset']['mime']);
         $this->assertStringContainsString('pdf', $response['asset']['extension']);
         $this->assertNotNull($response['asset']['size']);
+    }
+
+    public function testCreateNewRemoteAssetWithVulnerableFile(): void
+    {
+        $payload = [
+            'file'            => 'file:///etc/passwd',
+            'storageLocation' => 'remote',
+            'title'           => 'title',
+        ];
+        $this->client->request('POST', 'api/assets/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(400, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals('{"errors":[{"code":400,"message":"remotePath: The remote should be a valid URL.","details":{"remotePath":["The remote should be a valid URL."]}}]}', $clientResponse->getContent());
     }
 
     public function testCreateNewLocalAsset()

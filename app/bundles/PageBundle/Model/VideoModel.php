@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -141,7 +132,7 @@ class VideoModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
+                if (($pos = strpos(';q=', $l)) !== false) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }

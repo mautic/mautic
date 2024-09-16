@@ -2,21 +2,14 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -82,10 +75,24 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
+    public function testOneClickUnsubscribeAction(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('POST', '/email/unsubscribe/'.$stat->getTrackingHash(), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertEquals(1, $dncCollection->count());
+        $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
+    }
+
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function getStat(Form $form = null): Stat
+    protected function getStat(Form $form = null, Lead $lead = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';
@@ -101,11 +108,21 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = new Stat();
         $stat->setTrackingHash($trackingHash);
         $stat->setEmailAddress('john@doe.email');
+        $stat->setLead($lead);
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($email);
         $this->em->persist($stat);
 
         return $stat;
+    }
+
+    protected function createLead(): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail('john@doe.email');
+        $this->em->persist($lead);
+
+        return $lead;
     }
 
     /**
@@ -137,6 +154,25 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/email/preview/'.$email->getId());
         $this->assertTrue($this->client->getResponse()->isNotFound(), $this->client->getResponse()->getContent());
 
+        $email->setPublicPreview(true);
+        $this->em->persist($email);
+
+        $this->em->flush();
+
+        $this->client->request('GET', '/email/preview/'.$email->getId());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+    }
+
+    public function testPreviewForExpiredEmail(): void
+    {
+        $emailName    = 'Test preview email';
+
+        $email = new Email();
+        $email->setName($emailName);
+        $email->setSubject($emailName);
+        $email->setPublishUp(new \DateTime('-2 day'));
+        $email->setPublishDown(new \DateTime('-1 day'));
+        $email->setEmailType('template');
         $email->setPublicPreview(true);
         $this->em->persist($email);
 

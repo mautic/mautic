@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle;
 
 /**
@@ -397,6 +388,14 @@ final class LeadEvents
      * @var string
      */
     const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
+
+    /**
+     * The mautic.lead_import_on_validate event is dispatched when the import form is being validated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance
+     */
+    const IMPORT_ON_VALIDATE = 'mautic.lead_import_on_validate';
 
     /**
      * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.

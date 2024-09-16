@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -180,7 +171,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
             if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return 0;
+                return 1;
             }
 
             $this->updateCampaign($campaign);

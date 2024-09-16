@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -47,7 +38,7 @@ class ListType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
 
         $builder->add(

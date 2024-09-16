@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/themes/#{theme}/jquery-ui.min.css") }}" rel="stylesheet" type="text/css">
@@ -9,15 +9,19 @@
     <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js") }}"></script>
     <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/jquery-ui.min.js") }}"></script>
     <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/elfinder.min.js") }}"></script>
-    <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/i18n/elfinder.#{locale}.js") }}"></script>
 <script type="text/javascript" charset="utf-8">
     var editorType = '';
     var editor = null;
 
+    {# based on https://github.com/Studio-42/elFinder/wiki/Client-configuration-options-2.1#lang #}
+    {% if locale not in ['ar', 'bg', 'ca', 'cs', 'de', 'en', 'es', 'fr', 'hu', 'jp', 'nl', 'pl', 'pt_BR', 'ru', 'sk', 'zh_CN'] %}
+    {% set locale =  'en' %}
+    {% endif %}
     jQuery().ready(function() {
         var $f = jQuery('.elfinder').elfinder({
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
+            i18nBaseUrl : '{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/i18n/") }}',
             onlyMimes: {{ onlyMimes|raw }},
             getFileCallback : function(file, fm) {
                 let fileUrl = file.url;

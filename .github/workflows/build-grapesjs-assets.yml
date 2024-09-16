@@ -11,8 +11,14 @@ defaults:
   run:
     working-directory: plugins/GrapesJsBuilderBundle
 
+permissions:
+  contents: read
+
 jobs:
   build-js:
+    permissions:
+      contents: write  # for peter-evans/create-pull-request to create branch
+      pull-requests: write  # for peter-evans/create-pull-request to create a PR
     runs-on: ubuntu-latest
     if: github.repository == 'mautic/mautic'
 

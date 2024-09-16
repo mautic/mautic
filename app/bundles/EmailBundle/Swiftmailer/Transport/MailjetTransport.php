@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\EmailBundle\Model\TransportCallback;
@@ -112,9 +103,15 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 continue;
             }
 
-            if ('bounce' === $event['event'] || 'blocked' === $event['event']) {
-                $reason = $event['error_related_to'].': '.$event['error'];
+            if (('bounce' === $event['event']) || ('blocked' === $event['event'])) {
                 $type   = DoNotContact::BOUNCED;
+                if ('blocked' === $event['event']) {
+                    $reason = 'BLOCKED: '.$event['error_related_to'].': '.$event['error'];
+                } elseif (false === $event['hard_bounce']) {
+                    $reason = 'SOFT: '.$event['error_related_to'].': '.$event['error'].': '.$event['comment'];
+                } else {
+                    $reason = 'HARD: '.$event['error_related_to'].': '.$event['error'];
+                }
             } elseif ('spam' === $event['event']) {
                 $reason = 'User reported email as spam, source: '.$event['source'];
                 $type   = DoNotContact::UNSUBSCRIBED;

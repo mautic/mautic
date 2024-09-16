@@ -1,16 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * This class will kill some IDEs so best to not parse these as PHP
- */
-
 namespace Mautic\CoreBundle\Helper\EmojiMap;
 
 class ShortToUnicodeEmojiMap
@@ -1363,5 +1352,6 @@ class ShortToUnicodeEmojiMap
     public static $exceptions = [
             // Outlook email rendering
             "microsoft-com\xf0\x9f\x8f\xa2office" => 'microsoft-com:office:office',
+            "microsoft-com\xf0\x9f\x8f\xa2word"   => 'microsoft-com:office:word',
       ];
 }

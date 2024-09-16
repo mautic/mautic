@@ -1,36 +1,24 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 
-/**
- * Class IntegrationCampaignFilterQueryBuilder.
- */
 class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.special.integration';
     }
 
     /**
-     * {@inheritdoc}
+     * @throws QueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
+        $leadsTableAlias          = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $integrationCampaignParts = $filter->getIntegrationCampaignParts();
 
         $integrationNameParameter    = $this->generateRandomParameterName();
@@ -39,12 +27,12 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
         $tableAlias = $this->generateRandomParameterName();
 
         $queryBuilder->leftJoin(
-            'l',
+            $leadsTableAlias,
             MAUTIC_TABLE_PREFIX.'integration_entity',
             $tableAlias,
             $tableAlias.'.integration_entity = "CampaignMember" AND '.
             $tableAlias.".internal_entity = 'lead' AND ".
-            $tableAlias.'.internal_entity_id = l.id'
+            $tableAlias.'.internal_entity_id = '.$leadsTableAlias.'.id'
         );
 
         $expression = $queryBuilder->expr()->andX(

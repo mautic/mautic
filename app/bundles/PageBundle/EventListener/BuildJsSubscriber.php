@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -229,10 +220,17 @@ JS;
             null,
             true
         );
+        $froogaloop2       = $this->assetsHelper->getUrl(
+            'app/bundles/CoreBundle/Assets/js/libraries/froogaloop2.min.js',
+            null,
+            null,
+            true
+        );
 
         $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
         $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
         $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
+        $froogaloop2     = str_replace('/index_dev.php', '', $froogaloop2);
 
         $mediaElementJs = <<<'JS'
 /*!
@@ -282,7 +280,7 @@ MauticJS.initGatedVideo = function () {
     }
 
     if ("undefined" == typeof Froogaloop && "undefined" == typeof MauticJS.mauticInsertedScripts.Froogaloop) {
-        MauticJS.insertScript('https://f.vimeocdn.com/js/froogaloop2.min.js');
+        MauticJS.insertScript('{$froogaloop2}');
         MauticJS.mauticInsertedScripts.Froogaloop = true;
     }
     
@@ -497,19 +495,31 @@ JS;
         $lead   = $this->trackingHelper->getLead();
 
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
-            $gaUserId      = ($lead && $lead->getId()) ? 'ga(\'set\', \'userId\', '.$lead->getId().');' : '';
-            $gaAnonymizeIp = $this->trackingHelper->getAnonymizeIp() ? 'ga(\'set\', \'anonymizeIp\', true);' : '';
+            $gtagSettings = [];
+
+            if ($this->trackingHelper->getAnonymizeIp()) {
+                $gtagSettings['anonymize_ip'] = true;
+            }
+
+            if ($lead && $lead->getId()) {
+                $gtagSettings['user_id'] = $lead->getId();
+            }
+
+            if (count($gtagSettings) > 0) {
+                $gtagSettings = ', '.json_encode($gtagSettings);
+            } else {
+                $gtagSettings = '';
+            }
 
             $js .= <<<JS
-            dataLayer = window.dataLayer ? window.dataLayer : [];
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', '{$id}', 'auto');
-  {$gaAnonymizeIp}
-  {$gaUserId}
-  ga('send', 'pageview');
+a = document.createElement('script');
+a.async = 1;
+a.src = 'https://www.googletagmanager.com/gtag/js?id={$id}';
+document.getElementsByTagName('head')[0].appendChild(a);
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '{$id}'{$gtagSettings});
 JS;
         }
 
@@ -568,15 +578,14 @@ MauticJS.setTrackedEvents = function(events) {
                 
                 if (typeof ga  !== 'undefined' && typeof events.google_analytics !== 'undefined') {
                  var e = events.google_analytics; 
-                     for(var i = 0; i < e.length; i++) {
-                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
-                             	ga('send', {
-                                    hitType: 'event',
-                                    eventCategory: e[i]['category'],
-                                    eventAction: e[i]['action'],
-                                    eventLabel: e[i]['label'],
-			                     });
-                     }
+                    for(var i = 0; i < e.length; i++) {
+                        if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' ) {
+                            gtag('event', e[i]['action'], {
+                                'event_category': e[i]['category'],
+                                'event_label': e[i]['label']
+                            });
+                        }
+                    }
                 }        
                 
                 if (typeof events.focus_item !== 'undefined') {

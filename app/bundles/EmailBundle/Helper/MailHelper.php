@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Doctrine\ORM\ORMException;
@@ -67,7 +58,7 @@ class MailHelper
     public $message;
 
     /**
-     * @var null
+     * @var string|array<string, string>
      */
     protected $from;
 
@@ -354,6 +345,7 @@ class MailHelper
                     if (!empty($owner)) {
                         $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
                         $ownerSignature = $this->getContactOwnerSignature($owner);
+                        $this->setReplyTo($owner['email']);
                     } else {
                         $this->setFrom($this->systemFrom, null);
                     }
@@ -419,6 +411,10 @@ class MailHelper
 
                     self::searchReplaceTokens($search, $replace, $this->message);
                 }
+            }
+
+            if (true === $this->factory->getParameter('mailer_convert_embed_images')) {
+                $this->convertEmbedImages();
             }
 
             // Attach assets
@@ -977,10 +973,6 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
-        if ($this->factory->getParameter('mailer_convert_embed_images')) {
-            $content = $this->convertEmbedImages($content);
-        }
-
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
@@ -1001,25 +993,30 @@ class MailHelper
         ];
     }
 
-    /**
-     * @param string $content
-     *
-     * @return string
-     */
-    private function convertEmbedImages($content)
+    private function convertEmbedImages(): void
     {
+        $content = $this->message->getBody();
         $matches = [];
         $content = strtr($content, $this->embedImagesReplaces);
-        if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+        $tokens  = $this->getTokens();
+        if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches) > 0) {
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
-                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                // skip items that already embedded, or have token {tracking_pixel}
+                if (false !== strpos($match, 'cid:') || false !== strpos($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
+                    continue;
                 }
+
+                // skip images with tracking pixel that are already replaced.
+                if (isset($tokens['{tracking_pixel}']) && $match === $tokens['{tracking_pixel}']) {
+                    continue;
+                }
+
+                $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
             }
             $content = strtr($content, $this->embedImagesReplaces);
         }
 
-        return $content;
+        $this->message->setBody($content);
     }
 
     /**
@@ -1418,13 +1415,11 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
-        $BCcontent  = $email->getContent();
+        $template   = $email->getTemplate();
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
-        if (empty($customHtml) && !empty($BCcontent)) {
-            $template = $email->getTemplate();
+        if (empty($customHtml) && $template) {
             if (empty($slots)) {
-                $template = $email->getTemplate();
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
             }
 
@@ -1518,6 +1513,7 @@ class MailHelper
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
             }
+            $headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
         }
 
         return $headers;

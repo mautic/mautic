@@ -62,6 +62,11 @@ class Allowlist
         return null;
     }
 
+    public function clearCache(): void
+    {
+        $this->cache->getSimpleCache()->delete(self::MARKETPLACE_ALLOWLIST_CACHE_KEY);
+    }
+
     private function parseAllowlistJson(string $payload): DTOAllowlist
     {
         return DTOAllowlist::fromArray(json_decode($payload, true));

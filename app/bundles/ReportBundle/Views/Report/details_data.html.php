@@ -21,8 +21,7 @@ $aggregatorCount      = count($aggregatorOrder);
 $groupBy              = $report->getGroupBy();
 $groupByCount         = count($groupBy);
 $startCount           = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
-function getTotal($a, $f, $t, $allrows, $ac)
-{
+$getTotal             = function ($a, $f, $t, $allrows, $ac) {
     switch ($f) {
         case 'COUNT':
         case 'SUM':
@@ -36,7 +35,7 @@ function getTotal($a, $f, $t, $allrows, $ac)
         default:
             return (int) $t;
     }
-}
+};
 
 $graphContent = $view->render(
     'MauticReportBundle:Report:details_data_graphs.html.php',
@@ -127,16 +126,18 @@ $graphContent = $view->render(
                                                 }
                                                 ?>
                                                 <?php
-                                                switch ($cellType) {
-                                                    case 'datetime':
-                                                        echo $view['date']->toFullConcat($cellVal, 'UTC');
-                                                        break;
-                                                    case 'date':
-                                                        echo $view['date']->toShort($cellVal, 'UTC');
-                                                        break;
-                                                    default:
-                                                        echo $view['formatter']->_($cellVal, $cellType);
-                                                        break;
+                                                if ('' !== $cellVal && !is_null($cellVal)) {
+                                                    switch ($cellType) {
+                                                        case 'datetime':
+                                                            echo $view['date']->toFullConcat($cellVal, 'UTC');
+                                                            break;
+                                                        case 'date':
+                                                            echo $view['date']->toShort($cellVal, 'UTC');
+                                                            break;
+                                                        default:
+                                                            echo $view['formatter']->_($cellVal, $cellType);
+                                                            break;
+                                                    }
                                                 }
                                                 ?>
                                                 <?php if ($closeLink): ?></a><?php endif; ?>
@@ -152,7 +153,7 @@ $graphContent = $view->render(
                                             <?php
                                             if (isset($row[$aggregator['function'].' '.$aggregator['column']])) {
                                                 echo $view['formatter']->_($row[$aggregator['function'].' '.$aggregator['column']], 'text');
-                                                $total[$index] = getTotal($row[$aggregator['function'].' '.$aggregator['column']], $aggregator['function'], (isset($total[$index])) ? $total[$index] : 0, $dataCount, $avgCounter);
+                                                $total[$index] = $getTotal($row[$aggregator['function'].' '.$aggregator['column']], $aggregator['function'], (isset($total[$index])) ? $total[$index] : 0, $dataCount, $avgCounter);
                                             }
                                             ?>
                                         </td>

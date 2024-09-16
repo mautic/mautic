@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\AssetBundle\Entity\Asset;
@@ -29,6 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Url;
 
 class AssetType extends AbstractType
 {
@@ -50,7 +42,7 @@ class AssetType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
         $builder->add('storageLocation', ButtonGroupType::class, [
@@ -99,10 +91,17 @@ class AssetType extends AbstractType
             'remotePath',
             TextType::class,
             [
-                'label'      => 'mautic.asset.asset.form.remotePath',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'       => 'mautic.asset.asset.form.remotePath',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'constraints' => [
+                    new Url(
+                        [
+                            'message' => 'mautic.asset.validation.error.url',
+                        ]
+                    ),
+                ],
             ]
         );
 

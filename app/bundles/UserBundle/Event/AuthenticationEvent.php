@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Event;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -88,10 +79,10 @@ class AuthenticationEvent extends Event
     protected $failedAuthMessage;
 
     /**
-     * @param        $user
-     * @param bool   $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
-     * @param string $authenticatingService Service Service requesting authentication
-     * @param null   $integrations
+     * @param string|User|null                $user
+     * @param bool                            $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
+     * @param string                          $authenticatingService Service Service requesting authentication
+     * @param array<AbstractIntegration>|null $integrations
      */
     public function __construct(
         $user,
@@ -129,7 +120,7 @@ class AuthenticationEvent extends Event
     /**
      * Get user returned by username search.
      *
-     * @return string|User
+     * @return string|User|null
      */
     public function getUser()
     {

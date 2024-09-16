@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
@@ -107,10 +99,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         try {
                             $model = $this->modelFactory->getModel($log['bundle'].'.'.$log['object']);
                             $item  = $model->getEntity($log['objectId']);
-                            if (method_exists($item, $model->getNameGetter())) {
+                            if (null === $item) {
+                                $log['objectName'] = $log['object'].'-'.$log['objectId'];
+                            } elseif ($model instanceof FormModel && method_exists($item, $model->getNameGetter())) {
                                 $log['objectName'] = $item->{$model->getNameGetter()}();
 
-                                if ('lead' == $log['bundle'] && 'mautic.lead.lead.anonymous' == $log['objectName']) {
+                                if ('lead' === $log['bundle'] && 'mautic.lead.lead.anonymous' === $log['objectName']) {
                                     $log['objectName'] = $this->translator->trans('mautic.lead.lead.anonymous');
                                 }
                             } else {
@@ -118,7 +112,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             }
 
                             $routeName = 'mautic_'.$log['bundle'].'_action';
-                            if (null !== $this->router->getRouteCollection()->get($routeName)) {
+                            if (null !== $item && null !== $this->router->getRouteCollection()->get($routeName)) {
                                 $log['route'] = $this->router->generate(
                                     'mautic_'.$log['bundle'].'_action',
                                     ['objectAction' => 'view', 'objectId' => $log['objectId']]

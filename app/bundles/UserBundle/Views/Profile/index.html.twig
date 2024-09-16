@@ -1,0 +1,86 @@
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block headerTitle %}{% trans %}mautic.user.account.settings{% endtrans %}{% endblock %}
+{% block mauticContent %}user{% endblock %}
+
+{% block content %}
+
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- step container -->
+    <div class="col-md-3 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {% if me.getId() %}
+            <div class="media">
+                <div class="pull-left">
+                    <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}" alt="" width="65px">
+                </div>
+                <div class="media-body">
+                    <h4>{{ me.getName() }}</h4>
+                    <h5>{{ me.getPosition() }}</h5>
+                </div>
+            </div>
+            <hr />
+            {% endif %}
+
+            <ul class="list-group list-group-tabs">
+                <li class="list-group-item active">
+                    <a href="#profile" class="steps" data-toggle="tab">
+                        {% trans %}mautic.user.account.header.details{% endtrans %}
+                    </a>
+                </li>
+
+                {% if permissions['apiAccess'] %}
+                <li class="list-group-item">
+                    <a href="#clients" class="steps" data-toggle="tab">
+                        {% trans %}mautic.user.account.header.authorizedclients{% endtrans %}
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <!--/ step container -->
+
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-l">
+        <div class="tab-content">
+            <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
+                {{ form_start(userForm) }}
+                <div class="pa-md bg-auto bg-light-xs bdr-b">
+                    <h4 class="fw-sb">{% trans %}mautic.user.account.header.details{% endtrans %}</h4>
+                </div>
+                <div class="pa-md">
+                    <div class="col-md-6">
+                        {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
+                        {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
+                        {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
+                        {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
+                        {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(userForm.timezone) }}
+                        {{ form_row(userForm.locale) }}
+                        {{ form_row(userForm.plainPassword.password) }}
+                        {{ form_row(userForm.plainPassword.confirm) }}
+                        {{ form_row(userForm.signature) }}
+                    </div>
+                </div>
+                {{ form_end(userForm) }}
+            </div>
+
+            {% if permissions.apiAccess is defined and permissions.apiAccess %}
+                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="clients">
+                    <div class="pa-md bg-auto bg-light-xs bdr-b">
+                        <h4 class="fw-sb">{% trans %}mautic.user.account.header.authorizedclients{% endtrans %}</h4>
+                    </div>
+                    <div class="pa-md">
+                        {{ authorizedClients|raw }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <!--/ end: container -->
+</div>
+{% endblock %}

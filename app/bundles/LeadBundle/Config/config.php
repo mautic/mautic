@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -389,8 +380,8 @@ return [
             'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber::class,
                 'arguments' => [
-                   'mautic.lead.model.lead',
-                   'mautic.campaign.helper.removed_contact_tracker',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.helper.removed_contact_tracker',
                 ],
             ],
             'mautic.lead.campaignbundle.action_dnc.subscriber' => [
@@ -508,6 +499,7 @@ return [
                     'mautic.lead.field.field_list',
                     'mautic.security',
                     'mautic.lead.model.lead',
+                    'translator',
                 ],
             ],
             'mautic.lead.import.company.subscriber' => [
@@ -516,6 +508,7 @@ return [
                     'mautic.lead.field.field_list',
                     'mautic.security',
                     'mautic.lead.model.company',
+                    'translator',
                 ],
             ],
             'mautic.lead.import.subscriber' => [
@@ -640,7 +633,12 @@ return [
             ],
             'mautic.form.type.leadfield' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\FieldType::class,
-                'arguments' => ['translator', 'mautic.lead.repository.field'],
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
+                    'translator',
+                    'mautic.lead.field.identifier_fields',
+                ],
+                'alias'     => 'leadfield',
             ],
             'mautic.form.type.lead.submitaction.pointschange' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType::class,
@@ -833,6 +831,8 @@ return [
                     'mautic.lead.model.list',
                     'mautic.helper.field.alias',
                     '@doctrine.orm.entity_manager',
+                    'translator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
                 ],
             ],
             \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
@@ -1078,6 +1078,13 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.query.builder.channel_click.value' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
@@ -1106,6 +1113,10 @@ return [
                 'class'     => Mautic\LeadBundle\Templating\Helper\DncReasonHelper::class,
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',
+            ],
+            'mautic.helper.segment.count.cache' => [
+                'class'     => \Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
+                'arguments' => ['mautic.helper.cache_storage'],
             ],
         ],
         'models' => [
@@ -1161,6 +1172,7 @@ return [
                     'mautic.lead.model.lead_segment_service',
                     'mautic.lead.segment.stat.chart.query.factory',
                     'request_stack',
+                    'mautic.helper.segment.count.cache',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
@@ -1219,6 +1231,7 @@ return [
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
                     'mautic.lead.model.lead_segment.decorator.date.optionFactory',
                     'mautic.lead.model.lead_segment_decorator_company',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.lead.model.lead_segment_decorator_base' => [
@@ -1471,6 +1484,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.lead.field.identifier_fields' => [
+                'class'     => \Mautic\LeadBundle\Field\IdentifierFields::class,
+                'arguments' => [
+                    'mautic.lead.field.fields_with_unique_identifier',
+                    'mautic.lead.field.field_list',
+                ],
+            ],
             'mautic.lead.field.lead_field_saver' => [
                 'class'     => Mautic\LeadBundle\Field\LeadFieldSaver::class,
                 'arguments' => [
@@ -1562,6 +1582,23 @@ return [
                 'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
+                'optional'  => true,
+            ],
+            'mautic.lead.fixture.test.click' => [
+                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
+                'optional'  => true,
+            ],
+            'mautic.lead.fixture.test.dnc' => [
+                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
+                'optional'  => true,
+            ],
+            'mautic.lead.fixture.test.tag' => [
+                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'optional'  => true,
             ],
         ],

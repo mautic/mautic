@@ -1,0 +1,12 @@
+{% if updateMessage.message is not empty %}
+<div class="media pt-sm pb-sm pr-md pl-md nm bdr-b alert-mautic mautic-update">
+    <h4 class="pull-left">{{ updateMessage.message|raw }}</h4>
+    <div class="pull-right">
+        <a class="btn btn-danger" href="{{ path('mautic_core_update') }}" data-toggle="ajax">{% trans %}mautic.core.update.now{% endtrans %}</a>
+    </div>
+    <div class="clearfix"></div>
+</div>
+{% endif %}
+{% for n in notifications %}
+    {{ include('MauticCoreBundle:Notification:notification.html.twig', {n: n}) }}
+{% endfor %}

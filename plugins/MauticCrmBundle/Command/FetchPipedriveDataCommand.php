@@ -54,6 +54,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
         $this->io  = new SymfonyStyle($input, $output);
+        $this->io->warning(PipedriveIntegration::DEPRECATION_MESSAGE);
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper

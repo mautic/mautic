@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -162,10 +153,6 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerate(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $channelListHelperMock   = $this->createMock(ChannelListHelper::class);
         $fieldsBuilderMock       = $this->createMock(FieldsBuilder::class);
         $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);

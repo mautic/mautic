@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
@@ -576,6 +567,7 @@ class ReportModel extends FormModel
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
         $order = $parts['orderBy'];
+
         $query->resetQueryPart('orderBy');
 
         if (empty($options['ignoreGraphData'])) {
@@ -614,7 +606,11 @@ class ReportModel extends FormModel
             }
         }
 
-        $query->add('orderBy', $order);
+        $columnsAllowed = $this->getColumnList($entity->getSource());
+        $order          = $this->getOrderBySanitized($order, $columnsAllowed);
+        if ($order['hasOrderBy']) {
+            $query->add('orderBy', $order['orderBy']);
+        }
 
         // Allow plugin to manipulate the query
         $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
@@ -702,6 +698,55 @@ class ReportModel extends FormModel
             'debug'             => $debugData,
             'aggregatorColumns' => $dataAggregatorColumns,
         ];
+    }
+
+    /**
+     * Sanitize order by array comparing it to the allowed columns.
+     *
+     * @param iterable<mixed> $orderBys
+     *
+     * @return iterable<mixed>
+     */
+    private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
+    {
+        $hasOrderBy = false;
+        foreach ($orderBys as $key => $orderBy) {
+            if ($this->orderByIsValid($orderBy, $allowedColumns)) {
+                $hasOrderBy = true;
+                continue;
+            }
+            $orderBys[$key] = '';
+        }
+
+        return [
+            'orderBy'    => $orderBys,
+            'hasOrderBy' => $hasOrderBy,
+        ];
+    }
+
+    /**
+     * Check if order by is valid.
+     */
+    private function orderByIsValid(string $order, \stdClass $allowedColumns): bool
+    {
+        if (empty($order)) {
+            return false;
+        }
+
+        $orderBy         = $order;
+        $oderByDirection = '';
+
+        if (str_contains($order, ' ')) {
+            $orderTemp       = explode(' ', $order);
+            $orderBy         = $orderTemp[0];
+            $oderByDirection = $orderTemp[1];
+        }
+
+        if (!array_key_exists($orderBy, $allowedColumns->choices) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

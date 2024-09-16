@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
@@ -25,7 +16,7 @@ class IpstackLookupTest extends \PHPUnit\Framework\TestCase
         $mockHttp = $this->createMock(Client::class);
 
         // Mock a successful response
-        $mockResponse = new Response(200, [], '{"ip":"192.30.252.131","country_code":"US","country_name":"United States","region_code":"CA","region_name":"California","city":"San Francisco","zip_code":"94107","time_zone":"America/Los_Angeles","latitude":37.7697,"longitude":-122.3933,"metro_code":807}');
+        $mockResponse = new Response(200, [], '{"ip":"192.30.252.131","country_code":"US","country_name":"United States","region_code":"CA","region_name":"California","city":"San Francisco","zip":"94107","time_zone":"America/Los_Angeles","latitude":37.7697,"longitude":-122.3933,"metro_code":807}');
 
         $mockHttp->expects($this->once())
             ->method('get')

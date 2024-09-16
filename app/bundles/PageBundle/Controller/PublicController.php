@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -459,7 +450,7 @@ class PublicController extends CommonFormController
         }
 
         // Ensure the URL does not have encoded ampersands
-        $url = str_replace('&amp;', '&', $redirect->getUrl());
+        $url = UrlHelper::decodeAmpersands($redirect->getUrl());
 
         // Get query string
         $query = $this->request->query->all();

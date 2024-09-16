@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
@@ -232,5 +223,36 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertCount(0, $pendingCountQuery);
+    }
+
+    public function testSendEmailForImportCustomEmailTemplate(): void
+    {
+        $email = new Email();
+        $email->setName('Test Email C');
+        $email->setSubject('Test Email C Subject');
+        $email->setTemplate('blank');
+        $email->setEmailType('template');
+
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+
+        $this->em->persist($email);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        // Create the member now.
+        $payload = [
+            'action'   => 'lead:getEmailTemplate',
+            'template' => $email->getId(),
+        ];
+
+        $this->client->request('GET', '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(1, $response['success']);
+        $this->assertNotEmpty($response['subject']);
+        $this->assertEquals($email->getSubject(), $response['subject']);
+        $this->assertNotEmpty($response['body']);
     }
 }

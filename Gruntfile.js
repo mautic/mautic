@@ -39,6 +39,9 @@ module.exports = function (grunt) {
                     return dest + src.replace('.less', '.css')
                 },
                 dest: ''
+            },
+            options: {
+                javascriptEnabled: true
             }
         },
 

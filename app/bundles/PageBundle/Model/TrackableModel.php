@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -125,9 +116,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (false !== strpos($url, '&amp;')) {
-            $url = str_replace('&amp;', '&', $url);
-        }
+        $url = UrlHelper::decodeAmpersands($url);
 
         $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
         if (null == $trackable) {
@@ -367,26 +356,10 @@ class TrackableModel extends AbstractCommonModel
         libxml_use_internal_errors($libxmlPreviousState);
         $links = $dom->getElementsByTagName('a');
 
-        $trackableUrls = [];
+        $xpath = new \DOMXpath($dom);
+        $maps  = $xpath->query('//map/area');
 
-        /** @var \DOMElement $link */
-        foreach ($links as $link) {
-            $url = $link->getAttribute('href');
-
-            // Check for a do not track
-            if ($link->hasAttribute('mautic:disable-tracking')) {
-                $this->doNotTrack[$url] = $url;
-
-                continue;
-            }
-
-            if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
-                $trackableUrls[$urlKey]  = $urlValue;
-            }
-        }
-
-        return $trackableUrls;
+        return array_merge($this->extractTrackables($links), $this->extractTrackables($maps));
     }
 
     /**
@@ -439,19 +412,15 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Validate and parse link for tracking.
      *
-     * @param $url
-     *
-     * @return array[$trackingKey, $trackingUrl]|false
+     * @return bool|non-empty-array<mixed, mixed>
      */
-    protected function prepareUrlForTracking($url)
+    protected function prepareUrlForTracking(string $url)
     {
         // Ensure it's clean
         $url = trim($url);
 
-        // Ensure these are & for the sake of parsing
-        while (false !== strpos($url, '&amp;')) {
-            $url = str_replace('&amp;', '&', $url);
-        }
+        // Ensure ampersands are & for the sake of parsing
+        $url = UrlHelper::decodeAmpersands($url);
 
         // If this is just a token, validate it's supported before going further
         if (preg_match('/^{.*?}$/i', $url) && !$this->validateTokenIsTrackable($url)) {
@@ -464,7 +433,8 @@ class TrackableModel extends AbstractCommonModel
         // Convert URL
         $urlParts = parse_url($url);
 
-        if (!$this->isValidUrl($urlParts, false)) {
+        // We need to ignore not parsable and invalid urls
+        if (false === $urlParts || !$this->isValidUrl($urlParts, false)) {
             return false;
         }
 
@@ -926,5 +896,37 @@ class TrackableModel extends AbstractCommonModel
         $this->leadFieldRepository->detachEntities($fieldEntities);
 
         return $this->contactFieldUrlTokens;
+    }
+
+    /**
+     * @param \DOMNodeList<\DOMNode> $links
+     *
+     * @return array<string, string>
+     */
+    private function extractTrackables(\DOMNodeList $links): array
+    {
+        $trackableUrls = [];
+        /** @var \DOMElement $link */
+        foreach ($links as $link) {
+            $url = $link->getAttribute('href');
+
+            if ('' === $url) {
+                continue;
+            }
+
+            // Check for a do not track
+            if ($link->hasAttribute('mautic:disable-tracking')) {
+                $this->doNotTrack[$url] = $url;
+
+                continue;
+            }
+
+            if ($preparedUrl = $this->prepareUrlForTracking($url)) {
+                [$urlKey, $urlValue]     = $preparedUrl;
+                $trackableUrls[$urlKey]  = $urlValue;
+            }
+        }
+
+        return $trackableUrls;
     }
 }

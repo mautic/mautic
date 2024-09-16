@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -123,6 +114,6 @@ class Tag
      */
     protected function validateTag($tag)
     {
-        return InputHelper::clean(trim($tag));
+        return InputHelper::string(trim($tag));
     }
 }

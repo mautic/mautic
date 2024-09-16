@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testFormWorkflow()
     {
         $payload = [

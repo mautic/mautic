@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -51,8 +42,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
@@ -146,16 +135,16 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testApplySearchQueryRelationshipJoinOnlyOnce(): void
     {
         $queryBuilder = new QueryBuilder($this->connection);
-        $queryBuilder->select('*')->from('table_a');
+        $queryBuilder->select('*')->from(MAUTIC_TABLE_PREFIX.'table_a');
         $tableB = [
             'alias'      => 'alias_b',
-            'from_alias' => 'table_a',
+            'from_alias' => MAUTIC_TABLE_PREFIX.'table_a',
             'table'      => 'table_b',
             'condition'  => 'condition_b',
         ];
         $tableC = [
             'alias'      => 'alias_c',
-            'from_alias' => 'table_a',
+            'from_alias' => MAUTIC_TABLE_PREFIX.'table_a',
             'table'      => 'table_c',
             'condition'  => 'condition_c',
         ];
@@ -167,7 +156,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         );
 
         Assert::assertSame(
-            'SELECT * FROM table_a INNER JOIN table_b alias_b ON condition_b INNER JOIN table_c alias_c ON condition_c GROUP BY l.id',
+            'SELECT * FROM '.MAUTIC_TABLE_PREFIX.'table_a INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_b alias_b ON condition_b INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_c alias_c ON condition_c GROUP BY l.id',
             $queryBuilder->getSQL()
         );
     }

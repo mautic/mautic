@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -20,13 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement([
@@ -63,6 +47,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
 
+        $this->client->restart();
         // Let's remove the member now.
         $payload = [
             'action'         => 'lead:toggleLeadCampaign',

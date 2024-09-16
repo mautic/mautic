@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -186,7 +177,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
                             foreach ($ccMergeVars['vars'] as &$var) {
-                                if (false !== strpos($var['content'], 'http') && $ctPos = false !== strpos($var['content'], 'ct=')) {
+                                if (false !== strpos($var['content'], 'http') && ($ctPos = strpos($var['content'], 'ct=')) !== false) {
                                     // URL so make sure a ct query is not part of it
                                     $var['content'] = substr($var['content'], 0, $ctPos);
                                 }
@@ -281,6 +272,10 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
      */
     public function start()
     {
+        if ($this->started) {
+            return;
+        }
+
         $key = $this->getApiKey();
         if (empty($key)) {
             // BC support @deprecated - remove in 3.0
@@ -300,6 +295,20 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
         );
 
         $this->started = true;
+    }
+
+    /**
+     * @param string[]|null $failedRecipients An array of failures by-reference
+     *
+     * @return int
+     *
+     * @throws \Swift_TransportException
+     */
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    {
+        $this->start();
+
+        return parent::send($message, $failedRecipients);
     }
 
     /**

@@ -136,10 +136,13 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getStatTotalContacts(int $campaignId): int
     {
+        $from = date('Y-m-d', strtotime('-2 months'));
+        $to   = date('Y-m-d', strtotime('-1 month'));
+
         $stats = $this->campaignModel->getCampaignMetricsLineChartData(
             null,
-            new \DateTime('2020-10-21'),
-            new \DateTime('2020-11-22'),
+            new \DateTime($from),
+            new \DateTime($to),
             null,
             ['campaign_id' => $campaignId]
         );
@@ -178,10 +181,13 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getCrawlers(int $campaignId): Crawler
     {
+        $from = date('F d, Y', strtotime('-2 months'));
+        $to   = date('F d, Y', strtotime('-1 month'));
+
         $parameters = [
             'daterange' => [
-                'date_from' => 'Nov 1, 2020',
-                'date_to'   => 'Nov 30, 2020',
+                'date_from' => $from,
+                'date_to'   => $to,
             ],
         ];
 
@@ -222,7 +228,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         Assert::assertSame(2, $totalContacts);
     }
 
-    private function getCountAndDetails(bool $emulatePendingCount = false, bool $runCommand = false, int $expectedSuccessPercent, int $expectedCompleted, int $expectedPending): void
+    private function getCountAndDetails(bool $emulatePendingCount, bool $runCommand, int $expectedSuccessPercent, int $expectedCompleted, int $expectedPending): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs($emulatePendingCount);
         $campaignId = $campaign->getId();
@@ -232,7 +238,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
                 SummarizeCommand::NAME,
                 [
                     '--env'       => 'test',
-                    '--max-hours' => 9999999,
+                    '--max-hours' => 768,
                 ]
             );
         }

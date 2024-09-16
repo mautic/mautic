@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -296,5 +287,21 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
             ['redirect_id'],
             ['notification'],
         ];
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
+     */
+    public function testBehaviorsTypeFilter(): void
+    {
+        $filter = [
+            'object'     => 'behaviors',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertFalse($contactSegmentFilterCrate->isContactType());
+        $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
+        $this->assertTrue($contactSegmentFilterCrate->isBehaviorsType());
     }
 }

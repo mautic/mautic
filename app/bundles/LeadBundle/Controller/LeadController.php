@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -83,6 +74,9 @@ class LeadController extends FormController
 
         //do some default filtering
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        // Add an id field to orderBy. Prevent Null-value ordering
+        $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
+        $orderBy    = $orderBy.$orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
@@ -214,6 +208,28 @@ class LeadController extends FormController
      */
     public function quickAddAction()
     {
+        // set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (
+            !$permissions['lead:leads:viewown']
+            && !$permissions['lead:leads:viewother']
+            && !$permissions['lead:leads:create']
+            && !$permissions['lead:leads:editown']
+            && !$permissions['lead:leads:editother']
+        ) {
+            return $this->accessDenied();
+        }
+
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
@@ -1580,7 +1596,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1683,7 +1698,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1780,7 +1794,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1840,6 +1853,10 @@ class LeadController extends FormController
      */
     public function batchOwnersAction($objectId = 0)
     {
+        if (!$this->get('mautic.security')->isGranted('user:users:view')) {
+            return $this->accessDenied();
+        }
+
         if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
@@ -1880,7 +1897,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1958,6 +1974,9 @@ class LeadController extends FormController
         $session    = $this->get('session');
         $search     = $session->get('mautic.lead.filter', '');
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        // Add an id field to orderBy. Prevent Null-value ordering
+        $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
+        $orderBy    = $orderBy.$orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
         $ids        = $this->request->get('ids');
 

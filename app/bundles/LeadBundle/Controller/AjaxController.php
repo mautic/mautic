@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
+use Exception;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -33,6 +25,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
@@ -62,9 +55,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function getLeadIdsByFieldValueAction(Request $request)
     {
-        $field     = InputHelper::clean($request->request->get('field'));
-        $value     = InputHelper::clean($request->request->get('value'));
-        $ignore    = (int) $request->request->get('ignore');
+        $field     = InputHelper::clean($request->query->get('field'));
+        $value     = InputHelper::clean($request->query->get('value'));
+        $ignore    = (int) $request->query->get('ignore');
         $dataArray = ['items' => []];
 
         if ($field && $value) {
@@ -177,6 +170,7 @@ class AjaxController extends CommonAjaxController
         $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
         $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
         $operator    = InputHelper::clean($request->request->get('operator'));
+        $search      = InputHelper::clean($request->request->get('search'));
         $filterNum   = (int) $request->request->get('filterNum');
 
         /** @var FormFactoryInterface $formFactory */
@@ -196,7 +190,7 @@ class AjaxController extends CommonAjaxController
                 $fieldAlias,
                 $fieldObject,
                 $operator,
-                $listModel->getChoiceFields()[$fieldObject][$fieldAlias]
+                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
             );
         }
 
@@ -655,7 +649,7 @@ class AjaxController extends CommonAjaxController
     protected function getEmailTemplateAction(Request $request)
     {
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
-        $emailId = $request->get('template');
+        $emailId = $request->query->get('template');
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
@@ -861,7 +855,7 @@ class AjaxController extends CommonAjaxController
                         $options = FormFieldHelper::getTimezonesChoices();
                         break;
                     case 'locale':
-                        $options = FormFieldHelper::getLocaleChoices();
+                        $options = array_flip(FormFieldHelper::getLocaleChoices());
                         break;
                     case 'date':
                     case 'datetime':
@@ -938,8 +932,8 @@ class AjaxController extends CommonAjaxController
 
     protected function getCampaignShareStatsAction(Request $request)
     {
-        $ids      = $request->get('ids');
-        $entityid = $request->get('entityId');
+        $ids      = $request->query->get('ids');
+        $entityid = $request->query->get('entityId');
         /** @var SegmentCampaignShare $segmentCampaignShareService */
         $segmentCampaignShareService = $this->get('mautic.lead.segment.stat.campaign.share');
 
@@ -951,5 +945,41 @@ class AjaxController extends CommonAjaxController
         ];
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function getLeadCountAction(Request $request): JsonResponse
+    {
+        $id = (int) InputHelper::clean($request->get('id'));
+
+        /** @var ListModel $model */
+        $model          = $this->getModel('lead.list');
+        $leadListExists = $model->leadListExists($id);
+
+        if (!$leadListExists) {
+            return new JsonResponse($this->prepareJsonResponse(0), Response::HTTP_NOT_FOUND);
+        }
+
+        $leadCounts = $model->getSegmentContactCount([$id]);
+        $leadCount  = $leadCounts[$id];
+
+        return new JsonResponse($this->prepareJsonResponse($leadCount));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function prepareJsonResponse(int $leadCount): array
+    {
+        return [
+            'html' => $this->translator->transChoice(
+                'mautic.lead.list.viewleads_count',
+                $leadCount,
+                ['%count%' => $leadCount]
+            ),
+            'leadCount' => $leadCount,
+        ];
     }
 }

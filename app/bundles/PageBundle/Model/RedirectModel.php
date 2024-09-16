@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -121,9 +112,7 @@ class RedirectModel extends FormModel
     public function getRedirectByUrl($url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (false !== strpos($url, '&amp;')) {
-            $url = str_replace('&amp;', '&', $url);
-        }
+        $url = UrlHelper::decodeAmpersands($url);
 
         $repo     = $this->getRepository();
         $redirect = $repo->findOneBy(['url' => $url]);

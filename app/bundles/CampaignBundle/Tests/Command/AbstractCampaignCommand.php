@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Doctrine\DBAL\Connection;
@@ -69,10 +60,10 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         // Schedule event
         date_default_timezone_set('UTC');
         $this->eventDate = new \DateTime();
-        $this->eventDate->modify('+15 seconds');
+        $this->eventDate->modify('+3 seconds');
         $sql = str_replace('{SEND_EMAIL_1_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
-        $this->eventDate->modify('+15 seconds');
+        $this->eventDate->modify('+6 seconds');
         $sql = str_replace('{CONDITION_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
         $this->em->getConnection()->exec($sql);

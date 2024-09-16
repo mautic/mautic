@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +13,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
@@ -66,12 +57,17 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     const SEGMENT_B = 'segment B';
 
     /**
+     * @var Connection|MockObject
+     */
+    private $connection;
+
+    /**
      * @var MockObject|IpLookupHelper
      */
     private $ipLookupHelper;
 
     /**
-     * @var MockObject|ThemeHelper
+     * @var MockObject|ThemeHelperInterface
      */
     private $themeHelper;
 
@@ -210,7 +206,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $this->themeHelper              = $this->createMock(ThemeHelper::class);
+        $this->themeHelper              = $this->createMock(ThemeHelperInterface::class);
         $this->mailboxHelper            = $this->createMock(Mailbox::class);
         $this->mailHelper               = $this->createMock(MailHelper::class);
         $this->leadModel                = $this->createMock(LeadModel::class);
@@ -236,6 +232,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
+        $this->connection               = $this->createMock(Connection::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -254,7 +251,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -638,7 +636,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection
         );
 
         $emailModel->setTranslator($this->translator);

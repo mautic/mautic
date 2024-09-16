@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -188,5 +179,27 @@ STRING
         $this->assertTrue(UrlHelper::isValidUrl('https://domain.tld/é'));
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurl'));
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurlé'));
+    }
+
+    /**
+     * @dataProvider dataDecodeAmpersands
+     */
+    public function testDecodeAmpersands(string $value, string $expected): void
+    {
+        $this->assertSame($expected, UrlHelper::decodeAmpersands($value));
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public function dataDecodeAmpersands(): iterable
+    {
+        yield 'With html encoded ampersands' => ['https://example.org/?utm_source=mautic&amp;utm_medium=phpunit&amp;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With decimal encoded ampersands' => ['https://example.org/?utm_source=mautic&#38;utm_medium=phpunit&#38;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With hex encoded ampersands' => ['https://example.org/?utm_source=mautic&#x26;utm_medium=phpunit&#x26;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With mixed encoded ampersands' => ['https://example.org/?utm_source=mautic&amp;utm_medium=phpunit&#38;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With double encoded ampersands' => ['https://example.org/?utm_source=mautic&#38;amp;utm_medium=phpunit&#38;amp;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With other encoded characters' => ['https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=&#60;tests&#62;', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=&#60;tests&#62;'];
+        yield 'Without encoded ampersands' => ['https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
     }
 }

@@ -1,26 +1,23 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Command;
 
+use Exception;
 use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
+    private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
+
+        $this->segmentCountCacheHelper = self::$container->get('mautic.helper.segment.count.cache');
     }
 
     public function tearDown(): void
@@ -28,10 +25,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         parent::tearDown();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=0');
+
+        $this->segmentCountCacheHelper = null;
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -81,8 +80,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 20 seconds then execute the campaign again to send scheduled events
-        sleep(20);
+        // Wait 6 seconds then execute the campaign again to send scheduled events
+        sleep(6);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
@@ -124,8 +123,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[3]);
         $this->assertCount(25, $byEvent[10]);
 
-        // Wait 20 seconds to go beyond the inaction timeframe
-        sleep(20);
+        // Wait 6 seconds to go beyond the inaction timeframe
+        sleep(6);
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -197,7 +196,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -246,8 +245,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 20 seconds then execute the campaign again to send scheduled events
-        sleep(20);
+        // Wait 6 seconds then execute the campaign again to send scheduled events
+        sleep(6);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
@@ -289,8 +288,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[3]);
         $this->assertCount(1, $byEvent[10]);
 
-        // Wait 20 seconds to go beyond the inaction timeframe
-        sleep(20);
+        // Wait 6 seconds to go beyond the inaction timeframe
+        sleep(6);
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
@@ -405,8 +404,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 20 seconds then execute the campaign again to send scheduled events
-        sleep(20);
+        // Wait 6 seconds then execute the campaign again to send scheduled events
+        sleep(6);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
@@ -448,8 +447,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[3]);
         $this->assertCount(2, $byEvent[10]);
 
-        // Wait 20 seconds to go beyond the inaction timeframe
-        sleep(20);
+        // Wait 6 seconds to go beyond the inaction timeframe
+        sleep(6);
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
@@ -542,6 +541,18 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
         Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
         Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testSegmentCacheCount(): void
+    {
+        // Execute the command again to trigger related events.
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
+        // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
     }
 
     /**

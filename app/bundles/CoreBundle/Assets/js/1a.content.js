@@ -134,7 +134,8 @@ Mautic.loadAjaxColumn = function(elementName, route, callback){
                     }
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         }
     }

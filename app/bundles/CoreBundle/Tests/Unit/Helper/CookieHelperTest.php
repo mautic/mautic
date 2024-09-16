@@ -75,8 +75,8 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
         $cookieHelper->setCookie($cookieName, 'test');
 
         $cookie = $this->getCookie($cookieName);
-        $this->assertNotContains('SameSite=None', $cookie);
-        $this->assertNotContains('secure', $cookie);
+        $this->assertStringContainsString('SameSite=None', $cookie);
+        $this->assertStringNotContainsString('secure', $cookie);
     }
 
     /**

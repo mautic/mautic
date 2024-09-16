@@ -1,16 +1,6 @@
 <?php
 
 /**
- * lessphp v0.5.0
- * http://leafo.net/lessphp.
- *
- * LESS CSS compiler, adapted from http://lesscss.org
- *
- * Copyright 2013, Leaf Corcoran <leafot@gmail.com>
- * Licensed under MIT or GPLv3, see LICENSE
- */
-
-/**
  * The LESS compiler and parser.
  *
  * Converting LESS to CSS is a three stage process. The incoming file is parsed

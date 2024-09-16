@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
@@ -464,10 +465,10 @@ class InstallService
 
         $encoder = $this->encoder;
 
-        $user->setFirstName($data['firstname']);
-        $user->setLastName($data['lastname']);
-        $user->setUsername($data['username']);
-        $user->setEmail($data['email']);
+        $user->setFirstName(InputHelper::clean($data['firstname']));
+        $user->setLastName(InputHelper::clean($data['lastname']));
+        $user->setUsername(InputHelper::clean($data['username']));
+        $user->setEmail(InputHelper::email($data['email']));
         $user->setPassword($encoder->encodePassword($user, $data['password']));
 
         $adminRole = null;

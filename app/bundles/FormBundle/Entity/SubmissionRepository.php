@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -68,7 +59,7 @@ class SubmissionRepository extends CommonRepository
                 $fq->expr()->notIn('f.type', $viewOnlyFields),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
-            ->orderBy('f.field_order', 'ASC')
+            ->orderBy('f.field_order, f.id', 'ASC')
             ->setParameter('saveResult', true);
         $results = $fq->execute()->fetchAll();
 

@@ -81,8 +81,10 @@ if (!isset($lead)) {
 
                         $template = $params['template'];
                     else:
-                        if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
+                        if (!$f->isAlwaysDisplay() && !$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
                             $f->setType('hidden');
+                        } else {
+                            $displayManager->increaseDisplayedFields($f);
                         }
                         $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
                     endif;
@@ -113,11 +115,6 @@ if (!isset($lead)) {
 
                         $template = $params['template'];
                     else:
-                        if (!$f->isAlwaysDisplay() && !$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
-                            $f->setType('hidden');
-                        } else {
-                            $displayManager->increaseDisplayedFields($f);
-                        }
                         $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
                     endif;
 

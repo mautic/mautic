@@ -7,18 +7,11 @@ use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 /** @var PackageDetail $packageDetail */
 $packageDetail = $packageDetail;
-
-try {
-    $latestVersion = $packageDetail->versions->findLatestVersionPackage();
-} catch (\Throwable $e) {
-    $latestVersionException = $e;
-}
-
 ?>
 <div class="text-center" id="marketplace-removal-in-progress">
     <p><?php echo $view['translator']->trans(
         'marketplace.package.remove.html.in.progress',
-        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
         ); ?></p>
     <div class="spinner">
         <i class="fa fa-spin fa-spinner"></i>
@@ -27,14 +20,14 @@ try {
 <div style="display: none" class="text-center" id="marketplace-removal-failed">
     <p><?php echo $view['translator']->trans(
         'marketplace.package.remove.html.failed',
-        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
         ); ?></p>
     <textarea class="form-control" readonly id="marketplace-removal-failed-details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-removal-success">
     <p><?php echo $view['translator']->trans(
         'marketplace.package.remove.html.success',
-        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
         ); ?></p>
     <p><a class="btn btn-primary" href="<?php echo $view['router']->path(RouteProvider::ROUTE_LIST); ?>"><?php echo $view['translator']->trans(
         'marketplace.package.remove.html.success.continue'); ?></a></p>

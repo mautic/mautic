@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Integration;
 
 use Mautic\PluginBundle\Entity\Integration;
@@ -16,10 +7,13 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
  * Class CitrixAbstractIntegration.
+ *
+ * @deprecated will be removed in Mautic 5. See DEPRECATION_MESSAGE below.
  */
 abstract class CitrixAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
+    public const DEPRECATION_MESSAGE = 'The Citrix plugin is deprecated and will be removed in Mautic 5. See <a href="https://www.leuchtfeuer.com/en/mautic/downloads/mautic-goto-plugin/" target=”_blank”>an alternative</a> for this plugin.';
 
     /**
      * @return array
@@ -173,5 +167,24 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         }
 
         return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param string $section
+     *
+     * @return string
+     */
+    public function getFormNotes($section)
+    {
+        if ('authorization' == $section) {
+            return [
+                '<b>'.self::DEPRECATION_MESSAGE.'</b><br><br>',
+                'warning',
+            ];
+        }
+
+        return parent::getFormNotes($section);
     }
 }

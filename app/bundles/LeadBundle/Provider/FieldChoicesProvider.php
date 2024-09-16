@@ -31,9 +31,9 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
     /**
      * @return mixed[]
      */
-    public function getChoicesForField(string $fieldType, string $fieldAlias): array
+    public function getChoicesForField(string $fieldType, string $fieldAlias, string $search = ''): array
     {
-        $aliasChoices = $this->getAllChoicesForListFieldAliases();
+        $aliasChoices = $this->getAllChoicesForListFieldAliases($search);
         $typeChoices  = $this->getAllChoicesForListFieldTypes();
 
         if (isset($aliasChoices[$fieldAlias])) {
@@ -60,18 +60,18 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
     /**
      * @return mixed[]
      */
-    private function getAllChoicesForListFieldAliases(): array
+    private function getAllChoicesForListFieldAliases(string $search = ''): array
     {
-        $this->lookForFieldChoices();
+        $this->lookForFieldChoices($search);
 
         return $this->cachedAliasChoices;
     }
 
-    private function lookForFieldChoices(): void
+    private function lookForFieldChoices(string $search = ''): void
     {
         if (empty($this->cachedTypeChoices)) {
             $event = new ListFieldChoicesEvent();
-
+            $event->setSearchTerm($search);
             $this->dispatcher->dispatch(LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE, $event);
 
             $this->cachedTypeChoices  = $event->getChoicesForAllListFieldTypes();

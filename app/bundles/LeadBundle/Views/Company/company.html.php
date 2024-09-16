@@ -133,26 +133,28 @@ $view['slots']->set(
                                     <table class="table table-bordered table-striped mb-0">
                                         <tbody>
                                         <?php foreach ($fields[$group] as $field) : ?>
-                                            <tr>
-                                                <td width="20%"><span class="fw-b"><?php echo $view->escape($field['label']); ?></span>
-                                                </td>
-                                                <td>
-                                                    <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)) : ?>
-                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
-                                                    <span class="mt-1"><?php echo $view->escape($field['value']); ?>
-                                                    <?php else : ?>
-                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']) : ?>
-                                                            <?php echo implode(', ', $field['value']); ?>
-                                                        <?php elseif (is_string($field['value']) && 'url' === $field['type']) : ?>
-                                                            <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
+                                            <?php if (isset($field['value'])): ?>
+                                                <tr>
+                                                    <td width="20%"><span class="fw-b"><?php echo $view->escape($field['label']); ?></span>
+                                                    </td>
+                                                    <td>
+                                                        <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)) : ?>
+                                                        <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
+                                                        <span class="mt-1"><?php echo $view->escape($field['value']); ?>
+                                                            <?php else : ?>
+                                                                <?php if (is_array($field['value']) && 'multiselect' === $field['type']) : ?>
+                                                                    <?php echo implode(', ', $field['value']); ?>
+                                                                <?php elseif (is_string($field['value']) && 'url' === $field['type']) : ?>
+                                                                    <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
                                                                 <?php echo $field['value']; ?>
                                                             </a>
-                                                        <?php else : ?>
-                                                            <?php echo $view->escape($field['normalizedValue']); ?>
-                                                        <?php endif; ?>
-                                                    <?php endif; ?>
-                                                </td>
-                                            </tr>
+                                                                <?php else : ?>
+                                                                    <?php echo $view->escape($field['normalizedValue']); ?>
+                                                                <?php endif; ?>
+                                                            <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                         </tbody>
                                     </table>
@@ -236,10 +238,9 @@ $view['slots']->set(
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="mt-sm points-panel text-center">
                 <h1>
-                    <?php echo $view['translator']->transChoice(
+                    <?php echo $view['translator']->trans(
                         'mautic.company.score.count',
-                        $company->getScore(),
-                        ['%score%' => $company->getScore()]
+                        ['%count%' => $company->getScore()]
                     ); ?>
                 </h1>
                 <hr/>
@@ -251,7 +252,7 @@ $view['slots']->set(
             </div>
             <div class="panel-body pt-sm">
             <?php if ($company->getOwner()) : ?>
-                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.company.field.owner'); ?></h6>
                 <p class="text-muted"><?php echo $view->escape($company->getOwner()->getName()); ?></p>
             <?php endif; ?>
 

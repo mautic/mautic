@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle;
 
 /**
@@ -126,4 +117,15 @@ final class DynamicContentEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.dwc.on_campaign_trigger_action';
+
+    /**
+     * The mautic.dwc.on_contact_filters_evaluate event is fired when dynamic content's decision's
+     * filters need to be evaluated.
+     *
+     * The event listener receives a
+     * Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent
+     *
+     * @var string
+     */
+    const ON_CONTACTS_FILTER_EVALUATE = 'mautic.dwc.on_contact_filters_evaluate';
 }

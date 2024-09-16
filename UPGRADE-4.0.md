@@ -6,6 +6,14 @@
 *   Symfony 4
     *   Symfony deprecations were removed or refactored [https://github.com/symfony/symfony/blob/4.4/UPGRADE-4.0.md](https://github.com/symfony/symfony/blob/4.4/UPGRADE-4.0.md)
     *   Services are now private by default in Symfony 4. Mautic has a "hack" to register its own services as public but dependency injection should be preferred for Commands, Controllers, and services. Some Symfony services may no longer be available to the Controller via the Container.
+    *   \Mautic\CoreBundle\Form\Type\YesNoButtonGroupType now uses false/true values which Symfony 4 will convert to empty values for No in the UI. This shouldn't cause issues for most unless the field is using a NotBlank constraint, which is no longer valid, or submitting a form via a functional test with 0 as the value of a YesNoButtonGroupType field. 
+*   **Important note about PHP vs Twig templates**
+    
+    Until recently, Symfony supported two templating engines: PHP and Twig. Mautic is pretty much exclusively built using the PHP templating engine. However, this engine was [officially deprecated in Symfony 4.3](https://symfony.com/doc/4.4/templating/PHP.html) and has been removed in Symfony 5.
+    
+    Starting with Mautic 4.3, we'd like new internal bundles **as well as new plugins** to be built in Twig. Mautic 4.3 introduces a working `MauticCoreBundle:Default:content.html.twig` alongside the already existing `MauticCoreBundle:Default:content.html.php` that can be extended by bundle or plugin authors.
+
+    Later on in the Mautic 4 development lifecycle, the aim will be to slowly migrate exiting bundles from the PHP templating engine over to Twig. The good thing is that both engines can co-exist until we upgrade to Symfony 5 at some point in the future, so we can migrate bundles and plugins one by one.
 *   Packages removed
     *   debril/rss-atom-bundle removed
     *   egeloen/ordered-form-bundle removed
@@ -78,5 +86,3 @@
 
 *   Misc
     * Second constructor argument of `\Mautic\CoreBundle\Doctrine\Provider\VersionProvider` has been removed as it's no longer necessary.
-    
-=======

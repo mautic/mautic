@@ -69,6 +69,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         $integrationObject = $this->integrationHelper
             ->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
         $this->io          = new SymfonyStyle($input, $output);
+        $this->io->warning(PipedriveIntegration::DEPRECATION_MESSAGE);
 
         $pushed = 0;
 
