@@ -92,8 +92,8 @@
           transition: var(--transition-all-productive);
         }
 
-        &:hover { 
-          background-color: transparent; 
+        &:hover {
+          background-color: transparent;
           color: var(--text-primary);
 
           &:after { background-color: var(--layer-accent-hover); }
@@ -121,8 +121,15 @@
         &:hover { background-color: var(--layer-accent-hover);}
       }
 
-      &.active {
-        > a { background-color: var(--layer); }
+      &.active { > a { background-color: var(--layer); } }
+      &.disabled {
+        cursor: not-allowed;
+        color: var(--text-disabled);
+        > a {
+          background-color: var(--button-disabled);
+          pointer-events: none;
+
+        }
       }
     }
   }
