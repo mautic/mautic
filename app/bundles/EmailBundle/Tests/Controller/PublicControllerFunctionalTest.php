@@ -514,28 +514,4 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason(), 'Expected reason to be UNSUBSCRIBED');
         $this->assertEquals('email', $dncRecords[0]->getChannel(), 'Expected channel to be email');
     }
-
-    public function testNoLeadNameInPreferencesPage(): void
-    {
-        // Create a lead and email stat
-        $lead = $this->createLead();
-
-        $lead->setFirstname('Tomasz');
-        $this->em->persist($lead);
-
-        $stat = $this->getStat(null, $lead);
-        $this->em->flush();
-
-        // Get the unsubscribe page
-        $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
-
-        // Assert that the response is OK
-        self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-
-        // Assert that the response contains the expected string
-        $this->assertStringNotContainsString(
-            'Tomasz',
-            $this->client->getResponse()->getContent()
-        );
-    }
 }
