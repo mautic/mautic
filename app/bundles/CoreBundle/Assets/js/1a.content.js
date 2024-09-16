@@ -659,9 +659,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
         mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-ltr');
         });
-        mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
-            mQuery("html").removeClass('sidebar-open-rtl');
-        });
     }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
@@ -844,11 +841,6 @@ Mautic.onPageUnload = function (container, response) {
                 ckEditors.clear();
             }
         }
-
-        //turn off shuffle events
-        mQuery('html')
-            .off('fa.sidebar.minimize')
-            .off('fa.sidebar.maximize');
 
         mQuery(container + " input[data-toggle='color']").each(function() {
             mQuery(this).minicolors('destroy');
@@ -1824,3 +1816,18 @@ Mautic.processCsvContactExport = function (route) {
         }
     });
 };
+
+/**
+ * Applies a quick filter to a list based on the selected element's data-filter attribute
+ *
+ * @param {HTMLElement} element
+ */
+Mautic.listQuickFilter = function (element) {
+    const filterValue = element.dataset.filter;
+    const searchInput = document.getElementById('list-search');
+    searchInput.value = filterValue;
+    const enterKeyEvent = new KeyboardEvent('keyup', {
+        keyCode: 13
+    });
+    searchInput.dispatchEvent(enterKeyEvent);
+}
