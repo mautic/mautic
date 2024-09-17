@@ -153,7 +153,7 @@
           <hr class="hr-w-2" style="width:50%">
 
           {# we can leverage data from audit_log table and build activity feed from it #}
-          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
               <!-- recent activity -->
               {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
           </div>
