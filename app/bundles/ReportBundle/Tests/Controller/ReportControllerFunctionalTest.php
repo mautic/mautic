@@ -66,7 +66,6 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $report = $this->createReport('Report Most Visited Pages', 'page.hits', []);
         $report->setColumns(['p.title', 'p.hits']);
-        $report->setGraphs(['mautic.email.table.most.emails.clicks']);
         $this->em->persist($report);
         $this->em->flush();
 
