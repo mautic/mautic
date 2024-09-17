@@ -226,6 +226,16 @@ export default class BuilderService {
     return this.editor;
   }
 
+  mjmlToHtml(mjml) {
+      const converted = MjmlService.mjmlToHtml(mjml);
+
+      if (0 === converted.errors.length) {
+          return converted.html;
+      }
+
+      return '';
+  }
+
   initEmailMjml() {
     const components = MjmlService.getOriginalContentMjml();
     // validate

@@ -208,6 +208,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
+    private ?EmailDraft $draft = null;
+
     private bool $isCloned = false;
 
     /**
@@ -236,6 +238,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
+        $this->setDraft(null);
 
         parent::__clone();
     }
@@ -333,6 +336,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('headers', Types::JSON);
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
+
+        $builder->createOneToOne('draft', EmailDraft::class)
+            ->mappedBy('email')
+            ->fetchExtraLazy()
+            ->cascadeAll()
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -1254,6 +1263,35 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $this->initListChanges($property);
         $this->changes[$property][1] = array_diff($this->changes[$property][1], [$id]);
+    }
+
+    public function getDraft(): ?EmailDraft
+    {
+        return $this->draft;
+    }
+
+    public function setDraft(?EmailDraft $draft): void
+    {
+        $this->draft = $draft;
+    }
+
+    public function hasDraft(): bool
+    {
+        if (is_null($this->getDraft())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getDraftContent(): ?string
+    {
+        $content = null;
+        if (true === $this->hasDraft()) {
+            $content = $this->getDraft()->getHtml();
+        }
+
+        return $content;
     }
 
     /**

@@ -2,13 +2,19 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event as Events;
+use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
+use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
@@ -24,7 +30,9 @@ class EmailSubscriber implements EventSubscriberInterface
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
         private EmailModel $emailModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
+        private EntityManager $entityManager,
+        private EmailDraftModel $emailDraftModel
     ) {
     }
 
@@ -37,13 +45,15 @@ class EmailSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
+            EmailEvents::ON_EMAIL_EDIT_SUBMIT => ['manageEmailDraft'],
+            EmailEvents::EMAIL_PRE_DELETE     => ['deleteEmailDraft'],
         ];
     }
 
     /**
      * Add an entry to the audit log.
      */
-    public function onEmailPostSave(Events\EmailEvent $event): void
+    public function onEmailPostSave(EmailEvent $event): void
     {
         $email = $event->getEmail();
         if ($details = $event->getChanges()) {
@@ -82,7 +92,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onEmailDelete(Events\EmailEvent $event): void
+    public function onEmailDelete(EmailEvent $event): void
     {
         $email = $event->getEmail();
         $log   = [
@@ -147,5 +157,77 @@ class EmailSubscriber implements EventSubscriberInterface
         }
 
         $this->emailModel->saveEmailStat($stat);
+    }
+
+    public function manageEmailDraft(EmailEditSubmitEvent $event): void
+    {
+        $liveEmail   = $event->getPreviousEmail();
+        $editedEmail = $event->getCurrentEmail();
+
+        if (
+            ((true === $event->isSaveAndClose()) || (true === $event->isApply()))
+            && $editedEmail->hasDraft()
+        ) {
+            $emailDraft = $editedEmail->getDraft();
+            $emailDraft->setHtml($editedEmail->getCustomHtml());
+            $emailDraft->setTemplate($editedEmail->getTemplate());
+            $editedEmail->setCustomHtml($liveEmail->getCustomHtml());
+            $editedEmail->setTemplate($liveEmail->getTemplate());
+            $this->entityManager->persist($emailDraft);
+            $this->entityManager->persist($editedEmail);
+        }
+
+        if (true === $event->isSaveAsDraft()) {
+            $emailDraft = $this
+                ->emailDraftModel
+                ->createDraft($editedEmail, $editedEmail->getCustomHtml(), $editedEmail->getTemplate());
+
+            $editedEmail->setCustomHtml($liveEmail->getCustomHtml());
+            $editedEmail->setTemplate($liveEmail->getTemplate());
+            $editedEmail->setDraft($emailDraft);
+            $this->emailModel->saveEntity($editedEmail);
+        }
+
+        if (true === $event->isDiscardDraft()) {
+            $this->revertEmailModifications($liveEmail, $editedEmail);
+            $this->emailDraftModel->deleteDraft($editedEmail);
+            $editedEmail->setDraft(null);
+            $this->entityManager->persist($editedEmail);
+        }
+
+        if (true === $event->isApplyDraft()) {
+            $this->emailDraftModel->deleteDraft($editedEmail);
+            $editedEmail->setDraft(null);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function deleteEmailDraft(EmailEvent $event): void
+    {
+        try {
+            $this->emailDraftModel->deleteDraft($event->getEmail());
+        } catch (NotFoundHttpException) {
+            // No associated draft found for deletion. We have nothing to do here. Return.
+            return;
+        }
+    }
+
+    private function revertEmailModifications(Email $liveEmail, Email $editedEmail): void
+    {
+        $liveEmailReflection   = new \ReflectionObject($liveEmail);
+        $editedEmailReflection = new \ReflectionObject($editedEmail);
+        foreach ($liveEmailReflection->getProperties() as $property) {
+            if (in_array($property->getName(), ['id', 'emailType'])) {
+                continue;
+            }
+
+            $property->setAccessible(true);
+            $name                = $property->getName();
+            $value               = $property->getValue($liveEmail);
+            $editedEmailProperty = $editedEmailReflection->getProperty($name);
+            $editedEmailProperty->setAccessible(true);
+            $editedEmailProperty->setValue($editedEmail, $value);
+        }
     }
 }
