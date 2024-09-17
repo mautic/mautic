@@ -709,6 +709,18 @@
 @secondary-80: darken(@secondary-color, 20%);
 @secondary-90: darken(@secondary-color, 30%);
 
+/// CKEditor
+:root,
+:root[theme="dark"],
+:root[theme="solarized-dark"],
+:root[theme="solarized-light"] {
+    --ck-color-base-background: var(--background);
+    --ck-color-text: var(--text-primary);
+    --ck-color-base-border: var(--border-subtle);
+    --ck-color-button-default-hover-background: var(--background-hover);
+    --ck-color-focus-border: var(--focus);
+}
+
 :root {
 --primary-20: @primary-20;
 --primary-30: @primary-30;
