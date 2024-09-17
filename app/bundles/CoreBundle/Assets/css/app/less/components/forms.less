@@ -417,22 +417,22 @@ input[type=file].form-control {
     margin: 0;
     border-radius: 50%;
     border: 1px solid var(--icon-primary, #161616);
-    transition: 0.2s all linear;
     outline-offset: -1px;
     margin-right: 4px;
-    .outline();
+    .transition(var(--transition-all-productive));
+    .outline-noff();
 
     &:checked {
       &:before {
         position: relative;
-    display: inline-block;
-    border-radius: 50%;
-    background-color: var(--icon-primary, #161616);
-    block-size: 100%;
-    content: "";
-    inline-size: 100%;
-    -webkit-transform: scale(.5);
-    transform: scale(.5);
+        display: inline-block;
+        border-radius: 50%;
+        background-color: var(--icon-primary, #161616);
+        block-size: 100%;
+        content: "";
+        inline-size: 100%;
+        -webkit-transform: scale(.5);
+        transform: scale(.5);
       }
     }
   }
@@ -474,10 +474,36 @@ input[type=file].form-control {
 }
 
 input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
+  aspect-ratio: 1 / 1;
+  height: 16px;
   vertical-align: -3px;
-  accent-color: var(--text-primary);
+  background-color: transparent;
+  appearance: none;
+  border: 1px solid var(--icon-primary);
+  border-radius: 2px;
+  .transition(var(--transition-all-productive));
+  .outline-noff();
+
+  &:checked {
+    background-color: var(--icon-primary);
+    &:after {
+      -webkit-transform: scale(1) rotate(-45deg);
+      transform: scale(.5) rotate(-45deg);
+      position: absolute;
+      background: 0 0;
+      block-size: 0.3125em;
+      border-block-end: 2px solid var(--icon-inverse, #ffffff);
+      border-inline-start: 2px solid var(--icon-inverse, #ffffff);
+      content: "";
+      inline-size: 2.3625em;
+      inset-block-start: 0.00625em;
+      inset-inline-start: -0.2075em;
+      margin-block-start: -0.1875em;
+      transform-origin: bottom right;
+      height: 13px;
+      aspect-ratio: 1 / 1;
+    }
+  }
 }
 
 // time input (3 select boxes hh:mm:ss)

@@ -268,6 +268,17 @@
   &:focus, &.focus { outline: 2px solid var(--focus); }
 }
 
+.outline-noff() {
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  &:hover { outline: 2px solid transparent; }
+  &:active, &.active,
+  &:focus, &.focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+  }
+}
+
 // Alerts
 
 .alert-variant(@background; @border; @text-color) {
