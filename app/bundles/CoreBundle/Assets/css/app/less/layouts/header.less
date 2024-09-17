@@ -70,7 +70,6 @@
         .icon-bar {
           margin-left: auto;
           margin-right: auto;
-          background-color: fade(contrast(@header-bg), 60%);
           height: 2px;
           width: 18px;
           border-radius: 0;
@@ -106,7 +105,7 @@
 
         // `navbar-nav` anchor
         > a {
-          color: fade(contrast(@header-bg), 60%);
+          color: var(--text-primary);
           line-height: @header-height;
           padding-top: 0;
           padding-bottom: 0;
@@ -161,14 +160,14 @@
           // interaction
           // -------------------------
           &:hover {
-            color: fade(contrast(@header-bg), 70%);
+            color: var(--text-primary);
             background-color: transparent;
           }
           &:active,
           &:focus,
           &.active {
-            color: fade(contrast(@header-bg), 70%);
-            background-color: darken(@header-bg, 4%);
+            color: var(--text-primary);
+            background-color: var(--background-hover);
           }
         }
       }
@@ -225,14 +224,14 @@
 
         // `navbar-nav` anchor
         > a {
-          color: fade(contrast(@header-bg), 70%);
-          background-color: darken(@header-bg, 4%);
+          color: var(--text-primary);
+          background-color: var(--background-hover);
 
           // interaction
           &:hover,
           &:focus {
-            color: fade(contrast(@header-bg), 70%);
-            background-color: darken(@header-bg, 4%);
+            color: var(--text-primary);
+            background-color: var(--background-hover);
           }
 
           // badge & bullet
@@ -240,7 +239,7 @@
           > .badge,
           > .bullet,
           > .label {
-            .box-shadow(0 0 0 2px darken(@header-bg, 4%));
+            .box-shadow(0 0 0 2px var(--background-hover));
           }
         }
       }
@@ -277,14 +276,14 @@
         margin-bottom: ((@header-height - @input-height-base) / 2);
 
         // reset fontawesome color
-        .fa { color: fade(contrast(@header-bg), 60%); }
+        .fa { color: var(--text-primary); }
       }
 
       // `form-control` reset
       .form-control {
-        background-color: fade(contrast(@header-bg), 8%);
+        background-color: var(--background-hover);
         border-color: transparent;
-        .placeholder(fade(contrast(@header-bg), 50%));
+        .placeholder(var(--text-placeholder));
       }
     }
 

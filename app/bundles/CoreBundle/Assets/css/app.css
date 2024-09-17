@@ -130,7 +130,7 @@ body > #app-wrapper {
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
-  background-color: #ffffff;
+  background-color: var(--background);
   float: left;
   z-index: 1005;
   min-height: 48px;
@@ -171,7 +171,6 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-header .navbar-toggle .icon-bar {
   margin-left: auto;
   margin-right: auto;
-  background-color: rgba(0, 0, 0, 0.6);
   height: 2px;
   width: 18px;
   border-radius: 0;
@@ -202,7 +201,7 @@ body > #app-wrapper {
   float: left;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-primary);
   line-height: 48px;
   padding-top: 0;
   padding-bottom: 0;
@@ -230,8 +229,8 @@ body > #app-wrapper {
   height: 16px;
   min-width: 16px;
   border-radius: 16px;
-  -webkit-box-shadow: 0 0 0 2px #ffffff;
-  box-shadow: 0 0 0 2px #ffffff;
+  -webkit-box-shadow: 0 0 0 2px var(--background);
+  box-shadow: 0 0 0 2px var(--background);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .badge.pull-right,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .label.pull-right {
@@ -243,22 +242,22 @@ body > #app-wrapper {
   z-index: 1;
   top: 12px;
   right: 15px;
-  -webkit-box-shadow: 0 0 0 2px #ffffff;
-  box-shadow: 0 0 0 2px #ffffff;
+  -webkit-box-shadow: 0 0 0 2px var(--background);
+  box-shadow: 0 0 0 2px var(--background);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .bullet.pull-right {
   left: auto;
   right: 4px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--text-primary);
   background-color: transparent;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:active,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:focus,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a.active {
-  color: rgba(0, 0, 0, 0.7);
-  background-color: #f5f5f5;
+  color: var(--text-primary);
+  background-color: var(--background-hover);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav img,
 #app-header.navbar .navbar-nocollapse .navbar-nav .img-wrapper {
@@ -297,22 +296,22 @@ body > #app-wrapper {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a {
-  color: rgba(0, 0, 0, 0.7);
-  background-color: #f5f5f5;
+  color: var(--text-primary);
+  background-color: var(--background-hover);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a:hover,
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a:focus {
-  color: rgba(0, 0, 0, 0.7);
-  background-color: #f5f5f5;
+  color: var(--text-primary);
+  background-color: var(--background-hover);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a > .badge,
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a > .bullet,
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a > .label {
-  -webkit-box-shadow: 0 0 0 2px #f5f5f5;
-  box-shadow: 0 0 0 2px #f5f5f5;
+  -webkit-box-shadow: 0 0 0 2px var(--background-hover);
+  box-shadow: 0 0 0 2px var(--background-hover);
 }
 #app-header.navbar .navbar-nocollapse .navbar-form {
-  background-color: #ffffff;
+  background-color: var(--background);
   padding-top: 0;
   padding-bottom: 0;
   margin: 0;
@@ -341,21 +340,21 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-form .form-group .fa,
 #app-header.navbar .navbar-nocollapse .navbar-form .input-group .fa {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-primary);
 }
 #app-header.navbar .navbar-nocollapse .navbar-form .form-control {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: var(--background-hover);
   border-color: transparent;
 }
 #app-header.navbar .navbar-nocollapse .navbar-form .form-control::-moz-placeholder {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--text-placeholder);
   opacity: 1;
 }
 #app-header.navbar .navbar-nocollapse .navbar-form .form-control:-ms-input-placeholder {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--text-placeholder);
 }
 #app-header.navbar .navbar-nocollapse .navbar-form .form-control::-webkit-input-placeholder {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--text-placeholder);
 }
 #app-header.navbar .navbar-nocollapse .navbar-left {
   float: left !important;
@@ -3513,7 +3512,6 @@ ul.dropdown-menu-form {
 }
 .stats-menu.stats-menu .date-range {
   padding: 5px;
-  background-color: #ffffff;
   border-top-left-radius: 3px;
 }
 .stats-menu.stats-menu + div {
