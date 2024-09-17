@@ -407,24 +407,34 @@ input[type=file].form-control {
   }
 
   input[type="radio"] {
-    width: 16px;
-    height: 16px;
+    height: 18px;
+    aspect-ratio: 1/1;
     vertical-align: top;
     margin-right: 4px;
     appearance: none;
     -webkit-appearance: none;
+    background-color: transparent;
     margin: 0;
-    border: 4px solid white;
     border-radius: 50%;
-    outline: 1px solid black;
+    border: 1px solid var(--icon-primary, #161616);
     transition: 0.2s all linear;
     outline-offset: -1px;
     margin-right: 4px;
-  }
+    .outline();
 
-  input[type="radio"]:checked {
-    background-color: black;
-
+    &:checked {
+      &:before {
+        position: relative;
+    display: inline-block;
+    border-radius: 50%;
+    background-color: var(--icon-primary, #161616);
+    block-size: 100%;
+    content: "";
+    inline-size: 100%;
+    -webkit-transform: scale(.5);
+    transform: scale(.5);
+      }
+    }
   }
 
   input[type="radio"]:hover {
