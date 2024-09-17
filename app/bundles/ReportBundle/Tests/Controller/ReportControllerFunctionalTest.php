@@ -488,6 +488,9 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
     }
 
+    /**
+     * @return array<int,array<int,mixed>>
+     */
     private function domTableToArray(Crawler $crawler): array
     {
         return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
