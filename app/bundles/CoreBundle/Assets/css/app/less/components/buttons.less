@@ -7,7 +7,7 @@
 // ---------------------
 .btn {
   transition: var(--transition-all-productive);
-  border: 1px solid var(--button-primary);
+  border: 1px solid transparent;
   .outline();
   border-radius: var(--border-radius-sm);
   display: inline-flex;
@@ -20,7 +20,7 @@
   gap: var(--spacing-03);
   justify-content: space-between;
   width: fit-content;
-  &:hover {border: 1px solid var(--button-primary-hover);}
+  &:hover {border: 1px solid transparent}
   &,
   &:active,
   &.active {
