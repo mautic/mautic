@@ -59,14 +59,14 @@
       transition: var(--transition-all-productive);
 
       em {
-        background: #feffde;
+        background: var(--layer-accent);
         font-style: normal;
       }
 
       &.group-result {
         display: list-item;
         cursor: default;
-        color: #999;
+        color: var(--text-primary);
         font-weight: bold;
       }
 
@@ -91,18 +91,18 @@
 
       &.disabled-result {
         display: list-item;
-        color: @gray-light;
+        color: var(--text-disabled);
       }
     }
 
     .no-results {
-      background: @gray-lighter;
+      background: var(--layer);
       display: list-item;
     }
   }
 
   .chosen-results-scroll {
-    background: white;
+    background: var(--layer);
     margin: 0 4px;
     position: absolute;
     text-align: center;
@@ -396,7 +396,7 @@
     .transition(@chosen-focus-transition);
 
     .search-field input[type="text"] {
-      color: #111 !important;
+      color: var(--text-primary) !important;
     }
   }
 
