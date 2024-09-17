@@ -56,28 +56,39 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testReportTableOrderColumn(): void
     {
-        $page  = $this->createPage('test page 1');
-        $page2 = $this->createPage('test page 2');
-        $page3 = $this->createPage('test page 3');
+        $page  = $this->createPage('test page 1', 15);
+        $page2 = $this->createPage('test page 2', 9);
+        $page3 = $this->createPage('test page 3', 30);
+
         $this->createHit($page);
         $this->createHit($page2);
         $this->createHit($page3);
-        $this->createHit(null);
 
-        $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
-            'mautic.page.table.most.visited.unique',
-            'mautic.page.table.most.visited',
-        ]);
+        $report = $this->createReport('Report Most Visited Pages', 'page.hits', []);
+        $report->setColumns(['p.title', 'p.hits']);
+        $report->setGraphs(['mautic.email.table.most.emails.clicks']);
+        $this->em->persist($report);
+        $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderBy=p.id');
+        $crawler = $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId());
 
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
         $this->assertSame([
-            ['test page 1', '0'],
-            ['test page 2', '0'],
-            ['test page 3', '0'],
+            ['1', 'test page 1', '15'],
+            ['2', 'test page 2', '9'],
+            ['3', 'test page 3', '30'],
+        ], array_slice($crawlerReportTable, 1, 3));
+
+        $crawler            = $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=p.hits');
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+        $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
+
+        $this->assertSame([
+            ['1', 'test page 2', '9'],
+            ['2', 'test page 1', '15'],
+            ['3', 'test page 3', '30'],
         ], array_slice($crawlerReportTable, 1, 3));
     }
 
@@ -499,10 +510,11 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         return $report;
     }
 
-    private function createPage(string $title): Page
+    private function createPage(string $title, int $hitCount=0): Page
     {
         $page = new Page();
         $page->setTitle($title);
+        $page->setHits($hitCount);
         $page->setAlias(str_replace(' ', '_', $title));
 
         $this->em->persist($page);
