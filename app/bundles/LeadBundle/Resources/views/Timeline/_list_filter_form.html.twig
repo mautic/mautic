@@ -27,6 +27,7 @@
                         {% endfor %}
                     </select>
                 </div>
+                {% if enableExportPermission %}
                 <div class="col-sm-2 mt-lg">
                     <a class="btn btn-default btn-block mt-lg" href="{{ url('mautic_contact_timeline_export_action', {'leadId': lead.id}) }}" data-toggle="download">
                         <span>
@@ -34,6 +35,7 @@
                         </span>
                     </a>
                 </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}

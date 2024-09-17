@@ -14,14 +14,16 @@ Mautic.leadOnLoad = function (container, response) {
         }
     }, 'contact pages');
 
-    Mautic.addKeyboardShortcut('t', 'Activate Table View', function(e) {
-        mQuery('#table-view').click();
+    Mautic.addKeyboardShortcut('v', 'Toggle View', function(e) {
+        if (mQuery('.shuffle-grid').length) {
+            // If the card view is currently active, switch to table view
+            mQuery('#table-view').click();
+        } else {
+            // If the table view is currently active, switch to card view
+            mQuery('#card-view').click();
+        }
     }, 'contact pages');
-
-    Mautic.addKeyboardShortcut('c', 'Activate Card View', function(e) {
-        mQuery('#card-view').click();
-    }, 'contact pages');
-
+    
     //Prevent single combo keys from initiating within lead note
     Mousetrap.stopCallback = function(e, element, combo) {
         if (element.id == 'leadnote_text' && combo != 'mod+enter') {
@@ -1025,7 +1027,7 @@ Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
 Mautic.toggleLeadSwitch = function(toggleId, query, action) {
     var toggleOn  = 'ri-toggle-fill text-success';
     var toggleOff = 'ri-toggle-line text-danger';
-    var spinClass = 'fa-spin fa-spinner ';
+    var spinClass = 'ri-spin ri-loader-3-line ';
 
     if (action == 'remove') {
         //switch it on
@@ -1149,7 +1151,7 @@ Mautic.reloadLeadImportProgress = function() {
 };
 
 Mautic.removeBounceStatus = function (el, dncId, channel) {
-    mQuery(el).removeClass('ri-close-line').addClass('fa-spinner fa-spin');
+    mQuery(el).removeClass('ri-close-line').addClass('ri-loader-3-line ri-spin');
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
@@ -1158,7 +1160,7 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
 };
 
 Mautic.removeTagFromLead = function (el, leadId, tagId) {
-    mQuery(el).removeClass('ri-close-line').addClass('fa-spinner fa-spin');
+    mQuery(el).removeClass('ri-close-line').addClass('ri-loader-3-line ri-spin');
 
     Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
         mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });

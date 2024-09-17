@@ -1269,7 +1269,7 @@ Mautic.getSlotToolbar = function(type) {
 
 Mautic.getSlotDeleteLink = function() {
     if (typeof Mautic.deleteLink == 'undefined') {
-        Mautic.deleteLink = mQuery('<a><i class="fa fa-lg ri-close-line"></i></a>')
+        Mautic.deleteLink = mQuery('<a><i class="ri-lg ri-close-line"></i></a>')
             .attr('data-slot-action', 'delete')
             .attr('alt', 'delete')
             .addClass('btn btn-delete btn-default');
@@ -1280,7 +1280,7 @@ Mautic.getSlotDeleteLink = function() {
 
 Mautic.getSlotCloneLink = function() {
     if (typeof Mautic.cloneLink == 'undefined') {
-        Mautic.cloneLink = mQuery('<a><i class="fa fa-lg ri-file-copy-line"></i></a>')
+        Mautic.cloneLink = mQuery('<a><i class="ri-lg ri-file-copy-line"></i></a>')
             .attr('data-slot-action', 'clone')
             .attr('alt', 'clone')
             .addClass('btn btn-clone btn-clone');

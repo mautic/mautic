@@ -2,8 +2,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormController;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
@@ -108,7 +108,7 @@ class TweetController extends FormController
             return '@MauticSocial/Tweet/form_modal.html.twig';
         }
 
-        return '@MauticSocial/'.$file;
+        return AbstractStandardFormController::getTemplateName($file);
     }
 
     /**
@@ -122,13 +122,6 @@ class TweetController extends FormController
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         return parent::editStandard($request, $objectId, $ignorePost);
-    }
-
-    public function viewAction($objectId): Response
-    {
-        return $this->forward('MauticPlugin\MauticSocialBundle\Controller\TweetController::editAction', [
-            'objectId' => $objectId,
-        ]);
     }
 
     /**
