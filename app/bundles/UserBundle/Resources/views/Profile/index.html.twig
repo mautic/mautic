@@ -64,31 +64,22 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <h3 id="personal-info" class="pt-20">{{ 'mautic.user.config.title.get_to_know_you'|trans }}
-                            </h3>
-                            <div class="text-muted small description pb-20">{{
-                                'mautic.user.config.personalize.interface.helper'|trans }}</div>
-                            {{ permissions.editName ? form_row(userForm.firstName) :
-                            form_row(userForm.firstName_unbound) }}
-                            {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound)
-                            }}
-                            {{ permissions.editPosition ? form_row(userForm.position) :
-                            form_row(userForm.position_unbound) }}
+                            <h3 id="personal-info" class="pt-20">{{ 'mautic.user.config.title.get_to_know_you'|trans }}</h3>
+                            <div class="text-muted small description pb-20">{{ 'mautic.user.config.personalize.interface.helper'|trans }}</div>
+                            {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
+                            {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
+                            {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
                             {{ form_row(userForm.signature) }}
 
                             <h3 id="locale" class="pt-20">{{ 'mautic.user.config.title.locale'|trans }}</h3>
-                            <div class="text-muted small description pb-20">{{
-                                'mautic.user.config.region.preferences.helper'|trans }}</div>
+                            <div class="text-muted small description pb-20">{{ 'mautic.user.config.region.preferences.helper'|trans }}</div>
                             {{ form_row(userForm.timezone) }}
                             {{ form_row(userForm.locale) }}
                         </div>
                         <div class="col-md-6">
-                            <h3 id="security" class="pt-20">{{ 'mautic.user.config.title.account_data_security'|trans }}
-                            </h3>
-                            <div class="text-muted small description pb-20">{{
-                                'mautic.user.config.account.security.helper'|trans }}</div>
-                            {{ permissions.editUsername ? form_row(userForm.username) :
-                            form_row(userForm.username_unbound) }}
+                            <h3 id="security" class="pt-20">{{ 'mautic.user.config.title.account_data_security'|trans }}</h3>
+                            <div class="text-muted small description pb-20">{{ 'mautic.user.config.account.security.helper'|trans }}</div>
+                            {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
                             {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
                             {{ form_row(userForm.plainPassword.password) }}
                             {{ form_row(userForm.plainPassword.confirm) }}
@@ -183,16 +174,14 @@
                         <div class="col-xs-12 mb-lg">
                             <h3 class="pt-20 mb-md">{{ 'mautic.user.account.accessibility.appearance'|trans }}</h3>
                             <h4>{{ 'mautic.user.account.accessibility.smooth_color_transitions'|trans }}</h4>
-                            <div class="help-block">{{
-                                'mautic.user.account.accessibility.smooth_color_transitions_help'|trans }}</div>
+                            <div class="help-block">{{ 'mautic.user.account.accessibility.smooth_color_transitions_help'|trans }}</div>
                             <div class="radio-group">
                                 <div class="radio-option">
                                     <input type="radio" id="transitions-enabled" name="reduce-motion" value="false"
                                         data-attribute-toggle="reduce-motion" data-attribute-value="false" checked>
                                     <label for="transitions-enabled">
                                         <strong>{{ 'mautic.user.account.accessibility.enabled'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.transitions_enabled_description'|trans }}
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.transitions_enabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -201,25 +190,21 @@
                                         data-attribute-toggle="reduce-motion" data-attribute-value="true">
                                     <label for="transitions-disabled">
                                         <strong>{{ 'mautic.user.account.accessibility.disabled'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.transitions_disabled_description'|trans
-                                            }}</div>
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.transitions_disabled_description'|trans }}</div>
                                     </label>
                                 </div>
                             </div>
                             <hr>
 
                             <h4>{{ 'mautic.user.account.accessibility.borders_outline_style'|trans }}</h4>
-                            <div class="help-block">{{
-                                'mautic.user.account.accessibility.borders_outline_style_help'|trans }}</div>
+                            <div class="help-block">{{ 'mautic.user.account.accessibility.borders_outline_style_help'|trans }}</div>
                             <div class="radio-group">
                                 <div class="radio-option">
                                     <input type="radio" id="borders-disabled" name="contrast-borders" value="false"
                                         data-attribute-toggle="contrast-borders" data-attribute-value="false" checked>
                                     <label for="borders-disabled">
                                         <strong>{{ 'mautic.user.account.accessibility.disabled'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.borders_disabled_description'|trans }}
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.borders_disabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -228,16 +213,14 @@
                                         data-attribute-toggle="contrast-borders" data-attribute-value="true">
                                     <label for="borders-enabled">
                                         <strong>{{ 'mautic.user.account.accessibility.enabled'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.borders_enabled_description'|trans }}
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.borders_enabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
                             </div>
                             <hr>
                             <h4>{{ 'mautic.user.account.accessibility.reduce_transparency_blur'|trans }}</h4>
-                            <div class="help-block">{{
-                                'mautic.user.account.accessibility.reduce_transparency_blur_help'|trans }}</div>
+                            <div class="help-block">{{ 'mautic.user.account.accessibility.reduce_transparency_blur_help'|trans }}</div>
                             <div class="radio-group">
                                 <div class="radio-option">
                                     <input type="radio" id="transparency-normal" name="reduce-transparency"
@@ -245,8 +228,7 @@
                                         data-attribute-value="false" checked>
                                     <label for="transparency-normal">
                                         <strong>{{ 'mautic.user.account.accessibility.normal'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.transparency_normal_description'|trans }}
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.transparency_normal_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -256,9 +238,7 @@
                                         data-attribute-value="true">
                                     <label for="transparency-reduced">
                                         <strong>{{ 'mautic.user.account.accessibility.reduced'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.transparency_reduced_description'|trans
-                                            }}</div>
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.transparency_reduced_description'|trans }}</div>
                                     </label>
                                 </div>
                             </div>
@@ -273,8 +253,7 @@
                                         data-attribute-toggle="enable-underlines" data-attribute-value="false" checked>
                                     <label for="underlines-disabled">
                                         <strong>{{ 'mautic.user.account.accessibility.disabled'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.underlines_disabled_description'|trans }}
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.underlines_disabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -283,8 +262,7 @@
                                         data-attribute-toggle="enable-underlines" data-attribute-value="true">
                                     <label for="underlines-enabled">
                                         <strong>{{ 'mautic.user.account.accessibility.enabled'|trans }}</strong>
-                                        <div class="description text-help">{{
-                                            'mautic.user.account.accessibility.underlines_enabled_description'|trans }}
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.underlines_enabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
