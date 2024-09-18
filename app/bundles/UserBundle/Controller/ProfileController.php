@@ -23,6 +23,14 @@ class ProfileController extends FormController
         /** @var UserModel $model */
         $model = $this->getModel('user');
 
+        // Get the AuditLog model
+        /** @var \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel */
+        $auditLogModel      = $this->getModel('core.auditlog');
+        $auditLogRepository = $auditLogModel->getRepository();
+
+        // Fetch recent activity for the current user with a limit of 100
+        $userActivity = $auditLogRepository->getLogsForUser($me, 150);
+
         // set some permissions
         $permissions = [
             'apiAccess' => ($this->coreParametersHelper->get('api_enabled')) ?
@@ -223,6 +231,7 @@ class ProfileController extends FormController
             'me'                => $me,
             'userForm'          => $form->createView(),
             'authorizedClients' => $this->forward('Mautic\ApiBundle\Controller\ClientController::authorizedClientsAction')->getContent(),
+            'logs'              => $userActivity,
         ];
 
         return $this->delegateView(

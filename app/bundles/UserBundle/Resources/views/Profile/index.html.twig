@@ -43,6 +43,11 @@
                 <li class="list-group-item">
                     <a href="#accessibility" class="list-group-item-text steps" data-toggle="tab">{{ 'mautic.user.account.accessibility'|trans }}</a>
                 </li>
+
+                <li class="list-group-item">
+                    <a href="#myactivity" class="list-group-item-text steps" data-toggle="tab">{{
+                        'mautic.user.account.myactivity'|trans }}</a>
+                </li>
             </ul>
 
         </div>
@@ -198,6 +203,16 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="myactivity">
+                    <div class="row pa-md bg-light-xs bdr-b">
+                        <h4 class="fw-sb">{{ 'mautic.user.account.myactivity'|trans }}</h4>
+                    </div>
+                    <div class="row">
+                        {{ include('@MauticUser/Profile/my_activity.html.twig')}}
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

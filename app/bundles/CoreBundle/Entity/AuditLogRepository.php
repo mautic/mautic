@@ -237,10 +237,8 @@ class AuditLogRepository extends CommonRepository
     public function getLogsForUser(User $user, int $limit = 15): array
     {
         $query = $this->createQueryBuilder('al')
-            ->select('al.userName, al.userId, al.bundle, al.object,
-            al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
-            ->where('al.bundle = \'user\'')
-            ->andWhere('al.userId = :user_id')
+            ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
+            ->where('al.userId = :user_id')
             ->setParameter('user_id', $user->getId())
             ->orderBy('al.dateAdded', 'DESC')
             ->setMaxResults($limit);

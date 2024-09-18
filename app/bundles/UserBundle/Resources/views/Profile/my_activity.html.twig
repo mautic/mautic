@@ -1,0 +1,76 @@
+<table class="table">
+    <tbody>
+    {% if logs is defined and logs is not empty %}
+        {% for log in logs %}
+            <tr>
+                <td>
+                    <!-- First line: username – translated object and action -->
+                    <strong>
+                        {% set username = log.userName is defined ? log.userName : 'Unknown User' %}
+                        {{ username }} – {{ log.object is defined ? log.object : '' }}.{{ log.action is defined ? log.action : '' }}
+                    </strong>
+                    <br>
+                    <!-- Second line: humanized description based on context -->
+                    {% set object_name = (log.details is defined and log.details['name'] is defined and log.details['name'][1] is defined) ? log.details['name'][1] : '' %}
+
+                    {% if log.action == 'create' %}
+                        {% if object_name != '' %}
+                            {{ 'mautic.user.account.log.create'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+                        {% else %}
+                            {{ 'mautic.user.account.log.create.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
+                        {% endif %}
+
+                    {% elseif log.action == 'update' %}
+                        {% if object_name != '' %}
+                            {{ 'mautic.user.account.log.update'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+                        {% else %}
+                            {{ 'mautic.user.account.log.update.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
+                        {% endif %}
+
+                    {% elseif log.action == 'delete' %}
+                        {% if object_name != '' %}
+                            {{ 'mautic.user.account.log.delete'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+                        {% else %}
+                            {{ 'mautic.user.account.log.delete.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
+                        {% endif %}
+
+                    {% elseif log.action == 'send' %}
+                        {% set subject = (log.details is defined and log.details['subject'] is defined) ? log.details['subject'] : '' %}
+                        {{ 'mautic.user.account.log.send'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': subject}) }}
+
+                    {% elseif log.action == 'login' %}
+                        {{ 'mautic.user.account.log.login'|trans }}
+
+                    {% elseif log.action == 'logout' %}
+                        {{ 'mautic.user.account.log.logout'|trans }}
+
+                    {% elseif log.action == 'failed_login' %}
+                        {{ 'mautic.user.account.log.failed_login'|trans }}
+
+                    {% elseif log.action == 'publish' %}
+                        {{ 'mautic.user.account.log.publish'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+
+                    {% elseif log.action == 'unpublish' %}
+                        {{ 'mautic.user.account.log.unpublish'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+
+                    {% elseif log.action == 'start' %}
+                        {{ 'mautic.user.account.log.start'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+
+                    {% elseif log.action == 'submit' %}
+                        {{ 'mautic.user.account.log.submit'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+
+                    {% endif %}
+                    <br>
+                    <!-- Third line: formatted date -->
+                    <small>{{ log.dateAdded is defined ? dateToFull(log.dateAdded) : '' }} - {{ log.ipAddress is defined ? log.ipAddress : '' }}</small>
+
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>{{ 'mautic.core.no.log.available'|trans }}</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>
