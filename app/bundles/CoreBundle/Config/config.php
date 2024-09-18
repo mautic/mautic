@@ -127,7 +127,7 @@ return [
             ],
             'mautic.theme.menu.index' => [
                 'route'     => 'mautic_themes_index',
-                'iconClass' => 'ri-pantone-fill',
+                'iconClass' => 'ri-pantone-line',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
                 'parent'    => 'mautic.core.general',

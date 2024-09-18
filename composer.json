@@ -25,6 +25,10 @@
     "mautic/core-lib": "^5.0"
   },
   "require-dev": {
+    "codeception/codeception": "^5.1",
+    "codeception/module-asserts": "^3.0",
+    "codeception/module-db": "^3.1",
+    "codeception/module-webdriver": "^3.2",
     "friendsofphp/php-cs-fixer": "^3.14",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
@@ -131,6 +135,7 @@
       "@generate-assets"
     ],
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
+    "e2e-test": "bin/codecept run acceptance",
     "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=4G bin/phpstan analyse --ansi",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
@@ -141,7 +146,7 @@
   },
   "config": {
     "platform": {
-      "php": "8.0.2"
+      "php": "8.1.0"
     },
     "bin-dir": "bin",
     "component-dir": "media/assets",

@@ -18,7 +18,7 @@
 
 {% block content %}
 {% if isIndex %}
-<div class="panel panel-default bdr-t-wdh-0 mb-0">
+<div id="page-list-wrapper">
     {{- include('@MauticCore/Helper/list_toolbar.html.twig',
         {
             'searchValue' : searchValue,
@@ -113,11 +113,8 @@
                     <td class="visible-md visible-lg">
                         {% set category = item.getCategory() %}
                         {% set catName = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = category ? '#' ~ category.getColor() : 'inherit' %}
-                        <span style="white-space: nowrap;">
-                        <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> 
-                        <span>{{ catName }}</span>
-                        </span>
+                        {% set color = category ? '#' ~ category.getColor() : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>

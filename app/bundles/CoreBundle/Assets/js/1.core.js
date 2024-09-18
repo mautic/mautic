@@ -57,9 +57,35 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
+    initializeCodeBlocks();
 });
 
 mQuery( document ).ready(function() {
+    // Load user preferences for UI saved previously
+    const prefix = 'm-toggle-setting-';
+    Object.keys(localStorage)
+        .filter(key => key.startsWith(prefix))
+        .forEach(setting => {
+            const attributeName = setting.replace(prefix, '');
+            const value = localStorage.getItem(setting);
+
+            if (value) {
+                document.documentElement.setAttribute(attributeName, value);
+            }
+        });
+
+    // Handle radio button changes
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const attributeName = this.dataset.attributeToggle;
+                const newValue = this.dataset.attributeValue;
+                document.documentElement.setAttribute(attributeName, newValue);
+                localStorage.setItem(`${prefix}${attributeName}`, newValue);
+            }
+        });
+    });
+
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -82,7 +108,32 @@ mQuery( document ).ready(function() {
                 });
         }
     }, mauticSessionLifetime * 1000 / 2);
+
+    // Copy code block on click
+    mQuery(document).on('click', 'code', function() {
+        var $codeBlock = mQuery(this);
+        var $icon = $codeBlock.find('.copy-icon');
+        var $temp = mQuery('<textarea>');
+        mQuery('body').append($temp);
+        $temp.val($codeBlock.text()).select();
+        document.execCommand('copy');
+        $temp.remove();
+        $icon.removeClass('ri-clipboard-fill').addClass('ri-check-line');
+        setTimeout(function() {
+            $icon.removeClass('ri-check-line').addClass('ri-clipboard-fill');
+        }, 2000);
+    });
+    initializeCodeBlocks();
 });
+
+function initializeCodeBlocks() {
+    mQuery('code').each(function() {
+        var $codeBlock = mQuery(this);
+        if (!$codeBlock.find('.copy-icon').length) {
+            $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
+        }
+    });
+}
 
 if (typeof history != 'undefined') {
     //back/forward button pressed
@@ -128,43 +179,78 @@ var Mautic = {
      * Binds global keyboard shortcuts
      */
     bindGlobalKeyboardShortcuts: function () {
-        Mautic.addKeyboardShortcut('shift+d', 'Load the Dashboard', function (e) {
+        Mautic.addKeyboardShortcut('g d', 'Load the Dashboard', function (e) {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+c', 'Load Contacts', function (e) {
+        Mautic.addKeyboardShortcut('g c', 'Load Contacts', function (e) {
             mQuery('#mautic_contact_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
-            mQuery(".navbar-right a[data-toggle='sidebar']").click();
+        Mautic.addKeyboardShortcut('g e', 'Load Emails', function (e) {
+            mQuery('#mautic_email_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+n', 'Show Notifications', function (e) {
+        Mautic.addKeyboardShortcut('g f', 'Load Forms', function (e) {
+            mQuery('#mautic_form_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('g s', 'Load Segments', function (e) {
+            mQuery('#mautic_segment_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('g p', 'Load Segments', function (e) {
+            mQuery('#mautic_page_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('f m', 'Toggle Admin Menu', function (e) {
+            mQuery("#admin-menu").click();
+        });
+
+        Mautic.addKeyboardShortcut('f n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
+        Mautic.addKeyboardShortcut('f /', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
         });
 
-        Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
-            if (mQuery('.btn-undo').length) {
-                mQuery('.btn-undo').click();
-            }
+        Mautic.addKeyboardShortcut('/', 'Search current list', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mQuery('#list-search').focus();
         });
 
-        Mautic.addKeyboardShortcut('mod+shift+z', 'Redo change', function (e) {
-            if (mQuery('.btn-redo').length) {
-                mQuery('.btn-redo').click();
-            }
+        Mautic.addKeyboardShortcut('e', 'Edit current resource', function(e) {
+            mQuery('#edit').click();
+        });
+
+        Mautic.addKeyboardShortcut('c', 'Create current resource', function(e) {
+            mQuery('#new').click();
+        });
+
+        Mautic.addKeyboardShortcut(['del', 'meta+backspace'], 'Delete current resource', function(e) {
+            mQuery('#delete').click();
+        });
+
+        Mautic.addKeyboardShortcut('enter', 'Modal confirm action', function(e) {
+            mQuery('#confirm').click();
+        });
+
+        Mautic.addKeyboardShortcut('s', 'General send example button', function(e) {
+            mQuery('#sendEmailButton').click();
+        });
+
+        Mautic.addKeyboardShortcut('g i', 'Back to index (list)', function(e) {
+            mQuery('[id*="buttons_cancel"]').click();
+            mQuery('#close').click();
         });
 
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
         });
-        
+
     },
 
     /**
@@ -257,7 +343,7 @@ var Mautic = {
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
         if (!button.find('.ri-loader-3-line.ri-spin').length) {
-            button.append(mQuery('<i class="ri-loader-3-line ri-spin"></i>'));
+            button.append(mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>'));
         }
     },
 
@@ -278,7 +364,7 @@ var Mautic = {
      */
     activateLabelLoadingIndicator: function (el) {
         var labelSpinner = mQuery("label[for='" + el + "']");
-        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin"></i>');
+        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
