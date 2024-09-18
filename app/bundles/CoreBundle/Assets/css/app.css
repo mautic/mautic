@@ -137,8 +137,6 @@ body > #app-wrapper {
   border-width: 0;
   border-radius: 0;
   margin-bottom: 0;
-  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 .header-fixed #app-header.navbar {
   position: fixed;
@@ -4382,7 +4380,7 @@ input[type=file].form-control {
 }
 .radio-group input[type="radio"] {
   height: 18px;
-  aspect-ratio: 1/1;
+  width: 18px;
   vertical-align: top;
   appearance: none;
   -webkit-appearance: none;
@@ -4422,6 +4420,16 @@ input[type=file].form-control {
 .radio-group input[type="radio"]:hover {
   cursor: pointer;
   opacity: 0.7;
+}
+.radio-cards input[type="radio"] {
+  position: absolute;
+  top: 130px;
+}
+.radio-cards svg,
+.radio-cards img {
+  width: 228px;
+  height: 120px;
+  border-radius: 4px;
 }
 .radio-inline[class*=" custom"] label input + span,
 .radio[class*=" custom"] label input + span,
@@ -8668,7 +8676,7 @@ ul.media-list.media-list-feed div.media-body {
   --label-background-hover-brand-secondary: #1f7972;
   --label-border-brand-secondary: #14514c;
 }
-:root[theme=freire] {
+:root[theme="freire"] {
   --background: #1C1C2E;
   --background-hover: #232336;
   --background-active: #2A2A40;

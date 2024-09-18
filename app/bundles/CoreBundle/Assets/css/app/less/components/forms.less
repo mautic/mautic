@@ -408,7 +408,7 @@ input[type=file].form-control {
 
   input[type="radio"] {
     height: 18px;
-    aspect-ratio: 1/1;
+    width: 18px;
     vertical-align: top;
     margin-right: 4px;
     appearance: none;
@@ -440,6 +440,20 @@ input[type=file].form-control {
   input[type="radio"]:hover {
     cursor: pointer;
     opacity: 0.7;
+  }
+}
+
+.radio-cards {
+  input[type="radio"] {
+    position: absolute;
+    top: 130px;
+  }
+
+  svg,
+  img {
+    width: 228px;
+    height: 120px;
+    border-radius: 4px;
   }
 }
 
