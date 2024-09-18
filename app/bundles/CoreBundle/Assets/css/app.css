@@ -2001,10 +2001,6 @@ kbd {
 .alert:has(.btn) {
   align-items: center;
 }
-.nav-tabs-contained + .tab-content .alert,
-.nav-tabs-contained + * > .tab-content .alert {
-  background-color: var(--layer-alternate);
-}
 .alert-success {
   border-color: var(--support-success);
 }
@@ -3911,7 +3907,7 @@ label {
 .form-control,
 .chosen-container-single .chosen-single,
 .form-control.search.tt-input {
-  background-color: var(--field) !important;
+  background-color: var(--field);
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
   transition: var(--transition-all-productive);
@@ -3929,7 +3925,7 @@ label {
 .form-control:hover,
 .chosen-container-single .chosen-single:hover,
 .form-control.search.tt-input:hover {
-  background-color: var(--field-hover) !important;
+  background-color: var(--field-hover);
 }
 .form-control:focus,
 .chosen-container-single .chosen-single:focus,
@@ -7649,6 +7645,18 @@ a.inline-token .text-muted {
 .map-options__item.btn.active:focus {
   outline: 0 !important;
 }
+.modal-content {
+  border-radius: var(--border-radius-lg);
+  box-shadow: none;
+}
+.form-type-modal-backdrop {
+  background-color: var(--background) !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(10px);
+}
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
 .accordion {
   --layout-density-padding-inline-local: 16px;
   padding: 0;
@@ -8921,4 +8929,23 @@ ul.media-list.media-list-feed div.media-body {
 :root[enable-underlines="true"] .accordion-title:hover,
 :root[enable-underlines="true"] td a:not(.label):not([class*="dropdown-"]):not(.dropdown-menu a):hover {
   text-decoration: underline;
+}
+.modal-content > *,
+.tile > *,
+.nav-tabs-contained + .tab-content > *,
+.nav-tabs-contained + form > .tab-content > * {
+  --layer: var(--layer-alternate);
+  --layer-hover: var(--layer-hover-alternate);
+  --layer-active: var(--layer-active-alternate);
+  --layer-selected: var(--layer-selected-alternate);
+  --layer-selected-hover: var(--layer-selected-hover-alternate);
+  --layer-accent: var(--layer-accent-alternate);
+  --layer-accent-hover: var(--layer-accent-hover-alternate);
+  --layer-accent-active: var(--layer-accent-active-alternate);
+  --field: var(--field-alternate);
+  --field-hover: var(--field-hover-alternate);
+  --border-subtle: var(--border-subtle-alternate);
+  --border-subtle-selected: var(--border-subtle-selected-alternate);
+  --border-strong: var(--border-strong-alternate);
+  --border-tile: var(--border-tile-alternate);
 }

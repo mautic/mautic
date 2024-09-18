@@ -5120,10 +5120,10 @@ button.close {
 }
 .modal-content {
   position: relative;
-  background-color: #fff;
+  background-color: var(--layer);
   background-clip: padding-box;
   border: 1px solid #999;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
   border-radius: 4px;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
@@ -5136,19 +5136,19 @@ button.close {
   bottom: 0;
   left: 0;
   z-index: 1040;
-  background-color: #000;
+  background-color: var(--overlay);
 }
 .modal-backdrop.fade {
   filter: alpha(opacity=0);
   opacity: 0;
 }
 .modal-backdrop.in {
-  filter: alpha(opacity=50);
-  opacity: 0.5;
+  filter: alpha(opacity=100);
+  opacity: 1;
 }
 .modal-header {
-  padding: 15px;
-  border-bottom: 1px solid #e5e5e5;
+  padding: var(--spacing-05);
+  border-bottom: 1px solid transparent;
 }
 .modal-header .close {
   margin-top: -2px;
@@ -5159,12 +5159,12 @@ button.close {
 }
 .modal-body {
   position: relative;
-  padding: 15px;
+  padding: var(--spacing-05);
 }
 .modal-footer {
-  padding: 15px;
+  padding: var(--spacing-05);
   text-align: right;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid transparent;
 }
 .modal-footer .btn + .btn {
   margin-bottom: 0;
@@ -6068,6 +6068,10 @@ button.close {
   -o-perspective: 2000px;
   perspective: 2000px;
 }
+.modal.in .modal-dialog {
+  top: 45%;
+  transform: translate(0, -50%);
+}
 .modal.in .modal-dialog.aside {
   -webkit-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
   -ms-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
@@ -6107,6 +6111,16 @@ button.close {
   -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-340px + (40px * 5)));
   -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-340px + (40px * 5)));
   transform: scale(0.8) rotateY(45deg) translateZ(calc(-340px + (40px * 5)));
+}
+.modal .modal-dialog {
+  top: 45%;
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+  transform: scale(0.8) rotateY(45deg) translateZ(translate(0, -50%));
+}
+.modal.fade .modal-dialog {
+  transition: var(--transition-all-productive);
 }
 /*
 * Remix Icon v4.3.0

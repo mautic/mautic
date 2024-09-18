@@ -984,3 +984,33 @@
         &:hover {text-decoration: underline;}
     }
 }
+
+// Handle alternate layer colors automatically
+.modal-content,
+.tile,
+.nav-tabs-contained + .tab-content,
+.nav-tabs-contained + form > .tab-content {
+    > * {
+        /// Layer
+        --layer: var(--layer-alternate);
+        --layer-hover: var(--layer-hover-alternate);
+        --layer-active: var(--layer-active-alternate);
+        --layer-selected: var(--layer-selected-alternate);
+        --layer-selected-hover: var(--layer-selected-hover-alternate);
+
+        /// Layer accent
+        --layer-accent: var(--layer-accent-alternate);
+        --layer-accent-hover: var(--layer-accent-hover-alternate);
+        --layer-accent-active: var(--layer-accent-active-alternate);
+
+        /// Field
+        --field: var(--field-alternate);
+        --field-hover: var(--field-hover-alternate);
+
+        /// Border
+        --border-subtle: var(--border-subtle-alternate);
+        --border-subtle-selected: var(--border-subtle-selected-alternate);
+        --border-strong: var(--border-strong-alternate);
+        --border-tile: var(--border-tile-alternate);
+    }
+}
