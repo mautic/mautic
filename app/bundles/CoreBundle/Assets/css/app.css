@@ -1237,11 +1237,13 @@ kbd {
 }
 .btn:hover {
   border: 1px solid transparent;
+  color: var(--text-primary);
 }
 .btn,
 .btn:active,
 .btn.active {
   box-shadow: none;
+  color: var(--text-primary);
 }
 .btn:focus,
 .btn:active:focus,
@@ -1933,13 +1935,11 @@ kbd {
 .btn-info:hover {
   color: #3c4650;
 }
-.modal-footer {
-  padding: var(--spacing-03) 0 0;
-}
 .modal-footer .modal-form-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 1px;
+  margin: -15px;
 }
 .modal-footer .modal-form-buttons .btn {
   align-items: flex-start;
@@ -2050,10 +2050,10 @@ kbd {
 }
 .alert-growl a {
   font-weight: 700;
-  color: #6a79b5;
 }
+.alert-growl a,
 .alert-growl a:hover {
-  color: #aeb6d7;
+  color: var(--text-inverse);
 }
 .alert-growl--warning {
   border-left-color: #FDB933;
@@ -4155,7 +4155,7 @@ input[type=file].form-control {
   margin-top: 1px;
   background-color: transparent;
   border-radius: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--text-primary);
 }
 .checkbox[class*=" custom"] label input + span:after,
 .radio[class*=" custom"] label input + span:after,
@@ -4210,7 +4210,7 @@ input[type=file].form-control {
 .radio[class^="custom"] label input:checked + span,
 .checkbox-inline[class^="custom"] label input:checked + span,
 .radio-inline[class^="custom"] label input:checked + span {
-  border: 1px solid #3c4650;
+  border: 1px solid var(--text-primary);
 }
 .checkbox[class*=" custom"] label input:checked + span:after,
 .radio[class*=" custom"] label input:checked + span:after,
@@ -4236,7 +4236,7 @@ input[type=file].form-control {
 .radio[class^="custom"] label:hover input + span,
 .checkbox-inline[class^="custom"] label:hover input + span,
 .radio-inline[class^="custom"] label:hover input + span {
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--text-primary);
 }
 .checkbox[class*=" custom"] label:hover input:checked + span,
 .radio[class*=" custom"] label:hover input:checked + span,
@@ -4264,7 +4264,11 @@ input[type=file].form-control {
 .radio.custom-primary label:hover input + span,
 .checkbox-inline.custom-primary label:hover input + span,
 .radio-inline.custom-primary label:hover input + span {
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--text-primary);
+  opacity: 0.8;
+  -webkit-transition: var(--transition-all-productive);
+  -o-transition: var(--transition-all-productive);
+  transition: var(--transition-all-productive);
 }
 .checkbox.custom-primary label:hover input:checked + span,
 .radio.custom-primary label:hover input:checked + span,
@@ -4288,7 +4292,11 @@ input[type=file].form-control {
 .radio.custom-info label:hover input + span,
 .checkbox-inline.custom-info label:hover input + span,
 .radio-inline.custom-info label:hover input + span {
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--text-primary);
+  opacity: 0.8;
+  -webkit-transition: var(--transition-all-productive);
+  -o-transition: var(--transition-all-productive);
+  transition: var(--transition-all-productive);
 }
 .checkbox.custom-info label:hover input:checked + span,
 .radio.custom-info label:hover input:checked + span,
@@ -4312,7 +4320,11 @@ input[type=file].form-control {
 .radio.custom-success label:hover input + span,
 .checkbox-inline.custom-success label:hover input + span,
 .radio-inline.custom-success label:hover input + span {
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--text-primary);
+  opacity: 0.8;
+  -webkit-transition: var(--transition-all-productive);
+  -o-transition: var(--transition-all-productive);
+  transition: var(--transition-all-productive);
 }
 .checkbox.custom-success label:hover input:checked + span,
 .radio.custom-success label:hover input:checked + span,
@@ -4336,7 +4348,11 @@ input[type=file].form-control {
 .radio.custom-warning label:hover input + span,
 .checkbox-inline.custom-warning label:hover input + span,
 .radio-inline.custom-warning label:hover input + span {
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--text-primary);
+  opacity: 0.8;
+  -webkit-transition: var(--transition-all-productive);
+  -o-transition: var(--transition-all-productive);
+  transition: var(--transition-all-productive);
 }
 .checkbox.custom-warning label:hover input:checked + span,
 .radio.custom-warning label:hover input:checked + span,
@@ -4360,7 +4376,11 @@ input[type=file].form-control {
 .radio.custom-danger label:hover input + span,
 .checkbox-inline.custom-danger label:hover input + span,
 .radio-inline.custom-danger label:hover input + span {
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--text-primary);
+  opacity: 0.8;
+  -webkit-transition: var(--transition-all-productive);
+  -o-transition: var(--transition-all-productive);
+  transition: var(--transition-all-productive);
 }
 .checkbox.custom-danger label:hover input:checked + span,
 .radio.custom-danger label:hover input:checked + span,
@@ -4637,6 +4657,11 @@ ul.line-legend li {
 .table-responsive-force > .table {
   margin-bottom: 0;
 }
+.table-responsive-force > .table > thead > tr,
+.table-responsive-force > .table > tbody > tr,
+.table-responsive-force > .table > tfoot > tr {
+  background-color: var(--background);
+}
 .table-responsive-force > .table > thead > tr > th,
 .table-responsive-force > .table > tbody > tr > th,
 .table-responsive-force > .table > tfoot > tr > th,
@@ -4678,6 +4703,14 @@ ul.line-legend li {
 .table-hover > tbody > tr.active:hover > th {
   transition: var(--transition-all-productive);
   background-color: var(--background-hover);
+}
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  background-color: var(--background);
 }
 .progress {
   background-color: var(--border-subtle);
@@ -7657,6 +7690,10 @@ a.inline-token .text-muted {
 .modal-backdrop {
   backdrop-filter: blur(4px);
 }
+.modal kbd {
+  box-shadow: inset 0 -1px 0 #afb8c157;
+  border: 1px solid #afb8c157;
+}
 .accordion {
   --layout-density-padding-inline-local: 16px;
   padding: 0;
@@ -8353,7 +8390,7 @@ ul.media-list.media-list-feed div.media-body {
   --interactive: var(--primary-50);
   --highlight: var(--primary-90);
   --toggle-off: #6f6f6f;
-  --overlay: #161616;
+  --overlay: #171717cc;
   --skeleton-element: #525252;
   --skeleton-background: #353535;
   --label-background-gray: #525252;
@@ -8432,7 +8469,7 @@ ul.media-list.media-list-feed div.media-body {
   --field-hover: #094352;
   --field-hover-alternate: #657b83;
   --border-interactive: #268bd2;
-  --border-subtle: #586e75;
+  --border-subtle: #002f3e;
   --border-subtle-alternate: #657b83;
   --border-subtle-selected: #657b83;
   --border-subtle-selected-alternate: #839496;
@@ -8492,7 +8529,7 @@ ul.media-list.media-list-feed div.media-body {
   --interactive: #268bd2;
   --highlight: #6c71c4;
   --toggle-off: #839496;
-  --overlay: #00232c;
+  --overlay: #000c0fcc;
   --skeleton-element: #657b83;
   --skeleton-background: #586e75;
   --label-background-gray: #657b83;
@@ -8632,7 +8669,7 @@ ul.media-list.media-list-feed div.media-body {
   --interactive: #268bd2;
   --highlight: #eee8d5;
   --toggle-off: #93a1a1;
-  --overlay: #002b36cc;
+  --overlay: #bfb79bcc;
   --skeleton-element: #bfb7a3;
   --skeleton-background: #dcd4c0;
   --label-background-gray: #dcd4c0;
@@ -8780,7 +8817,7 @@ ul.media-list.media-list-feed div.media-body {
   --interactive: #F7B84B;
   --highlight: #8E8EFF;
   --toggle-off: #A0A0B0;
-  --overlay: #1C1C2ECC;
+  --overlay: #171726cc;
   --skeleton-element: #323248;
   --skeleton-background: #2A2A40;
   --label-background-gray: #323248;

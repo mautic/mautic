@@ -56,7 +56,7 @@
     >tbody,
     >tfoot {
       >tr {
-
+        background-color: var(--background);
         >th,
         >td {
           white-space: nowrap;
@@ -116,4 +116,8 @@
       background-color: var(--background-hover);
     }
   }
+}
+
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+  background-color: var(--background);
 }

@@ -319,7 +319,7 @@ input[type=file].form-control {
           margin-top: 1px;
           background-color: transparent;
           border-radius: @border-radius-base;
-          border: 1px solid rgba(0, 0, 0, 0.2);
+          border: 1px solid var(--text-primary);
 
           &:after {
             content: "";
@@ -350,7 +350,7 @@ input[type=file].form-control {
         // checked state
         &:checked {
           +span {
-            border: 1px solid @gray-dark;
+            border: 1px solid var(--text-primary);
 
             &:after {
               .scale(1);
@@ -364,7 +364,7 @@ input[type=file].form-control {
       &:hover {
         input {
           +span {
-            border: 1px solid rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--text-primary);
           }
 
           &:checked {

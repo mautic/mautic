@@ -20,11 +20,15 @@
   gap: var(--spacing-03);
   justify-content: space-between;
   width: fit-content;
-  &:hover {border: 1px solid transparent}
+  &:hover {
+    border: 1px solid transparent;
+    color: var(--text-primary);
+  }
   &,
   &:active,
   &.active {
     box-shadow: none;
+    color: var(--text-primary);
     &:focus,
     &.focus {
       outline: 2px solid transparent;
@@ -357,11 +361,12 @@
 
 // Modal footer buttons
 .modal-footer {
-  padding: var(--spacing-03) 0 0;
   .modal-form-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 1px;
+    margin: -15px;
+
       .btn {
         align-items: flex-start;
         height: var(--spacing-10);

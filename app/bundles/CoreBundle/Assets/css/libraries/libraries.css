@@ -5055,16 +5055,16 @@ button.list-group-item-danger.active:focus {
 .close {
   float: right;
   font-size: 19.5px;
-  font-weight: bold;
+  font-weight: normal;
   line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
+  color: var(--text-primary);
+  text-shadow: none;
   filter: alpha(opacity=20);
   opacity: 0.2;
 }
 .close:hover,
 .close:focus {
-  color: #000;
+  color: var(--text-primary);
   text-decoration: none;
   cursor: pointer;
   filter: alpha(opacity=50);
