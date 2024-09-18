@@ -71,8 +71,8 @@
     --text-primary: #161616;
     --text-secondary: #525252;
     --text-placeholder: #a8a8a8;
-    --text-on-color: contrast(@primary-60);
-    --text-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d);
+    --text-on-color: contrast(@primary-color);
+    --text-on-color-disabled: contrast(@primary-color, #16161640, #8d8d8d);
     --text-helper: #6f6f6f;
     --text-error: #da1e28;
     --text-inverse: #ffffff;
@@ -88,8 +88,8 @@
     /// Icons
     --icon-primary: #161616;
     --icon-secondary: #525252;
-    --icon-on-color: contrast(@primary-60);
-    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d);
+    --icon-on-color: contrast(@primary-color);
+    --icon-on-color-disabled: contrast(@primary-color, #16161640, #8d8d8d);
     --icon-interactive: var(--primary-60);
     --icon-inverse: #ffffff;
     --icon-disabled: #16161640;
@@ -247,8 +247,8 @@
     --text-primary: #f4f4f4;
     --text-secondary: #c6c6c6;
     --text-placeholder: #6f6f6f;
-    --text-on-color: contrast(@primary-80);
-    --text-on-color-disabled: contrast(@primary-80, #16161640, #8d8d8d);
+    --text-on-color: contrast(darken(@primary-color, 20%));
+    --text-on-color-disabled: contrast(darken(@primary-color, 20%), #16161640, #8d8d8d);
     --text-helper: #8d8d8d;
     --text-error: #ff8389;
     --text-inverse: #161616;
@@ -264,8 +264,8 @@
     /// Icons
     --icon-primary: #f4f4f4;
     --icon-secondary: #c6c6c6;
-    --icon-on-color: contrast(@primary-80);
-    --icon-on-color-disabled: contrast(@primary-80, #16161640, #8d8d8d);
+    --icon-on-color: contrast(darken(@primary-color, 20%)); // @primary-80
+    --icon-on-color-disabled: contrast(darken(@primary-color, 20%), #16161640, #8d8d8d); // @primary-80
     --icon-interactive: #ffffff;
     --icon-inverse: #161616;
     --icon-disabled: #f4f4f4;
@@ -877,22 +877,6 @@
 // General
 //
 // Brand palette //
-@primary-20: lighten(@primary-color, 40%);
-@primary-30: lighten(@primary-color, 30%);
-@primary-40: lighten(@primary-color, 20%);
-@primary-50: lighten(@primary-color, 10%);
-@primary-60: @primary-color;
-@primary-70: darken(@primary-color, 10%);
-@primary-80: darken(@primary-color, 20%);
-@primary-90: darken(@primary-color, 30%);
-@secondary-20: lighten(@secondary-color, 40%);
-@secondary-30: lighten(@secondary-color, 30%);
-@secondary-40: lighten(@secondary-color, 20%);
-@secondary-50: lighten(@secondary-color, 10%);
-@secondary-60: @secondary-color;
-@secondary-70: darken(@secondary-color, 10%);
-@secondary-80: darken(@secondary-color, 20%);
-@secondary-90: darken(@secondary-color, 30%);
 
 /// CKEditor
 :root,
@@ -907,22 +891,25 @@
 }
 
 :root {
---primary-20: @primary-20;
---primary-30: @primary-30;
---primary-40: @primary-40;
---primary-50: @primary-50;
---primary-60: @primary-60;
---primary-70: @primary-70;
---primary-80: @primary-80;
---primary-90: @primary-90;
---secondary-20: @secondary-20;
---secondary-30: @secondary-30;
---secondary-40: @secondary-40;
---secondary-50: @secondary-50;
---secondary-60: @secondary-60;
---secondary-70: @secondary-70;
---secondary-80: @secondary-80;
---secondary-90: @secondary-90;
+--primary-20: lighten(@primary-color, 40%);
+--primary-30: lighten(@primary-color, 30%);
+--primary-40: lighten(@primary-color, 20%);
+--primary-50: lighten(@primary-color, 10%);
+--primary-60: @primary-color;
+--primary-70: darken(@primary-color, 10%);
+--primary-80: darken(@primary-color, 20%);
+--primary-90: darken(@primary-color, 30%);
+--primary-100: darken(@primary-color, 40%);
+
+--secondary-20: lighten(@secondary-color, 40%);
+--secondary-30: lighten(@secondary-color, 30%);
+--secondary-40: lighten(@secondary-color, 20%);
+--secondary-50: lighten(@secondary-color, 10%);
+--secondary-60: @secondary-color;
+--secondary-70: darken(@secondary-color, 10%);
+--secondary-80: darken(@secondary-color, 20%);
+--secondary-90: darken(@secondary-color, 30%);
+--secondary-100: darken(@secondary-color, 40%);
 
 // Motion //
 
