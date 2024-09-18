@@ -10,8 +10,6 @@
 // Themes
 /// Light theme
 :root {
-    // Colors //
-
     /// Background
     --background: #ffffff;
     --background-hover: #8d8d8d1f;
@@ -180,15 +178,13 @@
     --label-background-hover-brand-primary: var(--primary-70);
     --label-border-brand-primary: var(--primary-80);
     --label-background-brand-secondary: var(--secondary-60);
-    --label-color-brand-secondary: contrast(@secondary-60);
+    --label-color-brand-secondary: contrast(@secondary-color);
     --label-background-hover-brand-secondary: var(--secondary-70);
     --label-border-brand-secondary: var(--secondary-80);
 }
 
 /// Dark theme
 :root[theme="dark"] {
-    // Colors //
-
     /// Background
     --background: #161616;
     --background-hover: #8d8d8d29;
@@ -355,8 +351,6 @@
 
 /// Solarized Dark theme
 :root[theme="solarized-dark"] {
-    // Colors //
-
     /// Background
     --background: #002b36;
     --background-hover: #073642;
@@ -381,7 +375,7 @@
     --layer-selected-hover-alternate: #839496;
     --layer-selected-inverse: #fdf6e3;
     --layer-selected-disabled: #93a1a1;
-    --layer-translucent: #00232c99;
+    --layer-translucent: hsla(192, 100%, 9%, 0.8);
     --layer-translucent-inverse: #fdf6e399;
 
     /// Layer accent
@@ -523,8 +517,6 @@
 
 /// Solarized Light theme
 :root[theme="solarized-light"] {
-    // Colors //
-
     /// Background
     --background: #fdf6e3;
     --background-hover: #eee8d533;
@@ -549,8 +541,8 @@
     --layer-selected-hover-alternate: #e0d7c3;
     --layer-selected-inverse: #073642;
     --layer-selected-disabled: #93a1a1;
-    --layer-translucent: #fdf6e3cc;
-    --layer-translucent-inverse: #002b36b3;
+    --layer-translucent: hsla(44, 87%, 94%, 0.8);
+    --layer-translucent-inverse: #002d38cc;
 
     /// Layer accent
     --layer-accent: #dcd4c0;
@@ -699,8 +691,6 @@
 }
 
 :root[theme="freire"] {
-    // Colors //
-
     /// Background
     --background: #1C1C2E;
     --background-hover: #232336;
@@ -725,7 +715,7 @@
     --layer-selected-hover-alternate: #323248;
     --layer-selected-inverse: #F7B84B;
     --layer-selected-disabled: #3A3A52;
-    --layer-translucent: #1C1C2ECC;
+    --layer-translucent: #1d1d2fe6;
     --layer-translucent-inverse: #F7B84BCC;
 
     /// Layer accent
