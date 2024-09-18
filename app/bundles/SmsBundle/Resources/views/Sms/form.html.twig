@@ -22,7 +22,7 @@
         <div class="characters-count">
             <label class="control-label" for="" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="{{ 'mautic.sms.form.nbcharacter.infobox'|trans }}">
                 {{ 'mautic.sms.form.nbcharacter.counter'|trans }}
-                <span class="label label-default" id="sms_nb_char">0</span>
+                <span size="sm" class="label label-gray" id="sms_nb_char">0</span>
             </label>
         </div>
         {{ form_row(form.message) }}
@@ -39,8 +39,8 @@
 
 <div id="leadList"{% if 'template' == type %} class="hide"{% endif %}>
     {{ form_row(form.lists) }}
-    {{ form_row(form.publishUp) }}
-    {{ form_row(form.publishDown) }}
+    {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
+    {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
 </div>
 
 <div class="hide">

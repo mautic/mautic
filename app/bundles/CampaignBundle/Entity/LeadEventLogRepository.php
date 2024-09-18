@@ -83,7 +83,11 @@ class LeadEventLogRepository extends CommonRepository
                     fl.reason as fail_reason
                     '
                       )
-                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+                        ->add('from', [
+                            'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                            'alias' => 'll',
+                            'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'campaign_date_triggered)',
+                        ], true)
                         ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
                         ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
                         ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
@@ -125,7 +129,7 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);
+        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate'], null, 'll.id');
     }
 
     /**

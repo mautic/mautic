@@ -111,7 +111,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         yield ['2020-02-02', '2020-02-02'];
 
         // date time
-        yield ['2021-02-21 18:00:00', 'February 21, 2021 7:00 pm'];
+        yield ['2021-02-21 18:00:00', 'February 21, 2021 6:00 pm'];
 
         // date object
         yield [

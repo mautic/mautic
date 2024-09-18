@@ -233,6 +233,8 @@ class CorePermissions
                 } elseif ('anon.' == $userEntity) {
                     // anon user or session timeout
                     $permissions[$permission] = false;
+                } elseif ($permissionObject instanceof VirtualPermissions) {
+                    $permissions[$permission] = $permissionObject->isVirtuallyGranted($parts[1], $parts[2]);
                 } elseif (!isset($activePermissions[$parts[0]])) {
                     // user does not have implicit access to bundle so deny
                     $permissions[$permission] = false;

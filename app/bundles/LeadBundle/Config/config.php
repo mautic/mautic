@@ -342,7 +342,7 @@ return [
             'mautic.lead.export_scheduled_logger_subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ContactExportSchedulerLoggerSubscriber::class,
                 'arguments' => [
-                    'logger',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.lead.export_scheduled_notification_subscriber' => [

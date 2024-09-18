@@ -236,11 +236,13 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
+        mQuery('#scheduleOptions').removeClass('hide');
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
         mQuery('#leadList').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
+        mQuery('#scheduleOptions').addClass('hide');
     }
 
     mQuery('#emailform_emailType').val(emailType);
@@ -365,7 +367,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
         });
     }
 
-    tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
+    tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('fa-plus text-success');
     newTab.find('a').tab('show');
 
     firstInput.focus();
