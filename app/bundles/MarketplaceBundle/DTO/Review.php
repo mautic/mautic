@@ -16,9 +16,9 @@ final class Review
     public static function fromArray(array $array): self
     {
         return new self(
-            $array['name'],
+            $array['name'] ?? 'Unknown user',
             (int) $array['rating'],
-            $array['review']
+            $array['review'] ?? ''
         );
     }
 }
