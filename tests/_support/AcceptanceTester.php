@@ -44,8 +44,9 @@ class AcceptanceTester extends Codeception\Actor
     public function createAContactSegment(string $name): void
     {
         $this->amOnPage(SegmentsPage::URL);
+        $this->waitForElementClickable(SegmentsPage::NEW_BUTTON);
         $this->click(SegmentsPage::NEW_BUTTON);
-        $this->wait(1);
+        $this->waitForElementVisible(SegmentsPage::SEGMENT_NAME);
         $this->fillField(SegmentsPage::SEGMENT_NAME, $name);
         $this->click(SegmentsPage::SAVE_AND_CLOSE_BUTTON);
     }
@@ -53,11 +54,10 @@ class AcceptanceTester extends Codeception\Actor
     public function createACategory(string $name): void
     {
         $this->amOnPage(CategoriesPage::URL);
-        $this->wait(1);
+        $this->waitForElementClickable(CategoriesPage::NEW_BUTTON);
         $this->click(CategoriesPage::NEW_BUTTON);
         $this->waitForElementClickable(CategoriesPage::BUNDLE_DROPDOWN);
         $this->click(CategoriesPage::BUNDLE_DROPDOWN);
-
         $this->waitForElementClickable(CategoriesPage::BUNDLE_EMAIL_OPTION);
         $this->click(CategoriesPage::BUNDLE_EMAIL_OPTION);
         $this->fillField(CategoriesPage::TITLE_FIELD, $name);
