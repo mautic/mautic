@@ -14,7 +14,7 @@ class FieldControllerTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
 
-        $form  = $crawler->selectButton('Save & Close')->form();
+        $form  = $crawler->selectButton('Save')->form();
         $label = 'The leading Drupal Cloud platform to securely develop, deliver, and run websites, applications, and content. Top-of-the-line hosting options are paired with automated testing and development tools. Documentation is also included for the following components';
         $form['leadfield[label]']->setValue($label);
         $crawler = $this->client->submit($form);
@@ -29,7 +29,7 @@ class FieldControllerTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
 
-        $form  = $crawler->selectButton('Save & Close')->form();
+        $form  = $crawler->selectButton('Save')->form();
         $label = 'Test value for custom field 4';
         $form['leadfield[label]']->setValue($label);
         $crawler = $this->client->submit($form);

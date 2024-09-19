@@ -318,8 +318,8 @@ class PageType extends AbstractType
 
         $builder->add('buttons', FormButtonsType::class,
             [
-                'apply_text' => false,
-                'save_text'  => 'mautic.core.form.save',
+                'apply_text'        => false,
+                'save_text'         => 'mautic.core.form.save',
                 'pre_extra_buttons' => [
                     [
                         'name'  => 'builder',
