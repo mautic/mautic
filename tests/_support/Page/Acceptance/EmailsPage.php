@@ -12,7 +12,7 @@ class EmailsPage
     public const NEW_CATEGORY_OPTION       = '#email_batch_newCategory_chosen > div > ul > li.active-result:nth-child(2)';
     public const NEW_CATEGORY_DROPDOWN     = '#email_batch_newCategory_chosen';
     public const CHANGE_CATEGORY_ACTION    = "a[href='/s/emails/batch/categories/view']";
-    public const SELECTED_ACTIONS_DROPDOWN = '#app-content > div > div.panel.panel-default.bdr-t-wdh-0.mb-0 > div.page-list > div.table-responsive > table > thead > tr > th.col-actions > div > div > button > i';
+    public const SELECTED_ACTIONS_DROPDOWN = '#page-list-wrapper > div.page-list > div.table-responsive > table > thead > tr > th.col-actions > div > div > button > i';
     public const SAVE_BUTTON               = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-default.btn-save.btn-copy';
     public const SELECT_ALL_CHECKBOX       = '#customcheckbox-one0';
     public const SELECT_SEGMENT_EMAIL      = '#app-content > div > div.modal.fade.in.email-type-modal > div > div > div.modal-body.form-select-modal > div > div:nth-child(2) > div > div.hidden-xs.panel-footer.text-center > button';
