@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\FilterTrait;
-use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -21,8 +20,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
     use FilterTrait;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private ListModel $listModel
+        private TranslatorInterface $translator
     ) {
     }
 
@@ -77,7 +75,6 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                 'stages',
                 'locales',
                 'fields',
-                'lists',
             ]
         );
 
@@ -85,8 +82,6 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             [
                 'label'          => false,
                 'error_bubbling' => false,
-                // @see \Mautic\LeadBundle\Controller\AjaxController::loadSegmentFilterFormAction()
-                'lists'          => $this->listModel->getChoiceFields()['lead']['leadlist']['properties']['list'] ?? [],
             ]
         );
     }

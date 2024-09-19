@@ -715,7 +715,7 @@ Mautic.toggleBuilderButton = function (hide) {
                 .addClass('hide btn-standard-toolbar')
                 .appendTo('.toolbar-form-buttons')
 
-            mQuery('.toolbar-form-buttons .toolbar-dropdown i.ri-instance-fill').parent().addClass('hide');
+            mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().addClass('hide');
         } else {
             if (!mQuery('.btn-standard-toolbar.btn-builder').length) {
                 mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder').addClass('btn-standard-toolbar')
@@ -725,7 +725,7 @@ Mautic.toggleBuilderButton = function (hide) {
                     .prependTo('.toolbar-form-buttons .toolbar-standard')
                     .removeClass('hide');
 
-                mQuery('.toolbar-form-buttons .toolbar-dropdown i.ri-instance-fill').parent().removeClass('hide');
+                mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().removeClass('hide');
             }
         }
     }
@@ -753,7 +753,7 @@ Mautic.initSectionListeners = function() {
                 'bottom': {},
                 'left': {},
                 'clone': {
-                    classes: 'ri-file-copy-line',
+                    classes: 'fa fa-copy',
                     onClick: function() {
                         var cloneBtn = mQuery(this);
                         var clonedElem = cloneBtn.closest('[data-section-wrapper]');
@@ -764,7 +764,7 @@ Mautic.initSectionListeners = function() {
                     }
                 },
                 'handle': {
-                    classes: 'ri-expand-height-line'
+                    classes: 'fa fa-arrows-v'
                 },
                 'delete': {
                     classes: 'ri-close-line',

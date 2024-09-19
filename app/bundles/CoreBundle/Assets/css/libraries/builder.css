@@ -1,3 +1,36 @@
+:root {
+  --timing: 0.3s ease;
+  --all: all var(--timing);
+  --border-interactive: #4e5e9e;
+  --border-subtle: #e0e0e0;
+  --border-subtle-alt: #c6c6c6;
+  --border-subtle-selected: #c6c6c6;
+  --border-strong: #8d8d8d;
+  --border-tile: #c6c6c6;
+  --border-tile-alt: #a8a8a8;
+  --border-inverse: #161616;
+  --border-disabled: #c6c6c6;
+  --layer: #f4f4f4;
+  --layer-alt: #ffffff;
+  --layer-hover: #e8e8e8;
+  --layer-active: #c6c6c6;
+  --layer-selected: #e0e0e0;
+  --layer-selected-hover: #cacaca;
+  --layer-selected-inverse: #161616;
+  --layer-selected-disabled: #8d8d8d;
+  --icon-primary: #161616;
+  --icon-secondary: #525252;
+  --icon-on-color: #ffffff;
+  --icon-on-color-disabled: #8d8d8d;
+  --icon-interactive: #4e5e9e;
+  --icon-inverse: #ffffff;
+  --icon-disabled: rgba(22, 22, 22, 0.25);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --timing: 0;
+  }
+}
 /*!
  * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/

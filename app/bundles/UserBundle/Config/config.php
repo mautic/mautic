@@ -5,6 +5,7 @@ return [
         'admin' => [
             'mautic.user_management' => [
                 'id'        => 'mautic_user_management_root',
+                'iconClass' => 'ri-user-settings-fill',
                 'priority'  => 17,
             ],
             'mautic.user.users' => [
@@ -141,6 +142,7 @@ return [
                     'request_stack',
                     'security.csrf.token_manager',
                     'router',
+                    'mautic.user.model.password_strength_estimator',
                 ],
             ],
             'mautic.user.preauth_authenticator' => [

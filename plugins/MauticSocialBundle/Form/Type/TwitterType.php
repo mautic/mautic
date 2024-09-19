@@ -45,7 +45,7 @@ class TwitterType extends AbstractType
             'attr'       => [
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.integration.Twitter.share.username',
-                'preaddon'    => 'ri-at-line',
+                'preaddon'    => 'fa fa-at',
             ],
         ]);
 
@@ -56,7 +56,7 @@ class TwitterType extends AbstractType
             'attr'       => [
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.integration.Twitter.share.username',
-                'preaddon'    => 'ri-at-line',
+                'preaddon'    => 'fa fa-at',
             ],
         ]);
 

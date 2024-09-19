@@ -148,7 +148,7 @@
                                onchange="Mautic.matchedFields({{ indexCount }}, '{{ object }}', '{{ integration }}')"
                                {% if checked %}checked="checked"{% endif %}
                                {% if child.vars['attr']['disabled'] %}disabled{% endif %}>
-                        <btn class="btn-nospin ri-arrow-left-circle-line"></btn>
+                        <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                       </label>
                       {% set checked = '1' == child.vars.value %}
                       <label class="btn-arrow{{ indexCount }} btn btn-default {% if checked %}active{% endif %} {% if child.vars['attr']['disabled'] %}disabled{% endif %}">

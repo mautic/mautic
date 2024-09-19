@@ -23,7 +23,7 @@
                 'data-header': 'mautic.lead.batch.lists'|trans,
             },
             'btnText': 'mautic.lead.batch.lists'|trans,
-            'iconClass': 'fa ri-pie-chart-line',
+            'iconClass': 'fa fa-pie-chart',
         },
         {
             'attr': {
@@ -67,7 +67,7 @@
                 'data-header': 'mautic.lead.batch.dnc'|trans,
             },
             'btnText': 'mautic.lead.batch.dnc'|trans,
-            'iconClass': 'ri-prohibited-line text-danger',
+            'iconClass': 'fa fa-ban text-danger',
         },
     ] %}
 {% endif %}
@@ -176,7 +176,7 @@
                                     'href': path('mautic_contact_action', {'objectId': contact.id, 'objectAction': 'email', 'list': 1}),
                                 },
                                 'btnText': 'mautic.lead.email.send_email',
-                                'iconClass': 'ri-send-plane-line',
+                                'iconClass': 'fa fa-send',
                             }]) %}
                         {% endif %}
                         {{ include('@MauticCore/Helper/list_actions.html.twig', {

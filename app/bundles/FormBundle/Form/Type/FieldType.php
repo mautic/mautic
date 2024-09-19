@@ -623,11 +623,10 @@ class FieldType extends AbstractType
     private function getDefaultMappedField(string $type): string
     {
         return match ($type) {
-            'email'         => 'email',
-            'country'       => 'country',
-            'tel'           => 'phone',
-            'companyLookup' => 'company',
-            default         => '',
+            'email'   => 'email',
+            'country' => 'country',
+            'tel'     => 'phone',
+            default   => '',
         };
     }
 }

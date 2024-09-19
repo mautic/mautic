@@ -115,7 +115,6 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
             {% else %}
             {{ form_widget(form) }}
             {% endif %}
-            {{ form_help(form) }}
             {{ form_errors(form) }}
         </div>
     </div>
@@ -467,7 +466,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {{ disabled|default(false) ? 'disabled="disabled"' : '' }}
 {{ required|default(false) ? 'required="required"' : '' }}
 
-{% for k,v in attr|filter((v,k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr', 'help_icon']) %}
+{% for k,v in attr|filter((v,k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr']) %}
     {% if k in ['placeholder', 'title'] %}
         {{ '%s="%s" '|format(k|escape, v|trans({}, translation_domain)|escape)|raw }}
     {% elseif k is same as 'data-order' and v is string %}
@@ -481,6 +480,8 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
     {% endif %}
 {% endfor %}
+
+{# Disable by default and use false for chrome support #}
 {{ attr.autocomplete is not defined ? 'autocomplete="false" ' : '' }}
 {% endblock %}
 
@@ -515,7 +516,6 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         </label>
     {% endfor %}
 </div>
-    {{ form_help(form) }}
 {% endblock %}
 
 {% block attributes -%}
@@ -534,29 +534,14 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {%- endblock attributes -%}
 
 {% block form_help -%}
-    {%- if help is not empty or form.vars.attr.help_icon is defined -%}
-        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-block')|trim}) -%}
+    {%- if help is not empty -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
         <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
-            {%- if form.vars.attr.help_icon is defined and form.vars.attr.help_icon is not empty -%}
-                <i class="{{ form.vars.attr.help_icon }} ri-lg mr-xs"></i>
-            {%- endif -%}
-            {%- if help is not empty -%}
                 {%- if help_html is same as(false) -%}
                     {{- help|trans(help_translation_parameters, translation_domain) -}}
                 {%- else -%}
                     {{- help|trans(help_translation_parameters, translation_domain)|purify -}}
                 {%- endif -%}
-            {%- endif -%}
         </p>
     {%- endif -%}
 {%- endblock form_help %}
-
-{% block alert_widget %}
-    <div class="row">
-        <div {% with { attr: {class: 'col-sm-12'}|merge(attr) } %} {{ block('attributes') }}{% endwith %}>
-            <div class="alert alert-{{ messageType }}">
-                {{ message }}
-            </div>
-        </div>
-    </div>
-{%- endblock alert_widget %}

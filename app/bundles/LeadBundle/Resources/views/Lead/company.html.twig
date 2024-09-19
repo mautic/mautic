@@ -8,7 +8,7 @@
 {% set leadId = lead.id %}
 <ul class="list-group">
     {% for company in companies %}
-        {% set switch = companyLead[company.id] is defined ? 'ri-toggle-fill' : 'ri-toggle-line' %}
+        {% set switch = companyLead[company.id] is defined ? 'fa-toggle-on' : 'fa-toggle-off' %}
         {% set bgClass = companyLead[company.id] is defined ? 'text-success' : 'text-danger' %}
         <li class="list-group-item">
             <i class="ri-lg ri-fw {{ switch }} {{ bgClass }}"

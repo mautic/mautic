@@ -187,7 +187,10 @@ class TimelineController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): array|Response
+    /**
+     * @return array|Response
+     */
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
     {
         if (empty($leadId)) {
             return $this->accessDenied();
@@ -196,10 +199,6 @@ class TimelineController extends CommonController
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
             return $lead;
-        }
-
-        if (!$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
         }
 
         $this->setListFilters();

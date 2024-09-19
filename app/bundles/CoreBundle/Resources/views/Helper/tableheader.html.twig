@@ -30,7 +30,7 @@
 
         <div class="input-group-btn">
             <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
-                <i class="ri-more-2-line"></i>
+                <i class="ri-arrow-down-s-line"></i>
             </button>
             <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
                 {{ buttonsRender() }}
@@ -54,7 +54,7 @@
         <a href="javascript: void(0);" onclick="Mautic.reorderTableData('{{ sessionVar }}','{{ orderBy }}','{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});">
             <span>{{ text|trans }}</span>
             {% if order == orderBy %}
-            <i class="ri-sort-{{ dir|lower }}"></i>
+            <i class="fa fa-sort-amount-{{ dir|lower }}"></i>
             {% endif %}
         </a>
         {% else %}

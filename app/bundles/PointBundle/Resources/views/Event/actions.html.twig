@@ -6,7 +6,7 @@
     - sessionId
 #}
 {% set action = deleted ? 'undelete' : 'delete' %}
-{% set iconClass = deleted ? 'ri-arrow-go-back-line' : 'ri-close-line' %}
+{% set iconClass = deleted ? 'fa-undo' : 'ri-close-line' %}
 {% set btnClass = deleted ? 'btn-warning' : 'btn-danger' %}
 {% set route = route|default('mautic_pointtriggerevent_action') %}
 <div class="form-buttons hide">

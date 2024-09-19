@@ -30,4 +30,9 @@ final class Version20210217115150 extends AbstractMauticMigration
         $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))
             ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
     }
+
+    private function getPrefixedTableName(string $tableName): string
+    {
+        return $this->prefix.$tableName;
+    }
 }

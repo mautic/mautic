@@ -280,7 +280,7 @@ Mautic.unlockEntity = function (model, id, parameter) {
 Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     event.preventDefault();
 
-    var wasPublished = mQuery(el).hasClass('ri-toggle-fill');
+    var wasPublished = mQuery(el).hasClass('fa-toggle-on');
     var element = mQuery(el);
 
     element.removeClass('fa-toggle-on fa-toggle-off').addClass('ri-spin ri-loader-3-line');

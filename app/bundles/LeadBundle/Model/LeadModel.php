@@ -643,7 +643,11 @@ class LeadModel extends FormModel
                 $results = $this->em->getRepository(User::class)->getUserList($filter, $limit, $start, ['lead' => 'leads']);
                 break;
             case 'contact':
-                $fetchResults = $this->getEntities(['start' => $start, 'limit' => $limit, 'filter' => $filter]);
+                $fetchResults = $this->getEntities([
+                    'start'          => $start,
+                    'limit'          => $limit,
+                    'filter'         => ['string' => $filter],
+                ]);
 
                 $results = [];
 

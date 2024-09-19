@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
-use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -146,7 +145,7 @@ class TagController extends FormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, TagDependencies $tagDependencies)
+    public function newAction(Request $request)
     {
         if (!$this->security->isGranted('tagManager:tagManager:create')) {
             return $this->accessDenied();
@@ -211,7 +210,7 @@ class TagController extends FormController
                     ],
                 ]);
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($request, $tagDependencies, $tag->getId(), true);
+                return $this->editAction($request, $tag->getId(), true);
             }
         }
 
@@ -237,7 +236,7 @@ class TagController extends FormController
      *
      * @return Response
      */
-    public function editAction(Request $request, TagDependencies $tagDependencies, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('tagManager:tagManager:edit')) {
             return $this->accessDenied();
@@ -251,7 +250,6 @@ class TagController extends FormController
             return $this->createTagModifyResponse(
                 $request,
                 $tag,
-                $tagDependencies,
                 $postActionVars,
                 $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
@@ -281,7 +279,7 @@ class TagController extends FormController
      *
      * @return Response
      */
-    private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, $action, $ignorePost)
+    private function createTagModifyResponse(Request $request, Tag $tag, array $postActionVars, $action, $ignorePost)
     {
         /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
@@ -349,7 +347,7 @@ class TagController extends FormController
 
                         return $this->postActionRedirect($postActionVars);
                     } else {
-                        return $this->viewAction($request, $tagDependencies, $tag->getId());
+                        return $this->viewAction($request, $tag->getId());
                     }
                 }
             }
@@ -433,7 +431,7 @@ class TagController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, TagDependencies $tagDependencies, $objectId)
+    public function viewAction(Request $request, $objectId)
     {
         /** @var TagModel $model */
         $model    = $this->getModel('lead.tag');
@@ -470,9 +468,8 @@ class TagController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
-                'tag'        => $tag,
-                'security'   => $security,
-                'usageStats' => $tagDependencies->getChannelsIds($tag),
+                'tag'      => $tag,
+                'security' => $security,
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
             'passthroughVars' => [

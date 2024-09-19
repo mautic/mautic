@@ -121,9 +121,9 @@ class CompanyType extends AbstractType
                             ],
                         ],
                     ],
-                ]
-            );
-        }
+                ],
+            ]
+        );
 
         $builder->addEventSubscriber(new CleanFormSubscriber($cleaningRules));
     }

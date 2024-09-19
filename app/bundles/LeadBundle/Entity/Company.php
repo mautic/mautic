@@ -16,7 +16,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     use CustomFieldEntityTrait;
 
     public const FIELD_ALIAS = 'company';
-    public const TABLE_NAME  = 'companies';
 
     /**
      * @var int
@@ -85,7 +84,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable(self::TABLE_NAME)
+        $builder->setTable('companies')
             ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')

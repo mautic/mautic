@@ -102,7 +102,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'ri-mail-line',
+                    'preaddon' => 'fa fa-envelope',
                     'tooltip'  => 'mautic.email.from_email.tooltip',
                 ],
                 'required' => false,
@@ -117,7 +117,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'ri-mail-line',
+                    'preaddon' => 'fa fa-envelope',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
                 ],
                 'required' => false,
@@ -132,7 +132,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'ri-mail-line',
+                    'preaddon' => 'fa fa-envelope',
                     'tooltip'  => 'mautic.email.bcc.tooltip',
                 ],
                 'required' => false,

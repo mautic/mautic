@@ -12,8 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Field
 {
-    public const TABLE_NAME = 'form_fields';
-
     /**
      * @var int
      */
@@ -174,7 +172,7 @@ class Field
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder->setTable('form_fields')
             ->setCustomRepositoryClass(FieldRepository::class)
             ->addIndex(['type'], 'form_field_type_search');
 

@@ -16,7 +16,7 @@ class TwitterMentionType extends TwitterAbstractType
             'attr'       => [
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.social.monitoring.twitter.handle.tooltip',
-                'preaddon' => 'ri-at-line',
+                'preaddon' => 'fa fa-at',
             ],
         ]);
 
