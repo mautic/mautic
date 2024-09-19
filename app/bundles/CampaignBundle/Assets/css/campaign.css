@@ -107,6 +107,18 @@
     color: #47535f;
 }
 
+.jtk-label--success {
+    border-color: var(--support-success);
+    background-color: var(--support-success);
+    color: var(--text-inverse);
+}
+
+.jtk-label--error {
+    border-color: var(--support-error);
+    background-color: var(--support-error);
+    color: var(--text-inverse);
+}
+
 .jtk-connector {
     z-index: 1000;
 }
@@ -370,7 +382,8 @@
     position: relative;
 }
 
-.preview .jtk-endpoint {
+.preview .jtk-endpoint,
+.preview .jtk-label {
     cursor: default;
 }
 
@@ -417,4 +430,12 @@
     text-align: center;
     line-height: 250px;
     font-size: 24px;
+}
+
+.campaign-event-stat {
+    padding: 4px;
+}
+
+.campaign-event-stat-divider {
+    padding: 0 4px;
 }

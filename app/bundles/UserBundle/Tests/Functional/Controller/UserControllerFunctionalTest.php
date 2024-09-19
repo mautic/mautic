@@ -5,53 +5,175 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\CoreBundle\Entity\AuditLogRepository;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testEditUserAction(): void
+    public function testEditGetPage(): void
     {
-        $auditLogModel      = $this->createMock(AuditLogModel::class);
-        $auditLogRepository = $this->createMock(AuditLogRepository::class);
+        $this->client->request('GET', '/s/users/edit/1');
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
 
-        $auditLog = $this->auditLogSetter(1, 'Test User', 'user', 'security', 1, 'login', ['username' => 'testuser']);
+    public function testRedirectNonExistingUser(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/edit/00000');
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Users', $crawler->filter('h1')->text());
+        $this->assertStringContainsString('User not found with', $crawler->filter('#flashes')->text());
+    }
 
-        $auditLogRepository->method('getLogsForUser')->willReturn([$auditLog]);
-        $auditLogModel->method('getRepository')->willReturn($auditLogRepository);
+    public function testEditActionFormSubmissionValid(): void
+    {
+        $crawler                = $this->client->request('GET', '/s/users/edit/1');
+        $buttonCrawlerNode      = $crawler->selectButton('Save & Close');
+        $form                   = $buttonCrawlerNode->form();
+        $form['user[username]'] = 'test';
+        $this->client->submit($form);
 
-        $userModel = $this->createMock(UserModel::class);
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertStringContainsString('has been updated!', $response->getContent());
+    }
 
-        $role = new Role();
-        $role->setName('Administrator');
+    public function testEditActionFormSubmissionInvalid(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/edit/1');
 
-        $user = $this->userSetter($role);
+        $form = $crawler->selectButton('Save')->form([
+            'user[firstName]'               => '',
+            'user[lastName]'                => '',
+            'user[email]'                   => 'invalid-email',
+            'user[plainPassword][password]' => '',
+        ]);
 
-        $this->em->persist($auditLog);
-        $this->em->persist($user);
-        $this->em->persist($role);
-        $this->em->flush();
+        $this->client->submit($form);
 
-        $userModel->method('getEntity')->willReturn($user);
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
+    }
 
-        $crawler        = $this->client->request(Request::METHOD_GET, '/s/users/edit/1');
-        $clientResponse = $this->client->getResponse();
+    /**
+     * @param array<string, string> $data
+     *
+     * @dataProvider dataNewUserForPasswordField
+     */
+    public function testNewUserForPasswordField(array $data, string $message): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/new');
 
-        $this->assertEquals(200, $clientResponse->getStatusCode());
-        $this->assertStringContainsString('Test User</a>', $clientResponse->getContent());
+        $formData = [
+            'user[firstName]' => 'John',
+            'user[lastName]'  => 'Doe',
+            'user[email]'     => 'john.doe@example.com',
+        ];
+
+        $form = $crawler->selectButton('Save')->form($formData + $data);
+
+        $this->client->submit($form);
+
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array<int, string|array<string, string>>>
+     */
+    public function dataNewUserForPasswordField(): iterable
+    {
+        yield 'Blank' => [
+            [
+                'user[plainPassword][password]' => '',
+                'user[plainPassword][confirm]'  => '',
+            ],
+            'Password cannot be blank.',
+        ];
+
+        yield 'Do not match with confirm' => [
+            [
+                'user[plainPassword][password]' => 'same',
+            ],
+            'Passwords do not match.',
+        ];
+
+        yield 'Minimum length' => [
+            [
+                'user[plainPassword][password]' => 'same',
+                'user[plainPassword][confirm]'  => 'same',
+            ],
+            'Password must be at least 6 characters.',
+        ];
+
+        yield 'No stronger' => [
+            [
+                'user[plainPassword][password]' => 'same123',
+                'user[plainPassword][confirm]'  => 'same123',
+            ],
+            'Please enter a stronger password. Your password must use a combination of upper and lower case, special characters and numbers.',
+        ];
+    }
+
+    /**
+     * @param array<string, string> $data
+     *
+     * @dataProvider dataForEditUserForPasswordField
+     */
+    public function testEditUserForPasswordField(array $data, string $message): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/edit/1');
+
+        $form = $crawler->selectButton('Save')->form($data);
+
+        $this->client->submit($form);
+
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array<int, string|array<string, string>>>
+     */
+    public function dataForEditUserForPasswordField(): iterable
+    {
+        yield 'Do not match with confirm' => [
+            [
+                'user[plainPassword][password]' => 'same',
+            ],
+            'Passwords do not match.',
+        ];
+
+        yield 'Minimum length' => [
+            [
+                'user[plainPassword][password]' => 'same',
+                'user[plainPassword][confirm]'  => 'same',
+            ],
+            'Password must be at least 6 characters.',
+        ];
+
+        yield 'No stronger' => [
+            [
+                'user[plainPassword][password]' => 'same123',
+                'user[plainPassword][confirm]'  => 'same123',
+            ],
+            'Please enter a stronger password. Your password must use a combination of upper and lower case, special characters and numbers.',
+        ];
     }
 
     /**
      * @param array<mixed> $details
      */
-    public function auditLogSetter(int $userId, string $userName, string $bundle,
-        string $object, int $objectId, string $action, array $details): AuditLog
-    {
+    public function auditLogSetter(
+        int $userId,
+        string $userName,
+        string $bundle,
+        string $object,
+        int $objectId,
+        string $action,
+        array $details
+    ): AuditLog {
         $auditLog = new AuditLog();
         $auditLog->setUserId($userId);
         $auditLog->setUserName($userName);

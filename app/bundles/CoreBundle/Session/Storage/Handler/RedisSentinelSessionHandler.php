@@ -56,9 +56,9 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function gc($maxlifetime): bool
+    public function gc($maxlifetime): int|false
     {
-        return true;
+        return 1;
     }
 
     public function updateTimestamp($sessionId, $data): bool

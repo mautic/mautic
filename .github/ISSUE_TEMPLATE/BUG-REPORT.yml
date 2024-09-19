@@ -60,7 +60,7 @@ body:
     attributes:
       label: PHP version
       description: What PHP version are you using in your environment?
-      placeholder: ex. 8.0.20
+      placeholder: ex. 8.1.0
     validations:
       required: true
   - type: dropdown
