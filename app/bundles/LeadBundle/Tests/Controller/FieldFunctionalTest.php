@@ -58,7 +58,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk(), $text);
         Assert::assertStringNotContainsString('New Custom Field', $text);
         Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
-        Assert::assertStringContainsString('Edit Custom Field - Best Date Ever', $text);
+        Assert::assertStringContainsString('Best Date Ever has been created!', $text);
     }
 
     public function testNewSelectField(): void
@@ -92,7 +92,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk(), $text);
         Assert::assertStringNotContainsString('New Custom Field', $text);
         Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
-        Assert::assertStringContainsString('Edit Custom Field - Test select field', $text);
+        Assert::assertStringContainsString('Test select field has been created!', $text);
     }
 
     /**

@@ -45,7 +45,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         // Find save & close button
-        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $buttonCrawler = $crawler->selectButton('config[buttons][apply]');
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
