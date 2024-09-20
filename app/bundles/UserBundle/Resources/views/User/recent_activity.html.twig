@@ -1,195 +1,95 @@
-<!-- Recent activity block(audit_log table) -->
-<div class="col-md-3 height-auto">
-	{{ customContent('right.section.top', _context) }}
-	<div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
-		<div class="panel-heading">
-			<div class="panel-title">{% trans %}mautic.core.recent.activity{% endtrans %}</div>
-		</div>
-		<div class="panel-body pt-xs">
-			{% if logs is defined and logs is not empty %}
-				<ul class="media-list media-list-feed">
-					{% for log in logs %}
+<div class="row">
+	<div class="col-xs-12 mt-lg">
+		<h3 class="pi-md mb-md">{{'mautic.core.recent.activity'|trans}}</h3>
+		<table class="table">
+			<thead>
+				<tr>
+					<td class="fw-b">{{'mautic.user.account.activity'|trans}}</td>
+					<td class="fw-b">{{'mautic.user.account.details'|trans}}</td>
+				</tr>
+			</thead>
+			<tbody>
+				{% if logs is defined and logs is not empty %}
+				{% for log in logs %}
+				<tr>
+					<td>
+						<div class="d-flex fd-column">
+							<!-- First line: username – translated object and action -->
+							<strong class="mb-xs">
+								{% set username = log.userName is defined ? log.userName : 'Unknown User' %}
+								{{ username }}
+							</strong>
+							<!-- Second line: humanized description based on context -->
+							{% set object_name = (log.details is defined and log.details['name'] is defined and
+							log.details['name'][1] is defined) ? log.details['name'][1] : '' %}
 
-						{% if log.action == 'create' and log.object == 'user' %}
-
-							{% set userPath = [] %}
-							{% set user_id = '1' %}
-							{% set usersEmail = log.details['email'][1] %}
-							{% set emailIsMatch = false %}
-							{% set usernameIsMatch = false %}
-
-							{% for user in users %}
-								{% if usersEmail is defined and usersEmail is not empty and user.email == usersEmail %}
-									{% set emailIsMatch = true %}
-									{% set user_id = user.id %}
-								{% else %}
-									{% set usernameIsMatch = true %}
-									{% set user_id = user.id %}
-								{% endif %}
-							{% endfor %}
-							{% if log.details['username'][1] is defined and log.details['username'][1] is not empty %}
-								{% if emailIsMatch == true %}
-									{% set userPath = userPath|merge([user_id, log.details['username'][1]]) %}
-								{% endif %}
+							{% if log.action == 'create' %}
+							{% if object_name != '' %}
+							{{ 'mautic.user.account.log.create'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+							{% else %}
+							{{ 'mautic.user.account.log.create.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
 							{% endif %}
 
-						{% elseif log.action == 'create' and log.object == 'role' %}
-
-							{% set role_id = '1' %}
-							{% set roleName = log.details['name'][1] %}
-							{% set roleIsMatch = false %}
-
-							{% for role in roles %}
-								{% if role.name == roleName %}
-									{% set roleIsMatch = true %}
-									{% set role_id = role.id %}
-								{% endif %}
-							{% endfor %}
-							{% if roleIsMatch == true %}
-								{% set rolePath = []|merge([role_id, roleName]) %}
+							{% elseif log.action == 'update' %}
+							{% if object_name != '' %}
+							{{ 'mautic.user.account.log.update'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+							{% else %}
+							{{ 'mautic.user.account.log.update.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
 							{% endif %}
 
-						{% elseif log.action == 'update' and log.object == 'user' %}
-
-							{% set userPath = [] %}
-							{% set usersUsername, usersEmail, usersFirstName, usersLastName, usersRole, usersPosition, usersSignature = '', '', '', '', '', '', '' %}
-							{% set user_id = '1' %}
-							{% set user_username = 'admin' %}
-							{% set isMatch = false %}
-							{% for detail in log.details %}
-								{% if detail == 'username' %}
-									{% set usersUsername = detail[1] %}
-
-								{% elseif detail == 'email' %}
-									{% set usersEmail = detail[1] %}
-
-								{% elseif detail == 'firstname' %}
-									{% set usersFirstName = detail[1] %}
-
-								{% elseif detail == 'lastName' %}
-									{% set usersLastName = detail[1] %}
-
-								{% elseif detail == 'role' %}
-									{% set usersRole = detail[1] %}
-
-								{% elseif detail == 'position' %}
-									{% set usersPosition = detail[1] %}
-
-								{% elseif detail == 'signature' %}
-									{% set usersSignature = detail[1] %}
-								{% endif %}
-							{% endfor %}
-
-							{% for user in users %}
-								{% if user.email == usersEmail or user.userName == usersUsername or user.firstName == usersFirstName
-								or user.lastName == usersLastName or user.role == usersRole
-								 or user.position == usersPosition or user.signature == usersSignature %}
-									{% set isMatch = true %}
-									{% set user_id = user.id %}
-									{% set user_username = user.userName %}
-								{% endif %}
-							{% endfor %}
-							{% if isMatch == true %}
-								{% set userPath = userPath|merge([user_id, user_username]) %}
+							{% elseif log.action == 'delete' %}
+							{% if object_name != '' %}
+							{{ 'mautic.user.account.log.delete'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+							{% else %}
+							{{ 'mautic.user.account.log.delete.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
 							{% endif %}
 
-						{% elseif log.action == 'update' and log.object == 'role' %}
-							{% set name, description, rowPermissions = '', '', '' %}
-							{% set role_id = '1' %}
-							{% set roleName = 'Admininstrator' %}
-							{% set isMatch = false %}
-							{% for detail in log.details %}
-								{% if detail == 'name' %}
-									{% set name = detail[1] %}
+							{% elseif log.action == 'send' %}
+							{% set subject = (log.details is defined and log.details['subject'] is defined) ? log.details['subject'] : '' %}
+							{{ 'mautic.user.account.log.send'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': subject}) }}
 
-								{% elseif detail == 'description' %}
-									{% set description = detail[1] %}
+							{% elseif log.action == 'login' %}
+							{{ 'mautic.user.account.log.login'|trans }}
 
-								{% elseif detail == 'rawPermissions' %}
-									{% set rowPermissions = detail[1] %}
-								{% endif %}
-							{% endfor %}
+							{% elseif log.action == 'logout' %}
+							{{ 'mautic.user.account.log.logout'|trans }}
 
-							{% for role in roles %}
-								{% if role.name == name or role.description == description or
-								role.rawPermissions == rowPermissions %}
-									{% set isMatch = true %}
-									{% set role_id = role.id %}
-									{% set roleName = role.name %}
-								{% endif %}
-							{% endfor %}
-							{% if isMatch == true %}
-								{% set rolePath = []|merge([role_id, roleName]) %}
+							{% elseif log.action == 'failed_login' %}
+							{{ 'mautic.user.account.log.failed_login'|trans }}
+
+							{% elseif log.action == 'publish' %}
+							{{ 'mautic.user.account.log.publish'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+
+							{% elseif log.action == 'unpublish' %}
+							{{ 'mautic.user.account.log.unpublish'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans,
+							'%%object_name%%': object_name}) }}
+
+							{% elseif log.action == 'start' %}
+							{{ 'mautic.user.account.log.start'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+
+							{% elseif log.action == 'submit' %}
+							{{ 'mautic.user.account.log.submit'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
+
 							{% endif %}
-						{% endif %}
-						<li class="media">
-							<div class="media-object pull-left">
-								{% if log.action == 'login' %}
-									<span class="figure featured">
-										<span class="ri-login-circle-line"></span>
-									</span>
-								{% elseif log.action == 'update' %}
-									<span class="figure"></span>
-								{% else %}
-									<span class="figure"></span>
-								{% endif %}
-							</div>
-							<div class="media-body">
-								{% if log.object == 'user' %}
-									{% if log.action == 'update' %}
-										{{ 'mautic.user.user.form.user'|trans }}
-										<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: userPath[0]}) }}" data-toggle="ajax">
-											{{ userPath[1] }}</a>
-										{{ 'mautic.user.role.form.updated_by'|trans }}
-
-									{% elseif log.action == 'create' %}
-										<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: userPath[0]}) }}" data-toggle="ajax">
-											{{ userPath[1] }}</a>
-										{{ 'mautic.user.user.form.created_by'|trans }}
-									{% endif %}
-
-								{% elseif log.object == 'role' %}
-									{% if log.action == 'create' %}
-										{{ 'mautic.role.role'|trans }}
-										<a href="{{ path('mautic_role_action', {objectAction: 'edit', objectId: rolePath[0]}) }}" data-toggle="ajax">
-											{{ rolePath[1] }}</a>
-										{{ 'mautic.user.user.form.created_by'|trans }}
-
-									{% elseif log.action == 'update' %}
-										{{ 'mautic.role.role'|trans }}
-										<a href="{{ path('mautic_role_action', {objectAction: 'edit', objectId: rolePath[0]}) }}" data-toggle="ajax">
-											{{ rolePath[1] }}</a>
-										{{ 'mautic.user.role.form.updated_by'|trans }}
-									{% endif %}
-
-								{% elseif log.object == 'security' %}
-									{% if log.action == 'login' %}
-										{{ 'mautic.user.user.form.user'|trans }}
-
-									{% elseif log.action == 'update' %}
-										{{ 'mautic.user.user.form.updated_by'|trans }}
-
-									{% endif %}
-								{% endif %}
-
-								{% if log.userId is defined and log.userId is not empty %}
-									<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: log.userId}) }}" data-toggle="ajax">{{ log.userName }}</a>
-									{% if log.action ==  'login' %}{{ 'mautic.user.user.form.login_by'|trans }}{% endif %}
-
-								{% else %}
-									{{ log.userName }}
-								{% endif %}
-								<p class="fs-12 dark-sm">
-									<small>
-										{{ dateToFull(log.dateAdded) }}</small>
-								</p>
-							</div>
-						</li>
-					{% endfor %}
-				</ul>
-			{% endif %}
-		</div>
+							<br>
+						</div>
+					</td>
+					<td>
+						<!-- Third line: formatted date -->
+						<small class="text-muted d-flex fd-column">
+							<span>{{ log.dateAdded is defined ? dateToFull(log.dateAdded) : '' }}</span>
+							<span>{{ log.ipAddress is defined ? log.ipAddress : '' }}</span>
+							<span>{{ log.object is defined ? log.object : '' }}.{{ log.action is defined ? log.action : '' }}</span>
+						</small>
+					</td>
+				</tr>
+				{% endfor %}
+				{% else %}
+				<tr>
+					<td>{{ 'mautic.core.no.log.available'|trans }}</td>
+				</tr>
+				{% endif %}
+			</tbody>
+		</table>
 	</div>
-	{{ customContent('right.section.bottom', _context) }}
 </div>
-<!-- Recent activity block(audit_log table) -->

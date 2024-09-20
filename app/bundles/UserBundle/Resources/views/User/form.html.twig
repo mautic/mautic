@@ -22,7 +22,7 @@
 		<!-- container -->
 		{{ form_start(form) }}
 		<div class="col-md-9 height-auto bdr-r">
-			<div class="pa-md">
+			<div>
 				<div class="form-group mb-0">
 					<div class="row">
 						<div class="col-sm-6{{ form.firstName.vars.errors|length ? ' has-error' : '' }}">
@@ -68,6 +68,13 @@
 							</div>
 							{{ form_widget(form.plainPassword, {'attr' : {'placeholder' : form.plainPassword.vars.label }}) }}
 						</div>
+						{% if editAction is defined and editAction == true %}
+							{{- include('@MauticUser/User/recent_activity.html.twig', {
+						'logs'  : logs,
+						'users' : users,
+						'roles' : roles,
+						}) -}}
+						{% endif %}
 					</div>
 				</div>
 			</div>
@@ -78,13 +85,6 @@
 				{{ form_rest(form) }}
 			</div>
 		</div>
-		{% if editAction is defined and editAction == true %}
-			{{- include('@MauticUser/User/recent_activity.html.twig', {
-        'logs'  : logs,
-        'users' : users,
-        'roles' : roles,
-    	}) -}}
-		{% endif %}
 
 		{{ form_end(form) }}
 	</div>

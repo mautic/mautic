@@ -238,7 +238,7 @@ class UserController extends FormController
         /** @var AuditLogModel $auditLogModel */
         $auditLogModel      = $this->getModel('core.auditlog');
         $auditLogRepository = $auditLogModel->getRepository();
-        $userActivity       = $auditLogRepository->getLogsForUser($user);
+        $userActivity       = $auditLogRepository->getLogsForUser($user, 150);
         $users              = $model->getEntities();
 
         $roleModel = $this->getModel('user.role');
