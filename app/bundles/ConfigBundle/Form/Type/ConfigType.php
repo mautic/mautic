@@ -72,8 +72,8 @@ class ConfigType extends AbstractType
             'buttons',
             FormButtonsType::class,
             [
+                'save_text'     => false,
                 'apply_onclick' => 'Mautic.activateBackdrop()',
-                'save_onclick'  => 'Mautic.activateBackdrop()',
             ]
         );
 

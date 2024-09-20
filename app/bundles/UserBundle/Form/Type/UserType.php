@@ -219,7 +219,11 @@ class UserType extends AbstractType
 
             $builder->add('isPublished', YesNoButtonGroupType::class);
 
-            $builder->add('buttons', FormButtonsType::class);
+            $builder->add('buttons', FormButtonsType::class,
+                [
+                    'apply_text' => false,
+                    'save_text'  => 'mautic.core.form.save',
+                ]);
         } else {
             $builder->add(
                 'buttons',

@@ -13,7 +13,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
     public function testNewRoleAction(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/roles/new');
-        $saveButton = $crawler->selectButton('role[buttons][apply]');
+        $saveButton = $crawler->selectButton('role[buttons][save]');
 
         $name = 'Test Role';
         $desc = 'Role Description';

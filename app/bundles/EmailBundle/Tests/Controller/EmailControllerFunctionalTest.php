@@ -385,7 +385,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // request for email clone
         $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $buttonCrawler  =  $crawler->selectButton('Save');
         $form           = $buttonCrawler->form();
         $form['emailform[emailType]']->setValue('list');
         $form['emailform[subject]']->setValue('Email B Subject clone');
@@ -420,7 +420,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // request for email clone
         $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/abtest/{$email->getId()}");
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $buttonCrawler  =  $crawler->selectButton('Save');
         $form           = $buttonCrawler->form();
         $form['emailform[subject]']->setValue('Email B Subject var 2');
         $form['emailform[name]']->setValue('Email B var 2');

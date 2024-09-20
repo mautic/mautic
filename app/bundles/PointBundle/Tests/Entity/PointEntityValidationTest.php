@@ -22,7 +22,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
     public function testDeltaValidationOnCreate(int $delta, string $errorMessage = ''): void
     {
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/new');
-        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $buttonCrawler = $crawler->selectButton('Save');
         $form          = $buttonCrawler->form();
         $form['point[name]']->setValue('Add point');
         $this->testPointData($form, $delta, $errorMessage);
@@ -76,7 +76,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $pointId = $point->getId();
 
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/edit/'.$pointId);
-        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $buttonCrawler = $crawler->selectButton('Save');
         $form          = $buttonCrawler->form();
         $form['point[name]']->setValue('Edit point');
         $this->testPointData($form, $delta, $errorMessage);

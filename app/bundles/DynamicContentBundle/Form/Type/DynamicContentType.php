@@ -251,7 +251,11 @@ class DynamicContentType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                FormButtonsType::class
+                FormButtonsType::class,
+                [
+                    'apply_text' => false,
+                    'save_text'  => 'mautic.core.form.save',
+                ]
             );
         }
 

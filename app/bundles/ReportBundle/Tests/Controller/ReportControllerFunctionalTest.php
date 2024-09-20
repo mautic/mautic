@@ -386,7 +386,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(['schedule_unit' => $oldScheduleUnit, 'schedule_day' => $oldScheduleDay, 'schedule_month_frequency' => $oldScheduleMonthFrequency], $schedule, 'Old schedule should be set correctly');
 
         $crawler        = $this->client->request(Request::METHOD_GET, 's/reports/edit/'.$report->getId());
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $buttonCrawler  =  $crawler->selectButton('Save');
         $form           = $buttonCrawler->form();
         $form['report[scheduleUnit]']->setValue($newScheduleUnit);
         if (!is_null($newScheduleDay)) {

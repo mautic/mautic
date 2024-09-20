@@ -93,10 +93,10 @@
                     {{ item.getName() }}
                 </td>
                 <td class="visible-md visible-lg">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ item.getPublicId() }}"/>
+                    <input id="client_publicId" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ item.getPublicId() }}"/>
                 </td>
                 <td class="visible-md visible-lg">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ item.getSecret() }}"/>
+                    <input id="client_secret" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ item.getSecret() }}"/>
                 </td>
                 <td class="visible-md visible-lg">{{ item.getId() }}</td>
             </tr>

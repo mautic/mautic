@@ -226,6 +226,8 @@ class FocusType extends AbstractType
                 'buttons',
                 FormButtonsType::class,
                 [
+                    'apply_text'        => false,
+                    'save_text'         => 'mautic.core.form.save',
                     'pre_extra_buttons' => $customButtons,
                 ]
             );

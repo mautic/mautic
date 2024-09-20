@@ -27,7 +27,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         // set form data
-        $form   = $crawler->selectButton('config[buttons][save]')->form();
+        $form   = $crawler->selectButton('config[buttons][apply]')->form();
         $values = $form->getPhpValues();
 
         $values['config']['leadconfig']['contact_columns']                              = ['name', 'email', 'id']; // required
@@ -59,7 +59,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $form = $crawler->selectButton('config[buttons][save]')->form();
+        $form = $crawler->selectButton('config[buttons][apply]')->form();
         Assert::assertEquals($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
         Assert::assertEquals($data['host'], $form['config[emailconfig][mailer_dsn][host]']->getValue());
         Assert::assertEquals($data['port'], $form['config[emailconfig][mailer_dsn][port]']->getValue());
@@ -81,7 +81,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         // set form data
-        $form = $crawler->selectButton('config[buttons][save]')->form();
+        $form = $crawler->selectButton('config[buttons][apply]')->form();
         $form->setValues($data + [
             'config[leadconfig][contact_columns]' => ['name', 'email', 'id'], // required
         ]);

@@ -29,7 +29,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditActionFormSubmissionValid(): void
     {
         $crawler                = $this->client->request('GET', '/s/users/edit/1');
-        $buttonCrawlerNode      = $crawler->selectButton('Save & Close');
+        $buttonCrawlerNode      = $crawler->selectButton('Save');
         $form                   = $buttonCrawlerNode->form();
         $form['user[username]'] = 'test';
         $this->client->submit($form);
