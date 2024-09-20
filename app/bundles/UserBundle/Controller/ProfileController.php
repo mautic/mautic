@@ -29,7 +29,7 @@ class ProfileController extends FormController
         $auditLogRepository = $auditLogModel->getRepository();
 
         // Fetch recent activity for the current user with a limit of 50
-        $userActivity = $auditLogRepository->getLogsForUser($me, 50);
+        $userActivity = $auditLogRepository->getLogsForUser($me, 30);
 
         // set some permissions
         $permissions = [

@@ -1,78 +1,80 @@
-<table class="table">
-    <tbody>
-    {% if logs is defined and logs is not empty %}
-        {% for log in logs %}
-            <tr>
-                <td class="pt-md pb-md">
-                    <div class="d-flex fd-column">
-<!-- First line: username – translated object and action -->
-<strong class="mb-xs">
-    {% set username = log.userName is defined ? log.userName : 'Unknown User' %}
-    {{ username }}
-</strong>
-<!-- Second line: humanized description based on context -->
-{% set object_name = (log.details is defined and log.details['name'] is defined and log.details['name'][1] is defined) ? log.details['name'][1] : '' %}
+{% if logs|default([])|length > 0 %}
+<ul class="media-list media-list-feed mt-lg pi-md">
+    {% for log in logs %}
+    {# Initialization of variables #}
+    {% set details = log.details|default({}) %}
 
-{% if log.action == 'create' %}
-    {% if object_name != '' %}
-        {{ 'mautic.user.account.log.create'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
-    {% else %}
-        {{ 'mautic.user.account.log.create.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
+    {# Handling for 'user' objects #}
+    {% if log.object == 'user' %}
+    {% set email = details['email'][1]|default('') %}
+    {% set username = details['username'][1]|default('') %}
+    {% set user = users|filter(u => u.email == email or u.userName == username)|first %}
+    {% if user %}
+    {% set userPath = [user.id, user.userName] %}
+    {% endif %}
     {% endif %}
 
-{% elseif log.action == 'update' %}
-    {% if object_name != '' %}
-        {{ 'mautic.user.account.log.update'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
-    {% else %}
-        {{ 'mautic.user.account.log.update.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
-    {% endif %}
+    <li class="media">
+        <div class="media-object pull-left">
+            {% set icon_class = {
+            'create': 'add-circle-line',
+            'update': 'edit-2-line',
+            'delete': 'delete-bin-line',
+            'send': 'send-plane-line',
+            'login': 'login-circle-line',
+            'logout': 'logout-circle-line',
+            'failed_login': 'error-warning-line',
+            'publish': 'upload-cloud-line',
+            'unpublish': 'cloud-off-line',
+            'start': 'play-circle-line',
+            'submit': 'checkbox-circle-line'
+            }[log.action]|default('information-line') %}
+            <span class="figure featured">
+                <i class="ri-{{ icon_class }}"></i>
+            </span>
+        </div>
+        <div class="media-body">
 
-{% elseif log.action == 'delete' %}
-    {% if object_name != '' %}
-        {{ 'mautic.user.account.log.delete'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
-    {% else %}
-        {{ 'mautic.user.account.log.delete.no_name'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans}) }}
-    {% endif %}
+            {# User link or name #}
+            <strong>{{ log.userName }}</strong>
 
-{% elseif log.action == 'send' %}
-    {% set subject = (log.details is defined and log.details['subject'] is defined) ? log.details['subject'] : '' %}
-    {{ 'mautic.user.account.log.send'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': subject}) }}
+            {# Humanized description #}
+            {% set object_name = details['name'][1]|default('') %}
+            {% set object_trans = ('mautic.object.' ~ log.object)|trans %}
 
-{% elseif log.action == 'login' %}
-    {{ 'mautic.user.account.log.login'|trans }}
+            {% set action_map = {
+            'create': ['mautic.user.account.log.create', 'mautic.user.account.log.create.no_name'],
+            'update': ['mautic.user.account.log.update', 'mautic.user.account.log.update.no_name'],
+            'delete': ['mautic.user.account.log.delete', 'mautic.user.account.log.delete.no_name'],
+            'send': 'mautic.user.account.log.send',
+            'login': 'mautic.user.account.log.login',
+            'logout': 'mautic.user.account.log.logout',
+            'failed_login': 'mautic.user.account.log.failed_login',
+            'publish': 'mautic.user.account.log.publish',
+            'unpublish': 'mautic.user.account.log.unpublish',
+            'start': 'mautic.user.account.log.start',
+            'submit': 'mautic.user.account.log.submit'
+            } %}
 
-{% elseif log.action == 'logout' %}
-    {{ 'mautic.user.account.log.logout'|trans }}
+            {% if log.action in ['create', 'update', 'delete'] %}
+            {% set trans_key = action_map[log.action][object_name ? 0 : 1] %}
+            {{ trans_key|trans({'%%object%%': object_trans, '%%object_name%%': object_name}) }}
+            {% elseif log.action == 'send' %}
+            {% set subject = details['subject'][1]|default('') %}
+            {{ action_map[log.action]|trans({'%%object%%': object_trans, '%%object_name%%': subject}) }}
+            {% elseif log.action in ['login', 'logout', 'failed_login'] %}
+            {{ action_map[log.action]|trans }}
+            {% elseif log.action in ['publish', 'unpublish', 'start', 'submit'] %}
+            {{ action_map[log.action]|trans({'%%object%%': object_trans, '%%object_name%%': object_name}) }}
+            {% endif %}
 
-{% elseif log.action == 'failed_login' %}
-    {{ 'mautic.user.account.log.failed_login'|trans }}
-
-{% elseif log.action == 'publish' %}
-    {{ 'mautic.user.account.log.publish'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
-
-{% elseif log.action == 'unpublish' %}
-    {{ 'mautic.user.account.log.unpublish'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
-
-{% elseif log.action == 'start' %}
-    {{ 'mautic.user.account.log.start'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
-
-{% elseif log.action == 'submit' %}
-    {{ 'mautic.user.account.log.submit'|trans({'%%object%%': ('mautic.object.' ~ log.object)|trans, '%%object_name%%': object_name}) }}
-
+            <p class="fs-12 text-muted mt-xs">
+                <small class="d-flex fd-column">
+                    {{ dateToFullConcat(log.dateAdded) }}
+                </small>
+            </p>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
 {% endif %}
-<br>
-<!-- Third line: formatted date -->
-<small class="text-muted">{{ log.dateAdded is defined ? dateToDate(log.dateAdded) : '' }}</small>
-                    </div>
-
-
-                </td>
-            </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
-            <td>{{ 'mautic.core.no.log.available'|trans }}</td>
-        </tr>
-    {% endif %}
-    </tbody>
-</table>
