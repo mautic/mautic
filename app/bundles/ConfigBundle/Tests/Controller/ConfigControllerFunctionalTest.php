@@ -85,7 +85,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $buttonCrawler = $crawler->selectButton('config[buttons][apply]');
         $form          = $buttonCrawler->form();
         Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
         Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
@@ -163,7 +163,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
         // Find save & close button
-        $buttonCrawler  = $crawler->selectButton('config[buttons][save]');
+        $buttonCrawler  = $crawler->selectButton('config[buttons][apply]');
         $form           = $buttonCrawler->form();
 
         // Fetch available option for 404_page field
@@ -185,7 +185,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $buttonCrawler = $crawler->selectButton('config[buttons][apply]');
         $form          = $buttonCrawler->form();
         Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
         // re-create the Symfony client to make config changes applied
@@ -200,7 +200,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
-        $buttonCrawler  =  $crawler->selectButton('config[buttons][save]');
+        $buttonCrawler  =  $crawler->selectButton('config[buttons][apply]');
         $form           = $buttonCrawler->form();
 
         $send_notification_to_author           = '0';
@@ -224,7 +224,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $buttonCrawler = $crawler->selectButton('config[buttons][apply]');
         $form          = $buttonCrawler->form();
 
         Assert::assertEquals($send_notification_to_author, $form['config[notification_config][campaign_send_notification_to_author]']->getValue());
@@ -250,7 +250,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // 2. Change system locale in configuration - should not change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $configSaveButton = $configCrawler->selectButton('config[buttons][save]');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][apply]');
         $configForm       = $configSaveButton->form();
         $configForm->setValues(
             [
@@ -277,7 +277,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // 2. Change system locale in configuration to en_US - should change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $configSaveButton = $configCrawler->selectButton('config[buttons][save]');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][apply]');
         $configForm       = $configSaveButton->form();
         $configForm->setValues(
             [

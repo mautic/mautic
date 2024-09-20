@@ -77,7 +77,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
         $this->client->restart();
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form    = $crawler->selectButton('leadlist_buttons_save')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -102,7 +102,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form    = $crawler->selectButton('leadlist_buttons_save')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -302,7 +302,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/clone/'.$segment->getId());
         $this->assertTrue($this->client->getResponse()->isOk());
 
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form    = $crawler->selectButton('leadlist_buttons_save')->form();
         $form['leadlist[alias]']->setValue('clonesegment2');
         $this->client->submit($form);
 
@@ -396,7 +396,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form    = $crawler->selectButton('leadlist_buttons_save')->form();
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
 
