@@ -90,6 +90,22 @@
   .bdr-b-lg { border-bottom: 1px solid @hr-border; }
 }
 
+// Border spacing
+.bsa-xs {
+  border-spacing: 5px;
+  border-collapse: separate;
+}
+
+.bsv-xs {
+  border-spacing: 0 5px;
+  border-collapse: separate;
+}
+
+.bsh-xs {
+  border-spacing: 5px 0;
+  border-collapse: separate;
+}
+
 // background picture
 // ---------------------------------------------
 .bg-picture {
@@ -140,7 +156,13 @@
 
 // Margin
 // ---------------------------------------------
-.ma-0, .nm { margin: 0px !important; }
+.ma-a { margin: auto !important; }
+.mr-a { margin-right: auto !important; }
+.mt-a { margin-top: auto !important; }
+.mb-a { margin-bottom: auto !important; }
+.ml-a { margin-left: auto !important; }
+
+.ma-0 { margin: 0px !important; }
 .mr-0 { margin-right: 0px !important; }
 .mt-0 { margin-top: 0px !important; }
 .mb-0 { margin-bottom: 0px !important; }
@@ -382,6 +404,7 @@
 .pb-160 { padding-bottom: var(--spacing-13) !important; }
 .pl-160 { padding-left: var(--spacing-13) !important; }
 
+.pi-16, .pi-md { padding-inline: var(--spacing-05) !important; }
 
 //fixed widths
 .w-44 {width: 44px;}
@@ -442,16 +465,16 @@
 }
 
 // Branded backgrounds
-.background-brand { 
-  background-color: var(--background-brand); 
+.background-brand {
+  background-color: var(--background-brand);
   color: var(--text-on-color);
 
   a {
     color: var(--text-on-color);
   }
 }
-.background-brand-alt { 
-  background-color: var(--background-brand-alt); 
+.background-brand-alt {
+  background-color: var(--background-brand-alt);
   color: var(--items-on-secondary);
 }
 
