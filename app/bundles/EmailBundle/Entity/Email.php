@@ -1395,7 +1395,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function listsChangedSet(string $property, array $ids): void
     {
         $this->initListChanges($property);
-        $this->changes[$property][1] = $ids;
+        $this->recordListChanges($property, $ids);
     }
 
     private function initListChanges(string $property): void
@@ -1421,5 +1421,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         }
 
         return $keys;
+    }
+
+    /**
+     * @param array<integer> $ids
+     */
+    private function recordListChanges(string $property, array $ids): void
+    {
+        if (array_diff($this->changes[$property][0], $ids)) {
+            $this->changes[$property][1] = $ids;
+        } else {
+            unset($this->changes[$property]);
+        }
     }
 }
