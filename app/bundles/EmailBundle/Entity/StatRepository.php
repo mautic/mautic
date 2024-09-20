@@ -491,7 +491,8 @@ class StatRepository extends CommonRepository
             $timestampColumn,
             ['openDetails'],
             ['dateRead', 'dateSent'],
-            $timeToReadParser
+            $timeToReadParser,
+            's.id'
         );
     }
 

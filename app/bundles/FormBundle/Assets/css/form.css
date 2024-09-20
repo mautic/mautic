@@ -138,8 +138,8 @@ textarea.form-html {
     color: red;
     margin-top: 2px;
 }
-.mauticform-selectbox, 
-.mauticform-input, 
+.mauticform-selectbox,
+.mauticform-input,
 .mauticform-textarea {
     width: 75%;
     max-width: 500px;
@@ -154,7 +154,7 @@ textarea.form-html {
     gap: 5px;
 }
 
-.mauticform-checkboxgrp-row input[type="radio"], 
+.mauticform-checkboxgrp-row input[type="radio"],
 .mauticform-checkboxgrp-row input[type="checkbox"] {
     margin: 0;
 }
@@ -167,16 +167,21 @@ textarea.form-html {
 .mauticform-radiogrp-label {
     font-weight: normal;
 }
-.mauticform-radiogrp-radio {}
+input[type="radio"].mauticform-radiogrp-radio {
+    width: 16px;
+    height: 16px;
+    vertical-align: -3px;
+    margin-right: 4px;
+}
 
 /* Mautic Form Button Styles */
-.mauticform-button-wrapper .mauticform-button.btn-default, 
+.mauticform-button-wrapper .mauticform-button.btn-default,
 .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default {
     color: #5d6c7c;
     background-color: #ffffff;
     border-color: #dddddd;
 }
-.mauticform-button-wrapper .mauticform-button, 
+.mauticform-button-wrapper .mauticform-button,
 .mauticform-pagebreak-wrapper .mauticform-pagebreak {
     display: inline-block;
     margin-bottom: 0;
@@ -196,7 +201,7 @@ textarea.form-html {
     -ms-user-select: none;
     user-select: none;
 }
-.mauticform-button-wrapper .mauticform-button.btn-default[disabled], 
+.mauticform-button-wrapper .mauticform-button.btn-default[disabled],
 .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default[disabled] {
     background-color: #ffffff;
     border-color: #dddddd;
