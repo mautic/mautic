@@ -60,7 +60,32 @@ mQuery( document ).ajaxStop(function(event) {
     initializeCodeBlocks();
 });
 
-mQuery(document).ready(function() {
+mQuery( document ).ready(function() {
+    // Load user preferences for UI saved previously
+    const prefix = 'm-toggle-setting-';
+    Object.keys(localStorage)
+        .filter(key => key.startsWith(prefix))
+        .forEach(setting => {
+            const attributeName = setting.replace(prefix, '');
+            const value = localStorage.getItem(setting);
+
+            if (value) {
+                document.documentElement.setAttribute(attributeName, value);
+            }
+        });
+
+    // Handle radio button changes
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const attributeName = this.dataset.attributeToggle;
+                const newValue = this.dataset.attributeValue;
+                document.documentElement.setAttribute(attributeName, newValue);
+                localStorage.setItem(`${prefix}${attributeName}`, newValue);
+            }
+        });
+    });
+
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false

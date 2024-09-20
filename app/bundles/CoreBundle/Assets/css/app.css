@@ -1145,6 +1145,13 @@ a.text-google:focus {
 .text-disabled {
   color: var(--text-disabled);
 }
+.text-helper {
+  color: var(--text-helper);
+}
+.text-help {
+  color: var(--text-helper);
+  font-size: var(--typography-utility-productive);
+}
 blockquote {
   padding-left: 40px;
   border-width: 0px;
@@ -1211,7 +1218,7 @@ kbd {
 .btn {
   transition: var(--transition-all-productive);
   border: 1px solid var(--border-no-color);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
   border-radius: var(--border-radius-sm);
   display: inline-flex;
@@ -1226,13 +1233,13 @@ kbd {
   width: fit-content;
 }
 .btn:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn:active,
 .btn.active,
 .btn:focus,
 .btn.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn:hover {
   border: 1px solid var(--border-no-color);
@@ -1318,12 +1325,12 @@ kbd {
 .btn-primary + .dropdown-toggle {
   background-color: var(--button-primary);
   color: var(--text-on-color);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-primary:hover,
 .btn-primary + .dropdown-toggle:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-primary:active,
 .btn-primary + .dropdown-toggle:active,
@@ -1333,7 +1340,7 @@ kbd {
 .btn-primary + .dropdown-toggle:focus,
 .btn-primary.focus,
 .btn-primary + .dropdown-toggle.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-primary i,
 .btn-primary + .dropdown-toggle i {
@@ -1360,12 +1367,12 @@ kbd {
 .btn-primary + .dropdown-toggle.btn-danger {
   color: var(--text-inverse);
   background-color: var(--button-danger-primary);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-primary.btn-danger:hover,
 .btn-primary + .dropdown-toggle.btn-danger:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-primary.btn-danger:active,
 .btn-primary + .dropdown-toggle.btn-danger:active,
@@ -1375,7 +1382,7 @@ kbd {
 .btn-primary + .dropdown-toggle.btn-danger:focus,
 .btn-primary.btn-danger.focus,
 .btn-primary + .dropdown-toggle.btn-danger.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-primary.btn-danger i,
 .btn-primary + .dropdown-toggle.btn-danger i {
@@ -1405,17 +1412,17 @@ kbd {
 .btn-secondary {
   background-color: var(--button-secondary);
   color: var(--text-inverse);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-secondary:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-secondary:active,
 .btn-secondary.active,
 .btn-secondary:focus,
 .btn-secondary.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-secondary i {
   color: var(--text-inverse);
@@ -1443,7 +1450,7 @@ kbd {
   color: var(--button-tertiary);
   border-color: var(--button-tertiary);
   margin-left: -1px;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-tertiary:hover,
@@ -1451,7 +1458,7 @@ kbd {
 .btn-primary + .btn-primary:not(.dropdown-toggle):hover,
 .btn-primary + .btn-primary + .btn-primary:hover,
 .btn-primary + .btn-primary + .btn-secondary:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-tertiary:active,
 .btn-tertiary + .dropdown-toggle:active,
@@ -1473,7 +1480,7 @@ kbd {
 .btn-primary + .btn-primary:not(.dropdown-toggle).focus,
 .btn-primary + .btn-primary + .btn-primary.focus,
 .btn-primary + .btn-primary + .btn-secondary.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-tertiary i,
 .btn-tertiary + .dropdown-toggle i,
@@ -1550,7 +1557,7 @@ kbd {
 .btn-primary + .btn-primary + .btn-secondary.btn-danger {
   color: var(--button-danger-secondary);
   border-color: var(--button-danger-secondary);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-tertiary.btn-danger:hover,
@@ -1558,7 +1565,7 @@ kbd {
 .btn-primary + .btn-primary:not(.dropdown-toggle).btn-danger:hover,
 .btn-primary + .btn-primary + .btn-primary.btn-danger:hover,
 .btn-primary + .btn-primary + .btn-secondary.btn-danger:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-tertiary.btn-danger:active,
 .btn-tertiary + .dropdown-toggle.btn-danger:active,
@@ -1580,7 +1587,7 @@ kbd {
 .btn-primary + .btn-primary:not(.dropdown-toggle).btn-danger.focus,
 .btn-primary + .btn-primary + .btn-primary.btn-danger.focus,
 .btn-primary + .btn-primary + .btn-secondary.btn-danger.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-tertiary.btn-danger i,
 .btn-tertiary + .dropdown-toggle.btn-danger i,
@@ -1668,17 +1675,17 @@ kbd {
   background-color: transparent;
   padding-inline: var(--spacing-05);
   justify-content: center;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-ghost:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-ghost:active,
 .btn-ghost.active,
 .btn-ghost:focus,
 .btn-ghost.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-ghost i {
   color: var(--link-primary);
@@ -1706,12 +1713,12 @@ kbd {
 .btn-ghost.btn-danger,
 .btn-ghost.btn-danger.btn-icon {
   color: var(--button-danger-secondary);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-ghost.btn-danger:hover,
 .btn-ghost.btn-danger.btn-icon:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-ghost.btn-danger:active,
 .btn-ghost.btn-danger.btn-icon:active,
@@ -1721,7 +1728,7 @@ kbd {
 .btn-ghost.btn-danger.btn-icon:focus,
 .btn-ghost.btn-danger.focus,
 .btn-ghost.btn-danger.btn-icon.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-ghost.btn-danger i,
 .btn-ghost.btn-danger.btn-icon i {
@@ -1761,17 +1768,17 @@ kbd {
 .btn-ghost.btn-icon {
   color: var(--icon-primary);
   background-color: transparent;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-ghost.btn-icon:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-ghost.btn-icon:active,
 .btn-ghost.btn-icon.active,
 .btn-ghost.btn-icon:focus,
 .btn-ghost.btn-icon.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-ghost.btn-icon i {
   color: var(--icon-primary);
@@ -1845,7 +1852,7 @@ kbd {
 .btn-group .dropdown-toggle,
 .btn-group.open .dropdown-toggle,
 .navbar-toggle {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn.active:hover,
@@ -1855,7 +1862,7 @@ kbd {
 .btn-group .dropdown-toggle:hover,
 .btn-group.open .dropdown-toggle:hover,
 .navbar-toggle:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn.active:active,
 .dropdown-toggle:active,
@@ -1885,7 +1892,7 @@ kbd {
 .btn-group .dropdown-toggle.focus,
 .btn-group.open .dropdown-toggle.focus,
 .navbar-toggle.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-link {
   font-weight: 600;
@@ -2010,8 +2017,8 @@ kbd {
   background: #a3e2e4;
 }
 .alert-growl {
-  background: rgba(0, 0, 0, 0.7);
-  color: #FFFFFF;
+  background: var(--layer-translucent-inverse);
+  color: var(--text-inverse);
   border-radius: 0;
   border-left: 4px solid var(--border-interactive);
   border-top: none;
@@ -2064,7 +2071,7 @@ kbd {
 }
 .alert-growl .close {
   font-size: 13px;
-  color: #fff;
+  color: var(--text-inverse);
   margin-left: 10px;
   font-weight: normal;
 }
@@ -2357,22 +2364,22 @@ a.media {
 .container {
   padding-right: 15px;
   padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
+  margin: 0;
+  display: flex;
 }
 @media (min-width: 768px) {
   .container {
-    width: 750px;
+    max-width: 750px;
   }
 }
 @media (min-width: 992px) {
   .container {
-    width: 970px;
+    max-width: 970px;
   }
 }
 @media (min-width: 1200px) {
   .container {
-    width: 1170px;
+    max-width: 1170px;
   }
 }
 .container-fluid {
@@ -2384,6 +2391,7 @@ a.media {
 .row {
   display: flex;
   flex-wrap: wrap;
+  max-width: 100%;
   margin-right: -15px;
   margin-left: -15px;
 }
@@ -3316,17 +3324,17 @@ ul.dropdown-menu-form {
   aspect-ratio: 1 / 1;
   justify-content: center;
   align-items: center;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .dropdown-toggle:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .dropdown-toggle:active,
 .dropdown-toggle.active,
 .dropdown-toggle:focus,
 .dropdown-toggle.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .dropdown-header {
   margin: 32px 16px 8px 16px;
@@ -3362,8 +3370,11 @@ ul.dropdown-menu-form {
   border-top-right-radius: var(--border-radius-sm);
   border-top-left-radius: var(--border-radius-sm);
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  position: relative;
   text-wrap: nowrap;
+  scroll-behavior: smooth;
 }
 .nav-tabs > li > a {
   line-height: 20px;
@@ -3423,6 +3434,14 @@ ul.dropdown-menu-form {
 .nav-tabs.nav-tabs-contained > li.active > a {
   background-color: var(--layer);
 }
+.nav-tabs.nav-tabs-contained > li.disabled {
+  cursor: not-allowed;
+  color: var(--text-disabled);
+}
+.nav-tabs.nav-tabs-contained > li.disabled > a {
+  background-color: var(--button-disabled);
+  pointer-events: none;
+}
 @media (min-width: 1200px) {
   .nav-tabs {
     flex-wrap: nowrap;
@@ -3446,6 +3465,8 @@ ul.dropdown-menu-form {
 .stats-menu__content.tab-content > .tab-pane {
   width: 100%;
 }
+.nav-tabs-wrapper:has(.nav-tabs-contained) + .tab-content,
+.nav-tabs-wrapper:has(.nav-tabs-contained) + form > .tab-content,
 .nav-tabs-contained + .tab-content,
 .nav-tabs-contained + form > .tab-content {
   background-color: var(--layer);
@@ -3465,6 +3486,53 @@ ul.dropdown-menu-form {
 }
 .stats-menu.stats-menu + div {
   min-height: 410px;
+}
+/* nav-tabs-wrapper styles */
+.nav-tabs-wrapper {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: -1px;
+}
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background-color: var(--layer-accent);
+  cursor: pointer;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  padding: 0;
+  inline-size: 40px;
+  aspect-ratio: 1 / 1;
+}
+.scroll-btn:before {
+  position: absolute;
+  z-index: 1;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--background, #ffffff));
+  block-size: 100%;
+  content: "";
+  inline-size: 0.5rem;
+  inset-inline-end: -0.5rem;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0), var(--layer-accent));
+}
+.left-btn {
+  inset-inline-start: 0;
+}
+.left-btn:before {
+  transform: scaleX(-1);
+}
+.right-btn {
+  inset-inline-end: 0;
+}
+.nav-tabs-wrapper.show-scroll-buttons .scroll-btn:disabled {
+  display: none;
+}
+.nav-tabs-wrapper.show-scroll-buttons .scroll-btn {
+  display: flex;
 }
 .notes {
   overflow: hidden;
@@ -4279,11 +4347,29 @@ input[type=file].form-control {
 .radio-inline.custom-danger label:hover input:checked + span {
   border: 1px solid #F86B4F;
 }
-input[type="radio"] {
+.radio-group .radio-option {
+  margin-bottom: var(--spacing-02);
+}
+.radio-group input[type="radio"] {
   width: 16px;
   height: 16px;
-  vertical-align: -3px;
+  vertical-align: top;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  border: 4px solid white;
+  border-radius: 50%;
+  outline: 1px solid black;
+  transition: 0.2s all linear;
+  outline-offset: -1px;
   margin-right: 4px;
+}
+.radio-group input[type="radio"]:checked {
+  background-color: black;
+}
+.radio-group input[type="radio"]:hover {
+  cursor: pointer;
+  opacity: 0.7;
 }
 .radio-inline[class*=" custom"] label input + span,
 .radio[class*=" custom"] label input + span,
@@ -6503,6 +6589,10 @@ lesshat-selector { -lh-property: 0 ;
 .pl-160 {
   padding-left: var(--spacing-13) !important;
 }
+.pi-16,
+.pi-md {
+  padding-inline: var(--spacing-05) !important;
+}
 .w-44 {
   width: 44px;
 }
@@ -7894,9 +7984,6 @@ ul.media-list.media-list-feed div.media-body {
     opacity: 0;
   }
 }
-.tooltip-inner {
-  padding: 12px;
-}
 :root {
   --background: #ffffff;
   --background-hover: #8d8d8d1f;
@@ -7920,6 +8007,7 @@ ul.media-list.media-list-feed div.media-body {
   --layer-selected-inverse: #161616;
   --layer-selected-disabled: #8d8d8d;
   --layer-translucent: #ffffffcc;
+  --layer-translucent-inverse: rgba(0, 0, 0, 0.7);
   --layer-accent: #e0e0e0;
   --layer-accent-hover: #d1d1d1;
   --layer-accent-active: #a8a8a8;
@@ -8067,6 +8155,7 @@ ul.media-list.media-list-feed div.media-body {
   --layer-selected-inverse: #f4f4f4;
   --layer-selected-disabled: #6f6f6f;
   --layer-translucent: #000000cc;
+  --layer-translucent-inverse: #ffffffcc;
   --layer-accent: #393939;
   --layer-accent-alternate: #525252;
   --layer-accent-hover: #4c4c4c;
@@ -8228,20 +8317,43 @@ ul.media-list.media-list-feed div.media-body {
   --border-radius-sm: clamp(0px, 0px, 7px);
   --border-radius-md: clamp(0px, calc(1.8 * 0px), 14px);
   --border-radius-lg: clamp(0px, calc(2.6 * 0px), 21px);
+  --outline-style: solid;
 }
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --duration-productive: 0;
-    --duration-expressive: 0;
-  }
+:root[reduce-motion="true"] {
+  --duration-productive: 0;
+  --duration-expressive: 0;
 }
-:root[high-contrast="enabled"] {
-  outline-style: dotted;
+:root[contrast-borders="true"] {
+  --outline-style: dashed;
   --border-no-color: var(--border-strong);
-  --border-bottom: 1px solid var(--border-strong);
+  --border-bottom: 1px;
 }
-@media (prefers-reduced-transparency: reduce) {
-  :root {
-    --layer-translucent: var(--layer);
-  }
+:root[contrast-borders="true"] a {
+  outline: 2px var(--outline-style) transparent;
+  outline-offset: -2px;
+}
+:root[contrast-borders="true"] a:hover {
+  outline: 2px var(--outline-style) transparent;
+}
+:root[contrast-borders="true"] a:active,
+:root[contrast-borders="true"] a.active,
+:root[contrast-borders="true"] a:focus,
+:root[contrast-borders="true"] a.focus {
+  outline: 2px var(--outline-style) var(--focus);
+}
+:root[reduce-transparency="true"] {
+  --layer-translucent: var(--layer);
+  --layer-translucent-inverse: var(--layer-selected-inverse);
+}
+:root[enable-underlines="true"] p a,
+:root[enable-underlines="true"] .alert a,
+:root[enable-underlines="true"] .list-group-item-text,
+:root[enable-underlines="true"] .accordion-title,
+:root[enable-underlines="true"] td a:not(.label):not([class*="dropdown-"]):not(.dropdown-menu a),
+:root[enable-underlines="true"] p a:hover,
+:root[enable-underlines="true"] .alert a:hover,
+:root[enable-underlines="true"] .list-group-item-text:hover,
+:root[enable-underlines="true"] .accordion-title:hover,
+:root[enable-underlines="true"] td a:not(.label):not([class*="dropdown-"]):not(.dropdown-menu a):hover {
+  text-decoration: underline;
 }

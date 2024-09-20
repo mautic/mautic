@@ -261,11 +261,11 @@
 }
 
 .outline() {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
-  &:hover { outline: 2px solid transparent; }
+  &:hover { outline: 2px var(--outline-style) transparent; }
   &:active, &.active,
-  &:focus, &.focus { outline: 2px solid var(--focus); }
+  &:focus, &.focus { outline: 2px var(--outline-style) var(--focus); }
 }
 
 // Alerts

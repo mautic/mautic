@@ -29,18 +29,24 @@
 
     {# Send email button #}
     {% if fields.core.email is defined %}
-      {% set buttons = buttons|merge([{
-          'attr': {
-              'id': 'sendEmailButton',
-              'data-toggle': 'ajaxmodal',
-              'data-target': '#MauticSharedModal',
-              'data-header': 'mautic.lead.email.send_email.header'|trans({'%email%': fields.core.email.value}),
-              'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'email'}),
-          },
-          'btnText': 'mautic.lead.email.send_email'|trans,
-          'iconClass': 'ri-mail-send-line',
-          'primary': true,
-      }]) %}
+        {% set emailAdress = fields.core.email.value %}
+        {% set sendButton = {
+            'attr': {
+                'id': 'sendEmailButton',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'data-header': 'mautic.lead.email.send_email.header'|trans({'%email%': emailAdress}),
+                'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'email'}),
+            },
+            'btnText': 'mautic.lead.email.send_email'|trans,
+            'iconClass': 'ri-mail-send-line',
+            'primary': true,
+        } %}
+        {% if emailAdress is empty %}
+            {% set sendButton = sendButton|merge({'tooltip' : 'mautic.lead.email.send_email.disabled'}) %}
+            {% set sendButton = sendButton|merge({'attr' : {'disabled' : true}}) %}
+        {% endif %}
+        {% set buttons = buttons|merge([sendButton]) %}
     {% endif %}
 
     {# View Contact Frequency button #}

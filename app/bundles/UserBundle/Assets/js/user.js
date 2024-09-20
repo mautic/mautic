@@ -9,6 +9,32 @@ Mautic.userOnLoad = function (container) {
             Mautic.activateSearchAutocomplete('list-search', 'user.user');
         }
     }
+
+    const prefix = 'm-toggle-setting-';
+    Object.keys(localStorage)
+        .filter(key => key.startsWith(prefix))
+        .forEach(setting => {
+            const attributeName = setting.replace(prefix, '');
+            const value = localStorage.getItem(setting);
+
+            if (value) {
+                // Set the correct radio button
+                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${value}"]`);
+                if (radio) radio.checked = true;
+            }
+        });
+
+    // Handle radio button changes
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const attributeName = this.dataset.attributeToggle;
+                const newValue = this.dataset.attributeValue;
+                document.documentElement.setAttribute(attributeName, newValue);
+                localStorage.setItem(`${prefix}${attributeName}`, newValue);
+            }
+        });
+    });
 };
 
 Mautic.roleOnLoad = function (container, response) {
@@ -19,6 +45,7 @@ Mautic.roleOnLoad = function (container, response) {
     if (response && response.permissionList) {
         MauticVars.permissionList = response.permissionList;
     }
+    Mautic.togglePermissionVisibility();
 };
 
 /**
@@ -31,9 +58,11 @@ Mautic.togglePermissionVisibility = function () {
         if (mQuery('#role_isAdmin_0').prop('checked')) {
             mQuery('#rolePermissions').removeClass('hide');
             mQuery('#isAdminMessage').addClass('hide');
+            mQuery('#permissions-tab').removeClass('disabled');
         } else {
             mQuery('#rolePermissions').addClass('hide');
             mQuery('#isAdminMessage').removeClass('hide');
+            mQuery('#permissions-tab').addClass('disabled');
         }
     }, 10);
 };
