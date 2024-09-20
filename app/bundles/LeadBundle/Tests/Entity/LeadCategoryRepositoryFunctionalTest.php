@@ -172,6 +172,35 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey($this->categories['two']->getId(), $unSubscribed);
     }
 
+    public function testCategoriesOnContactPreferencesWhenUnSubscribedCategoryIsSelectedToSubscribe(): void
+    {
+        $crawler = $this->getContactFrequencyCrawler($this->lead);
+
+        $subscribedCats = $crawler->filter('select[id="lead_contact_frequency_rules_global_categories"]')->filter('option[selected="selected"]');
+
+        // The count should be 3 as we have two subscribed and a new one.
+        $this->assertCount(2, $subscribedCats);
+
+        // The association count is 2.
+        $this->assertCount(2, $this->model->getLeadCategories($this->lead));
+
+        // Now submit the preference form.
+        $form = $crawler->filterXPath('//form[@name="lead_contact_frequency_rules"]')->form();
+        $form->setValues(
+            [
+                'lead_contact_frequency_rules[global_categories]' => [
+                    $this->categories['one']->getId(),
+                    $this->categories['two']->getId(),
+                    $this->categories['three']->getId(),
+                ],
+            ]
+        );
+        $this->client->submit($form);
+
+        $this->assertCount(3, $this->model->getLeadCategories($this->lead));
+        $this->assertCount(0, $this->model->getUnsubscribedLeadCategoriesIds($this->lead));
+    }
+
     /**
      * @return mixed[]
      */
