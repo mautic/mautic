@@ -2366,6 +2366,7 @@ a.media {
   padding-left: 15px;
   margin: 0;
   display: flex;
+  flex-direction: column;
 }
 @media (min-width: 768px) {
   .container {
