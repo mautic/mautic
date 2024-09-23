@@ -544,6 +544,15 @@ final class LeadEvents
     public const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
 
     /**
+     * The mautic.lead.on_campaign_action_anonymize_user_data event is dispatched when the campaign action to anonymize user data is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    public const ON_CAMPAIGN_ACTION_ANONYMIZE_USER_DATA = 'mautic.lead.on_campaign_action_anonymize_user_data';
+
+    /**
      * The mautic.company_pre_save event is thrown right before a form is persisted.
      *
      * The event listener receives a Mautic\LeadBundle\Event\CompanyEvent instance.
