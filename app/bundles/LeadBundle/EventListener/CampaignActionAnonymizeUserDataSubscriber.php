@@ -16,6 +16,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterface
 {
+    public const KEY_EVENT_NAME = 'lead.action_anonymizeuserdata';
+
     public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel)
     {
     }
@@ -31,7 +33,7 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
     public function configureAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
-            'lead.action_anonymizeuserdata',
+            self::KEY_EVENT_NAME,
             [
                 'label'                  => 'mautic.lead.lead.events.anonymize',
                 'description'            => 'mautic.lead.lead.events.anonymize_descr',
@@ -45,6 +47,10 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
 
     public function anonymizeUserData(PendingEvent $event): void
     {
+        if (!$event->checkContext(self::KEY_EVENT_NAME)) {
+            return;
+        }
+
         $properties = $event->getEvent()->getProperties();
         if (empty($properties['pseudonymize'])) {
             return;
