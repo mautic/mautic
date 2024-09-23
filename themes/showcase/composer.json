@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-showcase",
+  "description": "Showcase",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "showcase"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}
