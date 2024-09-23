@@ -45,8 +45,13 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
 
     public function anonymizeUserData(PendingEvent $event): void
     {
-        $leads      = $this->leadModel->getEntities($event->getContactIds());
         $properties = $event->getEvent()->getProperties();
+        if (empty($properties['pseudonymize'])) {
+            return;
+        }
+
+        $leads      = $this->leadModel->getEntities($event->getContactIds());
+
         $idFields   = array_merge($properties['fieldsToAnonymize'], $properties['fieldsToDelete']);
         $fields     = $this->fieldModel->getRepository()->findBy(['id' => $idFields]);
         foreach ($fields as $field) {
