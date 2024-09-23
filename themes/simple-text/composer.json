@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-simple-text",
+  "description": "Simple text",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "simple-text"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}
