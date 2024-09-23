@@ -299,7 +299,7 @@ class SubmissionRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted']);
+        return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted'], null, 'fs.id');
     }
 
     /**
