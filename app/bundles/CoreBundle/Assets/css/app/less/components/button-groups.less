@@ -4,10 +4,18 @@
 
 // Prevent double borders when buttons are next to each other
 .btn-group {
-  .btn ~ .btn,
+  .btn ~ .btn:not(.dropdown-toggle),
   .btn ~ .btn-group,
   .btn-group ~ .btn,
   .btn-group ~ .btn-group {
-    margin-left: -1px;
+    /* margin-left: 0; */
   }
+  > .btn-primary + .dropdown-toggle { margin-left: 1px; }
+}
+
+
+// The clickable button for toggling the menu
+// Remove the gradient and set the same inset shadow as the :active state
+.btn-group.open .dropdown-toggle {
+  .box-shadow(none);
 }

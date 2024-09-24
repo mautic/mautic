@@ -554,7 +554,7 @@
                 </div>
                 {% set classes = ['label-gray', 'label-red', 'label-magenta', 'label-purple', 'label-blue', 'label-cyan', 'label-teal', 'label-green'] %}
                 {% for key, list in lists[lead.id] %}
-                    <h5 class="pull-left mt-xs mr-xs">
+                    <h5 class="mt-xs mr-xs">
                         <span class="label {{ cycle(classes, key) }} has-click-event">
                             <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">
                                 {{ list.name|purify }}
