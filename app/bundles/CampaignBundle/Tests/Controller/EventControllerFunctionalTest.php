@@ -244,7 +244,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailSendTypeDefaultSetting(): void
     {
-        // Fetch the campaign condition form.
+        // Fetch the campaign action form.
         $uri = '/s/campaigns/events/new?type=email.send&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
         $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
