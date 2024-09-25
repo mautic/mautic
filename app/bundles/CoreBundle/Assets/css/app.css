@@ -1212,7 +1212,7 @@ kbd {
 .btn {
   transition: var(--transition-all-productive);
   border: 1px solid transparent;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
   border-radius: var(--border-radius-sm);
   display: inline-flex;
@@ -1227,13 +1227,13 @@ kbd {
   width: fit-content;
 }
 .btn:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn:active,
 .btn.active,
 .btn:focus,
 .btn.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn:hover {
   border: 1px solid transparent;
@@ -1322,12 +1322,12 @@ kbd {
   background-color: var(--button-primary);
   color: var(--text-on-color);
   border: 1px solid var(--button-primary);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-primary:hover,
 .btn-primary + .dropdown-toggle:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-primary:active,
 .btn-primary + .dropdown-toggle:active,
@@ -1337,7 +1337,7 @@ kbd {
 .btn-primary + .dropdown-toggle:focus,
 .btn-primary.focus,
 .btn-primary + .dropdown-toggle.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-primary i,
 .btn-primary + .dropdown-toggle i {
@@ -1366,12 +1366,12 @@ kbd {
 .btn-primary + .dropdown-toggle.btn-danger {
   color: var(--text-inverse);
   background-color: var(--button-danger-primary);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-primary.btn-danger:hover,
 .btn-primary + .dropdown-toggle.btn-danger:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-primary.btn-danger:active,
 .btn-primary + .dropdown-toggle.btn-danger:active,
@@ -1381,7 +1381,7 @@ kbd {
 .btn-primary + .dropdown-toggle.btn-danger:focus,
 .btn-primary.btn-danger.focus,
 .btn-primary + .dropdown-toggle.btn-danger.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-primary.btn-danger i,
 .btn-primary + .dropdown-toggle.btn-danger i {
@@ -1411,17 +1411,17 @@ kbd {
 .btn-secondary {
   background-color: var(--button-secondary);
   color: var(--text-inverse);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-secondary:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-secondary:active,
 .btn-secondary.active,
 .btn-secondary:focus,
 .btn-secondary.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-secondary i {
   color: var(--text-inverse);
@@ -1450,7 +1450,7 @@ kbd {
   color: var(--button-tertiary);
   border-color: var(--button-tertiary);
   margin-left: -1px;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-tertiary:hover,
@@ -1459,7 +1459,7 @@ kbd {
 .btn-primary + .btn-primary + .btn-primary:hover,
 .btn-primary + .btn-primary + .btn-secondary:hover,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-tertiary:active,
 .btn-tertiary + .dropdown-toggle:active,
@@ -1485,7 +1485,7 @@ kbd {
 .btn-primary + .btn-primary + .btn-primary.focus,
 .btn-primary + .btn-primary + .btn-secondary.focus,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-tertiary i,
 .btn-tertiary + .dropdown-toggle i,
@@ -1573,7 +1573,7 @@ kbd {
 .open > .btn-tertiary + .dropdown-toggle.btn-primary.btn-danger {
   color: var(--button-danger-secondary);
   border-color: var(--button-danger-secondary);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-tertiary.btn-danger:hover,
@@ -1582,7 +1582,7 @@ kbd {
 .btn-primary + .btn-primary + .btn-primary.btn-danger:hover,
 .btn-primary + .btn-primary + .btn-secondary.btn-danger:hover,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary.btn-danger:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-tertiary.btn-danger:active,
 .btn-tertiary + .dropdown-toggle.btn-danger:active,
@@ -1608,7 +1608,7 @@ kbd {
 .btn-primary + .btn-primary + .btn-primary.btn-danger.focus,
 .btn-primary + .btn-primary + .btn-secondary.btn-danger.focus,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary.btn-danger.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-tertiary.btn-danger i,
 .btn-tertiary + .dropdown-toggle.btn-danger i,
@@ -1703,17 +1703,17 @@ kbd {
   background-color: transparent;
   padding-inline: var(--spacing-05);
   justify-content: center;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-ghost:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-ghost:active,
 .btn-ghost.active,
 .btn-ghost:focus,
 .btn-ghost.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-ghost i {
   color: var(--link-primary);
@@ -1741,12 +1741,12 @@ kbd {
 .btn-ghost.btn-danger,
 .btn-ghost.btn-danger.btn-icon {
   color: var(--button-danger-secondary);
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-ghost.btn-danger:hover,
 .btn-ghost.btn-danger.btn-icon:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-ghost.btn-danger:active,
 .btn-ghost.btn-danger.btn-icon:active,
@@ -1756,7 +1756,7 @@ kbd {
 .btn-ghost.btn-danger.btn-icon:focus,
 .btn-ghost.btn-danger.focus,
 .btn-ghost.btn-danger.btn-icon.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-ghost.btn-danger i,
 .btn-ghost.btn-danger.btn-icon i {
@@ -1796,17 +1796,17 @@ kbd {
 .btn-ghost.btn-icon {
   color: var(--icon-primary);
   background-color: transparent;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn-ghost.btn-icon:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn-ghost.btn-icon:active,
 .btn-ghost.btn-icon.active,
 .btn-ghost.btn-icon:focus,
 .btn-ghost.btn-icon.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-ghost.btn-icon i {
   color: var(--icon-primary);
@@ -1880,7 +1880,7 @@ kbd {
 .btn-group .dropdown-toggle,
 .btn-group.open .dropdown-toggle,
 .navbar-toggle {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .btn.active:hover,
@@ -1890,7 +1890,7 @@ kbd {
 .btn-group .dropdown-toggle:hover,
 .btn-group.open .dropdown-toggle:hover,
 .navbar-toggle:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .btn.active:active,
 .dropdown-toggle:active,
@@ -1920,7 +1920,7 @@ kbd {
 .btn-group .dropdown-toggle.focus,
 .btn-group.open .dropdown-toggle.focus,
 .navbar-toggle.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-link {
   font-weight: 600;
@@ -2388,6 +2388,7 @@ a.media {
   padding-left: 15px;
   margin: 0;
   display: flex;
+  flex-direction: column;
 }
 @media (min-width: 768px) {
   .container {
@@ -3346,17 +3347,17 @@ ul.dropdown-menu-form {
   aspect-ratio: 1 / 1;
   justify-content: center;
   align-items: center;
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 .dropdown-toggle:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 .dropdown-toggle:active,
 .dropdown-toggle.active,
 .dropdown-toggle:focus,
 .dropdown-toggle.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 .dropdown-header {
   margin: 32px 16px 8px 16px;
@@ -8939,17 +8940,17 @@ ul.media-list.media-list-feed div.media-body {
   --border-bottom: 1px;
 }
 :root[contrast-borders="true"] a {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
 :root[contrast-borders="true"] a:hover {
-  outline: 2px solid transparent;
+  outline: 2px var(--outline-style) transparent;
 }
 :root[contrast-borders="true"] a:active,
 :root[contrast-borders="true"] a.active,
 :root[contrast-borders="true"] a:focus,
 :root[contrast-borders="true"] a.focus {
-  outline: 2px solid var(--focus);
+  outline: 2px var(--outline-style) var(--focus);
 }
 :root[reduce-transparency="true"] {
   --layer-translucent: var(--layer);
