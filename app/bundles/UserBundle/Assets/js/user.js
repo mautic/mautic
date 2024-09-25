@@ -55,14 +55,14 @@ Mautic.togglePermissionVisibility = function () {
     //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
     //is set to the parent div
     setTimeout(function () {
-        if (mQuery('#role_isAdmin_0').prop('checked')) {
-            mQuery('#rolePermissions').removeClass('hide');
-            mQuery('#isAdminMessage').addClass('hide');
-            mQuery('#permissions-tab').removeClass('disabled');
-        } else {
+        if (mQuery('#role_isAdmin').is(':checked')) {
             mQuery('#rolePermissions').addClass('hide');
             mQuery('#isAdminMessage').removeClass('hide');
             mQuery('#permissions-tab').addClass('disabled');
+        } else {
+            mQuery('#rolePermissions').removeClass('hide');
+            mQuery('#isAdminMessage').addClass('hide');
+            mQuery('#permissions-tab').removeClass('disabled');
         }
     }, 10);
 };
