@@ -486,63 +486,38 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:yesno_button_group_widget.html.php #}
 {% block yesno_button_group_widget %}
-    {% set attr = form.vars.attr %}
-    {% set id = form.vars.id %}
-    {% set name = form.vars.full_name %}
-    {% set value = form.vars.value %}
-    {% set size = attr.size|default(null) %}
+{% set attr = form.vars.attr %}
+{% set id = form.vars.id %}
+{% set name = form.vars.full_name %}
+{% set value = form.vars.value %}
+{% set size = attr.size|default(null) %}
+{% set default_onchange = 'Mautic.toggleYesNo(this);' %}
+{% set attr = attr|merge({'onchange': (attr.onchange|default('') ~ ' ' ~ default_onchange)|trim}) %}
 
-    {% set default_onchange = 'Mautic.toggleYesNo(this);' %}
-    {% if attr.onchange is defined %}
-        {% if not (attr.onchange ends with ';') %}
-            {% set attr = attr|merge({'onchange': attr.onchange ~ ';'}) %}
-        {% endif %}
-        {% set attr = attr|merge({'onchange': attr.onchange ~ ' ' ~ default_onchange}) %}
-    {% else %}
-        {% set attr = attr|merge({'onchange': default_onchange}) %}
-    {% endif %}
+{% set yes_choice = form.vars.choices[1] %}
+{% set yes_label = yes_choice.label|trans %}
+{% set yes_value = yes_choice.value %}
 
-    {% set yes_label, yes_value, no_label, no_value = '', '', '', '' %}
+{% set no_choice = form.vars.choices[0] %}
+{% set no_label = no_choice.label|trans %}
+{% set no_value = no_choice.value %}
 
-    {% for choice in form.vars.choices %}
-        {% if choice.value == '1' %}
-            {% set yes_label = choice.label|trans %}
-            {% set yes_value = choice.value %}
-        {% elseif choice.value == '0' %}
-            {% set no_label = choice.label|trans %}
-            {% set no_value = choice.value %}
-        {% endif %}
-    {% endfor %}
-
-    <div class="toggle" data-yes="{{ yes_label }}" data-no="{{ no_label }}">
-        <input type="hidden" name="{{ name }}" value="{{ no_value }}">
-        <input type="checkbox"
-               id="{{ id }}"
-               name="{{ name }}"
-               style="display: none;"
-               value="{{ yes_value }}"
-               {% if value == yes_value %}checked{% endif %}
-               {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}"{% endfor %}>
-        <button class="toggle__button"
-                role="switch"
-                type="button"
-                aria-checked="{{ value == yes_value ? 'true' : 'false' }}"
-                aria-labelledby="{{ id }}_label"
-                onclick="document.getElementById('{{ id }}').click();"></button>
-        <label id="{{ id }}_label" for="{{ id }}" class="toggle__label">
-            <div class="toggle__appearance" {% if size %}size="{{ size }}"{% endif %}>
-                <div class="toggle__switch {% if value == yes_value %}toggle__switch--checked{% endif %}">
-                    <svg class="toggle__check" width="6px" height="5px" viewBox="0 0 6 5">
-                        <path d="M2.2 2.7L5 0 6 1 2.2 5 0 2.7 1 1.5z"></path>
-                    </svg>
-                </div>
-                <span class="toggle__text" aria-hidden="true">
-                    {{ value == yes_value ? yes_label : no_label }}
-                </span>
+<div class="toggle" data-yes="{{ yes_label }}" data-no="{{ no_label }}">
+    <input type="hidden" name="{{ name }}" value="{{ no_value }}">
+    <input type="checkbox" id="{{ id }}" name="{{ name }}" style="display: none;" value="{{ yes_value }}" {% if value == yes_value %}checked{% endif %} {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}"{% endfor %}>
+    <button class="toggle__button" role="switch" type="button" aria-checked="{{ value == yes_value ? 'true' : 'false' }}" aria-labelledby="{{ id }}_label" onclick="document.getElementById('{{ id }}').click();"></button>
+    <label id="{{ id }}_label" for="{{ id }}" class="toggle__label">
+        <div class="toggle__appearance" {% if size %}size="{{ size }}"{% endif %}>
+            <div class="toggle__switch {% if value == yes_value %}toggle__switch--checked{% endif %}">
+                <svg class="toggle__check" width="6px" height="5px" viewBox="0 0 6 5">
+                    <path d="M2.2 2.7L5 0 6 1 2.2 5 0 2.7 1 1.5z"></path>
+                </svg>
             </div>
-        </label>
-    </div>
-    {{ form_help(form) }}
+            <span class="toggle__text" aria-hidden="true">{{ value == yes_value ? yes_label : no_label }}</span>
+        </div>
+    </label>
+</div>
+{{ form_help(form) }}
 {% endblock %}
 
 {% block attributes -%}
