@@ -106,6 +106,7 @@ class ListType extends AbstractType
                 'attr'       => [
                     'tooltip' => 'mautic.lead.list.form.isglobal.tooltip',
                 ],
+                'no_label'   => 'mautic.lead.list.form.isglobal.no',
             ]
         );
 
