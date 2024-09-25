@@ -6,7 +6,7 @@ Mautic.formOnLoad = function (container) {
     }
 
     Mautic.toggleThemeSelectorVisibility();
-    mQuery('#mauticform_renderStyle').on('change', Mautic.toggleThemeSelectorVisibility);
+    mQuery('#mauticform_renderStyle_0, #mauticform_renderStyle_1').on('change', Mautic.toggleThemeSelectorVisibility);
 
     Mautic.formBuilderNewComponentInit();
     Mautic.iniNewConditionalField();
@@ -393,10 +393,10 @@ Mautic.toggleThemeSelectorVisibility = function () {
     var selectField = mQuery('#mauticform_template');
     var chosenContainer = mQuery('#mauticform_template_chosen');
 
-    if (mQuery('#mauticform_renderStyle').is(':checked')) {
-        chosenContainer.removeClass('chosen-disabled');
-    } else {
+    if (mQuery('#mauticform_renderStyle_0').prop('checked')) {
         selectField.val('').trigger('chosen:updated');
         chosenContainer.addClass('chosen-disabled');
+    } else {
+        chosenContainer.removeClass('chosen-disabled');
     }
-}
+};
