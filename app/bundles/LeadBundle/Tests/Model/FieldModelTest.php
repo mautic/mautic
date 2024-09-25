@@ -193,7 +193,6 @@ class FieldModelTest extends MauticMysqlTestCase
             $customFieldColumn,
             $fieldSaveDispatcher,
             $leadFieldRepository,
-            $fieldsWithUniqueIdentifier,
             $fieldList,
             $leadFieldSaver,
             $this->createMock(EntityManagerInterface::class),
