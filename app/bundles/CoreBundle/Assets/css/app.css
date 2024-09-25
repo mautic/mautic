@@ -7715,6 +7715,8 @@ a.inline-token .text-muted {
   overflow: visible;
   border-block-start: 1px solid var(--border-subtle);
   transition: border-color cubic-bezier(0.2, 0, 0.38, 0.9) 110ms;
+  background-color: transparent;
+  box-shadow: none;
 }
 .accordion .panel:last-child {
   border-block-end: 1px solid var(--border-subtle);
