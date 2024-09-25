@@ -490,22 +490,14 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
     {% set value = form.vars.value %}
     {% set size = attr.size|default(null) %}
 
-    {# Initialize variables to hold labels and values #}
-    {% set yes_label = '' %}
-    {% set yes_value = '' %}
-    {% set no_label = '' %}
-    {% set no_value = '' %}
-
     {# Extract labels and values from form.vars.choices #}
-    {% for choice in form.vars.choices %}
-        {% if choice.value == '1' %}
-            {% set yes_label = choice.label|trans %}
-            {% set yes_value = choice.value %}
-        {% elseif choice.value == '0' %}
-            {% set no_label = choice.label|trans %}
-            {% set no_value = choice.value %}
-        {% endif %}
-    {% endfor %}
+    {% set yes_choice = form.vars.choices|filter(choice => choice.value == '1')|first %}
+    {% set no_choice = form.vars.choices|filter(choice => choice.value == '0')|first %}
+
+    {% set yes_label = yes_choice.label|trans %}
+    {% set yes_value = yes_choice.value %}
+    {% set no_label = no_choice.label|trans %}
+    {% set no_value = no_choice.value %}
 
     <div class="toggle" data-yes="{{ yes_label }}" data-no="{{ no_label }}">
         <input type="hidden" name="{{ name }}" value="{{ no_value }}">
@@ -530,11 +522,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
                     </svg>
                 </div>
                 <span class="toggle__text" aria-hidden="true">
-                    {% if value == yes_value %}
-                        {{ yes_label }}
-                    {% else %}
-                        {{ no_label }}
-                    {% endif %}
+                    {{ value == yes_value ? yes_label : no_label }}
                 </span>
             </div>
         </label>
