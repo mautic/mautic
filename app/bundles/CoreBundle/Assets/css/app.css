@@ -1214,7 +1214,7 @@ kbd {
   border: 1px solid transparent;
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-lg);
   display: inline-flex;
   align-items: center;
   height: var(--spacing-08);
@@ -3258,7 +3258,7 @@ label.list-group-item:focus {
 .dropdown-menu {
   padding: 0;
   overflow: hidden;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-md);
   -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
@@ -3914,7 +3914,7 @@ label {
   transition: var(--transition-all-productive);
   outline: 2px solid transparent;
   outline-offset: -2px;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-sm);
   -webkit-box-shadow: none;
   box-shadow: none;
 }
@@ -4558,7 +4558,7 @@ ul.line-legend li {
 }
 .input-group-addon {
   border-width: var(--border-bottom);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-sm);
   background-color: var(--field-hover);
   color: var(--text-secondary);
   border-color: var(--border-strong);
@@ -8927,7 +8927,7 @@ ul.media-list.media-list-feed div.media-body {
   --border-no-width: 1px solid var(--border-no-color);
   --border-no-color: transparent;
   --border-bottom: 0 0 clamp(0px, calc(1px - 0px), 1px) 0;
-  --border-radius-sm: clamp(0px, 0px, 7px);
+  --border-radius-sm: clamp(0px, 0px, 4px);
   --border-radius-md: clamp(0px, calc(1.8 * 0px), 14px);
   --border-radius-lg: clamp(0px, calc(2.6 * 0px), 21px);
   --outline-style: solid;

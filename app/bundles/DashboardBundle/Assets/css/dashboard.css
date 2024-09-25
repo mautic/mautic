@@ -98,6 +98,7 @@ body:has(.s-dashboard) {
     margin: -10px;
     text-align: center;
     line-height: 30px;
+    border-radius: var(--border-radius-md);
 }
 .dashboard-widgets .card-header h4 {
     width: 90%;
