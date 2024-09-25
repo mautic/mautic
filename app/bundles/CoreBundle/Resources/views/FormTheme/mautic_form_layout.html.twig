@@ -486,14 +486,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:yesno_button_group_widget.html.php #}
 {% block yesno_button_group_widget %}
-    {# Get attributes from form variables #}
     {% set attr = form.vars.attr %}
     {% set id = form.vars.id %}
     {% set name = form.vars.full_name %}
     {% set value = form.vars.value %}
     {% set size = attr.size|default(null) %}
 
-    {# Build the onchange attribute, allowing per-field modifications #}
     {% set default_onchange = 'Mautic.toggleYesNo(this);' %}
     {% if attr.onchange is defined %}
         {% if not (attr.onchange ends with ';') %}
@@ -504,11 +502,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         {% set attr = attr|merge({'onchange': default_onchange}) %}
     {% endif %}
 
-    {# Extract labels and values from form.vars.choices #}
-    {% set yes_label = '' %}
-    {% set yes_value = '' %}
-    {% set no_label = '' %}
-    {% set no_value = '' %}
+    {% set yes_label, yes_value, no_label, no_value = '', '', '', '' %}
 
     {% for choice in form.vars.choices %}
         {% if choice.value == '1' %}
@@ -543,11 +537,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
                     </svg>
                 </div>
                 <span class="toggle__text" aria-hidden="true">
-                    {% if value == yes_value %}
-                        {{ yes_label }}
-                    {% else %}
-                        {{ no_label }}
-                    {% endif %}
+                    {{ value == yes_value ? yes_label : no_label }}
                 </span>
             </div>
         </label>
