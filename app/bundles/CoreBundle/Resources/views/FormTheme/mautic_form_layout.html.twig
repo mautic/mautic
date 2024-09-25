@@ -484,30 +484,51 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {{ attr.autocomplete is not defined ? 'autocomplete="false" ' : '' }}
 {% endblock %}
 
+{# Twig version of MauticCoreBundle:Views:FormTheme:Custom:yesno_button_group_widget.html.php #}
 {% block yesno_button_group_widget %}
+    {# Get attributes from form variables #}
+    {% set attr = form.vars.attr %}
     {% set id = form.vars.id %}
     {% set name = form.vars.full_name %}
     {% set value = form.vars.value %}
     {% set size = attr.size|default(null) %}
 
-    {# Extract labels and values from form.vars.choices #}
-    {% set yes_choice = form.vars.choices|filter(choice => choice.value == '1')|first %}
-    {% set no_choice = form.vars.choices|filter(choice => choice.value == '0')|first %}
+    {# Build the onchange attribute, allowing per-field modifications #}
+    {% set default_onchange = 'Mautic.toggleYesNo(this);' %}
+    {% if attr.onchange is defined %}
+        {% if not (attr.onchange ends with ';') %}
+            {% set attr = attr|merge({'onchange': attr.onchange ~ ';'}) %}
+        {% endif %}
+        {% set attr = attr|merge({'onchange': attr.onchange ~ ' ' ~ default_onchange}) %}
+    {% else %}
+        {% set attr = attr|merge({'onchange': default_onchange}) %}
+    {% endif %}
 
-    {% set yes_label = yes_choice.label|trans %}
-    {% set yes_value = yes_choice.value %}
-    {% set no_label = no_choice.label|trans %}
-    {% set no_value = no_choice.value %}
+    {# Extract labels and values from form.vars.choices #}
+    {% set yes_label = '' %}
+    {% set yes_value = '' %}
+    {% set no_label = '' %}
+    {% set no_value = '' %}
+
+    {% for choice in form.vars.choices %}
+        {% if choice.value == '1' %}
+            {% set yes_label = choice.label|trans %}
+            {% set yes_value = choice.value %}
+        {% elseif choice.value == '0' %}
+            {% set no_label = choice.label|trans %}
+            {% set no_value = choice.value %}
+        {% endif %}
+    {% endfor %}
 
     <div class="toggle" data-yes="{{ yes_label }}" data-no="{{ no_label }}">
         <input type="hidden" name="{{ name }}" value="{{ no_value }}">
         <input type="checkbox"
                id="{{ id }}"
                name="{{ name }}"
+               style="display: none;"
                value="{{ yes_value }}"
                {% if value == yes_value %}checked{% endif %}
-               style="display: none;"
-               onchange="Mautic.toggleYesNo(this);">
+               {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}"{% endfor %}>
         <button class="toggle__button"
                 role="switch"
                 type="button"
@@ -522,11 +543,16 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
                     </svg>
                 </div>
                 <span class="toggle__text" aria-hidden="true">
-                    {{ value == yes_value ? yes_label : no_label }}
+                    {% if value == yes_value %}
+                        {{ yes_label }}
+                    {% else %}
+                        {{ no_label }}
+                    {% endif %}
                 </span>
             </div>
         </label>
     </div>
+    {{ form_help(form) }}
 {% endblock %}
 
 {% block attributes -%}
