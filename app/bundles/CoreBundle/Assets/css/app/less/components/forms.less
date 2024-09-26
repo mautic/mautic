@@ -403,10 +403,12 @@ input[type=file].form-control {
   .radio-option {
     margin-bottom: var(--spacing-02);
   }
+  label {align-self: stretch;}
 
   input[type="radio"] {
     height: 18px;
     width: 18px;
+    flex-shrink: 0;
     vertical-align: top;
     margin-right: 4px;
     appearance: none;
@@ -442,15 +444,9 @@ input[type=file].form-control {
 }
 
 .radio-cards {
-  input[type="radio"] {
-    position: absolute;
-    top: 130px;
-  }
-
   svg,
   img {
-    width: 228px;
-    height: 120px;
+    width: 100%;
     border-radius: 4px;
   }
 }

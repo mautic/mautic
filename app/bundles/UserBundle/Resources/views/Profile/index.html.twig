@@ -108,59 +108,43 @@
                             <h3 class="pt-20 mb-md">{{ 'mautic.user.account.appearance.theme_preferences'|trans }}</h3>
                             <div class="help-block">{{ 'mautic.user.account.appearance.theme_help'|trans }}</div>
                             <div class="radio-group radio-cards row">
-                                <div class="radio-option col-xs-12 col-md-4 mb-lg">
-                                    <input type="radio" id="theme-light" name="theme" value="light"
-                                        data-attribute-toggle="theme" data-attribute-value="light" checked>
-                                    <label class="d-flex fd-column" for="theme-light">
-                                        {{ include('@MauticUser/Profile/images/_light_preview.html.twig') }}
-                                        <strong class="ml-24">{{ 'mautic.user.account.appearance.theme_light'|trans }}</strong>
-                                        <div class="description text-help ml-24">{{
-                                            'mautic.user.account.appearance.theme_light_description'|trans }}</div>
-                                    </label>
-                                </div>
-                                <div class="radio-option col-xs-12 col-md-4 mb-lg">
-                                    <input type="radio" id="theme-dark" name="theme" value="dark"
-                                        data-attribute-toggle="theme" data-attribute-value="dark">
-                                    <label class="d-flex fd-column" for="theme-dark">
-                                        {{ include('@MauticUser/Profile/images/_dark_preview.html.twig') }}
-                                        <strong class="ml-24">{{ 'mautic.user.account.appearance.theme_dark'|trans }}</strong>
-                                        <div class="description text-help ml-24">{{
-                                            'mautic.user.account.appearance.theme_dark_description'|trans }}</div>
-                                    </label>
-                                </div>
-                                <div class="radio-option col-xs-12 col-md-4 mb-lg">
-                                    <input type="radio" id="theme-solarized-light" name="theme" value="solarized-light"
-                                        data-attribute-toggle="theme" data-attribute-value="solarized-light">
-                                    <label class="d-flex fd-column" for="theme-solarized-light">
-                                        <img src="{{ asset('app/bundles/UserBundle/Resources/views/Profile/images/_solarized_light_preview.svg') }}" alt="Light theme preview" aria-hidden="true" class="mb-sm">
-                                        <strong class="ml-24">{{ 'mautic.user.account.appearance.theme_solarized_light'|trans
-                                            }}</strong>
-                                        <div class="description text-help ml-24">{{
-                                            'mautic.user.account.appearance.theme_solarized_light_description'|trans }}
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="radio-option col-xs-12 col-md-4 mb-lg">
-                                    <input type="radio" id="theme-solarized-dark" name="theme" value="solarized-dark"
-                                        data-attribute-toggle="theme" data-attribute-value="solarized-dark">
-                                    <label class="d-flex fd-column" for="theme-solarized-dark">
-                                        <img src="{{ asset('app/bundles/UserBundle/Resources/views/Profile/images/_solarized_dark_preview.svg') }}" alt="Light theme preview" aria-hidden="true" class="mb-sm">
-                                        <strong class="ml-24">{{ 'mautic.user.account.appearance.theme_solarized_dark'|trans
-                                            }}</strong>
-                                        <div class="description text-help ml-24">{{
-                                            'mautic.user.account.appearance.theme_solarized_dark_description'|trans }}
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="radio-option col-xs-12 col-md-4 mb-lg">
-                                    <input type="radio" id="theme-freire" name="theme" value="freire"
-                                           data-attribute-toggle="theme" data-attribute-value="freire">
-                                    <label class="d-flex fd-column" for="theme-freire">
-                                        <img src="{{ asset('app/bundles/UserBundle/Resources/views/Profile/images/_freire_preview.svg') }}" alt="Light theme preview" aria-hidden="true" class="mb-sm">
-                                        <strong class="ml-24">{{ 'mautic.user.account.appearance.theme_freire'|trans }}</strong>
-                                        <div class="description text-help ml-24">{{ 'mautic.user.account.appearance.theme_freire_description'|trans }}</div>
-                                    </label>
-                                </div>
+                                {{ include('@MauticUser/Helper/theme.html.twig', {
+                                    themes: [
+                                        {
+                                            id: 'light',
+                                            name: 'mautic.user.account.appearance.theme_light',
+                                            description: 'mautic.user.account.appearance.theme_light_description',
+                                            preview: '@MauticUser/Profile/images/_light_preview.html.twig',
+                                            checked: true
+                                        },
+                                        {
+                                            id: 'dark',
+                                            name: 'mautic.user.account.appearance.theme_dark',
+                                            description: 'mautic.user.account.appearance.theme_dark_description',
+                                            preview: '@MauticUser/Profile/images/_dark_preview.html.twig'
+                                        },
+                                        {
+                                            id: 'solarized-light',
+                                            name: 'mautic.user.account.appearance.theme_solarized_light',
+                                            description: 'mautic.user.account.appearance.theme_solarized_light_description',
+                                            preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_solarized_light_preview.svg'
+                                        },
+                                        {
+                                            id: 'solarized-dark',
+                                            name: 'mautic.user.account.appearance.theme_solarized_dark',
+                                            description: 'mautic.user.account.appearance.theme_solarized_dark_description',
+                                            preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_solarized_dark_preview.svg'
+                                        },
+                                        {
+                                            id: 'freire',
+                                            name: 'mautic.user.account.appearance.theme_freire',
+                                            description: 'mautic.user.account.appearance.theme_freire_description',
+                                            preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_freire_preview.svg'
+                                        }
+                                    ]
+                                }) }}
+
+
                             </div>
                         </div>
                     </div>
