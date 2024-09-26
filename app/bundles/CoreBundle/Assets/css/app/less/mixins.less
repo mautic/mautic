@@ -296,3 +296,56 @@
     color: var(--text-primary);
   }
 }
+
+.button-variant(@background, @text-color, @border-color, @hover-background, @active-background, @disabled-background, @disabled-text-color) {
+  background-color: @background;
+  color: @text-color;
+  border: 1px solid @border-color;
+  .outline();
+
+  i {
+    color: @text-color;
+  }
+
+  &:hover {
+    color: @text-color;
+    background-color: @hover-background;
+    border: 1px solid @hover-background;
+  }
+
+  &:active,
+  &.active,
+  .open > .dropdown-toggle& {
+    color: @text-color;
+    background-color: @active-background;
+    border: 1px solid @active-background;
+
+    &:hover,
+    &:focus,
+    &.focus {
+      color: @text-color;
+      background-color: @active-background;
+      border-color: @active-background;
+    }
+  }
+
+  &:focus,
+  &.focus {
+    color: @text-color;
+    background-color: @active-background;
+    border: 1px solid @active-background;
+    box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background,#ffffff);
+  }
+
+  &[disabled],
+  &.disabled,
+  fieldset[disabled] & {
+    &:hover,
+    &:focus,
+    &.focus {
+      background-color: @disabled-background;
+      color: @disabled-text-color;
+      border: 1px solid @disabled-background;
+    }
+  }
+}
