@@ -33,9 +33,9 @@
 @text-color:            @gray-dark;
 
 //** Global textual link color.
-@link-color:            @brand-primary;
+@link-color:            var(--link-primary);
 //** Link hover color set via `darken()` function.
-@link-hover-color:      darken(@link-color, 15%);
+@link-hover-color:      var(--link-primary-hover);
 //** Link hover decoration.
 @link-hover-decoration: underline;
 
@@ -147,7 +147,7 @@
 
 @btn-font-weight:                600;
 
-@btn-default-color:              lighten(@text-color, 10%);
+@btn-default-color:              @text-color;
 @btn-default-border:             #ddd;
 @btn-default-bg:                 #fff;
 
@@ -222,7 +222,7 @@
 @legend-border-color:            #e5e5e5;
 
 //** Background color for textual input addons
-@input-group-addon-bg:           @gray-lighter;
+@input-group-addon-bg:           var(--layer);
 //** Border color for textual input addons
 @input-group-addon-border-color: @input-border;
 
@@ -424,7 +424,7 @@
 
 //=== Shared nav styles
 @nav-link-padding:                          10px 18px;
-@nav-link-hover-bg:                         darken(@body-bg, 3%);
+@nav-link-hover-bg:                         var(--layer-selected);
 
 @nav-disabled-link-color:                   @gray-light;
 @nav-disabled-link-hover-color:             @gray-light;
@@ -524,10 +524,10 @@
 //** Tooltip max width
 @tooltip-max-width:           200px;
 //** Tooltip text color
-@tooltip-color:               #fff;
+@tooltip-color:               var(--text-inverse);
 //** Tooltip background color
-@tooltip-bg:                  #000;
-@tooltip-opacity:             .9;
+@tooltip-bg:                  var(--background-inverse);
+@tooltip-opacity:             1;
 
 //** Tooltip arrow width
 @tooltip-arrow-width:         5px;
@@ -708,7 +708,7 @@
 //
 //##
 
-@panel-bg:                    #fff;
+@panel-bg:                    var(--background);
 @panel-body-padding:          15px;
 @panel-heading-padding:       10px 15px;
 @panel-footer-padding:        @panel-heading-padding;
@@ -716,13 +716,13 @@
 
 //** Border color for elements within panels
 @panel-inner-border:          @hr-border;
-@panel-footer-bg:             #f5f5f5;
+@panel-footer-bg:             inherit;
 
-@panel-default-text:          @gray-dark;
+@panel-default-text:          inherit;
 @panel-default-border:        @hr-border;
-@panel-default-heading-bg:    #f5f5f5;
+@panel-default-heading-bg:    inherit;
 
-@panel-primary-text:          #fff;
+@panel-primary-text:          var(--text-on-color);
 @panel-primary-border:        rgba(0,0,0,0.03);
 @panel-primary-heading-bg:    @brand-primary;
 
@@ -766,8 +766,8 @@
 //
 //##
 
-@well-bg:                     #f5f5f5;
-@well-border:                 darken(@well-bg, 7%);
+@well-bg:                     var(--layer);
+@well-border:                 transparent;
 
 
 //== Badges
@@ -841,9 +841,9 @@
 @kbd-color:                   var(--text-primary);
 @kbd-bg:                      var(--layer);
 
-@pre-bg:                      #f5f5f5;
-@pre-color:                   @gray-dark;
-@pre-border-color:            #ccc;
+@pre-bg:                      var(--layer);
+@pre-color:                   var(--text-primary);
+@pre-border-color:            var(--border-no-color);
 @pre-scrollable-max-height:   340px;
 
 
@@ -858,13 +858,13 @@
 //** Abbreviations and acronyms border color
 @abbr-border-color:           @gray-light;
 //** Headings small color
-@headings-small-color:        @gray-light;
+@headings-small-color:        var(--text-secondary);
 //** Blockquote small color
-@blockquote-small-color:      @gray-light;
+@blockquote-small-color:      var(--text-secondary);
 //** Blockquote font size
 @blockquote-font-size:        (@font-size-base * 1.25);
 //** Blockquote border color
-@blockquote-border-color:     @gray-lighter;
+@blockquote-border-color:     var(--border-no-color);
 //** Page header border color
 @page-header-border-color:    @gray-lighter;
 //** Width of horizontal description list titles
