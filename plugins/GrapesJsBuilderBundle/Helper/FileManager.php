@@ -89,6 +89,9 @@ class FileManager
             .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
+    /**
+     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManager::getImagePages instead
+     */
     public function getImages(): array
     {
         $files      = [];
@@ -126,5 +129,71 @@ class FileManager
         }
 
         return $files;
+    }
+
+    public function getImagePages(int $page, int $limit): array
+    {
+        $files      = [];
+        $uploadDir  = $this->getUploadDir();
+        $fileSystem = new Filesystem();
+
+        if (!$fileSystem->exists($uploadDir)) {
+            try {
+                $fileSystem->mkdir($uploadDir);
+            } catch (IOException) {
+                return ['files' => [], 'total' => 0];
+            }
+        }
+
+        $finder = new Finder();
+        $finder->files()->in($uploadDir);
+
+        if (!empty($search)) {
+            $finder->name("*$search*");
+        }
+
+        $totalFiles    = iterator_count($finder);
+        $offset        = ($page - 1) * $limit;
+        $filesIterator = new \LimitIterator($finder->getIterator(), $offset, $limit);
+
+        foreach ($filesIterator as $file) {
+            if (in_array($file->getRelativePath(), $this->coreParametersHelper->get('image_path_exclude'))) {
+                continue;
+            }
+
+            $fileInfo = $this->getFileInfo($file);
+            if ($fileInfo) {
+                $files[] = $fileInfo;
+            }
+        }
+
+        return [
+            'data'  => $files,
+            'total' => $totalFiles,
+            'page'  => $page,
+            'limit' => $limit,
+        ];
+    }
+
+    private function getFileInfo($file): ?array
+    {
+        $filePath = $this->getCompleteFilePath($file->getRelativePathname());
+        $size     = @getimagesize($filePath);
+
+        if ($size) {
+            return [
+                'src'    => $this->getFullUrl($file->getRelativePathname()),
+                'width'  => $size[0],
+                'height' => $size[1],
+                'type'   => 'image',
+            ];
+        } elseif (in_array($file->getExtension(), ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
+            return [
+                'src'  => $this->getFullUrl($file->getRelativePathname()),
+                'type' => 'document',
+            ];
+        }
+
+        return null;
     }
 }

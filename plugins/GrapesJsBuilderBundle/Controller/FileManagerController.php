@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FileManagerController extends AjaxController
 {
+    private const DEFAULT_PAGE  = 1;
+    private const DEFAULT_LIMIT = 20;
+
     public function uploadAction(Request $request, FileManager $fileManager): JsonResponse
     {
         return $this->sendJsonResponse(['data'=> $fileManager->uploadFiles($request)]);
@@ -30,10 +33,11 @@ class FileManagerController extends AjaxController
         return $this->sendJsonResponse(['success'=> true]);
     }
 
-    public function assetsAction(FileManager $fileManager): JsonResponse
+    public function assetsAction(Request $request, FileManager $fileManager): JsonResponse
     {
-        return $this->sendJsonResponse([
-            'data' => $fileManager->getImages(),
-        ]);
+        $page  = $request->query->getInt('page', self::DEFAULT_PAGE);
+        $limit = $request->query->getInt('limit', self::DEFAULT_LIMIT);
+
+        return $this->sendJsonResponse($fileManager->getImagePages($page, $limit));
     }
 }
