@@ -175,8 +175,8 @@ input[type="radio"].mauticform-radiogrp-radio {
 }
 
 /* Mautic Form Button Styles */
-.mauticform-button-wrapper .mauticform-button.btn-default,
-.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default {
+.mauticform-button-wrapper .mauticform-button.btn-ghost,
+.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost {
     color: #5d6c7c;
     background-color: #ffffff;
     border-color: #dddddd;
@@ -201,8 +201,8 @@ input[type="radio"].mauticform-radiogrp-radio {
     -ms-user-select: none;
     user-select: none;
 }
-.mauticform-button-wrapper .mauticform-button.btn-default[disabled],
-.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default[disabled] {
+.mauticform-button-wrapper .mauticform-button.btn-ghost[disabled],
+.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost[disabled] {
     background-color: #ffffff;
     border-color: #dddddd;
     opacity: 0.75;
