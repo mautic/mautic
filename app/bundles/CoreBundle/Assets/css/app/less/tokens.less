@@ -5,7 +5,7 @@
 @secondary-color: #fdb933;
 @border-radius: 0px;
 
- 
+
 
 // Themes
 /// Light theme
@@ -37,6 +37,7 @@
     --layer-selected-inverse: #161616;
     --layer-selected-disabled: #8d8d8d;
     --layer-translucent: #ffffffcc;
+    --layer-translucent-inverse: rgba(0, 0, 0, 0.7);
 
     /// Layer accent
     --layer-accent: #e0e0e0;
@@ -88,7 +89,7 @@
     --icon-primary: #161616;
     --icon-secondary: #525252;
     --icon-on-color: contrast(@primary-60);
-    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d); 
+    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d);
     --icon-interactive: var(--primary-60);
     --icon-inverse: #ffffff;
     --icon-disabled: #16161640;
@@ -213,6 +214,7 @@
     --layer-selected-inverse: #f4f4f4;
     --layer-selected-disabled: #6f6f6f;
     --layer-translucent: #000000cc;
+    --layer-translucent-inverse: #ffffffcc;
 
     /// Layer accent
     --layer-accent: #393939;
@@ -435,29 +437,40 @@
 --border-radius-sm: clamp(0px, @border-radius, 7px);
 --border-radius-md: clamp(0px, calc(1.8 * @border-radius), 14px);
 --border-radius-lg: clamp(0px, calc(2.6 * @border-radius), 21px);
+--outline-style: solid;
 }
 
 //
 // Accessibility features
 
 /// No animations
-@media (prefers-reduced-motion: reduce) {
-:root {
+:root[reduce-motion="true"] {
 --duration-productive: 0;
 --duration-expressive: 0;
-    }
 }
 
 /// High contrast
-:root[high-contrast="enabled"] {
-    outline-style: dotted;
---border-no-color: var(--border-strong);
---border-bottom: 1px solid var(--border-strong);
+:root[contrast-borders="true"] {
+    a {.outline();}
+    --outline-style: dashed;
+    --border-no-color: var(--border-strong);
+    --border-bottom: 1px;
 }
 
 /// No transparency and blur
-@media (prefers-reduced-transparency: reduce) {
-:root {
+:root[reduce-transparency="true"] {
     --layer-translucent: var(--layer);
+    --layer-translucent-inverse: var(--layer-selected-inverse);
+}
+
+/// Underlines
+:root[enable-underlines="true"] {
+    p a,
+    .alert a,
+    .list-group-item-text,
+    .accordion-title,
+    td a:not(.label):not([class*="dropdown-"]):not(.dropdown-menu a) {
+        &,
+        &:hover {text-decoration: underline;}
     }
 }

@@ -18,7 +18,7 @@
     ]
   },
   "require": {
-    "php": "~8.0",
+    "php": "~8.1",
     "ext-zlib": "*",
     "ext-zip": "*",
     "ext-imap": "*",
@@ -97,7 +97,7 @@
     "bandwidth-throttle/token-bucket": "^2.0",
     "gaufrette/extras": "^0.1.0",
     "gaufrette/aws-s3-adapter": "^0.4.0",
-    "theofidry/psysh-bundle": "~4.4.0",
+    "theofidry/psysh-bundle": "^4.5",
     "matomo/device-detector": "^4.0",
     "symfony/lock": "^5.1",
     "composer/package-versions-deprecated": "1.11.99.1",
