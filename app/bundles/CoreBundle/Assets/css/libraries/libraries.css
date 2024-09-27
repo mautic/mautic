@@ -17490,6 +17490,12 @@ a > .fa {
   margin: 6px 0 3px 5px;
   padding: 3px 9px 3px 9px;
   position: relative;
+  max-width: 100%;
+}
+.chosen-container-multi .chosen-choices .search-choice > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .chosen-container-multi .chosen-choices .search-choice .search-choice-close {
   display: block;
