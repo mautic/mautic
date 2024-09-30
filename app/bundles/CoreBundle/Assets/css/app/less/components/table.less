@@ -5,28 +5,13 @@
 // Baseline styles
 
 .table {
-
   // Cells
   >thead,
   >tbody,
   >tfoot {
     >tr {
-      &.active {
-
-        >td,
-        >th {
-          background-color: var(--layer-hover);
-        }
-      }
-
       >th,
-      >td {
-        vertical-align: middle;
-
-        &.active {
-          background-color: var(--layer-hover);
-        }
-      }
+      >td {vertical-align: middle;}
     }
   }
 
@@ -104,6 +89,19 @@
   }
 }
 
+// Exact selectors below required to override `.table-striped` and prevent
+// inheritance to nested tables.
+.table > thead > tr,
+.table > tbody > tr,
+.table > tfoot > tr {
+  > td.active,
+  > th.active,
+  &.active > td,
+  &.active > th {
+    background-color: var(--background);
+  }
+}
+
 .table-hover {
   >tbody>tr {
     &:hover,
@@ -116,8 +114,4 @@
       background-color: var(--background-hover);
     }
   }
-}
-
-.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
-  background-color: var(--background);
 }

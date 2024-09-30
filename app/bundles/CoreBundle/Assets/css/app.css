@@ -5231,14 +5231,6 @@ ul.line-legend li {
 .contact-avatar {
   width: 100%;
 }
-.table > thead > tr.active > td,
-.table > tbody > tr.active > td,
-.table > tfoot > tr.active > td,
-.table > thead > tr.active > th,
-.table > tbody > tr.active > th,
-.table > tfoot > tr.active > th {
-  background-color: var(--layer-hover);
-}
 .table > thead > tr > th,
 .table > tbody > tr > th,
 .table > tfoot > tr > th,
@@ -5246,14 +5238,6 @@ ul.line-legend li {
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
   vertical-align: middle;
-}
-.table > thead > tr > th.active,
-.table > tbody > tr > th.active,
-.table > tfoot > tr > th.active,
-.table > thead > tr > td.active,
-.table > tbody > tr > td.active,
-.table > tfoot > tr > td.active {
-  background-color: var(--layer-hover);
 }
 .table > thead > tr > th {
   vertical-align: middle;
@@ -5309,6 +5293,20 @@ ul.line-legend li {
 .table-responsive-force > .table-bordered > tfoot > tr:last-child > td {
   border-bottom: 0;
 }
+.table > thead > tr > td.active,
+.table > tbody > tr > td.active,
+.table > tfoot > tr > td.active,
+.table > thead > tr > th.active,
+.table > tbody > tr > th.active,
+.table > tfoot > tr > th.active,
+.table > thead > tr.active > td,
+.table > tbody > tr.active > td,
+.table > tfoot > tr.active > td,
+.table > thead > tr.active > th,
+.table > tbody > tr.active > th,
+.table > tfoot > tr.active > th {
+  background-color: var(--background);
+}
 .table-hover > tbody > tr:hover,
 .table-hover > tbody > tr > td.active:hover,
 .table-hover > tbody > tr > th.active:hover,
@@ -5317,14 +5315,6 @@ ul.line-legend li {
 .table-hover > tbody > tr.active:hover > th {
   transition: var(--transition-all-productive);
   background-color: var(--background-hover);
-}
-.table > thead > tr > th,
-.table > tbody > tr > th,
-.table > tfoot > tr > th,
-.table > thead > tr > td,
-.table > tbody > tr > td,
-.table > tfoot > tr > td {
-  background-color: var(--background);
 }
 .progress {
   background-color: var(--border-subtle);
