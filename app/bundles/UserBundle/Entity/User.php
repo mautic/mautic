@@ -236,7 +236,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $metadata->addPropertyConstraint('plainPassword', new Assert\NotBlank(
             [
                 'message' => 'mautic.user.user.password.notblank',
-                'groups'  => ['CheckPassword'],
+                'groups'  => ['CheckPasswordNotBlank'],
             ]
         ));
 
@@ -262,10 +262,15 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
+        if ($data instanceof User) {
+            $isNewUser        = !$data->getId();
+            $hasPlainPassword = !empty($data->getPlainPassword());
 
-        // check if creating a new user or editing an existing user and the password has been updated
-        if ($data instanceof User && (!$data->getId() || ($data->getId() && $data->getPlainPassword()))) {
-            $groups[] = 'CheckPassword';
+            if ($isNewUser) {
+                $groups[] = $hasPlainPassword ? 'CheckPassword' : 'CheckPasswordNotBlank';
+            } elseif ($hasPlainPassword) {
+                $groups[] = 'CheckPassword';
+            }
         }
 
         return $groups;

@@ -9,7 +9,7 @@
     'customButtons' : {
         0: {
             'attr' : {
-                'class'       : 'btn btn-default btn-nospin',
+                'class'       : 'btn btn-primary btn-nospin',
                 'data-toggle' : 'ajax',
                 'href'        : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_CLEAR_CACHE')),
             },
@@ -34,7 +34,7 @@
                 {% trans %}marketplace.composer.required{% endtrans %}
             </div>
         {% endif %}
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div id="page-list-wrapper">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'action'      : currentRoute,

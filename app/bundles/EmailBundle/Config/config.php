@@ -3,6 +3,14 @@
 return [
     'routes' => [
         'main' => [
+            'mautic_email_batch_categories_view' => [
+                'path'       => '/emails/batch/categories/view',
+                'controller' => 'Mautic\EmailBundle\Controller\BatchEmailController::indexAction',
+            ],
+            'mautic_email_batch_categories_set' => [
+                'path'       => '/emails/batch/categories/set',
+                'controller' => 'Mautic\EmailBundle\Controller\BatchEmailController::execAction',
+            ],
             'mautic_email_index' => [
                 'path'       => '/emails/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',

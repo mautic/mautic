@@ -1,0 +1,8 @@
+{% set shortcuts = {
+    'contacts': {
+      'a': 'mautic.keyboard.quick_add_contact',
+      'v': 'mautic.keyboard.toggle_view',
+    },
+} %}
+
+{% include '@MauticCore/Helper/keyboard_shortcuts_helper.html.twig' with {'shortcuts': shortcuts} %}

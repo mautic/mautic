@@ -46,7 +46,7 @@
 {% endif %}
 {% if inForm is defined and (true == inForm or inForm is not empty) %}
   {% if field.type in ['button', 'pagebreak'] %}
-    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' %}
   {% endif %}
 
   {% set labelAttributes = labelAttributes|merge({
@@ -186,12 +186,12 @@
 {% set nextButtonAttr = inputAttributes %}
 
 {% set backButtonAttr = backButtonAttr|merge({
-        'class': backButtonAttr.class|default([])|merge(['btn', 'btn-default', 'mautic-pagebreak-back']),
+        'class': backButtonAttr.class|default([])|merge(['btn', 'btn-ghost', 'mautic-pagebreak-back']),
         'type': 'button',
         'data-mautic-form-pagebreak-button': 'prev',
 }) %}
 {% set nextButtonAttr = nextButtonAttr|merge({
-        'class': nextButtonAttr.class|default([])|merge(['btn', 'btn-default', 'mautic-pagebreak-next']),
+        'class': nextButtonAttr.class|default([])|merge(['btn', 'btn-ghost', 'mautic-pagebreak-next']),
         'type': 'button',
         'data-mautic-form-pagebreak-button': 'next',
 }) %}
