@@ -3771,13 +3771,29 @@ a.media {
   transition: var(--transition-all-productive);
   border: 0;
   padding: 0;
+  vertical-align: middle;
 }
-.list-group-item > a {
+.list-group-item > a,
+.list-group-item > label {
   position: relative;
   z-index: 1;
   display: block;
   padding: 10px 15px;
+  cursor: pointer;
   color: var(--text-secondary);
+}
+.list-group-item > a input,
+.list-group-item > label input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  cursor: pointer;
 }
 .list-group-item:hover {
   background-color: var(--layer-hover);
@@ -5068,6 +5084,7 @@ input[type="checkbox"] {
   appearance: none;
   border: 1px solid var(--icon-primary);
   border-radius: 2px;
+  margin: 0;
   -webkit-transition: var(--transition-all-productive);
   -o-transition: var(--transition-all-productive);
   transition: var(--transition-all-productive);
@@ -5093,13 +5110,13 @@ input[type="checkbox"]:checked:after {
   position: absolute;
   background: 0 0;
   block-size: 0.3125em;
-  border-block-end: 2px solid var(--icon-inverse, #ffffff);
-  border-inline-start: 2px solid var(--icon-inverse, #ffffff);
+  border-block-end: 4px solid var(--icon-inverse, #ffffff);
+  border-inline-start: 4px solid var(--icon-inverse, #ffffff);
   content: "";
-  inline-size: 2.3625em;
-  inset-block-start: 0.00625em;
-  inset-inline-start: -0.3075em;
-  margin-block-start: -0.1875em;
+  inline-size: 27px;
+  inset-block-start: 0px;
+  inset-inline-start: -13px;
+  margin-block-start: -11px;
   transform-origin: bottom right;
   height: 13px;
   aspect-ratio: 1 / 1;

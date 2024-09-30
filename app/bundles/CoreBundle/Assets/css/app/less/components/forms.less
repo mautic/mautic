@@ -494,6 +494,7 @@ input[type="checkbox"] {
   appearance: none;
   border: 1px solid var(--icon-primary);
   border-radius: 2px;
+  margin: 0;
   .transition(var(--transition-all-productive));
   .outline-noff();
 
@@ -501,17 +502,17 @@ input[type="checkbox"] {
     background-color: var(--icon-primary);
     &:after {
       -webkit-transform: scale(1) rotate(-45deg);
-      transform: scale(.5) rotate(-45deg);
+      transform: scale(0.5) rotate(-45deg);
       position: absolute;
       background: 0 0;
       block-size: 0.3125em;
-      border-block-end: 2px solid var(--icon-inverse, #ffffff);
-      border-inline-start: 2px solid var(--icon-inverse, #ffffff);
+      border-block-end: 4px solid var(--icon-inverse, #ffffff);
+      border-inline-start: 4px solid var(--icon-inverse, #ffffff);
       content: "";
-      inline-size: 2.3625em;
-      inset-block-start: 0.00625em;
-      inset-inline-start: -0.3075em;
-      margin-block-start: -0.1875em;
+      inline-size: 27px;
+      inset-block-start: 0px;
+      inset-inline-start: -13px;
+      margin-block-start: -11px;
       transform-origin: bottom right;
       height: 13px;
       aspect-ratio: 1 / 1;

@@ -86,6 +86,8 @@ mQuery( document ).ready(function() {
         });
     }
 
+    Mautic.initListGroupToggle('body');
+
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
         if (e.which === 8 && !mQuery(e.target).is("input:not([readonly]):not([type=radio]):not([type=checkbox]), textarea, [contentEditable], [contentEditable=true]")) {
@@ -948,4 +950,40 @@ var Mautic = {
             return false;
         }
     }
+};
+
+Mautic.initListGroupToggle = function(container) {
+    mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+        e.preventDefault(); // Prevent default action if necessary
+
+        var $item = mQuery(this);
+        var $input = $item.find('input');
+
+        // If the input is disabled or readonly, do nothing
+        if ($input.prop('disabled') || $input.prop('readonly')) {
+            return;
+        }
+
+        var type = $input.prop('type');
+
+        if (type === 'radio') {
+            // Remove 'active' class from all items in the group
+            $item.closest('.list-group').find('.list-group-item').removeClass('active');
+
+            // Add 'active' class to the clicked item
+            $item.addClass('active');
+
+            // Set the input as checked
+            $input.prop('checked', true);
+        } else if (type === 'checkbox') {
+            // Toggle 'active' class on the clicked item
+            $item.toggleClass('active');
+
+            // Update the input's checked property based on the 'active' class
+            $input.prop('checked', $item.hasClass('active'));
+        }
+
+        // Trigger the 'change' event on the input
+        $input.trigger('change');
+    });
 };
