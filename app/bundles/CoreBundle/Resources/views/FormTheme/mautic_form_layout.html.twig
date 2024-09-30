@@ -38,7 +38,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 <div class="btn-group {{ buttonBlockClass }}" data-toggle="buttons">
     {% for child in form %}
         {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
-        <label class="btn btn-default{{ class }}">
+        <label class="btn btn-ghost{{ class }}">
             {{ form_widget(child, {'attr': attr}) }}
             {{ child.vars.label|trans }}
         </label>
@@ -140,7 +140,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list">
         {{ form_label(form, label) }}
         <a  data-prototype="{{ datePrototype|raw }}"
-           class="btn btn-warning btn-xs btn-add-item" href="#" id="{{ form.vars.id }}_additem">
+           class="btn btn-tertiary btn-sm btn-warning btn-add-item" href="#" id="{{ form.vars.id }}_additem">
             {{ 'mautic.core.form.list.additem'|trans }}
         </a>
         {% if isSortable %}
@@ -384,7 +384,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list" style="overflow:auto">
         {{ form_label(form, label) }}
         <a data-prototype="{{ datePrototype|raw }}"
-           class="btn btn-warning btn-xs btn-add-item" href="#" id="{{ form.vars.id }}_additem">
+           class="btn btn-tertiary btn-sm btn-add-item" href="#" id="{{ form.vars.id }}_additem">
             {{ addValueButton|trans }}
         </a>
         {{ block('sortablelist_errors') }}
@@ -509,7 +509,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
             ((child.vars.name == '0' and child.vars.checked is not empty) ? ' btn-danger' : '') ~
             ((child.vars.name == '1' and child.vars.checked is not empty) ? ' btn-success' : '')
         %}
-        <label class="btn btn-default {{ class }}">
+        <label class="btn btn-sm {{ class }}">
             {{ form_widget(child, {'attr': attr}) }}
             <span>{{ child.vars.label|trans }}</span>
         </label>
