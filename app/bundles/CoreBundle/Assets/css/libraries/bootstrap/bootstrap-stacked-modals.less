@@ -33,8 +33,6 @@
   .perspective(2000px);
 
   .modal-dialog{
-    top: 45%;
-    transform: translate(0, -50%);
     &.aside{
       .transform(@modal-translate-z);
       .preserve-3d();
@@ -57,10 +55,3 @@
     }
   }
 }
-
-.modal .modal-dialog {
-  top: 45%;
-  .transform(translate(0, -50%));
-}
-
-.modal.fade .modal-dialog {transition: var(--transition-all-productive);}
