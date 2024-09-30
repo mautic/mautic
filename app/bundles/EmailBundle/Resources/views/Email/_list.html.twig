@@ -7,8 +7,24 @@
                     'checkall'        : 'true',
                     'routeBase'       : 'email',
                     'templateButtons' : {
-                        'delete' : permissions['email:emails:deleteown'] or permissions['email:emails:deleteother']
+                        'delete' : permissions['email:emails:deleteown'] or permissions['email:emails:deleteother'],
                     },
+                    'customButtons': [
+                        {
+                            'attr': {
+                                'class': 'btn btn-default btn-sm btn-nospin',
+                                'data-toggle': 'ajaxmodal',
+                                'data-target': '#MauticSharedModal',
+                                'href': path('mautic_email_batch_categories_view'),
+                                'data-header': 'mautic.email.batch.categories'|trans,
+                            },
+                            'btnText': 'mautic.email.batch.categories'|trans,
+                            'iconClass': 'ri-folder-line',
+                        },
+                    ],
+                    'langVar': 'lead.lead',
+                    'routeBase': 'contact',
+                    'tooltip': 'mautic.lead.list.checkall.help'|trans,
                 }) -}}
 
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
@@ -64,7 +80,7 @@
                 {% set hasTranslations  = item.isTranslation() %}
                 {% set type = item.getEmailType() %}
                 {% set mauticTemplateVars = _context|merge({'item' : item}) %}
-                <tr>
+                <tr id="row_email_{{ item.id }}">
                     <td>
                         {% set edit = securityHasEntityAccess(
                             permissions['email:emails:editown'],

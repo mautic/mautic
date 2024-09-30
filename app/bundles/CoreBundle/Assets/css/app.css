@@ -971,6 +971,18 @@ h6,
 .fs-56 {
   font-size: 56px !important;
 }
+.fs-b-e {
+  font-size: var(--typography-body-expressive);
+}
+.fs-b-p {
+  font-size: var(--typography-body-productive);
+}
+.fs-u-e {
+  font-size: var(--typography-utility-expressive);
+}
+.fs-u-p {
+  font-size: var(--typography-utility-productive);
+}
 .page-header {
   padding: 15px;
   margin: 16px 0 0 0;
@@ -1015,11 +1027,7 @@ h6,
   line-height: 1;
 }
 .text-muted {
-  color: #758697;
-}
-a.text-muted:hover,
-a.text-muted:focus {
-  color: #5d6c7c;
+  color: var(--text-secondary);
 }
 .text-white {
   color: #fff;
@@ -1971,6 +1979,29 @@ kbd {
   margin-right: 10px;
   line-height: 0.5em;
   top: 0.15em;
+}
+.alert.alert-success.notification,
+.alert.alert-info.notification,
+.alert.alert-warning.notification,
+.alert.alert-danger.notification {
+  position: relative;
+}
+.alert.alert-success.notification:before,
+.alert.alert-info.notification:before,
+.alert.alert-warning.notification:before,
+.alert.alert-danger.notification:before {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+  font-size: 18px;
+}
+.alert.alert-success.notification .close,
+.alert.alert-info.notification .close,
+.alert.alert-warning.notification .close,
+.alert.alert-danger.notification .close {
+  position: absolute;
+  top: 10px;
+  right: 0;
 }
 .alert:has(.btn) {
   align-items: center;
@@ -7938,10 +7969,6 @@ ul.media-list.media-list-feed div.media-body {
 }
 .notification-title {
   display: block !important;
-}
-.notification-empty {
-  width: 100px;
-  margin: 50px;
 }
 .flip-vertically {
   transform: scaleY(-1);
