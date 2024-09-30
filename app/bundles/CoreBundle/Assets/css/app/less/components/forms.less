@@ -492,30 +492,29 @@ input[type="checkbox"] {
   vertical-align: -3px;
   background-color: transparent;
   appearance: none;
-  border: 1px solid var(--icon-primary);
-  border-radius: 2px;
+  border: 1px solid var(--interactive);
+  border-radius: 3px;
   margin: 0;
+  align-items: center;
+  display: flex;
+  justify-content: center;
   .transition(var(--transition-all-productive));
   .outline-noff();
 
   &:checked {
-    background-color: var(--icon-primary);
     &:after {
-      -webkit-transform: scale(1) rotate(-45deg);
-      transform: scale(0.5) rotate(-45deg);
-      position: absolute;
-      background: 0 0;
-      block-size: 0.3125em;
-      border-block-end: 4px solid var(--icon-inverse, #ffffff);
-      border-inline-start: 4px solid var(--icon-inverse, #ffffff);
       content: "";
-      inline-size: 27px;
-      inset-block-start: 0px;
-      inset-inline-start: -13px;
-      margin-block-start: -11px;
-      transform-origin: bottom right;
-      height: 13px;
-      aspect-ratio: 1 / 1;
+      background-color: var(--interactive);
+      height: 10px;
+      width: 10px;
+      border-radius: 2px;
+      -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+      -o-transform: scale(1);
+      transform: scale(1);
+      -webkit-transition: all 0.1s ease;
+      -o-transition: all 0.1s ease;
+      transition: all 0.1s ease;
     }
   }
 }
