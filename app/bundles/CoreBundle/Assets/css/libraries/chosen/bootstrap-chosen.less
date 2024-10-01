@@ -369,10 +369,12 @@
   }
 }
 
+.chosen-container.chosen-container-single.chosen-container-active .chosen-single {
+  outline: 2px var(--outline-style) var(--focus);
+}
+
 .chosen-container-active {
   .chosen-single {
-    border: @chosen-focus-border;
-    .box-shadow(@chosen-focus-box-shadow);
     .transition(@chosen-focus-transition);
   }
 

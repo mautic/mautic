@@ -17540,10 +17540,10 @@ a > .fa {
 .chosen-container-multi .chosen-drop .result-selected {
   display: none;
 }
+.chosen-container.chosen-container-single.chosen-container-active .chosen-single {
+  outline: 2px var(--outline-style) var(--focus);
+}
 .chosen-container-active .chosen-single {
-  border: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
   -webkit-transition: border linear .2s, box-shadow linear .2s;
   -o-transition: border linear .2s, box-shadow linear .2s;
   transition: border linear .2s, box-shadow linear .2s;

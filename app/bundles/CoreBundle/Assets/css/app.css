@@ -4563,7 +4563,7 @@ input[style]:hover {
   background-color: var(--field-hover) !important;
 }
 .form-control,
-.chosen-container-single .chosen-single,
+.chosen-container .chosen-single,
 .form-control.search.tt-input {
   background-color: var(--field);
   border-width: var(--border-bottom);
@@ -4576,36 +4576,36 @@ input[style]:hover {
   box-shadow: none;
 }
 .form-control:hover,
-.chosen-container-single .chosen-single:hover,
+.chosen-container .chosen-single:hover,
 .form-control.search.tt-input:hover {
   outline: 2px var(--outline-style) transparent;
 }
 .form-control:active,
-.chosen-container-single .chosen-single:active,
+.chosen-container .chosen-single:active,
 .form-control.search.tt-input:active,
 .form-control.active,
-.chosen-container-single .chosen-single.active,
+.chosen-container .chosen-single.active,
 .form-control.search.tt-input.active,
 .form-control:focus,
-.chosen-container-single .chosen-single:focus,
+.chosen-container .chosen-single:focus,
 .form-control.search.tt-input:focus,
 .form-control.focus,
-.chosen-container-single .chosen-single.focus,
+.chosen-container .chosen-single.focus,
 .form-control.search.tt-input.focus {
   outline: 2px var(--outline-style) var(--focus);
 }
 .form-control.form-control-rounded,
-.chosen-container-single .chosen-single.form-control-rounded,
+.chosen-container .chosen-single.form-control-rounded,
 .form-control.search.tt-input.form-control-rounded {
   border-radius: 32px;
 }
 .form-control:hover,
-.chosen-container-single .chosen-single:hover,
+.chosen-container .chosen-single:hover,
 .form-control.search.tt-input:hover {
   background-color: var(--field-hover);
 }
 .form-control:focus,
-.chosen-container-single .chosen-single:focus,
+.chosen-container .chosen-single:focus,
 .form-control.search.tt-input:focus {
   box-shadow: none;
 }
