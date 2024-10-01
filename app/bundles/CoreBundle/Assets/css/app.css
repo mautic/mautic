@@ -879,6 +879,10 @@ h6,
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+::selection {
+  background-color: rgb(from var(--background-brand-primary) r g b / 25%);
+  color: var(--link-primary);
+}
 .fs-base {
   font-size: 13px;
 }
@@ -7794,7 +7798,7 @@ lesshat-selector { -lh-property: 0 ;
   width: 30%;
   height: 100%;
   padding: 15px;
-  background-color: #d5d4d4;
+  background-color: var(--layer, #d5d4d4);
   overflow-y: auto;
 }
 .builder-content {
