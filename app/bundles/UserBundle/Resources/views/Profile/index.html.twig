@@ -1,4 +1,4 @@
-{% extends '@MauticCore/Default/content.html.twig' %}
+    {% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}{{ 'mautic.user.account.settings'|trans }}{% endblock %}
 {% block mauticContent %}user{% endblock %}
@@ -105,6 +105,39 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-lg">
+                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
+                            <div class="help-block">{{ 'mautic.user.account.appearance.accent_help'|trans }}</div>
+                            <div class="d-flex fw-wrap gap-lg mb-lg">
+                                {{ include('@MauticUser/Helper/accent.html.twig', {
+                                    accents: [
+                                        { id: '01' },
+                                        { id: '02' },
+                                        { id: '03' },
+                                        { id: '04' },
+                                        { id: '05' },
+                                        { id: '06' },
+                                        { id: '07' },
+                                        { id: '08' },
+                                        { id: '09' },
+                                        { id: '10' },
+                                        { id: '11' },
+                                        { id: '12' },
+                                        { id: '13' },
+                                        { id: '14' },
+                                        { id: '15' },
+                                        { id: '16' },
+                                        { id: '17' },
+                                        { id: '18' },
+                                        { id: '19' },
+                                        { id: '20' },
+                                        { id: '21' },
+                                        { id: '22' },
+                                        { id: '23' },
+                                        { id: '24' },
+                                        { id: '25' }
+                                    ]
+                                }) }}
+                            </div>
                             <h3 class="pt-20 mb-md">{{ 'mautic.user.account.appearance.theme_preferences'|trans }}</h3>
                             <div class="help-block">{{ 'mautic.user.account.appearance.theme_help'|trans }}</div>
                             <div class="radio-group radio-cards row">
@@ -143,8 +176,6 @@
                                         }
                                     ]
                                 }) }}
-
-
                             </div>
                         </div>
                     </div>
