@@ -80,7 +80,8 @@ label {
 
   .search {
     border: none;
-    background-color: transparent !important;
+    background-color: transparent !important; // JS libraries apply inline styles, showing a weird rectangle background behind the icon.
+    position: absolute;
     left: 0px;
     width: 24px;
     height: 34px;
@@ -232,8 +233,9 @@ label {
   .the-icon {
     position: absolute;
     z-index: 2;
-    top: 0;
-    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: @input-height-base;
     line-height: @input-height-base - 1;
     width: @input-height-base;
     text-align: center;
