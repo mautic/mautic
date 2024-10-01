@@ -38,10 +38,8 @@ input[style] {
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
   transition: var(--transition-all-productive);
-  outline: 2px solid transparent;
-  outline-offset: -2px;
   border-radius: var(--border-radius-sm);
-
+  .outline();
   .box-shadow(none);
 
   // Rounded
@@ -50,12 +48,9 @@ input[style] {
     border-radius: @input-height-base;
   }
 
-  &:hover {
-    background-color: var(--field-hover);
-  }
+  &:hover {background-color: var(--field-hover);}
 
   &:focus {
-    outline: 2px solid var(--focus);
     box-shadow: none;
   }
 }
@@ -270,6 +265,8 @@ input[style] {
 input[type=file].form-control {
   padding: 6px;
 }
+
+input[type=file] {.outline();}
 
 // Custom file input
 // -------------------------

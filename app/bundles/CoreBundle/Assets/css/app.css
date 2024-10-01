@@ -848,6 +848,7 @@ hr.hr-w-3,
 a {
   transition: var(--transition-all-productive);
   color: var(--link-primary);
+  outline: 2px solid transparent;
 }
 a:hover {
   color: var(--link-primary-hover);
@@ -856,6 +857,7 @@ a:hover {
 a:hover,
 a:focus {
   text-decoration: none;
+  outline: 2px solid transparent;
 }
 h1,
 h2,
@@ -4568,11 +4570,30 @@ input[style]:hover {
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
   transition: var(--transition-all-productive);
-  outline: 2px solid transparent;
-  outline-offset: -2px;
   border-radius: var(--border-radius-sm);
+  outline: 2px var(--outline-style) transparent;
+  outline-offset: -2px;
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+.form-control:hover,
+.chosen-container-single .chosen-single:hover,
+.form-control.search.tt-input:hover {
+  outline: 2px var(--outline-style) transparent;
+}
+.form-control:active,
+.chosen-container-single .chosen-single:active,
+.form-control.search.tt-input:active,
+.form-control.active,
+.chosen-container-single .chosen-single.active,
+.form-control.search.tt-input.active,
+.form-control:focus,
+.chosen-container-single .chosen-single:focus,
+.form-control.search.tt-input:focus,
+.form-control.focus,
+.chosen-container-single .chosen-single.focus,
+.form-control.search.tt-input.focus {
+  outline: 2px var(--outline-style) var(--focus);
 }
 .form-control.form-control-rounded,
 .chosen-container-single .chosen-single.form-control-rounded,
@@ -4587,7 +4608,6 @@ input[style]:hover {
 .form-control:focus,
 .chosen-container-single .chosen-single:focus,
 .form-control.search.tt-input:focus {
-  outline: 2px solid var(--focus);
   box-shadow: none;
 }
 .form-control {
@@ -4739,6 +4759,19 @@ input[style]:hover {
 }
 input[type=file].form-control {
   padding: 6px;
+}
+input[type=file] {
+  outline: 2px var(--outline-style) transparent;
+  outline-offset: -2px;
+}
+input[type=file]:hover {
+  outline: 2px var(--outline-style) transparent;
+}
+input[type=file]:active,
+input[type=file].active,
+input[type=file]:focus,
+input[type=file].focus {
+  outline: 2px var(--outline-style) var(--focus);
 }
 .btn-file {
   position: relative;
