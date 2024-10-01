@@ -3050,7 +3050,6 @@ a.media {
 .row {
   display: flex;
   flex-wrap: wrap;
-  max-width: 100%;
   margin-right: -15px;
   margin-left: -15px;
 }
