@@ -241,4 +241,21 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEquals($eventId, $responseData['eventId']);
         $this->assertNotEmpty($responseData['eventHtml']);
     }
+
+    public function testEmailSendTypeDefaultSetting(): void
+    {
+        // Fetch the campaign action form.
+        $uri = '/s/campaigns/events/new?type=email.send&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
+        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        Assert::assertTrue($response->isOk(), $response->getContent());
+
+        // Get the form HTML element out of the response
+        $responseData = json_decode($response->getContent(), true);
+        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
+        $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
+
+        // Assert the field email_type === "marketing"
+        Assert::assertEquals('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
+    }
 }

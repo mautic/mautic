@@ -26,8 +26,8 @@ class UserLogoutFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $user->setRole($role);
-        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword('mautic', null));
+        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $user->setPassword($encoder->hash('mautic'));
         $this->em->persist($user);
 
         $this->em->flush();
