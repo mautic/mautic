@@ -15,7 +15,7 @@
     {%- endif %}
 {%- endif %}
 
-{%- set btnClass = btnClass ?? 'btn btn-default' %}
+{%- set btnClass = btnClass ?? 'btn btn-ghost' %}
 
 {%- set btnTextAttr = btnTextAttr|default('') %}
 
@@ -69,6 +69,7 @@
 {%- set precheck = precheck|default('') %}
 {{- wrapOpeningTag }}
 <{{ tag }}{{ buttonType }}
+    id="delete"
     class="{{ btnClass }}"
     href="{{ confirmAction }}"
     data-toggle="confirmation"

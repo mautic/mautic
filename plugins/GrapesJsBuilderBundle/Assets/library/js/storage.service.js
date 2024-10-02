@@ -32,7 +32,7 @@ export default class StorageService {
 
         const dismissButton = document.createElement('button');
         dismissButton.innerHTML = Mautic.translate('mautic.core.builder.storage.dismiss.button')
-        dismissButton.className = 'btn btn-default';
+        dismissButton.className = 'btn btn-ghost';
         buttonContainer.append(restoreButton, dismissButton);
 
         const formattedDateTime = this.formatDateTime(storedContent.date);
