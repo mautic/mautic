@@ -6,10 +6,9 @@ use Page\Acceptance\EmailsPage;
 
 class EmailManagementCest
 {
-    private AcceptanceTester $I;
-    public const ADMIN_PASSWORD                   = 'Maut1cR0cks!';
-    public const ADMIN_USER                       = 'admin';
-    public const DATE_FORMAT                      = 'Y:m:d H:i:s';
+    public const ADMIN_PASSWORD = 'Maut1cR0cks!';
+    public const ADMIN_USER     = 'admin';
+    public const DATE_FORMAT    = 'Y:m:d H:i:s';
 
     public function _before(AcceptanceTester $I): void
     {
@@ -18,8 +17,6 @@ class EmailManagementCest
 
     public function tryToBatchChangeEmailCategory(AcceptanceTester $I): void
     {
-        $this->I = $I;
-
         $now = date(self::DATE_FORMAT);
 
         // Arrange
@@ -29,46 +26,39 @@ class EmailManagementCest
 
         // Act
         $I->amOnPage(EmailsPage::URL);
-        $I->wait(1);
-        $this->selectAllEmails();
-        $this->selectChangeCategoryAction();
-        $newCategoryName = $this->doChangeCategory();
+        $this->selectAllEmails($I);
+        $this->selectChangeCategoryAction($I);
+        $newCategoryName = $this->doChangeCategory($I);
         $I->reloadPage();
 
         // Assert
-        $this->verifyAllEmailsBelongTo($newCategoryName);
+        $this->verifyAllEmailsBelongTo($I, $newCategoryName);
     }
 
-    public function selectAllEmails(): void
+    public function selectAllEmails(AcceptanceTester $I): void
     {
-        $I = $this->I;
         $I->waitForElementClickable(EmailsPage::SELECT_ALL_CHECKBOX);
         $I->click(EmailsPage::SELECT_ALL_CHECKBOX);
     }
 
-    private function selectChangeCategoryAction(): void
+    private function selectChangeCategoryAction(AcceptanceTester $I): void
     {
-        $I = $this->I;
         $I->waitForElementClickable(EmailsPage::SELECTED_ACTIONS_DROPDOWN);
         $I->click(EmailsPage::SELECTED_ACTIONS_DROPDOWN);
         $I->waitForElementClickable(EmailsPage::CHANGE_CATEGORY_ACTION);
         $I->click(EmailsPage::CHANGE_CATEGORY_ACTION);
     }
 
-    protected function verifyAllEmailsBelongTo(string $firstCategoryName): void
+    protected function verifyAllEmailsBelongTo(AcceptanceTester $I, string $firstCategoryName): void
     {
-        $I = $this->I;
-
         $categories = $I->grabMultiple('span.label-category');
         for ($i = 1; $i <= count($categories); ++$i) {
             $I->see($firstCategoryName, '//*[@id="app-content"]/div/div[2]/div[2]/div[1]/table/tbody/tr['.$i.']/td[3]/div');
         }
     }
 
-    private function doChangeCategory(): string
+    private function doChangeCategory(AcceptanceTester $I): string
     {
-        $I = $this->I;
-
         $I->waitForElementClickable(EmailsPage::NEW_CATEGORY_DROPDOWN);
         $I->click(EmailsPage::NEW_CATEGORY_DROPDOWN);
         $I->waitForElementVisible(EmailsPage::NEW_CATEGORY_OPTION);
