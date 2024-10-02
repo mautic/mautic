@@ -11,7 +11,7 @@
       'customButtons': [
           {
               'attr': {
-                  'class': 'btn btn-default btn-nospin',
+                  'class': 'btn btn-primary btn-nospin',
                   'data-toggle': 'ajaxmodal',
                   'data-target': '#MauticSharedModal',
                   'href': path('mautic_dashboard_action', {'objectAction': 'new'}),
@@ -23,7 +23,7 @@
           },
           {
               'attr': {
-                  'class': 'btn btn-default btn-nospin',
+                  'class': 'btn btn-ghost btn-nospin',
                   'href': 'javascript:void(0)',
                   'onclick': "Mautic.saveDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"');",
                   'data-toggle': '',
@@ -33,7 +33,7 @@
           },
           {
               'attr': {
-                  'class': 'btn btn-default btn-nospin',
+                  'class': 'btn btn-ghost btn-nospin',
                   'href': 'javascript:void(0)',
                   'onclick': "Mautic.exportDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"', '"~path('mautic_dashboard_action', {'objectAction': 'export'})~"');",
                   'data-toggle': '',
@@ -43,7 +43,7 @@
           },
           {
               'attr': {
-                  'class': 'btn btn-default',
+                  'class': 'btn btn-ghost',
                   'href': path('mautic_dashboard_action', {'objectAction': 'import'}),
                   'data-header': 'mautic.dashboard.widget.import'|trans,
               },
