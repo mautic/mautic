@@ -15,7 +15,7 @@ Variables
             {% for stat in stats %}
                 {% if stat.ids|length > 0 %}
                     <a href="{{ path(stat.route, {'search': 'mautic.core.searchcommand.ids'|trans~':'~stat.ids|join(',')}) }}"
-                       class="btn btn-default mt-4">
+                       class="btn btn-ghost mt-4">
                         {{ stat.label|trans }}
                         <span class="mt-xs label label-primary">{{ stat.ids|length }}</span>
                     </a>
