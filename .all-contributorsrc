@@ -1367,6 +1367,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Aleks0129",
+      "name": "Aleks0129",
+      "avatar_url": "https://avatars.githubusercontent.com/u/182695073?v=4",
+      "profile": "https://github.com/Aleks0129",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "mchojrin",
+      "name": "Mauro Chojrin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1532615?v=4",
+      "profile": "https://academy.leewayweb.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
