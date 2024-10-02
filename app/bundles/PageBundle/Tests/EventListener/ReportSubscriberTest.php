@@ -234,7 +234,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['expr', 'execute'])
+            ->onlyMethods(['expr', 'executeQuery'])
             ->getMock();
 
         $mockStmt = $this->getMockBuilder(Result::class)
@@ -264,7 +264,7 @@ class ReportSubscriberTest extends TestCase
             ->willReturn($mockExprBuilder);
 
         $mockQueryBuilder->expects($this->any())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($mockStmt);
 
         $mockEvent->expects($this->once())
