@@ -228,7 +228,7 @@ class PageModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -371,7 +371,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = []): void
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = []): void
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -482,7 +482,7 @@ class PageModel extends FormModel
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDate = null
+        ?\DateTimeInterface $hitDate = null
     ): void {
         // Store Page/Redirect association
         if ($page) {
@@ -720,7 +720,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -733,7 +733,7 @@ class PageModel extends FormModel
      *
      * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null): array
+    public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -968,7 +968,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -991,6 +991,37 @@ class PageModel extends FormModel
     }
 
     /**
+     * Get a list of popular (by hits) tracking pages.
+     *
+     * @param array<int|string> $filters
+     *
+     * @return array<array<int|string>>
+     */
+    public function getPopularTrackedPages(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = []): array
+    {
+        $companyId  = $filters['companyId'] ?? null;
+        $campaignId = $filters['campaignId'] ?? null;
+        $segmentId  = $filters['segmentId'] ?? null;
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+        // IF NULL in select statement is 3 times faster like where condition
+        $q->select('t.url_title, t.url, COUNT(CASE WHEN t.page_id IS NULL AND t.email_id IS NULL AND t.redirect_id IS NULL AND t.code = 200 THEN 1 ELSE NULL END) AS hits')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
+            ->orderBy('hits', 'DESC')
+            ->groupBy('t.url_title, t.url')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        $chartQuery->applyDateFilters($q, 'date_hit');
+        $chartQuery->addCompanyFilter($q, $companyId);
+        $chartQuery->addCampaignFilter($q, $campaignId);
+        $chartQuery->addSegmentFilter($q, $segmentId);
+
+        return $q->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
      * Get a list of pages created in a date range.
      *
      * @param int   $limit
@@ -999,7 +1030,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

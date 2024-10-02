@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\ColorHelper;
 
 abstract class AbstractChart
@@ -231,5 +232,42 @@ abstract class AbstractChart
         }
 
         return $color;
+    }
+
+    public function addCampaignFilter(QueryBuilder $q, ?int $campaignId, string $fromAlias = 't'): void
+    {
+        if ($campaignId) {
+            $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = clel.lead_id')
+                ->setParameter('campaignId', $campaignId);
+        }
+    }
+
+    public function addCompanyFilter(QueryBuilder $q, ?int $companyId = null, string $fromAlias = 't'): void
+    {
+        if ($companyId) {
+            $sb = $q->expr()->and(
+                $q->expr()->eq('cl.company_id', ':companyId'),
+                $q->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
+            );
+
+            $q->andWhere(
+                sprintf('EXISTS (SELECT null FROM %scompanies_leads cl WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
+            )->setParameter('companyId', $companyId);
+        }
+    }
+
+    public function addSegmentFilter(QueryBuilder $q, ?int $segmentId = null, string $fromAlias = 't'): void
+    {
+        if ($segmentId) {
+            $sb = $q->expr()->and(
+                $q->expr()->eq('lll.leadlist_id', ':segmentId'),
+                $q->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
+                $q->expr()->eq('lll.manually_removed', 0)
+            );
+
+            $q->andWhere(
+                sprintf('EXISTS (SELECT null FROM %slead_lists_leads lll WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
+            )->setParameter('segmentId', $segmentId);
+        }
     }
 }
