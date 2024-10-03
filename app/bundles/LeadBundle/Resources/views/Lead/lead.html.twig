@@ -178,8 +178,10 @@
                                         {% if 'core' == group %}
                                           {{ include('@MauticCore/Helper/details.html.twig', {'entity': lead}) }}
                                         {% endif %}
+                                        {% set no_result = true %}
                                         {% for field in fields[group] %}
                                             {% if field.value is not empty %}
+                                                {%  set no_result = false %}
                                                 <tr>
                                                     <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span></td>
                                                     <td>
@@ -207,6 +209,11 @@
                                                 </tr>
                                             {% endif %}
                                         {% endfor %}
+
+                                        {% if no_result %}
+                                            <tr><td colspan="2">{{ 'mautic.lead.field.group.no_data'|trans }}</td></tr>
+                                        {% endif %}
+
                                         </tbody>
                                     </table>
                                 </div>

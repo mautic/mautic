@@ -11,5 +11,5 @@ class CategoriesPage
     public const BUNDLE_DROPDOWN     = '#category_form_bundle_chosen > a > span';
     public const BUNDLE_EMAIL_OPTION = "#category_form_bundle_chosen > div > ul > li[data-option-array-index='3']";
     public const TITLE_FIELD         = 'category_form[title]';
-    public const SAVE_AND_CLOSE      = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-default.btn-save.btn-copy';
+    public const SAVE_AND_CLOSE      = 'div.modal-form-buttons button.btn.btn-primary.btn-save.btn-copy';
 }
