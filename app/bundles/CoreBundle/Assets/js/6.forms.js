@@ -529,10 +529,6 @@ Mautic.toggleYesNoButtonClass = function (changedId) {
  */
 Mautic.removeFormListOption = function (el) {
     var sortableDiv = mQuery(el).parents('div.sortable');
-    var inputCount = mQuery(sortableDiv).parents('div.form-group').find('input.sortable-itemcount');
-    var count = mQuery(inputCount).val();
-    count--;
-    mQuery(inputCount).val(count);
     mQuery(sortableDiv).remove();
 };
 
