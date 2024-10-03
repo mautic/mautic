@@ -1,4 +1,0 @@
-#ddev-generated
-# If omit_containers[ddev-router] then this file will be replaced
-# with another with a `ports` statement to directly expose port 80 to 8036
-services: {}
