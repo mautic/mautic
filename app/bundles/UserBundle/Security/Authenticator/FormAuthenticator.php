@@ -5,6 +5,8 @@ namespace Mautic\UserBundle\Security\Authenticator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Exception\WeakPasswordException;
+use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -49,7 +51,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         private EventDispatcherInterface $dispatcher,
         private ?RequestStack $requestStack,
         private CsrfTokenManagerInterface $csrfTokenManager,
-        private UrlGeneratorInterface $urlGenerator
+        private UrlGeneratorInterface $urlGenerator,
+        private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel
     ) {
     }
 
@@ -145,7 +148,15 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         $newUser->setUsername($user->getUserIdentifier());
         $newUser->setPassword($user->getPassword());
 
-        return $this->hasher->isPasswordValid($newUser, $this->getPassword($credentials));
+        $valid =  $this->hasher->isPasswordValid($newUser, $this->getPassword($credentials));
+
+        if ($valid) {
+            if (!$this->passwordStrengthEstimatorModel->validate($credentials['password'])) {
+                throw new WeakPasswordException();
+            }
+        }
+
+        return $valid;
     }
 
     public function getPassword($credentials): ?string
