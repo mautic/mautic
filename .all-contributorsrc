@@ -1385,6 +1385,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "tomfriedhof",
+      "name": "Tom Friedhof",
+      "avatar_url": "https://avatars.githubusercontent.com/u/810903?v=4",
+      "profile": "http://activelamp.com",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
