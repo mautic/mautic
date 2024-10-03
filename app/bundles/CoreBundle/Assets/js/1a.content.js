@@ -477,8 +477,11 @@ Mautic.onPageLoad = function (container, response, inModal) {
         var disabled = Mautic.batchActionPrecheck(container) ? false : true;
         var color    = (disabled) ? 'btn-ghost' : 'btn-info';
         var button   = container + ' th.col-actions .input-group-btn button';
-        mQuery(button).prop('disabled', disabled);
-        mQuery(button).removeClass('btn-ghost btn-info').addClass(color);
+
+        if(!mQuery(button).is(':disabled')) {
+            mQuery(button).prop('disabled', disabled);
+            mQuery(button).removeClass('btn-ghost btn-info').addClass(color);
+        }
     });
 
     //Copy form buttons to the toolbar
