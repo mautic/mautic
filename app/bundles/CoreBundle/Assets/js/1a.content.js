@@ -478,7 +478,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
         var color    = (disabled) ? 'btn-ghost' : 'btn-info';
         var button   = container + ' th.col-actions .input-group-btn button';
 
-        if(!mQuery(button).is(':disabled')) {
+        var count = mQuery(button).data('button-count');
+        if (count > 0) {
             mQuery(button).prop('disabled', disabled);
             mQuery(button).removeClass('btn-ghost btn-info').addClass(color);
         }
