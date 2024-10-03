@@ -158,7 +158,7 @@
                 {{ form_row(form.vars.form.children.value) }}
             </div>
             <div class="choice-wrapper col-xs-2">
-                {{ form_row(form.vars.form.children.dynamic) }}
+                {{ form_row(form.vars.form.children.dynamic, {'attr': {'size': 'sm'}}) }}
             </div>
             <div class="col-xs-1 mt-lg">
                 <button type="button" class="btn btn-ghost btn-danger btn-icon btn-sm" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-delete-row fs-16"></i></button>
