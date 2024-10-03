@@ -69,11 +69,12 @@ class ReportType extends AbstractType
                 'system',
                 YesNoButtonGroupType::class,
                 [
-                    'label' => 'mautic.report.report.form.issystem',
-                    'data'  => $data,
-                    'attr'  => [
+                    'label'      => 'mautic.report.report.form.issystem',
+                    'data'       => $data,
+                    'attr'       => [
                         'tooltip' => 'mautic.report.report.form.issystem.tooltip',
                     ],
+                    'no_label'   => 'mautic.lead.list.form.isglobal.no',
                 ]
             );
 
