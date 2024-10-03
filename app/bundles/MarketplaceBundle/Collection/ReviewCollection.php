@@ -24,6 +24,9 @@ class ReviewCollection implements \Iterator, \Countable, \ArrayAccess
         $this->records = array_values($records);
     }
 
+    /**
+     * @param mixed[] $array
+     */
     public static function fromArray(array $array): self
     {
         return new self(
