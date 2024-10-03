@@ -17,7 +17,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -474,10 +474,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('non-admin-user');
         $user->setRole($role);
 
-        /** @var PasswordEncoderInterface $encoder */
-        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($user);
+        /** @var PasswordHasherInterface $encoder */
+        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
 
-        $user->setPassword($encoder->encodePassword('mautic', null));
+        $user->setPassword($encoder->hash('mautic'));
         $userRepository->saveEntity($user);
 
         /** @var User $nonAdminUser */
