@@ -23,12 +23,14 @@ class Connection
      */
     public function getPlugins(int $page, int $limit, string $query = ''): array
     {
-        $offset = ($page - 1) * $limit;
+        $offset = ($page - 1) * $limit + 1;
 
         return $this->makeRequest("https://mau.tc/api-marketplace-packages?_limit={$limit}&_offset={$offset}&_type=&_query={$query}");
     }
 
     /**
+     * @return mixed[]
+     *
      * @throws ApiException
      */
     public function getPackage(string $pluginName): array
@@ -36,11 +38,16 @@ class Connection
         return $this->makeRequest("https://mau.tc/api-marketplace-package?packag_name={$pluginName}");
     }
 
+    /**
+     * @return mixed[]
+     *
+     * @throws ApiException
+     */
     public function makeRequest(string $url): array
     {
         $this->logger->debug('About to query the Packagist API: '.$url);
 
-        $request  = new Request('GET', $url, $this->getHeaders());
+        $request = new Request('GET', $url, $this->getHeaders());
 
         try {
             $response = $this->httpClient->send($request);
@@ -61,6 +68,9 @@ class Connection
         return $payload;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getHeaders(): array
     {
         return [

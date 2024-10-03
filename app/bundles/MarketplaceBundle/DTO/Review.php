@@ -13,6 +13,9 @@ final class Review
     ) {
     }
 
+    /**
+     * @param array{name?: string, rating: int, review?: string} $array
+     */
     public static function fromArray(array $array): self
     {
         return new self(
