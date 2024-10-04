@@ -2,7 +2,6 @@
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 
@@ -25,17 +24,14 @@ class ClientRepository extends CommonRepository
         return $query->getQuery()->getResult();
     }
 
-    /**
-     * @return Paginator<Client>
-     */
-    public function getEntities(array $args = []): Paginator
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('c');
 
-        $query = $q->getQuery();
+        $args['qb'] = $q;
 
-        return new Paginator($query);
+        return parent::getEntities($args);
     }
 
     protected function addCatchAllWhereClause($q, $filter): array
