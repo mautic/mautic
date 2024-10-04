@@ -12,7 +12,6 @@
   padding-left: 15px;
   margin: 0;
   display: flex;
-  flex-direction: column;
 
   @media (min-width: @screen-sm-min) {
     max-width: @container-sm;
@@ -25,6 +24,10 @@
   }
 }
 
+.container-column {
+  .container-fixed();
+  flex-direction: column;
+}
 
 // Fluid container
 //
