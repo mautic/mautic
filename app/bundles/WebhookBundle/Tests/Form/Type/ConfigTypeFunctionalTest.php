@@ -13,12 +13,12 @@ class ConfigTypeFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request('GET', '/s/config/edit');
 
-        // get "Yes" input for "Send email details" toggle
-        $input = $crawler->filterXPath('//div[label[contains(text(), "Send email details")]]')
-            ->filterXPath('//label[*[contains(text(), "Yes")]]')
-            ->filter('input');
+        // Find the "Yes" span for "Send email details" toggle
+        $yesSpan = $crawler->filterXPath('//div[label[contains(text(), "Send email details")]]')
+            ->filterXPath('//span[contains(text(), "Yes")]')
+            ->filter('span');
 
-        Assert::assertCount(1, $input);
-        Assert::assertSame('checked', $input->attr('checked'));
+        Assert::assertCount(1, $yesSpan);
+        Assert::assertSame('Yes', $yesSpan->text());
     }
 }

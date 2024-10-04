@@ -482,45 +482,41 @@ Mautic.updateEntitySelect = function (response) {
  * Toggles the class for yes/no button groups
  * @param changedId
  */
-Mautic.toggleYesNoButtonClass = function (changedId) {
-    changedId = '#' + changedId;
+Mautic.toggleYesNo = function(element) {
+    var $label = mQuery(element);
+    var $toggle = $label.closest('.toggle');
+    var yesId = $label.data('yes-id');
+    var noId = $label.data('no-id');
+    var $yesInput = mQuery('#' + yesId);
+    var $noInput = mQuery('#' + noId);
+    var $switchEl = $toggle.find('.toggle__switch');
+    var $textEl = $toggle.find('.toggle__text');
 
-    var isYesButton   = mQuery(changedId).parent().hasClass('btn-yes');
-    var isExtraButton = mQuery(changedId).parent().hasClass('btn-extra');
+    var yesText = $toggle.data('yes');
+    var noText = $toggle.data('no');
 
-    if (isExtraButton) {
-        mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-ghost');
+    if ($yesInput.is(':checked')) {
+        // Switch to 'No'
+        $noInput.prop('checked', true).trigger('change');
+        $yesInput.prop('checked', false);
+        $switchEl.removeClass('toggle__switch--checked');
+        $textEl.text(noText);
+        $label.attr('aria-checked', 'false');
     } else {
-        //change the other
-        var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
-        var otherLabel = mQuery(changedId).parent().parent().find(otherButton);
-
-        if (mQuery(changedId).prop('checked')) {
-            var thisRemove = 'btn-ghost',
-                otherAdd = 'btn-ghost';
-            if (isYesButton) {
-                var thisAdd = 'btn-success',
-                    otherRemove = 'btn-danger';
-            } else {
-                var thisAdd = 'btn-danger',
-                    otherRemove = 'btn-success';
-            }
-        } else {
-            var thisAdd = 'btn-ghost';
-            if (isYesButton) {
-                var thisAdd = 'btn-success',
-                    otherRemove = 'btn-danger';
-            } else {
-                var thisAdd = 'btn-danger',
-                    otherRemove = 'btn-success';
-            }
-        }
-
-        mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
-        mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
+        // Switch to 'Yes'
+        $yesInput.prop('checked', true).trigger('change');
+        $noInput.prop('checked', false);
+        $switchEl.addClass('toggle__switch--checked');
+        $textEl.text(yesText);
+        $label.attr('aria-checked', 'true');
     }
+};
 
-    return true;
+Mautic.handleKeyDown = function(event, element) {
+    if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault();
+        Mautic.toggleYesNo(element);
+    }
 };
 
 /**
