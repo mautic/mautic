@@ -35,10 +35,10 @@
                 {% for key in form.children|keys|filter(v => formConfigs[v] is defined and form[v].children|length > 0) %}
                     <li role="presentation" class="list-group-item {% if loop.first %}in active{% endif %}">
                         {% set containsErrors = formContainsErrors(form[key]) %}
-                        <a href="#{{ key }}" aria-controls="{{ key }}" role="tab" data-toggle="tab" class="steps {% if formContainsErrors(form[key]) %}text-danger{% endif %}">
+                        <a href="#{{ key }}" aria-controls="{{ key }}" role="tab" data-toggle="tab" class="list-group-item-text steps {% if formContainsErrors(form[key]) %}text-danger{% endif %}">
                             {{ ('mautic.config.tab.' ~ key)|trans }}
                             {% if formContainsErrors(form[key]) %}
-                                <i class="fa fa-warning"></i>
+                                <i class="ri-alert-line"></i>
                             {% endif %}
                         </a>
                     </li>

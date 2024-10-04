@@ -5,6 +5,7 @@
     0: {
         'attr' : {
             'href' : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
+            'class' : 'btn btn-tertiary'
         },
         'btnText'   : 'marketplace.package.details.close'|trans,
         'iconClass' : 'ri-arrow-go-back-line',
@@ -27,7 +28,7 @@
             'data-toggle' : '',
         },
         'btnText'   : 'marketplace.package.issue.tracker'|trans,
-        'iconClass' : 'fa fa-question',
+        'iconClass' : 'ri-question-mark',
         'primary'   : false,
     }}) %}
 {% endif %}
@@ -41,7 +42,7 @@
             'data-toggle' : '',
         },
         'btnText'   : 'marketplace.package.wiki'|trans,
-        'iconClass' : 'fa fa-book',
+        'iconClass' : 'ri-book-line',
         'primary'   : false,
     }}) %}
 {% endif %}
@@ -61,7 +62,7 @@
             'href'        : installRoute,
         },
         'btnText'   : 'marketplace.package.install'|trans,
-        'iconClass' : 'fa fa-download',
+        'iconClass' : 'ri-download-line',
         'primary'   : true,
     }}) %}
 
@@ -78,7 +79,7 @@
             'href'        : removeRoute,
     },
         'btnText'   : 'marketplace.package.remove'|trans,
-        'iconClass' : 'fa fa-trash',
+        'iconClass' : 'ri-delete-bin-line',
         'primary'   : true,
     }}) %}
 {% endif %}

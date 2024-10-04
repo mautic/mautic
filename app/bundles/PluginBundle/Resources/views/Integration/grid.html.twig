@@ -23,9 +23,10 @@
             'attr': {
                 'data-toggle': 'ajax',
                 'href': path('mautic_plugin_reload'),
+                'class': 'btn btn-primary'
             },
             'btnText': 'mautic.plugin.reload.plugins'|trans,
-            'iconClass': 'fa fa-cubes',
+            'iconClass': 'ri-instance-fill',
             'tooltip': 'mautic.plugin.reload.plugins.tooltip',
         },
     ],
@@ -34,7 +35,7 @@
 
 {% block content %}
   {% if isIndex %}
-    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <div id="page-list-wrapper">
         <div class="panel-body">
             <div class="box-layout">
                 <div class="row">

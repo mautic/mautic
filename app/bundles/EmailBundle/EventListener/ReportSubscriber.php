@@ -6,9 +6,12 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\SeriesPieChart;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -155,6 +158,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private Connection $db,
         private CompanyReportData $companyReportData,
         private StatRepository $statRepository,
+        private EmailRepository $emailRepository,
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
         private FieldsBuilder $fieldsBuilder
     ) {
@@ -257,6 +261,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_EMAILS, $data);
         $context = self::CONTEXT_EMAILS;
         $event->addGraph($context, 'pie', 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced');
+        $event->addGraph($context, 'pie', 'mautic.email.graph.pie.sent.read.clicked.unsubscribed');
         $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
 
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
@@ -475,6 +480,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         if ($event->checkContext(self::CONTEXT_EMAILS)
             && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)
+            && !in_array('mautic.email.graph.pie.sent.read.clicked.unsubscribed', $graphs)
             && !in_array('mautic.email.table.most.emails.clicks', $graphs)) {
             return;
         }
@@ -531,11 +537,82 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-flag-checkered',
+                            'iconClass' => 'ri-flag-fill',
                         ]
                     );
                     break;
 
+                case 'mautic.email.graph.pie.sent.read.clicked.unsubscribed':
+                    $counts       = $this->emailRepository->getSentReadNotReadCount($queryBuilder);
+                    $clicked      = $this->emailRepository->getUniqueClicks($queryBuilder);
+                    $unsubscribed = $this->emailRepository->getUnsubscribedCount($queryBuilder);
+                    $unsubCount   = $this->countVsRead($unsubscribed, 'unsubscribed', $counts);
+                    $clickedCount = $this->countVsRead($clicked, 'clicked', $counts);
+
+                    $chart  = new SeriesPieChart();
+                    $chart->setTotalCount($counts['sent_count']);
+                    $chart->setLabels([
+                        $chart->buildFullLabel($options['translator']->trans('mautic.email.report.unsubscribed'), $unsubCount['unsubscribed']),
+                        $chart->buildFullLabel($options['translator']->trans('mautic.email.clicked'), $clicked),
+                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']),
+                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.notread'), $counts['not_read']),
+                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.sent'), $counts['sent_count']),
+                    ]);
+
+                    $chart->setDataset([$unsubCount['unsubscribed'], 0, $unsubCount['vsRead'], $unsubCount['vsNotRead'], 0]);
+                    $chart->setDataset([0, $clicked, $clickedCount['vsRead'], $clickedCount['vsNotRead'], 0]);
+                    $chart->setDataset([0, 0, $counts['read_count'], $counts['not_read'], 0]);
+                    $chart->setDataset([0, 0, 0, 0, $counts['sent_count']]);
+
+                    $event->setGraph(
+                        $g,
+                        [
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-flag-checkered',
+                        ]
+                    );
+                    break;
+                case 'mautic.email.graph.bar.read.clicked.unsubscribed.bounced':
+                    $queryBuilder->select('e.id, e.name, e.sent_count, e.read_count,
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                    )
+                    ->groupBy('e.id');
+
+                    $this->addDNCTableForEmails($queryBuilder);
+
+                    $data = $queryBuilder->executeQuery()->fetchAllAssociative();
+
+                    if (is_array($data)) {
+                        $names        = array_column($data, 'name');
+                        $sentCount    = array_column($data, 'sent_count');
+                        $readCount    = array_column($data, 'read_count');
+                        $unsubscribed = array_column($data, 'unsubscribed');
+                        $bounced      = array_column($data, 'bounced');
+
+                        $sentCount[]    = 0;
+                        $readCount[]    = 0;
+                        $unsubscribed[] = 0;
+                        $bounced[]      = 0;
+
+                        $chart = new BarChart($names);
+
+                        $chart->setDataset('Sent Count', $sentCount);
+                        $chart->setDataset('Read Count', $readCount);
+                        $chart->setDataset('Unsubscribed Count', $unsubscribed);
+                        $chart->setDataset('Bounced Count', $bounced);
+
+                        $event->setGraph(
+                            $g,
+                            [
+                                'data'      => $chart->render(),
+                                'name'      => $g,
+                                'iconClass' => 'fa-flag-checkered',
+                            ]
+                        );
+                    }
+                    break;
                 case 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced':
                     $queryBuilder->select('SUM(DISTINCT e.sent_count) as sent_count,
                         SUM(DISTINCT e.read_count) as read_count,
@@ -544,7 +621,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
-                    $counts = $queryBuilder->execute()->fetchAssociative();
+                    $counts = $queryBuilder->executeQuery()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.stat.read'),
@@ -568,7 +645,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-flag-checkered',
+                            'iconClass' => 'ri-flag-fill',
                         ]
                     );
                     break;
@@ -584,7 +661,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-paper-plane-o';
+                    $graphData['iconClass'] = 'ri-send-plane-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -600,7 +677,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -620,7 +697,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-exclamation-triangle';
+                    $graphData['iconClass'] = 'ri-alert-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -643,7 +720,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-exclamation-triangle';
+                    $graphData['iconClass'] = 'ri-alert-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -665,7 +742,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-exclamation-triangle';
+                    $graphData['iconClass'] = 'ri-alert-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -681,7 +758,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-tachometer';
+                    $graphData['iconClass'] = 'ri-speed-up-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -694,17 +771,37 @@ class ReportSubscriber implements EventSubscriberInterface
                         ->orderBy('tr.hits', 'DESC')
                         ->setMaxResults(10);
 
-                    $items                  = $queryBuilder->execute()->fetchAllAssociative();
+                    $items                  = $queryBuilder->executeQuery()->fetchAllAssociative();
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-external-link-square';
+                    $graphData['iconClass'] = 'ri-external-link-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
             }
             unset($queryBuilder);
         }
+    }
+
+    /**
+     * @param array<string, int> $emailCounts
+     *
+     * @return array<string, int>
+     */
+    private function countVsRead(int $value, string $label, array $emailCounts): array
+    {
+        if (($emailCounts['read_count'] - $value) > 0) {
+            $result['vsRead']    = $emailCounts['read_count'] - $value;
+            $result['vsNotRead'] = $emailCounts['not_read'];
+        } else {
+            $result['vsRead']    = 0;
+            $result['vsNotRead'] = $emailCounts['sent_count'] - $value;
+        }
+
+        $result[$label] = $value;
+
+        return $result;
     }
 
     private function joinEmailsTableIfMissing(QueryBuilder $queryBuilder, ReportGraphEvent $event): void

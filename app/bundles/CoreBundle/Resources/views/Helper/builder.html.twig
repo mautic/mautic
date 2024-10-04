@@ -21,12 +21,12 @@
             {{ include('@MauticCore/Helper/builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');'}, with_context=false) }}
 
             <div class="code-mode-toolbar {% if not isCodeMode %}hide{% endif %}">
-                <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.media.manager.desc'|trans }}">
-                    <i class="fa fa-photo"></i>
+                <button class="btn btn-ghost btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.media.manager.desc'|trans }}">
+                    <i class="ri-image-circle-line"></i>
                     {{ 'mautic.core.media.manager'|trans }}
                 </button>
-                <button class="btn btn-default btn-nospin" onclick="Mautic.formatCode()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.format.code.desc'|trans }}">
-                    <i class="fa fa-indent"></i>
+                <button class="btn btn-ghost btn-nospin" onclick="Mautic.formatCode()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.format.code.desc'|trans }}">
+                    <i class="ri-indent-increase"></i>
                     {{ 'mautic.core.format.code'|trans }}
                 </button>
             </div>
@@ -42,8 +42,8 @@
                         <div class="input-group">
                             <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl }}"/>
                             <span class="input-group-btn">
-                                <button class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
-                                    <i class="fa fa-external-link"></i>
+                                <button class="btn btn-ghost btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
+                                    <i class="ri-external-link-line"></i>
                                 </button>
                             </span>
                         </div>
@@ -65,7 +65,7 @@
                     {% if slots is defined and slots is iterable %}
                         <div id="slot-type-container" class="col-md-12">
                             {% for slotKey, slot in slots %}
-                                <div class="slot-type-handle btn btn-default btn-lg btn-nospin" data-slot-type="{{ slotKey }}">
+                                <div class="slot-type-handle btn btn-ghost btn-lg btn-nospin" data-slot-type="{{ slotKey }}">
                                     <i class="fa fa-{{ slot.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ slot.header|raw }}</span>
@@ -90,7 +90,7 @@
                     {% if sections is defined and sections is iterable %}
                         <div id="section-type-container" class="col-md-12">
                             {% for sectionKey, section in sections %}
-                                <div class="section-type-handle btn btn-default btn-lg btn-nospin" data-section-type="{{ sectionKey }}">
+                                <div class="section-type-handle btn btn-ghost btn-lg btn-nospin" data-section-type="{{ sectionKey }}">
                                     <i class="fa fa-{{ section.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ section.header }}</span>

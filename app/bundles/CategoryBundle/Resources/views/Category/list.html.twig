@@ -30,11 +30,11 @@
 
 {% block content %}
 	{% if isIndex %}
-		<div class="panel panel-default bdr-t-wdh-0 mb-0">
+		<div id="page-list-wrapper">
 			{# //TODO - Restore these buttons to the listactions when custom content is supported #}
 			{# <div class="btn-group">
-							        <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
-							        <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
+							        <button type="button" class="btn btn-ghost"><i class="ri-upload-line"></i></button>
+							        <button type="button" class="btn btn-ghost"><i class="ri-archive-2-line"></i></button>
 							    </div> #}
 			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
@@ -48,7 +48,7 @@
                 },
                 'action': currentRoute,
             }) -}}
-            <div class="page-list"> 
+            <div class="page-list">
                 {{ block('listResults') }}
 			</div>
 		</div>
@@ -134,7 +134,7 @@
 							</td>
 							<td>
 								{% set color = item.getColor() %}
-								<span class="label label-default pa-10" style="background: {{ '#' not in color ? '#' : ''}}{{ color }};"> </span>
+								<span class="label label-gray label-category" style="background: {{ '#' not in color ? '#' : ''}}{{ color }};"> </span>
 							</td>
 							<td>
                                 <div>

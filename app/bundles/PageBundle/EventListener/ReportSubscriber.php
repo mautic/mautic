@@ -455,7 +455,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-clock-o',
+                            'iconClass' => 'ri-time-line',
                         ]
                     );
                     break;
@@ -477,7 +477,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-bookmark-o',
+                            'iconClass' => 'ri-information-2-line',
                         ]
                     );
                     break;
@@ -486,7 +486,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ph.page_language')
                         ->andWhere($qb->expr()->isNotNull('ph.page_language'));
-                    $data  = $queryBuilder->execute()->fetchAllAssociative();
+                    $data  = $queryBuilder->executeQuery()->fetchAllAssociative();
                     $chart = new PieChart();
 
                     foreach ($data as $lang) {
@@ -498,14 +498,14 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ds.device');
-                    $data     = $queryBuilder->execute()->fetchAllAssociative();
+                    $data     = $queryBuilder->executeQuery()->fetchAllAssociative();
                     $chart    = new PieChart();
 
                     foreach ($data as $device) {
@@ -518,7 +518,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
@@ -529,7 +529,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-sign-in';
+                    $graphData['iconClass'] = 'ri-login-box-line';
                     $event->setGraph($g, $graphData);
                     break;
 
@@ -540,7 +540,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -552,7 +552,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
                     break;

@@ -139,11 +139,13 @@ class PointType extends AbstractType
             'repeatable',
             YesNoButtonGroupType::class,
             [
-                'label' => 'mautic.point.form.repeat',
-                'data'  => $options['data']->getRepeatable() ?: false,
-                'attr'  => [
+                'label'     => 'mautic.point.form.repeat',
+                'data'      => $options['data']->getRepeatable() ?: false,
+                'attr'      => [
                     'tooltip' => 'mautic.point.form.repeat.help',
                 ],
+                'yes_label' => 'mautic.point.form.repeat.yes',
+                'no_label'  => 'mautic.point.form.repeat.no',
             ]
         );
 

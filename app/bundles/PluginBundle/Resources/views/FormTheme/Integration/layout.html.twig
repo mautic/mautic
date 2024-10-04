@@ -138,7 +138,7 @@
                   <div class="choice-wrapper">
                     <div class="btn-group btn-block" data-toggle="buttons" {% if child.vars['attr']['forceDirection'] %}data-force-direction="1"{% endif %}>
                       {% set checked = '0' == child.vars.value %}
-                      <label class="btn-arrow{{ indexCount }} btn btn-default {% if checked %}active{% endif %} {% if child.vars['attr']['disabled'] %}disabled{% endif %}">
+                      <label class="btn-arrow{{ indexCount }} btn btn-ghost {% if checked %}active{% endif %} {% if child.vars['attr']['disabled'] %}disabled{% endif %}">
                         <input type="radio"
                                id="{{ child.vars['id'] }}_0"
                                name="{{ child.vars['full_name'] }}"
@@ -148,10 +148,10 @@
                                onchange="Mautic.matchedFields({{ indexCount }}, '{{ object }}', '{{ integration }}')"
                                {% if checked %}checked="checked"{% endif %}
                                {% if child.vars['attr']['disabled'] %}disabled{% endif %}>
-                        <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
+                        <btn class="btn-nospin ri-arrow-left-circle-line"></btn>
                       </label>
                       {% set checked = '1' == child.vars.value %}
-                      <label class="btn-arrow{{ indexCount }} btn btn-default {% if checked %}active{% endif %} {% if child.vars['attr']['disabled'] %}disabled{% endif %}">
+                      <label class="btn-arrow{{ indexCount }} btn btn-ghost {% if checked %}active{% endif %} {% if child.vars['attr']['disabled'] %}disabled{% endif %}">
                         <input type="radio" id="{{ child.vars['id'] }}_1"
                                name="{{ child.vars['full_name'] }}"
                                title=""
@@ -160,7 +160,7 @@
                                onchange="Mautic.matchedFields({{ indexCount }}, '{{ object }}', '{{ integration }}')"
                                {% if '1' == child.vars['value'] %}checked="checked"{% endif %}
                                {% if child.vars['attr']['disabled'] %}disabled{% endif %}>
-                        <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
+                        <btn class="btn-nospin ri-arrow-right-circle-line"></btn>
                       </label>
                     </div>
                   </div>

@@ -195,22 +195,22 @@ Mautic.generatePageTitle = function(route){
         var currentModule = route.split('/')[3];
 
         //check if we find spans
-        var titleWithHTML = mQuery('.page-header h3').find('span.span-block');
+        var titleWithHTML = mQuery('.page-header h1').find('span.span-block');
         var currentModuleItem = '';
 
         if( 1 < titleWithHTML.length ){
             currentModuleItem = titleWithHTML.eq(0).text() + ' - ' + titleWithHTML.eq(1).text();
         } else {
-            currentModuleItem = mQuery('.page-header h3').text();
+            currentModuleItem = mQuery('.page-header h1').text();
         }
 
-        // Encoded entites are decoded by this process and can cause a XSS
-        currentModuleItem = mQuery('<div>'+currentModuleItem+'</div>').text();
+        // Safely set the text content to prevent XSS
+        currentModuleItem = mQuery('<div>').text(currentModuleItem).html();
 
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title
-        mQuery('title').html( mQuery('.page-header h3').text() + ' | Mautic' );
+        mQuery('title').html( mQuery('.page-header h1').text() + ' | Mautic' );
     }
 };
 
@@ -353,7 +353,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         var elementParent = thisTooltip.parent();
 
         if (elementParent.get(0).tagName === 'LABEL') {
-            elementParent.append('<i class="fa fa-question-circle"></i>');
+            elementParent.append('<i class="ri-question-line"></i>');
 
             elementParent.hover(function () {
                 thisTooltip.tooltip('show')
@@ -475,10 +475,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
     mQuery(container + ' input[class=list-checkbox]').on('change', function () {
         var disabled = Mautic.batchActionPrecheck(container) ? false : true;
-        var color    = (disabled) ? 'btn-default' : 'btn-info';
+        var color    = (disabled) ? 'btn-ghost' : 'btn-info';
         var button   = container + ' th.col-actions .input-group-btn button';
         mQuery(button).prop('disabled', disabled);
-        mQuery(button).removeClass('btn-default btn-info').addClass(color);
+        mQuery(button).removeClass('btn-ghost btn-info').addClass(color);
     });
 
     //Copy form buttons to the toolbar
@@ -658,9 +658,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
         mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-ltr');
-        });
-        mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
-            mQuery("html").removeClass('sidebar-open-rtl');
         });
     }
 
@@ -844,11 +841,6 @@ Mautic.onPageUnload = function (container, response) {
                 ckEditors.clear();
             }
         }
-
-        //turn off shuffle events
-        mQuery('html')
-            .off('fa.sidebar.minimize')
-            .off('fa.sidebar.maximize');
 
         mQuery(container + " input[data-toggle='color']").each(function() {
             mQuery(this).minicolors('destroy');
@@ -1469,10 +1461,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
         if (mQuery(el).val()) {
             mQuery(btn).attr('data-livesearch-action', 'clear');
-            mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
+            mQuery(btn + ' i').removeClass('ri-search-line').addClass('ri-eraser-line');
         } else {
             mQuery(btn).attr('data-livesearch-action', 'search');
-            mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
+            mQuery(btn + ' i').removeClass('ri-eraser-line').addClass('ri-search-line');
         }
     }
 };
@@ -1824,3 +1816,18 @@ Mautic.processCsvContactExport = function (route) {
         }
     });
 };
+
+/**
+ * Applies a quick filter to a list based on the selected element's data-filter attribute
+ *
+ * @param {HTMLElement} element
+ */
+Mautic.listQuickFilter = function (element) {
+    const filterValue = element.dataset.filter;
+    const searchInput = document.getElementById('list-search');
+    searchInput.value = filterValue;
+    const enterKeyEvent = new KeyboardEvent('keyup', {
+        keyCode: 13
+    });
+    searchInput.dispatchEvent(enterKeyEvent);
+}

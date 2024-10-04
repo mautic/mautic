@@ -217,7 +217,7 @@ class CoreSubscriber implements EventSubscriberInterface
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
-                                    'controller' => $controller.':'.$standardDetails['action'].'Action',
+                                    'controller' => $controller.'::'.$standardDetails['action'].'Action',
                                     'method'     => $standardDetails['method'],
                                 ]
                             );

@@ -10,9 +10,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -93,7 +92,7 @@ class EventType extends AbstractType
                     'label'  => false,
                     'attr'   => [
                         'class'       => 'form-control',
-                        'preaddon'    => 'fa fa-calendar',
+                        'preaddon'    => 'ri-calendar-line',
                         'data-toggle' => 'datetime',
                     ],
                     'widget' => 'single_text',
@@ -106,7 +105,7 @@ class EventType extends AbstractType
                 || null === $options['data']['triggerInterval']) ? 1 : (int) $options['data']['triggerInterval'];
             $builder->add(
                 'triggerInterval',
-                NumberType::class,
+                IntegerType::class,
                 [
                     'label' => false,
                     'attr'  => [
@@ -242,10 +241,10 @@ class EventType extends AbstractType
         $update = !empty($options['data']['properties']);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
-            $btnIcon  = 'fa fa-pencil';
+            $btnIcon  = 'ri-edit-line';
         } else {
             $btnValue = 'mautic.core.form.add';
-            $btnIcon  = 'fa fa-plus';
+            $btnIcon  = 'ri-add-line';
         }
 
         $builder->add(

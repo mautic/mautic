@@ -21,21 +21,21 @@
               'attr': {
                   'target': '_new',
                   'data-toggle': '',
-                  'class': 'btn btn-default btn-nospin',
+                  'class': 'btn btn-ghost btn-nospin',
                   'href': path('mautic_page_export', {'objectId': activePage.id, 'format': 'html'}),
               },
               'btnText': 'mautic.form.result.export.html'|trans,
-              'iconClass': 'fa fa-file-code-o',
+              'iconClass': 'ri-file-code-line',
               'primary': true,
           },
           {
               'attr': {
                   'data-toggle': '',
-                  'class': 'btn btn-default btn-nospin',
+                  'class': 'btn btn-ghost btn-nospin',
                   'href': path('mautic_page_export', {'objectId': activePage.id, 'format': 'csv'}),
               },
               'btnText': 'mautic.form.result.export.csv'|trans,
-              'iconClass': 'fa fa-file-text-o',
+              'iconClass': 'ri-file-text-line',
               'primary': true,
           }
   ] %}
@@ -44,22 +44,22 @@
     {% set buttons = buttons|merge([{
           'attr': {
               'data-toggle': '',
-              'class': 'btn btn-default btn-nospin',
+              'class': 'btn btn-ghost btn-nospin',
               'href': path('mautic_page_export', {'objectId': activePage.id, 'format': 'xlsx'}),
           },
           'btnText': 'mautic.form.result.export.xlsx'|trans,
-          'iconClass': 'fa fa-file-excel-o',
+          'iconClass': 'ri-file-excel-2-fill',
           'primary': true,
     }]) %}
   {% endif %}
 
   {% set buttons = buttons|merge([{
         'attr': {
-            'class': 'btn btn-default',
+            'class': 'btn btn-ghost',
             'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': activePage.id}),
             'data-toggle': 'ajax',
         },
-        'iconClass': 'fa fa-remove',
+        'iconClass': 'ri-close-line',
         'btnText': 'mautic.core.form.close'|trans,
   }]) %}
 
