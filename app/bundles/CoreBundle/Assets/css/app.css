@@ -3024,6 +3024,7 @@ a.media {
   padding-left: 15px;
   margin: 0;
   display: flex;
+  flex-direction: column;
 }
 @media (min-width: 768px) {
   .container {
@@ -3039,13 +3040,6 @@ a.media {
   .container {
     max-width: 1170px;
   }
-}
-.container-column {
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  flex-direction: column;
 }
 .container-fluid {
   padding-right: 15px;
