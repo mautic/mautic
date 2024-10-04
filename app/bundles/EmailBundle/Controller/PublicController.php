@@ -113,13 +113,15 @@ class PublicController extends CommonFormController
      */
     public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
     {
-        $stat                  = $model->getEmailStatus($idHash);
-        $message               = '';
-        $email                 = null;
-        $lead                  = null;
-        $template              = null;
-        $session               = $request->getSession();
-        $isOneClickUnsubscribe = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
+        $stat                   = $model->getEmailStatus($idHash);
+        $message                = '';
+        $email                  = null;
+        $lead                   = null;
+        $template               = null;
+        $session                = $request->getSession();
+        $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
+        $isUnsubscribeAll       = $request->get('unsubscribe_all');
+        $showContactPreferences = $this->coreParametersHelper->get('show_contact_preferences');
 
         if (!empty($stat)) {
             if ($isOneClickUnsubscribe) {
@@ -191,7 +193,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            if (!$this->coreParametersHelper->get('show_contact_preferences')) {
+            if (!$showContactPreferences || $isUnsubscribeAll) {
                 if (!empty($stat)) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
                 } elseif ($lead && $lead instanceof Lead) {
@@ -213,6 +215,7 @@ class PublicController extends CommonFormController
                     'showContactPreferredChannels' => $this->coreParametersHelper->get('show_contact_preferred_channels'),
                     'showContactCategories'        => $this->coreParametersHelper->get('show_contact_categories'),
                     'showContactSegments'          => $this->coreParametersHelper->get('show_contact_segments'),
+                    'dncUrl'                       => $this->generateUrl('mautic_email_unsubscribe_all', $params),
                 ];
 
                 if ($session->get($successSessionName)) {
@@ -332,6 +335,18 @@ class PublicController extends CommonFormController
         }
 
         return $this->render($contentTemplate, $viewParams);
+    }
+
+    public function unsubscribeAllAction(Request $request, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
+    {
+        $request->attributes->set('unsubscribe_all', 1);
+
+        return $this->forward(static::class.'::unsubscribeAction', [
+            'request'    => $request,
+            'idHash'     => $idHash,
+            'urlEmail'   => $urlEmail,
+            'secretHash' => $secretHash,
+        ]);
     }
 
     /**
