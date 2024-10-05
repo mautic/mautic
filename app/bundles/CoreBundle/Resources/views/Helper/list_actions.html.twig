@@ -20,7 +20,7 @@
     </span>
 
     <div class="input-group-btn">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+        <button type="button" class="btn btn-ghost btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
             <i class="ri-more-2-line"></i>
         </button>
         {% if tooltip is defined and tooltip is not empty %}<i class="ri-question-line"></i>{% endif %}
@@ -28,7 +28,7 @@
             {% if templateButtons.edit is defined and templateButtons.edit is not empty %}
             {{ buttonAdd({
                 attr: editAttr|merge({
-                    class: 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
                     href: path(
                         actionRoute,
                         query|merge({objectAction: 'edit', objectId: id})
@@ -43,7 +43,7 @@
             {% if templateButtons.clone is defined and templateButtons.clone is not empty %}
             {{ buttonAdd({
                 attr: editAttr|merge({
-                    class: 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
                     href: path(
                         actionRoute,
                         query|merge({objectAction: 'clone', objectId: id})

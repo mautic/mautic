@@ -13,6 +13,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
@@ -20,11 +21,81 @@ use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    public function testRedirectPostAction(): void
+    {
+        $page = new Page();
+        $page->setTitle('Test');
+        $page->setAlias('test-form-redirect-target-page');
+        $page->setCustomHtml('<!DOCTYPE html><html><head></head><body>Test</body></html>');
+        $this->em->persist($page);
+        $this->em->flush();
+        $pageId = $page->getId();
+
+        // Create the test form via API.
+        $payload = [
+            'name'               => 'Redirect post action test form',
+            'description'        => 'Form created via submission test',
+            'formType'           => 'standalone',
+            'isPublished'        => true,
+            'postAction'         => 'redirect',
+            'postActionProperty' => '{pagelink='.$pageId.'}?foo=bar&lead={contactfield=id}&email={formfield=email}',
+
+            'fields'      => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_redirectpostactiontestform]');
+
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+
+        $form->setValues([
+            'mauticform[email]' => 'john@doe.com',
+        ]);
+
+        $this->client->submit($form);
+        $currentUrl = $this->client->getRequest()->getUri();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Check the redirect
+        $currentUrl = $this->client->getRequest()->getUri();
+        $urlParts   = parse_url($currentUrl);
+        parse_str($urlParts['query'], $queryParams);
+
+        $this->assertEquals('/test-form-redirect-target-page', $urlParts['path']);
+        // Test that the redirect didn't remove any additional URL parts
+        $this->assertEquals('john@doe.com', $queryParams['email']);
+        $this->assertGreaterThan(0, (int) $queryParams['lead']);
+        $this->assertEquals('bar', $queryParams['foo']);
+    }
 
     public function testRequiredConditionalFieldIfNotEmpty(): void
     {
@@ -529,9 +600,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        /** @var PasswordEncoderInterface $encoder */
-        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword($this->getUserPlainPassword(), $user->getSalt()));
+        /** @var PasswordHasherInterface $encoder */
+        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $user->setPassword($encoder->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);

@@ -447,7 +447,7 @@ class FormController extends CommonFormController
             $modifiedFields[$keyId]['showLabel']       = 1;
             $modifiedFields[$keyId]['type']            = 'button';
             $modifiedFields[$keyId]['id']              = $keyId;
-            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
             $modifiedFields[$keyId]['formId']          = $sessionId;
             unset($modifiedFields[$keyId]['form']);
             $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);
@@ -782,7 +782,7 @@ class FormController extends CommonFormController
                 $modifiedFields[$keyId]['showLabel']       = 1;
                 $modifiedFields[$keyId]['type']            = 'button';
                 $modifiedFields[$keyId]['id']              = $keyId;
-                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
                 $modifiedFields[$keyId]['formId']          = $objectId;
                 unset($modifiedFields[$keyId]['form']);
             }
