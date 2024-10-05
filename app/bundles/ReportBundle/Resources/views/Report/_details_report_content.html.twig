@@ -24,7 +24,11 @@
                             {% for key in columnOrder %}
                                 {% if columns[key] is defined %}
                                     {# order by alias if exists, if not then by column name #}
-                                    {%- set orderBy = columns[key].alias|default((key starts with 'channel.') ? key|replace({'.': '_'}) : key) -%}
+                                    {%- set orderBy = (columns[key].alias is defined and columns[key].alias starts with 'channel.')
+                                        ? columns[key].alias
+                                        : key
+                                    -%}
+
                                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                         'sessionVar': 'report.' ~ report.id,
                                         'orderBy': orderBy,

@@ -1198,6 +1198,7 @@ blockquote > p:after {
 code {
   padding: var(--spacing-01) var(--spacing-03);
   cursor: pointer;
+  overflow: hidden;
 }
 kbd {
   min-width: 20px;
@@ -8012,6 +8013,28 @@ ul.media-list.media-list-feed div.media-body {
     transform: scale(1);
     opacity: 0;
   }
+}
+.tooltip-inner {
+  padding: 12px;
+}
+.copy-icon {
+  display: inline-flex;
+  opacity: 0;
+  transform: translateX(-0.25rem);
+  transition: var(--transition-all-expressive);
+  margin-right: -22px;
+  background-color: var(--layer);
+  z-index: 2;
+  position: relative;
+  border-radius: 0 3px 3px 0;
+  aspect-ratio: 1 / 1;
+  color: var(--icon-interactive);
+  height: 17px;
+  vertical-align: middle;
+}
+code:hover > .copy-icon {
+  opacity: 1;
+  transform: none;
 }
 :root {
   --background: #ffffff;
