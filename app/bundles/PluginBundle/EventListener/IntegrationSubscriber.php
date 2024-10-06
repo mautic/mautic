@@ -4,6 +4,7 @@ namespace Mautic\PluginBundle\EventListener;
 
 use DOMDocument;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Monolog\Logger;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -59,7 +60,8 @@ class IntegrationSubscriber implements EventSubscriberInterface
         } else {
             $this->logger->debug("$name REQUEST URL: ".$event->getMethod().' '.$event->getUrl());
             if ('' !== $headers) {
-                $this->logger->debug("$name REQUEST HEADERS: \n".$headers.PHP_EOL);
+                $hashHeader = oAuthHelper::hashSensitiveHeaderData($headers);
+                $this->logger->debug("$name REQUEST HEADERS: \n".$hashHeader.PHP_EOL);
             }
             if ('' !== $params) {
                 $this->logger->debug("$name REQUEST PARAMS: \n".$params.PHP_EOL);

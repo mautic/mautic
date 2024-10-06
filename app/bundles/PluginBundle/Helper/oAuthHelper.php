@@ -41,6 +41,15 @@ class oAuthHelper
         $this->request           = $request;
     }
 
+    public static function hashSensitiveHeaderData(string $data): string
+    {
+        $isSensitive = preg_match('/(Authorization.*Bearer\s*)(\S*)\s/', $data, $match);
+
+        return 1 === $isSensitive
+            ? $match[1].hash('sha1', $match[2])
+            : $data;
+    }
+
     /**
      * @param $url
      * @param $parameters
