@@ -434,8 +434,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_OPEN);
         }
 
-        $this->emailStatModel->saveEntity($stat);
-
         // Only up counts if associated with both an email and lead
         if ($firstTime && $email && $lead) {
             try {
@@ -447,6 +445,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if ($email) {
             $this->em->persist($email);
         }
+
+        $this->emailStatModel->saveEntity($stat);
 
         // Flush the email stat entity in different transactions than the device stat entity to avoid deadlocks.
         if ($throwDoctrineExceptions) {
@@ -1826,7 +1826,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->addCampaignFilter($q, $campaignId);
         $this->addSegmentFilter($q, $segmentId);
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $chart  = new BarChart(array_column($result, 'hour'));
         $counts = array_column($result, 'count');
@@ -2035,7 +2035,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chartQuery->applyDateFilters($q, 'date_read');
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -2064,7 +2064,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
