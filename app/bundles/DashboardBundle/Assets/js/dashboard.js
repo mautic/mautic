@@ -308,7 +308,7 @@ Mautic.saveDashboardLayout = function(text) {
 Mautic.setDateRange = function(option) {
     var today = new Date();
     var fromDate, toDate;
-  
+
     switch(option) {
       case 'today':
         fromDate = today;
@@ -327,7 +327,7 @@ Mautic.setDateRange = function(option) {
           return;
         }
     }
-    
+
     document.getElementById('daterange_date_from').value = Mautic.formatDate(fromDate);
     document.getElementById('daterange_date_to').value = Mautic.formatDate(toDate);
     document.getElementById('daterange_apply').click();
@@ -337,6 +337,6 @@ Mautic.formatDate = function(date) {
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
-    
+
     return monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 };
