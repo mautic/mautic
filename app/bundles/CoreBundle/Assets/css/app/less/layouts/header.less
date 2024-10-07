@@ -117,8 +117,6 @@
             top: 1px;
           }
 
-          
-
           // badge & label
           // -------------------------
           > .badge,
@@ -171,7 +169,6 @@
           &.active {
             color: fade(contrast(@header-bg), 70%);
             background-color: darken(@header-bg, 4%);
-            outline: 0;
           }
         }
       }
@@ -362,11 +359,6 @@
       ~ .app-sidebar {
         padding-top: @header-height;
       }
-    }
-
-    // minimized state
-    .sidebar-minimized & {
-      left: @sidebar-left-collapse-width !important;
     }
 
     .navbar-nocollapse {

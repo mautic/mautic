@@ -216,7 +216,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository()
+            public function getRepository(): EmailRepository
             {
                 return $this->emailRepository;
             }
