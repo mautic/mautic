@@ -52,6 +52,23 @@ Mautic.userOnLoad = function (container) {
         });
         temporarySettings = {};
     });
+
+    // Cancel button functionality - discard temporary settings and revert changes
+    document.getElementById('user_buttons_cancel_toolbar').addEventListener('click', () => {
+        Object.keys(temporarySettings).forEach(attributeName => {
+            const storedValue = localStorage.getItem(`${prefix}${attributeName}`);
+            if (storedValue) {
+                document.documentElement.setAttribute(attributeName, storedValue);
+                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${storedValue}"]`);
+                if (radio) radio.checked = true;
+            } else {
+                document.documentElement.removeAttribute(attributeName);
+                const radios = document.querySelectorAll(`input[name="${attributeName}"]`);
+                radios.forEach(radio => radio.checked = false);
+            }
+        });
+        temporarySettings = {};
+    });
 };
 
 Mautic.roleOnLoad = function (container, response) {
