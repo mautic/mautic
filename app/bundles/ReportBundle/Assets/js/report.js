@@ -386,83 +386,50 @@ Mautic.getHighestIndex = function (selector) {
 
 Mautic.cloneReportRow = function (containerId) {
     // Get the existing filter container
-    var container = mQuery('#' + containerId);
+    const container = mQuery(`#${containerId}`);
 
     // Extract values from the existing filter
-    var glue = container.find('.filter-glue').val();
-    var column = container.find('.filter-columns').val();
-
-    // Handle the value field, considering different input types
-    var valueInput = container.find('.filter-value');
-    var value;
-    if (valueInput.is('select')) {
-        value = valueInput.val();
-    } else if (valueInput.is('input')) {
-        value = valueInput.val();
-    } else if (valueInput.is(':radio')) {
-        value = container.find('.filter-value:checked').val();
-    } else {
-        value = valueInput.val();
-    }
-
-    // Get the dynamic option
-    var dynamic = container.find('[name*="[dynamic]"]:checked').val();
+    const glue = container.find('.filter-glue').val();
+    const column = container.find('.filter-columns').val();
+    const value = container.find('.filter-value:checked, .filter-value').val();
+    const dynamic = container.find('[name*="[dynamic]"]:checked').val();
 
     // Add a new filter row using the existing add function
     Mautic.addReportRow('report_filters');
 
     // Get the new container by finding the last filter container
-    var newContainer = mQuery('#report_filters').find('> .panel.in-group').last();
+    const newContainer = mQuery('#report_filters').find('> .panel.in-group').last();
 
-    // Extract index from new container ID
-    var newContainerId = newContainer.attr('id');
-    var idParts = newContainerId.split('_');
-    var index = idParts[2];
-
-    // Set the 'glue' value
+    // Set the 'glue' and 'column' values
     newContainer.find('.filter-glue').val(glue);
+    const columnSelect = newContainer.find('.filter-columns').val(column).trigger('change');
 
-    // Set the 'column' value and trigger 'change' to update dependent fields
-    var columnSelect = newContainer.find('.filter-columns');
-    columnSelect.val(column).trigger('change'); // Trigger change event to update dependent fields
-
-    // Ensure the select field has options before initializing Chosen
-    var initializeChosenWhenReady = function(selectElement) {
-        // Use a longer timeout to ensure the options are fully rendered
-        setTimeout(function() {
-            if (selectElement.find('option').length > 0) {
-                Mautic.destroyChosen(selectElement); // Destroy previous Chosen instance
-                Mautic.activateChosenSelect(selectElement); // Reinitialize Chosen
-            } else {
-                // Retry after another delay if options are not ready yet
-                initializeChosenWhenReady(selectElement);
-            }
-        }, 200); // Delay of 200ms to ensure DOM is fully ready
+    // Initialize Chosen when the select field is ready
+    const initializeChosenWhenReady = (selectElement) => {
+        if (selectElement.find('option').length > 0) {
+            Mautic.destroyChosen(selectElement);
+            Mautic.activateChosenSelect(selectElement);
+        } else {
+            setTimeout(() => initializeChosenWhenReady(selectElement), 200);
+        }
     };
-
-    // Initialize Chosen for the column select
     initializeChosenWhenReady(columnSelect);
 
     // Set the 'value' field
-    var newValueInput = newContainer.find('.filter-value');
+    const newValueInput = newContainer.find('.filter-value');
     if (newValueInput.is('select')) {
         newValueInput.val(value);
-        initializeChosenWhenReady(newValueInput); // Reinitialize Chosen for the value field
-    } else if (newValueInput.is('input')) {
-        newValueInput.val(value);
-    } else if (newValueInput.is(':radio')) {
-        newContainer.find('.filter-value[value="' + value + '"]').prop('checked', true).parent().addClass('active');
+        initializeChosenWhenReady(newValueInput);
+    } else {
+        newValueInput.val(value).prop('checked', true).parent().addClass('active');
     }
 
-    // Set the dynamic option
-    if (dynamic == '1') {
-        newContainer.find('[name*="[dynamic]"][value="1"]').prop('checked', true).parent().addClass('active');
-        newContainer.find('[name*="[dynamic]"][value="0"]').prop('checked', false).parent().removeClass('active');
-    } else {
-        newContainer.find('[name*="[dynamic]"][value="0"]').prop('checked', true).parent().addClass('active');
-        newContainer.find('[name*="[dynamic]"][value="1"]').prop('checked', false).parent().removeClass('active');
+    // Set the dynamic option correctly using the toggle element
+    const dynamicLabel = newContainer.find('.toggle__label');
+    if ((dynamic === '1' && dynamicLabel.attr('aria-checked') !== 'true') || (dynamic === '0' && dynamicLabel.attr('aria-checked') !== 'false')) {
+        dynamicLabel.trigger('click');
     }
 
     // Reinitialize tooltips
-    newContainer.find("*[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+    newContainer.find("*[data-toggle='tooltip']").tooltip({ html: true, container: 'body' });
 };
