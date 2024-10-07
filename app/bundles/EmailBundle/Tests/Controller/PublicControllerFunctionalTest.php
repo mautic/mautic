@@ -472,4 +472,46 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame((int) $email->getId(), (int) $dncRecords[0]->getChannelId());
         Assert::assertSame('User unsubscribed.', $dncRecords[0]->getComments());
     }
+
+    public function testUnsubscribeAllFromPreferencesPage(): void
+    {
+        // Create a lead and email stat
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+
+        // Get the unsubscribe page
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        // Assert that the response is OK
+        self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        // Assert that the link for unsubscribe all exists
+        $unsubscribeAllLink = $crawler->filter('a[href^="/email/dnc/"]')->first();
+        $this->assertNotNull($unsubscribeAllLink, 'Unsubscribe all link not found');
+        $href = $unsubscribeAllLink->attr('href');
+
+        // Click the link for unsubscribe all
+        $this->client->request('GET', $href);
+
+        // Assert that the response is OK
+        self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        // Assert that the response contains the expected string
+        $this->assertStringContainsString(
+            'We are sorry to see you go! john@doe.email will no longer receive emails from us',
+            $this->client->getResponse()->getContent()
+        );
+
+        // Assert that a DoNotContact record was created
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        /** @var DoNotContact[] $dncRecords */
+        $dncRecords = $dncRepository->findBy(['lead' => $lead]);
+
+        $this->assertCount(1, $dncRecords, 'Expected one DoNotContact record');
+        $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason(), 'Expected reason to be UNSUBSCRIBED');
+        $this->assertEquals('email', $dncRecords[0]->getChannel(), 'Expected channel to be email');
+    }
 }

@@ -116,6 +116,10 @@
                         {{ successMessage }}
                     </div>
                 {% endif %}
+                <hr />
+                <div id="do-not-contact-text">
+                    {{ 'mautic.email.unsubscribe_all.text'|trans ({'%link%' : dncUrl})|purify }}
+                </div>
             </div>
             <div class="panel-footer text-left">
                 {{ form_row(form.buttons.save) }}

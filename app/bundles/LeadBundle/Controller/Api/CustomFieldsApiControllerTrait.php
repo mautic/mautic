@@ -211,6 +211,8 @@ trait CustomFieldsApiControllerTrait
     /**
      * @param string $object
      *
+     * @deprecated since Mautic 5.2, to be removed in 6.0 with no replacement.
+     *
      * @return void
      */
     protected function setCleaningRules($object = 'lead')

@@ -1,0 +1,15 @@
+{% if quickFilters is defined and quickFilters is not empty %}
+<div class="d-flex gap-xs">
+    {% for quickFilter in quickFilters %}
+        <a class="label label-outline"
+           data-filter="{{ quickFilter.search }}"
+           onclick="Mautic.listQuickFilter(this)"
+           data-toggle="tooltip"
+           data-placement="top"
+           data-original-title="{{ quickFilter.tooltip|trans }}">
+            <i class="{{ quickFilter.icon }}"></i>
+            {{ quickFilter.label|trans }}
+        </a>
+    {% endfor %}
+</div>
+{% endif %}
