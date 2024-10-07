@@ -482,7 +482,7 @@ final class ButtonHelper
         } elseif (!isset($button['attr']['class'])) {
             $addTo['attr']['class'] = 'btn btn-tertiary';
         } elseif (!strstr($addTo['attr']['class'], 'btn-')) {
-            $addTo['attr']['class'] .= ' btn btn-default';
+            $addTo['attr']['class'] .= ' btn btn-ghost';
         }
 
         if (self::LOCATION_PAGE_ACTIONS == $this->location) {
@@ -509,7 +509,7 @@ final class ButtonHelper
         }
 
         $search = [
-            'btn-default',
+            'btn-ghost',
             'btn-primary',
             'btn-success',
             'btn-info',

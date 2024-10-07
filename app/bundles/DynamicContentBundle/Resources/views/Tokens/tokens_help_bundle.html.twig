@@ -1,0 +1,27 @@
+<!-- Dynamic Content tokens -->
+<li class="panel">
+    <a role="button" id="headingDynamicContentTokens" class="accordion-heading collapsed" data-toggle="collapse"
+      data-parent="#tokensAccordion" href="#collapseDynamicContentTokens" aria-expanded="false"
+      aria-controls="collapseDynamicContentTokens">
+      <i class="ri-arrow-down-s-line accordion-arrow"></i>
+      <span class="accordion-title">{{ 'mautic.placeholder_tokens.dynamic_content_tokens'|trans }}</span>
+    </a>
+    <div id="collapseDynamicContentTokens" class="collapse accordion-wrapper" role="tabpanel"
+      aria-labelledby="headingDynamicContentTokens">
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+            <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.dynamic_content.example'|trans }}</td>
+            <td><code>{dynamiccontent="Dynamic Content 1"}</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </li>

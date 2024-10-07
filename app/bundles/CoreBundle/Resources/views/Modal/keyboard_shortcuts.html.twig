@@ -1,0 +1,94 @@
+<div class="modal fade" id="keyboardShortcutsModal" tabindex="-1" role="dialog"
+  aria-labelledby="keyboardShortcutsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="keyboardShortcutsModalLabel">
+          {{ "mautic.keyboard.shortcuts" | trans }}
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="row-no-gutters">
+          <div class="col-md-12">
+            {% set shortcuts = {
+            'navigation': {
+            'g+d': 'mautic.keyboard.load_dashboard',
+            'g+c': 'mautic.keyboard.load_contacts',
+            'g+e': 'mautic.keyboard.load_emails',
+            'g+f': 'mautic.keyboard.load_forms',
+            'g+s': 'mautic.keyboard.load_segments',
+            'g+p': 'mautic.keyboard.load_landing_pages',
+            },
+            'functions': {
+            '/' : 'mautic.keyboard.list_search',
+            'f+/': 'mautic.keyboard.global_search',
+            'f+n': 'mautic.keyboard.show_notifications',
+            'f+m': 'mautic.keyboard.open_settings',
+            },
+            'actions': {
+            'e' : 'mautic.keyboard.edit',
+            'c' : 'mautic.keyboard.create',
+            '⌘+Enter' : 'mautic.keyboard.save',
+            'g+i' : 'mautic.keyboard.back',
+            'Del / ⌘+⌫' : 'mautic.keyboard.delete',
+            } } %}
+            <h4 class="fw-sb">
+              {{ "mautic.keyboard.section.global" | trans }}
+            </h4>
+            {% for section, shortcut_list in shortcuts %}
+            <h5 class="mb-xs mt-md fw-sb">
+              {{ ('mautic.keyboard.section.' ~ section)|trans }}
+            </h5>
+            <table class="shortcut-table bsv-xs">
+              {% for key, description in shortcut_list %}
+              <tr class="mb-xs">
+                <td class="shortcut-description">
+                  {{ description | trans }}
+                </td>
+                <td class="shortcut-keys text-right">
+                  {% set parts = key|split(' / ') %}
+                  {% for part in parts %}
+                    {% if not loop.first %}
+                      / <!-- Add the separator outside of the <kbd> tags -->
+                    {% endif %}
+                    {% set keys = part|split('+') %}
+                    {% for k in keys %}
+                      {% set title = '' %}
+                      {% if k == '⌫' %}
+                        {% set title = 'mautic.keyboard.backspace'|trans %}
+                      {% elseif k == '⌘' %}
+                        {% set title = 'mautic.keyboard.command'|trans %}
+                     {% endif %}
+                  <kbd{% if title %} title="{{ title }}" data-toggle="tooltip" {% endif %}>{{ k }}</kbd>
+                    {% endfor %}
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <hr />
+      <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+        {{ include('@MauticLead/KeyboardShortcuts/lead_shortcuts.html.twig', ignore_missing = true) }}
+        {{ include('@MauticEmail/KeyboardShortcuts/emails_shortcuts.html.twig', ignore_missing = true) }}
+      </ul>
+      <div class="alert alert-info col-xs-12">
+        <div class="d-flex jc-space-between ai-center small">
+          <div> <strong class="mr-xs">{{ 'mautic.keyboard.tip'|trans }}</strong><kbd>⌘</kbd> <i
+              class="ri-arrow-right-line"></i> <kbd>Ctrl</kbd></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <p>
+          {{ 'mautic.keyboard.press_to_view'|trans({'%shift%': '', '%question%': '<kbd>?</kbd>'})|raw }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

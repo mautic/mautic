@@ -35,8 +35,12 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : sms}) -}}
+{{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+    'entity': sms,
+    'status': 'available'
+}) -}}
 {% endblock %}
+
 {# This doesn't seem to be used anywhere: #}
 {# {% set smsType = sms.getSmsType() %}
 {% if smsType is empty %}
