@@ -4,13 +4,14 @@
         {{ form_row(utmTag) }}
     {% endfor %}
 {% endset %}
+<div class="row">
 {% include '@MauticCore/Helper/accordion.html.twig' with {
     'items': [
         {
             'id': 'UTM',
             'title': 'mautic.email.utm_tags',
-            'padding_inline': false,
             'content': utmTagsContent,
         }
     ]
 } %}
+</div>
