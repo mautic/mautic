@@ -1236,7 +1236,7 @@ kbd {
   border: 1px solid transparent;
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
-  border-radius: var(--border-radius-lg);
+  border-radius: 20px;
   display: inline-flex;
   align-items: center;
   height: var(--spacing-08);
@@ -2544,10 +2544,19 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .btn-group .btn ~ .btn-group,
 .btn-group .btn-group ~ .btn,
 .btn-group .btn-group ~ .btn-group {
-  /* margin-left: 0; */
+  margin-left: 5px;
 }
 .btn-group > .btn-primary + .dropdown-toggle {
   margin-left: 1px;
+}
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle),
+.btn-group > .btn:last-child:not(:first-child),
+.btn-group > .dropdown-toggle:not(:first-child),
+.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 .btn-group.open .dropdown-toggle {
   -webkit-box-shadow: none;
