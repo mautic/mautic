@@ -3,6 +3,7 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -11,12 +12,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class PasswordResetConfirmType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
 
@@ -28,7 +29,7 @@ class PasswordResetConfirmType extends AbstractType
                 'label_attr' => ['class' => 'sr-only'],
                 'attr'       => [
                     'class'       => 'form-control',
-                    'preaddon'    => 'fa fa-user',
+                    'preaddon'    => 'ri-user-6-fill',
                     'placeholder' => 'mautic.user.auth.form.loginusername',
                 ],
                 'required'    => true,
@@ -50,7 +51,7 @@ class PasswordResetConfirmType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => 'mautic.user.user.passwordreset.password.placeholder',
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => true,
@@ -60,6 +61,9 @@ class PasswordResetConfirmType extends AbstractType
                         new Assert\Length([
                             'min'        => 6,
                             'minMessage' => 'mautic.user.user.password.minlength',
+                        ]),
+                        new NotWeak([
+                            'message' => 'mautic.user.user.password.weak',
                         ]),
                     ],
                 ],
@@ -71,7 +75,7 @@ class PasswordResetConfirmType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => 'mautic.user.user.passwordreset.confirm.placeholder',
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => true,
@@ -103,9 +107,6 @@ class PasswordResetConfirmType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'passwordresetconfirm';

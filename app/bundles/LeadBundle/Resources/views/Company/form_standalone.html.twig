@@ -24,13 +24,13 @@
 {% block content %}
 {{ form_start(form) }}
     <div class="box-layout">
-        <div class="col-md-3 bg-white height-auto">
+        <div class="col-md-3 height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
                 <ul class="list-group list-group-tabs">
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
                             <li class="list-group-item {% if loop.first %}active{% endif %}">
-                                <a href="#company-{{ g }}" class="steps" data-toggle="tab">
+                                <a href="#company-{{ g }}" class="list-group-item-text steps" data-toggle="tab">
                                     {{ ('mautic.lead.field.group.'~g)|trans }}
                                 </a>
                             </li>
@@ -38,16 +38,10 @@
                     {% endfor %}
                 </ul>
                 <hr/>
-                <div>
-                    {{ form_row(form.score) }}
-                </div>
-                <hr/>
-                <div>
-                    {{ form_row(form.owner) }}
-                </div>
+
             </div>
         </div>
-        <div class="col-md-9 bg-auto height-auto bdr-l">
+        <div class="col-md-9 height-auto bdr-l">
             <div class="tab-content">
                 {{ include('@MauticLead/Company/form_fields.html.twig', {
                     'form': form,

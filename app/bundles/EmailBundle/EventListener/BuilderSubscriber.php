@@ -17,7 +17,9 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -28,59 +30,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var CoreParametersHelper
+     * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
      */
-    private $coreParametersHelper;
-
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var TrackableModel
-     */
-    private $pageTrackableModel;
-
-    /**
-     * @var RedirectModel
-     */
-    private $pageRedirectModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private array $convertedContent = [];
 
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        EmailModel $emailModel,
-        TrackableModel $trackableModel,
-        RedirectModel $redirectModel,
-        TranslatorInterface $translator
+        private CoreParametersHelper $coreParametersHelper,
+        private EmailModel $emailModel,
+        private TrackableModel $pageTrackableModel,
+        private RedirectModel $pageRedirectModel,
+        private TranslatorInterface $translator,
+        private MailHashHelper $mailHash
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailModel           = $emailModel;
-        $this->pageTrackableModel   = $trackableModel;
-        $this->pageRedirectModel    = $redirectModel;
-        $this->translator           = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND  => [
-                ['fixEmailAccessibility', 0],
+                ['fixEmailAccessibility', 10000],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
             ],
             EmailEvents::EMAIL_ON_DISPLAY => [
-                ['fixEmailAccessibility', 0],
+                ['fixEmailAccessibility', 10000],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
@@ -88,7 +63,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
@@ -123,6 +98,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         // these should not allow visual tokens
         $tokens = [
             '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{dnc_url}'         => $this->translator->trans('mautic.email.token.unsubscribe_all_url'),
             '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -273,11 +249,25 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->setContent($content);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $idHash = $event->getIdHash();
         $lead   = $event->getLead();
         $email  = $event->getEmail();
+
+        // Get email
+        $toEmail = null;
+        if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
+            $toEmail = $lead['email'];
+        } elseif ($lead instanceof Lead && is_string($lead->getEmail())) {
+            $toEmail = $lead->getEmail();
+        }
+
+        // Get email hash
+        $unsubscribeHash = null;
+        if ($toEmail) {
+            $unsubscribeHash = $this->mailHash->getEmailHash($toEmail);
+        }
 
         if (null == $idHash) {
             // Generate a bogus idHash to prevent errors for routes that may include it
@@ -288,10 +278,13 @@ class BuilderSubscriber implements EventSubscriberInterface
         if (!$unsubscribeText) {
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
-        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
-        $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
 
-        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
+        // We will replace tokens in unsubscribe text too
+        $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
+        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
+        $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
+        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+        $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
 
         $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {
@@ -330,9 +323,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
-        /**
-         * @var Trackable|Redirect $trackable
-         */
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
@@ -345,43 +335,27 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Parses content for URLs and tokens.
+     * Parses the content for URLs and replaces them for trackables.
      *
-     * @param int|null $emailId
+     * @param ?int $emailId
      *
-     * @return array<mixed>
+     * @return Trackable[]|Redirect[]
      *
      * @throws MappingException
      */
     private function parseContentForUrls(EmailSendEvent $event, $emailId): array
     {
-        static $convertedContent = [];
+        $cacheKey = $event->getContentHash().'-'.$emailId;
 
         // Prevent parsing the exact same content over and over
-        if (!isset($convertedContent[$event->getContentHash()])) {
-            $html = $event->getContent();
-            $text = $event->getPlainText();
-
-            $contentTokens = $event->getTokens();
-
+        if (!isset($this->convertedContent[$cacheKey])) {
             [$content, $trackables] = $this->pageTrackableModel->parseContentForTrackables(
-                [$html, $text],
-                $contentTokens,
+                [$event->getContent(), $event->getPlainText()],
+                $event->getTokens(),
                 ($emailId) ? 'email' : null,
                 $emailId
             );
-
-            [$html, $text] = $content;
-            unset($content);
-
-            if ($html) {
-                $event->setContent($html);
-            }
-            if ($text) {
-                $event->setPlainText($text);
-            }
-
-            $convertedContent[$event->getContentHash()] = $trackables;
+            $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {
                 $trackableRepository = $this->pageTrackableModel->getRepository();
@@ -396,10 +370,18 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
                 }
             }
-
-            unset($html, $text, $trackables);
         }
 
-        return $convertedContent[$event->getContentHash()];
+        [$content, $trackables] = $this->convertedContent[$cacheKey];
+        [$html, $text]          = $content;
+
+        if ($html) {
+            $event->setContent($html);
+        }
+        if ($text) {
+            $event->setPlainText($text);
+        }
+
+        return $trackables;
     }
 }

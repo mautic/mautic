@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CampaignBundle\Tests\Controller;
+namespace Mautic\CampaignBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -107,7 +108,7 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
                     'order'       => 2,
                     'properties'  => [
                         'email'      => $email->getId(),
-                        'email_type' => 'transactional',
+                        'email_type' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                     ],
                     'triggerInterval'     => 0,
                     'triggerIntervalUnit' => 'd',

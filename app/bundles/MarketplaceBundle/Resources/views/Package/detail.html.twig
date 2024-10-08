@@ -5,9 +5,10 @@
     0: {
         'attr' : {
             'href' : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
+            'class' : 'btn btn-tertiary'
         },
-        'btnText'   : 'mautic.core.form.close'|trans,
-        'iconClass' : 'fa fa-remove',
+        'btnText'   : 'marketplace.package.details.close'|trans,
+        'iconClass' : 'ri-arrow-go-back-line',
         'primary'   : true,
 }
  } %}
@@ -27,7 +28,7 @@
             'data-toggle' : '',
         },
         'btnText'   : 'marketplace.package.issue.tracker'|trans,
-        'iconClass' : 'fa fa-question',
+        'iconClass' : 'ri-question-mark',
         'primary'   : false,
     }}) %}
 {% endif %}
@@ -41,7 +42,7 @@
             'data-toggle' : '',
         },
         'btnText'   : 'marketplace.package.wiki'|trans,
-        'iconClass' : 'fa fa-book',
+        'iconClass' : 'ri-book-line',
         'primary'   : false,
     }}) %}
 {% endif %}
@@ -61,7 +62,7 @@
             'href'        : installRoute,
         },
         'btnText'   : 'marketplace.package.install'|trans,
-        'iconClass' : 'fa fa-download',
+        'iconClass' : 'ri-download-line',
         'primary'   : true,
     }}) %}
 
@@ -78,7 +79,7 @@
             'href'        : removeRoute,
     },
         'btnText'   : 'marketplace.package.remove'|trans,
-        'iconClass' : 'fa fa-trash',
+        'iconClass' : 'ri-delete-bin-line',
         'primary'   : true,
     }}) %}
 {% endif %}
@@ -92,7 +93,7 @@
 {% block content %}
 <div class="col-md-9">
     {% if packageDetail.packageBase.description %}
-    <div class="bg-auto">
+    <div>
         <div class="pr-md pl-md pt-lg pb-lg">
             <div class="box-layout">
                 <div class="col-xs-10">
@@ -117,7 +118,7 @@
     <div class="panel-heading">
         <div class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</div>
     </div>
-    <table class="table table-bordered table-striped mb-0">
+    <table class="table table-hover mb-0">
         <tr>
             <th>{% trans %}marketplace.package.version{% endtrans %}</th>
             <td>
@@ -164,7 +165,7 @@
     <div class="panel-heading">
         <div class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</div>
     </div>
-    <table class="table table-bordered table-striped mb-0">
+    <table class="table table-hover mb-0">
         <tr>
             <th>{% trans %}marketplace.package.version{% endtrans %}</th>
             <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
@@ -218,7 +219,7 @@
     {% endfor %}
 
     <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.github.info{% endtrans %}</h3>
-    <table class="table mb-0">
+    <table class="table table-hover mb-0">
         <tr>
             <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
             <td>
@@ -246,7 +247,7 @@
     </table>
 
     <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.packagist.info{% endtrans %}</h3>
-    <table class="table mb-0">
+    <table class="table table-hover mb-0">
         <tr>
             <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
             <td>

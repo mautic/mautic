@@ -19,7 +19,8 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private MockObject $formBuilder;
+
     private FilterSelectorType $FilterSelectorType;
 
     protected function setUp(): void

@@ -2,10 +2,15 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -15,16 +20,18 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
     private $pointsAdded = false;
 
+    protected $useCleanupRollback = false;
+
     public function testSavingPrimaryCompanyAfterPointsAreSetByListenerAreNotResetToDefaultOf0BecauseOfPointsFieldDefaultIs0(): void
     {
         /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = self::$container->get('event_dispatcher');
+        $eventDispatcher = static::getContainer()->get('event_dispatcher');
         $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, [$this, 'addPointsListener']);
 
         /** @var LeadModel $model */
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         /** @var EntityManager $em */
-        $em   = self::$container->get('doctrine.orm.entity_manager');
+        $em   = static::getContainer()->get('doctrine.orm.entity_manager');
 
         // Set company to trigger setPrimaryCompany()
         $lead = new Lead();
@@ -57,14 +64,63 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $lead->adjustPoints(10);
 
         /** @var LeadModel $model */
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         $model->saveEntity($lead);
+    }
+
+    public function testMultipleAssignedCompany(): void
+    {
+        self::assertEquals(2, count($this->getContactWithAssignTwoCompanies()));
+    }
+
+    public function testSignleAssignedCompany(): void
+    {
+        $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
+
+        self::assertEquals(1, count($this->getContactWithAssignTwoCompanies()));
+    }
+
+    /**
+     * @return array<int,array<int|string>>
+     *
+     * @throws DBALException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    protected function getContactWithAssignTwoCompanies(): array
+    {
+        $company = new Company();
+        $company->setName('Doe Corp');
+
+        $this->em->persist($company);
+
+        $company2 = new Company();
+        $company2->setName('Doe Corp 2');
+
+        $this->em->persist($company2);
+
+        $contact = new Lead();
+        $contact->setEmail('test@test.com');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
+        $leadModel->addToCompany($contact, $company);
+        $leadModel->addToCompany($contact, $company2);
+
+        /** @var CompanyLeadRepository $companyLeadRepo */
+        $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
+        $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
+
+        return $contactCompanies;
     }
 
     public function testGetCustomLeadFieldLength(): void
     {
-        $leadModel  = self::$container->get('mautic.lead.model.lead');
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
+        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
 
         // Create a lead field.
         $leadField = new LeadField();
@@ -114,7 +170,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         $this->expectException(DBALException::class);
 
-        $leadModel  = self::$container->get('mautic.lead.model.lead');
+        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
         $leadModel->getCustomLeadFieldLength(['unknown_field']);
     }
 

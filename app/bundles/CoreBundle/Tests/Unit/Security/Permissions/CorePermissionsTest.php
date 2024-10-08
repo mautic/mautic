@@ -19,22 +19,19 @@ class CorePermissionsTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelper;
+    private MockObject $userHelper;
 
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
+    private CorePermissions $corePermissions;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {

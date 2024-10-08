@@ -14,17 +14,21 @@
 {% if columnOrder is not empty or aggregatorOrder is not empty %}
     <!-- table section -->
     <div class="col-xs-12">
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div id="page-list-wrapper">
             <div class="page-list">
                 <div class="table-responsive table-responsive-force">
-                    <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+                    <table class="table table-hover report-list" id="reportTable">
                         <thead>
                         <tr>
                             <th class="col-report-count"></th>
                             {% for key in columnOrder %}
                                 {% if columns[key] is defined %}
                                     {# order by alias if exists, if not then by column name #}
-                                    {%- set orderBy = columns[key].alias|default((key starts with 'channel.') ? key|replace({'.': '_'}) : key) -%}
+                                    {%- set orderBy = (columns[key].alias is defined and columns[key].alias starts with 'channel.')
+                                        ? columns[key].alias
+                                        : key
+                                    -%}
+
                                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                         'sessionVar': 'report.' ~ report.id,
                                         'orderBy': orderBy,
@@ -55,6 +59,7 @@
                                 <tr>
                                     <td>{{ startCount }}</td>
                                     {% for key in columnOrder|filter(v => columns[v] is defined) %}
+                                        {%- set collapse = columns[key].collapse is defined ? columns[key].collapse : false -%}
                                         <td>
                                             {%- set closeLink = false -%}
                                             {% if columns[key].link is defined and row[columns[key].alias] is defined and row[columns[key].alias] is not empty %}
@@ -81,10 +86,29 @@
                                                 {% elseif 'date' is same as cellType %}
                                                     {{ dateToShort(cellVal, 'UTC') }}
                                                 {% else %}
-                                                    {{ format(cellVal, cellType) }}
+                                                    {% set value = format(cellVal, cellType)|purify %}
+                                                    {% if collapse == false %}
+                                                        {{ format(cellVal, cellType)|purify }}
+                                                    {% else %}
+                                                        {% set value = htmlEntityDecode(format(cellVal, cellType)|purify) %}
+                                                        <div data-toggle="collapse" data-target="#audit-log-details-{{ startCount }}" class="accordion-toggle" style="cursor: pointer">
+                                                            {{ value|length > 50 ? value|slice(0, 50) ~ '...' : value }}
+                                                        </div>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                             {% if closeLink %}</a>{% endif %}
+                                            {% if collapse %}
+                                            <div class="accordian-body collapse" id="audit-log-details-{{ startCount }}">
+                                                <pre id="pre-audit-log-details-{{ startCount }}"></pre>
+                                            </div>
+                                            <script>
+                                                var txt = document.createElement("textarea");
+                                                txt.innerHTML = '{{ (value) }}';
+                                                document.getElementById('pre-audit-log-details-{{ startCount }}').textContent
+                                                    = JSON.stringify(JSON.parse((txt.value)), undefined, 2);
+                                            </script>
+                                            {% endif %}
                                         </td>
                                     {% endfor %}
                                     {% if aggregatorCount %}

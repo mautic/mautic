@@ -4,53 +4,58 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Mautic\EmailBundle\EventListener\EmailSubscriber;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
-     * @var MockObject|AuditLogModel
+     * @var MockObject&AuditLogModel
      */
-    private $auditLogModel;
+    private MockObject $auditLogModel;
 
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
-    private $emailModel;
+    private MockObject $emailModel;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&MauticMessage
      */
-    private $em;
+    private MockObject $mockMessage;
 
-    /**
-     * @var MockObject|MauticMessage
-     */
-    private $mockMessage;
-
-    /**
-     * @var EmailSubscriber
-     */
-    private $subscriber;
+    private EmailSubscriber $subscriber;
 
     protected function setup(): void
     {
@@ -60,17 +65,74 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->auditLogModel    = $this->createMock(AuditLogModel::class);
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
-        $this->em               = $this->createMock(EntityManager::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->em);
+        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator);
+    }
+
+    public function testOnEmailResendWithNoLeadIdHash(): void
+    {
+        $event = new QueueEmailEvent($this->mockMessage);
+
+        $this->emailModel->expects($this->never())
+            ->method('getEmailStatus');
+
+        $this->subscriber->onEmailResend($event);
+
+        Assert::assertFalse($event->shouldTryAgain());
+    }
+
+    public function testOnEmailResendWithNoStat(): void
+    {
+        $message = new class() extends MauticMessage {
+            public ?string $leadIdHash = 'some-hash';
+        };
+
+        $event = new QueueEmailEvent($message);
+
+        $this->emailModel->expects($this->once())
+            ->method('getEmailStatus');
+
+        $this->emailModel->expects($this->never())
+            ->method('saveEmailStat');
+
+        $this->emailModel->expects($this->never())
+            ->method('setDoNotContact');
+
+        $this->subscriber->onEmailResend($event);
+
+        Assert::assertFalse($event->shouldTryAgain());
+    }
+
+    public function testOnEmailResendWithNoRetry(): void
+    {
+        $message = new class() extends MauticMessage {
+            public ?string $leadIdHash = 'some-hash';
+        };
+
+        $event = new QueueEmailEvent($message);
+        $stat  = new Stat();
+
+        $this->emailModel->expects($this->once())
+            ->method('getEmailStatus')
+            ->willReturn($stat);
+
+        $this->emailModel->expects($this->once())
+            ->method('saveEmailStat')
+            ->with($stat);
+
+        $this->emailModel->expects($this->never())
+            ->method('setDoNotContact');
+
+        $this->subscriber->onEmailResend($event);
+
+        Assert::assertSame(1, $stat->getRetryCount());
+        Assert::assertTrue($event->shouldTryAgain());
     }
 
     public function testOnEmailResendWhenShouldTryAgain(): void
     {
-        $this->mockMessage
-        ->expects($this->once())
-        ->method('getLeadIdHash')
-        ->willReturn('idhash');
+        $this->mockMessage->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
@@ -88,9 +150,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnEmailResendWhenShouldNotTryAgain(): void
     {
         $this->mockMessage
-        ->expects($this->once())
-        ->method('getLeadIdHash')
-        ->willReturn('idhash');
+            ->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $this->mockMessage->expects($this->once())
             ->method('getSubject')
@@ -107,5 +168,147 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber->onEmailResend($queueEmailEvent);
         $this->assertFalse($queueEmailEvent->shouldTryAgain());
+    }
+
+    public function testOnEmailResendWith4Retry(): void
+    {
+        $message = new class() extends MauticMessage {
+            public ?string $leadIdHash = 'some-hash';
+        };
+
+        $message->subject('Subject');
+
+        $event = new QueueEmailEvent($message);
+        $stat  = new Stat();
+
+        $stat->setRetryCount(4);
+
+        $this->emailModel->expects($this->once())
+            ->method('getEmailStatus')
+            ->willReturn($stat);
+
+        $this->emailModel->expects($this->once())
+            ->method('saveEmailStat')
+            ->with($stat);
+
+        $this->emailModel->expects($this->once())
+            ->method('setDoNotContact')
+            ->with($stat);
+
+        $this->subscriber->onEmailResend($event);
+
+        Assert::assertSame(5, $stat->getRetryCount());
+        Assert::assertFalse($event->shouldTryAgain());
+    }
+
+    public function testOnEmailSendAddPreheaderText(): void
+    {
+        $this->runPreheaderEvent(
+            <<<'CONTENT'
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <body style="margin: 0px; cursor: auto;" class="ui-sortable">
+        <div data-section-wrapper="1">
+            <center>
+                <table data-section="1" style="width: 600;" width="600" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div data-slot-container="1" style="min-height: 30px">
+                                    <div data-slot="text"><br /><h2>Hello there!</h2><br />{test} test We haven't heard from you for a while...<a href="https://google.com">check this link</a><br /><br />{unsubscribe_text} | {webview_text}</div>{dynamiccontent="Dynamic Content 2"}<div data-slot="codemode">
+                                    <div id="codemodeHtmlContainer">
+    <p>Place your content here {test}</p></div>
+
+                                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </center>
+        </div>
+</body></html>
+CONTENT,
+            function (string $content): void {
+                $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
+                $this->assertStringContainsString($preheaderTextHtml, $content);
+                $this->assertMatchesRegularExpression(EmailSubscriber::PREHEADER_HTML_SEARCH_PATTERN, $content);
+            }
+        );
+    }
+
+    public function testOnEmailSendAddPreheaderTextWithPreheaderPresent(): void
+    {
+        $this->runPreheaderEvent(
+            <<<'CONTENT'
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <body style="margin: 0px; cursor: auto;" class="ui-sortable">
+        <div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">Original Preheader here</div>
+        <div data-section-wrapper="1">
+            <center>
+                <table data-section="1" style="width: 600;" width="600" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div data-slot-container="1" style="min-height: 30px">
+                                    <div data-slot="text"><br /><h2>Hello there!</h2><br />{test} test We haven't heard from you for a while...<a href="https://google.com">check this link</a><br /><br />{unsubscribe_text} | {webview_text}</div>{dynamiccontent="Dynamic Content 2"}<div data-slot="codemode">
+                                    <div id="codemodeHtmlContainer"><p>Place your content here {test}</p></div>
+                                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </center>
+        </div>
+</body></html>
+CONTENT,
+
+            function (string $content): void {
+                $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
+                $this->assertStringContainsString($preheaderTextHtml, $content);
+                $this->assertStringNotContainsString('Original Preheader here', $content);
+                $this->assertMatchesRegularExpression(EmailSubscriber::PREHEADER_HTML_SEARCH_PATTERN, $content);
+            }
+        );
+    }
+
+    private function runPreheaderEvent(string $html, callable $assert): void
+    {
+        /** @var MockObject&FromEmailHelper $fromEmailHelper */
+        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
+
+        /** @var MockObject&CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var MockObject&Mailbox $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
+        /** @var MockObject&RouterInterface $router */
+        $router = $this->createMock(RouterInterface::class);
+
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_from_name', null, 'No Body'],
+                ]
+            );
+        $mockFactory = $this->createMock(MauticFactory::class); /** @phpstan-ignore-line MauticFactory is deprecated */
+        $mailer      = new Mailer(new BatchTransport());
+        $mailHelper  = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, new NullLogger(), new MailHashHelper($coreParametersHelper), $router);
+
+        $email = new Email();
+        $email->setCustomHtml($html);
+        $email->setPreheaderText('this is a nice preheader text');
+        $mailHelper->setEmail($email);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->subscriber);
+
+        $event = new EmailSendEvent($mailHelper);
+
+        $this->subscriber->onEmailSendAddPreheaderText($event);
+
+        $assert($event->getContent());
     }
 }

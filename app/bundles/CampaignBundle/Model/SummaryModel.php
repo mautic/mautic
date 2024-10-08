@@ -17,10 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SummaryModel extends AbstractCommonModel
 {
-    /**
-     * @var array
-     */
-    private $logData = [];
+    private array $logData = [];
 
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
@@ -85,7 +82,7 @@ class SummaryModel extends AbstractCommonModel
         }
 
         // Start with the current hour.
-        $start = $start ?? new \DateTime('+1 hour');
+        $start ??= new \DateTime('+1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
 

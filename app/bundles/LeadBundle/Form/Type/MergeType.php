@@ -9,9 +9,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class MergeType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'lead_to_merge',
@@ -42,7 +45,7 @@ class MergeType extends AbstractType
             [
                 'apply_text' => false,
                 'save_text'  => 'mautic.lead.merge',
-                'save_icon'  => 'fa fa-user',
+                'save_icon'  => 'ri-user-6-line',
             ]
         );
 
@@ -51,7 +54,7 @@ class MergeType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['leads']);
     }

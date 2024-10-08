@@ -6,10 +6,10 @@
     - eventSettings
     - canvasSettings
 #}
-<div class="hide builder campaign-builder live">
+<div id="campaign-builder" class="hide builder campaign-builder live">
     <div class="btns-builder">
-        <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">{{ 'mautic.core.form.apply'|trans }}</button>
-        <button type="button" class="btn btn-primary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">{{ 'mautic.core.close.builder'|trans }}</button>
+        <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">{{ 'mautic.core.form.apply'|trans }}<i class="ri-save-line"></i></button>
+        <button type="button" class="btn btn-secondary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">{{ 'mautic.core.close.builder'|trans }}<i class="ri-close-line"></i></button>
     </div>
     <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
     <div class="builder-content">
@@ -18,7 +18,7 @@
                 <div class="campaign-event-content">
                     <div>
                         <span class="campaign-event-name ellipsis">
-                            <i class="mr-sm fa fa-users"></i> {{ 'mautic.campaign.add_new_source'|trans }}
+                            <i class="mr-sm ri-team-line"></i> {{ 'mautic.campaign.add_new_source'|trans }}
                         </span>
                     </div>
                 </div>
@@ -33,11 +33,13 @@
             {% endfor %}
 
             {% for event in campaignEvents %}
-              {% set settings = eventSettings[event.eventType][event.type]|default(null) %}
-              {{- include(settings['template']|default('@MauticCampaign/Event/_generic.html.twig'), {
-                    'event': event,
-                    'campaignId': campaignId,
-              }) -}}
+                {% if event.deleted|default(null) is empty %}
+                  {% set settings = eventSettings[event.eventType][event.type]|default(null) %}
+                  {{- include(settings['template']|default('@MauticCampaign/Event/_generic.html.twig'), {
+                        'event': event,
+                        'campaignId': campaignId,
+                  }) -}}
+                {% endif %}
             {% endfor %}
 
             {{- include('@MauticCampaign/Campaign/Builder/_index.html.twig', {
@@ -70,4 +72,5 @@
     Mautic.campaignBuilderCanvasSources = {% if campaignSources is not empty %}{{ campaignSources|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
     Mautic.campaignBuilderCanvasEvents = {% if campaignEvents is not empty %}{{ campaignEvents|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
     Mautic.campaignBuilderConnectionRestrictions = {% if eventSettings['connectionRestrictions'] is not empty %}{{ eventSettings['connectionRestrictions']|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderHasEventClone = {% if hasEventClone %}true{% else %}false{% endif %};
 </script>

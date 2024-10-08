@@ -46,56 +46,55 @@ Mautic.renameFormElements = function(container, oldIdPrefix, oldNamePrefix, newI
 Mautic.ajaxifyForm = function (formName) {
     Mautic.initializeFormFieldVisibilitySwitcher(formName);
 
-    //prevent enter submitting form and instead jump to next line
+    // Prevent enter from submitting form and instead jump to next line
     var form = 'form[name="' + formName + '"]';
+
+    // Handle Command+Enter (Mac) or Control+Enter (Windows/Linux) for form submission
+    Mautic.addKeyboardShortcut(['meta+enter', 'ctrl+enter'], 'Submit form', function(e) {
+        if (MauticVars.formSubmitInProgress) {
+            return false;
+        }
+
+        // Find save button first then apply
+        var saveButton = mQuery(form).find('button.btn-save');
+        var applyButton = mQuery(form).find('button.btn-apply');
+
+        var modalParent = mQuery(form).closest('.modal');
+        var inMain = mQuery(modalParent).length > 0 ? false : true;
+
+        if (mQuery(saveButton).length) {
+            if (inMain) {
+                if (mQuery(form).find('button.btn-save.btn-copy').length) {
+                    mQuery(mQuery(form).find('button.btn-save.btn-copy')).trigger('click');
+                    return;
+                }
+            } else {
+                if (mQuery(modalParent).find('button.btn-save.btn-copy').length) {
+                    mQuery(mQuery(modalParent).find('button.btn-save.btn-copy')).trigger('click');
+                    return;
+                }
+            }
+            mQuery(saveButton).trigger('click');
+        } else if (mQuery(applyButton).length) {
+            if (inMain) {
+                if (mQuery(form).find('button.btn-apply.btn-copy').length) {
+                    mQuery(mQuery(form).find('button.btn-apply.btn-copy')).trigger('click');
+                    return;
+                }
+            } else {
+                if (mQuery(modalParent).find('button.btn-apply.btn-copy').length) {
+                    mQuery(mQuery(modalParent).find('button.btn-apply.btn-copy')).trigger('click');
+                    return;
+                }
+            }
+            mQuery(applyButton).trigger('click');
+        }
+    });
+
+    // Handle Enter key for jumping to the next input
     mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
     mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
-        if(e.keyCode == 13 && (e.metaKey || e.ctrlKey)) {
-            if (MauticVars.formSubmitInProgress) {
-                return false;
-            }
-
-            // Find save button first then apply
-            var saveButton = mQuery(form).find('button.btn-save');
-            var applyButton = mQuery(form).find('button.btn-apply');
-
-            var modalParent = mQuery(form).closest('.modal');
-            var inMain      = mQuery(modalParent).length > 0 ? false : true;
-
-            if (mQuery(saveButton).length) {
-                if (inMain) {
-                    if (mQuery(form).find('button.btn-save.btn-copy').length) {
-                        mQuery(mQuery(form).find('button.btn-save.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                } else {
-                    if (mQuery(modalParent).find('button.btn-save.btn-copy').length) {
-                        mQuery(mQuery(modalParent).find('button.btn-save.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                }
-
-                mQuery(saveButton).trigger('click');
-            } else if (mQuery(applyButton).length) {
-                if (inMain) {
-                    if (mQuery(form).find('button.btn-apply.btn-copy').length) {
-                        mQuery(mQuery(form).find('button.btn-apply.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                } else {
-                    if (mQuery(modalParent).find('button.btn-apply.btn-copy').length) {
-                        mQuery(mQuery(modalParent).find('button.btn-apply.btn-copy')).trigger('click');
-
-                        return;
-                    }
-                }
-
-                mQuery(applyButton).trigger('click');
-            }
-        } else if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
+        if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
             var inputs = mQuery(this).parents('form').eq(0).find(':input');
             if (inputs[inputs.index(this) + 1] != null) {
                 inputs[inputs.index(this) + 1].focus();
@@ -198,10 +197,10 @@ Mautic.resetForm = function(form) {
  * @param callback
  */
 Mautic.postForm = function (form, callback) {
-    var form = mQuery(form);
+    form = mQuery(form);
 
     var modalParent = form.closest('.modal');
-    var inMain = mQuery(modalParent).length > 0 ? false : true;
+    var inMain = mQuery(modalParent).length === 0;
 
     var action = form.attr('action');
 
@@ -214,6 +213,7 @@ Mautic.postForm = function (form, callback) {
     form.ajaxSubmit({
         showLoadingBar: showLoading,
         success: function (data) {
+            form.trigger('submit:success', [action, data, inMain]);
             if (!inMain) {
                 Mautic.stopModalLoadingBar(modalTarget);
             }
@@ -468,7 +468,7 @@ Mautic.updateEntitySelect = function (response) {
         }
 
         newOption.prop('selected', true);
-        mQueryParent(el).val(response.id).trigger("chosen:updated");
+        mQueryParent(el).trigger("chosen:updated");
     }
 
     if (window.opener) {
@@ -482,45 +482,41 @@ Mautic.updateEntitySelect = function (response) {
  * Toggles the class for yes/no button groups
  * @param changedId
  */
-Mautic.toggleYesNoButtonClass = function (changedId) {
-    changedId = '#' + changedId;
+Mautic.toggleYesNo = function(element) {
+    var $label = mQuery(element);
+    var $toggle = $label.closest('.toggle');
+    var yesId = $label.data('yes-id');
+    var noId = $label.data('no-id');
+    var $yesInput = mQuery('#' + yesId);
+    var $noInput = mQuery('#' + noId);
+    var $switchEl = $toggle.find('.toggle__switch');
+    var $textEl = $toggle.find('.toggle__text');
 
-    var isYesButton   = mQuery(changedId).parent().hasClass('btn-yes');
-    var isExtraButton = mQuery(changedId).parent().hasClass('btn-extra');
+    var yesText = $toggle.data('yes');
+    var noText = $toggle.data('no');
 
-    if (isExtraButton) {
-        mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-default');
+    if ($yesInput.is(':checked')) {
+        // Switch to 'No'
+        $noInput.prop('checked', true).trigger('change');
+        $yesInput.prop('checked', false);
+        $switchEl.removeClass('toggle__switch--checked');
+        $textEl.text(noText);
+        $label.attr('aria-checked', 'false');
     } else {
-        //change the other
-        var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
-        var otherLabel = mQuery(changedId).parent().parent().find(otherButton);
-
-        if (mQuery(changedId).prop('checked')) {
-            var thisRemove = 'btn-default',
-                otherAdd = 'btn-default';
-            if (isYesButton) {
-                var thisAdd = 'btn-success',
-                    otherRemove = 'btn-danger';
-            } else {
-                var thisAdd = 'btn-danger',
-                    otherRemove = 'btn-success';
-            }
-        } else {
-            var thisAdd = 'btn-default';
-            if (isYesButton) {
-                var thisAdd = 'btn-success',
-                    otherRemove = 'btn-danger';
-            } else {
-                var thisAdd = 'btn-danger',
-                    otherRemove = 'btn-success';
-            }
-        }
-
-        mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
-        mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
+        // Switch to 'Yes'
+        $yesInput.prop('checked', true).trigger('change');
+        $noInput.prop('checked', false);
+        $switchEl.addClass('toggle__switch--checked');
+        $textEl.text(yesText);
+        $label.attr('aria-checked', 'true');
     }
+};
 
-    return true;
+Mautic.handleKeyDown = function(event, element) {
+    if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault();
+        Mautic.toggleYesNo(element);
+    }
 };
 
 /**
@@ -529,10 +525,6 @@ Mautic.toggleYesNoButtonClass = function (changedId) {
  */
 Mautic.removeFormListOption = function (el) {
     var sortableDiv = mQuery(el).parents('div.sortable');
-    var inputCount = mQuery(sortableDiv).parents('div.form-group').find('input.sortable-itemcount');
-    var count = mQuery(inputCount).val();
-    count--;
-    mQuery(inputCount).val(count);
     mQuery(sortableDiv).remove();
 };
 

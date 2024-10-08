@@ -73,7 +73,7 @@ trait VariantEntityTrait
     /**
      * Remove variant.
      */
-    public function removeVariantChild(VariantEntityInterface $child)
+    public function removeVariantChild(VariantEntityInterface $child): void
     {
         $this->variantChildren->removeElement($child);
     }
@@ -119,7 +119,7 @@ trait VariantEntityTrait
     /**
      * Remove variant parent.
      */
-    public function removeVariantParent()
+    public function removeVariantParent(): void
     {
         $this->setVariantParent();
     }
@@ -193,10 +193,8 @@ trait VariantEntityTrait
 
     /**
      * Check if this entity has variants.
-     *
-     * @return int
      */
-    public function hasVariants()
+    public function hasVariants(): int
     {
         $children = $this->getTranslationChildren();
 
@@ -206,7 +204,7 @@ trait VariantEntityTrait
     /**
      * Clear variants.
      */
-    public function clearVariants()
+    public function clearVariants(): void
     {
         $this->variantChildren = new ArrayCollection();
         $this->variantParent   = null;
@@ -245,9 +243,9 @@ trait VariantEntityTrait
      *
      * @return array<int,int|string>
      */
-    public function getRelatedEntityIds($publishedOnly = false)
+    public function getRelatedEntityIds($publishedOnly = false): array
     {
-        list($parent, $children) = $this->getVariants();
+        [$parent, $children] = $this->getVariants();
 
         // If parent is not published and only published has been requested, no need to proceed
         if ($parent && $publishedOnly && !$parent->isPublished()) {
@@ -277,7 +275,7 @@ trait VariantEntityTrait
      */
     protected function getAccumulativeVariantCount($getter)
     {
-        list($parent, $children) = $this->getVariants();
+        [$parent, $children]     = $this->getVariants();
         $count                   = $parent->$getter();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
@@ -308,7 +306,7 @@ trait VariantEntityTrait
 
         /** @var TranslationEntityInterface $parentTranslation */
         /** @var ArrayCollection $childrenTranslations */
-        list($parentTranslation, $childrenTranslations) = $entity->getTranslations();
+        [$parentTranslation, $childrenTranslations] = $entity->getTranslations();
         if ($entity->getId() && $parentTranslation != $entity) {
             if (!$publishedOnly || $parentTranslation->isPublished()) {
                 $ids[] = $parentTranslation->getId();

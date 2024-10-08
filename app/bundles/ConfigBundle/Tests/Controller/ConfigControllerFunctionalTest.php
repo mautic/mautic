@@ -6,10 +6,13 @@ namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const SUBDOMAIN_URL = 'subdomain_url.com';
+
     /**
      * @var string
      */
@@ -23,7 +26,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             'kernel.project_dir',
         ];
 
-        $this->configParams['locale'] = 'en_US';
+        $this->configParams['locale']        = 'en_US';
+        $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
 
@@ -89,7 +93,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return self::$container->get('kernel')->getLocalConfigFile();
+        return static::getContainer()->get('kernel')->getLocalConfigFile();
     }
 
     private function getConfigParameters(): array
@@ -242,7 +246,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($accountForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
 
         // 2. Change system locale in configuration - should not change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -256,7 +260,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
 
         // 3. Change user locale to system default in account - should change _locale session to system default
         $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
@@ -269,7 +273,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($accountForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
 
         // 2. Change system locale in configuration to en_US - should change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -283,6 +287,27 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
+    }
+
+    public function testSSOSettingEntityId(): void
+    {
+        $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][apply]');
+        $configForm       = $configSaveButton->form();
+
+        /** @var ChoiceFormField $entityIdField */
+        $entityIdField    = $configForm['config[userconfig][saml_idp_entity_id]'];
+        $availableOptions = $entityIdField->availableOptionValues();
+        Assert::assertCount(3, $availableOptions);
+        $configForm->setValues(
+            [
+                'config[userconfig][saml_idp_entity_id]'   => $availableOptions[1],
+                'config[coreconfig][site_url]'             => 'https://mautic-cloud.local', // required
+            ]
+        );
+        $this->client->submit($configForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertEquals($availableOptions[1], $configForm['config[userconfig][saml_idp_entity_id]']->getValue());
     }
 }

@@ -7,28 +7,13 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class Organizer
 {
-    /**
-     * @var array
-     */
-    private $records;
+    private array $leads = [];
 
-    /**
-     * @var array
-     */
-    private $leads = [];
+    private array $contacts = [];
 
-    /**
-     * @var array
-     */
-    private $contacts = [];
-
-    /**
-     * ObjectOrganizer constructor.
-     */
-    public function __construct(array $records)
-    {
-        $this->records = $records;
-
+    public function __construct(
+        private array $records
+    ) {
         $this->organize();
     }
 
@@ -40,10 +25,7 @@ class Organizer
         return $this->leads;
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadIds()
+    public function getLeadIds(): array
     {
         return array_keys($this->leads);
     }
@@ -56,15 +38,12 @@ class Organizer
         return $this->contacts;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactIds()
+    public function getContactIds(): array
     {
         return array_keys($this->contacts);
     }
 
-    private function organize()
+    private function organize(): void
     {
         foreach ($this->records as $campaignMember) {
             $object    = !empty($campaignMember['LeadId']) ? 'Lead' : 'Contact';

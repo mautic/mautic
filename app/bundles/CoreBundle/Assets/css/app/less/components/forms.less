@@ -7,17 +7,21 @@
 // Restyle and baseline non-control form elements.
 
 label {
-  font-weight: 600;
+  font-weight: normal;
+  font-size: var(--utility-01);
 }
 
 .label-tag {
-  white-space:normal;
+  white-space: normal;
   text-align: left;
 }
 
 // control label
 // -------------------------
 .control-label {
+  color: var(--text-secondary);
+  white-space: nowrap;
+
   &.text-left {
     text-align: left;
   }
@@ -25,13 +29,90 @@ label {
 
 // form control
 // -------------------------
-.form-control {
+.form-control,
+.chosen-container-single .chosen-single,
+.form-control.search.tt-input {
+  background-color: var(--field) !important;
+  border-width: var(--border-bottom);
+  border-color: var(--border-strong);
+  transition: var(--transition-all-productive);
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  border-radius: var(--border-radius-md);
+
   .box-shadow(none);
-  .transition(~"border-color ease-in-out .15s");
+
   // Rounded
   // -------------------------
   &.form-control-rounded {
     border-radius: @input-height-base;
+  }
+
+  &:hover {
+    background-color: var(--field-hover) !important;
+  }
+
+  &:focus {
+    outline: 2px solid var(--focus);
+    box-shadow: none;
+  }
+}
+
+.form-control {
+  padding: var(--spacing-04) var(--spacing-05);
+  color: var(--text-primary);
+
+  +.help-text,
+  +p {
+    margin-top: 5px;
+    font-size: var(--utility-01);
+  }
+
+  &.not-chosen {
+    padding: var(--spacing-01) var(--spacing-04);
+  }
+}
+
+//Search
+.search-container {
+  display: flex;
+  align-items: center;
+  .transition(all 0.3s ease);
+
+  .search {
+    border: none;
+    background-color: transparent !important; // JS libraries apply inline styles, showing a weird rectangle background behind the icon.
+    position: absolute;
+    left: 0px;
+    width: 24px;
+    height: 34px;
+    padding: 0 0 0 32px;
+    z-index: 1;
+    .transition(all 0.5s ease);
+  }
+
+  a.search-button {
+    color: var(--icon-secondary);
+    position: absolute;
+    display: inline-flex;
+    left: 12px;
+    z-index: 5;
+    transition: var(--transition-all-productive);
+
+    &:hover {
+      color: var(--icon-primary);
+    }
+  }
+
+  &.active {
+    .search {
+      width: 225px;
+      border: 1px solid @input-border;
+    }
+
+    i {
+      color: var(--icon-interactive);
+    }
   }
 }
 
@@ -40,11 +121,13 @@ label {
   .form-control {
     position: relative;
     border-radius: 0;
+
     // focus state
     &:focus {
       z-index: 1;
     }
-    + .form-control {
+
+    +.form-control {
       margin-top: -1px;
     }
 
@@ -52,6 +135,7 @@ label {
     &:first-child {
       border-radius: @border-radius-base @border-radius-base 0 0;
     }
+
     &:last-child {
       border-radius: 0 0 @border-radius-base @border-radius-base;
     }
@@ -61,6 +145,7 @@ label {
       &:first-child {
         border-radius: @border-radius-large @border-radius-large 0 0;
       }
+
       &:last-child {
         border-radius: 0 0 @border-radius-large @border-radius-large;
       }
@@ -71,39 +156,47 @@ label {
       &:first-child {
         border-radius: @border-radius-small @border-radius-small 0 0;
       }
+
       &:last-child {
         border-radius: 0 0 @border-radius-small @border-radius-small;
       }
     }
   }
+
   .form-control-icon {
     &:first-child {
-      > .form-control {
+      >.form-control {
         border-radius: @border-radius-base @border-radius-base 0 0;
+
         // input-lg reset radius
         &.input-lg {
           border-radius: @border-radius-large @border-radius-large 0 0;
         }
+
         // input-sm reset radius
         &.input-sm {
           border-radius: @border-radius-small @border-radius-small 0 0;
         }
       }
     }
+
     &:last-child {
-      > .form-control {
+      >.form-control {
         border-radius: 0 0 @border-radius-base @border-radius-base;
+
         // input-lg reset radius
         &.input-lg {
           border-radius: 0 0 @border-radius-large @border-radius-large;
         }
+
         // input-lg reset radius
         &.input-sm {
           border-radius: 0 0 @border-radius-small @border-radius-small;
         }
       }
     }
-    + .form-control-icon {
+
+    +.form-control-icon {
       margin-top: -1px;
     }
   }
@@ -113,46 +206,57 @@ label {
 // -------------------------
 .form-control-icon {
   position: relative;
+
   .form-control {
     padding-left: @input-height-base;
+
     &.input-lg {
       padding-left: @input-height-large;
-      + .the-icon {
+
+      +.the-icon {
         font-size: @font-size-large;
         line-height: @input-height-large;
         width: @input-height-large;
       }
     }
+
     &.input-sm {
       padding-left: @input-height-small;
-      + .the-icon {
+
+      +.the-icon {
         font-size: @font-size-small;
         line-height: @input-height-small;
         width: @input-height-small;
       }
     }
   }
+
   .the-icon {
     position: absolute;
     z-index: 2;
-    top: 0;
-    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: @input-height-base;
     line-height: @input-height-base - 1;
     width: @input-height-base;
     text-align: center;
   }
+
   &.form-control-icon-right {
     .the-icon {
       right: 0;
       left: auto;
     }
+
     .form-control {
       padding-left: @padding-base-horizontal;
       padding-right: @input-height-base;
+
       &.input-lg {
         padding-left: @padding-large-horizontal;
         padding-right: @input-height-large;
       }
+
       &.input-sm {
         padding-left: @padding-small-horizontal;
         padding-right: @input-height-small;
@@ -161,12 +265,17 @@ label {
   }
 }
 
+input[type=file].form-control {
+  padding: 6px;
+}
+
 // Custom file input
 // -------------------------
 .btn-file {
   position: relative;
   overflow: hidden;
 }
+
 .btn-file input[type=file] {
   position: absolute;
   top: 0px;
@@ -194,12 +303,15 @@ label {
   &[class*=" custom"],
   &[class^="custom"] {
     position: relative;
+
     label {
       padding-left: 24px;
+
       input {
         position: absolute;
         opacity: 0;
-        + span {
+
+        +span {
           display: inline-block;
           vertical-align: top;
           position: relative;
@@ -210,7 +322,7 @@ label {
           margin-top: 1px;
           background-color: transparent;
           border-radius: @border-radius-base;
-          border: 1px solid rgba(0,0,0,0.2);
+          border: 1px solid rgba(0, 0, 0, 0.2);
 
           &:after {
             content: "";
@@ -226,34 +338,40 @@ label {
             .transition(all .1s ease);
           }
         }
+
         // disabled state
         &:disabled {
-          + span {
+          +span {
             opacity: 0.4;
+
             &:hover {
               cursor: not-allowed;
             }
           }
         }
+
         // checked state
         &:checked {
-          + span {
+          +span {
             border: 1px solid @gray-dark;
-            &:after { 
+
+            &:after {
               .scale(1);
               .transition(all .1s ease);
             }
           }
         }
       }
+
       // hover state
       &:hover {
         input {
-          + span {
-            border: 1px solid rgba(0,0,0,0.3);
+          +span {
+            border: 1px solid rgba(0, 0, 0, 0.3);
           }
+
           &:checked {
-            + span {
+            +span {
               border: 1px solid @gray-dark;
             }
           }
@@ -266,29 +384,67 @@ label {
   &.custom-primary {
     .checkbox-radio-color(@brand-primary);
   }
+
   &.custom-info {
     .checkbox-radio-color(@brand-info);
   }
+
   &.custom-success {
     .checkbox-radio-color(@brand-success);
   }
+
   &.custom-warning {
     .checkbox-radio-color(@brand-warning);
   }
+
   &.custom-danger {
     .checkbox-radio-color(@brand-danger);
+  }
+}
+
+.radio-group {
+  .radio-option {
+    margin-bottom: var(--spacing-02);
+  }
+
+  input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    vertical-align: top;
+    margin-right: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    border: 4px solid white;
+    border-radius: 50%;
+    outline: 1px solid black;
+    transition: 0.2s all linear;
+    outline-offset: -1px;
+    margin-right: 4px;
+  }
+
+  input[type="radio"]:checked {
+    background-color: black;
+
+  }
+
+  input[type="radio"]:hover {
+    cursor: pointer;
+    opacity: 0.7;
   }
 }
 
 // radio radius reset
 .radio-inline,
 .radio {
+
   &[class*=" custom"],
   &[class^="custom"] {
     label {
       input {
-        + span,
-        + span:after {
+
+        +span,
+        +span:after {
           border-radius: 50%;
         }
       }
@@ -299,12 +455,20 @@ label {
 // label reset
 .checkbox-inline,
 .radio-inline {
+
   &[class*=" custom"],
   &[class^="custom"] {
     label {
       padding-left: 4px;
     }
   }
+}
+
+input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  vertical-align: -3px;
+  accent-color: var(--text-primary);
 }
 
 // time input (3 select boxes hh:mm:ss)

@@ -20,7 +20,7 @@ class UtmTag
     private $dateAdded;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     private $lead;
 
@@ -71,7 +71,7 @@ class UtmTag
      */
     private $utmTerm;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -90,12 +90,13 @@ class UtmTag
         $builder->addNullableField('utmMedium', Types::STRING, 'utm_medium');
         $builder->addNullableField('utmSource', Types::STRING, 'utm_source');
         $builder->addNullableField('utmTerm', Types::STRING, 'utm_term');
+        $builder->addIndex(['date_added'], 'utm_date_added');
     }
 
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('utmtags')
             ->addListProperties(
@@ -384,12 +385,15 @@ class UtmTag
         return $this;
     }
 
+    public function hasUtmTags(): bool
+    {
+        return !empty($this->utmCampaign) || !empty($this->utmSource) || !empty($this->utmMedium) || !empty($this->utmContent) || !empty($this->utmTerm);
+    }
+
     /**
      * Available fields and it's setters.
-     *
-     * @return array
      */
-    public function getFieldSetterList()
+    public function getFieldSetterList(): array
     {
         return [
             'utm_campaign' => 'setUtmCampaign',

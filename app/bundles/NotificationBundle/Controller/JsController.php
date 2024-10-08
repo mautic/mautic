@@ -10,10 +10,8 @@ class JsController extends CommonController
     /**
      * We can't user JsonResponse here, because
      * it improperly encodes the data array.
-     *
-     * @return Response
      */
-    public function manifestAction()
+    public function manifestAction(): Response
     {
         $gcmSenderId = $this->coreParametersHelper->get('gcm_sender_id', '446150739532');
         $data        = [
@@ -31,10 +29,7 @@ class JsController extends CommonController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function workerAction()
+    public function workerAction(): Response
     {
         return new Response(
             "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDK.js');",
@@ -46,10 +41,7 @@ class JsController extends CommonController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function updaterAction()
+    public function updaterAction(): Response
     {
         return new Response(
             "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDK.js');",

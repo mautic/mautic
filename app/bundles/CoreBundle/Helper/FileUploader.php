@@ -9,14 +9,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
-
-    public function __construct(FilePathResolver $filePathResolver)
-    {
-        $this->filePathResolver = $filePathResolver;
+    public function __construct(
+        private FilePathResolver $filePathResolver
+    ) {
     }
 
     /**
@@ -36,7 +31,7 @@ class FileUploader
                 $file->move($uploadDir, $fileName);
 
                 return $fileName;
-            } catch (FileException $e) {
+            } catch (FileException) {
                 throw new FileUploadException('Could not upload file');
             }
         } catch (FilePathException $e) {
@@ -47,7 +42,7 @@ class FileUploader
     /**
      * @param string $path
      */
-    public function delete($path)
+    public function delete($path): void
     {
         $this->filePathResolver->delete($path);
     }

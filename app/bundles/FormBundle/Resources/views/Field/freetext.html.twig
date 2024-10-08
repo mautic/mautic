@@ -46,7 +46,7 @@
 {% endif %}
 {% if inForm is defined and (true == inForm or inForm is not empty) %}
   {% if field.type in ['button', 'pagebreak'] %}
-    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' %}
   {% endif %}
 
   {% set labelAttributes = labelAttributes|merge({
@@ -91,7 +91,7 @@
   {% set required = true %}
   {% set validationMessage = field.validationMessage %}
   {% if validationMessage is empty %}
-        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) %}
   {% endif %}
   {% set containerAttributes = containerAttributes|merge({
           'class': containerAttributes.class|default([])|merge([
@@ -183,7 +183,7 @@
 {# end: field_helper #}
 
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  {% if field.showLabel %}<h3 {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</h3>{% endif %}
+  {% if field.showLabel %}<h3 {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</h3>{% endif %}
   <div {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
     {{ field.properties.text|raw }}
   </div>
