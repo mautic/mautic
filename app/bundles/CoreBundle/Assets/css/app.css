@@ -882,7 +882,7 @@ h6,
   white-space: nowrap;
 }
 ::selection {
-  background-color: rgb(from var(--background-brand-primary) r g b / 25%);
+  background-color: rgb(from var(--background-brand) r g b / 25%);
   color: var(--link-primary);
 }
 .fs-base {
@@ -2717,7 +2717,7 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current,
 .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {
-  background: var(--background-brand-primary);
+  background: var(--background-brand);
   color: var(--text-on-color);
   box-shadow: none;
 }
@@ -2809,7 +2809,7 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .xdsoft_datetimepicker .xdsoft_label > .xdsoft_select > div > .xdsoft_option.xdsoft_current {
   box-shadow: none;
   color: var(--text-on-color);
-  background: var(--background-brand-primary);
+  background: var(--background-brand);
 }
 .xdsoft_datetimepicker .xdsoft_label > .xdsoft_select {
   max-height: 180px;
@@ -4343,12 +4343,8 @@ a.label:focus,
   color: var(--label-color-green);
 }
 .label-primary {
-  background-color: var(--label-background-brand-primary);
-  color: var(--label-color-brand-primary);
-}
-.label-secondary {
-  background-color: var(--label-background-brand-secondary);
-  color: var(--label-color-brand-secondary);
+  background-color: var(--label-background-brand);
+  color: var(--label-color-brand);
 }
 .label-outline {
   background-color: transparent;
@@ -4458,21 +4454,12 @@ a.label:focus,
 }
 .label[href].label-primary,
 .label:has(> a).label-primary {
-  border: 1px solid var(--label-border-brand-primary);
-  color: var(--label-color-brand-primary);
+  border: 1px solid var(--label-border-brand);
+  color: var(--label-color-brand);
 }
 .label[href].label-primary:hover,
 .label:has(> a).label-primary:hover {
-  background-color: var(--label-background-hover-brand-primary);
-}
-.label[href].label-secondary,
-.label:has(> a).label-secondary {
-  border: 1px solid var(--label-border-brand-secondary);
-  color: var(--label-color-brand-secondary);
-}
-.label[href].label-secondary:hover,
-.label:has(> a).label-secondary:hover {
-  background-color: var(--label-background-hover-brand-secondary);
+  background-color: var(--label-background-hover-brand);
 }
 .label-default {
   background-color: #a0acb8;
@@ -7245,10 +7232,6 @@ lesshat-selector { -lh-property: 0 ;
 .background-brand a {
   color: var(--text-on-color);
 }
-.background-brand-alt {
-  background-color: var(--background-brand-alt);
-  color: var(--items-on-secondary);
-}
 .d-inline-flex {
   display: inline-flex;
 }
@@ -8581,8 +8564,7 @@ code:hover > .copy-icon {
   --background-selected-hover: #8d8d8d52;
   --background-inverse: #393939;
   --background-inverse-hover: #4c4c4c;
-  --background-brand-primary: var(--primary-60);
-  --background-brand-secondary: var(--secondary-60);
+  --background-brand: var(--primary-60);
   --layer: #f4f4f4;
   --layer-alternate: #ffffff;
   --layer-hover: #e8e8e8;
@@ -8712,14 +8694,10 @@ code:hover > .copy-icon {
   --label-color-green: #0e6027;
   --label-background-hover-green: #74e792;
   --label-border-green: #42be65;
-  --label-background-brand-primary: var(--primary-60);
-  --label-color-brand-primary: var(--text-on-color);
-  --label-background-hover-brand-primary: var(--primary-70);
-  --label-border-brand-primary: var(--primary-80);
-  --label-background-brand-secondary: var(--secondary-60);
-  --label-color-brand-secondary: #000000;
-  --label-background-hover-brand-secondary: var(--secondary-70);
-  --label-border-brand-secondary: var(--secondary-80);
+  --label-background-brand: var(--primary-60);
+  --label-color-brand: var(--text-on-color);
+  --label-background-hover-brand: var(--primary-70);
+  --label-border-brand: var(--primary-80);
 }
 :root[theme="solarized-light"] {
   --background: #fdf6e3;
@@ -8729,8 +8707,7 @@ code:hover > .copy-icon {
   --background-selected-hover: #eee8d599;
   --background-inverse: #002b36;
   --background-inverse-hover: #073642;
-  --background-brand-primary: #268bd2;
-  --background-brand-secondary: #2aa198;
+  --background-brand: #268bd2;
   --layer: #eee8d5;
   --layer-alternate: #fdf6e3;
   --layer-hover: #e4decd;
@@ -8856,14 +8833,10 @@ code:hover > .copy-icon {
   --label-color-green: #5a6800;
   --label-background-hover-green: #c6e787;
   --label-border-green: #859900;
-  --label-background-brand-primary: #268bd2;
-  --label-color-brand-primary: #fdf6e3;
-  --label-background-hover-brand-primary: #1e6ea7;
-  --label-border-brand-primary: #15516d;
-  --label-background-brand-secondary: #2aa198;
-  --label-color-brand-secondary: #fdf6e3;
-  --label-background-hover-brand-secondary: #1f7972;
-  --label-border-brand-secondary: #14514c;
+  --label-background-brand: #268bd2;
+  --label-color-brand: #fdf6e3;
+  --label-background-hover-brand: #1e6ea7;
+  --label-border-brand: #15516d;
 }
 :root[theme="dark"] {
   --background: #161616;
@@ -8874,7 +8847,6 @@ code:hover > .copy-icon {
   --background-inverse: #f4f4f4;
   --background-inverse-hover: #e5e5e5;
   --background-brand: var(--primary-80);
-  --background-brand-secondary: var(--secondary-80);
   --layer: #262626;
   --layer-alternate: #393939;
   --layer-hover: #333333;
@@ -9013,7 +8985,6 @@ code:hover > .copy-icon {
   --background-inverse: #fdf6e3;
   --background-inverse-hover: #eee8d5;
   --background-brand: #268bd2;
-  --background-brand-secondary: #2aa198;
   --layer: #073642;
   --layer-alternate: #094352;
   --layer-hover: #094352;
@@ -9151,8 +9122,7 @@ code:hover > .copy-icon {
   --background-selected-hover: #323248;
   --background-inverse: #F7B84B;
   --background-inverse-hover: #F9C46A;
-  --background-brand-primary: #F7B84B;
-  --background-brand-secondary: #8E8EFF;
+  --background-brand: #F7B84B;
   --layer: #232336;
   --layer-alternate: #1C1C2E;
   --layer-hover: #2A2A40;
@@ -9282,14 +9252,10 @@ code:hover > .copy-icon {
   --label-color-green: #1C1C2E;
   --label-background-hover-green: #66BB6A;
   --label-border-green: #80C783;
-  --label-background-brand-primary: #F7B84B;
-  --label-color-brand-primary: #1C1C2E;
-  --label-background-hover-brand-primary: #F9C46A;
-  --label-border-brand-primary: #FBCF89;
-  --label-background-brand-secondary: #8E8EFF;
-  --label-color-brand-secondary: #1C1C2E;
-  --label-background-hover-brand-secondary: #A5A5FF;
-  --label-border-brand-secondary: #BCBCFF;
+  --label-background-brand: #F7B84B;
+  --label-color-brand: #1C1C2E;
+  --label-background-hover-brand: #F9C46A;
+  --label-border-brand: #FBCF89;
 }
 :root,
 :root[theme] {
@@ -9371,15 +9337,6 @@ code:hover > .copy-icon {
   --primary-80: #2c355a;
   --primary-90: #1b2138;
   --primary-100: #0b0d15;
-  --secondary-20: #fffefd;
-  --secondary-30: #feedcb;
-  --secondary-40: #fedc98;
-  --secondary-50: #fdca66;
-  --secondary-60: #fdb933;
-  --secondary-70: #fba702;
-  --secondary-80: #c88502;
-  --secondary-90: #966401;
-  --secondary-100: #634201;
 }
 :root[accent="02"] {
   --primary-20: #ffeacc;
