@@ -342,6 +342,7 @@ class ContactManagementCest
 
         // Search for contacts in the "Segment Test 3" segment
         $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
+        $I->wait(1);
         $I->pressKey(ContactPage::$searchBar, WebDriverKeys::ENTER);
         $I->wait(5); // Wait for search results to load
 
@@ -370,6 +371,7 @@ class ContactManagementCest
 
         // Search again for contacts in the "Segment Test 3" segment
         $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
+        $I->wait(1);
         $I->pressKey(ContactPage::$searchBar, WebDriverKeys::ENTER);
         $I->wait(5);
 
@@ -402,6 +404,7 @@ class ContactManagementCest
 
         // Search for contacts in the "Segment Test 3" segment
         $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
+        $I->wait(1);
         $I->pressKey(ContactPage::$searchBar, WebDriverKeys::ENTER);
         $I->wait(5); // Wait for search results to load
         // Verify that the first and second contacts are not in the segment

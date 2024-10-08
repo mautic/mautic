@@ -175,7 +175,7 @@ class TrackableRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_hit', 'ph');
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return array of results

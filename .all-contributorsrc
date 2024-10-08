@@ -1385,6 +1385,25 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "tomfriedhof",
+      "name": "Tom Friedhof",
+      "avatar_url": "https://avatars.githubusercontent.com/u/810903?v=4",
+      "profile": "http://activelamp.com",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "MojisolaaaO",
+      "name": "Mojisola Otusheso",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173389301?v=4",
+      "profile": "https://github.com/MojisolaaaO",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
