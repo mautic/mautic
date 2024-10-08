@@ -34,6 +34,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($initialAssetCount + self::IMAGE_COUNT, $newAssetCount);
 
         $this->testPagination($newAssetCount);
+        $this->testRecentlyAddedFilesAppearFirst($uploadedFiles);
 
         $this->deleteUploadedFiles($uploadedFiles);
 
@@ -87,6 +88,29 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->makeRequest('GET', self::ASSETS_ENDPOINT."?limit={$limit}&page=".($totalPages + 1));
         $content  = $this->getJsonResponse($response);
         $this->assertEmpty($content['data']);
+    }
+
+    /**
+     * @param array<string> $uploadedFiles
+     */
+    private function testRecentlyAddedFilesAppearFirst(array $uploadedFiles): void
+    {
+        $response = $this->makeRequest('GET', self::ASSETS_ENDPOINT);
+        $content  = $this->getJsonResponse($response);
+
+        $this->assertArrayHasKey('data', $content);
+        $this->assertNotEmpty($content['data']);
+
+        $assetList         = $content['data'];
+        $uploadedFileNames = array_map([$this, 'getFileNameFromUrl'], $uploadedFiles);
+
+        // Check if the first 'IMAGE_COUNT' assets in the list are the recently uploaded files
+        for ($i = 0; $i < self::IMAGE_COUNT; ++$i) {
+            $this->assertArrayHasKey($i, $assetList);
+            $this->assertArrayHasKey('src', $assetList[$i]);
+            $assetFileName = $this->getFileNameFromUrl($assetList[$i]['src']);
+            $this->assertContains($assetFileName, $uploadedFileNames, 'Recently uploaded file not found in the first {self::IMAGE_COUNT} assets');
+        }
     }
 
     /**

@@ -141,19 +141,23 @@ class FileManager
             try {
                 $fileSystem->mkdir($uploadDir);
             } catch (IOException) {
-                return ['files' => [], 'total' => 0];
+                return ['data' => [], 'total' => 0, 'page' => $page, 'limit' => $limit];
             }
         }
 
         $finder = new Finder();
-        $finder->files()->in($uploadDir);
+        $finder->files()->in($uploadDir)->sortByModifiedTime()->reverseSorting();
 
-        if (!empty($search)) {
-            $finder->name("*$search*");
+        $totalFiles = iterator_count($finder);
+        $totalPages = (int) ceil($totalFiles / $limit);
+
+        // Check if the requested page is out of range
+        if ($page < 1 || $page > $totalPages) {
+            return ['data' => [], 'total' => $totalFiles, 'page' => $page, 'limit' => $limit];
         }
 
-        $totalFiles    = iterator_count($finder);
-        $offset        = ($page - 1) * $limit;
+        $offset = ($page - 1) * $limit;
+
         $filesIterator = new \LimitIterator($finder->getIterator(), $offset, $limit);
 
         foreach ($filesIterator as $file) {
