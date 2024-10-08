@@ -477,7 +477,6 @@ class TriggerController extends FormController
             foreach ($existingActions as $key => $action) {
                 $action      = clone $action;
                 $action->setTrigger($entity);
-                $action->isNew = true;
                 $entity->addTriggerEvent($key, $action);
                 $actionArray = $action->convertToArray();
                 unset($actionArray['form']);
