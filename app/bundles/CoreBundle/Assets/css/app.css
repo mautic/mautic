@@ -1241,7 +1241,6 @@ kbd {
   align-items: center;
   height: var(--spacing-08);
   line-height: var(--spacing-08);
-  font-weight: normal;
   font-size: 14px;
   padding: 0 var(--spacing-05);
   gap: var(--spacing-03);
@@ -1686,7 +1685,7 @@ fieldset[disabled] .btn-secondary.focus {
 .btn-primary + .btn-primary + .btn-primary:hover,
 .btn-primary + .btn-primary + .btn-secondary:hover,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary:hover {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-hover);
   border: 1px solid var(--button-tertiary-hover);
 }
@@ -1696,7 +1695,7 @@ fieldset[disabled] .btn-secondary.focus {
 .btn-primary + .btn-primary + .btn-primary:hover i,
 .btn-primary + .btn-primary + .btn-secondary:hover i,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary:hover i {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
 }
 .btn-tertiary:active,
 .btn-tertiary + .dropdown-toggle:active,
@@ -1716,7 +1715,7 @@ fieldset[disabled] .btn-secondary.focus {
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-primary,
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-secondary,
 .open > .dropdown-toggle.open > .btn-tertiary + .dropdown-toggle.btn-primary {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-active);
   border: 1px solid var(--button-tertiary-active);
 }
@@ -1738,7 +1737,7 @@ fieldset[disabled] .btn-secondary.focus {
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-primary i,
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-secondary i,
 .open > .dropdown-toggle.open > .btn-tertiary + .dropdown-toggle.btn-primary i {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
 }
 .btn-tertiary:active:hover,
 .btn-tertiary + .dropdown-toggle:active:hover,
@@ -1794,7 +1793,7 @@ fieldset[disabled] .btn-secondary.focus {
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-primary.focus,
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-secondary.focus,
 .open > .dropdown-toggle.open > .btn-tertiary + .dropdown-toggle.btn-primary.focus {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-active);
   border-color: var(--button-tertiary-active);
 }
@@ -1810,7 +1809,7 @@ fieldset[disabled] .btn-secondary.focus {
 .btn-primary + .btn-primary + .btn-primary.focus,
 .btn-primary + .btn-primary + .btn-secondary.focus,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary.focus {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-active);
   border: 1px solid var(--button-tertiary-active);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
@@ -2505,7 +2504,7 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
   outline: 2px var(--outline-style) var(--focus);
 }
 .btn-link {
-  font-weight: 600;
+  font-weight: normal;
 }
 .btn-link:hover,
 .btn-link:focus {
@@ -8556,7 +8555,8 @@ code:hover > .copy-icon {
   opacity: 1;
   transform: none;
 }
-:root {
+:root,
+:root[theme="light"] {
   --background: #ffffff;
   --background-hover: #8d8d8d1f;
   --background-active: #8d8d8d80;
@@ -9306,7 +9306,7 @@ code:hover > .copy-icon {
   --accent04: #FFCC00;
   --accent05: #b51963;
   --accent06: #0f62fe;
-  --accent07: #5FD64C;
+  --accent07: #32642B;
   --accent08: #5928ed;
   --accent09: #00FFFF;
   --accent10: #00b4c5;
@@ -9325,6 +9325,26 @@ code:hover > .copy-icon {
   --accent23: #ffae02;
   --accent24: #f14231;
   --accent25: #5c1c51;
+}
+:root[accent="03"][theme="light"],
+:root[accent="04"][theme="light"],
+:root[accent="07"][theme="light"],
+:root[accent="09"][theme="light"],
+:root[accent="10"][theme="light"],
+:root[accent="13"][theme="light"],
+:root[accent="15"][theme="light"],
+:root[accent="17"][theme="light"],
+:root[accent="19"][theme="light"],
+:root[accent="21"][theme="light"],
+:root[accent="23"][theme="light"],
+:root[accent="24"][theme="light"] {
+  --link-primary: var(--primary-80);
+  --link-primary-hover: var(--primary-90);
+  --link-secondary: var(--primary-90);
+  --link-inverse: var(--primary-40);
+  --icon-interactive: var(--primary-70);
+  --button-tertiary: var(--primary-80);
+  --interactive: var(--primary-70);
 }
 :root,
 :root[accent="01"] {
@@ -9414,19 +9434,19 @@ code:hover > .copy-icon {
   --icon-on-color-disabled: #8d8d8d;
 }
 :root[accent="07"] {
-  --primary-20: #f3fcf2;
-  --primary-30: #cef3c8;
-  --primary-40: #a9e99f;
-  --primary-50: #84e075;
-  --primary-60: #5FD64C;
-  --primary-70: #41c22d;
-  --primary-80: #339923;
-  --primary-90: #256f1a;
-  --primary-100: #174610;
+  --primary-20: #95ce8d;
+  --primary-30: #74bf69;
+  --primary-40: #56ab4a;
+  --primary-50: #44883a;
+  --primary-60: #32642B;
+  --primary-70: #20401c;
+  --primary-80: #0e1d0c;
+  --primary-90: #000000;
+  --primary-100: #000000;
   --text-on-color: #000;
-  --text-on-color-disabled: #16161640;
+  --text-on-color-disabled: #8d8d8d;
   --icon-on-color: #000;
-  --icon-on-color-disabled: #16161640;
+  --icon-on-color-disabled: #8d8d8d;
 }
 :root[accent="08"] {
   --primary-20: #eae4fd;

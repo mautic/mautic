@@ -8,7 +8,8 @@
 
 // Themes
 /// Light theme
-:root {
+:root,
+:root[theme="light"] {
     /// Background
     --background: #ffffff;
     --background-hover: #8d8d8d1f;
@@ -916,7 +917,7 @@
 @accent04: #FFCC00;
 @accent05: #b51963;
 @accent06: #0f62fe;
-@accent07: #5FD64C;
+@accent07: #32642B;
 @accent08: #5928ed;
 @accent09: #00FFFF;
 @accent10: #00b4c5;
@@ -963,6 +964,30 @@
     --accent23: @accent23;
     --accent24: @accent24;
     --accent25: @accent25;
+}
+
+// Workaround for all colors that look bad on top of white bg
+:root[accent="03"],
+:root[accent="04"],
+:root[accent="07"],
+:root[accent="09"],
+:root[accent="10"],
+:root[accent="13"],
+:root[accent="15"],
+:root[accent="17"],
+:root[accent="19"],
+:root[accent="21"],
+:root[accent="23"],
+:root[accent="24"] {
+    &[theme="light"] {
+        --link-primary: var(--primary-80);
+        --link-primary-hover: var(--primary-90);
+        --link-secondary: var(--primary-90);
+        --link-inverse: var(--primary-40);
+        --icon-interactive: var(--primary-70);
+        --button-tertiary: var(--primary-80);
+        --interactive: var(--primary-70);
+    }
 }
 
 :root,
@@ -1025,6 +1050,7 @@
     --icon-on-color: #000;
     --icon-on-color-disabled: contrast(@accent04, #16161640, #8d8d8d);
 }
+
 
 :root[accent="05"] {
     --primary-20: lighten(@accent05, 40%);
