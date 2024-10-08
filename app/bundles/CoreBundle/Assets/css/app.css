@@ -8567,7 +8567,7 @@ code:hover > .copy-icon {
 :root,
 :root[theme="light"] {
   --background: #ffffff;
-  --background-hover: #8d8d8d1f;
+  --background-hover: #f1f1f1;
   --background-active: #8d8d8d80;
   --background-selected: #8d8d8d33;
   --background-selected-hover: #8d8d8d52;
@@ -8849,7 +8849,7 @@ code:hover > .copy-icon {
 }
 :root[theme="dark"] {
   --background: #161616;
-  --background-hover: #8d8d8d29;
+  --background-hover: #292929;
   --background-active: #8d8d8d66;
   --background-selected: #8d8d8d3d;
   --background-selected-hover: #8d8d8d52;
