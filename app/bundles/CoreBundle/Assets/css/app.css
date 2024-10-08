@@ -9301,30 +9301,30 @@ code:hover > .copy-icon {
 }
 :root {
   --accent01: #4e5e9e;
-  --accent02: #FF9500;
-  --accent03: #FFCC00;
-  --accent04: #FF6B6B;
-  --accent05: #FF2D55;
-  --accent06: #007AFF;
-  --accent07: #5AC8FA;
-  --accent08: #4CD964;
-  --accent09: #00CEC9;
-  --accent10: #5856D6;
-  --accent11: #8B4513;
-  --accent12: #808000;
-  --accent13: #E2725B;
-  --accent14: #F5DEB3;
-  --accent15: #FFD700;
-  --accent16: #4A4A4A;
-  --accent17: #FF3B30;
-  --accent18: #0C0C0C;
-  --accent19: #E6E6FA;
-  --accent20: #98FF98;
-  --accent21: #FFDAB9;
-  --accent22: #FF00FF;
-  --accent23: #00FFFF;
-  --accent24: #CCFF00;
-  --accent25: #9400D3;
+  --accent02: #CE2F27;
+  --accent03: #FF9500;
+  --accent04: #FFCC00;
+  --accent05: #b51963;
+  --accent06: #0f62fe;
+  --accent07: #5FD64C;
+  --accent08: #5928ed;
+  --accent09: #00FFFF;
+  --accent10: #00b4c5;
+  --accent11: #0f5664;
+  --accent12: #123f20;
+  --accent13: #00bf7d;
+  --accent14: #26643b;
+  --accent15: #CCFF00;
+  --accent16: #c44601;
+  --accent17: #FF2E54;
+  --accent18: #ca3b88;
+  --accent19: #FF00FF;
+  --accent20: #9400D3;
+  --accent21: #26A2DD;
+  --accent22: #1c0d82;
+  --accent23: #ffae02;
+  --accent24: #f14231;
+  --accent25: #5c1c51;
 }
 :root,
 :root[accent="01"] {
@@ -9339,6 +9339,21 @@ code:hover > .copy-icon {
   --primary-100: #0b0d15;
 }
 :root[accent="02"] {
+  --primary-20: #f5cecc;
+  --primary-30: #eda4a1;
+  --primary-40: #e57b76;
+  --primary-50: #dd524b;
+  --primary-60: #CE2F27;
+  --primary-70: #a3251f;
+  --primary-80: #781b17;
+  --primary-90: #4d120f;
+  --primary-100: #220807;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="03"] {
   --primary-20: #ffeacc;
   --primary-30: #ffd599;
   --primary-40: #ffbf66;
@@ -9348,12 +9363,12 @@ code:hover > .copy-icon {
   --primary-80: #995900;
   --primary-90: #663c00;
   --primary-100: #331e00;
-  --text-on-color: #ffffff;
+  --text-on-color: #000;
   --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
+  --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="03"] {
+:root[accent="04"] {
   --primary-20: #fff5cc;
   --primary-30: #ffeb99;
   --primary-40: #ffe066;
@@ -9363,297 +9378,72 @@ code:hover > .copy-icon {
   --primary-80: #997a00;
   --primary-90: #665200;
   --primary-100: #332900;
-  --text-on-color: #000000;
+  --text-on-color: #000;
   --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
+  --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
-:root[accent="04"] {
-  --primary-20: #ffffff;
-  --primary-30: #ffffff;
-  --primary-40: #ffd1d1;
-  --primary-50: #ff9e9e;
-  --primary-60: #FF6B6B;
-  --primary-70: #ff3838;
-  --primary-80: #ff0505;
-  --primary-90: #d10000;
-  --primary-100: #9e0000;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
 :root[accent="05"] {
-  --primary-20: #fff9fa;
-  --primary-30: #ffc6d1;
-  --primary-40: #ff93a8;
-  --primary-50: #ff607e;
-  --primary-60: #FF2D55;
-  --primary-70: #f9002f;
-  --primary-80: #c60026;
-  --primary-90: #93001c;
-  --primary-100: #600012;
-  --text-on-color: #ffffff;
+  --primary-20: #f3a7cb;
+  --primary-30: #ed7ab1;
+  --primary-40: #e64e96;
+  --primary-50: #e0217c;
+  --primary-60: #b51963;
+  --primary-70: #88134a;
+  --primary-80: #5b0d32;
+  --primary-90: #2f0619;
+  --primary-100: #020001;
+  --text-on-color: #fff;
   --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
+  --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
 :root[accent="06"] {
-  --primary-20: #cce4ff;
-  --primary-30: #99caff;
-  --primary-40: #66afff;
-  --primary-50: #3395ff;
-  --primary-60: #007AFF;
-  --primary-70: #0062cc;
-  --primary-80: #004999;
-  --primary-90: #003166;
-  --primary-100: #001833;
-  --text-on-color: #ffffff;
+  --primary-20: #dae7ff;
+  --primary-30: #a7c6ff;
+  --primary-40: #75a4fe;
+  --primary-50: #4283fe;
+  --primary-60: #0f62fe;
+  --primary-70: #014cd9;
+  --primary-80: #013aa6;
+  --primary-90: #002874;
+  --primary-100: #001741;
+  --text-on-color: #fff;
   --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
+  --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
 :root[accent="07"] {
-  --primary-20: #ffffff;
-  --primary-30: #eef9ff;
-  --primary-40: #bde9fd;
-  --primary-50: #8bd8fc;
-  --primary-60: #5AC8FA;
-  --primary-70: #28b7f9;
-  --primary-80: #07a1e7;
-  --primary-90: #057eb6;
-  --primary-100: #045c84;
-  --text-on-color: #000000;
+  --primary-20: #f3fcf2;
+  --primary-30: #cef3c8;
+  --primary-40: #a9e99f;
+  --primary-50: #84e075;
+  --primary-60: #5FD64C;
+  --primary-70: #41c22d;
+  --primary-80: #339923;
+  --primary-90: #256f1a;
+  --primary-100: #174610;
+  --text-on-color: #000;
   --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
+  --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
 :root[accent="08"] {
-  --primary-20: #f4fdf6;
-  --primary-30: #caf4d1;
-  --primary-40: #a0ebad;
-  --primary-50: #76e288;
-  --primary-60: #4CD964;
-  --primary-70: #2ac845;
-  --primary-80: #219e37;
-  --primary-90: #197328;
-  --primary-100: #104919;
-  --text-on-color: #000000;
-  --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
-  --icon-on-color-disabled: #16161640;
+  --primary-20: #eae4fd;
+  --primary-30: #c6b5f9;
+  --primary-40: #a286f5;
+  --primary-50: #7d57f1;
+  --primary-60: #5928ed;
+  --primary-70: #4111d1;
+  --primary-80: #320ea1;
+  --primary-90: #240a72;
+  --primary-100: #150643;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
 }
 :root[accent="09"] {
-  --primary-20: #9bfffd;
-  --primary-30: #68fffb;
-  --primary-40: #35fffa;
-  --primary-50: #02fff9;
-  --primary-60: #00CEC9;
-  --primary-70: #009b97;
-  --primary-80: #006865;
-  --primary-90: #003534;
-  --primary-100: #000202;
-  --text-on-color: #000000;
-  --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
-  --icon-on-color-disabled: #16161640;
-}
-:root[accent="10"] {
-  --primary-20: #fafafe;
-  --primary-30: #d2d1f4;
-  --primary-40: #a9a8ea;
-  --primary-50: #817fe0;
-  --primary-60: #5856D6;
-  --primary-70: #3331c8;
-  --primary-80: #29279f;
-  --primary-90: #1e1d76;
-  --primary-100: #14134d;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="11"] {
-  --primary-20: #edac7d;
-  --primary-30: #e78f50;
-  --primary-40: #e17223;
-  --primary-50: #b85b19;
-  --primary-60: #8B4513;
-  --primary-70: #5e2f0d;
-  --primary-80: #311807;
-  --primary-90: #040201;
-  --primary-100: #000000;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="12"] {
-  --primary-20: #ffff4d;
-  --primary-30: #ffff1a;
-  --primary-40: #e6e600;
-  --primary-50: #b3b300;
-  --primary-60: #808000;
-  --primary-70: #4d4d00;
-  --primary-80: #1a1a00;
-  --primary-90: #000000;
-  --primary-100: #000000;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="13"] {
-  --primary-20: #ffffff;
-  --primary-30: #f9e2dd;
-  --primary-40: #f1bdb2;
-  --primary-50: #ea9786;
-  --primary-60: #E2725B;
-  --primary-70: #da4d30;
-  --primary-80: #b73a20;
-  --primary-90: #8b2c19;
-  --primary-100: #601e11;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="14"] {
-  --primary-20: #ffffff;
-  --primary-30: #ffffff;
-  --primary-40: #ffffff;
-  --primary-50: #fbf2e0;
-  --primary-60: #F5DEB3;
-  --primary-70: #efca86;
-  --primary-80: #e9b759;
-  --primary-90: #e3a32c;
-  --primary-100: #c2881a;
-  --text-on-color: #000000;
-  --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
-  --icon-on-color-disabled: #16161640;
-}
-:root[accent="15"] {
-  --primary-20: #fff7cc;
-  --primary-30: #ffef99;
-  --primary-40: #ffe766;
-  --primary-50: #ffdf33;
-  --primary-60: #FFD700;
-  --primary-70: #ccac00;
-  --primary-80: #998100;
-  --primary-90: #665600;
-  --primary-100: #332b00;
-  --text-on-color: #000000;
-  --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
-  --icon-on-color-disabled: #16161640;
-}
-:root[accent="16"] {
-  --primary-20: #b0b0b0;
-  --primary-30: #979797;
-  --primary-40: #7d7d7d;
-  --primary-50: #646464;
-  --primary-60: #4A4A4A;
-  --primary-70: #313131;
-  --primary-80: #171717;
-  --primary-90: #000000;
-  --primary-100: #000000;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="17"] {
-  --primary-20: #fffcfc;
-  --primary-30: #ffccc9;
-  --primary-40: #ff9c96;
-  --primary-50: #ff6b63;
-  --primary-60: #FF3B30;
-  --primary-70: #fc0d00;
-  --primary-80: #c90b00;
-  --primary-90: #960800;
-  --primary-100: #630500;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="18"] {
-  --primary-20: #727272;
-  --primary-30: #595959;
-  --primary-40: #3f3f3f;
-  --primary-50: #262626;
-  --primary-60: #0C0C0C;
-  --primary-70: #000000;
-  --primary-80: #000000;
-  --primary-90: #000000;
-  --primary-100: #000000;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="19"] {
-  --primary-20: #ffffff;
-  --primary-30: #ffffff;
-  --primary-40: #ffffff;
-  --primary-50: #ffffff;
-  --primary-60: #E6E6FA;
-  --primary-70: #bcbcf2;
-  --primary-80: #9191e9;
-  --primary-90: #6767e0;
-  --primary-100: #3c3cd8;
-  --text-on-color: #000000;
-  --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
-  --icon-on-color-disabled: #16161640;
-}
-:root[accent="20"] {
-  --primary-20: #ffffff;
-  --primary-30: #ffffff;
-  --primary-40: #fefffe;
-  --primary-50: #cbffcb;
-  --primary-60: #98FF98;
-  --primary-70: #65ff65;
-  --primary-80: #32ff32;
-  --primary-90: #00fe00;
-  --primary-100: #00cb00;
-  --text-on-color: #000000;
-  --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
-  --icon-on-color-disabled: #16161640;
-}
-:root[accent="21"] {
-  --primary-20: #ffffff;
-  --primary-30: #ffffff;
-  --primary-40: #ffffff;
-  --primary-50: #fff5ec;
-  --primary-60: #FFDAB9;
-  --primary-70: #ffbf86;
-  --primary-80: #ffa453;
-  --primary-90: #ff8920;
-  --primary-100: #ec6f00;
-  --text-on-color: #000000;
-  --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
-  --icon-on-color-disabled: #16161640;
-}
-:root[accent="22"] {
-  --primary-20: #ffccff;
-  --primary-30: #ff99ff;
-  --primary-40: #ff66ff;
-  --primary-50: #ff33ff;
-  --primary-60: #FF00FF;
-  --primary-70: #cc00cc;
-  --primary-80: #990099;
-  --primary-90: #660066;
-  --primary-100: #330033;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
-}
-:root[accent="23"] {
   --primary-20: #ccffff;
   --primary-30: #99ffff;
   --primary-40: #66ffff;
@@ -9663,12 +9453,87 @@ code:hover > .copy-icon {
   --primary-80: #009999;
   --primary-90: #006666;
   --primary-100: #003333;
-  --text-on-color: #000000;
+  --text-on-color: #000;
   --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
+  --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
-:root[accent="24"] {
+:root[accent="10"] {
+  --primary-20: #92f6ff;
+  --primary-30: #5ff1ff;
+  --primary-40: #2cedff;
+  --primary-50: #00e3f8;
+  --primary-60: #00b4c5;
+  --primary-70: #008592;
+  --primary-80: #00575f;
+  --primary-90: #00282c;
+  --primary-100: #000000;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="11"] {
+  --primary-20: #59cfe6;
+  --primary-30: #2dc2df;
+  --primary-40: #1ca2bd;
+  --primary-50: #167c90;
+  --primary-60: #0f5664;
+  --primary-70: #083038;
+  --primary-80: #020a0b;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="12"] {
+  --primary-20: #50cd77;
+  --primary-30: #34b65c;
+  --primary-40: #298e48;
+  --primary-50: #1d6734;
+  --primary-60: #123f20;
+  --primary-70: #07170c;
+  --primary-80: #000000;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="13"] {
+  --primary-20: #8cffd7;
+  --primary-30: #59ffc6;
+  --primary-40: #26ffb4;
+  --primary-50: #00f29e;
+  --primary-60: #00bf7d;
+  --primary-70: #008c5c;
+  --primary-80: #00593a;
+  --primary-90: #002619;
+  --primary-100: #000000;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="14"] {
+  --primary-20: #85d19f;
+  --primary-30: #60c382;
+  --primary-40: #42ae67;
+  --primary-50: #348951;
+  --primary-60: #26643b;
+  --primary-70: #183f25;
+  --primary-80: #0a1a0f;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="15"] {
   --primary-20: #f5ffcc;
   --primary-30: #ebff99;
   --primary-40: #e0ff66;
@@ -9678,12 +9543,72 @@ code:hover > .copy-icon {
   --primary-80: #7a9900;
   --primary-90: #526600;
   --primary-100: #293300;
-  --text-on-color: #000000;
+  --text-on-color: #000;
   --text-on-color-disabled: #16161640;
-  --icon-on-color: #000000;
+  --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
-:root[accent="25"] {
+:root[accent="16"] {
+  --primary-20: #feb993;
+  --primary-30: #fe9860;
+  --primary-40: #fe772d;
+  --primary-50: #f75801;
+  --primary-60: #c44601;
+  --primary-70: #913401;
+  --primary-80: #5f2200;
+  --primary-90: #2c1000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="17"] {
+  --primary-20: #fffafb;
+  --primary-30: #ffc7d1;
+  --primary-40: #ff94a7;
+  --primary-50: #ff617e;
+  --primary-60: #FF2E54;
+  --primary-70: #fa002d;
+  --primary-80: #c70024;
+  --primary-90: #94001b;
+  --primary-100: #610012;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="18"] {
+  --primary-20: #f5dce9;
+  --primary-30: #ebb3d1;
+  --primary-40: #e08bb9;
+  --primary-50: #d563a0;
+  --primary-60: #ca3b88;
+  --primary-70: #a52d6e;
+  --primary-80: #7d2253;
+  --primary-90: #551738;
+  --primary-100: #2d0c1e;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="19"] {
+  --primary-20: #ffccff;
+  --primary-30: #ff99ff;
+  --primary-40: #ff66ff;
+  --primary-50: #ff33ff;
+  --primary-60: #FF00FF;
+  --primary-70: #cc00cc;
+  --primary-80: #990099;
+  --primary-90: #660066;
+  --primary-100: #330033;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="20"] {
   --primary-20: #e3a0ff;
   --primary-30: #d36dff;
   --primary-40: #c43aff;
@@ -9693,9 +9618,84 @@ code:hover > .copy-icon {
   --primary-80: #4c006d;
   --primary-90: #29003a;
   --primary-100: #050007;
-  --text-on-color: #ffffff;
+  --text-on-color: #fff;
   --text-on-color-disabled: #8d8d8d;
-  --icon-on-color: #ffffff;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="21"] {
+  --primary-20: #d6eef9;
+  --primary-30: #aadbf2;
+  --primary-40: #7ec8eb;
+  --primary-50: #52b5e4;
+  --primary-60: #26A2DD;
+  --primary-70: #1c83b4;
+  --primary-80: #156388;
+  --primary-90: #0e435c;
+  --primary-100: #072330;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="22"] {
+  --primary-20: #7c6bf0;
+  --primary-30: #533cec;
+  --primary-40: #3016df;
+  --primary-50: #2612b0;
+  --primary-60: #1c0d82;
+  --primary-70: #120854;
+  --primary-80: #080425;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="23"] {
+  --primary-20: #ffefce;
+  --primary-30: #ffdf9b;
+  --primary-40: #ffcf68;
+  --primary-50: #ffbe35;
+  --primary-60: #ffae02;
+  --primary-70: #ce8c00;
+  --primary-80: #9b6900;
+  --primary-90: #684700;
+  --primary-100: #352400;
+  --text-on-color: #000;
+  --text-on-color-disabled: #16161640;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #16161640;
+}
+:root[accent="24"] {
+  --primary-20: #fef1f0;
+  --primary-30: #fbc5c0;
+  --primary-40: #f79a91;
+  --primary-50: #f46e61;
+  --primary-60: #f14231;
+  --primary-70: #e0220f;
+  --primary-80: #b01a0c;
+  --primary-90: #801309;
+  --primary-100: #510c05;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="25"] {
+  --primary-20: #d470c3;
+  --primary-30: #c849b2;
+  --primary-40: #aa3496;
+  --primary-50: #832873;
+  --primary-60: #5c1c51;
+  --primary-70: #35102f;
+  --primary-80: #0e040c;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
 :root[reduce-motion="true"] {
