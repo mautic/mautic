@@ -14,12 +14,12 @@
             {% if me.getId() %}
             <div class="media">
                 <div class="pull-left">
-                    <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}"
+                    <img class="img-circle mt-md mb-xs img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}"
                         alt="" width="65px">
                 </div>
                 <div class="media-body">
-                    <h4>{{ me.getName() }}</h4>
-                    <h5>{{ me.getPosition() }}</h5>
+                    <h3 class="fw-sb">{{ me.getName() }}</h3>
+                    <span class="text-muted">{{ me.getPosition() }}</span>
                 </div>
             </div>
             <hr />
@@ -105,8 +105,8 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-lg">
-                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
-                            <div class="help-block">{{ 'mautic.user.account.appearance.accent_help'|trans }}</div>
+                            <h3 class="pt-20">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
+                            <div class="help-block mb-lg">{{ 'mautic.user.account.appearance.accent_help'|trans }}</div>
                             <div class="d-flex fw-wrap gap-lg mb-lg">
                                 {{ include('@MauticUser/Helper/accent.html.twig', {
                                     accents: [
@@ -138,8 +138,8 @@
                                     ]
                                 }) }}
                             </div>
-                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.appearance.theme_preferences'|trans }}</h3>
-                            <div class="help-block">{{ 'mautic.user.account.appearance.theme_help'|trans }}</div>
+                            <h3 class="pt-20">{{ 'mautic.user.account.appearance.theme_preferences'|trans }}</h3>
+                            <div class="help-block mb-md">{{ 'mautic.user.account.appearance.theme_help'|trans }}</div>
                             <div class="radio-group radio-cards row">
                                 {{ include('@MauticUser/Helper/theme.html.twig', {
                                     themes: [
