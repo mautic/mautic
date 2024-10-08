@@ -1554,7 +1554,7 @@ fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
 }
 .btn-secondary {
   background-color: var(--button-secondary);
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   border: 1px solid var(--button-secondary);
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
@@ -1569,27 +1569,27 @@ fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
   outline: 2px var(--outline-style) var(--focus);
 }
 .btn-secondary i {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
 }
 .btn-secondary:hover {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-hover);
   border: 1px solid var(--button-secondary-hover);
 }
 .btn-secondary:hover i {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
 }
 .btn-secondary:active,
 .btn-secondary.active,
 .open > .dropdown-toggle.btn-secondary {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-active);
   border: 1px solid var(--button-secondary-active);
 }
 .btn-secondary:active i,
 .btn-secondary.active i,
 .open > .dropdown-toggle.btn-secondary i {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
 }
 .btn-secondary:active:hover,
 .btn-secondary.active:hover,
@@ -1600,13 +1600,13 @@ fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
 .btn-secondary:active.focus,
 .btn-secondary.active.focus,
 .open > .dropdown-toggle.btn-secondary.focus {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-active);
   border-color: var(--button-secondary-active);
 }
 .btn-secondary:focus,
 .btn-secondary.focus {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-active);
   border: 1px solid var(--button-secondary-active);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
@@ -8637,6 +8637,7 @@ code:hover > .copy-icon {
   --button-secondary: #393939;
   --button-secondary-hover: #4c4c4c;
   --button-secondary-active: #6f6f6f;
+  --button-secondary-text: #ffffff;
   --button-tertiary: var(--primary-60);
   --button-tertiary-hover: var(--primary-70);
   --button-tertiary-active: var(--primary-80);
@@ -8780,6 +8781,7 @@ code:hover > .copy-icon {
   --button-secondary: #586e75;
   --button-secondary-hover: #465c62;
   --button-secondary-active: #344a4f;
+  --button-secondary-text: #fdf6e3;
   --button-tertiary: #268bd2;
   --button-tertiary-hover: #1e6ea7;
   --button-tertiary-active: #15516d;
@@ -8918,6 +8920,7 @@ code:hover > .copy-icon {
   --button-secondary: #6f6f6f;
   --button-secondary-hover: #606060;
   --button-secondary-active: #393939;
+  --button-secondary-text: #ffffff;
   --button-tertiary: #ffffff;
   --button-tertiary-hover: #f4f4f4;
   --button-tertiary-active: #c6c6c6;
@@ -9056,6 +9059,7 @@ code:hover > .copy-icon {
   --button-secondary: #839496;
   --button-secondary-hover: #93a1a1;
   --button-secondary-active: #586e75;
+  --button-secondary-text: #000000;
   --button-tertiary: #268bd2;
   --button-tertiary-hover: #2aa198;
   --button-tertiary-active: #6c71c4;
@@ -9195,6 +9199,7 @@ code:hover > .copy-icon {
   --button-secondary: #8c98c6;
   --button-secondary-hover: #aeb6d7;
   --button-secondary-active: #d0d5e8;
+  --button-secondary-text: #000000;
   --button-tertiary: #8E8EFF;
   --button-tertiary-hover: #A5A5FF;
   --button-tertiary-active: #BCBCFF;
