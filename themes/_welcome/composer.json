@@ -3,9 +3,6 @@
   "description": "Welcome",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
-  "extra": {
-    "install-directory-name": "welcome"
-  },
   "minimum-stability": "dev",
   "require": {
     "mautic/core-lib": "^5.0"

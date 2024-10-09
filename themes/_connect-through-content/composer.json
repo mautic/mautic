@@ -3,9 +3,6 @@
   "description": "Connect through content",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
-  "extra": {
-    "install-directory-name": "connect-through-content"
-  },
   "minimum-stability": "dev",
   "require": {
     "mautic/core-lib": "^5.0"

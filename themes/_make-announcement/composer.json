@@ -3,9 +3,6 @@
   "description": "Make an announcement",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
-  "extra": {
-    "install-directory-name": "make-announcement"
-  },
   "minimum-stability": "dev",
   "require": {
     "mautic/core-lib": "^5.0"

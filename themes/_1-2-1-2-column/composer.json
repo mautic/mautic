@@ -3,9 +3,6 @@
   "description": "1:2:1:2 Column",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
-  "extra": {
-    "install-directory-name": "1-2-1-2-column"
-  },
   "minimum-stability": "dev",
   "require": {
     "mautic/core-lib": "^5.0"
