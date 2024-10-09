@@ -2346,9 +2346,8 @@ class LeadModel extends FormModel
                     ? $field['properties']
                     : unserialize($field['properties']);
 
-                $flattenedAllowedValues = array_map(function ($item) {
-                    return html_entity_decode($item['value'], ENT_QUOTES);
-                }, $allowedValues['list']);
+                $flattenedAllowedValues = array_map(fn ($item): string =>
+                    html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 
                 if (!empty($allowedValues['list']) && !in_array($field['value'], $flattenedAllowedValues)) {
                     // if the set value of the field is not present allowed values array,
