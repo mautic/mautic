@@ -953,3 +953,102 @@ var Mautic = {
         }
     }
 };
+
+/**
+ * Manages dismissed elements on the interface.
+ *
+ * @function dismissElement - Dismisses an element by ID.
+ * @param {string} elementId - The ID of the element to dismiss.
+ * @function resetDismissedElements - Resets all dismissed elements.
+ * @function attachDismissHandlers - Attaches event handlers to dismiss buttons.
+ */
+
+(function() {
+    // Ensure Mautic object exists
+    window.Mautic = window.Mautic || {};
+
+    // Retrieve the list of dismissed elements from localStorage
+    var dismissedElements = JSON.parse(localStorage.getItem('dismissedElements')) || [];
+
+    // Variable to hold the style element for future removal
+    var style;
+
+    // Inject CSS rules to hide dismissed elements immediately
+    if (dismissedElements.length > 0) {
+        // Combine IDs with commas for efficient CSS
+        var selector = dismissedElements.map(function(id) {
+            return '#' + id;
+        }).join(', ');
+
+        var css = selector + ' { display: none !important; }';
+
+        // Create a style element and append the CSS
+        style = document.createElement('style');
+        style.type = 'text/css';
+        style.appendChild(document.createTextNode(css));
+
+        // Append the style element to the document head
+        var head = document.head || document.getElementsByTagName('head')[0];
+        head.appendChild(style);
+    }
+
+    // Define the dismiss function globally within the Mautic namespace
+    Mautic.dismissElement = function(elementId) {
+        if (dismissedElements.indexOf(elementId) === -1) {
+            dismissedElements.push(elementId);
+            localStorage.setItem('dismissedElements', JSON.stringify(dismissedElements));
+        }
+
+        // Hide the element
+        var element = mQuery('#' + elementId);
+        if (element.length) {
+            element.hide();
+        }
+    };
+
+    // Function to reset dismissed elements
+    Mautic.resetDismissedElements = function() {
+        // Clear the dismissedElements array
+        dismissedElements = [];
+        localStorage.setItem('dismissedElements', JSON.stringify(dismissedElements));
+
+        // Remove the injected CSS that hides dismissed elements
+        if (style && style.parentNode) {
+            style.parentNode.removeChild(style);
+            style = null;
+        }
+
+        // Show all dismissible elements
+        mQuery('[data-dismiss]').each(function () {
+            var dismissButton = mQuery(this);
+            var dismissType = dismissButton.data('dismiss');
+            var dismissibleElement = dismissButton.closest('.' + dismissType);
+
+            // Remove any inline display styles and show the element
+            dismissibleElement.css('display', '');
+        });
+    };
+
+    // Function to attach event handlers to dismiss buttons
+    Mautic.attachDismissHandlers = function() {
+        mQuery('[data-dismiss]').each(function () {
+            var dismissButton = mQuery(this);
+            var dismissType = dismissButton.data('dismiss');
+            var dismissibleElement = dismissButton.closest('.' + dismissType);
+            var elementId = dismissibleElement.attr('id');
+
+            // Attach dismiss event handler to the close button
+            dismissButton.off('click').on('click', function (e) {
+                e.preventDefault();
+                Mautic.dismissElement(elementId);
+            });
+        });
+    };
+
+    mQuery(document).ready(function () {
+        Mautic.attachDismissHandlers();
+    });
+    mQuery(document).ajaxComplete(function () {
+        Mautic.attachDismissHandlers();
+    });
+})();

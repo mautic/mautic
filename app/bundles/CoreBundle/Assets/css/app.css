@@ -1967,6 +1967,7 @@ kbd {
   gap: 3px;
   background-color: var(--layer);
   border-radius: var(--border-radius-sm);
+  position: relative;
 }
 .alert.alert-success:not([class*="col-"]):before,
 .alert.alert-info:not([class*="col-"]):before,
@@ -2003,6 +2004,12 @@ kbd {
   position: absolute;
   top: 10px;
   right: 0;
+}
+.alert .close {
+  font-size: 13px;
+  position: absolute;
+  right: 12px;
+  top: 18px;
 }
 .alert:has(.btn) {
   align-items: center;
@@ -2106,10 +2113,6 @@ kbd {
   color: var(--text-inverse);
   margin-left: 10px;
   font-weight: normal;
-}
-.alert .close {
-  font-size: 13px;
-  margin-left: 10px;
 }
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current,
@@ -2398,7 +2401,6 @@ a.media {
   padding-left: 15px;
   margin: 0;
   display: flex;
-  flex-direction: column;
 }
 @media (min-width: 768px) {
   .container {
@@ -2414,6 +2416,13 @@ a.media {
   .container {
     max-width: 1170px;
   }
+}
+.container-column {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  flex-direction: column;
 }
 .container-fluid {
   padding-right: 15px;
