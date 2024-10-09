@@ -71,8 +71,8 @@ Mautic.dashboardFilterPreventSubmit = function() {
     let button = form.find('button:first');
     Mautic.dashboardSubmitButton = button.clone();
     button.width(button.width()+'px'); // Keep button width
-    button.html('<i class="fa fa-spin fa-spinner"></i>');
-    jQuery('.widget').find('.card-body').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
+    button.html('<i class="ri-loader-3-line ri-spin"></i>');
+    jQuery('.widget').find('.card-body').html('<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>');
     form
         .unbind('submit')
         .on('submit', function(e){
@@ -303,4 +303,40 @@ Mautic.saveDashboardLayout = function(text) {
             data: {name: name}
         });
     }
+};
+
+Mautic.setDateRange = function(option) {
+    var today = new Date();
+    var fromDate, toDate;
+
+    switch(option) {
+      case 'today':
+        fromDate = today;
+        toDate = today;
+        break;
+      case 'yesterday':
+        fromDate = new Date(today.getTime() - (24 * 60 * 60 * 1000));
+        toDate = fromDate;
+        break;
+      default:
+        if (typeof option === 'number') {
+          fromDate = new Date(today.getTime() - (option * 24 * 60 * 60 * 1000));
+          toDate = today;
+        } else {
+          console.error('Invalid option');
+          return;
+        }
+    }
+
+    document.getElementById('daterange_date_from').value = Mautic.formatDate(fromDate);
+    document.getElementById('daterange_date_to').value = Mautic.formatDate(toDate);
+    document.getElementById('daterange_apply').click();
+};
+
+Mautic.formatDate = function(date) {
+    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    return monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 };

@@ -1,14 +1,15 @@
 <div class="page-header">
-	<div class="box-layout">
-		<div class="col-xs-5 col-sm-6 col-md-5 va-m">
-			<h1 class="pull-left page-header-title">{{ headerTitle|purify }}</h1>
-			<div class="ml-sm pull-left">
-					{{ publishStatus|purify }}
-			</div>
+	<div class="row-no-gutters ai-center gap-md fw-nowrap-md fd-row-md fd-column-reverse">
+		<div class="col-xs-12 col-sm-6 col-md-5 va-m">
+			<div class="d-flex ai-center fw-wrap fw-nowrap-md">
+				<h1 class="pull-left page-header-title">{{ headerTitle|purify }}</h1>
+			<div class="ml-sm pull-left">{{ publishStatus|purify }}</div>
 			{{ customContent('page.header.left', _context) }}
+			</div>
+			
 		</div>
-		<div class="col-xs-7 col-sm-6 col-md-7 va-m">
-			<div class="toolbar text-right" id="toolbar">
+		<div class="col-xs-12 col-sm-6 col-md-7 va-m">
+			<div class="d-flex toolbar jc-end-md jc-start" id="toolbar">
 				{# only print if it's a string beause that contains HTML,
 						eg. in PointsBundle and FormBundle's 'new' pages it's outputting an Array #}
 				{{ actions is not iterable ? actions|raw }}
@@ -17,8 +18,8 @@
 				<div class="toolbar-form-buttons hide pull-right">
 					<div class="btn-group toolbar-standard hidden-xs hidden-sm "></div>
 					<div class="btn-group toolbar-dropdown hidden-md hidden-lg">
-						<button type="button" class="btn btn-default btn-main"></button>
-						<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+						<button type="button" class="btn btn-primary btn-main"></button>
+						<button type="button" class="btn btn-ghost btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 							<i class="ri-arrow-drop-down-line"></i>
 						</button>
 						<ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>

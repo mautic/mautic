@@ -356,14 +356,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies grouped by column.
      *
-     * @param QueryBuilder $query
-     *
-     * @return array
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getCompaniesByGroup($query, $column)
+    public function getCompaniesByGroup($query, $column): array
     {
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)
@@ -374,7 +372,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -537,5 +535,23 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $entities;
+    }
+
+    /**
+     * @return array<string[]>
+     */
+    public function getCompanyLookupData(string $filterVal): array
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('id, companyname, companycity, companystate')
+            ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
+            ->where($q->expr()->eq('is_published', true))
+            ->andWhere($q->expr()->like('companyname', ':filterVar'))
+            ->setParameter('filterVar', '%'.$filterVal.'%')
+            ->orderBy('companyname')
+            ->setMaxResults(50);
+
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }
