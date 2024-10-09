@@ -48,11 +48,14 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $content  = $this->getJsonResponse($response);
 
         $this->assertArrayHasKey('data', $content);
-        $this->assertArrayHasKey('total', $content);
         $this->assertArrayHasKey('page', $content);
         $this->assertArrayHasKey('limit', $content);
+        $this->assertArrayHasKey('totalItems', $content);
+        $this->assertArrayHasKey('totalPages', $content);
+        $this->assertArrayHasKey('hasNextPage', $content);
+        $this->assertArrayHasKey('hasPreviousPage', $content);
 
-        return $content['total'];
+        return $content['totalItems'];
     }
 
     private function testPagination(int $totalAssets): void
@@ -65,13 +68,20 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
             $content  = $this->getJsonResponse($response);
 
             $this->assertArrayHasKey('data', $content);
-            $this->assertArrayHasKey('total', $content);
             $this->assertArrayHasKey('page', $content);
             $this->assertArrayHasKey('limit', $content);
+            $this->assertArrayHasKey('totalItems', $content);
+            $this->assertArrayHasKey('totalPages', $content);
+            $this->assertArrayHasKey('hasNextPage', $content);
+            $this->assertArrayHasKey('hasPreviousPage', $content);
 
-            $this->assertEquals($totalAssets, $content['total']);
             $this->assertEquals($page, $content['page']);
             $this->assertEquals($limit, $content['limit']);
+            $this->assertEquals($totalAssets, $content['totalItems']);
+            $this->assertEquals($totalPages, $content['totalPages']);
+
+            $this->assertEquals($page < $totalPages, $content['hasNextPage']);
+            $this->assertEquals($page > 1, $content['hasPreviousPage']);
 
             $expectedItemCount = ($page < $totalPages) ? $limit : (($totalAssets % $limit) ?: $limit);
             $this->assertCount($expectedItemCount, $content['data']);

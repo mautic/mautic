@@ -15,6 +15,7 @@ import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor5';
 import StorageService from "./storage.service";
+import AssetService from './asset.service';
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
@@ -99,6 +100,43 @@ export default class BuilderService {
         url: this.deletePath,
         data: { filename: response.getFilename() },
       });
+    });
+
+    this.editor.on('asset:open', () => {
+      const editor = this.editor;
+      const assetsContainer = document.querySelector('.gjs-am-assets');
+
+      if (assetsContainer) {
+        let isLoading = false;
+
+        const loadNextPage = () => {
+          if (isLoading) return;
+
+          isLoading = true;
+          AssetService.getAssetsNextPageXhr(result => {
+            const assetManager = editor.AssetManager;
+            const currentAssets = assetManager.getAll().models;
+            const newAssets = result.data;
+
+            // Combine current assets with new assets
+            const combinedAssets = [...currentAssets, ...newAssets];
+
+            // Reset the entire collection with combined assets
+            assetManager.getAll().reset(combinedAssets);
+            assetManager.render();
+
+            isLoading = false;
+          });
+        };
+
+        assetsContainer.addEventListener('scroll', function() {
+          if (this.scrollTop + this.clientHeight >= this.scrollHeight - 5) {
+            loadNextPage();
+          }
+        });
+      } else {
+        console.warn('Element with class "gjs-am-assets" not found');
+      }
     });
 
     const triggerBuilderHide = () => {
@@ -454,6 +492,7 @@ export default class BuilderService {
       openAssetsOnDrop: 1,
       autoAdd: 1,
       headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
+      // custom: true,
     };
   }
 

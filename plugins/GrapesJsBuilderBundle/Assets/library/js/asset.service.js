@@ -1,8 +1,9 @@
 export default class AssetService {
+  static assetsPage = 1;
+  static totalPages = null;
 
   /**
-   * Get a list of all existing assets (e.g. images)
-   * to display in the assets manager, and the config
+   * Get initial config for asset manager
    *
    * @returns object
    */
@@ -19,15 +20,40 @@ export default class AssetService {
     };
   }
 
-  /**
-   * Get a list of all existing assets (e.g. images)
-   * to display in the assets manager, and the config
-   *
-   * @returns jqXHR
-   */
-  static getAssetsXhr(onSuccess) {
+  static getAssetsPath() {
     const textareaAssets = mQuery('#grapesjsbuilder_assets');
-    const assetsPath = textareaAssets.data('assets');
-    return mQuery.get(assetsPath, onSuccess);
+    return `${textareaAssets.data('assets')}?page=${AssetService.assetsPage}`;
+  }
+
+  static fetchAssets(assetsPath, onSuccess, onError) {
+    return mQuery.get(assetsPath)
+        .done((result) => {
+          if (result.totalPages !== undefined) {
+            AssetService.totalPages = result.totalPages;
+          }
+          if (typeof onSuccess === 'function') {
+            onSuccess(result);
+          }
+        })
+        .fail((error) => {
+          if (typeof onError === 'function') {
+            onError(error);
+          }
+        });
+  }
+
+  static getAssetsXhr(onSuccess, onError) {
+    AssetService.assetsPage = 1;
+    const assetsPath = AssetService.getAssetsPath();
+    return AssetService.fetchAssets(assetsPath, onSuccess, onError);
+  }
+
+  static getAssetsNextPageXhr(onSuccess, onError) {
+    if (!AssetService.totalPages || AssetService.assetsPage >= AssetService.totalPages) {
+      return;
+    }
+    AssetService.assetsPage++;
+    const assetsPath = AssetService.getAssetsPath();
+    return AssetService.fetchAssets(assetsPath, onSuccess, onError);
   }
 }

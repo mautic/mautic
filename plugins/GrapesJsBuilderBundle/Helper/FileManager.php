@@ -141,7 +141,15 @@ class FileManager
             try {
                 $fileSystem->mkdir($uploadDir);
             } catch (IOException) {
-                return ['data' => [], 'total' => 0, 'page' => $page, 'limit' => $limit];
+                return [
+                    'data'            => [],
+                    'page'            => $page,
+                    'limit'           => $limit,
+                    'totalItems'      => 0,
+                    'totalPages'      => 0,
+                    'hasNextPage'     => false,
+                    'hasPreviousPage' => false,
+                ];
             }
         }
 
@@ -153,7 +161,15 @@ class FileManager
 
         // Check if the requested page is out of range
         if ($page < 1 || $page > $totalPages) {
-            return ['data' => [], 'total' => $totalFiles, 'page' => $page, 'limit' => $limit];
+            return [
+                'data'            => [],
+                'page'            => $page,
+                'limit'           => $limit,
+                'totalItems'      => $totalFiles,
+                'totalPages'      => $totalPages,
+                'hasNextPage'     => $page < $totalPages,
+                'hasPreviousPage' => $page > 1,
+            ];
         }
 
         $offset = ($page - 1) * $limit;
@@ -172,10 +188,13 @@ class FileManager
         }
 
         return [
-            'data'  => $files,
-            'total' => $totalFiles,
-            'page'  => $page,
-            'limit' => $limit,
+            'data'            => $files,
+            'page'            => $page,
+            'limit'           => $limit,
+            'totalItems'      => $totalFiles,
+            'totalPages'      => $totalPages,
+            'hasNextPage'     => $page < $totalPages,
+            'hasPreviousPage' => $page > 1,
         ];
     }
 
