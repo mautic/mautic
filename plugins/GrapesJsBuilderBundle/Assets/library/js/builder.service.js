@@ -495,7 +495,6 @@ export default class BuilderService {
       openAssetsOnDrop: 1,
       autoAdd: 1,
       headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
-      // custom: true,
     };
   }
 

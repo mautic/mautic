@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class FileManager
 {
@@ -204,7 +205,7 @@ class FileManager
     /**
      * @return array<string, mixed>|null
      */
-    private function getFileInfo($file): ?array
+    private function getFileInfo(SplFileInfo $file): ?array
     {
         $filePath = $this->getCompleteFilePath($file->getRelativePathname());
         $size     = @getimagesize($filePath);
