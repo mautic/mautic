@@ -8,7 +8,6 @@ use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientControllerTest extends MauticMysqlTestCase
 {
@@ -16,7 +15,6 @@ class ClientControllerTest extends MauticMysqlTestCase
 
     public function testIndexActionForPager(): void
     {
-        $this->markTestSkipped('Disabling to verify the cause of failure');
         $this->createApiClients();
 
         // Test the first page without limits
@@ -68,7 +66,7 @@ class ClientControllerTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = static::getContainer()->get('translator');
 
         // Check for total item count in pagination
         $this->assertStringContainsString(
