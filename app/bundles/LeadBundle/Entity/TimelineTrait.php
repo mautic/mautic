@@ -17,6 +17,7 @@ trait TimelineTrait
      * @param array<mixed> $serializedColumns     Array of columns to unserialize
      * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
      * @param mixed|null   $resultsParserCallback Callback to custom parse results
+     * @param string|null  $secondaryOrdering     Name of column for secondary sort
      *
      * @return array<mixed>
      */
@@ -27,7 +28,8 @@ trait TimelineTrait
         $timestampColumn,
         $serializedColumns = [],
         $dateTimeColumns = [],
-        $resultsParserCallback = null
+        $resultsParserCallback = null,
+        string $secondaryOrdering = null
     ) {
         if (!empty($options['unitCounts'])) {
             [$tablePrefix, $column] = explode('.', $timestampColumn);
@@ -37,7 +39,7 @@ trait TimelineTrait
             $cq = $options['chartQuery'];
             $cq->modifyTimeDataQuery($query, $column, $tablePrefix);
             $cq->applyDateFilters($query, $column, $tablePrefix);
-            $data = $query->execute()->fetchAllAssociative();
+            $data = $query->executeQuery()->fetchAllAssociative();
 
             return $cq->completeTimeData($data);
         }
@@ -71,6 +73,10 @@ trait TimelineTrait
             };
 
             $query->orderBy($orderBy, $orderByDir);
+
+            if ($secondaryOrdering) {
+                $query->addOrderBy($secondaryOrdering, $orderByDir);
+            }
         }
 
         if (!empty($options['limit'])) {

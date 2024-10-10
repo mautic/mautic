@@ -13,7 +13,7 @@
         </div>
         <div class="col-xs-2">
             {% if 'emailform_dynamicContent_0_content' is not same as id %}
-                <a class="remove-item btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+                <a class="remove-item btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
             {% endif %}
         </div>
     </div>
@@ -52,7 +52,7 @@
             {{ form_errors(form.display) }}
           </div>
           <div class="col-xs-2 col-sm-1">
-              <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
+              <a href="javascript: void(0);" class="remove-selected btn btn-ghost text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
           </div>
           {{ form_widget(form.field) }}
           {{ form_widget(form.type) }}
@@ -69,7 +69,7 @@
             </div>
             <div class="col-xs-2">
                 {% if id is not same as 'emailform_dynamicContent_0_filters_0' %}
-                    <a class="remove-item remove-filter btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+                    <a class="remove-item remove-filter btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
                 {% endif %}
             </div>
         </div>
@@ -131,7 +131,7 @@
 {% block dynamic_content_filter_widget %}
     <div class="tab-pane dynamic-content bdr-w-0 {{ '0' == form.vars.name ? 'active' : 'fade' }}" id="{{ form.vars.id }}">
         <div class="panel">
-            <ul class="nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_{{ form.vars.name }}">
+            <ul class="nav nav-tabs nav-tabs-contained" id="dynamicContentFilterTabs_{{ form.vars.name }}">
               <li>
                 <a role="tab" class="addNewDynamicContentFilter" data-index="{{ form.vars.name }}"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
               </li>

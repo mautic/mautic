@@ -8,19 +8,26 @@
 // Set the container width, and override it for fixed navbars in media queries.
 
 .container {
-  .container-fixed();
+  padding-right: 15px;
+  padding-left: 15px;
+  margin: 0;
+  display: flex;
 
   @media (min-width: @screen-sm-min) {
-    width: @container-sm;
+    max-width: @container-sm;
   }
   @media (min-width: @screen-md-min) {
-    width: @container-md;
+    max-width: @container-md;
   }
   @media (min-width: @screen-lg-min) {
-    width: @container-lg;
+    max-width: @container-lg;
   }
 }
 
+.container-column {
+  .container-fixed();
+  flex-direction: column;
+}
 
 // Fluid container
 //
@@ -39,6 +46,7 @@
 .row {
   display: flex;
   flex-wrap: wrap;
+  max-width: 100%;
   .make-row();
 }
 
@@ -52,6 +60,8 @@
 .row-no-gutters {
   margin-right: 0;
   margin-left: 0;
+  display: flex;
+  flex-wrap: wrap;
 
   [class*="col-"] {
     padding-right: 0;

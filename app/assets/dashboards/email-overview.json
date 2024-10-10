@@ -1,6 +1,6 @@
 {
     "name": "Example - Email Overview",
-    "description": "Example layout with an overview of emails.",
+    "description": "Start with a dashboard of 7 widgets that provide insights into email interactions and contact management.",
     "widgets": [
         {
             "name": "Emails sent \/ opened",

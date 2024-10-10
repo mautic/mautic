@@ -26,7 +26,7 @@
         </div>
         <div class="panel-body">
             <div class="col-xs-6 col-sm-3 field-name">
-                <i class="object-icon fa {{ class }}" aria-hidden="true"></i> <span>{% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+                <span><i class="object-icon {{ class }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
             </div>
 
             <div class="col-xs-6 col-sm-3 padding-none">
@@ -42,7 +42,7 @@
             </div>
 
             <div class="col-xs-2 col-sm-1">
-                <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
+                <a href="javascript: void(0);" class="remove-selected btn btn-ghost btn-icon btn-sm btn-danger text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
             </div>
             {{ form_widget(form.field) }}
             {{ form_widget(form.type) }}

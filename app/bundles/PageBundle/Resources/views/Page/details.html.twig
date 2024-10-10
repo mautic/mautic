@@ -38,7 +38,12 @@
     }) }}
 {% endblock %}
 
-{% block publishStatus %}{{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activePage}) }}{% endblock %}
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activePage,
+        'status': 'available'
+    }) -}}
+{% endblock %}
 
 {% block content %}
   {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
@@ -95,7 +100,7 @@
               <!--/ page detail header -->
 
               <!-- page detail collapseable -->
-              <div class="collapse" id="page-details">
+              <div class="collapse pr-md pl-md" id="page-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
                           <table class="table table-hover mb-0">
@@ -128,7 +133,7 @@
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 va-m">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
-                                          <span class="fa fa-line-chart"></span>
+                                          <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.page.pageviews'|trans }}
                                       </h5>
                                   </div>
@@ -148,7 +153,7 @@
               {{ customContent('details.stats.graph.below', _context) }}
 
               <!-- tabs controls -->
-              <ul class="nav nav-tabs pr-md pl-md">
+              <ul class="nav nav-tabs nav-tabs-contained">
                   {% if showVariants %}
                       <li class="active">
                           <a href="#variants-container" role="tab" data-toggle="tab">
@@ -191,7 +196,7 @@
               <div class="text-center" style="height: 100%; width: 100%; ">
                   <h3 style="padding: 30px;">
                       <a class="create-abtest-link" href="{{ path('mautic_page_action', {'objectAction': 'abtest', 'objectId': activePage.id}) }}" data-toggle="ajax">
-                          {{ 'mautic.core.ab_test.create'|trans }} <i class="fa fa-angle-right"></i>
+                          {{ 'mautic.core.ab_test.create'|trans }} <i class="ri-arrow-right-s-line"></i>
                       </a>
                   </h3>
               </div>
@@ -214,7 +219,7 @@
                              readonly
                              value="{{ pageUrl|e }}"/>
                       <span class="input-group-btn">
-                          <button class="btn btn-default btn-nospin" onclick="window.open('{{ pageUrl }}', '_blank');">
+                          <button class="btn btn-ghost btn-nospin" onclick="window.open('{{ pageUrl }}', '_blank');">
                               <i class="ri-external-link-line"></i>
                           </button>
                       </span>
@@ -263,7 +268,7 @@
                                      value="{{ previewUrl|e }}"/>
                               <span class="input-group-btn">
                                   <button id="content_preview_url_button"
-                                          class="btn btn-default btn-nospin"
+                                          class="btn btn-ghost btn-nospin"
                                           onclick="window.open('{{ previewUrl }}', '_blank');">
                                       <i class="ri-external-link-line"></i>
                                   </button>
