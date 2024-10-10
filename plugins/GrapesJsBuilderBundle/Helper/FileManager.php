@@ -131,6 +131,9 @@ class FileManager
         return $files;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getImagePages(int $page, int $limit): array
     {
         $files      = [];
@@ -198,6 +201,9 @@ class FileManager
         ];
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     private function getFileInfo($file): ?array
     {
         $filePath = $this->getCompleteFilePath($file->getRelativePathname());
