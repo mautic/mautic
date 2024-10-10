@@ -56,4 +56,8 @@ export default class AssetService {
     const assetsPath = AssetService.getAssetsPath();
     return AssetService.fetchAssets(assetsPath, onSuccess, onError);
   }
+
+  static hasLoadedAllAssets() {
+    return AssetService.assetsPage && AssetService.assetsPage === AssetService.totalPages;
+  }
 }

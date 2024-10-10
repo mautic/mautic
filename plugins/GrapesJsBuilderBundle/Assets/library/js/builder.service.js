@@ -105,14 +105,16 @@ export default class BuilderService {
     this.editor.on('asset:open', () => {
       const editor = this.editor;
       const assetsContainer = document.querySelector('.gjs-am-assets');
+      const $assetsSpinner = mQuery('<div class="gjs-assets-spinner"><i class="ri-loader-3-line ri-spin"></i></div>');
 
       if (assetsContainer) {
         let isLoading = false;
 
         const loadNextPage = () => {
           if (isLoading) return;
-
           isLoading = true;
+          mQuery(assetsContainer).append($assetsSpinner);
+
           AssetService.getAssetsNextPageXhr(result => {
             const assetManager = editor.AssetManager;
             const currentAssets = assetManager.getAll().models;
@@ -130,7 +132,8 @@ export default class BuilderService {
         };
 
         assetsContainer.addEventListener('scroll', function() {
-          if (this.scrollTop + this.clientHeight >= this.scrollHeight - 5) {
+          const hasScrolledToBottom = this.scrollTop + this.clientHeight >= this.scrollHeight - 5;
+          if (hasScrolledToBottom && !AssetService.hasLoadedAllAssets()) {
             loadNextPage();
           }
         });
