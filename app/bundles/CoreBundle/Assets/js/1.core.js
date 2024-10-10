@@ -57,10 +57,14 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    initializeCodeBlocks();
+    Mautic.initializeCodeBlocks();
 });
 
-mQuery( document ).ready(function() {
+/**
+ * Applies user interface preferences from localStorage to the HTML element.
+ * Runs immediately to set attributes based on 'm-toggle-setting-' prefixed items.
+ */
+(function() {
     // Load user preferences for UI saved previously
     const prefix = 'm-toggle-setting-';
     Object.keys(localStorage)
@@ -73,24 +77,16 @@ mQuery( document ).ready(function() {
                 document.documentElement.setAttribute(attributeName, value);
             }
         });
+})();
 
-    // Handle radio button changes
-    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                const attributeName = this.dataset.attributeToggle;
-                const newValue = this.dataset.attributeValue;
-                document.documentElement.setAttribute(attributeName, newValue);
-                localStorage.setItem(`${prefix}${attributeName}`, newValue);
-            }
-        });
-    });
-
+mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
         });
     }
+
+    Mautic.initListGroupToggle('body');
 
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
@@ -109,31 +105,16 @@ mQuery( document ).ready(function() {
         }
     }, mauticSessionLifetime * 1000 / 2);
 
-    // Copy code block on click
-    mQuery(document).on('click', 'code', function() {
-        var $codeBlock = mQuery(this);
-        var $icon = $codeBlock.find('.copy-icon');
-        var $temp = mQuery('<textarea>');
-        mQuery('body').append($temp);
-        $temp.val($codeBlock.text()).select();
-        document.execCommand('copy');
-        $temp.remove();
-        $icon.removeClass('ri-clipboard-fill').addClass('ri-check-line');
-        setTimeout(function() {
-            $icon.removeClass('ri-check-line').addClass('ri-clipboard-fill');
-        }, 2000);
+    // Copy code blocks when clicked
+    mQuery(document).on('click', 'code', function(e) {
+        e.preventDefault();
+        navigator.clipboard.writeText(mQuery(this).clone().children('.copy-icon').remove().end().text().trim()).then(() => {
+            mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line');
+            setTimeout(() => mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line'), 2000);
+        });
     });
-    initializeCodeBlocks();
+    Mautic.initializeCodeBlocks();
 });
-
-function initializeCodeBlocks() {
-    mQuery('code').each(function() {
-        var $codeBlock = mQuery(this);
-        if (!$codeBlock.find('.copy-icon').length) {
-            $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
-        }
-    });
-}
 
 if (typeof history != 'undefined') {
     //back/forward button pressed
@@ -251,6 +232,19 @@ var Mautic = {
             modalWindow.modal();
         });
 
+    },
+
+    /**
+     * Copy code blocks when clicked
+     *
+     */
+    initializeCodeBlocks: function () {
+        mQuery('code').each(function() {
+            var $codeBlock = mQuery(this);
+            if (!$codeBlock.find('.copy-icon').length) {
+                $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
+            }
+        });
     },
 
     /**
@@ -954,4 +948,40 @@ var Mautic = {
             return false;
         }
     }
+};
+
+Mautic.initListGroupToggle = function(container) {
+    mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+        e.preventDefault(); // Prevent default action if necessary
+
+        var $item = mQuery(this);
+        var $input = $item.find('input');
+
+        // If the input is disabled or readonly, do nothing
+        if ($input.prop('disabled') || $input.prop('readonly')) {
+            return;
+        }
+
+        var type = $input.prop('type');
+
+        if (type === 'radio') {
+            // Remove 'active' class from all items in the group
+            $item.closest('.list-group').find('.list-group-item').removeClass('active');
+
+            // Add 'active' class to the clicked item
+            $item.addClass('active');
+
+            // Set the input as checked
+            $input.prop('checked', true);
+        } else if (type === 'checkbox') {
+            // Toggle 'active' class on the clicked item
+            $item.toggleClass('active');
+
+            // Update the input's checked property based on the 'active' class
+            $input.prop('checked', $item.hasClass('active'));
+        }
+
+        // Trigger the 'change' event on the input
+        $input.trigger('change');
+    });
 };
