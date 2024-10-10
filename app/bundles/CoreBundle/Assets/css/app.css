@@ -2698,9 +2698,6 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .alert-growl-container .alert-growl {
   margin-bottom: 5px;
 }
-.alert-growl-buttons {
-  margin-top: 10px;
-}
 .alert-growl-buttons .btn + .btn {
   margin-left: 5px;
 }
