@@ -1,0 +1,55 @@
+{# popover_button.html.twig #}
+
+{# Initialize an array with the base classes #}
+{% set classes = ['btn btn-nospin', 'btn-ghost'] %}
+
+{# Add size class if 'size' is defined and not empty #}
+{% if size is defined and size %}
+    {% set classes = classes|merge(['btn-' ~ size]) %}
+{% endif %}
+
+{# Add 'btn-icon' class if only 'icon' is provided without 'label' #}
+{% if icon is defined and icon and (label is not defined or not label) %}
+    {% set classes = classes|merge(['btn-icon']) %}
+{% endif %}
+
+{# Start the button tag #}
+<button type="button"
+    class="{{ classes|join(' ') }}"
+    data-toggle="popover"
+    data-container="body" {# Container is always set to the button itself #}
+
+    {# Set data-placement with default 'right' if not defined #}
+    data-placement="{{ placement|default('right') }}"
+
+    {# Set data-html with default 'false' if not defined #}
+    data-html="{{ html is defined and html ? 'true' : 'false' }}"
+
+    {# Set data-trigger with default 'click' if not defined #}
+    data-trigger="{{ trigger|default('click') }}"
+
+    {# Set data-selector if defined #}
+    {% if selector is defined and selector %}
+        data-selector="{{ selector }}"
+    {% endif %}
+
+    {# Set title if defined #}
+    {% if title is defined and title %}
+        title="{{ title|trans }}"
+    {% endif %}
+
+    {# Set data-content if defined #}
+    {% if content is defined and content %}
+        data-content="{{ content|trans }}"
+    {% endif %}
+>
+    {# Include icon if 'icon' is defined and not empty #}
+    {% if icon is defined and icon %}
+        <i class="{{ icon }}{% if icon is defined and icon and (label is not defined or not label) %} fs-20{% endif %}"></i>
+    {% endif %}
+
+    {# Include label if 'label' is defined and not empty #}
+    {% if label is defined and label %}
+        {{ label|trans }}
+    {% endif %}
+</button>
