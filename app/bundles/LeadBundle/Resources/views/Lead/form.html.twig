@@ -72,7 +72,7 @@
                       {% set groupFields = fields[group] %}
                       {% if groupFields is not empty %}
                           <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">
-                              <div class="pa-md bg-light-xs bdr-b">
+                              <div class="pa-md bdr-b">
                                   <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
                               </div>
                               <div class="pa-md">

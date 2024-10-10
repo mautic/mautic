@@ -1817,9 +1817,9 @@ legend {
   margin-bottom: 18px;
   font-size: 19.5px;
   line-height: inherit;
-  color: #3c4650;
+  color: var(--text-primary);
   border: 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--border-subtle);
 }
 label {
   display: inline-block;
@@ -1880,7 +1880,7 @@ output {
   font-size: 13px;
   line-height: 1.3856;
   color: #596776;
-  background-color: #fff;
+  background-color: var(--field);
   background-image: none;
   border: 1px solid #d5d5d5;
   border-radius: 3px;
@@ -1897,14 +1897,14 @@ output {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(188, 188, 188, 0.6);
 }
 .form-control::-moz-placeholder {
-  color: #999;
+  color: var(--text-placeholder);
   opacity: 1;
 }
 .form-control:-ms-input-placeholder {
-  color: #999;
+  color: var(--text-placeholder);
 }
 .form-control::-webkit-input-placeholder {
-  color: #999;
+  color: var(--text-placeholder);
 }
 .form-control::-ms-expand {
   background-color: transparent;
@@ -1913,7 +1913,7 @@ output {
 .form-control[disabled],
 .form-control[readonly],
 fieldset[disabled] .form-control {
-  background-color: #ebedf0;
+  background-color: var(--field);
   opacity: 1;
 }
 .form-control[disabled],
@@ -22272,7 +22272,7 @@ select[multiple].input-group.input-group-lg .twitter-typeahead .tt-hint {
 .twitter-typeahead .tt-input[readonly],
 fieldset[disabled] .twitter-typeahead .tt-input {
   cursor: not-allowed;
-  background-color: #ebedf0 !important;
+  background-color: var(--field) !important;
 }
 .tt-menu {
   position: absolute;

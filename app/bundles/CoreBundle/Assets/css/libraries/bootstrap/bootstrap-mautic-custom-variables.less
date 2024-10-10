@@ -184,9 +184,9 @@
 //##
 
 //** `<input>` background color
-@input-bg:                       #fff;
+@input-bg:                       var(--field);
 //** `<input disabled>` background color
-@input-bg-disabled:              @gray-lighter;
+@input-bg-disabled:              var(--field);
 
 //** Text color for `<input>`s
 @input-color:                    @gray;
@@ -206,7 +206,7 @@
 @input-border-focus:             darken(@input-border, 10%);
 
 //** Placeholder text color
-@input-color-placeholder:        #999;
+@input-color-placeholder:        var(--text-placeholder);
 
 //** Default `.form-control` height
 @input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2);
@@ -218,8 +218,8 @@
 //** `.form-group` margin
 @form-group-margin-bottom:       15px;
 
-@legend-color:                   @gray-dark;
-@legend-border-color:            #e5e5e5;
+@legend-color:                   var(--text-primary);
+@legend-border-color:            var(--border-subtle);
 
 //** Background color for textual input addons
 @input-group-addon-bg:           var(--layer);

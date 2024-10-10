@@ -4622,6 +4622,11 @@ input[style]:hover {
 .form-control.not-chosen {
   padding: var(--spacing-01) var(--spacing-04);
 }
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
+  color: var(--text-disabled);
+}
 .search-container {
   display: flex;
   align-items: center;
@@ -8907,7 +8912,7 @@ code:hover > .copy-icon {
   --text-helper: #8d8d8d;
   --text-error: #ff8389;
   --text-inverse: #161616;
-  --text-disabled: #f4f4f4;
+  --text-disabled: #f4f4f440;
   --link-primary: var(--primary-30);
   --link-primary-hover: var(--primary-20);
   --link-secondary: var(--primary-30);
