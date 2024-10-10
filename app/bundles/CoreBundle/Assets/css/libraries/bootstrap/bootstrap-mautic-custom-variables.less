@@ -33,9 +33,9 @@
 @text-color:            @gray-dark;
 
 //** Global textual link color.
-@link-color:            @brand-primary;
+@link-color:            var(--link-primary);
 //** Link hover color set via `darken()` function.
-@link-hover-color:      darken(@link-color, 15%);
+@link-hover-color:      var(--link-primary-hover);
 //** Link hover decoration.
 @link-hover-decoration: underline;
 
@@ -138,7 +138,7 @@
 @table-bg-active:               @table-bg-hover;
 
 //** Border color for table and cell borders.
-@table-border-color:            @gray-lighter;
+@table-border-color:            var(--border-subtle);
 
 
 //== Buttons
@@ -147,7 +147,7 @@
 
 @btn-font-weight:                600;
 
-@btn-default-color:              lighten(@text-color, 10%);
+@btn-default-color:              @text-color;
 @btn-default-border:             #ddd;
 @btn-default-bg:                 #fff;
 
@@ -184,9 +184,9 @@
 //##
 
 //** `<input>` background color
-@input-bg:                       #fff;
+@input-bg:                       var(--field);
 //** `<input disabled>` background color
-@input-bg-disabled:              @gray-lighter;
+@input-bg-disabled:              var(--field);
 
 //** Text color for `<input>`s
 @input-color:                    @gray;
@@ -206,7 +206,7 @@
 @input-border-focus:             darken(@input-border, 10%);
 
 //** Placeholder text color
-@input-color-placeholder:        #999;
+@input-color-placeholder:        var(--text-placeholder);
 
 //** Default `.form-control` height
 @input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2);
@@ -218,11 +218,11 @@
 //** `.form-group` margin
 @form-group-margin-bottom:       15px;
 
-@legend-color:                   @gray-dark;
-@legend-border-color:            #e5e5e5;
+@legend-color:                   var(--text-primary);
+@legend-border-color:            var(--border-subtle);
 
 //** Background color for textual input addons
-@input-group-addon-bg:           @gray-lighter;
+@input-group-addon-bg:           var(--layer);
 //** Border color for textual input addons
 @input-group-addon-border-color: @input-border;
 
@@ -257,10 +257,10 @@
 @dropdown-link-active-bg:        @component-active-bg;
 
 //** Disabled dropdown menu item background color.
-@dropdown-link-disabled-color:   @gray-light;
+@dropdown-link-disabled-color:   var(--button-disabled);
 
 //** Text color for headers within dropdown menus.
-@dropdown-header-color:          @gray-light;
+@dropdown-header-color:          var(--text-secondary);
 
 //** Deprecated `@dropdown-caret-color` as of v3.1.0
 @dropdown-caret-color:           gray;
@@ -424,10 +424,10 @@
 
 //=== Shared nav styles
 @nav-link-padding:                          10px 18px;
-@nav-link-hover-bg:                         darken(@body-bg, 3%);
+@nav-link-hover-bg:                         var(--layer-selected);
 
-@nav-disabled-link-color:                   @gray-light;
-@nav-disabled-link-hover-color:             @gray-light;
+@nav-disabled-link-color:                   var(--text-disabled);
+@nav-disabled-link-hover-color:             var(--text-disabled);
 
 //== Tabs
 @nav-tabs-border-color:                     var(--border-no-color);
@@ -452,20 +452,20 @@
 //##
 
 @pagination-color:                     @link-color;
-@pagination-bg:                        #fff;
-@pagination-border:                    #ddd;
+@pagination-bg:                        var(--layer);
+@pagination-border:                    transparent;
 
-@pagination-hover-color:               @link-hover-color;
-@pagination-hover-bg:                  @gray-lighter;
-@pagination-hover-border:              #ddd;
+@pagination-hover-color:               var(--text-primary);
+@pagination-hover-bg:                  var(--layer-hover);
+@pagination-hover-border:              transparent;
 
 @pagination-active-color:              @pagination-hover-color;
 @pagination-active-bg:                 @pagination-hover-bg;
 @pagination-active-border:             @pagination-hover-border;
 
-@pagination-disabled-color:            @gray-light;
-@pagination-disabled-bg:               #fff;
-@pagination-disabled-border:           #ddd;
+@pagination-disabled-color:            var(--text-disabled);
+@pagination-disabled-bg:               transparent;
+@pagination-disabled-border:           transparent;
 
 
 //== Pager
@@ -524,10 +524,10 @@
 //** Tooltip max width
 @tooltip-max-width:           200px;
 //** Tooltip text color
-@tooltip-color:               #fff;
+@tooltip-color:               var(--text-inverse);
 //** Tooltip background color
-@tooltip-bg:                  #000;
-@tooltip-opacity:             .9;
+@tooltip-bg:                  var(--background-inverse);
+@tooltip-opacity:             1;
 
 //** Tooltip arrow width
 @tooltip-arrow-width:         5px;
@@ -592,26 +592,26 @@
 //##
 
 //** Padding applied to the modal body
-@modal-inner-padding:         15px;
+@modal-inner-padding:         var(--spacing-05);
 
 //** Padding applied to the modal title
-@modal-title-padding:         15px;
+@modal-title-padding:         var(--spacing-05);
 //** Modal title line-height
 @modal-title-line-height:     @line-height-base;
 
 //** Background color of modal content area
-@modal-content-bg:                             #fff;
+@modal-content-bg:                             var(--layer);
 //** Modal content border color
-@modal-content-border-color:                   rgba(0, 0, 0, .2);
+@modal-content-border-color:                   transparent;
 //** Modal content border color **for IE8**
 @modal-content-fallback-border-color:          #999;
 
 //** Modal backdrop background color
-@modal-backdrop-bg:           #000;
+@modal-backdrop-bg:           var(--overlay);
 //** Modal backdrop opacity
-@modal-backdrop-opacity:      .5;
+@modal-backdrop-opacity:      1;
 //** Modal header border color
-@modal-header-border-color:   #e5e5e5;
+@modal-header-border-color:   transparent;
 //** Modal footer border color
 @modal-footer-border-color:   @modal-header-border-color;
 
@@ -657,7 +657,7 @@
 @progress-border-radius:      @border-radius-base;
 
 //** Default progress bar color
-@progress-bar-bg:             @brand-primary;
+@progress-bar-bg:             var(--background-brand-primary);
 //** Success progress bar color
 @progress-bar-success-bg:     @brand-success;
 //** Warning progress bar color
@@ -693,11 +693,11 @@
 @list-group-active-text-color:  var(--text-inverse);
 
 //** Text color of disabled list items
-@list-group-disabled-color:      @gray-light;
+@list-group-disabled-color:      var(--text-disabled);
 //** Background color of disabled list items
-@list-group-disabled-bg:         @gray-lighter;
+@list-group-disabled-bg:         var(--button-disabled);
 //** Text color for content within disabled list items
-@list-group-disabled-bg:         @gray-lighter;
+@list-group-disabled-bg:         var(--button-disabled);
 
 @list-group-link-color:         var(--text-secondary);
 @list-group-link-hover-color:   var(--text-primary);
@@ -708,7 +708,7 @@
 //
 //##
 
-@panel-bg:                    #fff;
+@panel-bg:                    var(--background);
 @panel-body-padding:          15px;
 @panel-heading-padding:       10px 15px;
 @panel-footer-padding:        @panel-heading-padding;
@@ -716,31 +716,31 @@
 
 //** Border color for elements within panels
 @panel-inner-border:          @hr-border;
-@panel-footer-bg:             #f5f5f5;
+@panel-footer-bg:             inherit;
 
-@panel-default-text:          @gray-dark;
+@panel-default-text:          inherit;
 @panel-default-border:        @hr-border;
-@panel-default-heading-bg:    #f5f5f5;
+@panel-default-heading-bg:    inherit;
 
-@panel-primary-text:          #fff;
-@panel-primary-border:        rgba(0,0,0,0.03);
-@panel-primary-heading-bg:    @brand-primary;
+@panel-primary-text:          var(--text-on-color);
+@panel-primary-border:        transparent;
+@panel-primary-heading-bg:    var(--background-brand-primary);
 
-@panel-success-text:          #fff;
-@panel-success-border:        rgba(0,0,0,0.03);
-@panel-success-heading-bg:    @brand-success;
+@panel-success-text:          var(--text-inverse);
+@panel-success-border:        transparent;
+@panel-success-heading-bg:    var(--support-success);
 
-@panel-info-text:             #fff;
-@panel-info-border:           rgba(0,0,0,0.03);
-@panel-info-heading-bg:       @brand-info;
+@panel-info-text:             var(--text-inverse);
+@panel-info-border:           transparent;
+@panel-info-heading-bg:       var(--support-info);
 
-@panel-warning-text:          #fff;
-@panel-warning-border:        rgba(0,0,0,0.03);
-@panel-warning-heading-bg:    @brand-warning;
+@panel-warning-text:          var(--text-primary);
+@panel-warning-border:        transparent;
+@panel-warning-heading-bg:    var(--support-warning);
 
-@panel-danger-text:           #fff;
-@panel-danger-border:         rgba(0,0,0,0.03);
-@panel-danger-heading-bg:     @brand-danger;
+@panel-danger-text:           var(--text-inverse);
+@panel-danger-border:         transparent;
+@panel-danger-heading-bg:     var(--support-error);
 
 
 //== Thumbnails
@@ -750,14 +750,14 @@
 //** Padding around the thumbnail image
 @thumbnail-padding:           4px;
 //** Thumbnail background color
-@thumbnail-bg:                @body-bg;
+@thumbnail-bg:                transparent;
 //** Thumbnail border color
-@thumbnail-border:            #ddd;
+@thumbnail-border:            var(--border-subtle);
 //** Thumbnail border radius
 @thumbnail-border-radius:     @border-radius-base;
 
 //** Custom text color for thumbnail captions
-@thumbnail-caption-color:     @text-color;
+@thumbnail-caption-color:     var(--text-secondary);
 //** Padding around the thumbnail caption
 @thumbnail-caption-padding:   9px;
 
@@ -766,8 +766,8 @@
 //
 //##
 
-@well-bg:                     #f5f5f5;
-@well-border:                 darken(@well-bg, 7%);
+@well-bg:                     var(--layer);
+@well-border:                 transparent;
 
 
 //== Badges
@@ -826,9 +826,9 @@
 //
 //##
 
-@close-font-weight:           bold;
-@close-color:                 #000;
-@close-text-shadow:           0 1px 0 #fff;
+@close-font-weight:           normal;
+@close-color:                 var(--text-primary);
+@close-text-shadow:           none;
 
 
 //== Code
@@ -841,9 +841,9 @@
 @kbd-color:                   var(--text-primary);
 @kbd-bg:                      var(--layer);
 
-@pre-bg:                      #f5f5f5;
-@pre-color:                   @gray-dark;
-@pre-border-color:            #ccc;
+@pre-bg:                      var(--layer);
+@pre-color:                   var(--text-primary);
+@pre-border-color:            var(--border-no-color);
 @pre-scrollable-max-height:   340px;
 
 
@@ -858,13 +858,13 @@
 //** Abbreviations and acronyms border color
 @abbr-border-color:           @gray-light;
 //** Headings small color
-@headings-small-color:        @gray-light;
+@headings-small-color:        var(--text-secondary);
 //** Blockquote small color
-@blockquote-small-color:      @gray-light;
+@blockquote-small-color:      var(--text-secondary);
 //** Blockquote font size
 @blockquote-font-size:        (@font-size-base * 1.25);
 //** Blockquote border color
-@blockquote-border-color:     @gray-lighter;
+@blockquote-border-color:     var(--border-no-color);
 //** Page header border color
 @page-header-border-color:    @gray-lighter;
 //** Width of horizontal description list titles
@@ -872,4 +872,4 @@
 //** Point at which .dl-horizontal becomes horizontal
 @dl-horizontal-breakpoint:    @grid-float-breakpoint;
 //** Horizontal line color.
-@hr-border:                   @gray-lighter;
+@hr-border:                   var(--border-subtle);

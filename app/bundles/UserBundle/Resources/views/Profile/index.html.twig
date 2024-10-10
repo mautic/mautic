@@ -41,7 +41,13 @@
                 {% endif %}
 
                 <li class="list-group-item">
-                    <a href="#accessibility" class="list-group-item-text steps" data-toggle="tab">{{ 'mautic.user.account.accessibility'|trans }}</a>
+                    <a href="#appearance" class="list-group-item-text steps" data-toggle="tab">{{
+                        'mautic.user.account.appearance'|trans }}</a>
+                </li>
+
+                <li class="list-group-item">
+                    <a href="#accessibility" class="list-group-item-text steps" data-toggle="tab">{{
+                        'mautic.user.account.accessibility'|trans }}</a>
                 </li>
             </ul>
 
@@ -53,7 +59,7 @@
             <div class="tab-content">
                 <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
                     {{ form_start(userForm) }}
-                    <div class="row pa-md bg-light-xs bdr-b">
+                    <div class="row pa-md bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.header.details'|trans }}</h4>
                     </div>
                     <div class="row">
@@ -84,7 +90,7 @@
 
                 {% if permissions.apiAccess is defined and permissions.apiAccess %}
                 <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="clients">
-                    <div class="row pa-md bg-light-xs bdr-b">
+                    <div class="row pa-md bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.header.authorizedclients'|trans }}</h4>
                     </div>
                     <div class="row">
@@ -93,8 +99,59 @@
                 </div>
                 {% endif %}
 
+                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="appearance">
+                    <div class="row pa-md bdr-b">
+                        <h4 class="fw-sb">{{ 'mautic.user.account.appearance'|trans }}</h4>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 mb-lg">
+                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.appearance.theme_preferences'|trans }}</h3>
+                            <div class="help-block">{{ 'mautic.user.account.appearance.theme_help'|trans }}</div>
+                            <div class="radio-group radio-cards row">
+                                {{ include('@MauticUser/Helper/theme.html.twig', {
+                                    themes: [
+                                        {
+                                            id: 'light',
+                                            name: 'mautic.user.account.appearance.theme_light',
+                                            description: 'mautic.user.account.appearance.theme_light_description',
+                                            preview: '@MauticUser/Profile/images/_light_preview.html.twig',
+                                            checked: true
+                                        },
+                                        {
+                                            id: 'dark',
+                                            name: 'mautic.user.account.appearance.theme_dark',
+                                            description: 'mautic.user.account.appearance.theme_dark_description',
+                                            preview: '@MauticUser/Profile/images/_dark_preview.html.twig'
+                                        },
+                                        {
+                                            id: 'solarized-light',
+                                            name: 'mautic.user.account.appearance.theme_solarized_light',
+                                            description: 'mautic.user.account.appearance.theme_solarized_light_description',
+                                            preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_solarized_light_preview.svg'
+                                        },
+                                        {
+                                            id: 'solarized-dark',
+                                            name: 'mautic.user.account.appearance.theme_solarized_dark',
+                                            description: 'mautic.user.account.appearance.theme_solarized_dark_description',
+                                            preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_solarized_dark_preview.svg'
+                                        },
+                                        {
+                                            id: 'freire',
+                                            name: 'mautic.user.account.appearance.theme_freire',
+                                            description: 'mautic.user.account.appearance.theme_freire_description',
+                                            preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_freire_preview.svg'
+                                        }
+                                    ]
+                                }) }}
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="accessibility">
-                    <div class="row pa-md bg-light-xs bdr-b">
+                    <div class="row pa-md bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.accessibility'|trans }}</h4>
                     </div>
                     <div class="row">
@@ -165,8 +222,7 @@
                                         data-attribute-value="true">
                                     <label for="transparency-reduced">
                                         <strong>{{ 'mautic.user.account.accessibility.reduced'|trans }}</strong>
-                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.transparency_reduced_description'|trans
-                                            }}</div>
+                                        <div class="description text-help">{{ 'mautic.user.account.accessibility.transparency_reduced_description'|trans }}</div>
                                     </label>
                                 </div>
                             </div>

@@ -1,4 +1,4 @@
-<div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+<div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
     <div class="panel-heading">
         <div class="panel-title">{% trans %}mautic.core.recent.activity{% endtrans %}</div>
     </div>
@@ -17,7 +17,7 @@
                 <div class="media-body">
                     {{ ('mautic.core.' ~ log.action ~ '.by.past.tense')|trans }}
                     {% if log.userId is defined and log.userId is not empty %}
-                        <a 
+                        <a
                             href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: log.userId}) }}"
                             data-toggle="ajax"
                         >{{ log.userName }}</a>

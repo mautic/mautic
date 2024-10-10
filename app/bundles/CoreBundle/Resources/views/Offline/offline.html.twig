@@ -20,10 +20,10 @@
             {% if inline is defined and inline is not empty %}
                 <h3><i class="ri-alert-line ri-fw text-danger pull-left"></i>{{ error.message | raw }}</h3>
                 <h6 class="text-muted">{{ error.file |raw ~ ':'~ error.line | raw }}</h6>
-            {% else %}        
+            {% else %}
                 <div class="text-center">
                     <i class="ri-alert-line ri-5x"></i>
-                </div>        
+                </div>
                 <div class="alert alert-danger">
                     <div>{{ error.message | raw }}</div>
                     <div class="text-muted small text-right mt-10">
@@ -52,7 +52,7 @@
     </div>
     {% else %}
     <div class="col-sm-offset-3 col-sm-6">
-        <div class="bg-white pa-lg text-center" style="margin-top:100px;">
+        <div class="pa-lg text-center" style="margin-top:100px;">
             <i class="ri-alert-line ri-5x"></i>
             <h2>{{ error.message | raw }}</h2>
             {% if error.submessage is defined and error.submessage is not empty %}

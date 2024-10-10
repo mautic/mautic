@@ -22,7 +22,7 @@ class ContactPage
     public static $saveButton         = '.btn-save.btn-copy';
 
     // Edit Contact Form
-    public static $editForm     = '#core > div.pa-md.bg-light-xs.bdr-b > h4';
+    public static $editForm     = '#core > div.pa-md.bdr-b > h4';
 
     // Delete Contact alert
     public static $ConfirmDelete = 'button.btn.btn-danger';
