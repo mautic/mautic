@@ -7,6 +7,10 @@
 Mautic.campaignOnLoad = function (container, response) {
     Mautic.lazyLoadContactListOnCampaignDetail();
 
+    const $flashes = mQuery('#flashes');
+    const $builder = mQuery('#campaign-builder');
+    const isCampaignPreview = $builder.hasClass('preview');
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
@@ -24,7 +28,7 @@ Mautic.campaignOnLoad = function (container, response) {
         });
 
         // set hover and double click functions for the event buttons
-        if (!(mQuery('.preview').length)) {
+        if (!isCampaignPreview) {
             mQuery('#CampaignCanvas .list-campaign-event, #CampaignCanvas .list-campaign-source').off('.eventbuttons')
                 .on('mouseover.eventbuttons', function() {
                     mQuery(this).find('.campaign-event-buttons').removeClass('hide');
@@ -112,8 +116,6 @@ Mautic.campaignOnLoad = function (container, response) {
             }
         });
 
-        const $flashes = mQuery('#flashes');
-        const $builder = mQuery('#campaign-builder');
         $builder.on('campaign-builder:show', function () {
             $builder.addClass('builder-active').removeClass('hide');
             $flashes.addClass('alert-offset');
@@ -146,6 +148,10 @@ Mautic.campaignOnLoad = function (container, response) {
                 Mautic.campaignEventInsertOnError(event, jqxhr);
             }
         });
+
+        if (isCampaignPreview) {
+            Mautic.previewCampaignLabels();
+        }
     }
 };
 
@@ -2269,4 +2275,35 @@ Mautic.clearCampaignEventClone = function() {
 
 Mautic.hideCampaignEventPanel = function() {
     mQuery('#CampaignEventPanel').addClass('hide');
+}
+
+Mautic.previewCampaignLabels = function() {
+    const campaignBuilder = Mautic.campaignBuilderInstance;
+    const managedElements = Mautic.campaignBuilderInstance.getManagedElements();
+    const allElements = Object.values(managedElements).map(el => el.el);
+
+    allElements.forEach(function(element) {
+        const id = element.id;
+        const connections = campaignBuilder.getConnections({source: id});
+
+        connections.forEach(function(connection) {
+            const connectionAnchor = connection.target.dataset.connected ?? null;
+            if (connectionAnchor === 'yes') {
+                connection.addOverlay(["Label", {
+                    label: element.dataset.eventYesPercent + '%',
+                    location: 0.44,
+                    cssClass: 'jtk-label jtk-label--success',
+                    id: element.id + 'yes-path-label'
+                }]);
+            }
+            if (connectionAnchor === 'no') {
+                connection.addOverlay(["Label", {
+                    label: element.dataset.eventNoPercent + '%',
+                    location: 0.44,
+                    cssClass: 'jtk-label jtk-label--error',
+                    id: element.id + 'no-path-label'
+                }]);
+            }
+        });
+    });
 }
