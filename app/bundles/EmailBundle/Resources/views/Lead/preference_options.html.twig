@@ -56,6 +56,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            {%- do form.lead_channels.subscribed_channels.setRendered(true) %}
                             <tr>
                                 <td>
                                     <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
