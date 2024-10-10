@@ -195,9 +195,8 @@ class FormApiController extends CommonApiController
                         throw new InvalidArgumentException($msg, Response::HTTP_NOT_FOUND);
                     }
 
-                    $fieldEntityArray                 = $fieldEntity->convertToArray();
-                    $fieldEntityArray['formId']       = $formId;
-                    $fieldEntityArray['mappedObject'] = $fieldParams['mappedObject'] ?? null;
+                    $fieldEntityArray           = $fieldEntity->convertToArray();
+                    $fieldEntityArray['formId'] = $formId;
 
                     if (!empty($fieldParams['alias'])) {
                         $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
