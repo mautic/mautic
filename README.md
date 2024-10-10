@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-148-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-149-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -257,6 +257,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MojisolaaaO"><img src="https://avatars.githubusercontent.com/u/173389301?v=4?s=100" width="100px;" alt="Mojisola Otusheso"/><br /><sub><b>Mojisola Otusheso</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3AMojisolaaaO" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nileshlohar"><img src="https://avatars.githubusercontent.com/u/18068907?v=4?s=100" width="100px;" alt="Nilesh Lohar"/><br /><sub><b>Nilesh Lohar</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nileshlohar" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
