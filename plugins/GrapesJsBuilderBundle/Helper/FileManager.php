@@ -91,7 +91,7 @@ class FileManager
     }
 
     /**
-     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManager::getImagePages instead
+     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManager::getMediaFiles instead
      */
     public function getImages(): array
     {
@@ -135,7 +135,7 @@ class FileManager
     /**
      * @return array<string, mixed>
      */
-    public function getImagePages(int $page, int $limit): array
+    public function getMediaFiles(int $page, int $limit): array
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();
