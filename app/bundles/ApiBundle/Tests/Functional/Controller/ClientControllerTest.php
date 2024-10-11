@@ -12,8 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 class ClientControllerTest extends MauticMysqlTestCase
 {
     private const TOTAL_COUNT     = 6;
-    protected $useCleanupRollback = false;
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testIndexActionForPager(): void
     {
         $this->createApiClients();
