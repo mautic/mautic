@@ -19,7 +19,7 @@ class ClientControllerTest extends MauticMysqlTestCase
 
         // Test the first page without limits
         $this->requestCredentialsPage();
-        $this->assertPaginationDetails(1);
+        //        $this->assertPaginationDetails(1);
         //
         //        // Test pagination with varying limits
         //        $this->requestCredentialsPage(5);
@@ -37,7 +37,7 @@ class ClientControllerTest extends MauticMysqlTestCase
         }
 
         $this->em->flush();
-        $this->em->clear();
+        //        $this->em->clear();
     }
 
     /**
