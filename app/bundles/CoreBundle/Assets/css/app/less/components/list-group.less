@@ -12,13 +12,27 @@
   transition: var(--transition-all-productive);
   border: 0;
   padding: 0;
+  vertical-align: middle;
 
-  > a {
+  > a, > label {
     position: relative;
     z-index: 1;
     display: block;
     padding: 10px 15px;
+    cursor: pointer;
     color: @list-group-link-color;
+    input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      margin: 0;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+    }
   }
 
   &:hover {

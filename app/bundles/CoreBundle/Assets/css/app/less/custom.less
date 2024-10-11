@@ -157,9 +157,9 @@ body.noscroll {
 }
 
 .theme-selected {
-  border: 1px solid #4e5e9e;
-  -webkit-box-shadow: 0px 0px 40px #f3f3f3;
-  box-shadow: 0px 0px 40px #f3f3f3;
+  outline: 1px solid var(--focus);
+  -webkit-box-shadow: 0px 0px 40px var(--focus);
+  box-shadow: 0px 0px 40px var(--focus);
 }
 
 #app-content.content-only {
@@ -333,8 +333,6 @@ ul.media-list.media-list-feed div.media-body
       opacity: 0;
   }
 }
-
-.tooltip-inner { padding: 12px; }
 
 .copy-icon {
   display: inline-flex;

@@ -277,7 +277,7 @@
                   </div>
               </div>
 
-              <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
+              <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
                   <div class="tab-pane active bdr-w-0" id="stats-container">
                       <div id="emailGraphStats"
                            data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
@@ -365,7 +365,7 @@
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
           <!-- preview URL -->
-          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
               </div>
@@ -419,7 +419,7 @@
           </div>
 
           <!-- email usages -->
-          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.usages'|trans }}</div>
               </div>

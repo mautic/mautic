@@ -3,7 +3,7 @@
 {% block mainFormContent %}
     {{ form_start(form) }}
     <div class="box-layout">
-        <div class="col-md-{{ hasRightColumn ? 9 : 12 }} height-auto bg-white">
+        <div class="col-md-{{ hasRightColumn ? 9 : 12 }} height-auto">
             <div class="row">
                 <div class="col-xs-12">
                     {{ form_errors(form) }}
@@ -24,7 +24,7 @@
         </div>
         {% set rightContent = block('rightFormContent') %}
         {% if rightContent is not empty %}
-        <div class="col-md-3 bg-white height-auto bdr-l">
+        <div class="col-md-3 height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
                 {{ rightContent|raw }}
             </div>
