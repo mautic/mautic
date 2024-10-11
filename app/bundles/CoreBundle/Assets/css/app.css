@@ -3024,7 +3024,6 @@ a.media {
   padding-left: 15px;
   margin: 0;
   display: flex;
-  flex-direction: column;
 }
 @media (min-width: 768px) {
   .container {
@@ -3040,6 +3039,13 @@ a.media {
   .container {
     max-width: 1170px;
   }
+}
+.container-column {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  flex-direction: column;
 }
 .container-fluid {
   padding-right: 15px;
@@ -9477,8 +9483,11 @@ code:hover > .copy-icon {
 .toggle__appearance[size="sm"] .toggle__switch--checked .toggle__check {
   visibility: visible;
 }
-.toggle--disabled .toggle__appearance {
+.toggle--disabled {
   cursor: not-allowed;
+}
+.toggle--disabled .toggle__label {
+  pointer-events: none;
 }
 .toggle--disabled .toggle__label-text,
 .toggle--disabled .toggle__text {
@@ -9489,6 +9498,7 @@ code:hover > .copy-icon {
 }
 .toggle--disabled .toggle__switch::before {
   background-color: var(--icon-on-color-disabled, #8d8d8d);
+  box-shadow: none;
 }
 .toggle--disabled .toggle__check {
   fill: var(--button-disabled, #c6c6c6);
