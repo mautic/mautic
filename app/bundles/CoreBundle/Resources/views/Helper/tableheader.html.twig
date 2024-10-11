@@ -22,37 +22,22 @@
             priority: -1
         }) }}
     {% endif %}
-    {% set buttonCount = buttonGetCount() %}
-    <th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ tooltip|trans }}"{% endif %}>
-        <div class="input-group input-group-sm">
-            <span class="input-group-addon">
-                <label for="customcheckbox-one0" class="sr-only">Select all</label>
-                <input type="checkbox" id="customcheckbox-one0"
-                    {% if buttonCount == 0 %}
-                        disabled="disabled"
-                    {% else %}
-                        value="1" data-toggle="checkall" data-target="{{ target }}"
-                    {% endif %} />
-            </span>
-            
-            <div class="input-group-btn">
-                <button data-button-count="{{ buttonCount }}" class="btn btn-sm dropdown-toggle {% if buttonCount == 0 %} btn-ghost btn-nospin {% endif %}"
-                    {% if buttonCount == 0 %}
-                        disabled="disabled"
-                        data-list-action="false"
-                    {% else %}
-                        data-toggle="dropdown"
-                    {% endif %}>
-                    <i class="ri-more-2-line"></i>
-                </button>
-                {% if buttonCount > 0 %}
-                    <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu" aria-label="Bulk action options">
-                        {{ buttonsRender() }}
-                    </ul>
-                {% endif %}
-            </div>
+<th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ tooltip|trans }}"{% endif %}>
+    <div class="input-group input-group-sm">
+        <span class="input-group-addon">
+            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="{{ target }}">
+        </span>
+
+        <div class="input-group-btn">
+            <button type="button" disabled class="btn btn-ghost btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+                <i class="ri-more-2-line"></i>
+            </button>
+            <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
+                {{ buttonsRender() }}
+            </ul>
         </div>
-    </th>
+    </div>
+</th>
 {% elseif sessionVar is not defined or sessionVar is empty %}
 <th{% if class is defined and class is not empty %} class="{{ class }}"{% endif %}>
     <span>{{ text|trans }}</span>
