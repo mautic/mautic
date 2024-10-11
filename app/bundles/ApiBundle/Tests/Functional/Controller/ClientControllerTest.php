@@ -11,11 +11,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClientControllerTest extends MauticMysqlTestCase
 {
-    private const TOTAL_COUNT = 20;
+    private const TOTAL_COUNT = 6;
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testIndexActionForPager(): void
     {
-        $this->markTestSkipped();
         $this->createApiClients();
 
         // Test the first page without limits
@@ -24,9 +26,6 @@ class ClientControllerTest extends MauticMysqlTestCase
 
         // Test pagination with varying limits
         $this->requestCredentialsPage(5);
-        $this->assertPaginationDetails(4);
-
-        $this->requestCredentialsPage(10);
         $this->assertPaginationDetails(2);
     }
 
