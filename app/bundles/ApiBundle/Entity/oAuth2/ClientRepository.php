@@ -24,16 +24,6 @@ class ClientRepository extends CommonRepository
         return $query->getQuery()->getResult();
     }
 
-    public function getEntities(array $args = [])
-    {
-        $q = $this
-            ->createQueryBuilder('c');
-
-        $args['qb'] = $q;
-
-        return parent::getEntities($args);
-    }
-
     protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
