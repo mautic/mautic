@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClientControllerTest extends MauticMysqlTestCase
 {
-    private const TOTAL_COUNT = 6;
+    private const TOTAL_COUNT     = 6;
+    protected $useCleanupRollback = false;
 
     public function testIndexActionForPager(): void
     {
