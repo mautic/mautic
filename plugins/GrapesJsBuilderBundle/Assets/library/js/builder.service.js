@@ -15,7 +15,6 @@ import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor5';
 import StorageService from "./storage.service";
-import AssetService from './asset.service';
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
@@ -27,28 +26,15 @@ import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 export default class BuilderService {
   editor;
 
-  assets;
-
-  uploadPath;
-
-  deletePath;
-
   storageService;
 
-  /**
-   * @param {*} assets
-   */
-  constructor(assets) {
-    if (!assets.conf.uploadPath) {
-      throw Error('No uploadPath found');
-    }
-    if (!assets.conf.deletePath) {
-      throw Error('No deletePath found');
-    }
+  assetService;
 
-    this.assets = assets.files;
-    this.uploadPath = assets.conf.uploadPath;
-    this.deletePath = assets.conf.deletePath;
+  /**
+   * @param {AssetService} assetService
+   */
+  constructor(assetService) {
+    this.assetService = assetService;
   }
 
   /**
@@ -97,43 +83,51 @@ export default class BuilderService {
     this.editor.on('asset:remove', (response) => {
       // Delete file on server
       mQuery.ajax({
-        url: this.deletePath,
+        url: this.assetService.getDeletePath(),
         data: { filename: response.getFilename() },
       });
     });
 
     this.editor.on('asset:open', () => {
       const editor = this.editor;
+      const assetsService = this.assetService;
       const assetsContainer = document.querySelector('.gjs-am-assets');
-      const $assetsSpinner = mQuery('<div class="gjs-assets-spinner"><i class="ri-loader-3-line ri-spin"></i></div>');
+      const $assetsSpinner = document.createElement('div');
+      $assetsSpinner.className = 'gjs-assets-spinner';
+      $assetsSpinner.innerHTML = '<i class="ri-loader-3-line ri-spin"></i>';
 
       if (assetsContainer) {
         let isLoading = false;
 
-        const loadNextPage = () => {
+        const loadNextPage = async () => {
           if (isLoading) return;
           isLoading = true;
-          mQuery(assetsContainer).append($assetsSpinner);
+          assetsContainer.appendChild($assetsSpinner);
 
-          AssetService.getAssetsNextPageXhr(result => {
-            const assetManager = editor.AssetManager;
-            const currentAssets = assetManager.getAll().models;
-            const newAssets = result.data;
+          try {
+            const result = await assetsService.getAssetsNextPageXhr();
+            if (result) {
+              const assetManager = editor.AssetManager;
+              const currentAssets = assetManager.getAll().models;
+              const newAssets = result.data;
 
-            // Combine current assets with new assets
-            const combinedAssets = [...currentAssets, ...newAssets];
+              // Combine current assets with new assets
+              const combinedAssets = [...currentAssets, ...newAssets];
 
-            // Reset the entire collection with combined assets
-            assetManager.getAll().reset(combinedAssets);
-            assetManager.render();
-
+              // Reset the entire collection with combined assets
+              assetManager.getAll().reset(combinedAssets);
+              assetManager.render();
+            }
+          } catch (error) {
+            console.error('Error loading next page of assets:', error);
+          } finally {
             isLoading = false;
-          });
+          }
         };
 
         assetsContainer.addEventListener('scroll', function() {
           const hasScrolledToBottom = this.scrollTop + this.clientHeight >= this.scrollHeight - 5;
-          if (hasScrolledToBottom && !AssetService.hasLoadedAllAssets()) {
+          if (hasScrolledToBottom && !assetsService.hasLoadedAllAssets()) {
             loadNextPage();
           }
         });
@@ -486,9 +480,9 @@ export default class BuilderService {
    */
   getAssetManagerConf() {
     return {
-      assets: this.assets,
+      assets: [],
       noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
-      upload: this.uploadPath,
+      upload: this.assetService.getUploadPath(),
       uploadName: 'files',
       multiUpload: 1,
       embedAsBase64: false,

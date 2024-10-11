@@ -25,8 +25,8 @@ function launchBuilderGrapesjs(formName) {
   const $builder = mQuery('.builder');
   $builder.addClass('builder-active').removeClass('hide');
 
-  const assetsConfig = AssetService.getAssetsConfig();
-  const builder = new BuilderService(assetsConfig);
+  const assetService = new AssetService();
+  const builder = new BuilderService(assetService);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
 
@@ -36,9 +36,14 @@ function launchBuilderGrapesjs(formName) {
   builder.editor.trigger('show');
 
   // Load and add assets
-  AssetService.getAssetsXhr(function (result) {
-    builder.editor.AssetManager.add(result.data);
-  });
+  (async () => {
+    try {
+      const result = await assetService.getAssetsXhr();
+      builder.editor.AssetManager.add(result.data);
+    } catch (error) {
+      console.error('Error loading initial assets:', error);
+    }
+  })();
 }
 
 /**

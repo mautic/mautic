@@ -1,63 +1,85 @@
 export default class AssetService {
-  static assetsPage = 1;
-  static totalPages = null;
+  constructor() {
+    this.uploadPath = '/s/grapesjsbuilder/upload';
+    this.deletePath = '/s/grapesjsbuilder/delete';
+    this.assetsPath = '/s/grapesjsbuilder/media';
+    this.assetsPage = 1;
+    this.totalPages = null;
+  }
 
   /**
-   * Get initial config for asset manager
-   *
-   * @returns object
+   * Get the path for uploading assets
+   * @returns {string} The upload path
    */
-  static getAssetsConfig() {
-    const textareaAssets = mQuery('#grapesjsbuilder_assets');
-    const uploadPath = textareaAssets.data('upload');
-    const deletePath = textareaAssets.data('delete');
-    return {
-      files: [],
-      conf: {
-        uploadPath,
-        deletePath,
-      },
-    };
+  getUploadPath() {
+    return this.uploadPath;
   }
 
-  static getAssetsPath() {
-    const textareaAssets = mQuery('#grapesjsbuilder_assets');
-    return `${textareaAssets.data('assets')}?page=${AssetService.assetsPage}`;
+  /**
+   * Get the path for deleting assets
+   * @returns {string} The delete path
+   */
+  getDeletePath() {
+    return this.deletePath;
+  };
+
+
+  /**
+   * Get assets path with current page
+   * @returns {string}
+   */
+  getAssetsPath() {
+    return `${this.assetsPath}?page=${this.assetsPage}`;
   }
 
-  static fetchAssets(assetsPath, onSuccess, onError) {
-    return mQuery.get(assetsPath)
-        .done((result) => {
-          if (result.totalPages !== undefined) {
-            AssetService.totalPages = result.totalPages;
-          }
-          if (typeof onSuccess === 'function') {
-            onSuccess(result);
-          }
-        })
-        .fail((error) => {
-          if (typeof onError === 'function') {
-            onError(error);
-          }
-        });
-  }
-
-  static getAssetsXhr(onSuccess, onError) {
-    AssetService.assetsPage = 1;
-    const assetsPath = AssetService.getAssetsPath();
-    return AssetService.fetchAssets(assetsPath, onSuccess, onError);
-  }
-
-  static getAssetsNextPageXhr(onSuccess, onError) {
-    if (!AssetService.totalPages || AssetService.assetsPage >= AssetService.totalPages) {
-      return;
+  /**
+   * Fetch assets from the server
+   * @param {string} assetsPath
+   * @returns {Promise<Object>}
+   */
+  async fetchAssets(assetsPath) {
+    try {
+      const response = await fetch(assetsPath);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const result = await response.json();
+      if (result.totalPages !== undefined) {
+        this.totalPages = result.totalPages;
+      }
+      return result;
+    } catch (error) {
+      console.error('Error fetching assets:', error);
+      throw error;
     }
-    AssetService.assetsPage++;
-    const assetsPath = AssetService.getAssetsPath();
-    return AssetService.fetchAssets(assetsPath, onSuccess, onError);
   }
 
-  static hasLoadedAllAssets() {
-    return AssetService.assetsPage && AssetService.assetsPage === AssetService.totalPages;
+  /**
+   * Get assets for the first page
+   * @returns {Promise<Object>}
+   */
+  async getAssetsXhr() {
+    this.assetsPage = 1;
+    return this.fetchAssets(this.getAssetsPath());
+  }
+
+  /**
+   * Get assets for the next page
+   * @returns {Promise<Object>|null}
+   */
+  async getAssetsNextPageXhr() {
+    if (this.hasLoadedAllAssets()) {
+      return null;
+    }
+    this.assetsPage++;
+    return this.fetchAssets(this.getAssetsPath());
+  }
+
+  /**
+   * Check if all assets have been loaded
+   * @returns {boolean}
+   */
+  hasLoadedAllAssets() {
+    return this.totalPages !== null && this.assetsPage >= this.totalPages;
   }
 }
