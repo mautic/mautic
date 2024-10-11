@@ -15,7 +15,15 @@ class ClientControllerTest extends MauticMysqlTestCase
 
     public function testIndexActionForPager(): void
     {
-        $this->createApiClients();
+        //        $this->createApiClients();
+
+        $client = new Client();
+        $client->setName('client');
+        $client->setRedirectUris(['https://example.com/']);
+
+        $this->em->persist($client);
+        $this->em->flush();
+        $this->em->clear();
 
         // Test the first page without limits
         $this->requestCredentialsPage();
