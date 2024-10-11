@@ -44,9 +44,9 @@ class ClientControllerTest extends MauticMysqlTestCase
      */
     private function requestCredentialsPage(?int $limit = null): void
     {
-        $url = '/s/credentials?tmpl=list&name=client';
+        $url = '/s/credentials';
         if ($limit) {
-            $url .= '&limit='.$limit;
+            $url .= '?tmpl=list&name=client&limit='.$limit;
         }
 
         $this->client->request(Request::METHOD_GET, $url);
