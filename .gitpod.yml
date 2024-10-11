@@ -24,7 +24,7 @@ ports:
   # phpmyadmin https port
   - port: 8027
     onOpen: ignore
-  # mailhog https port
+  # mailpit https port
   - port: 8036
     onOpen: ignore
   # Main web port
