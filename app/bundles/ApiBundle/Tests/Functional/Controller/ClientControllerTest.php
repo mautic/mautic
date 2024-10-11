@@ -24,10 +24,10 @@ class ClientControllerTest extends MauticMysqlTestCase
         // Test the first page without limits
         $this->requestCredentialsPage();
         $this->assertPaginationDetails(1);
-        //
-        //        // Test pagination with varying limits
-        //        $this->requestCredentialsPage(5);
-        //        $this->assertPaginationDetails(2);
+
+        // Test pagination with varying limits
+        $this->requestCredentialsPage(5);
+        $this->assertPaginationDetails(2);
     }
 
     private function createApiClients(): void
