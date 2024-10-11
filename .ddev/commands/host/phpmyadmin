@@ -1,0 +1,19 @@
+#!/bin/bash
+
+## #ddev-generated: If you want to edit and own this file, remove this line.
+## Description: Launch a browser with PhpMyAdmin
+## Usage: phpmyadmin
+## Example: "ddev phpmyadmin"
+
+DDEV_PHPMYADMIN_PORT=8036
+DDEV_PHPMYADMIN_HTTPS_PORT=8037
+if [ ${DDEV_PRIMARY_URL%://*} = "http" ] || [ -n "${GITPOD_WORKSPACE_ID:-}" ] || [ "${CODESPACES:-}" = "true" ]; then
+    # Gitpod: "gp preview" opens a blank page for PhpMyAdmin, use "xdg-open" instead
+    if [ "${OSTYPE:-}" = "linux-gnu" ] && [ -n "${GITPOD_WORKSPACE_ID:-}" ] && [ -z "${DDEV_DEBUG:-}" ]; then
+        xdg-open "$(DDEV_DEBUG=true ddev launch :$DDEV_PHPMYADMIN_PORT | grep "FULLURL" | awk '{print $2}')"
+    else
+        ddev launch :$DDEV_PHPMYADMIN_PORT
+    fi
+else
+    ddev launch :$DDEV_PHPMYADMIN_HTTPS_PORT
+fi
