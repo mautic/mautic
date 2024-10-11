@@ -2415,12 +2415,20 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
   color: var(--icon-disabled);
   border: 1px solid transparent;
 }
+.btn-ghost.btn-icon.btn-toggletip {
+  color: inherit;
+}
 .btn-icon {
   justify-content: center;
   padding: 0;
   align-items: center;
   aspect-ratio: 1 / 1;
   border-radius: 20px;
+}
+.btn-toggletip {
+  height: auto;
+  line-height: 1em;
+  padding: 2px;
 }
 .btn-group > .btn.btn-yes:first-child:not(:last-child):not(.dropdown-toggle),
 .btn-group > .btn.btn-no:first-child:not(:last-child):not(.dropdown-toggle),
@@ -3040,6 +3048,7 @@ a.media {
   padding-left: 15px;
   margin: 0;
   display: flex;
+  flex-direction: column;
 }
 @media (min-width: 768px) {
   .container {
@@ -3055,13 +3064,6 @@ a.media {
   .container {
     max-width: 1170px;
   }
-}
-.container-column {
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  flex-direction: column;
 }
 .container-fluid {
   padding-right: 15px;

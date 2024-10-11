@@ -234,6 +234,8 @@
       @disabled-background: transparent,
       @disabled-text-color: var(--icon-disabled)
     );
+
+    &.btn-toggletip { color: inherit; }
   }
 }
 
@@ -244,6 +246,12 @@
   align-items: center;
   aspect-ratio: 1 / 1;
   border-radius: 20px;
+}
+
+.btn-toggletip {
+  height: auto;
+  line-height: 1em;
+  padding: 2px;
 }
 
 .btn-group {
