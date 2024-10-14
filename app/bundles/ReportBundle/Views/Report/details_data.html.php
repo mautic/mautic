@@ -120,23 +120,27 @@ $graphContent = $view->render(
                                                 $cellType = $columns[$key]['type'];
                                                 $cellVal  = $row[$columns[$key]['alias']];
 
-                                                // For grouping by datetime fields, so we don't get the timestamp on them
-                                                if ('datetime' === $cellType && 10 === strlen($cellVal)) {
-                                                    $cellType = 'date';
-                                                }
-                                                ?>
-                                                <?php
-                                                if ('' !== $cellVal && !is_null($cellVal)) {
-                                                    switch ($cellType) {
-                                                        case 'datetime':
-                                                            echo $view['date']->toFullConcat($cellVal, 'UTC');
-                                                            break;
-                                                        case 'date':
-                                                            echo $view['date']->toShort($cellVal, 'UTC');
-                                                            break;
-                                                        default:
-                                                            echo $view['formatter']->_($cellVal, $cellType);
-                                                            break;
+                                                // If field is date or datetime, and is formatted with string
+                                                // which does not convert back to date simply print the formatted string.
+                                                if (in_array($cellType, ['date', 'datetime']) && !strtotime($cellVal)) {
+                                                    echo $cellVal;
+                                                } else {
+                                                    // For grouping by datetime fields, so we don't get the timestamp on them
+                                                    if ('datetime' === $cellType && 10 === strlen($cellVal)) {
+                                                        $cellType = 'date';
+                                                    }
+                                                    if ('' !== $cellVal && !is_null($cellVal)) {
+                                                        switch ($cellType) {
+                                                            case 'datetime':
+                                                                echo $view['date']->toFullConcat($cellVal, 'UTC');
+                                                                break;
+                                                            case 'date':
+                                                                echo $view['date']->toShort($cellVal, 'UTC');
+                                                                break;
+                                                            default:
+                                                                echo $view['formatter']->_($cellVal, $cellType);
+                                                                break;
+                                                        }
                                                     }
                                                 }
                                                 ?>
