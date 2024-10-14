@@ -18,6 +18,11 @@ h1, h2, h3, h4, h5, h6,
   .text-overflow();
 }
 
+::selection {
+  background-color: rgb(from var(--background-brand-primary) r g b / 25%);
+  color: var(--link-primary);
+}
+
 // font size
 // -------------------------
 .fs-base { font-size: @font-size-base; }
@@ -102,8 +107,9 @@ h1, h2, h3, h4, h5, h6,
 // Contextual colors
 // -------------------------
 .text-muted { color: var(--text-secondary); }
+.text-placeholder { color: var(--text-placeholder); }
 .text-white { .text-emphasis-variants(#fff); }
-.text-primary { .text-emphasis-variant(@brand-primary); }
+.text-primary { color: var(--interactive) }
 .text-success { .text-emphasis-variants(@brand-success); }
 .text-warning { .text-emphasis-variant(@brand-warning); }
 .text-danger { .text-emphasis-variant(@brand-danger); }
@@ -159,6 +165,7 @@ blockquote {
 
 .help-block {
   font-size: 12px;
+  color: var(--text-helper);
 }
 code {
   padding: var(--spacing-01) var(--spacing-03);
@@ -173,3 +180,5 @@ kbd {
   border: 1px solid #afb8c133;
   border-radius: 5px;
 }
+
+.tooltip-inner { padding: 12px; }

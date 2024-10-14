@@ -57,11 +57,6 @@
   &:has(.btn) { align-items: center; }
 }
 
-.nav-tabs-contained + .tab-content,
-.nav-tabs-contained + * > .tab-content {
-  .alert { background-color: var(--layer-alternate); }
-}
-
 .alert-success {
   border-color: var(--support-success);
 
@@ -122,9 +117,9 @@
 
   a {
     font-weight: 700;
-    color: lighten(@mautic-primary, 10%);
+    &,
     &:hover {
-      color: lighten(@mautic-primary, 30%);
+      color: var(--text-inverse);
     }
   }
 

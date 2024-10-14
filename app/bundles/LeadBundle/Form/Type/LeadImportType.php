@@ -59,8 +59,9 @@ class LeadImportType extends AbstractType
             'delimiter',
             TextType::class,
             [
-                'label' => 'mautic.lead.import.delimiter',
-                'attr'  => [
+                'label'      => 'mautic.lead.import.delimiter',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.delimiter.help',
                 ],
@@ -74,8 +75,9 @@ class LeadImportType extends AbstractType
             'enclosure',
             TextType::class,
             [
-                'label' => 'mautic.lead.import.enclosure',
-                'attr'  => [
+                'label'      => 'mautic.lead.import.enclosure',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.enclosure.help',
                 ],
@@ -89,8 +91,9 @@ class LeadImportType extends AbstractType
             'escape',
             TextType::class,
             [
-                'label' => 'mautic.lead.import.escape',
-                'attr'  => [
+                'label'      => 'mautic.lead.import.escape',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.escape.help',
                 ],
@@ -104,8 +107,9 @@ class LeadImportType extends AbstractType
             'batchlimit',
             TextType::class,
             [
-                'label' => 'mautic.lead.import.batchlimit',
-                'attr'  => [
+                'label'      => 'mautic.lead.import.batchlimit',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.batchlimit_tooltip',
                 ],
