@@ -44,7 +44,7 @@ a.media {
     .media {
       overflow: visible;
 
-      &:first-of-type > .media-object > .figure { 
+      &:first-of-type > .media-object > .figure {
         background-color: var(--background-inverse);
         color: var(--text-inverse);
         transition: var(--transition-all-productive);
@@ -64,7 +64,7 @@ a.media {
           bottom: -200%;
           width: 1px;
           left: 50%;
-          .lh-background-image(linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(229,229,229,1) 5%, rgb(242, 242, 242) 90%, rgba(229,229,229,0) 100%));
+          .lh-background-image(linear-gradient(top,  rgba(255,255,255,0) 0%, var(--layer) 5%, var(--layer) 90%, rgba(229,229,229,0) 100%));
         }
 
         > .figure {

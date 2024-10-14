@@ -60,7 +60,11 @@ mQuery( document ).ajaxStop(function(event) {
     Mautic.initializeCodeBlocks();
 });
 
-mQuery( document ).ready(function() {
+/**
+ * Applies user interface preferences from localStorage to the HTML element.
+ * Runs immediately to set attributes based on 'm-toggle-setting-' prefixed items.
+ */
+(function() {
     // Load user preferences for UI saved previously
     const prefix = 'm-toggle-setting-';
     Object.keys(localStorage)
@@ -73,24 +77,16 @@ mQuery( document ).ready(function() {
                 document.documentElement.setAttribute(attributeName, value);
             }
         });
+})();
 
-    // Handle radio button changes
-    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                const attributeName = this.dataset.attributeToggle;
-                const newValue = this.dataset.attributeValue;
-                document.documentElement.setAttribute(attributeName, newValue);
-                localStorage.setItem(`${prefix}${attributeName}`, newValue);
-            }
-        });
-    });
-
+mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
         });
     }
+
+    Mautic.initListGroupToggle('body');
 
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
@@ -952,4 +948,40 @@ var Mautic = {
             return false;
         }
     }
+};
+
+Mautic.initListGroupToggle = function(container) {
+    mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+        e.preventDefault(); // Prevent default action if necessary
+
+        var $item = mQuery(this);
+        var $input = $item.find('input');
+
+        // If the input is disabled or readonly, do nothing
+        if ($input.prop('disabled') || $input.prop('readonly')) {
+            return;
+        }
+
+        var type = $input.prop('type');
+
+        if (type === 'radio') {
+            // Remove 'active' class from all items in the group
+            $item.closest('.list-group').find('.list-group-item').removeClass('active');
+
+            // Add 'active' class to the clicked item
+            $item.addClass('active');
+
+            // Set the input as checked
+            $input.prop('checked', true);
+        } else if (type === 'checkbox') {
+            // Toggle 'active' class on the clicked item
+            $item.toggleClass('active');
+
+            // Update the input's checked property based on the 'active' class
+            $input.prop('checked', $item.hasClass('active'));
+        }
+
+        // Trigger the 'change' event on the input
+        $input.trigger('change');
+    });
 };

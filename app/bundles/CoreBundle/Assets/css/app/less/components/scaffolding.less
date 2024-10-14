@@ -13,6 +13,7 @@ hr,
   margin-bottom: 15px;
   border: 0;
   border-top: 0;
+  width: auto;
 
   &.hr-w-2 {
     border-width: 2px;
@@ -69,11 +70,15 @@ hr,
 a {
   transition: var(--transition-all-productive);
   color: var(--link-primary);
+  outline: 2px solid transparent;
 
   &:hover {
     color: var(--link-primary-hover);
     cursor: pointer;
   }
   &:hover,
-  &:focus {text-decoration: none;}
+  &:focus {
+    text-decoration: none;
+    outline: 2px solid transparent;
+  }
 }

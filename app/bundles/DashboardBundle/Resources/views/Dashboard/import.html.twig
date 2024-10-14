@@ -14,7 +14,7 @@
                         <div class="panel-title">{{ 'mautic.dashboard.predefined'|trans }}</div>
                     </div>
                     <div class="panel-body">
-                        <div class="list-group">
+                        <div class="list-group bdr-w-0">
                             {% for dashboard, config in dashboards %}
                                 <div class="list-group-item mt-md {{ (dashboard == preview) ? 'active' : '' }}">
                                     <h4 class="list-group-item-heading">{{ config.name|purify }}</h4>

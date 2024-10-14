@@ -24,7 +24,7 @@
     {{ form_row(form.name) }}
 
     {% if form.triggerMode is defined %}
-    <div{% if hideTriggerMode %} class="hide"{% endif %}>
+    <div class="mb-lg{% if hideTriggerMode %} hide{% endif %}">
         {{ form_row(form.triggerMode) }}
 
         <div{% if ('date' != form.triggerMode.vars['data']) %} class="hide"{% endif %} id="triggerDate">
@@ -44,12 +44,15 @@
                 <hr />
                 <div class="row">
                     <div class="col-sm-12">
-                        <div style="display:inline-block; font-weight: 600;">{{ 'mautic.campaign.form.type.interval_schedule_at'|trans }} </div>
-                        <div style="width: 75px; display:inline-block; margin:0 10px 0 10px;">{{ form_widget(form.triggerHour) }}</div>
-                        <div style="display:inline-block; font-weight: 600;"> {{ 'mautic.campaign.form.type.interval_schedule_between_hours'|trans }} </div>
-                        <div style="width: 75px;display:inline-block; margin:0 10px 0 10px;">{{ form_widget(form.triggerRestrictedStartHour) }}</div>
-                        <div style="display:inline-block; font-weight: 600;"> {{ 'mautic.core.and'|trans }} </div>
-                        <div style="width: 75px; display:inline-block; margin:0 10px 0 10px;">{{ form_widget(form.triggerRestrictedStopHour) }}</div>
+                        <div class="d-flex fd-row fw-nowrap ai-center gap-sm">
+                            <div>{{ 'mautic.campaign.form.type.interval_schedule_at'|trans }} </div>
+                            <div>{{ form_widget(form.triggerHour) }}</div>
+                            <div> {{ 'mautic.campaign.form.type.interval_schedule_between_hours'|trans }} </div>
+                            <div>{{ form_widget(form.triggerRestrictedStartHour) }}</div>
+                            <div> {{ 'mautic.core.and'|trans }} </div>
+                            <div>{{ form_widget(form.triggerRestrictedStopHour) }}</div>
+                        </div>
+
                     </div>
                 </div>
                 <hr />
