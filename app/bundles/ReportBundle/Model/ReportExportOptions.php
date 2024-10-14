@@ -26,6 +26,11 @@ class ReportExportOptions
      */
     private $dateTo;
 
+    /**
+     * @var bool
+     */
+    private $paginate = true;
+
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->batchSize = $coreParametersHelper->get('report_export_batch_size');
@@ -96,5 +101,15 @@ class ReportExportOptions
     public function setDateTo($dateTo)
     {
         $this->dateTo = $dateTo;
+    }
+
+    public function isPaginate(): bool
+    {
+        return $this->paginate;
+    }
+
+    public function setPaginate(bool $paginate): void
+    {
+        $this->paginate = $paginate;
     }
 }

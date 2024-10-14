@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ScheduleController extends CommonAjaxController
 {
-    public function indexAction($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    public function indexAction($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency, string $scheduleTimeZone, string $scheduleTime)
     {
         /** @var DateBuilder $dateBuilder */
         $dateBuilder = $this->container->get('mautic.report.model.scheduler_date_builder');
-        $dates       = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
+        $dates       = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
 
         $html = $this->render(
             'MauticReportBundle:Schedule:index.html.php',

@@ -10,6 +10,11 @@ use Mautic\ReportBundle\Exception\FileIOException;
 class ReportFileWriter
 {
     /**
+     * @var ExcelExporter
+     */
+    private $excelExporter;
+
+    /**
      * @var CsvExporter
      */
     private $csvExporter;
@@ -19,10 +24,11 @@ class ReportFileWriter
      */
     private $exportHandler;
 
-    public function __construct(CsvExporter $csvExporter, ExportHandler $exportHandler)
+    public function __construct(CsvExporter $csvExporter, ExcelExporter $excelExporter, ExportHandler $exportHandler)
     {
-        $this->csvExporter   = $csvExporter;
-        $this->exportHandler = $exportHandler;
+        $this->exportHandler     = $exportHandler;
+        $this->csvExporter       = $csvExporter;
+        $this->excelExporter     = $excelExporter;
     }
 
     /**
@@ -30,10 +36,19 @@ class ReportFileWriter
      */
     public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions)
     {
-        $fileName = $this->getFileName($scheduler);
-        $handler  = $this->exportHandler->getHandler($fileName);
-        $this->csvExporter->export($reportDataResult, $handler, $reportExportOptions->getPage());
-        $this->exportHandler->closeHandler($handler);
+        switch ($scheduler->getReport()->getScheduleFormat()) {
+          case 'csv':
+            $fileName = $this->getFileName($scheduler);
+            $handler  = $this->exportHandler->getHandler($fileName);
+            $this->csvExporter->export($reportDataResult, $handler, $reportExportOptions->getPage());
+            $this->exportHandler->closeHandler($handler);
+            break;
+          case 'xlsx':
+            $filePath = $this->getFilePath($scheduler);
+            $name     = $this->getName($scheduler);
+            $this->excelExporter->export($reportDataResult, $name, $filePath);
+            break;
+        }
     }
 
     public function clear(Scheduler $scheduler)
@@ -43,26 +58,31 @@ class ReportFileWriter
     }
 
     /**
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getFilePath(Scheduler $scheduler)
+    public function getFilePath(Scheduler $scheduler): string
     {
         $fileName = $this->getFileName($scheduler);
 
         return $this->exportHandler->getPath($fileName);
     }
 
-    /**
-     * @return string
-     */
-    private function getFileName(Scheduler $scheduler)
+    private function getName(Scheduler $scheduler): string
     {
         $date       = $scheduler->getScheduleDate();
         $dateString = $date->format('Y-m-d');
         $reportName = $scheduler->getReport()->getName();
 
         return $dateString.'_'.InputHelper::alphanum($reportName, false, '-');
+    }
+
+    private function getFileName(Scheduler $scheduler): string
+    {
+        return $this->getName($scheduler).'.'.$this->getSuffix($scheduler);
+    }
+
+    private function getSuffix(Scheduler $scheduler): ?string
+    {
+        return $scheduler->getReport()->getScheduleFormat();
     }
 }

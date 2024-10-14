@@ -102,6 +102,26 @@ class Report extends FormEntity implements SchedulerInterface
      */
     private $scheduleMonthFrequency;
 
+    /**
+     * @var string|null
+     */
+    private $scheduleFormat = 'csv';
+
+    /**
+     * @var string|null
+     */
+    private $scheduleTimezone = 'UTC';
+
+    /**
+     * @var string|null
+     */
+    private $scheduleTime = '00:00';
+
+    /**
+     * @var bool
+     */
+    private $sendEmpty = false;
+
     public function __clone()
     {
         $this->id = null;
@@ -162,6 +182,21 @@ class Report extends FormEntity implements SchedulerInterface
         $builder->addNullableField('toAddress', Type::STRING, 'to_address');
         $builder->addNullableField('scheduleDay', Type::STRING, 'schedule_day');
         $builder->addNullableField('scheduleMonthFrequency', Type::STRING, 'schedule_month_frequency');
+        $builder->addNullableField('scheduleFormat', Type::STRING, 'schedule_format');
+
+        $builder->createField('scheduleTime', Type::STRING)
+          ->columnName('schedule_time')->option('default', '00:00')
+          ->build();
+
+        $builder->createField('scheduleTimezone', Type::STRING)
+          ->columnName('schedule_timezone')
+          ->option('default', 'UTC')
+          ->build();
+
+        $builder->createField('sendEmpty', Type::BOOLEAN)
+         ->columnName('send_empty')
+         ->option('default', '0')
+         ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -206,6 +241,10 @@ class Report extends FormEntity implements SchedulerInterface
                     'toAddress',
                     'scheduleDay',
                     'scheduleMonthFrequency',
+                    'scheduleFormat',
+                    'scheduleTimezone',
+                    'scheduleTime',
+                    'sendEmpty',
                 ]
             )
             ->build();
@@ -505,10 +544,7 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->settings;
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduled()
+    public function isScheduled(): bool
     {
         return $this->isScheduled;
     }
@@ -521,6 +557,24 @@ class Report extends FormEntity implements SchedulerInterface
         $this->isChanged('isScheduled', $isScheduled);
 
         $this->isScheduled = $isScheduled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function sendEmpty()
+    {
+        return $this->sendEmpty;
+    }
+
+    /**
+     * @param bool $sendEmpty
+     */
+    public function setSendEmpty($sendEmpty): void
+    {
+        $this->isChanged('sendEmpty', $sendEmpty);
+
+        $this->sendEmpty = $sendEmpty;
     }
 
     /**
@@ -559,10 +613,7 @@ class Report extends FormEntity implements SchedulerInterface
         $this->scheduleUnit = $scheduleUnit;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleDay()
+    public function getScheduleDay(): ?string
     {
         return $this->scheduleDay;
     }
@@ -577,10 +628,7 @@ class Report extends FormEntity implements SchedulerInterface
         $this->scheduleDay = $scheduleDay;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleMonthFrequency()
+    public function getScheduleMonthFrequency(): ?string
     {
         return $this->scheduleMonthFrequency;
     }
@@ -622,8 +670,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function ensureIsMonthlyScheduled()
     {
-        if (
-            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
+        if (!in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
             !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
         ) {
             throw new ScheduleNotValidException();
@@ -650,35 +697,57 @@ class Report extends FormEntity implements SchedulerInterface
         return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledDaily()
+    public function isScheduledDaily(): bool
     {
         return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledWeekly()
+    public function isScheduledWeekly(): bool
     {
         return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledMonthly()
+    public function isScheduledMonthly(): bool
     {
         return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledWeekDays()
+    public function isScheduledWeekDays(): bool
     {
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
+    }
+
+    public function getScheduleFormat(): ?string
+    {
+        return $this->scheduleFormat ?: 'csv';
+    }
+
+    public function setScheduleFormat(?string $scheduleFormat): void
+    {
+        $this->scheduleFormat = $scheduleFormat;
+    }
+
+    public function getScheduleTime(): ?string
+    {
+        return $this->scheduleTime ?: '00:00';
+    }
+
+    public function setScheduleTime(?string $scheduleTime): void
+    {
+        $this->isChanged('scheduleTime', $scheduleTime);
+
+        $this->scheduleTime = $scheduleTime;
+    }
+
+    public function getScheduleTimezone(): ?string
+    {
+        return $this->scheduleTimezone;
+    }
+
+    public function setScheduleTimezone(?string $scheduleTimezone): void
+    {
+        $this->isChanged('scheduleTimezone', $scheduleTimezone);
+
+        $this->scheduleTimezone = $scheduleTimezone;
     }
 }
