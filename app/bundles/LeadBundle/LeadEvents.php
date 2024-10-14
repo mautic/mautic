@@ -71,7 +71,7 @@ final class LeadEvents
      * The mautic.lead_category_change event is dispatched if a lead's subscribed categories change.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadCategoryEvent instance.
+     * Mautic\LeadBundle\Event\CategoryChangeEvent instance.
      *
      * @var string
      */

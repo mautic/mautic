@@ -28,8 +28,7 @@
 #CampaignEventPanel {
     position: absolute;
     padding: 10px 20px;
-    background-color: #ededed;
-    border: 1px solid #cdcdcd;
+    background-color: var(--layer);
     border-radius: 4px;
     z-index:1035;
 }
@@ -47,7 +46,6 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-top: 10px;
 }
 #CampaignPasteContainer::before {
     content: "";
@@ -105,6 +103,18 @@
     cursor:pointer;
     z-index: 1004;
     color: #47535f;
+}
+
+.jtk-label--success {
+    border-color: var(--support-success);
+    background-color: var(--support-success);
+    color: var(--text-inverse);
+}
+
+.jtk-label--error {
+    border-color: var(--support-error);
+    background-color: var(--support-error);
+    color: var(--text-inverse);
 }
 
 .jtk-connector {
@@ -182,24 +192,8 @@
     right: -10px;
 }
 
-.campaign-event-buttons .btn {
-    border-radius: 20px;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    font-weight: normal;
-    line-height: 20px;
-    transition: var(--transition-all-productive);
-}
-
 .campaign-event-buttons .btn:hover {
     transform: scale(1.2);
-}
-
-.campaign-event-buttons .btn-edit,
-.campaign-event-buttons .btn-clone {
-    background: var(--button-secondary);
-    color: var(--icon-on-color);
 }
 
 .campaign-event-icon {
@@ -242,9 +236,8 @@
     border-color: var(--support-info);
 }
 
-.list-campaign-decision, 
+.list-campaign-decision,
 .list-campaign-condition {
-    padding: var(--spacing-05);
     line-height: 1em;
 }
 
@@ -265,9 +258,9 @@
     padding: 0 var(--spacing-05) 0 0;
     color: var(--text-on-color);
 }
-.list-campaign-action .campaign-event-icon { 
+.list-campaign-action .campaign-event-icon {
     background-color: var(--background);
-    color: var(--icon-interactive); 
+    color: var(--icon-interactive);
     aspect-ratio: 1/1;
     height: 60px;
     display: inline-flex;
@@ -283,10 +276,10 @@
     align-items: center;
     justify-content: center;
 }
-.list-campaign-condition .campaign-event-icon { 
+.list-campaign-condition .campaign-event-icon {
     color: var(--support-warning);
 }
-.list-campaign-decision .campaign-event-icon { 
+.list-campaign-decision .campaign-event-icon {
     color: var(--support-info);
 }
 
@@ -370,7 +363,8 @@
     position: relative;
 }
 
-.preview .jtk-endpoint {
+.preview .jtk-endpoint,
+.preview .jtk-label {
     cursor: default;
 }
 
@@ -417,4 +411,8 @@
     text-align: center;
     line-height: 250px;
     font-size: 24px;
+}
+
+.campaign-event-stat-divider {
+    padding: 0 4px;
 }

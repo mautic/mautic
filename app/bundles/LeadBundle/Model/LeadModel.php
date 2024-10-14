@@ -413,6 +413,8 @@ class LeadModel extends FormModel
             }
         }
 
+        $this->validateSelectFields($entity, $fields);
+
         $this->processManipulator($entity);
 
         $this->setEntityDefaultValues($entity);
@@ -1619,8 +1621,10 @@ class LeadModel extends FormModel
 
         array_walk($tags, function (&$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
-            $val = InputHelper::clean($val);
+            $val = InputHelper::_($val, 'string');
         });
+        // Remove any tags that became empty after filtering
+        $tags = array_filter($tags, 'strlen');
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1657,8 +1661,10 @@ class LeadModel extends FormModel
 
             array_walk($removeTags, function (&$val): void {
                 $val = html_entity_decode(trim($val), ENT_QUOTES);
-                $val = InputHelper::clean($val);
+                $val = InputHelper::_($val, 'string');
             });
+            // Remove any tags that became empty after filtering
+            $removeTags = array_filter($removeTags, 'strlen');
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
@@ -2318,6 +2324,36 @@ class LeadModel extends FormModel
         if ($lead && $tag) {
             $lead->removeTag($tag);
             $this->saveEntity($lead);
+        }
+    }
+
+    /**
+     * @param array<mixed>|null $fields
+     */
+    private function validateSelectFields(Lead $entity, ?array $fields): void
+    {
+        if (is_null($fields)) {
+            return;
+        }
+        foreach ($fields as $groupFields) {
+            foreach ($groupFields as $field) {
+                if (!is_array($field)) {
+                    return;
+                } elseif ('select' !== $field['type']) {
+                    continue;
+                }
+                $allowedValues = is_array($field['properties'])
+                    ? $field['properties']
+                    : unserialize($field['properties']);
+
+                $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
+
+                if (!empty($allowedValues['list']) && !in_array($field['value'], $flattenedAllowedValues)) {
+                    // if the set value of the field is not present allowed values array,
+                    // update the field value to null
+                    $entity->addUpdatedField($field['alias'], null);
+                }
+            }
         }
     }
 }

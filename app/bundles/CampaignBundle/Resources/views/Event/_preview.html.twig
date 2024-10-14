@@ -18,7 +18,9 @@
 data-type="{{ event['eventType'] }}"
 class="draggable list-campaign-event list-campaign-{{ event['eventType'] }}"
 data-event="{{ event['type'] }}"
-data-event-id="{{ event['id'] }}">
+data-event-id="{{ event['id'] }}"
+data-event-yes-percent="{{ event['yesPercent'] }}"
+data-event-no-percent="{{ event['noPercent'] }}">
 {% endif %}
 
 <div class="campaign-event-type">
@@ -26,10 +28,17 @@ data-event-id="{{ event['id'] }}">
     <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-        <span class="campaign-event-name label label-info ml-5 mr-lg ellipsis">
+        <span class="campaign-event-name label label-info ml-5 mr-5 ellipsis">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
         </span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ml-a campaign-event-icon event-type-color"></i>
+        <div class="campaign-event-stat pa-4">
+            <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>
+            {% if (event.logCountForPending) %}
+            <span class="campaign-event-stat-divider">|</span>
+            <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}"><span class="ri-hourglass-line"></span> {{ event.logCountForPending }}</span>
+            {% endif %}
+        </div>
     </div>
 
     {% elseif event['eventType'] == 'action' %}
@@ -39,16 +48,30 @@ data-event-id="{{ event['id'] }}">
                 <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
                 <span class="campaign-event-name ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span>
             </div>
+            <div class="campaign-event-stat pa-4">
+                <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>
+                {% if (event.logCountForPending) %}
+                <span class="campaign-event-stat-divider">|</span>
+                <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}"><span class="ri-hourglass-line"></span> {{ event.logCountForPending }}</span>
+                {% endif %}
+            </div>
         </div>
 
     {% elseif event['eventType'] == 'condition' %}
     <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-            <span class="campaign-event-name label label-warning ml-5 mr-lg ellipsis">
+            <span class="campaign-event-name label label-warning ml-5 mr-5 ellipsis">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
             </span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ml-a campaign-event-icon event-type-color"></i>
+        <div class="campaign-event-stat pa-4">
+            <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>
+            {% if (event.logCountForPending) %}
+            <span class="campaign-event-stat-divider">|</span>
+            <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}"><span class="ri-hourglass-line"></span> {{ event.logCountForPending }}</span>
+            {% endif %}
+        </div>
     </div>
     {% endif %}
 </div>

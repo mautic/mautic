@@ -287,7 +287,7 @@ export default class BuilderService {
     // Browsers only recognize explicit self-closing tags like <img /> and <br />, leading to rendering problems.
     // This can be reverted once the issue with self-closing tags is resolved in grapesjs-mjml.
     // See: https://github.com/GrapesJS/mjml/issues/149
-    const voidTypes = ['mj-image', 'mj-divider', 'mj-font'];
+    const voidTypes = ['mj-image', 'mj-divider', 'mj-font', 'mj-spacer'];
     voidTypes.forEach(function(component) {
       editor.DomComponents.addType(component, {
         model: {

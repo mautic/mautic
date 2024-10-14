@@ -57,15 +57,36 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    initializeCodeBlocks();
+    Mautic.initializeCodeBlocks();
 });
 
-mQuery(document).ready(function() {
+/**
+ * Applies user interface preferences from localStorage to the HTML element.
+ * Runs immediately to set attributes based on 'm-toggle-setting-' prefixed items.
+ */
+(function() {
+    // Load user preferences for UI saved previously
+    const prefix = 'm-toggle-setting-';
+    Object.keys(localStorage)
+        .filter(key => key.startsWith(prefix))
+        .forEach(setting => {
+            const attributeName = setting.replace(prefix, '');
+            const value = localStorage.getItem(setting);
+
+            if (value) {
+                document.documentElement.setAttribute(attributeName, value);
+            }
+        });
+})();
+
+mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
         });
     }
+
+    Mautic.initListGroupToggle('body');
 
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
@@ -84,31 +105,16 @@ mQuery(document).ready(function() {
         }
     }, mauticSessionLifetime * 1000 / 2);
 
-    // Copy code block on click
-    mQuery(document).on('click', 'code', function() {
-        var $codeBlock = mQuery(this);
-        var $icon = $codeBlock.find('.copy-icon');
-        var $temp = mQuery('<textarea>');
-        mQuery('body').append($temp);
-        $temp.val($codeBlock.text()).select();
-        document.execCommand('copy');
-        $temp.remove();
-        $icon.removeClass('ri-clipboard-fill').addClass('ri-check-line');
-        setTimeout(function() {
-            $icon.removeClass('ri-check-line').addClass('ri-clipboard-fill');
-        }, 2000);
+    // Copy code blocks when clicked
+    mQuery(document).on('click', 'code', function(e) {
+        e.preventDefault();
+        navigator.clipboard.writeText(mQuery(this).clone().children('.copy-icon').remove().end().text().trim()).then(() => {
+            mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line');
+            setTimeout(() => mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line'), 2000);
+        });
     });
-    initializeCodeBlocks();
+    Mautic.initializeCodeBlocks();
 });
-
-function initializeCodeBlocks() {
-    mQuery('code').each(function() {
-        var $codeBlock = mQuery(this);
-        if (!$codeBlock.find('.copy-icon').length) {
-            $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
-        }
-    });
-}
 
 if (typeof history != 'undefined') {
     //back/forward button pressed
@@ -154,36 +160,71 @@ var Mautic = {
      * Binds global keyboard shortcuts
      */
     bindGlobalKeyboardShortcuts: function () {
-        Mautic.addKeyboardShortcut('shift+d', 'Load the Dashboard', function (e) {
+        Mautic.addKeyboardShortcut('g d', 'Load the Dashboard', function (e) {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+c', 'Load Contacts', function (e) {
+        Mautic.addKeyboardShortcut('g c', 'Load Contacts', function (e) {
             mQuery('#mautic_contact_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
-            mQuery(".navbar-right a[data-toggle='sidebar']").click();
+        Mautic.addKeyboardShortcut('g e', 'Load Emails', function (e) {
+            mQuery('#mautic_email_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+n', 'Show Notifications', function (e) {
+        Mautic.addKeyboardShortcut('g f', 'Load Forms', function (e) {
+            mQuery('#mautic_form_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('g s', 'Load Segments', function (e) {
+            mQuery('#mautic_segment_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('g p', 'Load Segments', function (e) {
+            mQuery('#mautic_page_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('f m', 'Toggle Admin Menu', function (e) {
+            mQuery("#admin-menu").click();
+        });
+
+        Mautic.addKeyboardShortcut('f n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
+        Mautic.addKeyboardShortcut('f /', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
         });
 
-        Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
-            if (mQuery('.btn-undo').length) {
-                mQuery('.btn-undo').click();
-            }
+        Mautic.addKeyboardShortcut('/', 'Search current list', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mQuery('#list-search').focus();
         });
 
-        Mautic.addKeyboardShortcut('mod+shift+z', 'Redo change', function (e) {
-            if (mQuery('.btn-redo').length) {
-                mQuery('.btn-redo').click();
-            }
+        Mautic.addKeyboardShortcut('e', 'Edit current resource', function(e) {
+            mQuery('#edit').click();
+        });
+
+        Mautic.addKeyboardShortcut('c', 'Create current resource', function(e) {
+            mQuery('#new').click();
+        });
+
+        Mautic.addKeyboardShortcut(['del', 'meta+backspace'], 'Delete current resource', function(e) {
+            mQuery('#delete').click();
+        });
+
+        Mautic.addKeyboardShortcut('enter', 'Modal confirm action', function(e) {
+            mQuery('#confirm').click();
+        });
+
+        Mautic.addKeyboardShortcut('s', 'General send example button', function(e) {
+            mQuery('#sendEmailButton').click();
+        });
+
+        Mautic.addKeyboardShortcut('g i', 'Back to index (list)', function(e) {
+            mQuery('[id*="buttons_cancel"]').click();
+            mQuery('#close').click();
         });
 
         Mousetrap.bind('?', function (e) {
@@ -191,6 +232,19 @@ var Mautic = {
             modalWindow.modal();
         });
 
+    },
+
+    /**
+     * Copy code blocks when clicked
+     *
+     */
+    initializeCodeBlocks: function () {
+        mQuery('code').each(function() {
+            var $codeBlock = mQuery(this);
+            if (!$codeBlock.find('.copy-icon').length) {
+                $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
+            }
+        });
     },
 
     /**
@@ -894,4 +948,40 @@ var Mautic = {
             return false;
         }
     }
+};
+
+Mautic.initListGroupToggle = function(container) {
+    mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+        e.preventDefault(); // Prevent default action if necessary
+
+        var $item = mQuery(this);
+        var $input = $item.find('input');
+
+        // If the input is disabled or readonly, do nothing
+        if ($input.prop('disabled') || $input.prop('readonly')) {
+            return;
+        }
+
+        var type = $input.prop('type');
+
+        if (type === 'radio') {
+            // Remove 'active' class from all items in the group
+            $item.closest('.list-group').find('.list-group-item').removeClass('active');
+
+            // Add 'active' class to the clicked item
+            $item.addClass('active');
+
+            // Set the input as checked
+            $input.prop('checked', true);
+        } else if (type === 'checkbox') {
+            // Toggle 'active' class on the clicked item
+            $item.toggleClass('active');
+
+            // Update the input's checked property based on the 'active' class
+            $input.prop('checked', $item.hasClass('active'));
+        }
+
+        // Trigger the 'change' event on the input
+        $input.trigger('change');
+    });
 };
