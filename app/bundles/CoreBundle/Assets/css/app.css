@@ -8715,7 +8715,7 @@ code:hover > .copy-icon {
   --label-background-hover-brand-secondary: var(--secondary-70);
   --label-border-brand-secondary: var(--secondary-80);
 }
-:root[theme="solarized-light"] {
+:root[theme="light-solarized"] {
   --background: #fdf6e3;
   --background-hover: #eee8d533;
   --background-active: #eee8d580;
@@ -8998,7 +8998,7 @@ code:hover > .copy-icon {
   --label-background-hover-green: #11742f;
   --label-border-green: #24a148;
 }
-:root[theme="solarized-dark"] {
+:root[theme="dark-solarized"] {
   --background: #002b36;
   --background-hover: #073642;
   --background-active: #586e75;
@@ -9137,7 +9137,7 @@ code:hover > .copy-icon {
   --label-background-hover-green: #96ac00;
   --label-border-green: #b58900;
 }
-:root[theme="freire"] {
+:root[theme="dark-freire"] {
   --background: #1C1C2E;
   --background-hover: #232336;
   --background-active: #2A2A40;
@@ -9294,6 +9294,12 @@ code:hover > .copy-icon {
   --ck-color-focus-border: var(--focus);
   --ck-color-tooltip-background: var(--layer);
   --ck-color-tooltip-text: var(--text-secondary);
+}
+:root[theme^="light"] {
+  --custom-bg-colored-lightness: 70%;
+}
+:root[theme^="dark"] {
+  --custom-bg-colored-lightness: 30%;
 }
 :root {
   --primary-20: #d0d5e8;

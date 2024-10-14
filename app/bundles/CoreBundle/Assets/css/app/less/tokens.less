@@ -184,7 +184,7 @@
 }
 
 /// Solarized Light theme
-:root[theme="solarized-light"] {
+:root[theme="light-solarized"] {
     /// Background
     --background: #fdf6e3;
     --background-hover: #eee8d533;
@@ -521,7 +521,7 @@
 }
 
 /// Solarized Dark theme
-:root[theme="solarized-dark"] {
+:root[theme="dark-solarized"] {
     /// Background
     --background: #002b36;
     --background-hover: #073642;
@@ -686,7 +686,7 @@
     --label-border-green: #b58900;
 }
 
-:root[theme="freire"] {
+:root[theme="dark-freire"] {
     /// Background
     --background: #1C1C2E;
     --background-hover: #232336;
@@ -875,6 +875,16 @@
     --ck-color-focus-border: var(--focus);
     --ck-color-tooltip-background: var(--layer);
     --ck-color-tooltip-text: var(--text-secondary);
+}
+
+/// Dynamic lightness for custom backgrounds
+//// Themes with light background
+:root[theme^="light"] {
+    --custom-bg-colored-lightness: 70%;
+}
+//// Themes with dark background
+:root[theme^="dark"] {
+    --custom-bg-colored-lightness: 30%;
 }
 
 :root {
