@@ -7,9 +7,9 @@
 // ---------------------
 .btn {
   transition: var(--transition-all-productive);
-  border: 1px solid var(--border-no-color);
+  border: 1px solid transparent;
   .outline();
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-lg);
   display: inline-flex;
   align-items: center;
   height: var(--spacing-08);
@@ -20,11 +20,15 @@
   gap: var(--spacing-03);
   justify-content: space-between;
   width: fit-content;
-  &:hover {border: 1px solid var(--border-no-color);}
+  &:hover {
+    border: 1px solid transparent;
+    color: var(--text-primary);
+  }
   &,
   &:active,
   &.active {
     box-shadow: none;
+    color: var(--text-primary);
     &:focus,
     &.focus {
       outline: 2px solid transparent;
@@ -100,51 +104,44 @@
 
 /// Primary
 .btn-primary, .btn-primary + .dropdown-toggle {
-  background-color: var(--button-primary);
-  color: var(--text-on-color);
-  .outline();
-  i {color: var(--text-on-color);}
-  &:hover {background-color: var(--button-primary-hover);}
-  &:active {background-color: var(--button-primary-active);}
-  &:focus {box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);}
-  &:disabled {
-    background-color: var(--button-disabled);
-    color: var(--text-on-color-disabled);
-  }
+  .button-variant(
+    @background: var(--button-primary),
+    @text-color: var(--text-on-color),
+    @border-color: var(--button-primary),
+    @hover-background: var(--button-primary-hover),
+    @hover-text-color: var(--text-on-color),
+    @active-background: var(--button-primary-active),
+    @disabled-background: var(--button-disabled),
+    @disabled-text-color: var(--text-on-color-disabled)
+  );
 
   /// Primary danger
   &.btn-danger {
-    color: var(--text-inverse);
-    background-color: var(--button-danger-primary);
-    .outline();
-    i {color: var(--icon-inverse);}
-    &:hover {background-color: var(--button-danger-hover);}
-    &:active {background-color: var(--button-danger-active);}
-    &:focus {box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);}
-    &:disabled {
-      background-color: var(--button-disabled);
-      color: var(--text-on-color-disabled);
-      i {color: var(--icon-on-color-disabled);}
-    }
+    .button-variant(
+      @background: var(--button-danger-primary),
+      @text-color: var(--text-inverse),
+      @border-color: var(--button-danger-primary),
+      @hover-background: var(--button-danger-hover),
+      @hover-text-color: var(--text-inverse),
+      @active-background: var(--button-danger-active),
+      @disabled-background: var(--button-disabled),
+      @disabled-text-color: var(--text-on-color-disabled)
+    );
   }
 }
 
 /// Secondary
 .btn-secondary {
-  background-color: var(--button-secondary);
-  color: var(--text-inverse);
-  .outline();
-  i {color: var(--text-inverse);}
-  &:hover {
-    background-color: var(--button-secondary-hover);
-    color: var(--text-inverse);
-  }
-  &:active {background-color: var(--button-secondary-active);}
-  &:focus {box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);}
-  &:disabled {
-    background-color: var(--button-disabled);
-    color: var(--text-on-color-disabled);
-  }
+  .button-variant(
+    @background: var(--button-secondary),
+    @text-color: var(--text-inverse),
+    @border-color: var(--button-secondary),
+    @hover-background: var(--button-secondary-hover),
+    @hover-text-color: var(--text-inverse),
+    @active-background: var(--button-secondary-active),
+    @disabled-background: var(--button-disabled),
+    @disabled-text-color: var(--text-on-color-disabled)
+  );
 }
 
 /// Tertiary + automatic error fixes
@@ -152,56 +149,32 @@
 .btn-tertiary + .dropdown-toggle,
 .btn-primary + .btn-primary:not(.dropdown-toggle),
 .btn-primary + .btn-primary + .btn-primary,
-.btn-primary + .btn-primary + .btn-secondary {
-  background-color: transparent;
-  color: var(--button-tertiary);
-  border-color: var(--button-tertiary);
+.btn-primary + .btn-primary + .btn-secondary,
+.open > .btn-tertiary + .dropdown-toggle.btn-primary {
+  .button-variant(
+    @background: transparent,
+    @text-color: var(--button-tertiary),
+    @border-color: var(--button-tertiary),
+    @hover-background: var(--button-tertiary-hover),
+    @hover-text-color: var(--text-inverse),
+    @active-background: var(--button-tertiary-active),
+    @disabled-background: transparent,
+    @disabled-text-color: var(--text-disabled)
+  );
   margin-left: -1px;
-  .outline();
-  i {color: var(--button-tertiary);}
-  &:hover {
-    color: var(--text-inverse);
-    background-color: var(--button-tertiary-hover);
-    i {color: var(--icon-inverse);}
-  }
-  &:active {
-    color: var(--text-inverse);
-    background-color: var(--button-tertiary-active);
-    i {color: var(--icon-inverse);}
-  }
-  &:focus {
-    background-color: var(--button-tertiary-hover);
-    box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);
-    i {color: var(--icon-inverse);}
-  }
-  &:disabled {
-    background-color: transparent;
-    border-color: var(--button-disabled);
-    color: var(--text-disabled);
-    i {color: var(--icon-disabled);}
-  }
 
   /// Tertiary danger
   &.btn-danger {
-    color: var(--button-danger-secondary);
-    border-color: var(--button-danger-secondary);
-    .outline();
-    i {color: var(--button-danger-secondary);}
-    &:hover {
-      background-color: var(--button-danger-hover);
-      color: var(--text-inverse);
-    }
-    &:active {
-      background-color: var(--button-danger-active);
-      color: var(--text-inverse);
-      i {color: var(--icon-inverse);}
-    }
-    &:focus {box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);}
-    &:disabled {
-      background-color: var(--button-disabled);
-      color: var(--text-disabled);
-      i {color: var(--icon-disabled);}
-    }
+    .button-variant(
+      @background: transparent,
+      @text-color: var(--button-danger-secondary),
+      @border-color: var(--button-danger-secondary),
+      @hover-background: var(--button-danger-hover),
+      @hover-text-color: var(--text-inverse),
+      @active-background: var(--button-danger-active),
+      @disabled-background: var(--button-disabled),
+      @disabled-text-color: var(--text-disabled)
+    );
   }
 }
 
@@ -225,59 +198,47 @@
 
 /// Ghost
 .btn-ghost {
-  color: var(--link-primary);
-  background-color: transparent;
+  .button-variant(
+    @background: transparent,
+    @text-color: var(--link-primary),
+    @border-color: transparent,
+    @hover-background: var(--background-hover),
+    @hover-text-color: var(--link-primary-hover),
+    @active-background: var(--background-active),
+    @disabled-background: transparent,
+    @disabled-text-color: var(--text-disabled)
+  );
   padding-inline: var(--spacing-05);
   justify-content: center;
-  .outline();
-  i {color: var(--link-primary);}
-  &:hover {
-    color: var(--link-primary-hover);
-    background-color: var(--background-hover);
-    i {color: var(--link-primary-hover);}
-  }
-  &:active {background-color: var(--background-active);}
-  &:disabled {
-    color: var(--text-disabled);
-    background-color: transparent;
-    i {color: var(--icon-disabled);}
-  }
   span {gap: var(--spacing-03);}
 
   //// Ghost Danger
   &.btn-danger,
   &.btn-danger.btn-icon {
-    color: var(--button-danger-secondary);
-    .outline();
-    i {color: var(--button-danger-secondary);}
-    &:hover {
-      background-color: var(--button-danger-hover);
-      color: var(--text-inverse);
-      i {color: var(--icon-inverse);}
-    }
-    &:active {
-      background-color: var(--button-danger-active);
-      color: var(--text-inverse);
-      i {color: var(--icon-inverse);}
-    }
-    &:focus {box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);}
-    &:disabled {
-      background-color: transparent;
-      color: var(--text-disabled);
-      i {color: var(--icon-disabled);}
-    }
+    .button-variant(
+      @background: transparent,
+      @text-color: var(--button-danger-secondary),
+      @border-color: transparent,
+      @hover-background: var(--button-danger-hover),
+      @hover-text-color: var(--text-inverse),
+      @active-background: var(--button-danger-active),
+      @disabled-background: transparent,
+      @disabled-text-color: var(--text-disabled)
+    );
   }
 
   //// Ghost icon only
   &.btn-icon {
-    color: var(--icon-primary);
-    background-color: transparent;
-    .outline();
-    i {color: var(--icon-primary);}
-    &:hover { background-color: var(--background-hover);}
-    &:active { background-color: var(--background-active);}
-    &:selected { background-color: var(--background-selected);}
-    &:disabled { color: var(--icon-disabled);}
+    .button-variant(
+      @background: transparent,
+      @text-color: var(--icon-primary),
+      @border-color: transparent,
+      @hover-background: var(--background-hover),
+      @hover-text-color: var(--icon-primary),
+      @active-background: var(--background-active),
+      @disabled-background: transparent,
+      @disabled-text-color: var(--icon-disabled)
+    );
   }
 }
 
@@ -350,11 +311,12 @@
 
 // Modal footer buttons
 .modal-footer {
-  padding: var(--spacing-03) 0 0;
   .modal-form-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 1px;
+    margin: -15px;
+
       .btn {
         align-items: flex-start;
         height: var(--spacing-10);

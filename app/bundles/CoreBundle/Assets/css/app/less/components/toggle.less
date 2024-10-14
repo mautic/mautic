@@ -82,8 +82,10 @@
     visibility: visible
 }
 
-.toggle--disabled .toggle__appearance {
-    cursor: not-allowed
+.toggle--disabled {cursor: not-allowed;}
+
+.toggle--disabled .toggle__label {
+    pointer-events: none;
 }
 
 .toggle--disabled .toggle__label-text,
@@ -96,7 +98,8 @@
 }
 
 .toggle--disabled .toggle__switch::before {
-    background-color: var(--icon-on-color-disabled, #8d8d8d)
+    background-color: var(--icon-on-color-disabled, #8d8d8d);
+    box-shadow: none;
 }
 
 .toggle--disabled .toggle__check {

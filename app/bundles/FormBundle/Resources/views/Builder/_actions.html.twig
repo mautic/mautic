@@ -8,7 +8,7 @@
 {% set route = route|default('mautic_formfield_action') %}
 
 <div class="form-buttons btn-group" role="group" aria-label="Field options">
-    <button type="button" data-toggle="ajaxmodal" data-target="#formComponentModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': id, 'formId': formId}) }}" class="btn btn-ghost btn-edit">
+    <button type="button" data-toggle="ajaxmodal" data-target="#formComponentModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': id, 'formId': formId}) }}" class="btn btn-ghost btn-icon btn-sm btn-edit">
         <i class="ri-edit-line text-primary"></i>
     </button>
     {% if disallowDelete is not defined or (disallowDelete is defined and false == disallowDelete) %}

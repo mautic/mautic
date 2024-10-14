@@ -206,10 +206,7 @@ Mautic.initWidgetSorting = function () {
             ui.helper.data("clone").hide();
         },
         sort: function(e, ui) {
-            var card = ui.item.find('.card').first();
-            // Keep the placeholder width and height of the same as that of the inner card's width to prevent the jump effect
-            ui.placeholder.width(card.width());
-            ui.placeholder.height(card.height());
+            var tile = ui.item.find('.tile').first();
             // Prevent margin from pushing the elements out of the way
             ui.placeholder.css({
                 marginTop: "5px",
