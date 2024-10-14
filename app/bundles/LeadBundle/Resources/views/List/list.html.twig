@@ -42,5 +42,8 @@
   {% if isIndex %}
         </div>
     </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.segments.dynamic', 'mautic.protip.segments.test'])
+  }) }}
   {% endif %}
 {% endblock %}

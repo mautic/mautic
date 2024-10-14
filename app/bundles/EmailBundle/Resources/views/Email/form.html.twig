@@ -191,11 +191,8 @@
                     {{ form_row(form.preferenceCenter) }}
                 {% endif %}
                 <hr/>
-                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-                <br/>
-                {% for i, utmTag in form.utmTags %}
-                    {{ form_row(utmTag) }}
-                {% endfor %}
+                {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
+
             </div>
             <div class="hide">
                 {{ form_rest(form) }}
