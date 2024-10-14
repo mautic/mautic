@@ -189,7 +189,11 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
             ->setAlias('select_field')
             ->setType('select')
             ->setObject('lead')
-            ->setProperties(['list' => [['label' => 'Male', 'value' => 'male'], ['label' => 'Female', 'value' => 'female']]]);
+            ->setProperties(['list' => [
+                ['label' => 'Male', 'value' => 'male'],
+                ['label' => 'Female', 'value' => 'female'],
+                ['label' => 'Other\'s', 'value' => 'other\'s'],
+            ]]);
         $fieldModel->saveEntity($selectField);
         $this->em->clear();
 
@@ -216,7 +220,12 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
                     'alias'      => $selectField->getAlias(),
                     'type'       => $selectField->getType(),
                     'value'      => $selectFieldValue,
-                    'properties' => ['list' => [['label' => 'Male', 'value' => 'male'], ['label' => 'Female', 'value' => 'female']]],
+                    'properties' => ['list' => [
+                        ['label' => 'Male', 'value' => 'male'],
+                        ['label' => 'Female', 'value' => 'female'],
+                        // As it stores HTML encoded value.
+                        ['label' => 'Other&#39;s', 'value' => 'other&#39;s'],
+                    ]],
                 ],
             ],
         ];
@@ -245,6 +254,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         return [
             'allowed_value'    => ['female', 'female'],
             'disallowed_value' => ['gibberish', null],
+            'with_quotes'      => ['other\'s', 'other\'s'],
         ];
     }
 }

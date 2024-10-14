@@ -2345,7 +2345,8 @@ class LeadModel extends FormModel
                 $allowedValues = is_array($field['properties'])
                     ? $field['properties']
                     : unserialize($field['properties']);
-                $flattenedAllowedValues = array_column($allowedValues['list'], 'value');
+
+                $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 
                 if (!empty($allowedValues['list']) && !in_array($field['value'], $flattenedAllowedValues)) {
                     // if the set value of the field is not present allowed values array,

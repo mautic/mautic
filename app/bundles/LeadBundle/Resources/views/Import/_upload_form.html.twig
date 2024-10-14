@@ -19,22 +19,11 @@
                         </span>
                     </div>
 
-                    <div class="row">
-                        <div class="col-xs-3">
-                            {{ form_row(form.batchlimit) }}
-                        </div>
-
-                        <div class="col-xs-3">
-                            {{ form_row(form.delimiter) }}
-                        </div>
-
-                        <div class="col-xs-3">
-                            {{ form_row(form.enclosure) }}
-                        </div>
-
-                        <div class="col-xs-3">
-                            {{ form_row(form.escape) }}
-                        </div>
+                    <div class="d-flex fd-row-md fd-column fw-wrap fw-nowrap-md gap-md">
+                        {{ form_row(form.batchlimit) }}
+                        {{ form_row(form.delimiter) }}
+                        {{ form_row(form.enclosure) }}
+                        {{ form_row(form.escape) }}
                     </div>
                     {{ form_end(form) }}
                 </div>
