@@ -1,5 +1,5 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
-{% block headerTitle %}{{ packageDetail.packageBase.getHumanPackageName()|escape }}{% endblock %}
+{% block headerTitle %}{% endblock %}
 
 {% set buttons = {
     0: {
@@ -91,6 +91,14 @@
 {% endblock %}
 
 {% block content %}
+{% set input_string = packageDetail.packageBase.getHumanPackageName()|escape %}
+{% set hue = (input_string|length * 37 + input_string|split('')|reduce((carry, char) => carry + char|length * 11, 0)) % 360 %}
+
+<div class="marketplace-header bg-picture col-xs-12 ai-center jc-center mb-lg" style="background-color: hsl({{ hue }}, 100%, var(--custom-bg-colored-lightness));">
+
+
+    <h1 class="fw-b fs-46 text-center">{{ packageDetail.packageBase.getHumanPackageName()|escape }}</h1>
+</div>
 <div class="col-md-9">
     {% if packageDetail.packageBase.description %}
     <div>
