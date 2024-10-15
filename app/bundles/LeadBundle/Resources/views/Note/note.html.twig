@@ -31,7 +31,7 @@ Variables:
                             data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="ri-edit-line"></i></a>
                         {% endif %}
                         {% if permissions['delete'] %}
-                        <a class="btn btn-ghost btn-xs" data-toggle="confirmation"
+                        <a class="btn btn-ghost btn-icon btn-xs" data-toggle="confirmation"
                             href="{{ path('mautic_contactnote_action', {'objectAction': 'delete', 'objectId': note.id, 'leadId': lead.id}) }}"
                             data-message="{{ 'mautic.lead.note.confirmdelete'|trans|e }}"
                             data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}"

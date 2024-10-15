@@ -1404,6 +1404,24 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "nileshlohar",
+      "name": "Nilesh Lohar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18068907?v=4",
+      "profile": "https://github.com/nileshlohar",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "AlbertMN",
+      "name": "Albert Møller Nielsen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11600207?v=4",
+      "profile": "https://simplyprint.io/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

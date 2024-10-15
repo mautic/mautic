@@ -22,7 +22,7 @@
 					<div class="col-md-7 pl-0">
 						{{ form_row(form.storageLocation) }}
 					</div>
-			        <div class="col-md-5 text-left mt-lg{% if startOnLocal %}  hide {% endif %}" id="remote-button">
+			        <div class="text-left mt-lg mb-lg{% if startOnLocal %}  hide {% endif %}" id="remote-button">
 						{% if integrations %}
 							<a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-header="{% trans %}mautic.asset.remote.file.browse{% endtrans %}" href="{{ path('mautic_asset_remote') }}?tmpl=modal" class="btn btn-primary">
 								{% trans %}mautic.asset.remote.file.browse{% endtrans %}
@@ -52,7 +52,7 @@
 		    		<div class="row">
 				    	<div class="form-group col-xs-12 preview">
 				    		{{- include('@MauticAsset/Asset/preview.html.twig', {
-								'activeAsset' : activeAsset, 
+								'activeAsset' : activeAsset,
 								'assetDownloadUrl' : url('mautic_asset_action',
                                 {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
                             )}) -}}

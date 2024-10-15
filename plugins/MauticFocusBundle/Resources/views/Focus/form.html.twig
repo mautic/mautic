@@ -34,11 +34,7 @@
                 {{ form_row(form.publishUp) }}
                 {{ form_row(form.publishDown) }}
                 <hr />
-                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-                <br />
-                {% for utmTag in form.utmTags %}
-                    {{ form_row(utmTag) }}
-                {% endfor %}
+                {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
             </div>
         </div>
     </div>
@@ -108,7 +104,7 @@
                     </div>
                     <div id="focusTypePanel" class="panel-collapse collapse in" role="tabpanel">
                         {{ form_widget(form.type) }}
-                        <ul class="list-group mb-0">
+                        <ul class="list-group mb-0 bdr-w-0">
                             <li data-focus-type="form" class="focus-type list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
@@ -177,7 +173,7 @@
                         </h4>
                     </div>
                     <div id="focusStylePanel" class="panel-collapse collapse" role="tabpanel">
-                        <ul class="list-group mb-0">
+                        <ul class="list-group mb-0 bdr-w-0">
                             <li data-focus-style="bar" class="focus-style visible-focus-style-bar list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">

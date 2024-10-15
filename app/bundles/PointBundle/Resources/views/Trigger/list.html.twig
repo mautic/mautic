@@ -32,5 +32,9 @@
   {% if isIndex %}
         </div>
     </div>
+
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.triggers.behavioral'])
+  }) }}
   {% endif %}
 {% endblock %}

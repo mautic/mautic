@@ -27,6 +27,10 @@
             {{ block('listResults') }}
         </div>
     </div>
+
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+        tip: random(['mautic.protip.sms.concise', 'mautic.protip.sms.timesensitive', 'mautic.protip.sms.compliance'])
+    }) }}
     {% else %}
 		{{ block('listResults') }}
 	{% endif %}
