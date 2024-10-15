@@ -90,7 +90,8 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
     //move the modal to the body tag to get around positioned div issues
     element.one('show.bs.modal', function () {
         if (header) {
-            element.find(".modal-title").html(header);
+            // use text instead of html method to prevent XSS
+            element.find(".modal-title").text(header);
         }
 
         if (footer && footer != 'false') {

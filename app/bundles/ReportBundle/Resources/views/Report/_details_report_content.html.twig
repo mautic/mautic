@@ -82,11 +82,11 @@
                                                 {% elseif 'date' is same as cellType %}
                                                     {{ dateToShort(cellVal, 'UTC') }}
                                                 {% else %}
-                                                    {% set value = format(cellVal, cellType) %}
+                                                    {% set value = format(cellVal, cellType)|purify %}
                                                     {% if collapse == false %}
-                                                        {{ format(cellVal, cellType) }}
+                                                        {{ format(cellVal, cellType)|purify }}
                                                     {% else %}
-                                                        {% set value = htmlEntityDecode(format(cellVal, cellType)) %}
+                                                        {% set value = htmlEntityDecode(format(cellVal, cellType)|purify) %}
                                                         <div data-toggle="collapse" data-target="#audit-log-details-{{ startCount }}" class="accordion-toggle" style="cursor: pointer">
                                                             {{ value|length > 50 ? value|slice(0, 50) ~ '...' : value }}
                                                         </div>
