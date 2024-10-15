@@ -29,6 +29,10 @@
         {{- include('@MauticReport/Report/_list.html.twig') -}}
       </div>
   </div>
+
+  {{ include('@MauticCore/Helper/protip.html.twig', {
+    tip: random(['mautic.protip.reports.dnc'])
+}) }}
   {% else %}
     {{- include('@MauticReport/Report/_list.html.twig') -}}
   {% endif %}
