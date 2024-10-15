@@ -43,5 +43,9 @@
   {% if isIndex %}
         </div>
     </div>
+
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.pages.mobile', 'mautic.protip.pages.forms'])
+  }) }}
   {% endif %}
 {% endblock %}

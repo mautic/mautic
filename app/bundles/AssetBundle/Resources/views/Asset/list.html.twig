@@ -223,4 +223,8 @@
         'id'     : 'AssetPreviewModal',
         'header' : false,
 }) -}}
+
+{{ include('@MauticCore/Helper/protip.html.twig', {
+    tip: random(['mautic.protip.assets.gating', 'mautic.protip.assets.naming', 'mautic.protip.assets.repurpose', 'mautic.protip.assets.track'])
+}) }}
 {% endblock %}
