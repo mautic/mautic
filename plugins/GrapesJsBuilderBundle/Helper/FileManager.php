@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class FileManager
 {
@@ -89,6 +90,9 @@ class FileManager
             .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
+    /**
+     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManager::getMediaFiles instead
+     */
     public function getImages(): array
     {
         $files      = [];
@@ -126,5 +130,100 @@ class FileManager
         }
 
         return $files;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getMediaFiles(int $page, int $limit): array
+    {
+        $files      = [];
+        $uploadDir  = $this->getUploadDir();
+        $fileSystem = new Filesystem();
+
+        if (!$fileSystem->exists($uploadDir)) {
+            try {
+                $fileSystem->mkdir($uploadDir);
+            } catch (IOException) {
+                return [
+                    'data'            => [],
+                    'page'            => $page,
+                    'limit'           => $limit,
+                    'totalItems'      => 0,
+                    'totalPages'      => 0,
+                    'hasNextPage'     => false,
+                    'hasPreviousPage' => false,
+                ];
+            }
+        }
+
+        $finder = new Finder();
+        $finder->files()->in($uploadDir)->sortByModifiedTime()->reverseSorting();
+
+        $totalFiles = iterator_count($finder);
+        $totalPages = (int) ceil($totalFiles / $limit);
+
+        // Check if the requested page is out of range
+        if ($page < 1 || $page > $totalPages) {
+            return [
+                'data'            => [],
+                'page'            => $page,
+                'limit'           => $limit,
+                'totalItems'      => $totalFiles,
+                'totalPages'      => $totalPages,
+                'hasNextPage'     => $page < $totalPages,
+                'hasPreviousPage' => $page > 1,
+            ];
+        }
+
+        $offset = ($page - 1) * $limit;
+
+        $filesIterator = new \LimitIterator($finder->getIterator(), $offset, $limit);
+
+        foreach ($filesIterator as $file) {
+            if (in_array($file->getRelativePath(), $this->coreParametersHelper->get('image_path_exclude'))) {
+                continue;
+            }
+
+            $fileInfo = $this->getFileInfo($file);
+            if ($fileInfo) {
+                $files[] = $fileInfo;
+            }
+        }
+
+        return [
+            'data'            => $files,
+            'page'            => $page,
+            'limit'           => $limit,
+            'totalItems'      => $totalFiles,
+            'totalPages'      => $totalPages,
+            'hasNextPage'     => $page < $totalPages,
+            'hasPreviousPage' => $page > 1,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function getFileInfo(SplFileInfo $file): ?array
+    {
+        $filePath = $this->getCompleteFilePath($file->getRelativePathname());
+        $size     = @getimagesize($filePath);
+
+        if ($size) {
+            return [
+                'src'    => $this->getFullUrl($file->getRelativePathname()),
+                'width'  => $size[0],
+                'height' => $size[1],
+                'type'   => 'image',
+            ];
+        } elseif (in_array($file->getExtension(), ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
+            return [
+                'src'  => $this->getFullUrl($file->getRelativePathname()),
+                'type' => 'document',
+            ];
+        }
+
+        return null;
     }
 }
