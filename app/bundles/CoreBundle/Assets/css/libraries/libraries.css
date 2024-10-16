@@ -2817,7 +2817,7 @@ tbody.collapse.in {
   font-size: 13px;
   text-align: left;
   list-style: none;
-  background-color: var(--layer);
+  background-color: var(--layer-translucent);
   background-clip: padding-box;
   border: 1px solid #eee;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -2848,7 +2848,7 @@ tbody.collapse.in {
 .dropdown-menu > li > a:focus {
   color: var(--text-primary);
   text-decoration: none;
-  background-color: var(--layer-hover);
+  background-color: var(--layer-hover-translucent);
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
@@ -22299,7 +22299,7 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   margin: 2px 0 0;
   list-style: none;
   font-size: 13px;
-  background-color: var(--layer);
+  background-color: var(--layer-translucent);
   border: 1px solid #eee;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 3px;
@@ -22321,7 +22321,7 @@ fieldset[disabled] .twitter-typeahead .tt-input {
 .tt-menu .tt-suggestion.tt-cursor {
   text-decoration: none;
   outline: 0;
-  background-color: var(--layer-hover);
+  background-color: var(--layer-hover-translucent);
   color: var(--text-primary);
 }
 .tt-menu .tt-suggestion.tt-cursor a {

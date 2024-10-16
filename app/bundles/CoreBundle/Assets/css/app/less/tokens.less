@@ -972,6 +972,7 @@
 --border-radius-sm: clamp(0px, @border-radius, 4px);
 --border-radius-md: clamp(0px, calc(1.8 * @border-radius), 14px);
 --border-radius-lg: clamp(0px, calc(2.6 * @border-radius), 21px);
+--layer-hover-translucent: var(--layer-translucent);
 --outline-style: solid;
 }
 
@@ -1476,6 +1477,7 @@
 /// No transparency and blur
 :root[reduce-transparency="true"] {
     --layer-translucent: var(--layer);
+    --layer-hover-translucent: var(--layer-hover);
     --layer-translucent-inverse: var(--layer-selected-inverse);
 }
 

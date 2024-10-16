@@ -283,6 +283,7 @@ body > #app-wrapper {
   }
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open .dropdown-menu {
+  background-color: var(--layer);
   position: absolute;
   top: 100%;
   margin-top: 5px;
@@ -3946,6 +3947,8 @@ label.list-group-item:focus {
   padding: 0;
   overflow: hidden;
   border-radius: var(--border-radius-md);
+  backdrop-filter: blur(6px);
+  background-color: var(--layer-translucent);
   -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
@@ -8626,8 +8629,8 @@ code:hover > .copy-icon {
   --layer-selected-hover-alternate: #cacaca;
   --layer-selected-inverse: #161616;
   --layer-selected-disabled: #8d8d8d;
-  --layer-translucent: #ffffffcc;
-  --layer-translucent-inverse: rgba(0, 0, 0, 0.7);
+  --layer-translucent: hsla(0, 0%, 100%, 0.7);
+  --layer-translucent-inverse: rgba(0, 0, 0, 0.8);
   --layer-accent: #e0e0e0;
   --layer-accent-hover: #d1d1d1;
   --layer-accent-active: #a8a8a8;
@@ -8780,7 +8783,7 @@ code:hover > .copy-icon {
   --layer-selected-hover-alternate: #e0d7c3;
   --layer-selected-inverse: #073642;
   --layer-selected-disabled: #93a1a1;
-  --layer-translucent: hsla(44, 87%, 94%, 0.8);
+  --layer-translucent: hsla(44, 87%, 94%, 0.7);
   --layer-translucent-inverse: #002d38cc;
   --layer-accent: #dcd4c0;
   --layer-accent-hover: #d3cbb7;
@@ -8930,8 +8933,8 @@ code:hover > .copy-icon {
   --layer-selected-hover-alternate: #656565;
   --layer-selected-inverse: #f4f4f4;
   --layer-selected-disabled: #6f6f6f;
-  --layer-translucent: #000000cc;
-  --layer-translucent-inverse: #ffffffcc;
+  --layer-translucent: hsla(0, 0%, 0%, 0.7);
+  --layer-translucent-inverse: hsla(0, 0%, 100%, 0.8);
   --layer-accent: #393939;
   --layer-accent-alternate: #525252;
   --layer-accent-hover: #4c4c4c;
@@ -9079,8 +9082,8 @@ code:hover > .copy-icon {
   --layer-selected-hover-alternate: #0c5468;
   --layer-selected-inverse: #fdf6e3;
   --layer-selected-disabled: #586e75;
-  --layer-translucent: hsla(192, 100%, 9%, 0.8);
-  --layer-translucent-inverse: #fdf6e399;
+  --layer-translucent: hsla(192, 100%, 9%, 0.7);
+  --layer-translucent-inverse: hsla(44, 87%, 94%, 0.8);
   --layer-accent: #094352;
   --layer-accent-alternate: #0b4b5d;
   --layer-accent-hover: #0b4b5d;
@@ -9228,7 +9231,7 @@ code:hover > .copy-icon {
   --layer-selected-hover-alternate: #323248;
   --layer-selected-inverse: #F7B84B;
   --layer-selected-disabled: #3A3A52;
-  --layer-translucent: #1d1d2fe6;
+  --layer-translucent: hsla(240, 24%, 15%, 0.7);
   --layer-translucent-inverse: #F7B84BCC;
   --layer-accent: #323248;
   --layer-accent-hover: #3A3A52;
@@ -9401,6 +9404,7 @@ code:hover > .copy-icon {
   --border-radius-sm: clamp(0px, 0px, 4px);
   --border-radius-md: clamp(0px, calc(1.8 * 0px), 14px);
   --border-radius-lg: clamp(0px, calc(2.6 * 0px), 21px);
+  --layer-hover-translucent: var(--layer-translucent);
   --outline-style: solid;
 }
 :root {
@@ -9870,6 +9874,7 @@ code:hover > .copy-icon {
 }
 :root[reduce-transparency="true"] {
   --layer-translucent: var(--layer);
+  --layer-hover-translucent: var(--layer-hover);
   --layer-translucent-inverse: var(--layer-selected-inverse);
 }
 :root[enable-underlines="true"] p a,
