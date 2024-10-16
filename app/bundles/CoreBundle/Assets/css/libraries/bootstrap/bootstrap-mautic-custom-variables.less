@@ -4,6 +4,7 @@
 // Variables
 // --------------------------------------------------
 
+@import "../../app/less/components/brand";
 
 //== Colors
 //
@@ -105,9 +106,9 @@
 @line-height-large:         1.25;
 @line-height-small:         1.456;
 
-@border-radius-base:        3px;
-@border-radius-large:       4px;
-@border-radius-small:       2px;
+@border-radius-base:        min(max(1.8 * @border-radius, 0px), 14px);
+@border-radius-large:       min(max(2.6 * @border-radius, 0px), 21px);
+@border-radius-small:       min(max(@border-radius, 0px), 6px);
 
 //** Global color for active items (e.g., navs or dropdowns).
 @component-active-color:    #fff;
@@ -174,9 +175,9 @@
 @btn-link-disabled-color:        @gray-light;
 
 // Allows for customizing button radius independently from global border radius
-@btn-border-radius-base:         @border-radius-base;
-@btn-border-radius-large:        @border-radius-large;
-@btn-border-radius-small:        @border-radius-small;
+@btn-border-radius-base:         32px;
+@btn-border-radius-large:        32px;
+@btn-border-radius-small:        32px;
 
 
 //== Forms
@@ -196,9 +197,9 @@
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
 // This has no effect on `<select>`s in some browsers, due to the limited stylability of `<select>`s in CSS.
-@input-border-radius:            @border-radius-base;
+@input-border-radius:            @border-radius-small;
 //** Large `.form-control` border radius
-@input-border-radius-large:      @border-radius-large;
+@input-border-radius-large:      @border-radius-small;
 //** Small `.form-control` border radius
 @input-border-radius-small:      @border-radius-small;
 
@@ -712,11 +713,11 @@
 @panel-body-padding:          15px;
 @panel-heading-padding:       10px 15px;
 @panel-footer-padding:        @panel-heading-padding;
-@panel-border-radius:         @border-radius-base;
+@panel-border-radius:         @border-radius-large;
 
 //** Border color for elements within panels
 @panel-inner-border:          @hr-border;
-@panel-footer-bg:             inherit;
+@panel-footer-bg:             var(--layer);
 
 @panel-default-text:          inherit;
 @panel-default-border:        @hr-border;
