@@ -3,11 +3,16 @@
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Event\BounceEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
+use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class TransportCallback
 {
@@ -25,15 +30,21 @@ class TransportCallback
      * @var StatRepository
      */
     private $statRepository;
+    private EventDispatcherInterface $dispatcher;
 
     /**
      * TransportCallback constructor.
      */
-    public function __construct(DoNotContact $dncModel, ContactFinder $finder, StatRepository $statRepository)
-    {
+    public function __construct(
+        DoNotContact $dncModel,
+        ContactFinder $finder,
+        StatRepository $statRepository,
+        EventDispatcherInterface $dispatcher
+    ) {
         $this->dncModel       = $dncModel;
         $this->finder         = $finder;
         $this->statRepository = $statRepository;
+        $this->dispatcher     = $dispatcher;
     }
 
     /**
@@ -107,5 +118,28 @@ class TransportCallback
         ];
         $stat->setOpenDetails($openDetails);
         $this->statRepository->saveEntity($stat);
+    }
+
+    public function dispatchBounceEvent(Request $request, ?string $hashId = '', ?string $emailAddress = ''): void
+    {
+        if (empty($hashId) && empty($emailAddress)) {
+            throw new \InvalidArgumentException();
+        }
+
+        $result = null;
+        if (!empty($hashId)) {
+            $result = $this->finder->findByHash($hashId);
+        } elseif (!empty($emailAddress)) {
+            $result = $this->finder->findByAddress($emailAddress);
+        }
+
+        if ($result instanceof Result && $contacts = $result->getContacts()) {
+            $stat  = $result->getStat();
+            $email = $stat->getEmail();
+            $event = $this->dispatcher->dispatch(
+                EmailEvents::EMAIL_ON_BOUNCE,
+                new BounceEmailEvent($request, $email, $contacts)
+            );
+        }
     }
 }

@@ -122,6 +122,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 continue;
             }
 
+            $leadIdHash = '';
             if (isset($event['CustomID']) && '' !== $event['CustomID'] && false !== strpos($event['CustomID'], '-', 0)) {
                 $fistDashPos = strpos($event['CustomID'], '-', 0);
                 $leadIdHash  = substr($event['CustomID'], 0, $fistDashPos);
@@ -131,6 +132,10 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 }
             } else {
                 $this->transportCallback->addFailureByAddress($event['email'], $reason, $type);
+            }
+
+            if (DoNotContact::BOUNCED === $type) {
+                $this->transportCallback->dispatchBounceEvent($request, $leadIdHash, $event['email']);
             }
         }
     }
