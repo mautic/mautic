@@ -374,6 +374,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         \DateTimeInterface $hitDateTime = null,
         bool $throwDoctrineExceptions = false
     ): void {
+        // check for existing IP
+        $ipAddress     = $this->ipLookupHelper->getIpAddress();
+        $isIpTrackable = $ipAddress->isTrackable();
+
+        if (!$isIpTrackable) {
+            return;
+        }
+
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
         }
@@ -424,9 +432,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 'inBrowser' => $viaBrowser,
             ]
         );
-
-        // check for existing IP
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
         $stat->setIpAddress($ipAddress);
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {

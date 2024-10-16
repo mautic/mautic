@@ -804,6 +804,44 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->hitEmail($stat, $request);
     }
 
+    public function setUpHitEmail(bool $isIpTrackable): void
+    {
+        $ipAddress     = $this->createMock(IpAddress::class);
+        $ipAddress->expects($this->any())
+            ->method('isTrackable')
+            ->willReturn($isIpTrackable);
+
+        $this->ipLookupHelper->expects($this->any())
+            ->method('getIpAddress')
+            ->willReturn($ipAddress);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testHitEmailIpAddressNotTrackable(): void
+    {
+        $stat          = new Stat();
+        $request       = new Request();
+        $this->setUpHitEmail(false);
+
+        $this->emailModel->hitEmail($stat, $request);
+        $this->assertFalse($stat->getIsRead());
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testHitEmailIpAddressTrackable(): void
+    {
+        $stat          = new Stat();
+        $request       = new Request();
+        $this->setUpHitEmail(true);
+
+        $this->emailModel->hitEmail($stat, $request);
+        $this->assertTrue($stat->getIsRead());
+    }
+
     public function testGetLookupResultsWithNameIsKey(): void
     {
         $this->entityManager->expects($this->once())
