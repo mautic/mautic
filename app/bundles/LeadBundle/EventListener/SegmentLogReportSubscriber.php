@@ -85,8 +85,12 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
                 $qb->expr()->isNotNull('log_removed.date_added')
             )
         );
-        $qb->setParameter('dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
-        $qb->setParameter('dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
+
+        $dateFrom = $event->getOptions()['dateFrom'] ?? (new \DateTime('-30 days'));
+        $dateTo   = $event->getOptions()['dateTo'] ?? (new \DateTime());
+
+        $qb->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+        $qb->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
 
         if (!$event->hasGroupBy()) {
             $qb->groupBy('l.id,log_added.object_id');
