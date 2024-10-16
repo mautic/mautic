@@ -162,7 +162,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $result = [];
         foreach ($tokens as $token => $dwc) {
             $result[$token] = '';
-            if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
+            if ($this->dynamicContentHelper->filtersMatchContact($dwc['filters'], $leadArray)) {
                 $result[$token] = $dwc['content'];
             }
         }

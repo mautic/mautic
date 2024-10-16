@@ -235,7 +235,7 @@ class DynamicContentHelper
      * @param mixed[] $filters
      * @param mixed[] $contactArray
      */
-    private function filtersMatchContact(array $filters, array $contactArray): bool
+    public function filtersMatchContact(array $filters, array $contactArray): bool
     {
         if (empty($contactArray['id'])) {
             return false;
@@ -244,15 +244,15 @@ class DynamicContentHelper
         //  We attempt even listeners first
         if ($this->dispatcher->hasListeners(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)) {
             /** @var Lead $contact */
-            $contact = $this->leadModel->getEntity($contactArray['id']);
-
-            $event = new ContactFiltersEvaluateEvent($filters, $contact);
+            $contact               = $this->leadModel->getEntity($contactArray['id']);
+            $extendedFiltersPassed = false;
+            $event                 = new ContactFiltersEvaluateEvent($filters, $contact);
             $this->dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE);
             if ($event->isMatch()) {
-                return true;
+                $extendedFiltersPassed = true;
             }
         }
 
-        return $this->matchFilterForLead($filters, $contactArray);
+        return $this->matchFilterForLead($filters, $contactArray, $extendedFiltersPassed);
     }
 }
