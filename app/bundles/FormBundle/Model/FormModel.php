@@ -450,7 +450,7 @@ class FormModel extends CommonFormModel
                 'fields'                 => $fields,
                 'mappedFields'           => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
                 'form'                   => $entity,
-                'theme'                  => '@themes/'.$entity->getTemplate().'/Field/',
+                'theme'                  => '@themes/'.$entity->getTemplate().'/html/MauticFormBundle/Field/',
                 'submissions'            => $submissions,
                 'lead'                   => $lead,
                 'formPages'              => $pages,
