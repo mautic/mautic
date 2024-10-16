@@ -1216,18 +1216,23 @@ kbd {
 }
 .popover {
   border-radius: 10px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
 }
 .popover-title {
   padding: 16px 16px 12px;
-  background-color: var(--layer);
   border-bottom: 1px solid var(--border-subtle);
   font-weight: 600;
   line-height: 1em;
   font-size: calc(1em + 1px);
   border-radius: 8px 8px 0 0;
+  backdrop-filter: blur(6px);
+  background-color: var(--layer-translucent);
 }
 .popover-content {
   padding: 12px 16px 16px;
+  background-color: var(--layer-alternate);
 }
 .touchevents .scroll-content {
   height: 100%;
