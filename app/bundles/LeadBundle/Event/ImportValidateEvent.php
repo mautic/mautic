@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ImportValidateEvent extends Event
 {
-    private bool $skipIfExists;
+    private bool $skipIfExists = false;
     private ?int $ownerId = null;
 
     private ?int $list    = null;

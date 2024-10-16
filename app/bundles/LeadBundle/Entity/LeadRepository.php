@@ -354,6 +354,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return $results[0] ?? [];
     }
 
+    public function exists(string $id): bool
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id = :id')
+            ->setParameter(':id', $id);
+
+        return (bool) $query->execute()->fetchOne();
+    }
+
     /**
      * @param int $id
      */
