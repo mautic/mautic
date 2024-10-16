@@ -2,24 +2,23 @@
 // Brand center
 // --------------------------------------------------
 @primary-color: #4e5e9e;
-@secondary-color: #fdb933;
 @border-radius: 0px;
 
 
 
 // Themes
 /// Light theme
-:root {
+:root,
+:root[theme="light"] {
     /// Background
     --background: #ffffff;
-    --background-hover: #8d8d8d1f;
+    --background-hover: #f1f1f1;
     --background-active: #8d8d8d80;
     --background-selected: #8d8d8d33;
     --background-selected-hover: #8d8d8d52;
     --background-inverse: #393939;
     --background-inverse-hover: #4c4c4c;
-    --background-brand-primary: var(--primary-60);
-    --background-brand-secondary: var(--secondary-60);
+    --background-brand: var(--primary-60);
 
     /// Layer
     --layer: #f4f4f4;
@@ -99,6 +98,7 @@
     --button-secondary: #393939;
     --button-secondary-hover: #4c4c4c;
     --button-secondary-active: #6f6f6f;
+    --button-secondary-text: #ffffff; // Workaround for Freire and Solarized Dark themes
     --button-tertiary: var(--primary-60);
     --button-tertiary-hover: var(--primary-70);
     --button-tertiary-active: var(--primary-80);
@@ -173,14 +173,10 @@
     --label-color-green: #0e6027;
     --label-background-hover-green: #74e792;
     --label-border-green: #42be65;
-    --label-background-brand-primary: var(--primary-60);
-    --label-color-brand-primary: var(--text-on-color);
-    --label-background-hover-brand-primary: var(--primary-70);
-    --label-border-brand-primary: var(--primary-80);
-    --label-background-brand-secondary: var(--secondary-60);
-    --label-color-brand-secondary: contrast(@secondary-color);
-    --label-background-hover-brand-secondary: var(--secondary-70);
-    --label-border-brand-secondary: var(--secondary-80);
+    --label-background-brand: var(--primary-60);
+    --label-color-brand: var(--text-on-color);
+    --label-background-hover-brand: var(--primary-70);
+    --label-border-brand: var(--primary-80);
 }
 
 /// Solarized Light theme
@@ -193,8 +189,7 @@
     --background-selected-hover: #eee8d599;
     --background-inverse: #002b36;
     --background-inverse-hover: #073642;
-    --background-brand-primary: #268bd2;
-    --background-brand-secondary: #2aa198;
+    --background-brand: #268bd2;
 
     /// Layer
     --layer: #eee8d5;
@@ -274,6 +269,7 @@
     --button-secondary: #586e75;
     --button-secondary-hover: #465c62;
     --button-secondary-active: #344a4f;
+    --button-secondary-text: #fdf6e3; // Workaround for Freire and Solarized Dark themes
     --button-tertiary: #268bd2;
     --button-tertiary-hover: #1e6ea7;
     --button-tertiary-active: #15516d;
@@ -344,28 +340,23 @@
     --label-color-green: #5a6800;
     --label-background-hover-green: #c6e787;
     --label-border-green: #859900;
-    --label-background-brand-primary: #268bd2;
-    --label-color-brand-primary: #fdf6e3;
-    --label-background-hover-brand-primary: #1e6ea7;
-    --label-border-brand-primary: #15516d;
-    --label-background-brand-secondary: #2aa198;
-    --label-color-brand-secondary: #fdf6e3;
-    --label-background-hover-brand-secondary: #1f7972;
-    --label-border-brand-secondary: #14514c;
+    --label-background-brand: #268bd2;
+    --label-color-brand: #fdf6e3;
+    --label-background-hover-brand: #1e6ea7;
+    --label-border-brand: #15516d;
 }
 
 /// Dark theme
 :root[theme="dark"] {
     /// Background
     --background: #161616;
-    --background-hover: #8d8d8d29;
+    --background-hover: #292929;
     --background-active: #8d8d8d66;
     --background-selected: #8d8d8d3d;
     --background-selected-hover: #8d8d8d52;
     --background-inverse: #f4f4f4;
     --background-inverse-hover: #e5e5e5;
     --background-brand: var(--primary-80);
-    --background-brand-secondary: var(--secondary-80);
 
     /// Layer
     --layer: #262626;
@@ -444,6 +435,7 @@
     --button-secondary: #6f6f6f;
     --button-secondary-hover: #606060;
     --button-secondary-active: #393939;
+    --button-secondary-text: #ffffff; // Workaround for Freire and Solarized Dark themes
     --button-tertiary: #ffffff;
     --button-tertiary-hover: #f4f4f4;
     --button-tertiary-active: #c6c6c6;
@@ -531,7 +523,6 @@
     --background-inverse: #fdf6e3;
     --background-inverse-hover: #eee8d5;
     --background-brand: #268bd2;
-    --background-brand-secondary: #2aa198;
 
     /// Layer
     --layer: #073642;
@@ -610,6 +601,7 @@
     --button-secondary: #839496;
     --button-secondary-hover: #93a1a1;
     --button-secondary-active: #586e75;
+    --button-secondary-text: #000000; // Workaround for Freire and Solarized Dark themes
     --button-tertiary: #268bd2;
     --button-tertiary-hover: #2aa198;
     --button-tertiary-active: #6c71c4;
@@ -695,8 +687,7 @@
     --background-selected-hover: #323248;
     --background-inverse: #F7B84B;
     --background-inverse-hover: #F9C46A;
-    --background-brand-primary: #F7B84B;
-    --background-brand-secondary: #8E8EFF;
+    --background-brand: #F7B84B;
 
     /// Layer
     --layer: #232336;
@@ -773,9 +764,10 @@
     --button-primary: #F7B84B;
     --button-primary-hover: #F9C46A;
     --button-primary-active: #FBCF89;
-    --button-secondary: var(--primary-40);
-    --button-secondary-hover: var(--primary-30);
-    --button-secondary-active: var(--primary-20);
+    --button-secondary: #8c98c6;
+    --button-secondary-hover: #aeb6d7;
+    --button-secondary-active: #d0d5e8;
+    --button-secondary-text: #000000; // Workaround for Freire and Solarized Dark themes
     --button-tertiary: #8E8EFF;
     --button-tertiary-hover: #A5A5FF;
     --button-tertiary-active: #BCBCFF;
@@ -800,15 +792,15 @@
     --skeleton-background: #2A2A40;
 
     /// Support
-    --support-error: #B71C1C;  // Deep red
-    --support-success: #00C853;  // Deep green
-    --support-warning: #FFB300;  // Deep yellow/amber
-    --support-info: #0091EA;  // Deep blue
+    --support-error: #B71C1C;
+    --support-success: #00C853;
+    --support-warning: #FFB300;
+    --support-info: #0091EA;
 
-    --support-error-inverse: #FF4D4D;  // Bright, vivid red
-    --support-success-inverse: #00E676;  // Vibrant green
-    --support-warning-inverse: #FFD740;  // Bright yellow
-    --support-info-inverse: #40C4FF;  // Bright blue
+    --support-error-inverse: #FF4D4D;
+    --support-success-inverse: #00E676;
+    --support-warning-inverse: #FFD740;
+    --support-info-inverse: #40C4FF;
 
     /// Tag
     --label-background-gray: #323248;
@@ -851,14 +843,10 @@
     --label-color-green: #1C1C2E;
     --label-background-hover-green: #66BB6A;
     --label-border-green: #80C783;
-    --label-background-brand-primary: #F7B84B;
-    --label-color-brand-primary: #1C1C2E;
-    --label-background-hover-brand-primary: #F9C46A;
-    --label-border-brand-primary: #FBCF89;
-    --label-background-brand-secondary: #8E8EFF;
-    --label-color-brand-secondary: #1C1C2E;
-    --label-background-hover-brand-secondary: #A5A5FF;
-    --label-border-brand-secondary: #BCBCFF;
+    --label-background-brand: #F7B84B;
+    --label-color-brand: #1C1C2E;
+    --label-background-hover-brand: #F9C46A;
+    --label-border-brand: #FBCF89;
 }
 
 // General
@@ -878,26 +866,6 @@
 }
 
 :root {
---primary-20: lighten(@primary-color, 40%);
---primary-30: lighten(@primary-color, 30%);
---primary-40: lighten(@primary-color, 20%);
---primary-50: lighten(@primary-color, 10%);
---primary-60: @primary-color;
---primary-70: darken(@primary-color, 10%);
---primary-80: darken(@primary-color, 20%);
---primary-90: darken(@primary-color, 30%);
---primary-100: darken(@primary-color, 40%);
-
---secondary-20: lighten(@secondary-color, 40%);
---secondary-30: lighten(@secondary-color, 30%);
---secondary-40: lighten(@secondary-color, 20%);
---secondary-50: lighten(@secondary-color, 10%);
---secondary-60: @secondary-color;
---secondary-70: darken(@secondary-color, 10%);
---secondary-80: darken(@secondary-color, 20%);
---secondary-90: darken(@secondary-color, 30%);
---secondary-100: darken(@secondary-color, 40%);
-
 // Motion //
 
 /// Durations
@@ -946,6 +914,485 @@
 --border-radius-lg: clamp(0px, calc(2.6 * @border-radius), 21px);
 --outline-style: solid;
 }
+
+//
+// Accent colors
+@accent02: #CE2F27;
+@accent03: #FF9500;
+@accent04: #FFCC00;
+@accent05: #b51963;
+@accent06: #0f62fe;
+@accent07: #32642B;
+@accent08: #5928ed;
+@accent09: #00FFFF;
+@accent10: #00b4c5;
+@accent11: #0f5664;
+@accent12: #123f20;
+@accent13: #00bf7d;
+@accent14: #26643b;
+@accent15: #CCFF00;
+@accent16: #c44601;
+@accent17: #FF2E54;
+@accent18: #ca3b88;
+@accent19: #FF00FF;
+@accent20: #9400D3;
+@accent21: #26A2DD;
+@accent22: #1c0d82;
+@accent23: #ffae02;
+@accent24: #f14231;
+@accent25: #5c1c51;
+
+// Making available out of the app accent color for preview in user settings
+:root {
+    --accent01: @primary-color;
+    --accent02: @accent02;
+    --accent03: @accent03;
+    --accent04: @accent04;
+    --accent05: @accent05;
+    --accent06: @accent06;
+    --accent07: @accent07;
+    --accent08: @accent08;
+    --accent09: @accent09;
+    --accent10: @accent10;
+    --accent11: @accent11;
+    --accent12: @accent12;
+    --accent13: @accent13;
+    --accent14: @accent14;
+    --accent15: @accent15;
+    --accent16: @accent16;
+    --accent17: @accent17;
+    --accent18: @accent18;
+    --accent19: @accent19;
+    --accent20: @accent20;
+    --accent21: @accent21;
+    --accent22: @accent22;
+    --accent23: @accent23;
+    --accent24: @accent24;
+    --accent25: @accent25;
+}
+
+// Workaround for all colors that look bad on top of white bg
+:root[accent="03"],
+:root[accent="04"],
+:root[accent="07"],
+:root[accent="09"],
+:root[accent="10"],
+:root[accent="13"],
+:root[accent="15"],
+:root[accent="17"],
+:root[accent="19"],
+:root[accent="21"],
+:root[accent="23"],
+:root[accent="24"] {
+    &[theme="light"] {
+        --link-primary: var(--primary-80);
+        --link-primary-hover: var(--primary-90);
+        --link-secondary: var(--primary-90);
+        --link-inverse: var(--primary-40);
+        --icon-interactive: var(--primary-70);
+        --button-tertiary: var(--primary-80);
+        --interactive: var(--primary-70);
+    }
+}
+
+:root,
+:root[accent="01"] {
+    --primary-20: lighten(@primary-color, 40%);
+    --primary-30: lighten(@primary-color, 30%);
+    --primary-40: lighten(@primary-color, 20%);
+    --primary-50: lighten(@primary-color, 10%);
+    --primary-60: @primary-color;
+    --primary-70: darken(@primary-color, 10%);
+    --primary-80: darken(@primary-color, 20%);
+    --primary-90: darken(@primary-color, 30%);
+    --primary-100: darken(@primary-color, 40%);
+}
+
+:root[accent="02"] {
+    --primary-20: lighten(@accent02, 40%);
+    --primary-30: lighten(@accent02, 30%);
+    --primary-40: lighten(@accent02, 20%);
+    --primary-50: lighten(@accent02, 10%);
+    --primary-60: @accent02;
+    --primary-70: darken(@accent02, 10%);
+    --primary-80: darken(@accent02, 20%);
+    --primary-90: darken(@accent02, 30%);
+    --primary-100: darken(@accent02, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent02, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent02, #16161640, #8d8d8d);
+}
+
+:root[accent="03"] {
+    --primary-20: lighten(@accent03, 40%);
+    --primary-30: lighten(@accent03, 30%);
+    --primary-40: lighten(@accent03, 20%);
+    --primary-50: lighten(@accent03, 10%);
+    --primary-60: @accent03;
+    --primary-70: darken(@accent03, 10%);
+    --primary-80: darken(@accent03, 20%);
+    --primary-90: darken(@accent03, 30%);
+    --primary-100: darken(@accent03, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent03, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent03, #16161640, #8d8d8d);
+}
+
+:root[accent="04"] {
+    --primary-20: lighten(@accent04, 40%);
+    --primary-30: lighten(@accent04, 30%);
+    --primary-40: lighten(@accent04, 20%);
+    --primary-50: lighten(@accent04, 10%);
+    --primary-60: @accent04;
+    --primary-70: darken(@accent04, 10%);
+    --primary-80: darken(@accent04, 20%);
+    --primary-90: darken(@accent04, 30%);
+    --primary-100: darken(@accent04, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent04, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent04, #16161640, #8d8d8d);
+}
+
+
+:root[accent="05"] {
+    --primary-20: lighten(@accent05, 40%);
+    --primary-30: lighten(@accent05, 30%);
+    --primary-40: lighten(@accent05, 20%);
+    --primary-50: lighten(@accent05, 10%);
+    --primary-60: @accent05;
+    --primary-70: darken(@accent05, 10%);
+    --primary-80: darken(@accent05, 20%);
+    --primary-90: darken(@accent05, 30%);
+    --primary-100: darken(@accent05, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent05, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent05, #16161640, #8d8d8d);
+}
+
+:root[accent="06"] {
+    --primary-20: lighten(@accent06, 40%);
+    --primary-30: lighten(@accent06, 30%);
+    --primary-40: lighten(@accent06, 20%);
+    --primary-50: lighten(@accent06, 10%);
+    --primary-60: @accent06;
+    --primary-70: darken(@accent06, 10%);
+    --primary-80: darken(@accent06, 20%);
+    --primary-90: darken(@accent06, 30%);
+    --primary-100: darken(@accent06, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent06, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent06, #16161640, #8d8d8d);
+}
+
+:root[accent="07"] {
+    --primary-20: lighten(@accent07, 40%);
+    --primary-30: lighten(@accent07, 30%);
+    --primary-40: lighten(@accent07, 20%);
+    --primary-50: lighten(@accent07, 10%);
+    --primary-60: @accent07;
+    --primary-70: darken(@accent07, 10%);
+    --primary-80: darken(@accent07, 20%);
+    --primary-90: darken(@accent07, 30%);
+    --primary-100: darken(@accent07, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent07, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent07, #16161640, #8d8d8d);
+}
+
+:root[accent="08"] {
+    --primary-20: lighten(@accent08, 40%);
+    --primary-30: lighten(@accent08, 30%);
+    --primary-40: lighten(@accent08, 20%);
+    --primary-50: lighten(@accent08, 10%);
+    --primary-60: @accent08;
+    --primary-70: darken(@accent08, 10%);
+    --primary-80: darken(@accent08, 20%);
+    --primary-90: darken(@accent08, 30%);
+    --primary-100: darken(@accent08, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent08, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent08, #16161640, #8d8d8d);
+}
+
+:root[accent="09"] {
+    --primary-20: lighten(@accent09, 40%);
+    --primary-30: lighten(@accent09, 30%);
+    --primary-40: lighten(@accent09, 20%);
+    --primary-50: lighten(@accent09, 10%);
+    --primary-60: @accent09;
+    --primary-70: darken(@accent09, 10%);
+    --primary-80: darken(@accent09, 20%);
+    --primary-90: darken(@accent09, 30%);
+    --primary-100: darken(@accent09, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent09, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent09, #16161640, #8d8d8d);
+}
+
+:root[accent="10"] {
+    --primary-20: lighten(@accent10, 40%);
+    --primary-30: lighten(@accent10, 30%);
+    --primary-40: lighten(@accent10, 20%);
+    --primary-50: lighten(@accent10, 10%);
+    --primary-60: @accent10;
+    --primary-70: darken(@accent10, 10%);
+    --primary-80: darken(@accent10, 20%);
+    --primary-90: darken(@accent10, 30%);
+    --primary-100: darken(@accent10, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent10, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent10, #16161640, #8d8d8d);
+}
+
+:root[accent="11"] {
+    --primary-20: lighten(@accent11, 40%);
+    --primary-30: lighten(@accent11, 30%);
+    --primary-40: lighten(@accent11, 20%);
+    --primary-50: lighten(@accent11, 10%);
+    --primary-60: @accent11;
+    --primary-70: darken(@accent11, 10%);
+    --primary-80: darken(@accent11, 20%);
+    --primary-90: darken(@accent11, 30%);
+    --primary-100: darken(@accent11, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent11, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent11, #16161640, #8d8d8d);
+}
+
+:root[accent="12"] {
+    --primary-20: lighten(@accent12, 40%);
+    --primary-30: lighten(@accent12, 30%);
+    --primary-40: lighten(@accent12, 20%);
+    --primary-50: lighten(@accent12, 10%);
+    --primary-60: @accent12;
+    --primary-70: darken(@accent12, 10%);
+    --primary-80: darken(@accent12, 20%);
+    --primary-90: darken(@accent12, 30%);
+    --primary-100: darken(@accent12, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent12, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent12, #16161640, #8d8d8d);
+}
+
+:root[accent="13"] {
+    --primary-20: lighten(@accent13, 40%);
+    --primary-30: lighten(@accent13, 30%);
+    --primary-40: lighten(@accent13, 20%);
+    --primary-50: lighten(@accent13, 10%);
+    --primary-60: @accent13;
+    --primary-70: darken(@accent13, 10%);
+    --primary-80: darken(@accent13, 20%);
+    --primary-90: darken(@accent13, 30%);
+    --primary-100: darken(@accent13, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent13, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent13, #16161640, #8d8d8d);
+}
+
+:root[accent="14"] {
+    --primary-20: lighten(@accent14, 40%);
+    --primary-30: lighten(@accent14, 30%);
+    --primary-40: lighten(@accent14, 20%);
+    --primary-50: lighten(@accent14, 10%);
+    --primary-60: @accent14;
+    --primary-70: darken(@accent14, 10%);
+    --primary-80: darken(@accent14, 20%);
+    --primary-90: darken(@accent14, 30%);
+    --primary-100: darken(@accent14, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent14, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent14, #16161640, #8d8d8d);
+}
+
+:root[accent="15"] {
+    --primary-20: lighten(@accent15, 40%);
+    --primary-30: lighten(@accent15, 30%);
+    --primary-40: lighten(@accent15, 20%);
+    --primary-50: lighten(@accent15, 10%);
+    --primary-60: @accent15;
+    --primary-70: darken(@accent15, 10%);
+    --primary-80: darken(@accent15, 20%);
+    --primary-90: darken(@accent15, 30%);
+    --primary-100: darken(@accent15, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent15, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent15, #16161640, #8d8d8d);
+}
+
+:root[accent="16"] {
+    --primary-20: lighten(@accent16, 40%);
+    --primary-30: lighten(@accent16, 30%);
+    --primary-40: lighten(@accent16, 20%);
+    --primary-50: lighten(@accent16, 10%);
+    --primary-60: @accent16;
+    --primary-70: darken(@accent16, 10%);
+    --primary-80: darken(@accent16, 20%);
+    --primary-90: darken(@accent16, 30%);
+    --primary-100: darken(@accent16, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent16, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent16, #16161640, #8d8d8d);
+}
+
+:root[accent="17"] {
+    --primary-20: lighten(@accent17, 40%);
+    --primary-30: lighten(@accent17, 30%);
+    --primary-40: lighten(@accent17, 20%);
+    --primary-50: lighten(@accent17, 10%);
+    --primary-60: @accent17;
+    --primary-70: darken(@accent17, 10%);
+    --primary-80: darken(@accent17, 20%);
+    --primary-90: darken(@accent17, 30%);
+    --primary-100: darken(@accent17, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent17, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent17, #16161640, #8d8d8d);
+}
+
+:root[accent="18"] {
+    --primary-20: lighten(@accent18, 40%);
+    --primary-30: lighten(@accent18, 30%);
+    --primary-40: lighten(@accent18, 20%);
+    --primary-50: lighten(@accent18, 10%);
+    --primary-60: @accent18;
+    --primary-70: darken(@accent18, 10%);
+    --primary-80: darken(@accent18, 20%);
+    --primary-90: darken(@accent18, 30%);
+    --primary-100: darken(@accent18, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent18, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent18, #16161640, #8d8d8d);
+}
+
+:root[accent="19"] {
+    --primary-20: lighten(@accent19, 40%);
+    --primary-30: lighten(@accent19, 30%);
+    --primary-40: lighten(@accent19, 20%);
+    --primary-50: lighten(@accent19, 10%);
+    --primary-60: @accent19;
+    --primary-70: darken(@accent19, 10%);
+    --primary-80: darken(@accent19, 20%);
+    --primary-90: darken(@accent19, 30%);
+    --primary-100: darken(@accent19, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent19, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent19, #16161640, #8d8d8d);
+}
+
+:root[accent="20"] {
+    --primary-20: lighten(@accent20, 40%);
+    --primary-30: lighten(@accent20, 30%);
+    --primary-40: lighten(@accent20, 20%);
+    --primary-50: lighten(@accent20, 10%);
+    --primary-60: @accent20;
+    --primary-70: darken(@accent20, 10%);
+    --primary-80: darken(@accent20, 20%);
+    --primary-90: darken(@accent20, 30%);
+    --primary-100: darken(@accent20, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent20, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent20, #16161640, #8d8d8d);
+}
+
+:root[accent="21"] {
+    --primary-20: lighten(@accent21, 40%);
+    --primary-30: lighten(@accent21, 30%);
+    --primary-40: lighten(@accent21, 20%);
+    --primary-50: lighten(@accent21, 10%);
+    --primary-60: @accent21;
+    --primary-70: darken(@accent21, 10%);
+    --primary-80: darken(@accent21, 20%);
+    --primary-90: darken(@accent21, 30%);
+    --primary-100: darken(@accent21, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent21, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent21, #16161640, #8d8d8d);
+}
+
+:root[accent="22"] {
+    --primary-20: lighten(@accent22, 40%);
+    --primary-30: lighten(@accent22, 30%);
+    --primary-40: lighten(@accent22, 20%);
+    --primary-50: lighten(@accent22, 10%);
+    --primary-60: @accent22;
+    --primary-70: darken(@accent22, 10%);
+    --primary-80: darken(@accent22, 20%);
+    --primary-90: darken(@accent22, 30%);
+    --primary-100: darken(@accent22, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent22, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent22, #16161640, #8d8d8d);
+}
+
+:root[accent="23"] {
+    --primary-20: lighten(@accent23, 40%);
+    --primary-30: lighten(@accent23, 30%);
+    --primary-40: lighten(@accent23, 20%);
+    --primary-50: lighten(@accent23, 10%);
+    --primary-60: @accent23;
+    --primary-70: darken(@accent23, 10%);
+    --primary-80: darken(@accent23, 20%);
+    --primary-90: darken(@accent23, 30%);
+    --primary-100: darken(@accent23, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent23, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent23, #16161640, #8d8d8d);
+}
+
+:root[accent="24"] {
+    --primary-20: lighten(@accent24, 40%);
+    --primary-30: lighten(@accent24, 30%);
+    --primary-40: lighten(@accent24, 20%);
+    --primary-50: lighten(@accent24, 10%);
+    --primary-60: @accent24;
+    --primary-70: darken(@accent24, 10%);
+    --primary-80: darken(@accent24, 20%);
+    --primary-90: darken(@accent24, 30%);
+    --primary-100: darken(@accent24, 40%);
+    --text-on-color: #000;
+    --text-on-color-disabled: contrast(@accent24, #16161640, #8d8d8d);
+    --icon-on-color: #000;
+    --icon-on-color-disabled: contrast(@accent24, #16161640, #8d8d8d);
+}
+
+:root[accent="25"] {
+    --primary-20: lighten(@accent25, 40%);
+    --primary-30: lighten(@accent25, 30%);
+    --primary-40: lighten(@accent25, 20%);
+    --primary-50: lighten(@accent25, 10%);
+    --primary-60: @accent25;
+    --primary-70: darken(@accent25, 10%);
+    --primary-80: darken(@accent25, 20%);
+    --primary-90: darken(@accent25, 30%);
+    --primary-100: darken(@accent25, 40%);
+    --text-on-color: #fff;
+    --text-on-color-disabled: contrast(@accent25, #16161640, #8d8d8d);
+    --icon-on-color: #fff;
+    --icon-on-color-disabled: contrast(@accent25, #16161640, #8d8d8d);
+}
+
 
 //
 // Accessibility features
