@@ -8,6 +8,7 @@ use Doctrine\ORM\ORMException;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -16,6 +17,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ImportModelTest extends StandardImportTestHelper
 {
@@ -389,5 +391,64 @@ class ImportModelTest extends StandardImportTestHelper
         $import->end();
 
         Assert::assertSame(Import::FAILED, $import->getStatus());
+    }
+
+    public function testWhenImportUnpublishedInBetweenImportProcess(): void
+    {
+        $model = $this->initImportModel();
+
+        $this->dispatcher->expects($this->exactly(4))
+            ->method('dispatch')
+            ->with(
+                LeadEvents::IMPORT_ON_PROCESS,
+                $this->callback(function (ImportProcessEvent $event) {
+                    // Emulate a subscriber.
+                    $event->setWasMerged(false);
+
+                    return true;
+                })
+            );
+
+        /** @var MockObject&LeadEventLogRepository $logRepository */
+        $logRepository = $this->createMock(LeadEventLogRepository::class);
+
+        /** @var MockObject&ImportRepository $importRepository */
+        $importRepository = $this->createMock(ImportRepository::class);
+
+        // it will return false for is_published value.
+        $importRepository->expects($this->exactly(3))->method('getValue')
+            ->willReturnOnConsecutiveCalls(true, false, false);
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticLeadBundle:LeadEventLog', $logRepository],
+                        ['MauticLeadBundle:Import', $importRepository],
+                    ]
+                )
+            );
+
+        $this->entityManager->expects($this->any())
+            ->method('isOpen')
+            ->willReturn(true);
+
+        $this->setUpBeforeClass();
+
+        $entity = $this->initImportEntity();
+        $entity->setParserConfig([
+            'batchlimit' => 3,
+            'delimiter'  => ',',
+            'enclosure'  => '"',
+            'escape'     => '/',
+        ]);
+
+        $entity->start();
+        $model->process($entity, new Progress());
+        $entity->end();
+
+        Assert::assertSame(4, $entity->getInsertedCount());
+        Assert::assertSame(Import::STOPPED, $entity->getStatus());
     }
 }

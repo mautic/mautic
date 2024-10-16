@@ -392,7 +392,8 @@ class ImportModel extends FormModel
             }
         }
 
-        if ($import->getLastLineImported() < $import->getLineCount()) {
+        $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
+        if ($isPublished && $import->getLastLineImported() < $import->getLineCount()) {
             $import->setStatus($import::DELAYED);
             $this->saveEntity($import);
         }
