@@ -1904,7 +1904,7 @@ body > #app-wrapper {
   font-size: 14px;
   min-width: 26px;
   display: block;
-  transition: var(--all-expressive);
+  transition: var(--transition-all-expressive);
 }
 .app-sidebar .nav-sidebar > .nav > li > a .arrow {
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -5220,7 +5220,7 @@ label.list-group-item:focus {
   line-height: 16px;
   font-size: calc(16px - 5px);
   color: var(--icon-secondary);
-  transition: var(--all);
+  transition: var(--transition-all-productive);
   top: 11.8px;
   vertical-align: middle;
 }
