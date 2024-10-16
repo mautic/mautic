@@ -74,13 +74,13 @@
                         {% set indexRouteParams = indexRouteParams|merge({
                             'search': 'mautic.lead.lead.searchcommand.import_id'|trans ~ ':' ~ import.id
                         }) %}
-                        <a class="btn btn-success" href="{{ path(indexRoute, indexRouteParams) }}" data-toggle="ajax">
+                        <a class="btn btn-secondary" href="{{ path(indexRoute, indexRouteParams) }}" data-toggle="ajax">
                             {{ 'mautic.lead.list.view'|trans({'%objects%': objectName}) }}
                         </a>
-                        <a class="btn btn-success" href="{{ path('mautic_import_index', {'object': object}) }}" data-toggle="ajax">
+                        <a class="btn btn-secondary" href="{{ path('mautic_import_index', {'object': object}) }}" data-toggle="ajax">
                             {{ 'mautic.lead.view.imports'|trans }}
                         </a>
-                        <a class="btn btn-success" href="{{ path('mautic_import_action', {'objectAction': 'view', 'objectId': import.id, 'object': object}) }}" data-toggle="ajax">
+                        <a class="btn btn-secondary" href="{{ path('mautic_import_action', {'objectAction': 'view', 'objectId': import.id, 'object': object}) }}" data-toggle="ajax">
                             {{ 'mautic.lead.import.result.info'|trans({'%import%': import.name()}) }}
                         </a>
                     </div>

@@ -2,13 +2,73 @@
 Mautic.userOnLoad = function (container) {
     if (mQuery(container + ' form[name="user"]').length) {
         if (mQuery('#user_position').length) {
-            Mautic.activateTypeahead('#user_position', {displayKey: 'position'});
+            Mautic.activateTypeahead('#user_position', { displayKey: 'position' });
         }
     } else {
         if (mQuery(container + ' #list-search').length) {
             Mautic.activateSearchAutocomplete('list-search', 'user.user');
         }
     }
+
+    /**
+     * Initializes radio button states for UI settings based on localStorage settings.
+     * Applies settings to the document for preview on user changes.
+     * Saves settings to localStorage only when the Save button is clicked.
+     *
+     * @constant {string} prefix - Prefix for localStorage keys.
+     */
+    const prefix = 'm-toggle-setting-';
+    let temporarySettings = {};
+
+    // Load settings from localStorage on page load
+    Object.keys(localStorage)
+        .filter(key => key.startsWith(prefix))
+        .forEach(setting => {
+            const attributeName = setting.replace(prefix, '');
+            const value = localStorage.getItem(setting);
+
+            if (value) {
+                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${value}"]`);
+                if (radio) radio.checked = true;
+                document.documentElement.setAttribute(attributeName, value);
+            }
+        });
+
+    // Handle radio button changes - update temporary settings but do NOT save to localStorage yet
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (this.checked) {
+                const attributeName = this.dataset.attributeToggle;
+                temporarySettings[attributeName] = this.dataset.attributeValue;
+                document.documentElement.setAttribute(attributeName, temporarySettings[attributeName]);
+            }
+        });
+    });
+
+    // Save button functionality - persist the settings in localStorage
+    document.getElementById('user_buttons_save_toolbar').addEventListener('click', () => {
+        Object.entries(temporarySettings).forEach(([attributeName, value]) => {
+            localStorage.setItem(`${prefix}${attributeName}`, value);
+        });
+        temporarySettings = {};
+    });
+
+    // Cancel button functionality - discard temporary settings and revert changes
+    document.getElementById('user_buttons_cancel_toolbar').addEventListener('click', () => {
+        Object.keys(temporarySettings).forEach(attributeName => {
+            const storedValue = localStorage.getItem(`${prefix}${attributeName}`);
+            if (storedValue) {
+                document.documentElement.setAttribute(attributeName, storedValue);
+                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${storedValue}"]`);
+                if (radio) radio.checked = true;
+            } else {
+                document.documentElement.removeAttribute(attributeName);
+                const radios = document.querySelectorAll(`input[name="${attributeName}"]`);
+                radios.forEach(radio => radio.checked = false);
+            }
+        });
+        temporarySettings = {};
+    });
 };
 
 Mautic.roleOnLoad = function (container, response) {
@@ -75,8 +135,8 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
     if (mQuery('.' + bundle + '_granted').length) {
         var granted = 0;
         var levelPerms = MauticVars.permissionList[bundle];
-        mQuery.each(levelPerms, function(level, perms) {
-            mQuery.each(perms, function(index, perm) {
+        mQuery.each(levelPerms, function (level, perms) {
+            mQuery.each(perms, function (index, perm) {
                 var isChecked = mQuery('input[data-permission="' + bundle + ':' + level + ':' + perm + '"]').prop('checked');
                 if (perm == 'full') {
                     if (isChecked) {

@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
@@ -171,5 +172,89 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
         $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
         $leadModel->getCustomLeadFieldLength(['unknown_field']);
+    }
+
+    /**
+     * @dataProvider fieldValueProvider
+     *
+     * @throws MappingException
+     */
+    public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
+    {
+        $fieldModel = self::$container->get('mautic.lead.model.field');
+
+        // Create a lead field.
+        $selectField = new LeadField();
+        $selectField->setName('Select Field')
+            ->setAlias('select_field')
+            ->setType('select')
+            ->setObject('lead')
+            ->setProperties(['list' => [
+                ['label' => 'Male', 'value' => 'male'],
+                ['label' => 'Female', 'value' => 'female'],
+                ['label' => 'Other\'s', 'value' => 'other\'s'],
+            ]]);
+        $fieldModel->saveEntity($selectField);
+        $this->em->clear();
+
+        $leadModel  = self::$container->get('mautic.lead.model.lead');
+
+        $fields = [
+            'core' => [
+                'First Name' => [
+                    'alias' => 'firstname',
+                    'type'  => 'string',
+                    'value' => 'FirstName',
+                ],
+                'Last Name' => [
+                    'alias' => 'lastname',
+                    'type'  => 'string',
+                    'value' => 'LastName',
+                ],
+                'Email' => [
+                    'alias' => 'email',
+                    'type'  => 'email',
+                    'value' => 'firstname.lastname@test.com',
+                ],
+                'Select Field' => [
+                    'alias'      => $selectField->getAlias(),
+                    'type'       => $selectField->getType(),
+                    'value'      => $selectFieldValue,
+                    'properties' => ['list' => [
+                        ['label' => 'Male', 'value' => 'male'],
+                        ['label' => 'Female', 'value' => 'female'],
+                        // As it stores HTML encoded value.
+                        ['label' => 'Other&#39;s', 'value' => 'other&#39;s'],
+                    ]],
+                ],
+            ],
+        ];
+
+        // Create lead with multiple fields
+        $lead = new Lead();
+        $lead->setFields($fields);
+        $lead->setFirstname('FirstName')
+            ->setLastname('LastName')
+            ->setEmail('firstname.lastname@test.com')
+            ->addUpdatedField($selectField->getAlias(), $selectFieldValue);
+        $leadModel->saveEntity($lead);
+
+        $this->em->clear();
+
+        $lead = $leadModel->getEntity($lead->getId());
+
+        $this->assertSame($expectedValue, $lead->getFieldValue($selectField->getAlias()));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function fieldValueProvider(): array
+    {
+        return [
+            'allowed_value'    => ['female', 'female'],
+            'disallowed_value' => ['gibberish', null],
+            'with_quotes'      => ['other\'s', 'other\'s'],
+        ];
     }
 }

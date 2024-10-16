@@ -133,7 +133,7 @@
     {{ form_row(form.vars.form.children.function) }}
     {{ form_row(form.vars.form.children.column) }}
     <div class="col-xs-1 mt-lg">
-        <button type="button" class="btn btn-danger" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-subtract-line"></i></button>
+        <button type="button" class="btn btn-danger btn-icon" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-delete-row"></i></button>
     </div>
 </div>
 {% endblock %}
@@ -158,10 +158,20 @@
                 {{ form_row(form.vars.form.children.value) }}
             </div>
             <div class="choice-wrapper col-xs-2">
-                {{ form_row(form.vars.form.children.dynamic) }}
+                {{ form_row(form.vars.form.children.dynamic, {'attr': {'size': 'sm'}}) }}
             </div>
-            <div class="col-xs-1 mt-lg">
-                <button type="button" class="btn btn-danger" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-subtract-line"></i></button>
+            <div class="col-xs-1 pa-0 jc-center">
+                <div class="d-flex fd-row">
+                    <!-- Clone Button -->
+                    <button type="button" class="btn btn-xs btn-ghost btn-icon btn-nospin" onclick="Mautic.cloneReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{'mautic.report.report.label.clonefilter'|trans}}">
+                        <i class="ri-file-copy-line"></i>
+                    </button>
+                    <!-- Remove Button -->
+                    <button type="button" class="btn btn-xs btn-ghost btn-icon btn-danger" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}">
+                        <i class="ri-subtract-line"></i>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -173,7 +183,7 @@
     {{ form_row(form.vars.form.children.column) }}
     {{ form_row(form.vars.form.children.direction) }}
     <div class="col-xs-2 mt-lg">
-        <button type="button" class="btn btn-danger" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-subtract-line"></i></button>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip" title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="ri-delete-bin-2-line fs-14"></i></button>
     </div>
 </div>
 {% endblock %}

@@ -22,7 +22,7 @@ class ContactPage
     public static $saveButton         = '.btn-save.btn-copy';
 
     // Edit Contact Form
-    public static $editForm     = '#core > div.pa-md.bg-light-xs.bdr-b > h4';
+    public static $editForm     = '#core > div.pa-md.bdr-b > h4';
 
     // Delete Contact alert
     public static $ConfirmDelete = 'button.btn.btn-danger';
@@ -55,7 +55,7 @@ class ContactPage
     public static $campaignsModalRemoveOption  = '//*[@id="lead_batch_remove_chosen"]/ul/li/input';
     public static $firstCampaignFromAddList    = '#lead_batch_add_chosen > div > ul > li';
     public static $firstCampaignFromRemoveList = '#lead_batch_remove_chosen > div > ul > li';
-    public static $campaignsModalSaveButton    = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-default.btn-save.btn-copy';
+    public static $campaignsModalSaveButton    = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-save.btn-copy';
 
     // Change Owner From
     public static $addToTheFollowing          = '#lead_batch_owner_addowner_chosen';

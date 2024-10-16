@@ -138,8 +138,8 @@ textarea.form-html {
     color: red;
     margin-top: 2px;
 }
-.mauticform-selectbox, 
-.mauticform-input, 
+.mauticform-selectbox,
+.mauticform-input,
 .mauticform-textarea {
     width: 75%;
     max-width: 500px;
@@ -154,7 +154,7 @@ textarea.form-html {
     gap: 5px;
 }
 
-.mauticform-checkboxgrp-row input[type="radio"], 
+.mauticform-checkboxgrp-row input[type="radio"],
 .mauticform-checkboxgrp-row input[type="checkbox"] {
     margin: 0;
 }
@@ -167,40 +167,29 @@ textarea.form-html {
 .mauticform-radiogrp-label {
     font-weight: normal;
 }
-.mauticform-radiogrp-radio {}
+input[type="radio"].mauticform-radiogrp-radio {
+    width: 16px;
+    height: 16px;
+    vertical-align: -3px;
+    margin-right: 4px;
+}
 
 /* Mautic Form Button Styles */
-.mauticform-button-wrapper .mauticform-button.btn-default, 
-.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default {
-    color: #5d6c7c;
-    background-color: #ffffff;
-    border-color: #dddddd;
-}
-.mauticform-button-wrapper .mauticform-button, 
+.mauticform-button-wrapper .mauticform-button,
 .mauticform-pagebreak-wrapper .mauticform-pagebreak {
-    display: inline-block;
     margin-bottom: 0;
     font-weight: 600;
-    text-align: center;
-    vertical-align: middle;
     cursor: pointer;
-    background-image: none;
-    border: 1px solid transparent;
     white-space: nowrap;
-    padding: 6px 12px;
     font-size: 13px;
     line-height: 1.3856;
-    border-radius: 3px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
-.mauticform-button-wrapper .mauticform-button.btn-default[disabled], 
-.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default[disabled] {
-    background-color: #ffffff;
-    border-color: #dddddd;
-    opacity: 0.75;
+.mauticform-button-wrapper .mauticform-button.btn-ghost[disabled],
+.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost[disabled] {
     cursor: not-allowed;
 }
 .mauticform-pagebreak-wrapper .mauticform-button-wrapper {
