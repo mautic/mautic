@@ -1,0 +1,237 @@
+{
+    "version": "v1.0.0",
+    "entity": {
+      "type": "organisation",
+      "role": "steward",
+      "name": "Mautic",
+      "email": "ruth.cheesley@mautic.org",
+      "phone": "+44 (0) 7308 164475 ",
+      "description": "Mautic is the world's first open source marketing automation platform. Based on the Symfony framework and used by over 40,000 businesses worldwide to power their digital experience, Mautic became a fully independent open source project in April 2023 after spinning off from ownership by Acquia.",
+      "webpageUrl": {
+        "url": "https://www.mautic.org"
+      }
+    },
+    "projects": [
+      {
+        "guid": "better-bounce-management",
+        "name": "Improve Mautic's bounce management",
+        "description": "Please take a look at the full proposal on this link: https://docs.google.com/document/d/1FvzEtBmp-7kXjfIAnBo8ntFtWandzW3pdlfcmBVnR4M/edit.\n\nThe Problem\n\nMautic's processing of email webhooks from Omnivery, Mailgun and similar providers is a bit limited due to insufficient underlying model where we store information coming from webhooks. This proposal aims to add ability to the Mautic core in a way so that transport plugins can leverage them and map it more precisely to the Mautic core model.\n\nWe are looking for funding for implementation of the solution proposed in this document.\n\nProposed Solution\n\nFor the problem described above we are suggesting that we add a complaint flag into the DNC entity so transport plugins can use it when the provider (Omnivery, Mailgun, etc.) suggests so.\n\nWe would also like to introduce soft bounces into Mautic core in a way so that we still send to contacts that soft bounces, but if the soft bounce happens multiple times that translates to the DNC entity for that lead with a hard bounced flag.\n\nHow many times contact soft bounces consecutively before it translates to hard bounced is configurable with the setting in Configuration -> Email Settings.\n\nWe introduce soft bounce categories so that transport plugins can categorize and we can display that data to the end user.\n\nWe would add the following filters on segments: filter for DNC complaint reason, soft bounce filter and soft bounce of specific category.\n\nWe would like to show some more statistics about bounced, soft bounced and complaint contacts on the email list page.\n\nWe would like to show the count of soft bounces & complaints on the contact page. Also show how many soft bounces until the hard bounce for the given contact and to show the count of soft bounces & complaints on email list view.",
+        "webpageUrl": {
+          "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/47"
+        },
+        "repositoryUrl": {
+          "url": "https://github.com/mautic/mautic"
+        },
+        "licenses": [
+          "spdx:GPL-3.0"
+        ],
+        "tags": [
+          "programming",
+          "development",
+          "feature",
+          "bounce-management",
+          "email-deliverability",
+          "core",
+          "core-development"
+        ]
+      },
+      {
+        "guid": "archive-old-resources",
+        "name": "Resource Management Initiative - Archive old resources",
+        "description": "🤔 Problem outline\nThere is currently no way to remove older resources in Mautic which are no longer in use without deleting them completely.\n\nThis project involves implementing a state - archived - which would enable the marketer to effectively ‘hide’ resources which are no longer being used.\n\nThis project is one part of the Resource Management Strategic Initiative.\n\n✅ Key requirements\nA state of archived for all resources in Mautic\n\nThe ability to transition state between published, unpublished and archived individually and in batch\n\nThe ability to view archived resources (eg with a filter)\n\nA permissions level to restrict access to the functionality of archiving, and the viewing of archived resources\n\nThe ability to run a report to show all archived resources\n\nThis project currently has a $500 budget, half of the current budget for the Resource Management Initiative.\n",
+        "webpageUrl": {
+          "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/7"
+        },
+        "repositoryUrl": {
+          "url": "https://github.com/mautic/mautic"
+        },
+        "licenses": [
+          "spdx:GPL-3.0"
+        ],
+        "tags": [
+          "programming",
+          "core-development",
+          "core",
+          "archive"
+        ]
+      },
+      {
+        "guid": "project-lead-support",
+        "name": "Project Lead Support",
+        "description": "Mautic's governance model includes a Project Lead who is employed by the Mautic Council to work full time for the benefit of the Mautic project. Currently this role is held by Ruth Cheesley since 2020.\n\nPresently this is the only resource available on a full-time basis to support the Mautic project, and Ruth does a great job of pulling everything together and keeping the project moving forward.",
+        "webpageUrl": {
+          "url": "https://contribute.mautic.org/governance/governance#5-8-role-of-project-lead"
+        },
+        "repositoryUrl": {
+          "url": "https://github.com/mautic/mautic"
+        },
+        "licenses": [
+          "N/A"
+        ],
+        "tags": [
+          "community-leadership",
+          "sustainability",
+          "project-lead"
+        ]
+      },
+      {
+        "guid": "most-privacy-friendly-tool",
+        "name": "Making Mautic the most privacy-friendly marketing tool",
+        "description": "As of today, Mautic can't be used fully compliant with GDPR for all functions. There are possible hacks and patches, but out of the box several functions are not compliant. Also other regulations in other regions might be concerned (e.g California Consumer Privacy Act CCPA).\n\nWe have done some initial scoping on what's required: https://twzn.de/mauticdp.",
+        "webpageUrl": {
+          "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/16"
+        },
+        "repositoryUrl": {
+          "url": "https://github.com/mautic/mautic"
+        },
+        "licenses": [
+          "spdx:GPL-3.0"
+        ],
+        "tags": [
+          "programming",
+          "privacy",
+          "gdpr",
+          "ccpa",
+          "marketing"
+        ]
+      },
+      {
+        "guid": "full-time-developer",
+        "name": "Full time community-focused developer",
+        "description": "Mautic has no developers who work solely for the open source project as a core maintainer. We're entirely reliant on businesses providing good will and allowing their staff time to contribute during their working day, or volunteers working extra hours in their spare time.\n\nWe would like to mitigate this risk, by having the opportunity to hire a full-time developer who will work as part of the core team on projects and initiatives, as well as general triage and keeping up with bug reports, PRs from contributors, and generally improving the developer experience. This is featured in our 2025 budget which has been adopted by the General Assembly in 2024.",
+        "webpageUrl": {
+          "url": "https://community.mautic.org/assemblies/general-assembly/f/25/proposals/48"
+        },
+        "repositoryUrl": {
+          "url": "https://github.com/mautic/mautic"
+        },
+        "licenses": [
+          "N/A"
+        ],
+        "tags": [
+          "developer",
+          "core-development",
+          "sustainability"
+        ]
+      }
+    ],
+    "funding": {
+      "channels": [
+        {
+          "guid": "open-collective",
+          "type": "gateway",
+          "address": "440 N Barranca Ave #3939 Covina, CA 91723",
+          "description": "Open Source Collective - https://opencollective.com/mautic"
+        }
+      ],
+      "plans": [
+        {
+          "guid": "individual-member",
+          "status": "active",
+          "name": "Individual membership",
+          "description": "$100 or appropriate rate based on your location for tax purposes using https://mau.tc/big-mac.",
+          "amount": 100,
+          "currency": "USD",
+          "frequency": "yearly",
+          "channels": [
+            "open-collective"
+          ]
+        },
+        {
+          "guid": "community-tier",
+          "status": "active",
+          "name": "Community Tier membership",
+          "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. Vote in the Community Council elections, make substantive contributions to strategic decisions and help us evolve in the right direction.\n\nTake advantage of this platform to form meaningful connections within our community, lend your expertise, and associate your brand with a driving force in the open source world. \n\nActively contributing to the General Assembly is more than altruism: it’s smart business, fostering goodwill, visibility and strong relationships within a passionate community.\n\nTake the lead in open source. Join us today.\n\nCommunity tier benefits\n\nAt the Community Tier, the following benefits are provided:\nLogo on members page\nNo-follow link on members page\nMember badge with tier\nSocial media thank you shout-out\n1 complimentary ticket to Mautic Conference Global\nOrganization logo on members slide\n1 vote in any election and voting process",
+          "amount": 1200,
+          "currency": "USD",
+          "frequency": "yearly",
+          "channels": [
+            "open-collective"
+          ]
+        },
+        {
+          "guid": "bronze-tier",
+          "status": "active",
+          "name": "Bronze Tier membership",
+          "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. Vote in the Community Council elections, make substantive contributions to strategic decisions and help us evolve in the right direction.\n\nTake advantage of this platform to form meaningful connections within our community, lend your expertise, and associate your brand with a driving force in the open source world. \n\nActively contributing to the General Assembly is more than altruism: it’s smart business, fostering goodwill, visibility and strong relationships within a passionate community.\n\nTake the lead in open source. Join us today.\n\nBronze tier benefits\n\nAt the Bronze Tier, the following benefits are provided from the Community Tier:\nLogo on members page\nNo-follow link on members page\nMember badge with tier\nSocial media thank you shout-out\nOrganization logo on project sponsors slide\n1 vote in any election and voting process\nAlso the following benefits which are specific to the Bronze tier:\nExclusive forum badge for all staff\n1 forum ad campaign per year\n2 complimentary tickets to Mautic Conference Global\nOrganization logo on physical printed project sponsor banners at in-person events",
+          "amount": 5000,
+          "currency": "USD",
+          "frequency": "yearly",
+          "channels": [
+            "open-collective"
+          ]
+        },
+        {
+          "guid": "silver-tier",
+          "status": "active",
+          "name": "Silver Tier membership",
+          "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. Vote in the Community Council elections, make substantive contributions to strategic decisions and help us evolve in the right direction.\n\nTake advantage of this platform to form meaningful connections within our community, lend your expertise, and associate your brand with a driving force in the open source world. \n\nActively contributing to the General Assembly is more than altruism: it’s smart business, fostering goodwill, visibility and strong relationships within a passionate community.\n\nTake the lead in open source. Join us today.\n\nSilver tier benefits\n\nAt the Silver Tier, the following benefits are provided from the Community and Bronze Tiers:\nLogo on sponsors page\nMember badge with tier\nSocial media thank you shout-out\nOrganization name on General Assembly members page \nOrganization logo on project sponsors slide\n1 vote in any election and voting process\nExclusive forum badge for all staff\nOrganization logo on physical printed project sponsor banners at in-person events \nAlso the following benefits which are specific to the Silver tier:\nA do-follow link on sponsors page\n2 forum ad campaigns per year\n1 website ad campaign per year\n1 sponsored blog post per year\n3 complimentary tickets to Mautic Conference Global\n1 complimentary ticket to the official in-person Mautic conference",
+          "amount": 10000,
+          "currency": "USD",
+          "frequency": "yearly",
+          "channels": [
+            "open-collective"
+          ]
+        },
+        {
+          "guid": "gold-tier",
+          "status": "active",
+          "name": "Gold Tier membership",
+          "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. Vote in the Community Council elections, make substantive contributions to strategic decisions and help us evolve in the right direction.\n\nTake advantage of this platform to form meaningful connections within our community, lend your expertise, and associate your brand with a driving force in the open source world. \n\nActively contributing to the General Assembly is more than altruism: it’s smart business, fostering goodwill, visibility and strong relationships within a passionate community.\n\nTake the lead in open source. Join us today.\n\nGold tier benefits\n\nAt the Gold Tier, the following benefits are provided from the Community, Bronze and Silver Tiers:\nLogo on sponsors page\nMember badge with tier\nSocial media thank you shout-out\nOrganization name on General Assembly members page \nOrganization logo on project sponsors slide\n1 vote in any election and voting process\nExclusive forum badge for all staff\nOrganization logo on physical printed project sponsor banners at in-person events \nA do-follow link on sponsors page\n2 forum ad campaigns per year\nAlso the following benefits which are specific to the Gold tier:\nJoint press release with Mautic and your company\n2 website ad campaigns per year\n2 sponsored blog posts per year\n1 featured case study on the homepage of mautic.org per year\n1 official promotion of your case study, webinar or training course on Mautic channels per year\n4 complimentary tickets to Mautic Conference Global \n2 complimentary tickets to the official in-person Mautic conference\n5% discount code for additional tickets to all Mautic official conferences\n1 complimentary ticket to sponsors' dinner at one in-person Mautic conference per year\n1 complimentary ticket to Mautic Awards Dinner\nSponsor a Mautic Awards category\n",
+          "amount": 15000,
+          "currency": "USD",
+          "frequency": "yearly",
+          "channels": [
+            "open-collective"
+          ]
+        },
+        {
+          "guid": "platinum-tier",
+          "status": "active",
+          "name": "Platinum Tier membership",
+          "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. Vote in the Community Council elections, make substantive contributions to strategic decisions and help us evolve in the right direction.\n\nTake advantage of this platform to form meaningful connections within our community, lend your expertise, and associate your brand with a driving force in the open source world. \n\nActively contributing to the General Assembly is more than altruism: it’s smart business, fostering goodwill, visibility and strong relationships within a passionate community.\n\nTake the lead in open source. Join us today.\n\nPlatinum tier benefits\n\nAt the Platinum Tier, the following benefits are provided from all lower tiers:\nLogo on sponsors page\nMember badge with tier\nSocial media thank you shout-out\nOrganization name on General Assembly members page \nOrganization logo on project sponsors slide\n1 vote in any election and voting process\nExclusive forum badge for all staff\nOrganization logo on physical printed project sponsor banners at in-person events \nA do-follow link on sponsors page\n1 sponsored blog post per year\nJoint press release with Mautic and your company\n2 sponsored blog posts per year\n1 featured case study on the homepage of mautic.org per year\nSponsor a Mautic Awards category\nAlso the following benefits which are specific to the Platinum tier:\n3 forum ad campaigns per year\n3 website ad campaigns per year\n1 newsletter feature per year\n1 featured webinar per year\n2 official promotions of your case study, webinar or training course on Mautic channels per year\n25% discount on sponsorship of one official Mautic conference per year\n5 complimentary tickets to Mautic Conference Global\n3 complimentary tickets to the official in-person Mautic conference\n10% discount code for additional tickets to all Mautic official conferences\n2 complimentary ticket to sponsors' dinner at one in-person Mautic conference per year\n2 complimentary ticket to Mautic Awards Dinner",
+          "amount": 20000,
+          "currency": "USD",
+          "frequency": "yearly",
+          "channels": [
+            "open-collective"
+          ]
+        },
+        {
+          "guid": "diamond-tier",
+          "status": "active",
+          "name": "Diamond Tier membership",
+          "description": "A Unique Opportunity to Influence and Innovate\nEnhance your company's engagement in the open source community by joining the General Assembly of Mautic. Let your business be a beacon of influence and innovation.\n\nAs a member, you can lend your corporate vision to help shape our governance and future. Vote in the Community Council elections, make substantive contributions to strategic decisions and help us evolve in the right direction.\n\nTake advantage of this platform to form meaningful connections within our community, lend your expertise, and associate your brand with a driving force in the open source world. \n\nActively contributing to the General Assembly is more than altruism: it’s smart business, fostering goodwill, visibility and strong relationships within a passionate community.\n\nTake the lead in open source. Join us today.\n\nDiamond tier benefits\n\nAt the Diamond Tier, the following benefits are provided from all lower tiers:\nLogo on sponsors page\nMember badge with tier\nSocial media thank you shout-out\nOrganization name on General Assembly members page \nOrganization logo on project sponsors slide\n1 vote in any election and voting process\nExclusive forum badge for all staff\nOrganization logo on physical printed project sponsor banners at in-person events \nA do-follow link on sponsors page\n1 sponsored blog post per year\nJoint press release with Mautic and your company\nSponsor a Mautic Awards category\nAlso the following benefits which are specific to the Diamond tier:\n4 forum ad campaigns per year\n4 website ad campaigns per year\n3 sponsored blog posts per year\n2 featured case studies on the homepage of mautic.org per year\n2 newsletter feature per year\n2 featured webinar per year\n2 official promotions of your case study, webinar or training course on Mautic channels per year\n50% discount on sponsorship of one official Mautic conference per year\n6 complimentary tickets to Mautic Conference Global\n4 complimentary tickets to the official in-person Mautic conference\n15% discount code for additional tickets to all Mautic official conferences\n3 complimentary ticket to sponsors' dinner at one in-person Mautic conference per year\n3 complimentary ticket to Mautic Awards Dinner\n",
+          "amount": 30000,
+          "currency": "USD",
+          "frequency": "yearly",
+          "channels": [
+            "open-collective"
+          ]
+        }
+      ],
+      "history": [
+        {
+          "year": 2023,
+          "income": 148948.48,
+          "expenses": 122047.34,
+          "currency": "USD",
+          "description": "The financial report can be found here: https://community.mautic.org/assemblies/general-assembly/f/25/proposals/46 which was accepted in 2024's General Assembly.\n\nMore detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+        },
+        {
+          "year": 2022,
+          "income": 45027.09,
+          "expenses": 47578.75,
+          "currency": "USD",
+          "description": "More detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+        },
+        {
+          "year": 2021,
+          "income": 53282.63,
+          "expenses": 32537.79,
+          "currency": "USD",
+          "description": "More detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+        }
+      ]
+    }
+  }
