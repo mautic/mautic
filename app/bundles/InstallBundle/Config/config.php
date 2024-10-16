@@ -59,6 +59,7 @@ return [
                     '%kernel.project_dir%',
                     'request_stack',
                     'mautic.cipher.openssl',
+                    'mautic.helper.core_parameters',
                 ],
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
