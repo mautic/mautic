@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "19f9b5a2bf5ffef6f453d16604c29cb5",
+    "content-hash": "445ce73c62ece242b47417d153784208",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -6160,6 +6160,38 @@
             "transport-options": {
                 "relative": true
             }
+        },
+        {
+            "name": "mautic/theme-trulypersonal",
+            "version": "5.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-trulypersonal.git",
+                "reference": "87fd526ef742bde8c37b4c484f077ffd7b5198ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-trulypersonal/zipball/87fd526ef742bde8c37b4c484f077ffd7b5198ac",
+                "reference": "87fd526ef742bde8c37b4c484f077ffd7b5198ac",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^5.0"
+            },
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "trulypersonal"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Truly Personal Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "source": "https://github.com/mautic/theme-trulypersonal/tree/5.1.1"
+            },
+            "time": "2023-03-28T15:16:40+00:00"
         },
         {
             "name": "maxmind-db/reader",
