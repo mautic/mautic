@@ -1422,6 +1422,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "TheMarvelFan",
+      "name": "Kushagra Nigam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93257324?v=4",
+      "profile": "https://github.com/TheMarvelFan",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
