@@ -847,10 +847,10 @@
   --typography-body-expressive: 15px;
   --border-no-width: 1px solid var(--border-no-color);
   --border-no-color: transparent;
-  --border-bottom: 0 0 clamp(0px, calc(1px - 6px), 1px) 0;
-  --border-radius-sm: 6px;
-  --border-radius-md: 10.8px;
-  --border-radius-lg: 15.6px;
+  --border-bottom: 0 0 clamp(0px, calc(1px - 0px), 1px) 0;
+  --border-radius-sm: 0px;
+  --border-radius-md: 0px;
+  --border-radius-lg: 0px;
   --layer-hover-translucent: var(--layer-translucent);
   --outline-style: solid;
 }
@@ -2126,8 +2126,8 @@ hr.hr-w-3,
   padding: 0 15px;
   margin: 0 15px;
   border-top-width: 0;
-  border-bottom-left-radius: 10.8px;
-  border-bottom-right-radius: 10.8px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
   font-size: 9px;
   line-height: 22px;
   text-transform: uppercase;
@@ -4331,7 +4331,7 @@ a.media {
   padding: 8px;
   color: #47535f;
   background-color: #f3f3f3;
-  border-radius: 10.8px;
+  border-radius: 0px;
 }
 .media-list.media-list-bubble > .media.media-right .media-object {
   float: right;
@@ -5971,40 +5971,40 @@ fieldset[disabled] .form-control {
   margin-top: -1px;
 }
 .form-stack .form-control:first-child {
-  border-radius: 10.8px 10.8px 0 0;
+  border-radius: 0px 0px 0 0;
 }
 .form-stack .form-control:last-child {
-  border-radius: 0 0 10.8px 10.8px;
+  border-radius: 0 0 0px 0px;
 }
 .form-stack .form-control.input-lg:first-child {
-  border-radius: 15.6px 15.6px 0 0;
+  border-radius: 0px 0px 0 0;
 }
 .form-stack .form-control.input-lg:last-child {
-  border-radius: 0 0 15.6px 15.6px;
+  border-radius: 0 0 0px 0px;
 }
 .form-stack .form-control.input-sm:first-child {
-  border-radius: 6px 6px 0 0;
+  border-radius: 0px 0px 0 0;
 }
 .form-stack .form-control.input-sm:last-child {
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 0px 0px;
 }
 .form-stack .form-control-icon:first-child > .form-control {
-  border-radius: 10.8px 10.8px 0 0;
+  border-radius: 0px 0px 0 0;
 }
 .form-stack .form-control-icon:first-child > .form-control.input-lg {
-  border-radius: 15.6px 15.6px 0 0;
+  border-radius: 0px 0px 0 0;
 }
 .form-stack .form-control-icon:first-child > .form-control.input-sm {
-  border-radius: 6px 6px 0 0;
+  border-radius: 0px 0px 0 0;
 }
 .form-stack .form-control-icon:last-child > .form-control {
-  border-radius: 0 0 10.8px 10.8px;
+  border-radius: 0 0 0px 0px;
 }
 .form-stack .form-control-icon:last-child > .form-control.input-lg {
-  border-radius: 0 0 15.6px 15.6px;
+  border-radius: 0 0 0px 0px;
 }
 .form-stack .form-control-icon:last-child > .form-control.input-sm {
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 0px 0px;
 }
 .form-stack .form-control-icon + .form-control-icon {
   margin-top: -1px;
@@ -6144,7 +6144,7 @@ input[type=file].focus {
   margin-right: 4px;
   margin-top: 1px;
   background-color: transparent;
-  border-radius: 10.8px;
+  border-radius: 0px;
   border: 1px solid var(--text-primary);
 }
 .checkbox[class*=" custom"] label input + span:after,
@@ -6163,7 +6163,7 @@ input[type=file].focus {
   background-color: #3c4650;
   height: 10px;
   width: 10px;
-  border-radius: 9.8px;
+  border-radius: -1px;
   -webkit-transform: scale(0);
   -ms-transform: scale(0);
   -o-transform: scale(0);
@@ -6599,7 +6599,7 @@ ul.line-legend li {
   right: -10px;
 }
 .img-rounded {
-  border-radius: 10.8px;
+  border-radius: 0px;
 }
 .contact-avatar {
   width: 100%;
@@ -6696,16 +6696,16 @@ ul.line-legend li {
 }
 .progress.progress-md {
   height: 12px;
-  border-radius: 6px;
+  border-radius: 0px;
 }
 .progress.progress-sm {
   height: 8px;
-  border-radius: 6px;
+  border-radius: 0px;
   margin-top: 2px;
 }
 .progress.progress-xs {
   height: 4px;
-  border-radius: 6px;
+  border-radius: 0px;
 }
 .progress-bar {
   -webkit-box-shadow: none;
@@ -7656,13 +7656,13 @@ lesshat-selector { -lh-property: 0 ;
   border-radius: 0 !important;
 }
 .bdr-rds {
-  border-radius: 10.8px !important;
+  border-radius: 0px !important;
 }
 .bdr-rds-lg {
-  border-radius: 15.6px !important;
+  border-radius: 0px !important;
 }
 .bdr-rds-sm {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
 }
 .bdr-rds-circle {
   border-radius: 50% !important;
