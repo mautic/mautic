@@ -882,7 +882,7 @@ h6,
   white-space: nowrap;
 }
 ::selection {
-  background-color: rgb(from var(--background-brand-primary) r g b / 25%);
+  background-color: rgb(from var(--background-brand) r g b / 25%);
   color: var(--link-primary);
 }
 .fs-base {
@@ -1214,6 +1214,21 @@ kbd {
 .tooltip-inner {
   padding: 12px;
 }
+.popover {
+  border-radius: 10px;
+}
+.popover-title {
+  padding: 16px 16px 12px;
+  background-color: var(--layer);
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  line-height: 1em;
+  font-size: calc(1em + 1px);
+  border-radius: 8px 8px 0 0;
+}
+.popover-content {
+  padding: 12px 16px 16px;
+}
 .touchevents .scroll-content {
   height: 100%;
   overflow-y: auto;
@@ -1236,12 +1251,11 @@ kbd {
   border: 1px solid transparent;
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
-  border-radius: var(--border-radius-lg);
+  border-radius: 20px;
   display: inline-flex;
   align-items: center;
   height: var(--spacing-08);
   line-height: var(--spacing-08);
-  font-weight: normal;
   font-size: 14px;
   padding: 0 var(--spacing-05);
   gap: var(--spacing-03);
@@ -1283,14 +1297,10 @@ kbd {
 .btn span > span {
   margin-right: 8px;
 }
-.btn .fa,
 .btn i {
   min-width: 13px;
   order: 2;
   line-height: inherit;
-}
-.btn [class^="ri-"],
-.btn [class*=" ri-"] {
   font-size: 12px;
   vertical-align: -0.05em;
 }
@@ -1555,7 +1565,7 @@ fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
 }
 .btn-secondary {
   background-color: var(--button-secondary);
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   border: 1px solid var(--button-secondary);
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
@@ -1570,27 +1580,27 @@ fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
   outline: 2px var(--outline-style) var(--focus);
 }
 .btn-secondary i {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
 }
 .btn-secondary:hover {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-hover);
   border: 1px solid var(--button-secondary-hover);
 }
 .btn-secondary:hover i {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
 }
 .btn-secondary:active,
 .btn-secondary.active,
 .open > .dropdown-toggle.btn-secondary {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-active);
   border: 1px solid var(--button-secondary-active);
 }
 .btn-secondary:active i,
 .btn-secondary.active i,
 .open > .dropdown-toggle.btn-secondary i {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
 }
 .btn-secondary:active:hover,
 .btn-secondary.active:hover,
@@ -1601,13 +1611,13 @@ fieldset[disabled] .btn-primary + .dropdown-toggle.btn-danger.focus {
 .btn-secondary:active.focus,
 .btn-secondary.active.focus,
 .open > .dropdown-toggle.btn-secondary.focus {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-active);
   border-color: var(--button-secondary-active);
 }
 .btn-secondary:focus,
 .btn-secondary.focus {
-  color: var(--text-inverse);
+  color: var(--button-secondary-text);
   background-color: var(--button-secondary-active);
   border: 1px solid var(--button-secondary-active);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
@@ -1686,7 +1696,7 @@ fieldset[disabled] .btn-secondary.focus {
 .btn-primary + .btn-primary + .btn-primary:hover,
 .btn-primary + .btn-primary + .btn-secondary:hover,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary:hover {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-hover);
   border: 1px solid var(--button-tertiary-hover);
 }
@@ -1696,7 +1706,7 @@ fieldset[disabled] .btn-secondary.focus {
 .btn-primary + .btn-primary + .btn-primary:hover i,
 .btn-primary + .btn-primary + .btn-secondary:hover i,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary:hover i {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
 }
 .btn-tertiary:active,
 .btn-tertiary + .dropdown-toggle:active,
@@ -1716,7 +1726,7 @@ fieldset[disabled] .btn-secondary.focus {
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-primary,
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-secondary,
 .open > .dropdown-toggle.open > .btn-tertiary + .dropdown-toggle.btn-primary {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-active);
   border: 1px solid var(--button-tertiary-active);
 }
@@ -1738,7 +1748,7 @@ fieldset[disabled] .btn-secondary.focus {
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-primary i,
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-secondary i,
 .open > .dropdown-toggle.open > .btn-tertiary + .dropdown-toggle.btn-primary i {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
 }
 .btn-tertiary:active:hover,
 .btn-tertiary + .dropdown-toggle:active:hover,
@@ -1794,7 +1804,7 @@ fieldset[disabled] .btn-secondary.focus {
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-primary.focus,
 .open > .dropdown-toggle.btn-primary + .btn-primary + .btn-secondary.focus,
 .open > .dropdown-toggle.open > .btn-tertiary + .dropdown-toggle.btn-primary.focus {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-active);
   border-color: var(--button-tertiary-active);
 }
@@ -1810,7 +1820,7 @@ fieldset[disabled] .btn-secondary.focus {
 .btn-primary + .btn-primary + .btn-primary.focus,
 .btn-primary + .btn-primary + .btn-secondary.focus,
 .open > .btn-tertiary + .dropdown-toggle.btn-primary.focus {
-  color: var(--text-inverse);
+  color: var(--text-on-color);
   background-color: var(--button-tertiary-active);
   border: 1px solid var(--button-tertiary-active);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
@@ -2405,12 +2415,20 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
   color: var(--icon-disabled);
   border: 1px solid transparent;
 }
+.btn-ghost.btn-icon.btn-toggletip {
+  color: inherit;
+}
 .btn-icon {
   justify-content: center;
   padding: 0;
   align-items: center;
   aspect-ratio: 1 / 1;
   border-radius: 20px;
+}
+.btn-toggletip {
+  height: auto;
+  line-height: 1em;
+  padding: 2px;
 }
 .btn-group > .btn.btn-yes:first-child:not(:last-child):not(.dropdown-toggle),
 .btn-group > .btn.btn-no:first-child:not(:last-child):not(.dropdown-toggle),
@@ -2505,7 +2523,7 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
   outline: 2px var(--outline-style) var(--focus);
 }
 .btn-link {
-  font-weight: 600;
+  font-weight: normal;
 }
 .btn-link:hover,
 .btn-link:focus {
@@ -2545,10 +2563,19 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .btn-group .btn ~ .btn-group,
 .btn-group .btn-group ~ .btn,
 .btn-group .btn-group ~ .btn-group {
-  /* margin-left: 0; */
+  margin-left: 5px;
 }
 .btn-group > .btn-primary + .dropdown-toggle {
   margin-left: 1px;
+}
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle),
+.btn-group > .btn:last-child:not(:first-child),
+.btn-group > .dropdown-toggle:not(:first-child),
+.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 .btn-group.open .dropdown-toggle {
   -webkit-box-shadow: none;
@@ -2690,9 +2717,6 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .alert-growl-container .alert-growl {
   margin-bottom: 5px;
 }
-.alert-growl-buttons {
-  margin-top: 10px;
-}
 .alert-growl-buttons .btn + .btn {
   margin-left: 5px;
 }
@@ -2717,7 +2741,7 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current,
 .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {
-  background: var(--background-brand-primary);
+  background: var(--background-brand);
   color: var(--text-on-color);
   box-shadow: none;
 }
@@ -2809,7 +2833,7 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
 .xdsoft_datetimepicker .xdsoft_label > .xdsoft_select > div > .xdsoft_option.xdsoft_current {
   box-shadow: none;
   color: var(--text-on-color);
-  background: var(--background-brand-primary);
+  background: var(--background-brand);
 }
 .xdsoft_datetimepicker .xdsoft_label > .xdsoft_select {
   max-height: 180px;
@@ -3024,6 +3048,7 @@ a.media {
   padding-left: 15px;
   margin: 0;
   display: flex;
+  flex-direction: column;
 }
 @media (min-width: 768px) {
   .container {
@@ -3039,13 +3064,6 @@ a.media {
   .container {
     max-width: 1170px;
   }
-}
-.container-column {
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  flex-direction: column;
 }
 .container-fluid {
   padding-right: 15px;
@@ -4349,12 +4367,8 @@ a.label:focus,
   color: var(--label-color-green);
 }
 .label-primary {
-  background-color: var(--label-background-brand-primary);
-  color: var(--label-color-brand-primary);
-}
-.label-secondary {
-  background-color: var(--label-background-brand-secondary);
-  color: var(--label-color-brand-secondary);
+  background-color: var(--label-background-brand);
+  color: var(--label-color-brand);
 }
 .label-outline {
   background-color: transparent;
@@ -4464,21 +4478,12 @@ a.label:focus,
 }
 .label[href].label-primary,
 .label:has(> a).label-primary {
-  border: 1px solid var(--label-border-brand-primary);
-  color: var(--label-color-brand-primary);
+  border: 1px solid var(--label-border-brand);
+  color: var(--label-color-brand);
 }
 .label[href].label-primary:hover,
 .label:has(> a).label-primary:hover {
-  background-color: var(--label-background-hover-brand-primary);
-}
-.label[href].label-secondary,
-.label:has(> a).label-secondary {
-  border: 1px solid var(--label-border-brand-secondary);
-  color: var(--label-color-brand-secondary);
-}
-.label[href].label-secondary:hover,
-.label:has(> a).label-secondary:hover {
-  background-color: var(--label-background-hover-brand-secondary);
+  background-color: var(--label-background-hover-brand);
 }
 .label-default {
   background-color: #a0acb8;
@@ -6368,6 +6373,9 @@ lesshat-selector { -lh-property: 0 ;
 .bdr-rds-sm {
   border-radius: 2px !important;
 }
+.bdr-rds-circle {
+  border-radius: 50% !important;
+}
 @media (max-width: 767px) {
   .bdr-l-xs {
     border-left: 1px solid var(--border-subtle);
@@ -7248,9 +7256,8 @@ lesshat-selector { -lh-property: 0 ;
 .background-brand a {
   color: var(--text-on-color);
 }
-.background-brand-alt {
-  background-color: var(--background-brand-alt);
-  color: var(--items-on-secondary);
+.d-inline-flex {
+  display: inline-flex;
 }
 .d-flex {
   display: flex;
@@ -8573,16 +8580,16 @@ code:hover > .copy-icon {
   opacity: 1;
   transform: none;
 }
-:root {
+:root,
+:root[theme="light"] {
   --background: #ffffff;
-  --background-hover: #8d8d8d1f;
+  --background-hover: #f1f1f1;
   --background-active: #8d8d8d80;
   --background-selected: #8d8d8d33;
   --background-selected-hover: #8d8d8d52;
   --background-inverse: #393939;
   --background-inverse-hover: #4c4c4c;
-  --background-brand-primary: var(--primary-60);
-  --background-brand-secondary: var(--secondary-60);
+  --background-brand: var(--primary-60);
   --layer: #f4f4f4;
   --layer-alternate: #ffffff;
   --layer-hover: #e8e8e8;
@@ -8646,6 +8653,7 @@ code:hover > .copy-icon {
   --button-secondary: #393939;
   --button-secondary-hover: #4c4c4c;
   --button-secondary-active: #6f6f6f;
+  --button-secondary-text: #ffffff;
   --button-tertiary: var(--primary-60);
   --button-tertiary-hover: var(--primary-70);
   --button-tertiary-active: var(--primary-80);
@@ -8712,14 +8720,10 @@ code:hover > .copy-icon {
   --label-color-green: #0e6027;
   --label-background-hover-green: #74e792;
   --label-border-green: #42be65;
-  --label-background-brand-primary: var(--primary-60);
-  --label-color-brand-primary: var(--text-on-color);
-  --label-background-hover-brand-primary: var(--primary-70);
-  --label-border-brand-primary: var(--primary-80);
-  --label-background-brand-secondary: var(--secondary-60);
-  --label-color-brand-secondary: #000000;
-  --label-background-hover-brand-secondary: var(--secondary-70);
-  --label-border-brand-secondary: var(--secondary-80);
+  --label-background-brand: var(--primary-60);
+  --label-color-brand: var(--text-on-color);
+  --label-background-hover-brand: var(--primary-70);
+  --label-border-brand: var(--primary-80);
 }
 :root[theme="solarized-light"] {
   --background: #fdf6e3;
@@ -8729,8 +8733,7 @@ code:hover > .copy-icon {
   --background-selected-hover: #eee8d599;
   --background-inverse: #002b36;
   --background-inverse-hover: #073642;
-  --background-brand-primary: #268bd2;
-  --background-brand-secondary: #2aa198;
+  --background-brand: #268bd2;
   --layer: #eee8d5;
   --layer-alternate: #fdf6e3;
   --layer-hover: #e4decd;
@@ -8794,6 +8797,7 @@ code:hover > .copy-icon {
   --button-secondary: #586e75;
   --button-secondary-hover: #465c62;
   --button-secondary-active: #344a4f;
+  --button-secondary-text: #fdf6e3;
   --button-tertiary: #268bd2;
   --button-tertiary-hover: #1e6ea7;
   --button-tertiary-active: #15516d;
@@ -8856,25 +8860,20 @@ code:hover > .copy-icon {
   --label-color-green: #5a6800;
   --label-background-hover-green: #c6e787;
   --label-border-green: #859900;
-  --label-background-brand-primary: #268bd2;
-  --label-color-brand-primary: #fdf6e3;
-  --label-background-hover-brand-primary: #1e6ea7;
-  --label-border-brand-primary: #15516d;
-  --label-background-brand-secondary: #2aa198;
-  --label-color-brand-secondary: #fdf6e3;
-  --label-background-hover-brand-secondary: #1f7972;
-  --label-border-brand-secondary: #14514c;
+  --label-background-brand: #268bd2;
+  --label-color-brand: #fdf6e3;
+  --label-background-hover-brand: #1e6ea7;
+  --label-border-brand: #15516d;
 }
 :root[theme="dark"] {
   --background: #161616;
-  --background-hover: #8d8d8d29;
+  --background-hover: #292929;
   --background-active: #8d8d8d66;
   --background-selected: #8d8d8d3d;
   --background-selected-hover: #8d8d8d52;
   --background-inverse: #f4f4f4;
   --background-inverse-hover: #e5e5e5;
   --background-brand: var(--primary-80);
-  --background-brand-secondary: var(--secondary-80);
   --layer: #262626;
   --layer-alternate: #393939;
   --layer-hover: #333333;
@@ -8937,6 +8936,7 @@ code:hover > .copy-icon {
   --button-secondary: #6f6f6f;
   --button-secondary-hover: #606060;
   --button-secondary-active: #393939;
+  --button-secondary-text: #ffffff;
   --button-tertiary: #ffffff;
   --button-tertiary-hover: #f4f4f4;
   --button-tertiary-active: #c6c6c6;
@@ -9013,7 +9013,6 @@ code:hover > .copy-icon {
   --background-inverse: #fdf6e3;
   --background-inverse-hover: #eee8d5;
   --background-brand: #268bd2;
-  --background-brand-secondary: #2aa198;
   --layer: #073642;
   --layer-alternate: #094352;
   --layer-hover: #094352;
@@ -9076,6 +9075,7 @@ code:hover > .copy-icon {
   --button-secondary: #839496;
   --button-secondary-hover: #93a1a1;
   --button-secondary-active: #586e75;
+  --button-secondary-text: #000000;
   --button-tertiary: #268bd2;
   --button-tertiary-hover: #2aa198;
   --button-tertiary-active: #6c71c4;
@@ -9151,8 +9151,7 @@ code:hover > .copy-icon {
   --background-selected-hover: #323248;
   --background-inverse: #F7B84B;
   --background-inverse-hover: #F9C46A;
-  --background-brand-primary: #F7B84B;
-  --background-brand-secondary: #8E8EFF;
+  --background-brand: #F7B84B;
   --layer: #232336;
   --layer-alternate: #1C1C2E;
   --layer-hover: #2A2A40;
@@ -9213,9 +9212,10 @@ code:hover > .copy-icon {
   --button-primary: #F7B84B;
   --button-primary-hover: #F9C46A;
   --button-primary-active: #FBCF89;
-  --button-secondary: var(--primary-40);
-  --button-secondary-hover: var(--primary-30);
-  --button-secondary-active: var(--primary-20);
+  --button-secondary: #8c98c6;
+  --button-secondary-hover: #aeb6d7;
+  --button-secondary-active: #d0d5e8;
+  --button-secondary-text: #000000;
   --button-tertiary: #8E8EFF;
   --button-tertiary-hover: #A5A5FF;
   --button-tertiary-active: #BCBCFF;
@@ -9282,14 +9282,10 @@ code:hover > .copy-icon {
   --label-color-green: #1C1C2E;
   --label-background-hover-green: #66BB6A;
   --label-border-green: #80C783;
-  --label-background-brand-primary: #F7B84B;
-  --label-color-brand-primary: #1C1C2E;
-  --label-background-hover-brand-primary: #F9C46A;
-  --label-border-brand-primary: #FBCF89;
-  --label-background-brand-secondary: #8E8EFF;
-  --label-color-brand-secondary: #1C1C2E;
-  --label-background-hover-brand-secondary: #A5A5FF;
-  --label-border-brand-secondary: #BCBCFF;
+  --label-background-brand: #F7B84B;
+  --label-color-brand: #1C1C2E;
+  --label-background-hover-brand: #F9C46A;
+  --label-border-brand: #FBCF89;
 }
 :root,
 :root[theme] {
@@ -9302,24 +9298,6 @@ code:hover > .copy-icon {
   --ck-color-tooltip-text: var(--text-secondary);
 }
 :root {
-  --primary-20: #d0d5e8;
-  --primary-30: #aeb6d7;
-  --primary-40: #8c98c6;
-  --primary-50: #6a79b5;
-  --primary-60: #4e5e9e;
-  --primary-70: #3d4a7c;
-  --primary-80: #2c355a;
-  --primary-90: #1b2138;
-  --primary-100: #0b0d15;
-  --secondary-20: #fffefd;
-  --secondary-30: #feedcb;
-  --secondary-40: #fedc98;
-  --secondary-50: #fdca66;
-  --secondary-60: #fdb933;
-  --secondary-70: #fba702;
-  --secondary-80: #c88502;
-  --secondary-90: #966401;
-  --secondary-100: #634201;
   --duration-productive: 150ms;
   --duration-expressive: 300ms;
   --easing-standard-productive: cubic-bezier(0.2, 0, 0.38, 0.9);
@@ -9350,6 +9328,425 @@ code:hover > .copy-icon {
   --border-radius-md: clamp(0px, calc(1.8 * 0px), 14px);
   --border-radius-lg: clamp(0px, calc(2.6 * 0px), 21px);
   --outline-style: solid;
+}
+:root {
+  --accent01: #4e5e9e;
+  --accent02: #CE2F27;
+  --accent03: #FF9500;
+  --accent04: #FFCC00;
+  --accent05: #b51963;
+  --accent06: #0f62fe;
+  --accent07: #32642B;
+  --accent08: #5928ed;
+  --accent09: #00FFFF;
+  --accent10: #00b4c5;
+  --accent11: #0f5664;
+  --accent12: #123f20;
+  --accent13: #00bf7d;
+  --accent14: #26643b;
+  --accent15: #CCFF00;
+  --accent16: #c44601;
+  --accent17: #FF2E54;
+  --accent18: #ca3b88;
+  --accent19: #FF00FF;
+  --accent20: #9400D3;
+  --accent21: #26A2DD;
+  --accent22: #1c0d82;
+  --accent23: #ffae02;
+  --accent24: #f14231;
+  --accent25: #5c1c51;
+}
+:root[accent="03"][theme="light"],
+:root[accent="04"][theme="light"],
+:root[accent="07"][theme="light"],
+:root[accent="09"][theme="light"],
+:root[accent="10"][theme="light"],
+:root[accent="13"][theme="light"],
+:root[accent="15"][theme="light"],
+:root[accent="17"][theme="light"],
+:root[accent="19"][theme="light"],
+:root[accent="21"][theme="light"],
+:root[accent="23"][theme="light"],
+:root[accent="24"][theme="light"] {
+  --link-primary: var(--primary-80);
+  --link-primary-hover: var(--primary-90);
+  --link-secondary: var(--primary-90);
+  --link-inverse: var(--primary-40);
+  --icon-interactive: var(--primary-70);
+  --button-tertiary: var(--primary-80);
+  --interactive: var(--primary-70);
+}
+:root,
+:root[accent="01"] {
+  --primary-20: #d0d5e8;
+  --primary-30: #aeb6d7;
+  --primary-40: #8c98c6;
+  --primary-50: #6a79b5;
+  --primary-60: #4e5e9e;
+  --primary-70: #3d4a7c;
+  --primary-80: #2c355a;
+  --primary-90: #1b2138;
+  --primary-100: #0b0d15;
+}
+:root[accent="02"] {
+  --primary-20: #f5cecc;
+  --primary-30: #eda4a1;
+  --primary-40: #e57b76;
+  --primary-50: #dd524b;
+  --primary-60: #CE2F27;
+  --primary-70: #a3251f;
+  --primary-80: #781b17;
+  --primary-90: #4d120f;
+  --primary-100: #220807;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="03"] {
+  --primary-20: #ffeacc;
+  --primary-30: #ffd599;
+  --primary-40: #ffbf66;
+  --primary-50: #ffaa33;
+  --primary-60: #FF9500;
+  --primary-70: #cc7700;
+  --primary-80: #995900;
+  --primary-90: #663c00;
+  --primary-100: #331e00;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="04"] {
+  --primary-20: #fff5cc;
+  --primary-30: #ffeb99;
+  --primary-40: #ffe066;
+  --primary-50: #ffd633;
+  --primary-60: #FFCC00;
+  --primary-70: #cca300;
+  --primary-80: #997a00;
+  --primary-90: #665200;
+  --primary-100: #332900;
+  --text-on-color: #000;
+  --text-on-color-disabled: #16161640;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #16161640;
+}
+:root[accent="05"] {
+  --primary-20: #f3a7cb;
+  --primary-30: #ed7ab1;
+  --primary-40: #e64e96;
+  --primary-50: #e0217c;
+  --primary-60: #b51963;
+  --primary-70: #88134a;
+  --primary-80: #5b0d32;
+  --primary-90: #2f0619;
+  --primary-100: #020001;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="06"] {
+  --primary-20: #dae7ff;
+  --primary-30: #a7c6ff;
+  --primary-40: #75a4fe;
+  --primary-50: #4283fe;
+  --primary-60: #0f62fe;
+  --primary-70: #014cd9;
+  --primary-80: #013aa6;
+  --primary-90: #002874;
+  --primary-100: #001741;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="07"] {
+  --primary-20: #95ce8d;
+  --primary-30: #74bf69;
+  --primary-40: #56ab4a;
+  --primary-50: #44883a;
+  --primary-60: #32642B;
+  --primary-70: #20401c;
+  --primary-80: #0e1d0c;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="08"] {
+  --primary-20: #eae4fd;
+  --primary-30: #c6b5f9;
+  --primary-40: #a286f5;
+  --primary-50: #7d57f1;
+  --primary-60: #5928ed;
+  --primary-70: #4111d1;
+  --primary-80: #320ea1;
+  --primary-90: #240a72;
+  --primary-100: #150643;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="09"] {
+  --primary-20: #ccffff;
+  --primary-30: #99ffff;
+  --primary-40: #66ffff;
+  --primary-50: #33ffff;
+  --primary-60: #00FFFF;
+  --primary-70: #00cccc;
+  --primary-80: #009999;
+  --primary-90: #006666;
+  --primary-100: #003333;
+  --text-on-color: #000;
+  --text-on-color-disabled: #16161640;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #16161640;
+}
+:root[accent="10"] {
+  --primary-20: #92f6ff;
+  --primary-30: #5ff1ff;
+  --primary-40: #2cedff;
+  --primary-50: #00e3f8;
+  --primary-60: #00b4c5;
+  --primary-70: #008592;
+  --primary-80: #00575f;
+  --primary-90: #00282c;
+  --primary-100: #000000;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="11"] {
+  --primary-20: #59cfe6;
+  --primary-30: #2dc2df;
+  --primary-40: #1ca2bd;
+  --primary-50: #167c90;
+  --primary-60: #0f5664;
+  --primary-70: #083038;
+  --primary-80: #020a0b;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="12"] {
+  --primary-20: #50cd77;
+  --primary-30: #34b65c;
+  --primary-40: #298e48;
+  --primary-50: #1d6734;
+  --primary-60: #123f20;
+  --primary-70: #07170c;
+  --primary-80: #000000;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="13"] {
+  --primary-20: #8cffd7;
+  --primary-30: #59ffc6;
+  --primary-40: #26ffb4;
+  --primary-50: #00f29e;
+  --primary-60: #00bf7d;
+  --primary-70: #008c5c;
+  --primary-80: #00593a;
+  --primary-90: #002619;
+  --primary-100: #000000;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="14"] {
+  --primary-20: #85d19f;
+  --primary-30: #60c382;
+  --primary-40: #42ae67;
+  --primary-50: #348951;
+  --primary-60: #26643b;
+  --primary-70: #183f25;
+  --primary-80: #0a1a0f;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="15"] {
+  --primary-20: #f5ffcc;
+  --primary-30: #ebff99;
+  --primary-40: #e0ff66;
+  --primary-50: #d6ff33;
+  --primary-60: #CCFF00;
+  --primary-70: #a3cc00;
+  --primary-80: #7a9900;
+  --primary-90: #526600;
+  --primary-100: #293300;
+  --text-on-color: #000;
+  --text-on-color-disabled: #16161640;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #16161640;
+}
+:root[accent="16"] {
+  --primary-20: #feb993;
+  --primary-30: #fe9860;
+  --primary-40: #fe772d;
+  --primary-50: #f75801;
+  --primary-60: #c44601;
+  --primary-70: #913401;
+  --primary-80: #5f2200;
+  --primary-90: #2c1000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="17"] {
+  --primary-20: #fffafb;
+  --primary-30: #ffc7d1;
+  --primary-40: #ff94a7;
+  --primary-50: #ff617e;
+  --primary-60: #FF2E54;
+  --primary-70: #fa002d;
+  --primary-80: #c70024;
+  --primary-90: #94001b;
+  --primary-100: #610012;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="18"] {
+  --primary-20: #f5dce9;
+  --primary-30: #ebb3d1;
+  --primary-40: #e08bb9;
+  --primary-50: #d563a0;
+  --primary-60: #ca3b88;
+  --primary-70: #a52d6e;
+  --primary-80: #7d2253;
+  --primary-90: #551738;
+  --primary-100: #2d0c1e;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="19"] {
+  --primary-20: #ffccff;
+  --primary-30: #ff99ff;
+  --primary-40: #ff66ff;
+  --primary-50: #ff33ff;
+  --primary-60: #FF00FF;
+  --primary-70: #cc00cc;
+  --primary-80: #990099;
+  --primary-90: #660066;
+  --primary-100: #330033;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="20"] {
+  --primary-20: #e3a0ff;
+  --primary-30: #d36dff;
+  --primary-40: #c43aff;
+  --primary-50: #b507ff;
+  --primary-60: #9400D3;
+  --primary-70: #7000a0;
+  --primary-80: #4c006d;
+  --primary-90: #29003a;
+  --primary-100: #050007;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="21"] {
+  --primary-20: #d6eef9;
+  --primary-30: #aadbf2;
+  --primary-40: #7ec8eb;
+  --primary-50: #52b5e4;
+  --primary-60: #26A2DD;
+  --primary-70: #1c83b4;
+  --primary-80: #156388;
+  --primary-90: #0e435c;
+  --primary-100: #072330;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="22"] {
+  --primary-20: #7c6bf0;
+  --primary-30: #533cec;
+  --primary-40: #3016df;
+  --primary-50: #2612b0;
+  --primary-60: #1c0d82;
+  --primary-70: #120854;
+  --primary-80: #080425;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="23"] {
+  --primary-20: #ffefce;
+  --primary-30: #ffdf9b;
+  --primary-40: #ffcf68;
+  --primary-50: #ffbe35;
+  --primary-60: #ffae02;
+  --primary-70: #ce8c00;
+  --primary-80: #9b6900;
+  --primary-90: #684700;
+  --primary-100: #352400;
+  --text-on-color: #000;
+  --text-on-color-disabled: #16161640;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #16161640;
+}
+:root[accent="24"] {
+  --primary-20: #fef1f0;
+  --primary-30: #fbc5c0;
+  --primary-40: #f79a91;
+  --primary-50: #f46e61;
+  --primary-60: #f14231;
+  --primary-70: #e0220f;
+  --primary-80: #b01a0c;
+  --primary-90: #801309;
+  --primary-100: #510c05;
+  --text-on-color: #000;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #000;
+  --icon-on-color-disabled: #8d8d8d;
+}
+:root[accent="25"] {
+  --primary-20: #d470c3;
+  --primary-30: #c849b2;
+  --primary-40: #aa3496;
+  --primary-50: #832873;
+  --primary-60: #5c1c51;
+  --primary-70: #35102f;
+  --primary-80: #0e040c;
+  --primary-90: #000000;
+  --primary-100: #000000;
+  --text-on-color: #fff;
+  --text-on-color-disabled: #8d8d8d;
+  --icon-on-color: #fff;
+  --icon-on-color-disabled: #8d8d8d;
 }
 :root[reduce-motion="true"] {
   --duration-productive: 0;

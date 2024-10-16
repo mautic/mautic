@@ -60,6 +60,7 @@
 .bdr-rds { border-radius: @border-radius-base !important; }
 .bdr-rds-lg { border-radius: @border-radius-large !important; }
 .bdr-rds-sm { border-radius: @border-radius-small !important; }
+.bdr-rds-circle { border-radius: 50% !important; }
 
 // breakpoint screen-xs and up
 @media (max-width: @screen-xs-max) {
@@ -473,12 +474,9 @@
     color: var(--text-on-color);
   }
 }
-.background-brand-alt {
-  background-color: var(--background-brand-alt);
-  color: var(--items-on-secondary);
-}
 
 // Flex container properties
+.d-inline-flex { display: inline-flex; }
 .d-flex { display: flex; }
 .fd-row { flex-direction: row; }
 .fd-row-reverse { flex-direction: row-reverse; }
