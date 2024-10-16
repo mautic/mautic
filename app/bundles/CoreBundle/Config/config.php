@@ -315,6 +315,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.helper.core_parameters',
                     'mautic.ip_lookup',
+                    'mautic.lead.factory.device_detector_factory',
                 ],
             ],
             'mautic.helper.user' => [
