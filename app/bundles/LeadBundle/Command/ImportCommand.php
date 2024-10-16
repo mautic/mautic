@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -25,7 +26,8 @@ class ImportCommand extends Command
         private TranslatorInterface $translator,
         private ImportModel $importModel,
         private ProcessSignalService $processSignalService,
-        private UserTokenSetter $userTokenSetter
+        private UserTokenSetter $userTokenSetter,
+        private CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct();
     }
@@ -81,6 +83,9 @@ EOT
             ]
         ).'</info>');
 
+        $currentTimezone = date_default_timezone_get();
+        date_default_timezone_set($this->coreParametersHelper->get('default_timezone', 'UTC'));
+
         try {
             $this->importModel->beginImport($import, $progress, $limit);
         } catch (ImportFailedException) {
@@ -91,6 +96,8 @@ EOT
                 ]
             ).'</error>');
 
+            date_default_timezone_set($currentTimezone);
+
             return Command::FAILURE;
         } catch (ImportDelayedException) {
             $output->writeln('<info>'.$this->translator->trans(
@@ -100,8 +107,12 @@ EOT
                 ]
             ).'</info>');
 
+            date_default_timezone_set($currentTimezone);
+
             return Command::FAILURE;
         }
+
+        date_default_timezone_set($currentTimezone);
 
         // Success
         $output->writeln('<info>'.$this->translator->trans(
