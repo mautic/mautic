@@ -4697,7 +4697,7 @@ button.list-group-item-danger.active:focus {
 .panel-footer {
   padding: 10px 15px;
   background-color: var(--layer);
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--layer);
   border-bottom-right-radius: 14.6px;
   border-bottom-left-radius: 14.6px;
 }
@@ -4888,31 +4888,31 @@ button.list-group-item-danger.active:focus {
 }
 .panel-group .panel-heading + .panel-collapse > .panel-body,
 .panel-group .panel-heading + .panel-collapse > .list-group {
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--layer);
 }
 .panel-group .panel-footer {
   border-top: 0;
 }
 .panel-group .panel-footer + .panel-collapse .panel-body {
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--layer);
 }
 .panel-default {
-  border-color: var(--border-subtle);
+  border-color: var(--layer);
 }
 .panel-default > .panel-heading {
   color: inherit;
   background-color: inherit;
-  border-color: var(--border-subtle);
+  border-color: var(--layer);
 }
 .panel-default > .panel-heading + .panel-collapse > .panel-body {
-  border-top-color: var(--border-subtle);
+  border-top-color: var(--layer);
 }
 .panel-default > .panel-heading .badge {
   color: inherit;
   background-color: inherit;
 }
 .panel-default > .panel-footer + .panel-collapse > .panel-body {
-  border-bottom-color: var(--border-subtle);
+  border-bottom-color: var(--layer);
 }
 .panel-primary {
   border-color: transparent;
@@ -22189,8 +22189,8 @@ span.emoji-inner {
 }
 .input-group .twitter-typeahead:first-child .tt-input,
 .input-group .twitter-typeahead:first-child .tt-hint {
-  border-top-left-radius: 10.8px;
-  border-bottom-left-radius: 10.8px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
 }
 .input-group .twitter-typeahead:last-child .tt-input,
 .input-group .twitter-typeahead:last-child .tt-hint {

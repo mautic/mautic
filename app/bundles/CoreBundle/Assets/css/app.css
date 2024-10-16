@@ -6755,7 +6755,7 @@ ul.line-legend li {
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--layer);
   background-color: var(--background);
   transition: var(--transition-all-productive);
 }
@@ -6791,11 +6791,6 @@ ul.line-legend li {
 .panel-group .panel {
   -webkit-box-shadow: none;
   box-shadow: none;
-}
-.panel-footer {
-  overflow: hidden;
-  background-color: transparent;
-  border-top: none;
 }
 .panel-toolbar-wrapper {
   display: block;
@@ -7485,7 +7480,7 @@ lesshat-selector { -lh-property: 0 ;
   right: -11px;
   top: 10px;
   border-width: 10px 0 10px 10px;
-  border-color: transparent transparent transparent var(--border-subtle);
+  border-color: transparent transparent transparent var(--layer);
 }
 .timeline .events > .wrapper:nth-of-type(even) {
   float: right;
@@ -7512,7 +7507,7 @@ lesshat-selector { -lh-property: 0 ;
   left: -11px;
   top: 10px;
   border-width: 10px 10px 10px 0;
-  border-color: transparent var(--border-subtle) transparent transparent;
+  border-color: transparent var(--layer) transparent transparent;
 }
 @media (max-width: 767px) {
   .timeline .events {
