@@ -52,19 +52,16 @@ class ThemeHelper implements ThemeHelperInterface
      * @var string[]
      */
     protected $defaultThemes = [
-        'Mauve',
         'aurora',
         'blank',
         'brienz',
         'cards',
-        'coffee',
         'confirmme',
         'fresh-center',
         'fresh-fixed',
         'fresh-left',
         'fresh-wide',
         'goldstar',
-        'nature',
         'neopolitan',
         'oxygen',
         'paprika',
