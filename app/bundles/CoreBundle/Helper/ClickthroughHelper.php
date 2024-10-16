@@ -3,37 +3,63 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
+use Mautic\CoreBundle\Helper\Clickthrough\ClickthroughKeyConverter;
 
 class ClickthroughHelper
 {
-    /**
-     * Encode an array to append to a URL.
-     */
-    public static function encodeArrayForUrl(array $array): string
+    use ClickthroughHelperBCTrait;
+
+    public function __construct(private ClickthroughKeyConverter $shortKeyConverter)
     {
-        return urlencode(base64_encode(serialize($array)));
     }
 
     /**
-     * Decode a string appended to URL into an array.
-     *
-     * @param bool $urlDecode
-     *
-     * @return array
+     * @param array<mixed> $data
      */
-    public static function decodeArrayFromUrl($string, $urlDecode = true)
+    public function encode(array $data): string
     {
-        $raw     = $urlDecode ? urldecode($string) : $string;
+        $data       = $this->shortKeyConverter->pack($data);
+        $serialized =  $this->isIgBinaryEnabled() ? igbinary_serialize($data) : serialize($data);
+
+        return urlencode(base64_encode($serialized));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function decode(?string $string, bool $urlDecode = true): array
+    {
+        $raw     = $urlDecode ? rawurldecode($string) : $string;
         $decoded = base64_decode($raw);
 
         if (empty($decoded)) {
             return [];
         }
 
-        if (0 !== stripos($decoded, 'a')) {
-            throw new InvalidDecodedStringException($decoded);
+        try {
+            $data = @unserialize($decoded);
+
+            if ((false !== $data || 'b:0;' === $string) && $unserialized = Serializer::decode($decoded)) {
+                return $this->shortKeyConverter->unpack($unserialized);
+            }
+        } catch (\Exception) {
         }
 
-        return Serializer::decode($decoded);
+        if ($this->isIgBinaryEnabled()) {
+            try {
+                if ($unserialized = igbinary_unserialize($decoded)) {
+                    return $this->shortKeyConverter->unpack($unserialized);
+                }
+            } catch (\Exception) {
+            }
+        }
+
+        throw new InvalidDecodedStringException($raw);
+    }
+
+    //  This method is public for test purposes only
+    protected function isIgBinaryEnabled(): bool
+    {
+        return function_exists('igbinary_serialize');
     }
 }

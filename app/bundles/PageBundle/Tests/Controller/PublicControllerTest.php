@@ -397,6 +397,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
+            $this->pageModel,
             $redirectId
         );
         self::assertInstanceOf(RedirectResponse::class, $response);
@@ -410,7 +411,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $redirectId   = 'dummy_redirect_id';
         $clickThrough = 'dummy_click_through';
         $redirectUrl  = 'https://some.test.url/asset/1:examplefilejpg';
-        $targetUrl    = 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through%3Fct%3Ddummy_click_through';
+        $targetUrl    = 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through';
 
         $this->redirectModel->expects(self::once())
             ->method('getRedirectById')
@@ -496,6 +497,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
+            $this->pageModel,
             $redirectId
         );
         self::assertInstanceOf(RedirectResponse::class, $response);

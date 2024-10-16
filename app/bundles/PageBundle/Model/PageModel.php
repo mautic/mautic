@@ -705,6 +705,7 @@ class PageModel extends FormModel
             $query    = \array_merge($queryUrl, $query);
         }
 
+        $query['ct'] ?? $query['ct'] = $request->attributes->get('ct');
         // Process clickthrough if applicable
         if (!empty($query['ct'])) {
             $query['ct'] = $this->decodeArrayFromUrl($query['ct']);
