@@ -13,11 +13,11 @@
     },
     "projects": [
       {
-        "guid": "better-bounce-management",
-        "name": "Improve Mautic's bounce management",
-        "description": "Please take a look at the full proposal on this link: https://docs.google.com/document/d/1FvzEtBmp-7kXjfIAnBo8ntFtWandzW3pdlfcmBVnR4M/edit.\n\nThe Problem\n\nMautic's processing of email webhooks from Omnivery, Mailgun and similar providers is a bit limited due to insufficient underlying model where we store information coming from webhooks. This proposal aims to add ability to the Mautic core in a way so that transport plugins can leverage them and map it more precisely to the Mautic core model.\n\nWe are looking for funding for implementation of the solution proposed in this document.\n\nProposed Solution\n\nFor the problem described above we are suggesting that we add a complaint flag into the DNC entity so transport plugins can use it when the provider (Omnivery, Mailgun, etc.) suggests so.\n\nWe would also like to introduce soft bounces into Mautic core in a way so that we still send to contacts that soft bounces, but if the soft bounce happens multiple times that translates to the DNC entity for that lead with a hard bounced flag.\n\nHow many times contact soft bounces consecutively before it translates to hard bounced is configurable with the setting in Configuration -> Email Settings.\n\nWe introduce soft bounce categories so that transport plugins can categorize and we can display that data to the end user.\n\nWe would add the following filters on segments: filter for DNC complaint reason, soft bounce filter and soft bounce of specific category.\n\nWe would like to show some more statistics about bounced, soft bounced and complaint contacts on the email list page.\n\nWe would like to show the count of soft bounces & complaints on the contact page. Also show how many soft bounces until the hard bounce for the given contact and to show the count of soft bounces & complaints on email list view.",
+        "guid": "mautic",
+        "name": "Mautic",
+        "description": "Mautic is the world's first open source marketing automation platform. Based on the Symfony framework and used by over 40,000 businesses worldwide to power their digital experience, Mautic became a fully independent open source project in April 2023 after spinning off from ownership by Acquia.",
         "webpageUrl": {
-          "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/47"
+          "url": "https://www.mautic.org"
         },
         "repositoryUrl": {
           "url": "https://github.com/mautic/mautic"
@@ -26,92 +26,91 @@
           "spdx:GPL-3.0"
         ],
         "tags": [
-          "programming",
-          "development",
-          "feature",
-          "bounce-management",
-          "email-deliverability",
-          "core",
-          "core-development"
+          "marketing-automation",
+          "php",
+          "symfony",
+          "mautic",
+          "marketing-software"
         ]
       },
       {
-        "guid": "archive-old-resources",
-        "name": "Resource Management Initiative - Archive old resources",
-        "description": "🤔 Problem outline\nThere is currently no way to remove older resources in Mautic which are no longer in use without deleting them completely.\n\nThis project involves implementing a state - archived - which would enable the marketer to effectively ‘hide’ resources which are no longer being used.\n\nThis project is one part of the Resource Management Strategic Initiative.\n\n✅ Key requirements\nA state of archived for all resources in Mautic\n\nThe ability to transition state between published, unpublished and archived individually and in batch\n\nThe ability to view archived resources (eg with a filter)\n\nA permissions level to restrict access to the functionality of archiving, and the viewing of archived resources\n\nThe ability to run a report to show all archived resources\n\nThis project currently has a $500 budget, half of the current budget for the Resource Management Initiative.\n",
+        "guid": "mautic-api-library",
+        "name": "Mautic's API library",
+        "description": "The Mautic API library provides developers with a comprehensive tool to interact programmatically with Mautic's marketing automation platform. Hosted on GitHub, this official PHP library supports REST API operations. \n\nIt facilitates a wide range of actions from managing contacts to controlling campaigns and accessing analytical data, enabling developers to seamlessly integrate and automate marketing workflows. The API library requires authentication via OAuth 2 or Basic Auth, depending on the Mautic installation settings.\n\nExtensive documentation accompanying the API library can be found directly within the GitHub repository or via Mautic's official developer docs at https://devdocs.mautic.org (legacy docs at https://developer.mautic.org), ensuring developers have guidance on setting up and utilizing the library effectively. \n\nThere is not currently 100% API coverage however it's a long term goal to work towards this, such that the front-end of Mautic could be entirely decoupled, enabling it to run headless if desired.",
         "webpageUrl": {
-          "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/7"
+          "url": "https://github.com/mautic/api-library"
         },
         "repositoryUrl": {
-          "url": "https://github.com/mautic/mautic"
+          "url": "https://github.com/mautic/api-library"
         },
         "licenses": [
-          "spdx:GPL-3.0"
+          "spdx:MIT"
         ],
         "tags": [
           "programming",
           "core-development",
           "core",
-          "archive"
+          "api"
         ]
       },
       {
-        "guid": "project-lead-support",
-        "name": "Project Lead Support",
-        "description": "Mautic's governance model includes a Project Lead who is employed by the Mautic Council to work full time for the benefit of the Mautic project. Currently this role is held by Ruth Cheesley since 2020.\n\nPresently this is the only resource available on a full-time basis to support the Mautic project, and Ruth does a great job of pulling everything together and keeping the project moving forward.",
+        "guid": "user-docs",
+        "name": "Mautic's User Documentation",
+        "description": "The Mautic user documentation at https://docs.mautic.org provides a thorough guide specifically designed to assist end users in navigating and maximizing the capabilities of Mautic. \n\nThe End User Documentation is rich with detailed explanations on how to set up and manage campaigns, create and utilize marketing channels like emails and SMS, and analyze results through reports and dashboards. \n\nIt is regularly updated to reflect the latest functionalities introduced in new releases of Mautic, ensuring users have up-to-date information to operate the software proficiently.",
         "webpageUrl": {
-          "url": "https://contribute.mautic.org/governance/governance#5-8-role-of-project-lead"
+          "url": "https://docs.mautic.org"
         },
         "repositoryUrl": {
-          "url": "https://github.com/mautic/mautic"
+          "url": "https://github.com/mautic/user-documentation"
         },
         "licenses": [
-          "N/A"
+          "spdx:CC-BY-SA-4.0"
         ],
         "tags": [
-          "community-leadership",
-          "sustainability",
-          "project-lead"
+          "docs",
+          "documentation"
         ]
       },
       {
-        "guid": "most-privacy-friendly-tool",
-        "name": "Making Mautic the most privacy-friendly marketing tool",
-        "description": "As of today, Mautic can't be used fully compliant with GDPR for all functions. There are possible hacks and patches, but out of the box several functions are not compliant. Also other regulations in other regions might be concerned (e.g California Consumer Privacy Act CCPA).\n\nWe have done some initial scoping on what's required: https://twzn.de/mauticdp.",
+        "guid": "developer-documentation",
+        "name": "Developer Documentation",
+        "description": "The Mautic Developer Documentation, accessible at https://devdocs.mautic.org, is a comprehensive resource designed to aid developers in understanding and using the Mautic platform effectively. \n\nIt covers various aspects of Mautic’s open-source marketing automation system, offering detailed guides on APIs, plugin development, and core contributions. \n\nThis documentation is crucial for developers looking to integrate or extend Mautic’s functionalities. It includes a structured overview of Mautic's architecture, API endpoints, webhook implementations, and practical examples of how to create and customize plugins.\n\nAdditionally, the documentation provides insights into the development environment setup, covering system requirements and installation steps to ensure a smooth start for new developers. \n\nNote: The old dev docs are at https://developer.mautic.org as some sections are yet to be migrated.",
         "webpageUrl": {
-          "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/16"
+          "url": "https://devdocs.mautic.org"
         },
         "repositoryUrl": {
-          "url": "https://github.com/mautic/mautic"
+          "url": "https://github.com/mautic/developer-documentation-new"
         },
         "licenses": [
-          "spdx:GPL-3.0"
+          "spdx:CC-BY-SA-4.0"
         ],
         "tags": [
-          "programming",
-          "privacy",
-          "gdpr",
-          "ccpa",
-          "marketing"
+          "docs",
+          "documentation",
+          "developer-relations",
+          "devrel",
+          "developer-documentation"
         ]
       },
       {
-        "guid": "full-time-developer",
-        "name": "Full time community-focused developer",
-        "description": "Mautic has no developers who work solely for the open source project as a core maintainer. We're entirely reliant on businesses providing good will and allowing their staff time to contribute during their working day, or volunteers working extra hours in their spare time.\n\nWe would like to mitigate this risk, by having the opportunity to hire a full-time developer who will work as part of the core team on projects and initiatives, as well as general triage and keeping up with bug reports, PRs from contributors, and generally improving the developer experience. This is featured in our 2025 budget which has been adopted by the General Assembly in 2024.",
+        "guid": "grapesjs-preset",
+        "name": "GrapesJS Builder Preset",
+        "description": "At the heart of Mautic is the email and landing page builder, used by every marketer to create stunning resources using a drag-and-drop builder powered by the open source framework, GrapesJS.\n\nMautic's implementation of GrapesJS is made through a preset, which allows us to add our own custom blocks.\n\nThis is an area of Mautic that needs a lot of attention because we have several shortcomings and people are asking for a lot more functionality.",
         "webpageUrl": {
-          "url": "https://community.mautic.org/assemblies/general-assembly/f/25/proposals/48"
+          "url": "https://github.com/mautic/grapesjs-preset-mautic"
         },
         "repositoryUrl": {
-          "url": "https://github.com/mautic/mautic"
+          "url": "https://github.com/mautic/grapesjs-preset-mautic"
         },
         "licenses": [
-          "N/A"
+          "spdx:MIT"
         ],
         "tags": [
-          "developer",
-          "core-development",
-          "sustainability"
+          "grapesjs",
+          "email-builder",
+          "landing-page-builder",
+          "mautic",
+          "builder"
         ]
       }
     ],
