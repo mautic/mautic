@@ -141,21 +141,23 @@
       {% set mappedField = fieldCollection.getFieldByKey(field.mappedField) %}
       {% set mappedFieldType = mappedField.type %}
 
-      {%- if mappedField.properties.list is defined and mappedField.properties.list is not empty -%}
-        {%- set parseList = mappedField.properties.list -%}
-      {%- elseif 'boolean' == mappedFieldType -%}
-        {%- set parseList = {
-                '0': mappedField.properties.no,
-                '1': mappedField.properties.yes,
-        }-%}
-      {%- elseif 'country' == mappedFieldType -%}
-        {%- set list = leadFieldCountryChoices() -%}
-      {%- elseif 'region' == mappedFieldType -%}
-        {%- set list = leadFieldRegionChoices() -%}
-      {%- elseif 'timezone' == mappedFieldType -%}
-        {%- set list = leadFieldTimezonesChoices() -%}
-      {%- elseif 'locale' == mappedFieldType -%}
-        {%- set list = leadFieldLocaleChoices() -%}
+      {%- if field.properties.syncList is defined and field.properties.syncList is not empty and field.properties.syncList -%}
+        {%- if mappedField.properties.list is defined and mappedField.properties.list is not empty -%}
+          {%- set parseList = mappedField.properties.list -%}
+        {%- elseif 'boolean' == mappedFieldType -%}
+          {%- set parseList = {
+                  '0': mappedField.properties.no,
+                  '1': mappedField.properties.yes,
+          }-%}
+        {%- elseif 'country' == mappedFieldType -%}
+          {%- set list = leadFieldCountryChoices() -%}
+        {%- elseif 'region' == mappedFieldType -%}
+          {%- set list = leadFieldRegionChoices() -%}
+        {%- elseif 'timezone' == mappedFieldType -%}
+          {%- set list = leadFieldTimezonesChoices() -%}
+        {%- elseif 'locale' == mappedFieldType -%}
+          {%- set list = leadFieldLocaleChoices() -%}
+        {%- endif -%}
       {%- endif -%}
     {%- endif -%}
   {%- endif -%}
