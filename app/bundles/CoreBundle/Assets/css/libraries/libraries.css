@@ -17245,7 +17245,6 @@ a > .fa {
   border-bottom-left-radius: var(--border-radius-md);
   -webkit-box-shadow: 0 8px 8px rgba(0, 0, 0, .25);
   box-shadow: 0 8px 8px rgba(0, 0, 0, .25);
-  margin-top: -1px;
   position: absolute;
   top: 100%;
   left: -9000px;
@@ -17267,11 +17266,11 @@ a > .fa {
 }
 .chosen-container .chosen-results li {
   display: none;
-  line-height: 1.2em;
+  line-height: 1.4em;
   min-height: var(--spacing-07);
   list-style: none;
   margin: 0;
-  padding: 6px var(--spacing-05) 4px;
+  padding: 0.6em var(--spacing-05) 5px;
   transition: var(--transition-all-productive);
 }
 .chosen-container .chosen-results li em {
@@ -17289,8 +17288,7 @@ a > .fa {
 }
 .chosen-container .chosen-results li.active-result {
   cursor: pointer;
-  display: flex;
-  align-items: center;
+  display: list-item;
 }
 .chosen-container .chosen-results li.highlighted {
   background-color: var(--layer-hover);
