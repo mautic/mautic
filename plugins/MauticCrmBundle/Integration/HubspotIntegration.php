@@ -391,7 +391,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 $config                         = $this->mergeConfigToFeatureSettings();
                 $fields                         = implode('&property=', array_keys($config['leadFields']));
                 $params['post_append_to_query'] = '&property='.$fields.'&property=lifecyclestage';
-                $params['Count']                = 100;
+                $params['count']                = 100;
 
                 $data = $this->getApiHelper()->getContacts($params);
                 if (isset($data['contacts'])) {
