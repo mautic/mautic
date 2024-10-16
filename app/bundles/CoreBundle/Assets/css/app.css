@@ -3852,12 +3852,19 @@ fieldset[disabled] .btn-ghost.btn-icon.focus {
   align-items: flex-start;
   height: var(--spacing-10);
   width: var(--spacing-13);
+  border-radius: 0;
 }
 .modal-footer .modal-form-buttons .btn:first-child {
-  border-radius: var(--border-radius-md) 0 0 0;
+  border-radius: 0 0 0 calc(var(--border-radius-md) + 3px);
+}
+.modal-footer .modal-form-buttons .btn:last-child {
+  border-radius: 0 0 calc(var(--border-radius-md) + 3px) 0;
+}
+.modal-footer .modal-form-buttons .btn:only-child {
+  border-radius: 0 0 calc(var(--border-radius-md) + 3px) calc(var(--border-radius-md) + 3px);
+  flex-grow: 1;
 }
 .modal-footer .modal-form-buttons .btn + .btn {
-  border-radius: 0;
   margin: 0;
 }
 .modal-footer .modal-form-buttons:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn {
