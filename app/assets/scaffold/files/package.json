@@ -20,7 +20,7 @@
     "@ckeditor/ckeditor5-ckfinder": "^43.1.1",
     "@ckeditor/ckeditor5-core": "^43.1.1",
     "@ckeditor/ckeditor5-dev-translations": "^43.0.0",
-    "@ckeditor/ckeditor5-dev-utils": "^43.0.0",
+    "@ckeditor/ckeditor5-dev-utils": "^44.0.0",
     "@ckeditor/ckeditor5-editor-classic": "^43.1.1",
     "@ckeditor/ckeditor5-essentials": "^43.1.1",
     "@ckeditor/ckeditor5-font": "^43.1.1",
