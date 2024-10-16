@@ -9445,19 +9445,8 @@ code:hover > .copy-icon {
   --button-tertiary: var(--primary-80);
   --interactive: var(--primary-70);
 }
-:root,
-:root[accent="01"] {
-  --primary-20: #d0d5e8;
-  --primary-30: #aeb6d7;
-  --primary-40: #8c98c6;
-  --primary-50: #6a79b5;
-  --primary-60: #4e5e9e;
-  --primary-70: #3d4a7c;
-  --primary-80: #2c355a;
-  --primary-90: #1b2138;
-  --primary-100: #0b0d15;
-}
-:root[accent="02"] {
+:root[theme="light"]:root[accent="02"],
+:root[theme="dark"]:root[accent="02"] {
   --primary-20: #f5cecc;
   --primary-30: #eda4a1;
   --primary-40: #e57b76;
@@ -9472,7 +9461,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="03"] {
+:root[theme="light"]:root[accent="03"],
+:root[theme="dark"]:root[accent="03"] {
   --primary-20: #ffeacc;
   --primary-30: #ffd599;
   --primary-40: #ffbf66;
@@ -9487,7 +9477,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="04"] {
+:root[theme="light"]:root[accent="04"],
+:root[theme="dark"]:root[accent="04"] {
   --primary-20: #fff5cc;
   --primary-30: #ffeb99;
   --primary-40: #ffe066;
@@ -9502,7 +9493,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
-:root[accent="05"] {
+:root[theme="light"]:root[accent="05"],
+:root[theme="dark"]:root[accent="05"] {
   --primary-20: #f3a7cb;
   --primary-30: #ed7ab1;
   --primary-40: #e64e96;
@@ -9517,7 +9509,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="06"] {
+:root[theme="light"]:root[accent="06"],
+:root[theme="dark"]:root[accent="06"] {
   --primary-20: #dae7ff;
   --primary-30: #a7c6ff;
   --primary-40: #75a4fe;
@@ -9532,7 +9525,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="07"] {
+:root[theme="light"]:root[accent="07"],
+:root[theme="dark"]:root[accent="07"] {
   --primary-20: #95ce8d;
   --primary-30: #74bf69;
   --primary-40: #56ab4a;
@@ -9547,7 +9541,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="08"] {
+:root[theme="light"]:root[accent="08"],
+:root[theme="dark"]:root[accent="08"] {
   --primary-20: #eae4fd;
   --primary-30: #c6b5f9;
   --primary-40: #a286f5;
@@ -9562,7 +9557,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="09"] {
+:root[theme="light"]:root[accent="09"],
+:root[theme="dark"]:root[accent="09"] {
   --primary-20: #ccffff;
   --primary-30: #99ffff;
   --primary-40: #66ffff;
@@ -9577,7 +9573,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
-:root[accent="10"] {
+:root[theme="light"]:root[accent="10"],
+:root[theme="dark"]:root[accent="10"] {
   --primary-20: #92f6ff;
   --primary-30: #5ff1ff;
   --primary-40: #2cedff;
@@ -9592,7 +9589,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="11"] {
+:root[theme="light"]:root[accent="11"],
+:root[theme="dark"]:root[accent="11"] {
   --primary-20: #59cfe6;
   --primary-30: #2dc2df;
   --primary-40: #1ca2bd;
@@ -9607,7 +9605,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="12"] {
+:root[theme="light"]:root[accent="12"],
+:root[theme="dark"]:root[accent="12"] {
   --primary-20: #50cd77;
   --primary-30: #34b65c;
   --primary-40: #298e48;
@@ -9622,7 +9621,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="13"] {
+:root[theme="light"]:root[accent="13"],
+:root[theme="dark"]:root[accent="13"] {
   --primary-20: #8cffd7;
   --primary-30: #59ffc6;
   --primary-40: #26ffb4;
@@ -9637,7 +9637,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="14"] {
+:root[theme="light"]:root[accent="14"],
+:root[theme="dark"]:root[accent="14"] {
   --primary-20: #85d19f;
   --primary-30: #60c382;
   --primary-40: #42ae67;
@@ -9652,7 +9653,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="15"] {
+:root[theme="light"]:root[accent="15"],
+:root[theme="dark"]:root[accent="15"] {
   --primary-20: #f5ffcc;
   --primary-30: #ebff99;
   --primary-40: #e0ff66;
@@ -9667,7 +9669,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
-:root[accent="16"] {
+:root[theme="light"]:root[accent="16"],
+:root[theme="dark"]:root[accent="16"] {
   --primary-20: #feb993;
   --primary-30: #fe9860;
   --primary-40: #fe772d;
@@ -9682,7 +9685,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="17"] {
+:root[theme="light"]:root[accent="17"],
+:root[theme="dark"]:root[accent="17"] {
   --primary-20: #fffafb;
   --primary-30: #ffc7d1;
   --primary-40: #ff94a7;
@@ -9697,7 +9701,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="18"] {
+:root[theme="light"]:root[accent="18"],
+:root[theme="dark"]:root[accent="18"] {
   --primary-20: #f5dce9;
   --primary-30: #ebb3d1;
   --primary-40: #e08bb9;
@@ -9712,7 +9717,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="19"] {
+:root[theme="light"]:root[accent="19"],
+:root[theme="dark"]:root[accent="19"] {
   --primary-20: #ffccff;
   --primary-30: #ff99ff;
   --primary-40: #ff66ff;
@@ -9727,7 +9733,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="20"] {
+:root[theme="light"]:root[accent="20"],
+:root[theme="dark"]:root[accent="20"] {
   --primary-20: #e3a0ff;
   --primary-30: #d36dff;
   --primary-40: #c43aff;
@@ -9742,7 +9749,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="21"] {
+:root[theme="light"]:root[accent="21"],
+:root[theme="dark"]:root[accent="21"] {
   --primary-20: #d6eef9;
   --primary-30: #aadbf2;
   --primary-40: #7ec8eb;
@@ -9757,7 +9765,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="22"] {
+:root[theme="light"]:root[accent="22"],
+:root[theme="dark"]:root[accent="22"] {
   --primary-20: #7c6bf0;
   --primary-30: #533cec;
   --primary-40: #3016df;
@@ -9772,7 +9781,8 @@ code:hover > .copy-icon {
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="23"] {
+:root[theme="light"]:root[accent="23"],
+:root[theme="dark"]:root[accent="23"] {
   --primary-20: #ffefce;
   --primary-30: #ffdf9b;
   --primary-40: #ffcf68;
@@ -9787,7 +9797,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #16161640;
 }
-:root[accent="24"] {
+:root[theme="light"]:root[accent="24"],
+:root[theme="dark"]:root[accent="24"] {
   --primary-20: #fef1f0;
   --primary-30: #fbc5c0;
   --primary-40: #f79a91;
@@ -9802,7 +9813,8 @@ code:hover > .copy-icon {
   --icon-on-color: #000;
   --icon-on-color-disabled: #8d8d8d;
 }
-:root[accent="25"] {
+:root[theme="light"]:root[accent="25"],
+:root[theme="dark"]:root[accent="25"] {
   --primary-20: #d470c3;
   --primary-30: #c849b2;
   --primary-40: #aa3496;
@@ -9816,6 +9828,18 @@ code:hover > .copy-icon {
   --text-on-color-disabled: #8d8d8d;
   --icon-on-color: #fff;
   --icon-on-color-disabled: #8d8d8d;
+}
+:root,
+:root[accent="01"] {
+  --primary-20: #d0d5e8;
+  --primary-30: #aeb6d7;
+  --primary-40: #8c98c6;
+  --primary-50: #6a79b5;
+  --primary-60: #4e5e9e;
+  --primary-70: #3d4a7c;
+  --primary-80: #2c355a;
+  --primary-90: #1b2138;
+  --primary-100: #0b0d15;
 }
 :root[reduce-motion="true"] {
   --duration-productive: 0;
