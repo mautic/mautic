@@ -207,10 +207,14 @@ function s4() {
 
 MauticJS.mtcSet = false;
 MauticJS.appendTrackedContact = function(data) {
-    if (window.localStorage) {
+    try{
+      if (window.localStorage) {
         if (mtcId  = localStorage.getItem('mtc_id')) {
             data['mautic_device_id'] = localStorage.getItem('mautic_device_id');
-        }              
+            }              
+        }
+    } catch (e) {
+      // Do nothing if cookie and localstorage are blocked
     }
     
     return data;

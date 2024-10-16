@@ -264,7 +264,7 @@ MauticJS.convertIframesToVideos = function() {
 
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
- 
+    
     if (! MauticJS.videoElements.length) {
         MauticJS.videoElements = null;
         return;
@@ -301,12 +301,16 @@ MauticJS.processGatedVideos = function (videoElements) {
             if (mediaPlayers[i].views) {
                 MauticJS.iterateCollection(mediaPlayers[i].views)(function(nodeA, iA){
                     if (!node.views[iA].sent) {
-                        MauticJS.makeCORSRequest('POST', '{$mauticBaseUrl}video/hit', node.views[iA], function (data) {
+                        try{
+                          MauticJS.makeCORSRequest('POST', '{$mauticBaseUrl}video/hit', node.views[iA], function (data) {
                             // Don't continue to send locked views that have already been sent
                             if (data.success && node.views[iA].locked) {
                                 node.views[iA].sent = true;
-                            }
-                        });
+                                }
+                            });
+                        } catch (e) {
+                          // Do nothing if cookies and localstorage are blocked
+                        }
                     }
                 });
             }
@@ -370,17 +374,22 @@ MauticJS.processGatedVideos = function (videoElements) {
         }
 
         var playerFeatures = [];
+        youtubeSettings = {};
         var source = node.getElementsByTagName('source')[0];
         if (source && source.type && source.type === 'video/mp4') {
             node.dataset.mp4 = true;
             playerFeatures = ['playpause','progress','current','duration','volume','fullscreen'];
+        }
+        
+        if(source && source.type && source.type === 'video/youtube'){
+            youtubeSettings = {nocookie: true}
         }
 
         if (!node.id) {
             node.id = 'mautic-player-' + i;
         }
         
-        mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false, success: function (mediaElement, domElement) {
+        mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false,  youtube: youtubeSettings, success: function (mediaElement, domElement) {
             mediaPlayers[i].inPoster = false;
             mediaPlayers[i].success  = false;
             mediaPlayers[i].views    = [];
