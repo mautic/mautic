@@ -26,6 +26,10 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $filterParameters = $filter->getParameterValue();
 
+        // allow custom Lead::id foreign key columns like `contact_id`
+        // instead of the deprecated `lead_id`
+        $foreignContactColumn = $filter->getForeignContactColumn();
+
         if (is_array($filterParameters)) {
             $parameters = [];
             foreach ($filterParameters as $filterParameter) {
@@ -61,7 +65,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                         $leadsTableAlias,
                         $filter->getTable(),
                         $tableAlias,
-                        sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
+                        sprintf('%s.id = %s.%s', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias, $foreignContactColumn)
                     );
                 }
             }
@@ -121,8 +125,17 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             $queryBuilder->addGroupBy($leadsTableAlias.'.id');
         } else {
             if ($filterAggr) {
-                $expression = $queryBuilder->expr()->exists('SELECT '.$expressionArg.' FROM '.$filter->getTable().' '.
-                    $tableAlias.' WHERE '.$leadsTableAlias.'.id='.$tableAlias.'.lead_id HAVING '.$expression);
+                $subQueryBuilder = $queryBuilder->createQueryBuilder();
+                $subQueryBuilder->select($expressionArg)
+                    ->from($filter->getTable(), $tableAlias)
+                    ->andWhere($leadsTableAlias.'.id='.$tableAlias.'.'.$foreignContactColumn)
+                    ->andHaving($expression);
+
+                if ($where = $filter->getWhere()) {
+                    $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX ?? '', '', $filter->getTable()).'.', $tableAlias.'.', $where));
+                }
+
+                $expression = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
             } else { // This should never happen
                 $queryBuilder->addGroupBy($leadsTableAlias.'.id');
             }
