@@ -72,10 +72,21 @@
                       {% set groupFields = fields[group] %}
                       {% if groupFields is not empty %}
                           <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">
-                              <div class="pa-md bdr-b">
-                                  <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
+                              <div class="col-lg-8 pa-md bg-light-xs bdr-b">
+                                {% if not lead.id %}
+                                    {{ include('@MauticCore/Notification/inline_notification.html.twig', {
+                                        'title': 'mautic.contact.import.tip.title',
+                                        'content': 'mautic.contact.import.tip.description',
+                                        'alert_type': 'info',
+                                        'dismissible': true,
+                                        'action_label': 'mautic.contact.import.tip.button',
+                                        'action_link': path('mautic_import_action', {'object': 'contacts', 'objectAction': 'new'})
+                                    }) }}
+                                {% endif %}
+
+                                  <h4 class="fw-sb mt-md">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
                               </div>
-                              <div class="pa-md">
+                              <div class="col-lg-12 pa-md">
                                   {% if 'core' == group %}
                                       {% if form.title is defined or form.firstname is defined or form.lastname is defined %}
                                           <div class="form-group mb-0">

@@ -353,3 +353,48 @@ code:hover > .copy-icon {
   opacity: 1;
   transform: none;
 }
+
+// Logo
+// --------------------------------------------------
+
+// mautic-brand
+.mautic-brand {
+  display: block;
+  height: @header-height;
+  padding-left: 35px;
+  padding-right: 32px;
+  width: 100%;
+  overflow: hidden;
+
+  &.pull-left {
+    width: 75%;
+  }
+
+  // mautic logo figure
+  > svg.mautic-logo-figure {
+    width: @mautic-logo-figure-width;
+    height: @header-height;
+    .circle {
+      fill: @mautic-logo-figure-circle-fill;
+    }
+    .m,
+    .m-arrow {
+      fill: @mautic-logo-figure-m-fill;
+    }
+  }
+
+  // mautic logo text
+  > svg.mautic-logo-text {
+    height: @header-height;
+    width: @mautic-logo-text-width;
+    .m,.a,.u,.t,.i,.c {
+      fill: @mautic-logo-text-fill
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  svg.mautic-logo-text {
+    display: none;
+  }
+}
