@@ -224,11 +224,11 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Extract URLs from content and return as trackables.
      *
-     * @param mixed      $content
-     * @param null       $channel
-     * @param null       $channelId
-     * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
-     *                                      or & for URLs tracked that include query parameters
+     * @param mixed       $content
+     * @param string|null $channel
+     * @param int|null    $channelId
+     * @param bool|false  $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
+     *                                       or & for URLs tracked that include query parameters
      *
      * @return array[mixed $content, array $trackables]
      */
@@ -302,6 +302,13 @@ class TrackableModel extends AbstractCommonModel
         krsort($this->contentReplacements['second_pass']);
 
         if ('html' == $type) {
+            // First remove all EOL characters to avoid errors with replace regex later
+            $content = preg_replace(
+                '/[\r\n]/i',
+                '',
+                $content
+            );
+
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 $content = preg_replace(
