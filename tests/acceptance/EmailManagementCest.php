@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Page\Acceptance\EmailsPage;
-use Step\Acceptance\SegmentStep;
 use Step\Acceptance\EmailStep;
+use Step\Acceptance\SegmentStep;
 
 class EmailManagementCest
 {
@@ -61,5 +61,4 @@ class EmailManagementCest
             $I->see($firstCategoryName, '//*[@id="app-content"]/div/div[2]/div[2]/div[1]/table/tbody/tr['.$i.']/td[3]/div');
         }
     }
-
 }

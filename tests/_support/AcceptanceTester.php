@@ -1,8 +1,6 @@
 <?php
 
 use Page\Acceptance\CategoriesPage;
-use Page\Acceptance\EmailsPage;
-use Page\Acceptance\SegmentsPage;
 
 /**
  * Inherited Methods.
@@ -41,7 +39,6 @@ class AcceptanceTester extends Codeception\Actor
         $I->saveSessionSnapshot('login');
     }
 
-
     public function createACategory(string $name): void
     {
         $this->amOnPage(CategoriesPage::$URL);
@@ -54,5 +51,4 @@ class AcceptanceTester extends Codeception\Actor
         $this->fillField(CategoriesPage::$TITLE_FIELD, $name);
         $this->click(CategoriesPage::$SAVE_AND_CLOSE);
     }
-
 }

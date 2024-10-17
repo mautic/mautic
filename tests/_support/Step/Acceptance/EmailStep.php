@@ -2,15 +2,12 @@
 
 namespace Step\Acceptance;
 
-use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\EmailsPage;
 
 class EmailStep extends \AcceptanceTester
 {
     /**
      * Create an email with the given name.
-     *
-     * @param string $name
      */
     public function createAnEmail(string $name): void
     {
@@ -45,5 +42,4 @@ class EmailStep extends \AcceptanceTester
 
         return $newCategoryName;
     }
-
 }
