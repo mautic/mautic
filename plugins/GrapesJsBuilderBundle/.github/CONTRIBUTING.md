@@ -8,7 +8,7 @@ Development is open and available to any member of the Mautic community. All fix
 
 ### Developer Documentation
 
-Developer documentation is available at [https://developer.mautic.org](https://developer.mautic.org).  To add additions or corrects to the documentation, submit Issues or Pull Requests against [https://github.com/mautic/developer-documentation](https://github.com/mautic/developer-documentation).
+Developer documentation is available at [https://devdocs.mautic.org](https://devdocs.mautic.org).  To add additions or corrects to the documentation, submit Issues or Pull Requests against [https://github.com/mautic/developer-documentation-new](https://github.com/mautic/developer-documentation-new).
 
 ### Core Feature Development Procedures
 
