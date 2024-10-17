@@ -15,7 +15,7 @@ class EmailStep extends \AcceptanceTester
     public function createAnEmail(string $name): void
     {
         $I=$this;
-        $I>amOnPage(EmailsPage::$URL);
+        $I->amOnPage(EmailsPage::$URL);
         $I->wait(1);
         $I->click(EmailsPage::$NEW);
         $I->waitForElementClickable(EmailsPage::$SELECT_SEGMENT_EMAIL);
