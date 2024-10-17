@@ -44,6 +44,10 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         if ($this->filesystem->exists($themePath.'/'.ThemeHelper::HIDDEN_THEMES_TXT.'.bkp')) {
             $this->filesystem->rename($themePath.'/'.ThemeHelper::HIDDEN_THEMES_TXT.'.bkp', $themePath.'/'.ThemeHelper::HIDDEN_THEMES_TXT);
         }
+
+        if ($this->filesystem->exists($themePath.'/blanktest')) {
+            $this->filesystem->remove($themePath.'/blanktest');
+        }
     }
 
     public function testDeleteTheme(): void
@@ -53,12 +57,29 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
     }
 
-    public function testBatchDeleteAction(): void
+    public function testBatchDeleteActionValidation(): void
     {
         $this->client->request(Request::METHOD_POST, 's/themes/batchDelete?ids=[%22aurora%22,%22brienz%22]');
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
         $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
         $this->assertStringContainsString('brienz is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
+    }
+
+    public function testBatchDeleteActionWithNonCoreTheme(): void
+    {
+        $themeHelper = self::getContainer()->get(ThemeHelper::class);
+        \assert($themeHelper instanceof ThemeHelper);
+        $themeHelper->copy('blank', 'blanktest');
+
+        // Clear the private property 'themes' to reload themes.
+        $reflectionClass = new \ReflectionClass(ThemeHelper::class);
+        $themesProperty = $reflectionClass->getProperty('themes');
+        $themesProperty->setAccessible(true);
+        $themesProperty->setValue($themeHelper, []);
+
+        $this->client->request(Request::METHOD_POST, '/s/themes/batchDelete?ids=[%22blanktest%22]');
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('<strong>blanktest</strong> has been deleted!', $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
     }
 
     public function testThemeVisibility(): void
