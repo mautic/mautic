@@ -2938,9 +2938,9 @@ a > .fa {
   left: -1.85714286em;
 }
 .fa-border {
-  padding: 0.2em 0.25em 0.15em;
-  border: solid 0.08em #eee;
-  border-radius: 0.1em;
+  padding: .2em .25em .15em;
+  border: solid 0.08em #eeeeee;
+  border-radius: .1em;
 }
 .fa-pull-left {
   float: left;
@@ -2949,10 +2949,10 @@ a > .fa {
   float: right;
 }
 .fa.fa-pull-left {
-  margin-right: 0.3em;
+  margin-right: .3em;
 }
 .fa.fa-pull-right {
-  margin-left: 0.3em;
+  margin-left: .3em;
 }
 /* Deprecated as of 4.4.0 */
 .pull-right {
@@ -2962,10 +2962,10 @@ a > .fa {
   float: left;
 }
 .fa.pull-left {
-  margin-right: 0.3em;
+  margin-right: .3em;
 }
 .fa.pull-right {
-  margin-left: 0.3em;
+  margin-left: .3em;
 }
 .fa-spin {
   -webkit-animation: fa-spin 2s infinite linear;
@@ -3054,7 +3054,7 @@ a > .fa {
   font-size: 2em;
 }
 .fa-inverse {
-  color: #fff;
+  color: #ffffff;
 }
 /* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
    readers do not read off random characters that represent icons */
@@ -5442,9 +5442,9 @@ div[data-slot].ui-sortable-helper {
   border-radius: 0 0 0px 0px;
   -moz-border-radius: 0 0 0px 0px;
   -webkit-border-radius: 0 0 0px 0px;
-  -webkit-box-shadow: none  !important;
-  -moz-box-shadow: none  !important;
-  box-shadow: none  !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
   background: transparent !important;
 }
 [data-slot="text"].fr-box .fr-wrapper .fr-element {
@@ -5489,11 +5489,10 @@ div[data-slot].ui-sortable-helper {
 [data-slot="dynamicContent"] {
   z-index: 50;
 }
-.chosen-container .chosen-results li {
-  font-family: "Source Sans 3", Helvetica, Arial, sans-serif;
-}
 .chosen-container .chosen-results li:before {
-  font: normal normal normal 14px/1 FontAwesome;
+  font-weight: normal;
+  font-variant: normal;
+  font-style: normal;
   padding-right: 6px;
 }
 div:empty[data-slot],
