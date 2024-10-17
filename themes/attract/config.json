@@ -1,0 +1,9 @@
+{
+  "name": "Attract",
+  "author": "Dropsolid",
+  "authorUrl": "https://dropsolid.com",
+  "builder": ["grapesjsbuilder"],
+  "features": [
+    "email"
+  ]
+}
