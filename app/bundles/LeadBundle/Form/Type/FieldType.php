@@ -625,7 +625,10 @@ class FieldType extends AbstractType
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.object',
                 'placeholder' => false,
-                'attr'        => ['class' => 'form-control'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.toggleIsShortVisibleVisibility(this.value);',
+                ],
                 'required'    => false,
                 'disabled'    => ($disabled || !$new),
             ]
