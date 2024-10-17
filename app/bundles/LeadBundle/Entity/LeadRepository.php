@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -703,7 +704,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // This will be switched by some commands that use join tables as NOT EXISTS queries will be used
         $exprType = ($filter->not) ? 'negate_expr' : 'expr';
 
-        $operators = $this->getFilterExpressionFunctions();
+        $operators = OperatorOptions::getFilterExpressionFunctions();
         $operators = array_merge($operators, [
             'null' => [
                 'expr'        => 'isNull',

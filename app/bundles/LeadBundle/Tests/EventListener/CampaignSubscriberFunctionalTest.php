@@ -192,7 +192,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
             );
 
-            Assert::assertSame(true, $event->getResult());
+            Assert::assertTrue($event->getResult());
         }
     }
 

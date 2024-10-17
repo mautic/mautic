@@ -186,7 +186,6 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->setFields($form, $fields);
         $entityFields = $form->getFields()->toArray();
 
-        /** @var Field $newField */
         $newField = $entityFields[array_keys($fields)[0]];
 
         /** @var Field $fileField */
@@ -201,7 +200,6 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         /** @var Field $childField */
         $newChildField = $entityFields[array_keys($fields)[4]];
 
-        $this->assertInstanceOf(Field::class, $newField);
         $this->assertSame('email', $newField->getType());
         $this->assertSame('email', $newField->getAlias());
         $this->assertSame(1, $newField->getOrder());

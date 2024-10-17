@@ -19,7 +19,7 @@ class CategoryMapperTest extends \PHPUnit\Framework\TestCase
     {
         $category = CategoryMapper::map(Definition::ANTISPAM);
 
-        $this->assertInstanceOf(Category::class, $category);
+        $this->assertSame(Definition::ANTISPAM, $category->getCategory());
     }
 
     /**

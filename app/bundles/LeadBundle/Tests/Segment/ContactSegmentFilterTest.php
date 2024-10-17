@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
-use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
@@ -21,7 +20,7 @@ class ContactSegmentFilterTest extends TestCase
     private ContactSegmentFilterCrate $contactSegmentFilterCrate;
 
     /**
-     * @var BaseDecorator|MockObject
+     * @var FilterDecoratorInterface&MockObject
      */
     private MockObject $filterDecorator;
 
@@ -179,7 +178,6 @@ class ContactSegmentFilterTest extends TestCase
 
         $parts = $filter->getIntegrationCampaignParts();
 
-        self::assertInstanceOf(IntegrationCampaignParts::class, $parts);
         self::assertEquals($value, $parts->getCampaignId());
     }
 

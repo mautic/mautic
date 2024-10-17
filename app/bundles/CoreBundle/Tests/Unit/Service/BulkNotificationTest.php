@@ -54,7 +54,7 @@ class BulkNotificationTest extends TestCase
     {
         Assert::assertSame($data[1], $notification[0]);
         Assert::assertSame($data[2], $notification[1]);
-        Assert::assertSame(false, $notification[2]);
+        Assert::assertFalse($notification[2]);
         Assert::assertSame($data[3], $notification[3]);
         Assert::assertSame($data[4], $notification[4]);
         Assert::assertSame($data[5], $notification[5]);

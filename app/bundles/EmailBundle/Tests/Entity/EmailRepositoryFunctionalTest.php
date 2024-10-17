@@ -88,6 +88,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $result = $this->emailRepository->checkDoNotEmail('name@domain.tld');
+        Assert::assertNotFalse($result);
 
         Assert::assertSame([
             'id'           => (string) $doNotContact->getId(),
