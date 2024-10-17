@@ -78,7 +78,8 @@
     "mautic/theme-skyline": "self.version",
     "mautic/theme-sparse": "self.version",
     "mautic/theme-sunday": "self.version",
-    "mautic/theme-vibrant": "self.version"
+    "mautic/theme-vibrant": "self.version",
+    "mautic/theme-trulypersonal": "self.version"
   },
   "autoload": {
     "psr-4": {
