@@ -3,9 +3,11 @@
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\StageBundle\Cache\StageCountCache;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -17,7 +19,8 @@ class LeadSubscriber implements EventSubscriberInterface
         private StagesChangeLogRepository $stagesChangeLogRepository,
         private LeadStageLogRepository $leadStageLogRepository,
         private TranslatorInterface $translator,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private StageCountCache $stageCountCache
     ) {
     }
 
@@ -26,7 +29,21 @@ class LeadSubscriber implements EventSubscriberInterface
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
         ];
+    }
+
+    public function onLeadPostSave(LeadEvent $event): void
+    {
+        $changes = $event->getChanges()['stage'] ?? null;
+        if (is_array($changes)) {
+            if ($changes[0] ?? null) {
+                $this->stageCountCache->decrementStageContactCount($changes[0]);
+            }
+            if ($changes[1] ?? null) {
+                $this->stageCountCache->incrementStageContactCount($changes[1]);
+            }
+        }
     }
 
     /**
