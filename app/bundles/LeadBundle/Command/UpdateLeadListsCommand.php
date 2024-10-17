@@ -115,15 +115,21 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $leadList->getId()]).'</info>');
 
                     $startTimeForSingleSegment = time();
-                    $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
-                    if (0 >= (int) $max) {
-                        // Only full segment rebuilds count
-                        $leadList->setLastBuiltDateToCurrentDatetime();
-                        $listModel->saveEntity($leadList);
+                    try{
+                        $processed = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
+                        if (0 >= (int) $max) {
+                            // Only full segment rebuilds count
+                            $leadList->setLastBuiltDateToCurrentDatetime();
+                            $listModel->saveEntity($leadList);
+                        }
+                        $output->writeln(
+                            '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
+                        );
+                    }catch (\Exception $e){
+                        $output->writeln(
+                            '<comment>'.$translator->trans('mautic.lead.list.rebuild.error', ['%error%' => $e->getMessage()]).'</comment>'
+                        );
                     }
-                    $output->writeln(
-                        '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
-                    );
                     if ($enableTimeMeasurement) {
                         $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
                         $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime])."\n");
