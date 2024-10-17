@@ -26,6 +26,10 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $filterParameters = $filter->getParameterValue();
 
+        // allow custom Lead::id foreign key columns like `contact_id`
+        // instead of the deprecated `lead_id`
+        $foreignContactColumn = $filter->getForeignContactColumn();
+
         if (is_array($filterParameters)) {
             $parameters = [];
             foreach ($filterParameters as $filterParameter) {
@@ -61,7 +65,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                         $leadsTableAlias,
                         $filter->getTable(),
                         $tableAlias,
-                        sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
+                        sprintf('%s.id = %s.%s', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias, $foreignContactColumn)
                     );
                 }
             }
@@ -122,7 +126,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         } else {
             if ($filterAggr) {
                 $expression = $queryBuilder->expr()->exists('SELECT '.$expressionArg.' FROM '.$filter->getTable().' '.
-                    $tableAlias.' WHERE '.$leadsTableAlias.'.id='.$tableAlias.'.lead_id HAVING '.$expression);
+                $tableAlias.' WHERE '.$leadsTableAlias.'.id='.$tableAlias.'.'.$foreignContactColumn.' HAVING '.$expression);
             } else { // This should never happen
                 $queryBuilder->addGroupBy($leadsTableAlias.'.id');
             }
