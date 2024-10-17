@@ -1422,6 +1422,25 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "TheMarvelFan",
+      "name": "Kushagra Nigam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93257324?v=4",
+      "profile": "https://github.com/TheMarvelFan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "laurielim",
+      "name": "Laurie Lim Sam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/62180225?v=4",
+      "profile": "http://laurielim.github.io",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
