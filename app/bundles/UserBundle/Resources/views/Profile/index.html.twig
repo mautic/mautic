@@ -83,7 +83,7 @@
                             {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
                             {{ form_row(userForm.plainPassword.password) }}
                             {{ form_row(userForm.plainPassword.confirm) }}
-                            <h3 id="security" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
+                            <h3 id="learning" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
                             <div class="text-muted small description pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
                             <button class="btn btn-tertiary btn-sm btn-danger" onclick="Mautic.resetDismissedElements()">{{'mautic.user.config.title.experience_and_learning.reset_dismissed'|trans}}<i class="ri-refresh-line"></i></button>
                         </div>
