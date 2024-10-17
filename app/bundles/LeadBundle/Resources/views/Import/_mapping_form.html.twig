@@ -16,7 +16,7 @@
                 {% if form.list is defined %}{{ form_row(form.list) }}{% endif %}
             </div>
             <div class="col-xs-4">
-                {% if form.tags is defined %}{{ form_row(form.tags) }}{% endif %}
+                {% if form.optional_tags is defined %}{{ form_row(form.optional_tags) }}{% endif %}
             </div>
             <div class="col-xs-4">
                 {% if form.skip_if_exists is defined %}{{ form_row(form.skip_if_exists) }}{% endif %}
