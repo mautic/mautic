@@ -36,7 +36,8 @@ class PointType extends AbstractType
 
         $builder->add(
             'name',
-            TextType::class, [
+            TextType::class,
+            [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
@@ -45,7 +46,8 @@ class PointType extends AbstractType
 
         $builder->add(
             'description',
-            TextareaType::class, [
+            TextareaType::class,
+            [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control editor'],
@@ -83,9 +85,9 @@ class PointType extends AbstractType
         );
 
         $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
-        if ($type) {
-            $formType = (!empty($options['pointActions']['actions'][$type]['formType'])) ?
-                $options['pointActions']['actions'][$type]['formType'] : GenericPointSettingsType::class;
+
+        if ($type && !empty($options['pointActions']['actions'][$type]['formType'])) {
+            $formType   = $options['pointActions']['actions'][$type]['formType'];
             $properties = ($options['data']) ? $options['data']->getProperties() : [];
             $builder->add(
                 'properties',
