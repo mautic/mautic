@@ -288,5 +288,5 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
 [community]: <https://www.mautic.org/community>
 [mautic-docs]: <https://docs.mautic.org>
-[dev-docs]: <https://developer.mautic.org>
+[dev-docs]: <https://devdocs.mautic.org>
 [all-contributors]: <https://github.com/all-contributors/all-contributors>
