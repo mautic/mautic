@@ -21,6 +21,7 @@
   {% if isIndex %}
   <div id="page-list-wrapper">
       {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+              'searchId': 'collapseMautic_report_reports',
               'searchValue': searchValue,
               'searchHelp': 'mautic.report.report.help.searchcommands',
               'action': currentRoute,
