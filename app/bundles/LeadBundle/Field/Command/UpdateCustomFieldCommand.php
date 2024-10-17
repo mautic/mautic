@@ -18,6 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateCustomFieldCommand extends Command
 {
+    protected static $defaultDescription = 'Create custom field column in the background';
+
     public function __construct(private BackgroundService $backgroundService, private TranslatorInterface $translator)
     {
         parent::__construct();
@@ -28,7 +30,6 @@ class UpdateCustomFieldCommand extends Command
         parent::configure();
 
         $this->setName('mautic:custom-field:update-column')
-            ->setDescription('Create custom field column in the background')
             ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(

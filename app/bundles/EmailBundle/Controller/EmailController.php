@@ -948,12 +948,10 @@ class EmailController extends FormController
                         $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                         $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
-                        return $this->redirect($this->generateUrl('mautic_email_action',
-                            [
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
-                            ]
-                        ));
+                        return $this->redirectToRoute('mautic_email_action', [
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId(),
+                        ]);
                     }
                 }
             } else {

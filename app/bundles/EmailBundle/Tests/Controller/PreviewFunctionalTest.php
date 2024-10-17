@@ -43,7 +43,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     private function assertPageContent(string $url, string ...$expectedContents): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, $url);
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
         foreach ($expectedContents as $expectedContent) {
             self::assertStringContainsString($expectedContent, $crawler->text());
         }
@@ -141,7 +141,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
                 ],
             ]
         );
-        self::assertSame(201, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(201);
         self::assertJson($this->client->getResponse()->getContent());
 
         // Create some contacts
@@ -169,11 +169,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
                 ],
             ]
         );
-        self::assertSame(
-            201,
-            $this->client->getResponse()->getStatusCode(),
-            $this->client->getResponse()->getContent()
-        );
+        self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
         $contacts = json_decode($this->client->getResponse()->getContent(), true);
 
         // Create email with dynamic content variant
@@ -244,7 +240,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     public function testPreviewEmailWithInvalidIdThrows404Error(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/email/preview/5009');
-        self::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         self::assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
     }
 

@@ -195,7 +195,7 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, 'api/campaigns/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response   = json_decode($clientResponse->getContent(), true);
         $campaignId = $response['campaign']['id'];
         Assert::assertGreaterThan(0, $campaignId);
@@ -251,7 +251,7 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         // Search for this campaign:
         $this->client->request(Request::METHOD_GET, "/api/campaigns?search=ids:{$response['campaign']['id']}");
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
         Assert::assertEquals($payload['name'], $response['campaigns'][$campaignId]['name'], $clientResponse->getContent());
         Assert::assertEquals($payload['description'], $response['campaigns'][$campaignId]['description'], $clientResponse->getContent());

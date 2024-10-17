@@ -15,7 +15,7 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
@@ -33,7 +33,7 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(400, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(400, $clientResponse->getContent());
         $this->assertEquals('{"errors":[{"code":400,"message":"remotePath: The remote should be a valid URL.","details":{"remotePath":["The remote should be a valid URL."]}}]}', $clientResponse->getContent());
     }
 
@@ -49,7 +49,7 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);

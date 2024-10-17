@@ -24,6 +24,6 @@ final class HtmlTypeTest extends TestCase
 
     public function testGetName(): void
     {
-        $this->assertSame('html', $this->htmlType->getName());
+        $this->assertSame('html', $this->htmlType->getBlockPrefix());
     }
 }
