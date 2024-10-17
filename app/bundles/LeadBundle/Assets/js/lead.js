@@ -23,7 +23,7 @@ Mautic.leadOnLoad = function (container, response) {
             mQuery('#card-view').click();
         }
     }, 'contact pages');
-    
+
     //Prevent single combo keys from initiating within lead note
     Mousetrap.stopCallback = function(e, element, combo) {
         if (element.id == 'leadnote_text' && combo != 'mod+enter') {
@@ -738,6 +738,7 @@ Mautic.leadfieldOnLoad = function (container) {
 
     if (mQuery(container + ' form[name="leadfield"]').length) {
         Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val(), true);
+        Mautic.toggleIsShortVisibleVisibility(mQuery('#leadfield_object').val());
     }
 
 };
@@ -871,6 +872,15 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
        Mautic.activateChosenSelect('#leadfield_defaultValue');
     }
 };
+
+Mautic.toggleIsShortVisibleVisibility = function (selectedVal) {
+    var isShortVisibleContainer = mQuery('#leadfield_isShortVisible_label').parent();
+    if (selectedVal === 'company') {
+        isShortVisibleContainer.addClass('toggle--disabled');
+    } else {
+        isShortVisibleContainer.removeClass('toggle--disabled');
+    }
+}
 
 Mautic.updateLeadFieldBooleanLabels = function(el, label) {
     mQuery('#leadfield_defaultValue_' + label).parent().find('span').text(
