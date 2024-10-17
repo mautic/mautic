@@ -234,15 +234,6 @@ class Interval implements ScheduleModeInterface
         $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
         $groupExecutionDate->setTime((int) $groupExecutionDate->format('H'), (int) $groupExecutionDate->format('i'));
 
-        $testGroupHour = clone $groupExecutionDate;
-        $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
-
-        if ($groupExecutionDate <= $testGroupHour) {
-            return $testGroupHour;
-        } else {
-            $groupExecutionDate->modify('+1 day')->setTime($groupHour->format('H'), $groupHour->format('i'));
-        }
-
         return $groupExecutionDate;
     }
 
