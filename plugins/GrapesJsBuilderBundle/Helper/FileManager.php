@@ -70,7 +70,7 @@ class FileManager
     public function getFullUrl($fileName, $separator = '/'): string
     {
         // if a static_url (CDN) is configured use that, otherwiese use the site url
-        $url = $this->coreParametersHelper->getParameter('static_url') ?? $this->coreParametersHelper->getParameter('site_url');
+        $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');
 
         return $url
             .$separator
