@@ -121,11 +121,7 @@
 {% endif %}
 {# end: field_helper #}
 
-{% if inForm is defined and true == inForm %}
-  <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-      <label class="text-muted">{{ field.label }}</label>
-  </div>
-{% else %}
+{% if inForm is not defined or inForm != true %}
   {% set inputAttributes = inputAttributes|merge({
           'type': 'hidden',
   }) %}
