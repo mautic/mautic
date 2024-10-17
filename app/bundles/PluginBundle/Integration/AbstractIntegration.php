@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -43,6 +44,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -83,6 +85,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
+
+    protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
     protected array $notifications              = [];
 
@@ -1692,7 +1696,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         // Find unique identifier fields used by the integration
         /** @var LeadModel $leadModel */
         $leadModel           = $this->leadModel;
-        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
+        $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];
 
         foreach ($matchedFields as $leadField => $value) {
@@ -2447,5 +2451,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return new Client(['handler' => HandlerStack::create(new CurlHandler([
             'options' => $options,
         ]))]);
+    }
+
+    /**
+     * @todo deprecated Move this to the constructor for Mautic 6. Built in integrations does not use autowiring in M5, unfortunately.
+     */
+    #[Required]
+    public function setFieldsWithUniqueIdentifier(FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier): void
+    {
+        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 }
