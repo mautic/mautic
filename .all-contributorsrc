@@ -1431,6 +1431,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "laurielim",
+      "name": "Laurie Lim Sam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/62180225?v=4",
+      "profile": "http://laurielim.github.io",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
