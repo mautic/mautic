@@ -3,11 +3,12 @@
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\ContactDecoratorForeignInterface;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
-class DateAnniversary implements FilterDecoratorInterface
+class DateAnniversary implements FilterDecoratorInterface, ContactDecoratorForeignInterface
 {
     public function __construct(
         private DateDecorator $dateDecorator,
@@ -75,5 +76,10 @@ class DateAnniversary implements FilterDecoratorInterface
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
+    }
+
+    public function getForeignContactColumn(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
+    {
+        return $this->dateDecorator->getForeignContactColumn($contactSegmentFilterCrate);
     }
 }

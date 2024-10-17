@@ -4,10 +4,11 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\ContactDecoratorForeignInterface;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
-abstract class DateOptionAbstract implements FilterDecoratorInterface
+abstract class DateOptionAbstract implements FilterDecoratorInterface, ContactDecoratorForeignInterface
 {
     public function __construct(
         protected DateDecorator $dateDecorator,
@@ -122,5 +123,10 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
+    }
+
+    public function getForeignContactColumn(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
+    {
+        return $this->dateDecorator->getForeignContactColumn($contactSegmentFilterCrate);
     }
 }
