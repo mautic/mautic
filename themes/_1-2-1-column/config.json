@@ -1,0 +1,7 @@
+{
+  "name": "1:2:1 Column",
+  "author": "Dropsolid",
+  "authorUrl": "https://dropsolid.io",
+  "builder": ["grapesjsbuilder"],
+  "features": ["email"]
+}
