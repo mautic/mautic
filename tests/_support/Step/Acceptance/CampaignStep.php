@@ -4,7 +4,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\ContactPage;
 
-class Campaign extends \AcceptanceTester
+class CampaignStep extends \AcceptanceTester
 {
     public function addContactsToCampaign()
     {
