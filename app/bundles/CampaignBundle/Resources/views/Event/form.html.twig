@@ -95,6 +95,20 @@
                 </div>
             </div>
         </div>
+        <div{% if ('optimized' != form.triggerMode.vars['data']) %} class="hide"{% endif %} id="triggerOptimized">
+            <div class="row">
+                <div class="col-xs-7">
+                    <div class="mb-15">
+                        {% for child in form.triggerWindow %}
+                            <div>
+                                {{ form_widget(child) }}
+                                {{ form_label(child, null) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     {% endif %}
 
