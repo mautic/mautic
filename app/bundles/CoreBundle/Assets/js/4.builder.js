@@ -1365,7 +1365,7 @@ window.document.fileManagerInsertImageCallback = function(selector, url) {
     if (Mautic.isCodeMode()) {
         Mautic.insertTextAtCMCursor(url);
     } else {
-        if (typeof FroalaEditorForFileManager !== 'underfined') {
+        if (typeof FroalaEditorForFileManager !== 'undefined') {
             if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
                 FroalaEditorForFileManager.image.insert(url, false, {}, FroalaEditorForFileManagerCurrentImage);
             } else {
