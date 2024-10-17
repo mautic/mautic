@@ -14,16 +14,17 @@ class EmailStep extends \AcceptanceTester
      */
     public function createAnEmail(string $name): void
     {
-        $this->amOnPage(EmailsPage::$URL);
-        $this->wait(1);
-        $this->click(EmailsPage::$NEW);
-        $this->waitForElementClickable(EmailsPage::$SELECT_SEGMENT_EMAIL);
-        $this->click(EmailsPage::$SELECT_SEGMENT_EMAIL);
-        $this->fillField(EmailsPage::$SUBJECT_FIELD, $name);
-        $this->click(''.EmailsPage::$CONTACT_SEGMENT_DROPDOWN);
-        $this->waitForElementClickable(EmailsPage::$CONTACT_SEGMENT_OPTION);
-        $this->click(EmailsPage::$CONTACT_SEGMENT_OPTION);
-        $this->click(EmailsPage::$SAVE_AND_CLOSE);
+        $I=$this;
+        $I>amOnPage(EmailsPage::$URL);
+        $I->wait(1);
+        $I->click(EmailsPage::$NEW);
+        $I->waitForElementClickable(EmailsPage::$SELECT_SEGMENT_EMAIL);
+        $I->click(EmailsPage::$SELECT_SEGMENT_EMAIL);
+        $I->fillField(EmailsPage::$SUBJECT_FIELD, $name);
+        $I->click(''.EmailsPage::$CONTACT_SEGMENT_DROPDOWN);
+        $I->waitForElementClickable(EmailsPage::$CONTACT_SEGMENT_OPTION);
+        $I->click(EmailsPage::$CONTACT_SEGMENT_OPTION);
+        $I->click(EmailsPage::$SAVE_AND_CLOSE);
     }
 
     /**
@@ -31,8 +32,9 @@ class EmailStep extends \AcceptanceTester
      *
      * @return string the new category name
      */
-    public function changeEmailCategory(AcceptanceTester $I): string
+    public function changeEmailCategory(): string
     {
+        $I = $this;
         $I->waitForElementClickable(EmailsPage::$NEW_CATEGORY_DROPDOWN);
         $I->click(EmailsPage::$NEW_CATEGORY_DROPDOWN);
         $I->waitForElementVisible(EmailsPage::$NEW_CATEGORY_OPTION);

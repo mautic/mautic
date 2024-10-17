@@ -14,12 +14,13 @@ class SegmentStep extends \AcceptanceTester
      */
     public function createAContactSegment(string $name): void
     {
-        $this->amOnPage(SegmentsPage::$URL);
-        $this->waitForElementClickable(SegmentsPage::$NEW_BUTTON);
-        $this->click(SegmentsPage::$NEW_BUTTON);
-        $this->waitForElementVisible(SegmentsPage::$SEGMENT_NAME);
-        $this->fillField(SegmentsPage::$SEGMENT_NAME, $name);
-        $this->click(SegmentsPage::$SAVE_AND_CLOSE_BUTTON);
+        $I=$this;
+        $I->amOnPage(SegmentsPage::$URL);
+        $I->waitForElementClickable(SegmentsPage::$NEW_BUTTON);
+        $I->click(SegmentsPage::$NEW_BUTTON);
+        $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME);
+        $I->fillField(SegmentsPage::$SEGMENT_NAME, $name);
+        $I->click(SegmentsPage::$SAVE_AND_CLOSE_BUTTON);
     }
 
 }
