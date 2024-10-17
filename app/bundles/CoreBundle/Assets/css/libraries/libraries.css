@@ -2318,7 +2318,7 @@ select[multiple].input-lg {
 .btn {
   display: inline-block;
   margin-bottom: 0;
-  font-weight: 600;
+  font-weight: normal;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
@@ -4355,7 +4355,7 @@ a.thumbnail.active {
   line-height: 18px;
   color: #fff;
   text-align: center;
-  background-color: var(--background-brand-primary);
+  background-color: var(--background-brand);
   -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
   -webkit-transition: width 0.6s ease;
@@ -4919,14 +4919,14 @@ button.list-group-item-danger.active:focus {
 }
 .panel-primary > .panel-heading {
   color: var(--text-on-color);
-  background-color: var(--background-brand-primary);
+  background-color: var(--background-brand);
   border-color: transparent;
 }
 .panel-primary > .panel-heading + .panel-collapse > .panel-body {
   border-top-color: transparent;
 }
 .panel-primary > .panel-heading .badge {
-  color: var(--background-brand-primary);
+  color: var(--background-brand);
   background-color: var(--text-on-color);
 }
 .panel-primary > .panel-footer + .panel-collapse > .panel-body {
@@ -5339,7 +5339,7 @@ button.close {
   word-wrap: normal;
   white-space: normal;
   font-size: 13px;
-  background-color: #fff;
+  background-color: var(--layer-alternate);
   background-clip: padding-box;
   border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -5387,7 +5387,7 @@ button.close {
   bottom: 1px;
   margin-left: -10px;
   content: " ";
-  border-top-color: #fff;
+  border-top-color: var(--layer-alternate);
   border-bottom-width: 0;
 }
 .popover.right > .arrow {
@@ -5402,7 +5402,7 @@ button.close {
   bottom: -10px;
   left: 1px;
   content: " ";
-  border-right-color: #fff;
+  border-right-color: var(--layer-alternate);
   border-left-width: 0;
 }
 .popover.bottom > .arrow {
@@ -5418,7 +5418,7 @@ button.close {
   margin-left: -10px;
   content: " ";
   border-top-width: 0;
-  border-bottom-color: #fff;
+  border-bottom-color: var(--layer-alternate);
 }
 .popover.left > .arrow {
   top: 50%;
@@ -5433,14 +5433,14 @@ button.close {
   bottom: -10px;
   content: " ";
   border-right-width: 0;
-  border-left-color: #fff;
+  border-left-color: var(--layer-alternate);
 }
 .popover-title {
   padding: 8px 14px;
   margin: 0;
   font-size: 13px;
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #ebebeb;
+  background-color: #000;
+  border-bottom: 1px solid #000000;
   border-radius: 3px 3px 0 0;
 }
 .popover-content {
@@ -6130,56 +6130,72 @@ button.close {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.ri-lg {
+[class^="ri-"].ri-lg,
+[class*=" ri-"].ri-lg {
   font-size: 1.3333em;
   line-height: 0.75em;
   vertical-align: -0.0667em;
 }
-.ri-xl {
+[class^="ri-"].ri-xl,
+[class*=" ri-"].ri-xl {
   font-size: 1.5em;
   line-height: 0.6666em;
   vertical-align: -0.075em;
 }
-.ri-xxs {
+[class^="ri-"].ri-xxs,
+[class*=" ri-"].ri-xxs {
   font-size: 0.5em;
 }
-.ri-xs {
+[class^="ri-"].ri-xs,
+[class*=" ri-"].ri-xs {
   font-size: 0.75em;
 }
-.ri-sm {
+[class^="ri-"].ri-sm,
+[class*=" ri-"].ri-sm {
   font-size: 0.875em;
 }
-.ri-1x {
+[class^="ri-"].ri-1x,
+[class*=" ri-"].ri-1x {
   font-size: 1em;
 }
-.ri-2x {
+[class^="ri-"].ri-2x,
+[class*=" ri-"].ri-2x {
   font-size: 2em;
 }
-.ri-3x {
+[class^="ri-"].ri-3x,
+[class*=" ri-"].ri-3x {
   font-size: 3em;
 }
-.ri-4x {
+[class^="ri-"].ri-4x,
+[class*=" ri-"].ri-4x {
   font-size: 4em;
 }
-.ri-5x {
+[class^="ri-"].ri-5x,
+[class*=" ri-"].ri-5x {
   font-size: 5em;
 }
-.ri-6x {
+[class^="ri-"].ri-6x,
+[class*=" ri-"].ri-6x {
   font-size: 6em;
 }
-.ri-7x {
+[class^="ri-"].ri-7x,
+[class*=" ri-"].ri-7x {
   font-size: 7em;
 }
-.ri-8x {
+[class^="ri-"].ri-8x,
+[class*=" ri-"].ri-8x {
   font-size: 8em;
 }
-.ri-9x {
+[class^="ri-"].ri-9x,
+[class*=" ri-"].ri-9x {
   font-size: 9em;
 }
-.ri-10x {
+[class^="ri-"].ri-10x,
+[class*=" ri-"].ri-10x {
   font-size: 10em;
 }
-.ri-fw {
+[class^="ri-"].ri-fw,
+[class*=" ri-"].ri-fw {
   text-align: center;
   width: 1.25em;
 }

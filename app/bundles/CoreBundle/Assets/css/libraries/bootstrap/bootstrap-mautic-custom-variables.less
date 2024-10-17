@@ -145,7 +145,7 @@
 //
 //## For each of Bootstrap's buttons, define text, background and border color.
 
-@btn-font-weight:                600;
+@btn-font-weight:                normal;
 
 @btn-default-color:              @text-color;
 @btn-default-border:             #ddd;
@@ -540,7 +540,7 @@
 //##
 
 //** Popover body background color
-@popover-bg:                          #fff;
+@popover-bg:                          var(--layer-alternate);
 //** Popover maximum width
 @popover-max-width:                   276px;
 //** Popover border color
@@ -549,7 +549,7 @@
 @popover-fallback-border-color:       #ccc;
 
 //** Popover title background color
-@popover-title-bg:                    darken(@popover-bg, 3%);
+@popover-title-bg:                    #000; // No support for CSS variable
 
 //** Popover arrow width
 @popover-arrow-width:                 10px;
@@ -657,7 +657,7 @@
 @progress-border-radius:      @border-radius-base;
 
 //** Default progress bar color
-@progress-bar-bg:             var(--background-brand-primary);
+@progress-bar-bg:             var(--background-brand);
 //** Success progress bar color
 @progress-bar-success-bg:     @brand-success;
 //** Warning progress bar color
@@ -724,7 +724,7 @@
 
 @panel-primary-text:          var(--text-on-color);
 @panel-primary-border:        transparent;
-@panel-primary-heading-bg:    var(--background-brand-primary);
+@panel-primary-heading-bg:    var(--background-brand);
 
 @panel-success-text:          var(--text-inverse);
 @panel-success-border:        transparent;

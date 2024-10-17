@@ -41,7 +41,8 @@
             {{- include(
                 '@MauticCore/Helper/tableheader.html.twig',
                 {
-                    'checkall'        : 'true',
+                    'checkall'        : false,
+                    'text'            : null,
                     'target'          : '.client-list',
                     'action'          : currentRoute,
                     'routeBase'       : 'client',
