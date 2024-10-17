@@ -114,7 +114,7 @@
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{% trans %}mautic.webhook.webhook_url{% endtrans %}</div>
             </div>
@@ -123,7 +123,7 @@
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
                            value="{{ item.getWebhookUrl()|escape('html_attr') }}" />
                     <span class="input-group-btn">
-                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ item.getWebhookUrl()|escape('html_attr') }}', '_blank');">
+                        <button class="btn btn-ghost btn-nospin" onclick="window.open('{{ item.getWebhookUrl()|escape('html_attr') }}', '_blank');">
                             <i class="ri-external-link-line"></i>
                         </button>
                     </span>

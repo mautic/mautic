@@ -11,3 +11,35 @@
     }
   }
 }
+
+.input-group-addon {
+  border-width: var(--border-bottom);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--field-hover);
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+}
+
+.table .input-group-sm {
+  & > .input-group-addon {
+    line-height: 1em;
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+  }
+
+  .dropdown-toggle {
+    border: 0;
+    background-color: transparent;
+    padding: 5px 8px;
+  }
+}
+
+.input-group {
+  .input-group-btn {
+    button {
+      height: 32px;
+      width: 100%;
+    }
+  }
+}

@@ -27,7 +27,7 @@
   {% set listCommand = 'mautic.lead.lead.searchcommand.list'|trans %}
 
   {% if isIndex %}
-    <div class="panel panel-default bdr-t-wdh-0">
+    <div id="page-list-wrapper">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'searchHelp': 'mautic.lead.list.help.searchcommands',
@@ -42,5 +42,8 @@
   {% if isIndex %}
         </div>
     </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.segments.dynamic', 'mautic.protip.segments.test'])
+  }) }}
   {% endif %}
 {% endblock %}

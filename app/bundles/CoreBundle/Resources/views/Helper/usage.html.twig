@@ -6,7 +6,7 @@ Variables
 #}
 
 {% if stats is defined and stats is not empty %}
-    <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+    <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
         <div class="panel-heading">
             <div class="panel-title">{{- title -}}</div>
         </div>
@@ -15,7 +15,7 @@ Variables
             {% for stat in stats %}
                 {% if stat.ids|length > 0 %}
                     <a href="{{ path(stat.route, {'search': 'mautic.core.searchcommand.ids'|trans~':'~stat.ids|join(',')}) }}"
-                       class="btn btn-default mt-4">
+                       class="btn btn-ghost mt-4">
                         {{ stat.label|trans }}
                         <span class="mt-xs label label-primary">{{ stat.ids|length }}</span>
                     </a>

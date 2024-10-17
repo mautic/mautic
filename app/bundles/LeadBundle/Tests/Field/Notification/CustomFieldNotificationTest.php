@@ -75,7 +75,7 @@ class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
                 'info',
                 false,
                 'text',
-                'fa-columns',
+                'ri-layout-column-line',
                 null,
                 $user
             );

@@ -29,7 +29,7 @@
               <div class="col-xs-12">
 
                   <!-- tabs controls -->
-                  <ul class="nav nav-tabs pr-md pl-md">
+                  <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active"><a href="#notification-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
                       <li><a href="#data-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.data'|trans }}</a></li>
                       {% if integrationSettings.platforms is defined and 'ios' in integrationSettings.platforms %}
@@ -72,11 +72,7 @@
               {{ form_row(form.category) }}
               {{ form_row(form.language) }}
               <hr />
-              <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-              <br />
-              {% for utmTag in form.utmTags %}
-                  {{ form_row(utmTag) }}
-              {% endfor %}
+              {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
               <div class="hide">
                   {{ form_row(form.isPublished) }}
                   {{ form_row(form.publishUp) }}

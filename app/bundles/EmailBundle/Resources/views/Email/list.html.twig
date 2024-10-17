@@ -17,7 +17,7 @@
 
 {% block content %}
     {% if isIndex %}
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div id="page-list-wrapper">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'searchHelp'  : 'mautic.email.help.searchcommands',
@@ -28,6 +28,10 @@
               {{ include('@MauticEmail/Email/_list.html.twig') }}
             </div>
         </div>
+
+        {{ include('@MauticCore/Helper/protip.html.twig', {
+            tip: random(['mautic.protip.emails.unsubscribe', 'mautic.protip.emails.test', 'mautic.protip.emails.personalize', 'mautic.protip.emails.spam', 'mautic.protip.emails.cta'])
+        }) }}
     {% else %}
 
     {{ include('@MauticEmail/Email/_list.html.twig') }}

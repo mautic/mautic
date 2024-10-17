@@ -17,9 +17,9 @@
     <div class="box-layout">
 	<div class="col-xs-12 height-auto">
 		<!-- tabs controls -->
-		<ul class="nav nav-tabs pr-md pl-md">
+		<ul class="nav nav-tabs nav-tabs-contained">
 			<li class="active"><a href="#details-container" role="tab" data-toggle="tab">{% trans %}mautic.core.details{% endtrans %}</a></li>
-			<li class=""><a href="#permissions-container" role="tab" data-toggle="tab">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
+			<li class="" id="permissions-tab"><a href="#permissions-container" role="tab" data-toggle="tab">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
 		</ul>
 		<!--/ tabs controls -->
 
@@ -57,7 +57,7 @@
 								<ul class="list-group list-group-tabs" role="tablist">
                                     {% for bundle, config in permissionsConfig['config'] %}
 										<li role="presentation" class="list-group-item {{ loop.index0 is same as(0) ? 'in active' : '' }}">
-											<a href="#{{ bundle }}PermissionTab" aria-controls="{{ bundle }}PermissionTab" role="tab" data-toggle="tab" class="steps">
+											<a href="#{{ bundle }}PermissionTab" aria-controls="{{ bundle }}PermissionTab" role="tab" data-toggle="tab" class="list-group-item-text steps">
 												<span>{{ config['label'] }}</span>
 												<span class="permission-ratio"> (<span class="{{ bundle }}_granted">{{ config['ratio'][0] }}</span> / <span class="{{ bundle }}_total">{{ config['ratio'][1] }}</span>)</span>
 											</a>

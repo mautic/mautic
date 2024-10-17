@@ -48,7 +48,7 @@ class DynamicListType extends AbstractType
                 'option_required' => true,
                 'option_notblank' => true,
                 'remove_icon'     => 'ri-close-line',
-                'sortable'        => 'fa fa-ellipsis-v handle',
+                'sortable'        => 'ri-more-2-line handle',
                 'label'           => false,
                 'entry_options'   => [
                     'label'    => false,

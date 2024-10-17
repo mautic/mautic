@@ -704,15 +704,15 @@
                     <div class="btn-group toolbar-standard hidden-xs hidden-sm">
                       <button
                         type="button"
-                        class="btn btn-default btn-dnd btn-nospin text-primary btn-builder btn-copy"
+                        class="btn btn-ghost btn-dnd btn-nospin text-primary btn-builder btn-copy"
                         id="emailform_buttons_builder_toolbar"
                         onclick="Mautic.launchBuilder('emailform')"
                       >
-                        <i class="fa fa-cube"></i>
+                        <i class="ri-instance-fill"></i>
                         Builder</button
                       ><button
                         type="button"
-                        class="btn btn-default btn-apply btn-copy"
+                        class="btn btn-ghost btn-apply btn-copy"
                         id="emailform_buttons_apply_toolbar"
                         disabled
                       >
@@ -720,15 +720,15 @@
                         Save</button
                       ><button
                         type="button"
-                        class="btn btn-default btn-save btn-copy"
+                        class="btn btn-ghost btn-save btn-copy"
                         id="emailform_buttons_save_toolbar"
                         disabled
                       >
-                        <i class="fa fa-save text-success"></i>
+                        <i class="ri-save-line text-success"></i>
                         Save &amp; Close</button
                       ><button
                         type="button"
-                        class="btn btn-default btn-cancel btn-copy"
+                        class="btn btn-ghost btn-cancel btn-copy"
                         id="emailform_buttons_cancel_toolbar"
                         disabled
                       >
@@ -739,7 +739,7 @@
                     <div class="btn-group toolbar-dropdown hidden-md hidden-lg">
                       <button
                         type="button"
-                        class="btn btn-default btn-main"
+                        class="btn btn-ghost btn-main"
                         id="emailform_buttons_cancel_toolbar_mobile"
                       >
                         <i class="ri-close-line text-danger"></i>
@@ -747,16 +747,16 @@
                       </button>
                       <button
                         type="button"
-                        class="btn btn-default btn-nospin dropdown-toggle"
+                        class="btn btn-ghost btn-nospin dropdown-toggle"
                         data-toggle="dropdown"
                         aria-expanded="false"
                       >
-                        <i class="fa fa-caret-down"></i>
+                        <i class="ri-arrow-drop-down-line"></i>
                       </button>
                       <ul class="dropdown-menu dropdown-menu-right" role="menu">
                         <li>
                           <a id="emailform_buttons_save_toolbar_mobile">
-                            <i class="fa fa-save text-success"></i>
+                            <i class="ri-save-line text-success"></i>
                             Save &amp; Close</a
                           >
                         </li>
@@ -771,7 +771,7 @@
                             id="emailform_buttons_builder_toolbar_mobile"
                             onclick="Mautic.launchBuilder('emailform')"
                           >
-                            <i class="fa fa-cube"></i>
+                            <i class="ri-instance-fill"></i>
                             Builder</a
                           >
                         </li>
@@ -846,7 +846,7 @@
                                 <h3>Code Mode</h3>
                                 <div class="panel-body text-center" style="height: 250px">
                                   <i
-                                    class="fa fa-code fa-5x text-muted"
+                                    class="ri-code-s-slash-line ri-5x text-muted"
                                     aria-hidden="true"
                                     style="padding-top: 75px; color: #e4e4e4"
                                   ></i>
@@ -855,14 +855,14 @@
                                   href="#"
                                   type="button"
                                   data-theme="mautic_code_mode"
-                                  class="select-theme-link btn btn-default"
+                                  class="select-theme-link btn btn-ghost"
                                   onclick="mQuery('#dynamic-content-tab').removeClass('hidden')"
                                 >
                                   Select
                                 </a>
                                 <button
                                   type="button"
-                                  class="select-theme-selected btn btn-default hide"
+                                  class="select-theme-selected btn btn-ghost hide"
                                   disabled="disabled"
                                 >
                                   Selected
@@ -890,14 +890,14 @@
                                   href="#"
                                   type="button"
                                   data-theme="blank"
-                                  class="select-theme-link btn btn-default hide"
+                                  class="select-theme-link btn btn-ghost hide"
                                   onclick="mQuery('#dynamic-content-tab').addClass('hidden')"
                                 >
                                   Select
                                 </a>
                                 <button
                                   type="button"
-                                  class="select-theme-selected btn btn-default"
+                                  class="select-theme-selected btn btn-ghost"
                                   disabled="disabled"
                                 >
                                   Selected
@@ -1060,7 +1060,7 @@
                                                   data-cmd="undo"
                                                 >
                                                   <i
-                                                    class="fa fa-rotate-left"
+                                                    class="ri-anticlockwise-line"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only">Undo</span></button
@@ -1075,7 +1075,7 @@
                                                   data-cmd="redo"
                                                 >
                                                   <i
-                                                    class="fa fa-rotate-right"
+                                                    class="ri-clockwise-line"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only">Redo</span>
@@ -1095,7 +1095,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="bold"
                                                 >
-                                                  <i class="fa fa-bold" aria-hidden="true"></i
+                                                  <i class="ri-bold" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Bold</span></button
                                                 ><button
                                                   id="italic-1"
@@ -1107,7 +1107,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="italic"
                                                 >
-                                                  <i class="fa fa-italic" aria-hidden="true"></i
+                                                  <i class="ri-italic" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Italic</span></button
                                                 ><button
                                                   id="underline-1"
@@ -1119,7 +1119,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="underline"
                                                 >
-                                                  <i class="fa fa-underline" aria-hidden="true"></i
+                                                  <i class="ri-underline" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Underline</span></button
                                                 ><button
                                                   id="paragraphFormat-1"
@@ -1133,7 +1133,7 @@
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome fr-selection"
                                                   data-cmd="paragraphFormat"
                                                 >
-                                                  <i class="fa fa-paragraph" aria-hidden="true"></i
+                                                  <i class="ri-paragraph" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Paragraph Format</span>
                                                 </button>
                                                 <div
@@ -1274,7 +1274,7 @@
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome fr-selection"
                                                   data-cmd="fontFamily"
                                                 >
-                                                  <i class="fa fa-font" aria-hidden="true"></i
+                                                  <i class="ri-font-family" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Font Family</span>
                                                 </button>
                                                 <div
@@ -1399,7 +1399,7 @@
                                                   data-cmd="fontSize"
                                                 >
                                                   <i
-                                                    class="fa fa-text-height"
+                                                    class="ri-line-height"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only">Font Size</span>
@@ -1590,7 +1590,7 @@
                                                   data-cmd="color"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-tint" aria-hidden="true"></i
+                                                  <i class="ri-drop-fill" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Colors</span></button
                                                 ><button
                                                   id="align-1"
@@ -1604,7 +1604,7 @@
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome"
                                                   data-cmd="align"
                                                 >
-                                                  <i class="fa fa-align-left" aria-hidden="true"></i
+                                                  <i class="ri-align-left" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Align</span>
                                                 </button>
                                                 <div
@@ -1634,7 +1634,7 @@
                                                             data-param1="left"
                                                             title="Align Left"
                                                             ><i
-                                                              class="fa fa-align-left"
+                                                              class="ri-align-left"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -1651,7 +1651,7 @@
                                                             data-param1="center"
                                                             title="Align Center"
                                                             ><i
-                                                              class="fa fa-align-center"
+                                                              class="ri-align-center"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -1668,7 +1668,7 @@
                                                             data-param1="right"
                                                             title="Align Right"
                                                             ><i
-                                                              class="fa fa-align-right"
+                                                              class="ri-align-right"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -1685,7 +1685,7 @@
                                                             data-param1="justify"
                                                             title="Align Justify"
                                                             ><i
-                                                              class="fa fa-align-justify"
+                                                              class="ri-align-justify"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -1706,7 +1706,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="formatOL"
                                                 >
-                                                  <i class="fa fa-list-ol" aria-hidden="true"></i
+                                                  <i class="ri-list-check-ol" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Ordered List</span
                                                   ></button
@@ -1719,7 +1719,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="formatUL"
                                                 >
-                                                  <i class="fa fa-list-ul" aria-hidden="true"></i
+                                                  <i class="ri-list-check-ul" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Unordered List</span
                                                   ></button
@@ -1735,7 +1735,7 @@
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome"
                                                   data-cmd="quote"
                                                 >
-                                                  <i class="fa fa-quote-left" aria-hidden="true"></i
+                                                  <i class="ri-double-quotes-l" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Quote</span>
                                                 </button>
                                                 <div
@@ -1805,7 +1805,7 @@
                                                   data-cmd="insertLink"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-link" aria-hidden="true"></i
+                                                  <i class="ri-link" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Insert Link</span
                                                   ></button
@@ -1834,7 +1834,7 @@
                                                   data-popup="true"
                                                 >
                                                   <i
-                                                    class="fa fa-video-camera"
+                                                    class="ri-vidicon-2-line"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only"
@@ -1850,7 +1850,7 @@
                                                   data-cmd="insertTable"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-table" aria-hidden="true"></i
+                                                  <i class="ri-table-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Insert Table</span
                                                   ></button
@@ -1864,7 +1864,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="html"
                                                 >
-                                                  <i class="fa fa-code" aria-hidden="true"></i
+                                                  <i class="ri-code-s-slash-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Code View</span></button
                                                 ><button
                                                   id="fullscreen-1"
@@ -1876,7 +1876,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="fullscreen"
                                                 >
-                                                  <i class="fa fa-expand" aria-hidden="true"></i
+                                                  <i class="ri-expand-diagonal-s-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Fullscreen</span>
                                                 </button>
                                               </div>
@@ -1937,7 +1937,7 @@ Default Dynamic Content</textarea
                                                   data-cmd="undo"
                                                 >
                                                   <i
-                                                    class="fa fa-rotate-left"
+                                                    class="ri-anticlockwise-line"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only">Undo</span></button
@@ -1952,7 +1952,7 @@ Default Dynamic Content</textarea
                                                   data-cmd="redo"
                                                 >
                                                   <i
-                                                    class="fa fa-rotate-right"
+                                                    class="ri-clockwise-line"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only">Redo</span>
@@ -1972,7 +1972,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="bold"
                                                 >
-                                                  <i class="fa fa-bold" aria-hidden="true"></i
+                                                  <i class="ri-bold" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Bold</span></button
                                                 ><button
                                                   id="italic-2"
@@ -1984,7 +1984,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="italic"
                                                 >
-                                                  <i class="fa fa-italic" aria-hidden="true"></i
+                                                  <i class="ri-italic" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Italic</span></button
                                                 ><button
                                                   id="underline-2"
@@ -1996,7 +1996,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="underline"
                                                 >
-                                                  <i class="fa fa-underline" aria-hidden="true"></i
+                                                  <i class="ri-underline" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Underline</span></button
                                                 ><button
                                                   id="paragraphFormat-2"
@@ -2010,7 +2010,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome fr-selection"
                                                   data-cmd="paragraphFormat"
                                                 >
-                                                  <i class="fa fa-paragraph" aria-hidden="true"></i
+                                                  <i class="ri-paragraph" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Paragraph Format</span>
                                                 </button>
                                                 <div
@@ -2151,7 +2151,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome fr-selection"
                                                   data-cmd="fontFamily"
                                                 >
-                                                  <i class="fa fa-font" aria-hidden="true"></i
+                                                  <i class="ri-font-family" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Font Family</span>
                                                 </button>
                                                 <div
@@ -2276,7 +2276,7 @@ Default Dynamic Content</textarea
                                                   data-cmd="fontSize"
                                                 >
                                                   <i
-                                                    class="fa fa-text-height"
+                                                    class="ri-line-height"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only">Font Size</span>
@@ -2467,7 +2467,7 @@ Default Dynamic Content</textarea
                                                   data-cmd="color"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-tint" aria-hidden="true"></i
+                                                  <i class="ri-drop-fill" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Colors</span></button
                                                 ><button
                                                   id="align-2"
@@ -2481,7 +2481,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome"
                                                   data-cmd="align"
                                                 >
-                                                  <i class="fa fa-align-left" aria-hidden="true"></i
+                                                  <i class="ri-align-left" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Align</span>
                                                 </button>
                                                 <div
@@ -2511,7 +2511,7 @@ Default Dynamic Content</textarea
                                                             data-param1="left"
                                                             title="Align Left"
                                                             ><i
-                                                              class="fa fa-align-left"
+                                                              class="ri-align-left"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -2528,7 +2528,7 @@ Default Dynamic Content</textarea
                                                             data-param1="center"
                                                             title="Align Center"
                                                             ><i
-                                                              class="fa fa-align-center"
+                                                              class="ri-align-center"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -2545,7 +2545,7 @@ Default Dynamic Content</textarea
                                                             data-param1="right"
                                                             title="Align Right"
                                                             ><i
-                                                              class="fa fa-align-right"
+                                                              class="ri-align-right"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -2562,7 +2562,7 @@ Default Dynamic Content</textarea
                                                             data-param1="justify"
                                                             title="Align Justify"
                                                             ><i
-                                                              class="fa fa-align-justify"
+                                                              class="ri-align-justify"
                                                               aria-hidden="true"
                                                             ></i
                                                             ><span class="fr-sr-only"
@@ -2583,7 +2583,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="formatOL"
                                                 >
-                                                  <i class="fa fa-list-ol" aria-hidden="true"></i
+                                                  <i class="ri-list-check-ol" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Ordered List</span
                                                   ></button
@@ -2596,7 +2596,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="formatUL"
                                                 >
-                                                  <i class="fa fa-list-ul" aria-hidden="true"></i
+                                                  <i class="ri-list-check-ul" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Unordered List</span
                                                   ></button
@@ -2612,7 +2612,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-dropdown fr-btn-font_awesome"
                                                   data-cmd="quote"
                                                 >
-                                                  <i class="fa fa-quote-left" aria-hidden="true"></i
+                                                  <i class="ri-double-quotes-l" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Quote</span>
                                                 </button>
                                                 <div
@@ -2682,7 +2682,7 @@ Default Dynamic Content</textarea
                                                   data-cmd="insertLink"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-link" aria-hidden="true"></i
+                                                  <i class="ri-link" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Insert Link</span
                                                   ></button
@@ -2711,7 +2711,7 @@ Default Dynamic Content</textarea
                                                   data-popup="true"
                                                 >
                                                   <i
-                                                    class="fa fa-video-camera"
+                                                    class="ri-vidicon-2-line"
                                                     aria-hidden="true"
                                                   ></i
                                                   ><span class="fr-sr-only"
@@ -2727,7 +2727,7 @@ Default Dynamic Content</textarea
                                                   data-cmd="insertTable"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-table" aria-hidden="true"></i
+                                                  <i class="ri-table-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only"
                                                     >Insert Table</span
                                                   ></button
@@ -2741,7 +2741,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="html"
                                                 >
-                                                  <i class="fa fa-code" aria-hidden="true"></i
+                                                  <i class="ri-code-s-slash-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Code View</span></button
                                                 ><button
                                                   id="fullscreen-2"
@@ -2753,7 +2753,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="fullscreen"
                                                 >
-                                                  <i class="fa fa-expand" aria-hidden="true"></i
+                                                  <i class="ri-expand-diagonal-s-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Fullscreen</span>
                                                 </button>
                                               </div>
@@ -4103,17 +4103,17 @@ Default Dynamic Content</textarea
                       type="button"
                       id="emailform_buttons_builder"
                       name="emailform[buttons][builder]"
-                      class="btn btn-default btn-dnd btn-nospin text-primary btn-builder"
+                      class="btn btn-ghost btn-dnd btn-nospin text-primary btn-builder"
                       onclick="Mautic.launchBuilder('emailform', 'email');"
                     >
-                      <i class="fa fa-cube"></i>
+                      <i class="ri-instance-fill"></i>
                       Builder
                     </button>
                     <button
                       type="submit"
                       id="emailform_buttons_apply"
                       name="emailform[buttons][apply]"
-                      class="btn btn-default btn-apply"
+                      class="btn btn-ghost btn-apply"
                     >
                       <i class="ri-check-line text-success"></i>
                       Save
@@ -4122,16 +4122,16 @@ Default Dynamic Content</textarea
                       type="submit"
                       id="emailform_buttons_save"
                       name="emailform[buttons][save]"
-                      class="btn btn-default btn-save"
+                      class="btn btn-ghost btn-save"
                     >
-                      <i class="fa fa-save text-success"></i>
+                      <i class="ri-save-line text-success"></i>
                       Save &amp; Close
                     </button>
                     <button
                       type="submit"
                       id="emailform_buttons_cancel"
                       name="emailform[buttons][cancel]"
-                      class="btn btn-default btn-cancel"
+                      class="btn btn-ghost btn-cancel"
                     >
                       <i class="ri-close-line text-danger"></i>
                       Cancel
@@ -4163,7 +4163,7 @@ required="required" class="form-control dynamic-content-token-name" autocomplete
     <div class="col-xs-10">
         <label class="required" for="emailform_dynamicContent___name___content" >Default Content</label>    </div>
     <div class="col-xs-2">
-                    <a class="remove-item btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+                    <a class="remove-item btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
             </div>
 </div>
 <div class="row form-group">
@@ -4180,7 +4180,7 @@ required="required" class="form-control editor editor-dynamic-content" autocompl
         <div class="col-xs-10">
             <label class="required" for="emailform_dynamicContent_0_filters___name___content" >Content</label>        </div>
         <div class="col-xs-2">
-                        <a class="remove-item remove-filter btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+                        <a class="remove-item remove-filter btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
                     </div>
     </div>
     <div class="row form-group">
@@ -4249,7 +4249,7 @@ required="required" class="form-control editor editor-dynamic-content" autocompl
           autocomplete="false" />                    </div>
           
                   <div class="col-xs-2 col-sm-1">
-                      <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
+                      <a href="javascript: void(0);" class="remove-selected btn btn-ghost text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
                   </div>
                   <input type="hidden"
                   id="emailform_dynamicContent_0_filters_0_filters___name___field" name="emailform[dynamicContent][0][filters][0][filters][__name__][field]"

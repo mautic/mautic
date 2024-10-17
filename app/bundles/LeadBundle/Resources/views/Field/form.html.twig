@@ -17,7 +17,6 @@
 
 {% block content %}
 {# Render the templates so they don't get rendered automatically #}
-{% set textareaTemplate        = form_row(form['properties_textarea_template']) %}
 {% set selectTemplate          = form_row(form['properties_select_template']) %}
 {% set lookupTemplate          = form_row(form['properties_lookup_template']) %}
 {% set defaultTextTemplate     = form_widget(form['default_template_text']) %}
@@ -74,11 +73,6 @@
                                 'form': form.properties,
                                 'selectTemplate': lookupTemplate,
                                 'type': 'lookup',
-                            }) }}
-                        {% elseif 'textarea' == type %}
-                            {{ include('@MauticLead/Field/properties_textarea.html.twig', {
-                                'form': form.properties,
-                                'textareaTemplate': textareaTemplate,
                             }) }}
                         {% endif %}
                     </div>
@@ -155,10 +149,6 @@
           'form': null,
           'selectTemplate': selectTemplate,
           'type': 'lookup',
-      }) }}
-
-      {{ include('@MauticLead/Field/properties_textarea.html.twig', {
-          'textareaTemplate': textareaTemplate,
       }) }}
   </div>
 {% endif %}

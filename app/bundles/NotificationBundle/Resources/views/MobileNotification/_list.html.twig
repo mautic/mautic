@@ -71,7 +71,7 @@
                                             'href': path('mautic_mobile_notification_action', {'objectId': item.id, 'objectAction': 'preview'}),
                                         },
                                         'btnText': 'mautic.notification.mobile_notification.preview'|trans,
-                                        'iconClass': 'fa fa-share',
+                                        'iconClass': 'ri-share-forward-box-fill',
                                     },
                                 ]
                         }) }}
@@ -81,12 +81,12 @@
                             {% if 'template' == type %}
                                 {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'notification'}) }}
                             {% else %}
-                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
+                                <i class="ri-fw ri-lg ri-toggle-fill text-muted disabled"></i>
                             {% endif %}
                             <a href="{{ path('mautic_mobile_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}">
                                 {{ item.name }}
                                 {% if 'list' == type %}
-                                    <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="fa fa-fw fa-list"></i></span>
+                                    <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="ri-fw ri-list-check"></i></span>
                                 {% endif %}
                             </a>
                         </div>
@@ -94,14 +94,11 @@
                     <td class="visible-md visible-lg">
                         {% set category = item.category %}
                         {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : 'inherit' %}
-                        <span style="white-space:nowrap;">
-                          <span class="label label-default pa-4" style="border:1px solid #d5d5d5;background:{{ color }};"></span>
-                          <span>{{ catName }}</span>
-                        </span>
+                        {% set color = category ? '#' ~ category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats">
-                        <span class="mt-xs label label-warning has-click-event clickable-stat"
+                        <span class="mt-xs label label-green"
                               data-toggle="tooltip"
                               title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
                             <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.mobile_sent'|trans ~ ':' ~ item.id}) }}">

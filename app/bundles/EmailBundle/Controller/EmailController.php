@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
@@ -14,6 +15,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
@@ -23,6 +25,8 @@ use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1399,10 +1403,8 @@ class EmailController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.email.page', 1);
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
@@ -1477,11 +1479,8 @@ class EmailController extends FormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId)
+    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FieldModel $fieldModel)
     {
-        $model = $this->getModel('email');
-        \assert($model instanceof EmailModel);
-        /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 
         // not found or not allowed
@@ -1511,25 +1510,44 @@ class EmailController extends FormController
         $entity->setSubject($subject);
 
         $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
-        /* @var \Mautic\EmailBundle\Model\EmailModel $model */
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $isCancelled = $this->isFormCancelled($form);
             $isValid     = $this->isFormValid($form);
             if (!$isCancelled && $isValid) {
-                $emails = $form['emails']->getData()['list'];
+                $emails              = $form['emails']->getData()['list'];
+                $previewForContactId = null;
 
-                // Prepare a fake lead
-                /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-                $fieldModel = $this->getModel('lead.field');
-                $fields     = $fieldModel->getFieldList(false, false);
-                array_walk(
-                    $fields,
-                    function (&$field): void {
-                        $field = "[$field]";
-                    }
-                );
-                $fields['id'] = 0;
+                // Use this contact data to fill email body content
+                if ($form->has('contact_id')) {
+                    $previewForContactId = (int) $form->getData()['contact_id'];
+                }
+
+                if ($previewForContactId
+                    && (!$security->isAdmin()
+                        || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
+                    )
+                ) {
+                    // disallow displaying contact information
+                    $previewForContactId = null;
+                }
+
+                if ($previewForContactId) {
+                    // We have one from request parameter
+                    $fields = $leadModel->getRepository()->getLead($previewForContactId);
+                }
+
+                if (!isset($fields)) {
+                    // Prepare a fake lead
+                    $fields = $fieldModel->getFieldList(false, false);
+                    array_walk(
+                        $fields,
+                        function (&$field): void {
+                            $field = "[$field]";
+                        }
+                    );
+                    $fields['id'] = 0;
+                }
 
                 $errors = [];
                 foreach ($emails as $email) {

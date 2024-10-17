@@ -26,7 +26,7 @@
     <div class="col-md-9 height-auto">
         <div class="row">
             <div class="col-xs-12">
-                <ul class="nav nav-tabs pr-md pl-md">
+                <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
                         <a href="#details" role="tab" data-toggle="tab" class="{% if hasMainErrors %}text-danger{% endif %}">
                             {{ 'mautic.core.details'|trans }}
@@ -134,11 +134,7 @@
                 {{ form_row(form.slotName) }}
             </div>
             <hr/>
-            <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-            <br/>
-            {% for utmTag in form.utmTags %}
-                {{ form_row(utmTag) }}
-            {% endfor %}
+            {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
             <div class="hide">
                 {{ form_row(form.publishUp) }}
                 {{ form_row(form.publishDown) }}
