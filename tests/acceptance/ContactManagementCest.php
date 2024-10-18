@@ -5,7 +5,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Page\Acceptance\CampaignPage;
 use Page\Acceptance\ContactPage;
 use PHPUnit\Framework\Assert;
-use Step\Acceptance\Campaign;
+use Step\Acceptance\CampaignStep;
 use Step\Acceptance\ContactStep;
 
 class ContactManagementCest
@@ -210,7 +210,7 @@ class ContactManagementCest
     public function batchAddToCampaign(
         AcceptanceTester $I,
         ContactStep $contact,
-        Campaign $campaign
+        CampaignStep $campaign
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -254,7 +254,7 @@ class ContactManagementCest
     public function batchRemoveFromCampaign(
         AcceptanceTester $I,
         ContactStep $contact,
-        Campaign $campaign
+        CampaignStep $campaign
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
