@@ -22,7 +22,8 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         $batchLimiters    = $filter->getBatchLimiters();
         $filterParameters = $filter->getParameterValue();
 
-        // allow use of `contact_id` column instead of deprecated `lead_id`
+        // allow custom Lead::id foreign key columns like `contact_id`
+        // instead of the deprecated `lead_id`
         $foreignContactColumn = $filter->getForeignContactColumn();
 
         if (is_array($filterParameters)) {
