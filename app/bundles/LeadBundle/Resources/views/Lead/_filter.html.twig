@@ -29,7 +29,6 @@
     <div id="page-list-wrapper">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue|default(''),
-            'searchHelp': 'mautic.lead.lead.help.searchcommands',
             'action': currentRoute,
             'customButtons': toolbarButtons,
         }) }}
