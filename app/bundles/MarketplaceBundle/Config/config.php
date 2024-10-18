@@ -29,6 +29,11 @@ return [
                 'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RemoveController::viewAction',
                 'method'     => 'GET|POST',
             ],
+            RouteProvider::ROUTE_RATE_PACKAGE => [
+                'path'       => '/marketplace/rate/package/{vendor}/{package}',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RateController::rateAction',
+                'method'     => 'GET',
+            ],
             RouteProvider::ROUTE_CLEAR_CACHE => [
                 'path'       => '/marketplace/clear/cache',
                 'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
@@ -60,7 +65,6 @@ return [
                 'class'     => Mautic\MarketplaceBundle\Service\PluginCollector::class,
                 'arguments' => [
                     'marketplace.api.connection',
-                    'marketplace.service.allowlist',
                 ],
             ],
             'marketplace.service.route_provider' => [
@@ -73,20 +77,10 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'marketplace.service.allowlist' => [
-                'class'     => Mautic\MarketplaceBundle\Service\Allowlist::class,
-                'arguments' => [
-                    'marketplace.service.config',
-                    'mautic.cache.provider',
-                    'mautic.http.client',
-                ],
-            ],
         ],
     ],
     // NOTE: when adding new parameters here, please add them to the developer documentation as well:
     'parameters' => [
-        Config::MARKETPLACE_ENABLED                     => true,
-        Config::MARKETPLACE_ALLOWLIST_URL               => 'https://raw.githubusercontent.com/mautic/marketplace-allowlist/main/allowlist.json',
-        Config::MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS => 3600,
+        Config::MARKETPLACE_ENABLED => true,
     ],
 ];
