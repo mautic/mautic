@@ -2,6 +2,8 @@
   Variables
     - mappedFields (\Mautic\FormBundle\Collection\MappedObjectCollection)
 #}
+{% import '@MauticForm//Field/macros.html.twig' as macros %}
+
 {% set containerType = type ~ 'grp' %}
 {% set defaultInputClass = containerType ~ '-' ~ type %}
 {% set ignoreId = true %}
@@ -217,12 +219,12 @@
 {% endif %}
 {% set firstId = 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ field.alias ~ '_' ~ inputAlphanum(inputTransliterate(firstListValue|default(null))) ~ '1' %}
 
-<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+<div {{ macros.tag_attr(containerAttributes) }} >
   {% if field.showLabel %}
     {% set labelAttributes = labelAttributes|merge({
             'for': firstId,
     }) %}
-    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>
+    <label {{ macros.tag_attr(labelAttributes) }} >{{ field.label|purify }}</label>
   {% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
@@ -243,12 +245,12 @@
 
     {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}
 
-    <input {% for attrName, attrValue in listInputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
+    <input {{ macros.tag_attr(listInputAttributes) }}  />
     {% set optionLabelAttr = optionLabelAttr|merge({
             'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
             'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
     }) %}
-    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel|purify }}</label>
+    <label {{ macros.tag_attr(optionLabelAttr) }} >{{ listLabel|purify }}</label>
 
     {% if wrapDiv %}</div>{% endif %}
   {% endfor %}

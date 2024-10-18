@@ -2,6 +2,8 @@
   Variables
     - mappedFields (\Mautic\FormBundle\Collection\MappedObjectCollection)
 #}
+{% import '@MauticForm//Field/macros.html.twig' as macros %}
+
 {% set defaultInputClass = 'hidden' %}
 {% set containerType = 'hidden' %}
 
@@ -122,13 +124,13 @@
 {# end: field_helper #}
 
 {% if inForm is defined and true == inForm %}
-  <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+  <div {{ macros.tag_attr(containerAttributes) }} >
       <label class="text-muted">{{ field.label|purify }}</label>
   </div>
 {% else %}
   {% set inputAttributes = inputAttributes|merge({
           'type': 'hidden',
   }) %}
-  <input {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
+  <input {{ macros.tag_attr(inputAttributes) }}  />
 {% endif %}
 

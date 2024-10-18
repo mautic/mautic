@@ -2,6 +2,8 @@
   Variables
     - mappedFields (\Mautic\FormBundle\Collection\MappedObjectCollection)
 #}
+{% import '@MauticForm//Field/macros.html.twig' as macros %}
+
 {%- set defaultInputFormClass = 'not-chosen' -%}
 {%- set defaultInputClass = 'selectbox' -%}
 {%- set containerType = 'select' -%}
@@ -224,11 +226,11 @@
   {% endfor %}
 {%- endmacro -%}
 
-<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  {% if field.showLabel -%}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>{% endif %}
+<div {{ macros.tag_attr(containerAttributes) }} >
+  {% if field.showLabel -%}<label {{ macros.tag_attr(labelAttributes) }} >{{ field.label|purify }}</label>{% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
-  <select {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+  <select {{ macros.tag_attr(inputAttributes) }} >
     {# (!empty($properties['placeholder']) || empty($field['defaultValue']) && empty($properties['multiple'])) #}
     {%- if
           (

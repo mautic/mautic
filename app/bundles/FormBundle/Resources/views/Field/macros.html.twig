@@ -1,0 +1,19 @@
+{#
+   Creates a string of attributes for a HTML tag based on a passed array
+
+   Parameter:
+   - `attributes`: Array containing attributes. Array keys become attribute names.
+                   Array values become the corresponding attribute values.
+                   Array values which are iterables get joined using a space..
+
+   Usage:
+   {% import '@MauticForm//Field/macros.html.twig' as macros %}
+   <div {{ macros.tag_attr(containerAttributes) }}>
+       ...
+   </div>
+#}
+{% macro tag_attr(attributes) %}
+    {% for attrName, attrValue in attributes %}
+        {{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"
+    {% endfor %}
+{% endmacro %}
