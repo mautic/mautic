@@ -24,12 +24,12 @@
                 {{ form_widget(form.glue) }}
             </div>
             <div class="col-sm-2 pr-0 pull-right">
-                <div class="btn-group pull-right" role="group">
-                    <a href="javascript: void(0);" type="button" class="remove-selected btn btn-default text-danger">
-                        <i class="fa fa-trash-o"></i>
+                <div class="btn-group btn-group-xs pull-right" role="group">
+                    <a href="javascript: void(0);" type="button" class="pull-right remove-selected btn btn-xs btn-secondary">
+                        <i class="ri-delete-bin-line"></i>
                     </a>
-                    <a href="javascript: void(0);" type="button" class="copy-filter-group btn btn-default btn-nospin{% if inGroup %} hide{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.list.copy.filter.group'|trans }}">
-                        <i class="fa fa-copy"></i>
+                    <a href="javascript: void(0);" type="button" class="pull-right copy-filter-group btn btn-xs btn-secondary  btn-nospin{% if inGroup %} hide{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.list.copy.filter.group'|trans }}">
+                        <i class="ri-file-copy-line"></i>
                     </a>
                 </div>
             </div>
