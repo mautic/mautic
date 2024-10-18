@@ -94,7 +94,8 @@ class BuilderTokenHelper
         }
 
         $exprBuilder = $this->connection->createExpressionBuilder();
-
+        $expr = $expr ?? $this->connection->createQueryBuilder()->expr();
+        
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
