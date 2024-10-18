@@ -131,6 +131,29 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
+    public function testTimezoneQueryProcessPageHit(): void
+    {
+        $hit           = new Hit();
+        $page          = new Page();
+        $request       = new Request();
+        $contact       = new Lead();
+        $pageModel     = $this->getPageModel(false);
+
+        $hit->setIpAddress(new IpAddress());
+        $timezone = 'Europe/Paris';
+        $hit->setQuery(['timezone' => $timezone, 'timezone_offset' => -120]);
+
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+        $this->assertSame($timezone, $contact->getTimezone());
+
+        $hit->setQuery(['timezone_offset' => -120]);
+
+        $contact       = new Lead();
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+
+        $this->assertSame('Europe/Helsinki', $contact->getTimezone());
+    }
+
     /**
      * Test getHitQuery when the hit is a Redirect.
      */
