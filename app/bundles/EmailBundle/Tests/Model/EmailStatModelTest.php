@@ -43,6 +43,7 @@ final class EmailStatModelTest extends TestCase
 
             public function __construct()
             {
+                parent::__construct();
             }
 
             public function dispatch(object $event, string $eventName = null): object

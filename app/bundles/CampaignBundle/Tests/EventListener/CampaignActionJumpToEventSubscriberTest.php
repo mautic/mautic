@@ -87,7 +87,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null)
             {
                 Assert::assertSame('mautic.campaign.campaign.jump_to_event.target_not_exist', $id);
 

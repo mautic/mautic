@@ -149,7 +149,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             /**
              * @param array<int|string> $parameters
              */
-            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }

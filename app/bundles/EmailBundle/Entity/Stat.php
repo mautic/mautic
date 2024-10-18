@@ -50,7 +50,7 @@ class Stat
     private $ipAddress;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -70,7 +70,7 @@ class Stat
     private $viewedInBrowser = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateRead;
 
@@ -110,7 +110,7 @@ class Stat
     private $openCount = 0;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastOpened;
 

@@ -83,7 +83,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $response = $this->client->getResponse()->getContent();
-        self::assertSame(201, $this->client->getResponse()->getStatusCode(), $response);
+        self::assertResponseStatusCodeSame(201, $response);
         self::assertJson($response);
 
         // Create email with dynamic content variant
@@ -154,7 +154,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $response = $this->client->getResponse()->getContent();
-        self::assertSame(201, $this->client->getResponse()->getStatusCode(), $response);
+        self::assertResponseStatusCodeSame(201, $response);
         self::assertJson($response);
 
         // Create email with dynamic content variant
@@ -209,11 +209,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
                 ],
             ]
         );
-        self::assertSame(
-            201,
-            $this->client->getResponse()->getStatusCode(),
-            $this->client->getResponse()->getContent()
-        );
+        self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
         $contacts = json_decode($this->client->getResponse()->getContent(), true);
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
@@ -249,7 +245,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $response = $this->client->getResponse()->getContent();
-        self::assertSame(201, $this->client->getResponse()->getStatusCode(), $response);
+        self::assertResponseStatusCodeSame(201, $response);
         self::assertJson($response);
 
         // Create email with dynamic content variant
@@ -304,11 +300,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
                 ],
             ]
         );
-        self::assertSame(
-            201,
-            $this->client->getResponse()->getStatusCode(),
-            $this->client->getResponse()->getContent()
-        );
+        self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
         $contacts = json_decode($this->client->getResponse()->getContent(), true);
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
