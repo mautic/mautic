@@ -488,28 +488,16 @@ Mautic.reorderSegmentFilters = function() {
                     const suffixId = suffixIdMatch ? suffixIdMatch[1] : suffix;
                     const suffixName = suffixNameMatch ? suffixNameMatch[1] : suffix;
                     var newName = prefix + '[filters][' + counter + '][properties]' + suffixName;
-                    if (name.slice(-2) === '[]') {
-                        newName += '[]';
-                    }
-
-                    $element.attr('name', newName);
-                    $element.attr('id', prefix + '_filters_' + counter + '_properties_' + suffixId);
+                    suffix = 'properties_' + suffixId;
                 } else {
                     var newName = prefix + '[filters][' + counter + '][' + suffix + ']';
                     if (name.slice(-2) === '[]') {
                         newName += '[]';
                     }
-
-                    $element.attr('name', newName);
-                    $element.attr('id', prefix + '_filters_' + counter + '_' + suffix);
                 }
-            } else {
                 $element.attr('name', newName);
-                $element.attr('id', prefix + '_filters_'+counter+'_'+suffix);
             }
-
-            mQuery(this).attr('name', newName);
-            mQuery(this).attr('id', prefix + '_filters_'+counter+'_'+suffix);
+            $element.attr('id', prefix + '_filters_'+counter+'_'+suffix);
 
             // Destroy the chosen and recreate
             if ($element.is('select') && suffix == "filter") {
