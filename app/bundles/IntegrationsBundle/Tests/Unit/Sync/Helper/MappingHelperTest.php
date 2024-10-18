@@ -18,43 +18,44 @@ use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelperTest extends TestCase
 {
     /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
+     * @var ObjectProvider&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $objectProvider;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var EventDispatcherInterface&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
-     * @var ObjectMappingRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var ObjectMappingRepository&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectMappingRepository;
+    private MockObject $objectMappingRepository;
 
     private MappingHelper $mappingHelper;
 
     protected function setUp(): void
     {
-        $this->fieldModel              = $this->createMock(FieldModel::class);
-        $this->objectProvider          = $this->createMock(ObjectProvider::class);
-        $this->dispatcher              = $this->createMock(EventDispatcherInterface::class);
-        $this->objectMappingRepository = $this->createMock(ObjectMappingRepository::class);
-        $this->mappingHelper           = new MappingHelper(
-            $this->fieldModel,
+        $this->objectProvider             = $this->createMock(ObjectProvider::class);
+        $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $this->objectMappingRepository    = $this->createMock(ObjectMappingRepository::class);
+        $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+        $this->mappingHelper              = new MappingHelper(
+            $this->fieldsWithUniqueIdentifier,
             $this->objectMappingRepository,
             $this->objectProvider,
             $this->dispatcher
@@ -86,8 +87,8 @@ class MappingHelperTest extends TestCase
 
     public function testMauticObjectSearchedAndEmptyObjectReturnedIfNoIdentifierFieldsAreMapped(): void
     {
-        $this->fieldModel->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn([]);
 
         $mappingManual        = $this->createMock(MappingManualDAO::class);
@@ -102,8 +103,8 @@ class MappingHelperTest extends TestCase
 
     public function testEmptyObjectIsReturnedWhenMauticContactIsNotFound(): void
     {
-        $this->fieldModel->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(
                 [
                     'email' => 'Email',
@@ -148,8 +149,8 @@ class MappingHelperTest extends TestCase
 
     public function testMauticContactIsFoundAndReturnedAsObjectDAO(): void
     {
-        $this->fieldModel->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(
                 [
                     'email' => 'Email',
@@ -207,8 +208,8 @@ class MappingHelperTest extends TestCase
 
     public function testMauticCompanyIsFoundAndReturnedAsObjectDAO(): void
     {
-        $this->fieldModel->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(
                 [
                     'email' => 'Email',

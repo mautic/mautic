@@ -62,5 +62,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.repository.points_change_log', Mautic\LeadBundle\Entity\PointsChangeLogRepository::class);
     $services->alias('mautic.lead.repository.merged_records', Mautic\LeadBundle\Entity\MergeRecordRepository::class);
     $services->alias('mautic.lead.repository.field', Mautic\LeadBundle\Entity\LeadFieldRepository::class);
+    $services->alias('mautic.company.deduper', Mautic\LeadBundle\Deduplicate\CompanyDeduper::class);
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };
