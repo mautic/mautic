@@ -22,7 +22,7 @@ class LeadCategoryType extends AbstractType
     {
         $resolver->setDefaults([
             'choices'           => function (Options $options): array {
-                $categories = $this->categoryModel->getLookupResults('global');
+                $categories = $this->categoryModel->getLookupResults('email', '', 0);
                 $choices    = [];
 
                 foreach ($categories as $cat) {
