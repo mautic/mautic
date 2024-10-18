@@ -47,8 +47,14 @@ class MauticSocialMonitoringCommand extends Command
             return Command::SUCCESS;
         }
 
+        if (!is_numeric($batchSize)) {
+            $output->writeln('batch-size is not number.');
+
+            return self::FAILURE;
+        }
+
         // max iterations
-        $maxPerIterations = ceil($batchSize / count($monitorList));
+        $maxPerIterations = ceil((int) $batchSize / count($monitorList));
 
         foreach ($monitorList as $monitor) {
             $output->writeln('Executing Monitor Item '.$monitor->getId());
