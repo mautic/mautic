@@ -40,7 +40,7 @@ The GitHub version is recommended for both development and testing. The producti
 ### How to install Mautic
 You must already have [Composer][composer] available on your computer because this is a development release and you'll need Composer to download the vendor packages.
 
-Also note that if you have DDEV installed, you can run 'ddev config' followed by 'ddev start'. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
+Also note that if you have DDEV installed, you can just run 'ddev start' as a DDEV project’s configuration is present in the repo. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
 
 Installing Mautic is a simple three-step process:
 
@@ -289,5 +289,5 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
 [community]: <https://www.mautic.org/community>
 [mautic-docs]: <https://docs.mautic.org>
-[dev-docs]: <https://developer.mautic.org>
+[dev-docs]: <https://devdocs.mautic.org>
 [all-contributors]: <https://github.com/all-contributors/all-contributors>
