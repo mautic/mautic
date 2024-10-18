@@ -151,6 +151,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -206,6 +207,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -265,6 +267,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -316,6 +319,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -377,7 +381,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-calendar-todo-line',
             ],
             $choices['lead']['date_identified']
         );
@@ -392,7 +397,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-device-line',
             ],
             $choices['lead']['device_model']
         );
@@ -411,7 +417,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-mail-forbid-line',
             ],
             $choices['lead']['dnc_manual_email']
         );
@@ -476,6 +483,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
+                'iconClass' => 'ri-mail-open-line',
             ],
             $choices['behaviors']['lead_email_received']
         );
@@ -490,7 +498,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
         );
@@ -614,6 +623,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -675,7 +685,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-calendar-todo-line',
             ],
             $choices['lead']['date_identified']
         );
@@ -690,7 +701,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-device-line',
             ],
             $choices['lead']['device_model']
         );
@@ -709,7 +721,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-mail-forbid-line',
             ],
             $choices['lead']['dnc_manual_email']
         );
@@ -774,6 +787,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
+                'iconClass' => 'ri-mail-open-line',
             ],
             $choices['behaviors']['lead_email_received']
         );
@@ -788,7 +802,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
         );

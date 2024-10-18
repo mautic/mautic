@@ -631,16 +631,17 @@ Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, r
 Mautic.addLeadListFilter = function (elId, elObj) {
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
-    var label = filterOption.text();
+
+    const filterTypeIcon = filterOption.data('field-icon');
 
     // Create a new filter
-
     var filterNum = parseInt(mQuery('.available-filters').data('index'));
     mQuery('.available-filters').data('index', filterNum + 1);
 
     var prototypeStr = mQuery('.available-filters').data('prototype');
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
+    var label = filterOption.data('field-label');
 
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
     prototypeStr = prototypeStr.replace(/__label__/g, label);
@@ -662,11 +663,21 @@ Mautic.addLeadListFilter = function (elId, elObj) {
         prototype.find(".panel-heading").addClass('hide');
     }
 
-    if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
+    let objectClassName;
+    if (fieldObject === 'company') {
+        objectClassName = 'ri-building-2-line';
     } else {
-        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
+        objectClassName = 'ri-user-6-fill';
     }
+
+    prototype.find('.object-icon').removeClass (function (index, className) {
+        return (className.match (/\bri-\S+/g) || []).join(' ');
+    }).addClass(objectClassName);
+
+    prototype.find('.filter-type-icon').removeClass (function (index, className) {
+        return (className.match (/\bri-\S+/g) || []).join(' ');
+    }).addClass(filterTypeIcon);
+
     prototype.find(".inline-spacer").append(fieldObject);
 
     prototype.find("a.remove-selected").on('click', function() {
