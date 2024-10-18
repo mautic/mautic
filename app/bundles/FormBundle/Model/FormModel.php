@@ -378,6 +378,8 @@ class FormModel extends CommonFormModel
             $cachedHtml = $this->generateHtml($form, $useCache);
         }
 
+        $cachedHtml = $this->fieldHelper->populateDateTimeValues($form, $cachedHtml);
+
         if (!$form->getInKioskMode()) {
             $this->populateValuesWithLead($form, $cachedHtml);
         }
