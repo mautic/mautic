@@ -23,6 +23,7 @@ class EmailValidator
      *
      * @param bool $doDnsCheck
      *
+     * @throws UnexpectedValueException
      * @throws InvalidEmailException
      */
     public function validate($address, $doDnsCheck = false): void
