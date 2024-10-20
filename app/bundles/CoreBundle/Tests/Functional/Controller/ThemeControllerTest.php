@@ -48,6 +48,10 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         if ($this->filesystem->exists($themePath.'/blanktest')) {
             $this->filesystem->remove($themePath.'/blanktest');
         }
+
+        if ($this->filesystem->exists($themePath.'/auroratest')) {
+            $this->filesystem->remove($themePath.'/auroratest');
+        }
     }
 
     public function testDeleteTheme(): void
@@ -70,6 +74,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         $themeHelper = self::getContainer()->get(ThemeHelper::class);
         \assert($themeHelper instanceof ThemeHelper);
         $themeHelper->copy('blank', 'blanktest');
+        $themeHelper->copy('blank', 'auroratest');
 
         // Clear the private property 'themes' to reload themes.
         $reflectionClass = new \ReflectionClass(ThemeHelper::class);
@@ -77,9 +82,9 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         $themesProperty->setAccessible(true);
         $themesProperty->setValue($themeHelper, []);
 
-        $this->client->request(Request::METHOD_POST, '/s/themes/batchDelete?ids=[%22blanktest%22]');
+        $this->client->request(Request::METHOD_POST, '/s/themes/batchDelete?ids=[%22blanktest%22,%22auroratest%22]');
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('<strong>blanktest</strong> has been deleted!', $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('2 themes have been deleted!', $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
     }
 
     public function testThemeVisibility(): void
