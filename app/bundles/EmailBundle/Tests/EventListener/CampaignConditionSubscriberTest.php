@@ -53,6 +53,8 @@ class CampaignConditionSubscriberTest extends TestCase
             'systemTriggered' => true,
             'eventSettings'   => [],
         ];
+
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent($eventArgs, true);
 
         // Call the onCampaignTriggerCondition method
@@ -84,6 +86,8 @@ class CampaignConditionSubscriberTest extends TestCase
             'systemTriggered' => true,
             'eventSettings'   => [],
         ];
+
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent($eventArgs, true);
 
         // Call the onCampaignTriggerCondition method
@@ -117,6 +121,8 @@ class CampaignConditionSubscriberTest extends TestCase
             'systemTriggered' => true,
             'eventSettings'   => [],
         ];
+
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         $event = new CampaignExecutionEvent($eventArgs, true);
 
         // Call the onCampaignTriggerCondition method
