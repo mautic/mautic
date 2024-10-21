@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -62,32 +63,32 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         }
 
         // Sort messages by to address as the order can differ
-        Assert::assertTrue(usort(
+        usort(
             $messages,
-            fn (\Swift_Mime_SimpleMessage $a, \Swift_Mime_SimpleMessage $b) => strcmp(array_key_first($a->getTo()), array_key_first($b->getTo()))
-        ));
+            static fn (MauticMessage $a, MauticMessage $b) => $a->getTo()[0]->toString() <=> $b->getTo()[0]->toString()
+        );
 
         $unsubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/unsubscribe\/([0-9a-z]{20})/';
         $resubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/resubscribe\/([0-9a-z]{20})/';
 
         // First email:
         Assert::assertStringContainsString('contact-flood-0@doe.com', $messages[0]->toString());
-        preg_match($unsubscribeUrlPattern, $messages[0]->getBody(), $unsubscribeMatches1);
-        preg_match($resubscribeUrlPattern, $messages[0]->getBody(), $resubscribeMatches1);
+        preg_match($unsubscribeUrlPattern, $messages[0]->getHtmlBody(), $unsubscribeMatches1);
+        preg_match($resubscribeUrlPattern, $messages[0]->getHtmlBody(), $resubscribeMatches1);
 
-        Assert::assertNotEmpty($unsubscribeMatches1[1], $messages[0]->getBody());
-        Assert::assertEquals($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getBody());
+        Assert::assertNotEmpty($unsubscribeMatches1[1], $messages[0]->getHtmlBody());
+        Assert::assertEquals($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
 
         // Second email:
         Assert::assertStringContainsString('contact-flood-1@doe.com', $messages[1]->toString());
-        preg_match($unsubscribeUrlPattern, $messages[1]->getBody(), $unsubscribeMatches2);
-        preg_match($resubscribeUrlPattern, $messages[1]->getBody(), $resubscribeMatches2);
+        preg_match($unsubscribeUrlPattern, $messages[1]->getHtmlBody(), $unsubscribeMatches2);
+        preg_match($resubscribeUrlPattern, $messages[1]->getHtmlBody(), $resubscribeMatches2);
 
-        Assert::assertNotEmpty($unsubscribeMatches2[1], $messages[1]->getBody());
-        Assert::assertEquals($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getBody());
+        Assert::assertNotEmpty($unsubscribeMatches2[1], $messages[1]->getHtmlBody());
+        Assert::assertEquals($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
 
         // The email stat hashes cannot be the same in different emails:
-        Assert::assertNotEquals($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getBody());
+        Assert::assertNotEquals($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getHtmlBody());
     }
 
     /**
