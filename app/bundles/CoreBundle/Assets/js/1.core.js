@@ -50,6 +50,7 @@ mQuery( document ).ajaxComplete(function(event, xhr, settings) {
     if (xhr.responseJSON && xhr.responseJSON.flashes) {
         Mautic.setFlashes(xhr.responseJSON.flashes);
     }
+    Mautic.attachDismissHandlers();
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -114,6 +115,7 @@ mQuery( document ).ready(function() {
         });
     });
     Mautic.initializeCodeBlocks();
+    Mautic.attachDismissHandlers();
 });
 
 if (typeof history != 'undefined') {
@@ -135,8 +137,119 @@ MauticVars.intervalsInProgress   = {};
 
 var Mautic = {
     loadedContent: {},
-
     keyboardShortcutHtml: {},
+
+    /**
+     * Initializes dismissed elements by injecting necessary CSS.
+     */
+    initializeDismissedElements: function() {
+        // Ensure MauticVars and dismissedElements exist
+        this.dismissedElements = JSON.parse(localStorage.getItem('dismissedElements')) || [];
+        this.dismissedStyle = null;
+
+        if (this.dismissedElements.length > 0) {
+            // Combine IDs with commas for efficient CSS
+            var selector = this.dismissedElements.map(function(id) {
+                return '#' + id;
+            }).join(', ');
+
+            var css = selector + ' { display: none !important; }';
+
+            // Create a style element and append the CSS
+            this.dismissedStyle = document.createElement('style');
+            this.dismissedStyle.type = 'text/css';
+            this.dismissedStyle.appendChild(document.createTextNode(css));
+
+            // Append the style element to the document head
+            var head = document.head || document.getElementsByTagName('head')[0];
+            head.appendChild(this.dismissedStyle);
+        }
+    },
+
+    /**
+     * Dismisses an element by ID.
+     *
+     * @param {string} elementId - The ID of the element to dismiss.
+     */
+    dismissElement: function(elementId) {
+        if (this.dismissedElements.indexOf(elementId) === -1) {
+            this.dismissedElements.push(elementId);
+            localStorage.setItem('dismissedElements', JSON.stringify(this.dismissedElements));
+
+            // Inject CSS to hide the newly dismissed element
+            if (this.dismissedStyle) {
+                var newSelector = '#' + elementId;
+                this.dismissedStyle.appendChild(document.createTextNode(newSelector + ' { display: none !important; }'));
+            } else {
+                // Create a new style element if not existing
+                var css = '#' + elementId + ' { display: none !important; }';
+                this.dismissedStyle = document.createElement('style');
+                this.dismissedStyle.type = 'text/css';
+                this.dismissedStyle.appendChild(document.createTextNode(css));
+
+                // Append the style element to the document head
+                var head = document.head || document.getElementsByTagName('head')[0];
+                head.appendChild(this.dismissedStyle);
+            }
+
+            // Hide the element
+            var element = mQuery('#' + elementId);
+            if (element.length) {
+                element.hide();
+            }
+        }
+    },
+
+    /**
+     * Resets all dismissed elements.
+     */
+    resetDismissedElements: function() {
+        // Clear the dismissedElements array
+        this.dismissedElements = [];
+        localStorage.setItem('dismissedElements', JSON.stringify(this.dismissedElements));
+
+        // Remove the injected CSS that hides dismissed elements
+        if (this.dismissedStyle && this.dismissedStyle.parentNode) {
+            this.dismissedStyle.parentNode.removeChild(this.dismissedStyle);
+            this.dismissedStyle = null;
+        }
+
+        // Show all dismissible elements
+        mQuery('[data-dismiss]').each(function () {
+            var dismissButton = mQuery(this);
+            var dismissType = dismissButton.data('dismiss');
+            var dismissibleElement = dismissButton.closest('.' + dismissType);
+
+            // Remove any inline display styles and show the element
+            dismissibleElement.css('display', '');
+        });
+    },
+
+    /**
+     * Attaches event handlers to dismiss buttons.
+     */
+    attachDismissHandlers: function() {
+        mQuery('[data-dismiss]').each(function () {
+            var dismissButton = mQuery(this);
+            var dismissType = dismissButton.data('dismiss');
+            var dismissibleElement = dismissButton.closest('.' + dismissType);
+            var elementId = dismissibleElement.attr('id');
+
+            // Attach dismiss event handler to the close button
+            dismissButton.off('click').on('click', function (e) {
+                e.preventDefault();
+                Mautic.dismissElement(elementId);
+            });
+        });
+    },
+
+    /**
+     * Initializes the dismiss functionality.
+     */
+    initDismiss: function() {
+        this.initializeDismissedElements();
+        this.attachDismissHandlers();
+    },
 
     /**
      *
@@ -244,6 +357,45 @@ var Mautic = {
             if (!$codeBlock.find('.copy-icon').length) {
                 $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
             }
+        });
+    },
+
+    /**
+     * Initializes list group toggle functionality.
+     */
+    initListGroupToggle: function(container) {
+        mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+            e.preventDefault(); // Prevent default action if necessary
+
+            var $item = mQuery(this);
+            var $input = $item.find('input');
+
+            // If the input is disabled or readonly, do nothing
+            if ($input.prop('disabled') || $input.prop('readonly')) {
+                return;
+            }
+
+            var type = $input.prop('type');
+
+            if (type === 'radio') {
+                // Remove 'active' class from all items in the group
+                $item.closest('.list-group').find('.list-group-item').removeClass('active');
+
+                // Add 'active' class to the clicked item
+                $item.addClass('active');
+
+                // Set the input as checked
+                $input.prop('checked', true);
+            } else if (type === 'checkbox') {
+                // Toggle 'active' class on the clicked item
+                $item.toggleClass('active');
+
+                // Update the input's checked property based on the 'active' class
+                $input.prop('checked', $item.hasClass('active'));
+            }
+
+            // Trigger the 'change' event on the input
+            $input.trigger('change');
         });
     },
 
@@ -950,38 +1102,4 @@ var Mautic = {
     }
 };
 
-Mautic.initListGroupToggle = function(container) {
-    mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
-        e.preventDefault(); // Prevent default action if necessary
-
-        var $item = mQuery(this);
-        var $input = $item.find('input');
-
-        // If the input is disabled or readonly, do nothing
-        if ($input.prop('disabled') || $input.prop('readonly')) {
-            return;
-        }
-
-        var type = $input.prop('type');
-
-        if (type === 'radio') {
-            // Remove 'active' class from all items in the group
-            $item.closest('.list-group').find('.list-group-item').removeClass('active');
-
-            // Add 'active' class to the clicked item
-            $item.addClass('active');
-
-            // Set the input as checked
-            $input.prop('checked', true);
-        } else if (type === 'checkbox') {
-            // Toggle 'active' class on the clicked item
-            $item.toggleClass('active');
-
-            // Update the input's checked property based on the 'active' class
-            $input.prop('checked', $item.hasClass('active'));
-        }
-
-        // Trigger the 'change' event on the input
-        $input.trigger('change');
-    });
-};
+Mautic.initDismiss();
