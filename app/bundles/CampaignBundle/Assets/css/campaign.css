@@ -26,10 +26,13 @@
 }
 
 #CampaignEventPanel {
+    display: flex;
+    height: auto;
+    flex-direction: column;
     position: absolute;
     padding: 10px 20px;
-    background-color: var(--layer);
-    border-radius: 4px;
+    background-color: var(--background);
+    border-radius: var(--border-radius-lg);
     z-index:1035;
 }
 
@@ -251,8 +254,8 @@
 .list-campaign-action { border-radius: clamp(4px, var(--border-radius-md), 8px); }
 
 .list-campaign-action .campaign-event-content {
-    background-color: var(--background-brand-primary);
-    border: solid 2px var(--background-brand-primary);
+    background-color: var(--background-brand);
+    border: solid 2px var(--background-brand);
     border-radius: clamp(4px, var(--border-radius-md), 8px);
     overflow: hidden;
     padding: 0 var(--spacing-05) 0 0;

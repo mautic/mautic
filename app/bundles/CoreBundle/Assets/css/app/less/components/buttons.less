@@ -9,12 +9,11 @@
   transition: var(--transition-all-productive);
   border: 1px solid transparent;
   .outline();
-  border-radius: var(--border-radius-lg);
+  border-radius: 20px;
   display: inline-flex;
   align-items: center;
   height: var(--spacing-08);
   line-height: var(--spacing-08);
-  font-weight: normal;
   font-size: 14px;
   padding: 0 var(--spacing-05);
   gap: var(--spacing-03);
@@ -43,14 +42,10 @@
   }
 
   // reset font awesome width
-  .fa, i {
+  i {
     min-width: 13px;
     order: 2;
     line-height: inherit;
-  }
-
-  // remix icon
-  [class^="ri-"], [class*=" ri-"] {
     font-size: 12px;
     vertical-align: -.05em;
   }
@@ -134,10 +129,10 @@
 .btn-secondary {
   .button-variant(
     @background: var(--button-secondary),
-    @text-color: var(--text-inverse),
+    @text-color: var(--button-secondary-text),
     @border-color: var(--button-secondary),
     @hover-background: var(--button-secondary-hover),
-    @hover-text-color: var(--text-inverse),
+    @hover-text-color: var(--button-secondary-text),
     @active-background: var(--button-secondary-active),
     @disabled-background: var(--button-disabled),
     @disabled-text-color: var(--text-on-color-disabled)
@@ -156,7 +151,7 @@
     @text-color: var(--button-tertiary),
     @border-color: var(--button-tertiary),
     @hover-background: var(--button-tertiary-hover),
-    @hover-text-color: var(--text-inverse),
+    @hover-text-color: var(--text-on-color),
     @active-background: var(--button-tertiary-active),
     @disabled-background: transparent,
     @disabled-text-color: var(--text-disabled)
@@ -239,6 +234,8 @@
       @disabled-background: transparent,
       @disabled-text-color: var(--icon-disabled)
     );
+
+    &.btn-toggletip { color: inherit; }
   }
 }
 
@@ -249,6 +246,12 @@
   align-items: center;
   aspect-ratio: 1 / 1;
   border-radius: 20px;
+}
+
+.btn-toggletip {
+  height: auto;
+  line-height: 1em;
+  padding: 2px;
 }
 
 .btn-group {
@@ -321,13 +324,15 @@
         align-items: flex-start;
         height: var(--spacing-10);
         width: var(--spacing-13);
-        &:first-child { border-radius: var(--border-radius-md) 0 0 0; }
-      }
-      .btn + .btn {
         border-radius: 0;
-        margin: 0;
+        &:first-child { border-radius: 0 0 0 calc(var(--border-radius-md) + 3px); }
+        &:last-child { border-radius: 0 0 calc(var(--border-radius-md) + 3px) 0; }
+        &:only-child {
+          border-radius: 0 0 calc(var(--border-radius-md) + 3px) calc(var(--border-radius-md) + 3px);
+          flex-grow: 1;
+        }
       }
-
+      .btn + .btn { margin: 0; }
       &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
       &:has(.btn:nth-child(3)) .btn { min-width: 25%; }
    }

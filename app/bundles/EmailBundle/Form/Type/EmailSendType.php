@@ -82,7 +82,7 @@ class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'   => 'btn btn-tertiary btn-sm btn-nospin',
+                        'class'   => 'btn btn-tertiary btn-sm btn-nospin mr-xs',
                         'onclick' => 'Mautic.loadNewWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
@@ -108,7 +108,7 @@ class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'    => 'btn btn-tertiary btn-sm btn-nospin',
+                        'class'    => 'btn btn-tertiary btn-sm btn-nospin mr-xs',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
                         'icon'     => 'ri-edit-line',
@@ -125,7 +125,7 @@ class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'    => 'btn btn-tertiary btn-sm btn-nospin',
+                        'class'    => 'btn btn-tertiary btn-sm btn-nospin mr-xs',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
                         'icon'     => 'ri-external-link-line',
