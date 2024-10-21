@@ -39,10 +39,7 @@ class AjaxController extends CommonAjaxController
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @param string $name
-     */
-    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields'): JsonResponse
+    public function reorderFieldsAction(Request $request, string $name = 'fields'): JsonResponse
     {
         if ('form' === $name) {
             $name = 'fields';

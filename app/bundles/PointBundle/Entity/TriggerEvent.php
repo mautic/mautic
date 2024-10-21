@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class TriggerEvent
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
@@ -53,6 +53,11 @@ class TriggerEvent
      * @var array
      */
     private $changes;
+
+    public function __clone(): void
+    {
+        $this->id = null;
+    }
 
     public function __construct()
     {

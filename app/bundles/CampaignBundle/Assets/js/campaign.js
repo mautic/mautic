@@ -1827,7 +1827,7 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
                 left: (leftPos >=0 ) ? leftPos : 10,
                 top: topPos,
                 width: newWidth,
-                height: Mautic.campaignBuilderIsEventCloneAllowed ? 372 : 280
+
             });
 
         mQuery('#CampaignEventPanel').removeClass('hide');
@@ -1847,7 +1847,6 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
             left: (leftPos >= 0) ? leftPos : 10,
             top: topPos,
             width: 300,
-            height: 80,
         });
 
         mQuery('#CampaignEventPanelGroups').addClass('hide');

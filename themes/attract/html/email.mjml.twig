@@ -1,0 +1,392 @@
+<mjml>
+	<mj-head>
+	  <mj-style inline="inline">
+		p, li {margin:0 !important; padding:0; line-height:1.4em;}
+	  </mj-style>
+	</mj-head>
+	<mj-body background-color="#f4f4f4">
+	  <!-- Header Part Start -->
+	  <mj-section background-color="#FFFFFF" padding="25px 0">
+		<mj-column width="50%">
+		  <mj-image src="{{ getAssetUrl('themes/@defaults/placeholder-logo.png', null, null, true) }}" width="70px" align="left">
+		  </mj-image>
+		</mj-column>
+		<mj-column width="50%">
+		  <mj-text align="right"><p>{webview_text}</p></mj-text>
+		</mj-column>
+	  </mj-section>
+	  <!-- Header Part End -->
+
+	  <!-- Banner Part Start -->
+	  <mj-section padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px">
+		<mj-column width="100%" padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/banner.jpg', null, null, true) }}" width="600px" height="400px" padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px">
+		  </mj-image>
+		</mj-column>
+	  </mj-section>
+	  <!-- Banner Part End -->
+
+	  <!-- Introduction Part Start -->
+	  <mj-section background-color="#002b5c" padding="60px 0">
+		<mj-column width="500px">
+			<mj-spacer></mj-spacer>
+		  <mj-text align="center" font-size="16px" line-height="16px" color="#fff" font-weight="normal" padding-bottom="0px">
+			<p>Find your dream home today with</p>
+		  </mj-text>
+		  <mj-text align="center" font-size="40px" line-height="60px" color="#fff" font-weight="bold" padding-top="0px">
+			<p>HomeFinder</p>
+		  </mj-text>
+		  <mj-button background-color="#004080" font-size="14px" font-weight="bold" border-radius="50px" inner-padding="12px 30px" href="#">
+			<p>Explore our listings</p>
+		  </mj-button>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Introduction Part End -->
+
+	  <!-- Featured Listings Part Start -->
+	  <mj-section background-color="#FFFFFF" padding="50px 0">
+		<mj-column width="500px">
+			<mj-spacer></mj-spacer>
+		  <mj-text font-size="48px" line-height="48px" color="#000000" font-weight="bold" padding-top="0px">
+			<p>Featured Listings</p>
+		  </mj-text>
+		  <mj-text font-size="30px" line-height="30px" color="#000000">
+			<p>Explore our premium properties available now</p>
+		  </mj-text>
+		</mj-column>
+		<!-- Example of a featured listing -->
+		<mj-column width="250px">
+		  <!-- Replace with an image of the property -->
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/listing1.jpg', null, null, true) }}" width="215px" height="180px" border-radius="12px"></mj-image>
+		  <mj-text font-size="24px" line-height="24px" color="#000000"><p>Sunset Villa</p></mj-text>
+		  <mj-text font-size="14px" line-height="16px" color="#004080"><p>View Listing</p></mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="250px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/listing2.jpg', null, null, true) }}" width="215px" height="180px" border-radius="12px"></mj-image>
+		  <mj-text font-size="24px" line-height="24px" color="#000000"><p>City Apartment</p></mj-text>
+		  <mj-text font-size="14px" line-height="16px" color="#004080"><p>View Listing</p></mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="500px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/listing3.jpg', null, null, true) }}" width="450px" height="220px" border-radius="12px"></mj-image>
+		  <mj-text font-size="24px" line-height="34px" color="#000000">
+			<p>Beachside Bungalow: Perfect for Coastal Living</p>
+		  </mj-text>
+		  <mj-text font-size="14px" line-height="16px" color="#004080"><p>View Listing</p></mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Featured Listings Part End -->
+
+	  <!-- Statistics Part Start -->
+	  <mj-section background-color="#e0e0e0" padding="75px 0">
+		<mj-column width="500px">
+			<mj-spacer></mj-spacer>
+		  <mj-text font-size="30px" line-height="40px" color="#000000">
+			<p>Our achievements highlight our commitment to excellence.</p>
+		  </mj-text>
+		</mj-column>
+		<!-- Replace with relevant statistics -->
+		<mj-column width="166px">
+		  <mj-text font-size="30px" line-height="33px" color="#000000" font-weight="bold"><p>150+</p></mj-text>
+		  <mj-text font-size="18px" line-height="18px" color="#000000" padding-top="0px">
+			<p>Listings</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="166px">
+		  <mj-text font-size="30px" line-height="33px" color="#000000" font-weight="bold"><p>50+</p></mj-text>
+		  <mj-text font-size="18px" line-height="18px" color="#000000" padding-top="0px">
+			<p>Agents</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="166px">
+		  <mj-text font-size="30px" line-height="33px" color="#000000" font-weight="bold"><p>300+</p></mj-text>
+		  <mj-text font-size="18px" line-height="18px" color="#000000" padding-top="0px">
+			<p>Sold Properties</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Statistics Part End -->
+
+		<!-- Gallery Part Start -->
+		<mj-section padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px">
+		<mj-column width="280px" padding="0">
+			<!-- Replace with images showcasing your properties or team -->
+			<mj-image src="{{ getAssetUrl('themes/'~template~'/assets/gallery1.jpg', null, null, true) }}" width="280px" height="400px" padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px"></mj-image>
+		</mj-column>
+		<mj-column width="320px" padding="0">
+			<mj-image src="{{ getAssetUrl('themes/'~template~'/assets/gallery2.jpg', null, null, true) }}" width="320px" height="200px" padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px"></mj-image>
+			<mj-image src="{{ getAssetUrl('themes/'~template~'/assets/gallery3.jpg', null, null, true) }}" width="320px" height="200px" padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px"></mj-image>
+		</mj-column>
+		</mj-section>
+		<!-- Gallery Part End -->
+
+			  <!-- Latest Updates Part Start -->
+	  <mj-section background-color="#FFFFFF" padding="50px 0">
+		<mj-column width="500px">
+		  <!-- Section heading for updates -->
+		  <mj-spacer></mj-spacer>
+		  <mj-text font-size="14px" line-height="24px" color="#000000" text-transform="uppercase" padding-bottom="0px">
+			<p>What's new?</p>
+		  </mj-text>
+		  <mj-text font-size="48px" line-height="48px" color="#000000" font-weight="bold" padding-top="0px">
+			<p>Updates</p>
+		  </mj-text>
+		</mj-column>
+		<!-- Example update -->
+		<mj-column width="250px">
+		  <mj-text font-size="16px" line-height="16px" color="#004080" padding-bottom="0px">
+			<p>15 September 2024</p>
+		  </mj-text>
+		  <mj-text font-size="20px" color="#000"><p>New Neighborhood Open Houses</p></mj-text>
+		  <mj-text font-size="14px" color="#6f6f6f" padding-top="0px">
+			<p>Join us for exclusive open house events in the newly developed Riverside area.</p>
+		  </mj-text>
+		  <!-- Button to read more about the update -->
+		  <mj-button background-color="#004080" font-size="12px" font-weight="bold" border-radius="50px" inner-padding="10px 20px" align="left" href="#">
+			<p>Read more</p>
+		  </mj-button>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<!-- Example image related to the update -->
+		<mj-column width="250px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/update1.jpg', null, null, true) }}" width="240px" height="165px" padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px" border-radius="12px"></mj-image>
+		</mj-column>
+	  </mj-section>
+	  <mj-section background-color="#e0e0e0" padding="50px 0">
+		<mj-column width="250px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/update2.jpg', null, null, true) }}" width="240px" height="165px" padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px" border-radius="12px"></mj-image>
+		</mj-column>
+		<mj-column width="250px">
+		  <mj-text font-size="16px" line-height="16px" color="#004080" padding-bottom="0px">
+			<p>16 September 2024</p>
+		  </mj-text>
+		  <mj-text font-size="20px" color="#000"><p>Webinar on Real Estate Investing</p></mj-text>
+		  <mj-text font-size="14px" color="#6f6f6f" padding-top="0px">
+			<p>Join our experts for insights on maximizing your real estate investments.</p>
+		  </mj-text>
+		  <mj-button background-color="#004080" font-size="12px" font-weight="bold" border-radius="50px" inner-padding="10px 20px" align="left" href="#">
+			<p>Reserve your spot</p>
+		  </mj-button>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Latest Updates Part End -->
+
+	  <!-- Services Part Start -->
+	  <mj-section background-color="#FFFFFF" padding="95px 0">
+		<mj-column width="500px">
+			<mj-spacer></mj-spacer>
+		  <mj-text font-size="14px" line-height="24px" color="#000000" text-transform="uppercase" padding-bottom="0px">
+			<p>Our Expertise</p>
+		  </mj-text>
+		  <mj-text font-size="48px" line-height="48px" color="#000000" font-weight="bold" padding-top="0px">
+			<p>Services We Offer</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<!-- Highlight different real estate services -->
+		<mj-column width="250px" padding-top="20px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/icon1.png', null, null, true) }}" width="32px" height="32px" align="left"></mj-image>
+		  <mj-text font-size="24px" line-height="24px" color="#000000"><p>Residential Sales</p></mj-text>
+		  <mj-text font-size="15px" color="#6f6f6f" line-height="24px" padding-top="0px">
+			<p>Helping you find your dream home with personalized service.</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="250px" padding-top="20px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/icon2.png', null, null, true) }}" width="32px" height="32px" align="left"></mj-image>
+		  <mj-text font-size="24px" line-height="24px" color="#000000"><p>Commercial Leasing</p></mj-text>
+		  <mj-text font-size="15px" color="#6f6f6f" line-height="24px" padding-top="0px">
+			<p>Providing top-tier commercial spaces to boost your business.</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="250px" padding-top="20px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/icon3.png', null, null, true) }}" width="32px" height="32px" align="left"></mj-image>
+		  <mj-text font-size="24px" line-height="24px" color="#000000"><p>Property Management</p></mj-text>
+		  <mj-text font-size="15px" color="#6f6f6f" line-height="24px" padding-top="0px">
+			<p>Comprehensive management services to maintain and enhance your property value.</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="250px" padding-top="20px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/icon4.png', null, null, true) }}" width="32px" height="32px" align="left"></mj-image>
+		  <mj-text font-size="24px" line-height="24px" color="#000000"><p>Real Estate Consulting</p></mj-text>
+		  <mj-text font-size="15px" color="#6f6f6f" line-height="24px" padding-top="0px">
+			<p>Expert advice to navigate the real estate market effectively.</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Services Part End -->
+
+	  <!-- Why Choose Us Part Start -->
+	  <mj-section padding-top="0px" padding-bottom="0px" padding-right="0px" padding-left="0px">
+		<!-- Left Column -->
+		<mj-column width="50%" background-color="#002b5c" padding="30px">
+		  <!-- Explain why customers should choose your real estate services -->
+		  <mj-text font-size="15px" line-height="15px" color="#fff" align="center">
+			<p>Why choose us</p>
+		  </mj-text>
+		  <mj-text font-size="24px" line-height="24px" color="#fff" font-weight="bold" align="center">
+			<p>HomeFinder Advantage</p>
+		  </mj-text>
+		  <!-- Button to learn more about your services -->
+		  <mj-button background-color="#004080" font-size="12px" font-weight="bold" border-radius="50px" inner-padding="10px 20px" href="#">
+			<p>Learn more</p>
+		  </mj-button>
+		</mj-column>
+		<!-- Right Column -->
+		<mj-column width="50%" background-color="#004080" padding="30px">
+		  <!-- Highlight additional benefits or features -->
+		  <mj-text font-size="15px" line-height="15px" color="#fff" align="center">
+			<p>Your trusted partner</p>
+		  </mj-text>
+		  <mj-text font-size="24px" line-height="24px" color="#fff" font-weight="bold" align="center">
+			<p>24/7 customer support</p>
+		  </mj-text>
+		  <!-- Button to contact your support team -->
+		  <mj-button background-color="#002b5c" font-size="12px" font-weight="bold" border-radius="50px" inner-padding="10px 20px" href="#">
+			<p>Contact us</p>
+		  </mj-button>
+		</mj-column>
+	  </mj-section>
+	  <!-- Why Choose Us Part End -->
+
+<!-- Clients Part Start -->
+<mj-section background-color="#FFFFFF" padding="50px 0">
+	<mj-column width="500px">
+	  <!-- Section heading for clients -->
+	  <mj-spacer></mj-spacer>
+	  <mj-text align="center" font-size="14px" line-height="18px" color="#000000" text-transform="uppercase" padding-bottom="0px">
+		<p>Our Valued Clients</p>
+	  </mj-text>
+	</mj-column>
+	<!-- Replace with logos of your partner companies or satisfied clients -->
+	<mj-column width="166px">
+	  <mj-image src="{{ getAssetUrl('themes/@defaults/placeholder-logo.png', null, null, true) }}" width="70px"></mj-image>
+	</mj-column>
+	<mj-column width="166px">
+	  <mj-image src="{{ getAssetUrl('themes/@defaults/placeholder-logo.png', null, null, true) }}" width="70px"></mj-image>
+	</mj-column>
+	<mj-column width="166px">
+	  <mj-image src="{{ getAssetUrl('themes/@defaults/placeholder-logo.png', null, null, true) }}" width="70px"></mj-image>
+	</mj-column>
+  </mj-section>
+  <!-- Clients Part End -->
+
+	  <!-- Testimonial Part Start -->
+	  <mj-section background-color="#FFFFFF" padding="50px 0">
+		<mj-column width="500px">
+			<mj-spacer></mj-spacer>
+		  <mj-text font-size="14px" line-height="24px" color="#000000" text-transform="uppercase" padding-bottom="0px">
+			<p>What our clients think</p>
+		  </mj-text>
+		  <mj-text font-size="48px" line-height="48px" color="#000000" font-weight="bold">
+			<p>Testimonials</p>
+		  </mj-text>
+		  <mj-divider border-width="1px" padding="45px 0"></mj-divider>
+		</mj-column>
+		<!-- Example testimonial -->
+		<mj-column width="500px">
+		  <mj-text font-size="18px" line-height="26px" color="#000000">
+			<p>Their expertise helped us find the perfect home quickly!</p>
+		  </mj-text>
+		  <mj-text font-size="18px" line-height="18px" color="#000000" font-weight="bold">
+			<p>Sarah L.</p>
+		  </mj-text>
+		  <mj-text font-size="16px" line-height="16px" color="#000000">
+			<p>Homeowner</p>
+		  </mj-text>
+		</mj-column>
+		<mj-column width="250px" padding-top="20px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/quote1.png', null, null, true) }}" width="30px" height="22px" align="left"></mj-image>
+		  <mj-text font-size="16px" color="#000000">
+			<p>Exceptional service and support throughout our home buying journey!</p>
+		  </mj-text>
+		  <mj-text font-size="14px" line-height="14px" color="#000000" font-weight="bold">
+			<p>John D.</p>
+		  </mj-text>
+		  <mj-text font-size="14px" line-height="18px" color="#000000">
+			<p>Investor</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+		<mj-column width="250px" padding-top="20px">
+		  <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/quote1.png', null, null, true) }}" width="30px" height="22px" align="left"></mj-image>
+		  <mj-text font-size="16px" color="#000000">
+			<p>A seamless experience from start to finish. Highly recommend!</p>
+		  </mj-text>
+		  <mj-text font-size="14px" line-height="14px" color="#000000" font-weight="bold">
+			<p>Linda K.</p>
+		  </mj-text>
+		  <mj-text font-size="14px" line-height="18px" color="#000000">
+			<p>First-time Buyer</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Testimonial Part End -->
+
+	  <!-- Greeting Part Start -->
+	  <mj-section background-color="#002b5c" padding="50px 0">
+		<mj-column width="500px">
+			<mj-spacer></mj-spacer>
+		  <mj-text font-size="24px" line-height="28px" color="#fff">
+			<p>We're glad you're here!</p>
+		  </mj-text>
+		  <mj-text font-size="16px" color="#fff">
+			<p>Thank you for choosing HomeFinder. We are committed to helping you navigate the real estate market with ease and confidence.</p>
+		  </mj-text>
+		  <mj-text font-size="13px" color="#fff" font-weight="600">
+			<p>Mark T. Johnson, Client Relations Manager</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Greeting Part End -->
+
+	  <!-- Footer Part Start -->
+	  <mj-section padding="0" padding-top="0" padding-bottom="20px" background-color="#ffffff">
+		<mj-column>
+		  <mj-spacer></mj-spacer>
+		  <!-- Social media links: Replace href attributes with your social media URLs -->
+		  <mj-social font-size="12px" icon-size="30px" border-radius="12px" mode="horizontal">
+			<mj-social-element name="facebook" background-color="#000000" border-radius="14px" padding-right="10px">
+			</mj-social-element>
+			<mj-social-element name="instagram" background-color="#000000" border-radius="14px" padding="0 10px">
+			</mj-social-element>
+			<mj-social-element name="youtube" background-color="#000000" border-radius="14px" padding-left="10px">
+			</mj-social-element>
+		  </mj-social>
+		  <mj-spacer></mj-spacer>
+		  <!-- Replace with your company's address and contact information -->
+		  <mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding="0" font-size="12px">
+			<p>HomeFinder</p>
+			<p>123 Realty Lane, Suite 100</p>
+			<p>Metropolis, 54321</p>
+			<p>Country</p>
+		  </mj-text>
+		  <mj-spacer></mj-spacer>
+		  <!-- Unsubscribe information: Customize the unsubscribe text as needed -->
+		  <mj-text font-size="11px" align="center" color="#6d6d6d">
+			<p>You’re receiving this email because you opted in via our website.</p>
+			<p>Want to change how you receive these emails?</p>
+		  </mj-text>
+		  <mj-text font-size="11px" align="center" color="#6d6d6d">
+			<p>
+			  <span data-fr-verified="true"><span data-fr-verified="true" class="atwho-inserted">{unsubscribe_text}</span></span>
+			</p>
+		  </mj-text>
+		  <mj-spacer height="60px"></mj-spacer>
+		</mj-column>
+	  </mj-section>
+	  <!-- Footer Part End -->
+	</mj-body>
+  </mjml>
