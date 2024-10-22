@@ -30,7 +30,7 @@
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
                             <li class="list-group-item {% if loop.first %}active{% endif %}">
-                                <a href="#company-{{ g }}" class="steps" data-toggle="tab">
+                                <a href="#company-{{ g }}" class="list-group-item-text steps" data-toggle="tab">
                                     {{ ('mautic.lead.field.group.'~g)|trans }}
                                 </a>
                             </li>

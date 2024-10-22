@@ -2,14 +2,17 @@
 // Panels
 // --------------------------------------------------
 
-.panel {
+.panel, .panel2 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
   border: 1px solid @panel-default-border;
-  .box-shadow(0px 1px 1px darken(@body-bg, 2%));
+  background-color: var(--background);
+  transition: var(--transition-all-productive);
   //background-clip: padding-box;
+
+  &:hover { border-color: var(--border-subtle-alternate); }
 }
 
 // Panel heading
@@ -48,15 +51,9 @@
   }
 }
 
-// Panel footer
-.panel-footer {
-  overflow: hidden;
-  background-color: #fbfbfb;
-}
-
 .panel-toolbar-wrapper {
   display: block;
-  background-color: #fbfbfb;
-  border-bottom: 1px solid #cfd9db;
+  background-color: var(--layer);
+  border-bottom: 1px solid var(--border-subtle);
   padding: 0px 15px;
 }

@@ -30,7 +30,10 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : activeAsset}) -}}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activeAsset,
+        'status': 'available'
+    }) -}}
 {% endblock %}
 {% block content %}
 
@@ -49,7 +52,7 @@
             </div>
             <!--/ asset detail header -->
             <!-- asset detail collapseable -->
-            <div class="collapse" id="asset-details">
+            <div class="collapse pr-md pl-md" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
@@ -134,7 +137,7 @@
         <div class="tab-content pa-md preview-detail">
             {{- include('@MauticAsset/Asset/preview.html.twig',
                 {
-                    'activeAsset' : activeAsset, 
+                    'activeAsset' : activeAsset,
                     'assetDownloadUrl' : url(
                     'mautic_asset_action',
                     {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
@@ -147,7 +150,7 @@
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{% trans %}mautic.asset.asset.url{% endtrans %}</div>
             </div>
@@ -156,7 +159,7 @@
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly value="{{ assetDownloadUrl|escape }}"/>
                 <span class="input-group-btn">
-                    <button class="btn btn-default btn-nospin"
+                    <button class="btn btn-ghost btn-nospin"
                             onclick="window.open('{{ assetDownloadUrl }}', '_blank');">
                         <i class="ri-external-link-line"></i>
                     </button>

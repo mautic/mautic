@@ -14,7 +14,7 @@
   {% if permissions['lead:leads:create'] %}
       {% set pageButtons = pageButtons|merge([{
           'attr': {
-              'class': 'btn btn-default btn-nospin quickadd',
+              'class': 'btn btn-ghost btn-nospin quickadd',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
@@ -50,13 +50,13 @@
   {% set extraHtml %}
   <div class="btn-group ml-5 sr-only ">
       <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
-        <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-default">
-            <i class="fa fa-fw fa-table"></i>
+        <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-ghost">
+            <i class="ri-table-line"></i>
         </a>
       </span>
       <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-placement="left">
-        <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-default">
-          <i class="fa fa-fw fa-th-large"></i>
+        <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-ghost">
+          <i class="ri-layout-grid-line"></i>
         </a>
       </span>
   </div>
@@ -78,5 +78,8 @@
   {% if isIndex %}
         </div>
     </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.contacts.view', 'mautic.protip.contacts.tags', 'mautic.protip.contacts.list'])
+  }) }}
   {% endif %}
 {% endblock %}

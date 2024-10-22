@@ -17,7 +17,7 @@
 
 {% block content %}
   {% if isIndex %}
-    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <div id="page-list-wrapper">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'searchHelp': 'mautic.core.help.searchcommands',
@@ -31,5 +31,9 @@
   {% if isIndex %}
         </div>
     </div>
+
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.points.decay', 'mautic.protip.points.reduce', 'mautic.protip.points.limit'])
+  }) }}
   {% endif %}
 {% endblock %}

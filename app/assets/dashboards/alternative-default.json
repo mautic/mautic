@@ -1,6 +1,6 @@
 {
-    "name": "Default - Alternative",
-    "description": "An alternate layout to Mautic's default.",
+    "name": "Engagement",
+    "description": "Start with a dashboard of 13 widgets that provide insights into lead generation, engagement, email interactions, and contact management.",
     "widgets": [
         {
             "name": "Contacts created",

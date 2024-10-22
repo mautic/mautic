@@ -42,7 +42,7 @@
                 <div class="col-xs-12">
 
                     <!-- tabs controls -->
-                    <ul class="nav nav-tabs pr-md pl-md">
+                    <ul class="nav nav-tabs nav-tabs-contained">
                         <li class="active">
                             <a href="#email-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
                         </li>
@@ -109,7 +109,7 @@
                                         {{ form_label(form.plainText) }}
                                     </div>
                                     <div class="text-right pr-10">
-                                        <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                        <i class="ri-loader-3-line ri-spin ml-2 plaintext-spinner hide"></i>
                                         <a class="small"
                                            onclick="Mautic.autoGeneratePlaintext();">{{ 'mautic.email.plaintext.generate'|trans }}</a>
                                     </div>
@@ -123,7 +123,7 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-xs-3 dynamicContentFilterContainer">
-                                          <ul class="nav nav-tabs tabs-left" id="dynamicContentTabs">
+                                          <ul class="nav nav-tabs nav-tabs-contained tabs-left" id="dynamicContentTabs">
                                             <li>
                                               <a href="javascript:void(0);" role="tab" class="btn btn-primary" id="addNewDynamicContent"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
                                             </li>
@@ -154,11 +154,14 @@
             <div class="pr-lg pl-lg pt-md pb-md">
                 {{ form_row(form.subject) }}
                 {{ form_row(form.name) }}
+                {{ form_row(form.preheaderText) }}
                 {% if isVariant %}
                     {{ form_row(form.variantSettings) }}
                     {{ form_row(form.isPublished) }}
-                    {{ form_row(form.publishUp) }}
-                    {{ form_row(form.publishDown) }}
+                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
+                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
+                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                    </div>
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
                         {{ form_row(form.lists) }}
@@ -176,8 +179,11 @@
 
                 {% if not isVariant %}
                     {{ form_row(form.isPublished) }}
-                    {{ form_row(form.publishUp) }}
-                    {{ form_row(form.publishDown) }}
+                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
+                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
+                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                    </div>
+                    
                 {% endif %}
 
                 {{ form_row(form.unsubscribeForm) }}
@@ -185,11 +191,8 @@
                     {{ form_row(form.preferenceCenter) }}
                 {% endif %}
                 <hr/>
-                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-                <br/>
-                {% for i, utmTag in form.utmTags %}
-                    {{ form_row(utmTag) }}
-                {% endfor %}
+                {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
+
             </div>
             <div class="hide">
                 {{ form_rest(form) }}

@@ -1,22 +1,21 @@
 type: php
 docroot: ""
-php_version: "8.2"
+php_version: "8.3"
 webserver_type: apache-fpm
-router_http_port: "80"
-router_https_port: "443"
-xdebug_enabled: false
-additional_hostnames: []
-additional_fqdns: []
-mariadb_version: "10.3"
-mysql_version: ""
-provider: default
-upload_dir: "media/files, media/images" # Specify the directories containing user-generated uploads
+database:
+    type: mariadb
+    version: "10.3"
+hooks:
+    post-start:
+        - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh
+        - exec: sed -i -e 's/\r$//' ./.git/hooks/*
+        - exec: chmod +x ./.ddev/mautic-setup.sh
+        - exec: yes | ./.ddev/mautic-setup.sh
+upload_dirs:
+    - media/files
+    - media/images
+webimage_extra_packages: ["php${DDEV_PHP_VERSION}-imap"]
 use_dns_when_possible: true
 composer_version: "2"
-webimage_extra_packages: [php8.2-imap]
-hooks:
-  post-start:
-    # Fix line endings on Windows
-    - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh
-    - exec: sed -i -e 's/\r$//' ./.git/hooks/*
-    - exec: "yes | ./.ddev/mautic-setup.sh"
+web_environment: []
+corepack_enable: false

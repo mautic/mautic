@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -491,7 +492,8 @@ class StatRepository extends CommonRepository
             $timestampColumn,
             ['openDetails'],
             ['dateRead', 'dateSent'],
-            $timeToReadParser
+            $timeToReadParser,
+            's.id'
         );
     }
 
@@ -509,7 +511,7 @@ class StatRepository extends CommonRepository
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
-        $results = $query->execute()->fetchAssociative();
+        $results = $query->executeQuery()->fetchAssociative();
 
         if ($results) {
             $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
@@ -526,18 +528,16 @@ class StatRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmails($query, $limit = 10, $offset = 0)
+    public function getMostEmails($query, $limit = 10, $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**

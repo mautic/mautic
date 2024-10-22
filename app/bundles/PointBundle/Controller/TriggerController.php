@@ -160,11 +160,9 @@ class TriggerController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @param Trigger $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @param array<mixed> $triggerEvents
      */
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, Trigger $entity = null, array $triggerEvents = []): Response
     {
         /** @var TriggerModel $model */
         $model = $this->getModel('point.trigger');
@@ -174,9 +172,8 @@ class TriggerController extends FormController
             $entity = $model->getEntity();
         }
 
-        $session      = $request->getSession();
-        $pointTrigger = $request->request->get('pointtrigger') ?? [];
-        $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(random_int(1, PHP_INT_MAX), true));
+        $session   = $request->getSession();
+        $sessionId = $this->getSessionBase();
 
         if (!$this->security->isGranted('point:triggers:create')) {
             return $this->accessDenied();
@@ -187,13 +184,17 @@ class TriggerController extends FormController
 
         // set added/updated events
         $addEvents     = $session->get('mautic.point.'.$sessionId.'.triggerevents.modified', []);
+        if (!empty($triggerEvents)) {
+            $addEvents += $triggerEvents;
+            $session->set('mautic.point.'.$sessionId.'.triggerevents.modified', $triggerEvents);
+        }
         $deletedEvents = $session->get('mautic.point.'.$sessionId.'.triggerevents.deleted', []);
 
         $action = $this->generateUrl('mautic_pointtrigger_action', ['objectAction' => 'new']);
         $form   = $model->createForm($entity, $this->formFactory, $action);
         $form->get('sessionId')->setData($sessionId);
 
-        // /Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -223,6 +224,9 @@ class TriggerController extends FormController
                         ]);
 
                         if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
+                            // unset the clone session.
+                            $this->clearSessionComponents($request, $sessionId);
+
                             // return edit view so that all the session stuff is loaded
                             return $this->editAction($request, $entity->getId(), true);
                         }
@@ -248,10 +252,13 @@ class TriggerController extends FormController
                     ],
                 ]);
             }
+        } elseif (!empty($triggerEvents)) {
+            // The clone part, no need to clear session here.
+            $addEvents     = $triggerEvents;
+            $deletedEvents = [];
         } else {
             // clear out existing fields in case the form was refreshed, browser closed, etc
             $this->clearSessionComponents($request, $sessionId);
-            $addEvents = $deletedEvents = [];
         }
 
         return $this->delegateView([
@@ -451,19 +458,33 @@ class TriggerController extends FormController
      */
     public function cloneAction(Request $request, $objectId)
     {
+        /** @var TriggerModel $model */
         $model  = $this->getModel('point.trigger');
+        /** @var Trigger $entity */
         $entity = $model->getEntity($objectId);
+
+        $triggerEvents = [];
 
         if (null != $entity) {
             if (!$this->security->isGranted('point:triggers:create')) {
                 return $this->accessDenied();
             }
 
+            $existingActions = $entity->getEvents()->toArray();
+
             $entity = clone $entity;
             $entity->setIsPublished(false);
+            foreach ($existingActions as $key => $action) {
+                $action      = clone $action;
+                $action->setTrigger($entity);
+                $entity->addTriggerEvent($key, $action);
+                $actionArray = $action->convertToArray();
+                unset($actionArray['form']);
+                $triggerEvents[] = $actionArray;
+            }
         }
 
-        return $this->newAction($request, $entity);
+        return $this->newAction($request, $entity, $triggerEvents);
     }
 
     /**

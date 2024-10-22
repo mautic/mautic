@@ -43,10 +43,20 @@ a.media {
     position: relative;
     .media {
       overflow: visible;
+
+      &:first-of-type > .media-object > .figure {
+        background-color: var(--background-inverse);
+        color: var(--text-inverse);
+        transition: var(--transition-all-productive);
+
+        &:hover { background-color: var(--background-inverse-hover);}
+      }
       > .media-object {
         position: relative;
         width: 28px;
         text-align: center;
+        margin-right: 20px;
+
         &:before {
           content: '';
           position: absolute;
@@ -54,7 +64,7 @@ a.media {
           bottom: -200%;
           width: 1px;
           left: 50%;
-          .lh-background-image(linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(229,229,229,1) 10%, rgba(229,229,229,1) 90%, rgba(229,229,229,0) 100%));
+          .lh-background-image(linear-gradient(top,  rgba(255,255,255,0) 0%, var(--layer) 5%, var(--layer) 90%, rgba(229,229,229,0) 100%));
         }
 
         > .figure {
@@ -65,13 +75,18 @@ a.media {
           height: 14px;
           text-align: center;
           font-size: 12px;
-          border-radius: 50%;
-          background-color: darken(@hr-border, 5%);
+          border-radius: 20px;
+          background-color: var(--layer);
+          transition: var(--transition-all-productive);
+          left: 5px;
+
+          &:hover { background-color: var(--layer-hover); }
 
           &.featured {
-            width: 20px;
+            width: 30px;
             height: 20px;
-            line-height: 19px;
+            line-height: 20px;
+            left: 0;
           }
         }
       }

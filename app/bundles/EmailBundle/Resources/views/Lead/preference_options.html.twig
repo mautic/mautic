@@ -56,6 +56,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            {%- do form.lead_channels.subscribed_channels.setRendered(true) %}
                             <tr>
                                 <td>
                                     <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
@@ -116,6 +117,10 @@
                         {{ successMessage }}
                     </div>
                 {% endif %}
+                <hr />
+                <div id="do-not-contact-text">
+                    {{ 'mautic.email.unsubscribe_all.text'|trans ({'%link%' : dncUrl})|purify }}
+                </div>
             </div>
             <div class="panel-footer text-left">
                 {{ form_row(form.buttons.save) }}

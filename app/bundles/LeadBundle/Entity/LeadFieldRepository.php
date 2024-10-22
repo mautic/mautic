@@ -263,43 +263,34 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $property  = $this->getPropertyByField($field, $q);
-                $fieldType = $this->findOneBy(['alias' => $field])->getType();
-                $values    = (!is_array($value)) ? [$value] : $value;
+                $values   = (!is_array($value)) ? [$value] : $value;
+                $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
+                $expr     = $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead')
+                );
 
-                if ('multiselect' == $fieldType) {
-                    // multiselect field values are separated by `|` and must be queried using regexp
-                    $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
-
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead')
+                $innerExpr = [];
+                foreach ($values as $v) {
+                    $v = $q->expr()->literal(
+                        InputHelper::clean($v)
                     );
 
-                    // require all multiselect values in condition
-                    $andExpr = [];
-                    foreach ($value as $v) {
-                        $v = $q->expr()->literal(
-                            InputHelper::clean($v)
-                        );
-
-                        $v         = trim($v, "'");
-                        $andExpr[] = $property." $operator '\\\\|?$v\\\\|?'";
-                    }
-
-                    $expr = $expr->with($q->expr()->and(...$andExpr));
-
-                    $q->where($expr)
-                        ->setParameter('lead', (int) $lead);
-                } else {
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead'),
-                        'in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values')
-                    );
-
-                    $q->where($expr)
-                        ->setParameter('lead', (int) $lead)
-                        ->setParameter('values', $values, ArrayParameterType::STRING);
+                    $v           = trim($v, "'");
+                    $innerExpr[] = $property." $operator '\\\\|?$v\\\\|?'";
                 }
+
+                if (str_starts_with($operatorExpr, 'not')) {
+                    $expr = $expr->with($q->expr()->or(
+                        $q->expr()->isNull($property),
+                        $q->expr()->and(...$innerExpr)
+                    ));
+                } else {
+                    $expr = $expr->with($q->expr()->or(...$innerExpr));
+                }
+
+                $q->where($expr)
+                    ->setParameter('lead', (int) $lead)
+                    ->setParameter('values', $values, ArrayParameterType::STRING);
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')

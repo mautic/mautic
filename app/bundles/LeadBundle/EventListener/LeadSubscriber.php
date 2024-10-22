@@ -483,29 +483,29 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
             foreach ($utmTags['results'] as $utmTag) {
-                $icon = 'fa-tag';
+                $icon = 'ri-hashtag';
                 if (isset($utmTag['utm_medium'])) {
                     switch (strtolower($utmTag['utm_medium'])) {
                         case 'social':
                         case 'socialmedia':
-                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
+                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-line');
                             break;
                         case 'email':
                         case 'newsletter':
-                            $icon = 'fa-envelope-o';
+                            $icon = 'ri-mail-open-line';
                             break;
                         case 'banner':
                         case 'ad':
-                            $icon = 'fa-bullseye';
+                            $icon = 'ri-focus-2-line';
                             break;
                         case 'cpc':
-                            $icon = 'fa-money';
+                            $icon = 'ri-cash-line';
                             break;
                         case 'location':
-                            $icon = 'fa-map-marker';
+                            $icon = 'ri-map-pin-2-line';
                             break;
                         case 'device':
-                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
+                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet-line');
                             break;
                     }
                 }
@@ -545,7 +545,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 $row['reason'] = $this->dncReasonHelper->toText((int) $row['reason']);
 
                 $template = '@MauticLead/SubscribedEvents/Timeline/donotcontact.html.twig';
-                $icon     = 'fa-ban';
+                $icon     = 'ri-prohibited-line';
 
                 if (!empty($row['channel'])) {
                     if ($channelModel = $this->getChannelModel($row['channel'])) {
@@ -691,7 +691,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventType'  => $eventTypeName,
                         'eventLabel' => $eventTypeName,
                         'timestamp'  => $apiEvent['date_added'],
-                        'icon'       => 'fa-cogs',
+                        'icon'       => 'ri-list-settings-line',
                         'extra'      => $apiEvent,
                         'contactId'  => $apiEvent['lead_id'],
                     ]

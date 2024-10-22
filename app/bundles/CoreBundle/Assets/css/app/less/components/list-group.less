@@ -2,11 +2,45 @@
 // List groups
 // --------------------------------------------------
 
+.list-group {
+  border: 1px solid var(--border-inverse);
+  border-radius: clamp(4px, var(--border-radius-md), 12px);
+  overflow: hidden;
+}
+
 .list-group-item {
-  > a {
+  transition: var(--transition-all-productive);
+  border: 0;
+  padding: 0;
+  vertical-align: middle;
+
+  > a, > label {
     position: relative;
     z-index: 1;
     display: block;
+    padding: 10px 15px;
+    cursor: pointer;
+    color: @list-group-link-color;
+    input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      margin: 0;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  &:hover {
+    background-color: @list-group-hover-bg;
+
+    > a {
+      color: @list-group-link-hover-color;
+    }
   }
 }
 
@@ -66,7 +100,7 @@ label.list-group-item {
       line-height: @marker-size;
       font-size: calc(@marker-size - 5px);
       color: var(--icon-secondary);
-      transition: var(--all);
+      transition: var(--transition-all-productive);
       top: 11.8px;
       vertical-align: middle;
     }
