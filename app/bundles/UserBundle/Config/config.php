@@ -140,6 +140,7 @@ return [
                     'request_stack',
                     'security.csrf.token_manager',
                     'router',
+                    'mautic.user.model.password_strength_estimator',
                 ],
             ],
             'mautic.user.preauth_authenticator' => [
