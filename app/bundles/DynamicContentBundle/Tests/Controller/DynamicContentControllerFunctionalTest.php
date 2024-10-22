@@ -12,6 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -110,8 +111,9 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        $user->setPassword($encoder->hash('mautic'));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 
         $this->em->persist($user);

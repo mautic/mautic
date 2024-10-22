@@ -366,7 +366,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)
             ->andWhere(
-                $query->expr()->andX(
+                $query->expr()->and(
                     $query->expr()->isNotNull($column),
                     $query->expr()->neq($column, $query->expr()->literal(''))
                 )

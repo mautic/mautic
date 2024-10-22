@@ -628,9 +628,9 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName($userDetails['last-name']);
         $user->setRole($role);
 
-        /** @var PasswordHasherInterface $encoder */
-        $encoder = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        $user->setPassword($encoder->hash('mautic'));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash('mautic'));
 
         $this->em->persist($user);
         $this->em->flush();

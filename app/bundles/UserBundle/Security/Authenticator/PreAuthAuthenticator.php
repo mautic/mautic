@@ -16,6 +16,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+/**
+ * @deprecated Remove in Mautic 6.0. Use \Mautic\UserBundle\Security\Authenticator\ApiAuthenticator instead.
+ */
 class PreAuthAuthenticator implements AuthenticationProviderInterface
 {
     public function __construct(

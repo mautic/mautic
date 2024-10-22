@@ -74,7 +74,7 @@ class SAMLEnvVarsTest extends TestCase
 
         SAMLEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
 
-        $this->assertEquals('/s/login', $this->envVars->get('MAUTIC_SAML_LOGIN_PATH'));
-        $this->assertEquals('/s/login_check', $this->envVars->get('MAUTIC_SAML_LOGIN_CHECK_PATH'));
+        $this->assertEquals('/s/saml/login', $this->envVars->get('MAUTIC_SAML_LOGIN_PATH'));
+        $this->assertEquals('/s/saml/login_check', $this->envVars->get('MAUTIC_SAML_LOGIN_CHECK_PATH'));
     }
 }

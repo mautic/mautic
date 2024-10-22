@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\DependencyInjection;
 
+use Mautic\UserBundle\EventListener\SAMLSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -18,5 +19,10 @@ class MauticUserExtension extends Extension
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Config'));
         $loader->load('services.php');
+
+        $samlEnabled = $container->getParameter('mautic.saml_enabled');
+        if (true !== $samlEnabled) {
+            $container->removeDefinition(SAMLSubscriber::class);
+        }
     }
 }

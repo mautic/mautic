@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class MonitoringControllerTest extends MauticMysqlTestCase
 {
@@ -90,8 +91,9 @@ class MonitoringControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
-        $encoder = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        $user->setPassword($encoder->hash('mautic'));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 
         $this->em->persist($user);

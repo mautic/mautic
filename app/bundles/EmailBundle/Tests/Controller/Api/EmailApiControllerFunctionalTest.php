@@ -17,6 +17,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -351,9 +352,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
 
-        $user->setPassword($encoder->hash('password'));
+        $user->setPassword($hasher->hash('password'));
         $this->em->persist($user);
 
         // Create a contact:

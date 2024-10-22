@@ -22,13 +22,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    public function __construct(
-        protected UserRepository $userRepository,
-        protected PermissionRepository $permissionRepository,
-        protected Session $session,
-        protected EventDispatcherInterface $dispatcher,
-        protected UserPasswordHasher $encoder
-    ) {
+    public function __construct(protected UserRepository $userRepository, protected PermissionRepository $permissionRepository, protected Session $session, protected EventDispatcherInterface $dispatcher, protected UserPasswordHasher $encoder)
+    {
     }
 
     /**

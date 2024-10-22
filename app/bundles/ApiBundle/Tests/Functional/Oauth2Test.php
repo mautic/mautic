@@ -28,6 +28,11 @@ final class Oauth2Test extends MauticMysqlTestCase
         parent::setUp();
     }
 
+    protected function beforeTearDown(): void
+    {
+        $this->client->enableReboot();
+    }
+
     public function testAuthWithInvalidCredentials(): void
     {
         $this->client->enableReboot();
@@ -111,7 +116,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
-        $payload     = json_decode($response->getContent(), true);
+        $payload     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $accessToken = $payload['access_token'];
         Assert::assertNotEmpty($accessToken);
 

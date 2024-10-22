@@ -600,9 +600,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        /** @var PasswordHasherInterface $encoder */
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        $user->setPassword($encoder->hash($this->getUserPlainPassword()));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);

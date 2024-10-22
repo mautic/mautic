@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
 {
-    private PasswordHasherFactoryInterface $passwordEncoder;
+    private PasswordHasherFactoryInterface $passwordHasher;
 
     private RoleRepository $roleRepository;
 
@@ -25,9 +25,9 @@ final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->passwordEncoder = static::getContainer()->get('security.password_hasher_factory');
-        $this->roleRepository  = $this->em->getRepository(Role::class);
-        $this->validator       = static::getContainer()->get('validator');
+        $this->passwordHasher = self::getContainer()->get('security.password_hasher_factory');
+        $this->roleRepository = $this->em->getRepository(Role::class);
+        $this->validator      = static::getContainer()->get('validator');
     }
 
     public function testThatItIsNotPossibleToCreateAnUserWithAWeakPassword(): void
@@ -40,7 +40,7 @@ final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
         $user->setUsername('username');
         $user->setEmail('some@email.domain');
         $user->setPlainPassword($simplePassword);
-        $user->setPassword($this->passwordEncoder->getPasswordHasher($user)->hash($simplePassword));
+        $user->setPassword($this->passwordHasher->getPasswordHasher($user)->hash($simplePassword));
         $user->setRole($this->roleRepository->findAll()[0]);
         $violations                    = $this->validator->validate($user);
         $hasNotWeakConstraintViolation = false;
