@@ -551,7 +551,8 @@ class FieldType extends AbstractType
             [
                 'label' => 'mautic.lead.field.form.isshortvisible',
                 'attr'  => [
-                    'tooltip' => 'mautic.lead.field.form.isshortvisible.tooltip',
+                    'tooltip'         => 'mautic.lead.field.form.isshortvisible.tooltip',
+                    'data-disable-on' => '{"leadfield_object":"company"}',
                 ],
             ]
         );
