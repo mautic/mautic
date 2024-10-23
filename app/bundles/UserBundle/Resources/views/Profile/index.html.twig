@@ -1,4 +1,4 @@
-{% extends '@MauticCore/Default/content.html.twig' %}
+    {% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}{{ 'mautic.user.account.settings'|trans }}{% endblock %}
 {% block mauticContent %}user{% endblock %}
@@ -14,12 +14,12 @@
             {% if me.getId() %}
             <div class="media">
                 <div class="pull-left">
-                    <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}"
+                    <img class="img-circle mt-md mb-xs img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}"
                         alt="" width="65px">
                 </div>
                 <div class="media-body">
-                    <h4>{{ me.getName() }}</h4>
-                    <h5>{{ me.getPosition() }}</h5>
+                    <h3 class="fw-sb">{{ me.getName() }}</h3>
+                    <span class="text-muted">{{ me.getPosition() }}</span>
                 </div>
             </div>
             <hr />
@@ -64,25 +64,28 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <h3 id="personal-info" class="pt-20">{{ 'mautic.user.config.title.get_to_know_you'|trans }}</h3>
+                            <h3 id="personal-info" class="pt-20 mb-xs">{{ 'mautic.user.config.title.get_to_know_you'|trans }}</h3>
                             <div class="text-muted small description pb-20">{{ 'mautic.user.config.personalize.interface.helper'|trans }}</div>
                             {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
                             {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
                             {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
                             {{ form_row(userForm.signature) }}
 
-                            <h3 id="locale" class="pt-20">{{ 'mautic.user.config.title.locale'|trans }}</h3>
+                            <h3 id="locale" class="pt-20 mb-xs">{{ 'mautic.user.config.title.locale'|trans }}</h3>
                             <div class="text-muted small description pb-20">{{ 'mautic.user.config.region.preferences.helper'|trans }}</div>
                             {{ form_row(userForm.timezone) }}
                             {{ form_row(userForm.locale) }}
                         </div>
                         <div class="col-md-6">
-                            <h3 id="security" class="pt-20">{{ 'mautic.user.config.title.account_data_security'|trans }}</h3>
+                            <h3 id="security" class="pt-20 mb-xs">{{ 'mautic.user.config.title.account_data_security'|trans }}</h3>
                             <div class="text-muted small description pb-20">{{ 'mautic.user.config.account.security.helper'|trans }}</div>
                             {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
                             {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
                             {{ form_row(userForm.plainPassword.password) }}
                             {{ form_row(userForm.plainPassword.confirm) }}
+                            <h3 id="learning" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
+                            <div class="text-muted small description pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
+                            <button class="btn btn-tertiary btn-sm btn-danger" onclick="Mautic.resetDismissedElements()">{{'mautic.user.config.title.experience_and_learning.reset_dismissed'|trans}}<i class="ri-refresh-line"></i></button>
                         </div>
                     </div>
                     {{ form_end(userForm) }}
@@ -105,8 +108,53 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-lg">
-                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.appearance.theme_preferences'|trans }}</h3>
-                            <div class="help-block">{{ 'mautic.user.account.appearance.theme_help'|trans }}</div>
+                            <h3 class="pt-20">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
+                            <div class="help-block mb-lg">
+                                {{ 'mautic.user.account.appearance.accent_help'|trans }}
+                                {% include '@MauticCore/Helper/toggletip.html.twig' with {
+                                    title: 'mautic.user.account.appearance.accent_toggletip.title',
+                                    content: 'mautic.user.account.appearance.accent_toggletip.content',
+                                } %}
+                            </div>
+                            <div class="d-flex fw-wrap gap-lg mb-lg">
+                                {{ include('@MauticUser/Helper/accent.html.twig', {
+                                    accents: [
+                                        { id: '01' },
+                                        { id: '02' },
+                                        { id: '03' },
+                                        { id: '04' },
+                                        { id: '05' },
+                                        { id: '06' },
+                                        { id: '07' },
+                                        { id: '08' },
+                                        { id: '09' },
+                                        { id: '10' },
+                                        { id: '11' },
+                                        { id: '12' },
+                                        { id: '13' },
+                                        { id: '14' },
+                                        { id: '15' },
+                                        { id: '16' },
+                                        { id: '17' },
+                                        { id: '18' },
+                                        { id: '19' },
+                                        { id: '20' },
+                                        { id: '21' },
+                                        { id: '22' },
+                                        { id: '23' },
+                                        { id: '24' },
+                                        { id: '25' }
+                                    ]
+                                }) }}
+                            </div>
+                            <h3 class="pt-20">
+                                {{ 'mautic.user.account.appearance.theme_preferences'|trans }}
+                                {% include '@MauticCore/Helper/toggletip.html.twig' with {
+                                    title: 'mautic.user.account.appearance.theme_preferences.popover.title',
+                                    content: 'mautic.user.account.appearance.theme_preferences.popover.content',
+                                } %}
+                            </h3>
+                            <div class="help-block mb-md">{{ 'mautic.user.account.appearance.theme_help'|trans }}</div>
                             <div class="radio-group radio-cards row">
                                 {{ include('@MauticUser/Helper/theme.html.twig', {
                                     themes: [
@@ -143,8 +191,6 @@
                                         }
                                     ]
                                 }) }}
-
-
                             </div>
                         </div>
                     </div>

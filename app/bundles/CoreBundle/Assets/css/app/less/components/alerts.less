@@ -22,6 +22,7 @@
   gap: 3px;
   background-color: var(--layer);
   border-radius: var(--border-radius-sm);
+  position: relative;
 
   &.alert-success,
   &.alert-info,
@@ -54,11 +55,19 @@
     }
   }
 
+  .close {
+    font-size: 13px;
+    position: absolute;
+    right: 12px;
+    top: 18px;
+  }
+
   &:has(.btn) { align-items: center; }
 }
 
 .alert-success {
   border-color: var(--support-success);
+  background-color: var(--notification-background-success);
 
   &:not([class*="col-"]):before {
     content: '\EB80';
@@ -68,6 +77,7 @@
 
 .alert-info {
   border-color: var(--support-info);
+  background-color: var(--notification-background-info);
 
   &:not([class*="col-"]):before {
     content: '\F448';
@@ -77,6 +87,7 @@
 
 .alert-warning {
   border-color: var(--support-warning);
+  background-color: var(--notification-background-warning);
 
   &:not([class*="col-"]):before {
     content: '\ECA0';
@@ -86,6 +97,7 @@
 
 .alert-danger {
   border-color: var(--support-error);
+  background-color: var(--notification-background-error);
 
   &:not([class*="col-"]):before {
     content: '\ED94';
@@ -162,8 +174,6 @@
 }
 
 .alert-growl-buttons {
-  margin-top: 10px;
-
   .btn + .btn {
     margin-left: 5px;
   }
@@ -174,9 +184,4 @@
   color: var(--text-inverse);
   margin-left: 10px;
   font-weight: normal;
-}
-
-.alert .close {
-  font-size: (@font-size-base);
-  margin-left: 10px;
 }

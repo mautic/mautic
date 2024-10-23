@@ -4,13 +4,22 @@
 
 // Prevent double borders when buttons are next to each other
 .btn-group {
-  .btn ~ .btn:not(.dropdown-toggle),
+  .btn ~ .btn,
   .btn ~ .btn-group,
   .btn-group ~ .btn,
   .btn-group ~ .btn-group {
-    /* margin-left: 0; */
+    margin-left: 5px;
   }
   > .btn-primary + .dropdown-toggle { margin-left: 1px; }
+}
+
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle),
+.btn-group > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child),
+.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 
 
