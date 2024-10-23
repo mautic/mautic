@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Tests\Helper\EventListener\EmailValidationSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailValidatorTest extends \PHPUnit\Framework\TestCase
@@ -99,6 +100,12 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
 
         // hopefully this domain remains intact
         $this->emailValidator->validate('john@mail.email');
+    }
+
+    public function testValidateNull(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->emailValidator->validate(null);
     }
 
     public function testValidateEmailWithoutTld(): void
