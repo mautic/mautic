@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -12,6 +13,8 @@ use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
+    use RequestTrait;
+
     protected $auth;
 
     protected $helper;
@@ -355,6 +358,15 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
         $leadFieldTypes      = $this->fieldModel->getFieldListWithProperties();
+
+        // cleanup unique fields
+        foreach ($matchedFields as $leadField => $value) {
+            if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
+                if (isset($leadFieldTypes[$leadField]['type'])) {
+                    $this->cleanFields($matchedFields, $leadFieldTypes[$leadField]);
+                }
+            }
+        }
 
         foreach ($matchedFields as $leadField => $value) {
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
