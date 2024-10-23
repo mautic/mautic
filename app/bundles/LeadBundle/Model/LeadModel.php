@@ -1032,6 +1032,14 @@ class LeadModel extends FormModel
             $this->unsubscribeCategories($unsubscribedCategories);
         }
 
+        // Add non associated categories relations as removed.
+        $nonAssociatedCategories = $this->getLeadCategoryRepository()->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
+
+        $unsubscribeNewCategories = array_diff($nonAssociatedCategories, $data['global_categories']);
+        if (!empty($unsubscribeNewCategories)) {
+            $this->addToCategory($lead, $unsubscribeNewCategories, false);
+        }
+
         // Delete channels that were removed
         $deleted = array_diff_key($frequencyRules, $entities);
         if (!empty($deleted)) {
@@ -1042,30 +1050,48 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param bool $manuallyAdded
+     * @param bool $subscribedFlag
+     *
+     * @return mixed[]
      */
-    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true): array
+    public function addToCategory(Lead $lead, $categories, $subscribedFlag = true): array
     {
-        $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
-
         $results = [];
         foreach ($categories as $category) {
-            if (!isset($leadCategories[$category])) {
+            if (!$category instanceof Category) {
+                $category = $this->categoryModel->getEntity($category);
+            }
+
+            $dispatchEvent = false;
+
+            /** @var ?LeadCategory $leadCategory */
+            $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
+            if (is_null($leadCategory)) {
+                $dispatchEvent = true;
+
                 $newLeadCategory = new LeadCategory();
                 $newLeadCategory->setLead($lead);
-                if (!$category instanceof Category) {
-                    $category = $this->categoryModel->getEntity($category);
-                }
                 $newLeadCategory->setCategory($category);
                 $newLeadCategory->setDateAdded(new \DateTime());
-                $newLeadCategory->setManuallyAdded($manuallyAdded);
+                $newLeadCategory->setManuallyAdded($subscribedFlag);
+                $newLeadCategory->setManuallyRemoved(!$subscribedFlag);
                 $results[$category->getId()] = $newLeadCategory;
+            } elseif (true === $leadCategory->getManuallyRemoved()) {
+                $dispatchEvent = true;
 
+                $leadCategory->setManuallyAdded($subscribedFlag);
+                $leadCategory->setManuallyRemoved(!$subscribedFlag);
+                $leadCategory->setDateAdded(new \DateTime());
+                $results[$category->getId()] = $leadCategory;
+            }
+
+            if ($dispatchEvent) {
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
                     $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category), LeadEvents::LEAD_CATEGORY_CHANGE);
                 }
             }
         }
+
         if (!empty($results)) {
             $this->getLeadCategoryRepository()->saveEntities($results);
         }
@@ -1132,6 +1158,16 @@ class LeadModel extends FormModel
         }
 
         return $leadCategoryList;
+    }
+
+    /**
+     * @param string[] $types
+     *
+     * @return array<int, int>
+     */
+    public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
+    {
+        return $this->getLeadCategoryRepository()->getSubscribedAndNewCategoryIds($lead, $types);
     }
 
     /**
