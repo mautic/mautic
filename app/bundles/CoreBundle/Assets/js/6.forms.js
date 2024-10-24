@@ -44,7 +44,7 @@ Mautic.renameFormElements = function(container, oldIdPrefix, oldNamePrefix, newI
  * @param form
  */
 Mautic.ajaxifyForm = function (formName) {
-    Mautic.initializeFormFieldVisibilitySwitcher(formName);
+    Mautic.initializeFormFieldStateSwitcher(formName);
 
     // Prevent enter from submitting form and instead jump to next line
     var form = 'form[name="' + formName + '"]';
@@ -257,25 +257,28 @@ Mautic.postForm = function (form, callback) {
 
 
 /**
- * Initialize form field visibility switcher
+ * Initialize form field state switcher
  *
  * @param formName
  */
-Mautic.initializeFormFieldVisibilitySwitcher = function (formName)
+Mautic.initializeFormFieldStateSwitcher = function (formName)
 {
-    Mautic.switchFormFieldVisibilty(formName);
+    Mautic.switchFormFieldState(formName);
 
     mQuery('form[name="'+formName+'"]').on('change', function() {
-        Mautic.switchFormFieldVisibilty(formName);
+        Mautic.switchFormFieldState(formName);
     });
 };
 
 /**
- * Switch form field visibility based on selected values
+ * Switch form field state based on selected values
+ *
+ * Possible state: visible, disabled
  */
-Mautic.switchFormFieldVisibilty = function (formName) {
+Mautic.switchFormFieldState = function (formName) {
     var form   = mQuery('form[name="'+formName+'"]');
-    var fields = {};
+    var visibleFields = {};
+    var disabledFields = {};
     var fieldsPriority = {};
 
     var getFieldParts = function(fieldName) {
@@ -290,21 +293,21 @@ Mautic.switchFormFieldVisibilty = function (formName) {
     };
 
     var checkValueCondition = function (sourceFieldVal, condition) {
-        var visible = true;
+        var state = true;
         if (typeof condition == 'object') {
-            visible = mQuery.inArray(sourceFieldVal, condition) !== -1;
+            state = mQuery.inArray(sourceFieldVal, condition) !== -1;
         } else if (condition == 'empty' || (condition == 'notEmpty')) {
             var isEmpty = (sourceFieldVal == '' || sourceFieldVal == null || sourceFieldVal == 'undefined');
-            visible = (condition == 'empty') ? isEmpty : !isEmpty;
+            state = (condition == 'empty') ? isEmpty : !isEmpty;
         } else if (condition !== sourceFieldVal) {
-            visible = false;
+            state = false;
         }
 
-        return visible;
+        return state;
     };
 
     var checkFieldCondition = function (fieldId, attribute, condition) {
-        var visible = true;
+        var state = true;
 
         if (attribute) {
             // Compare the attribute value
@@ -314,7 +317,7 @@ Mautic.switchFormFieldVisibilty = function (formName) {
                 // Check the value option
                 var field = mQuery('#' + fieldId +' option[value="' + mQuery('#' + fieldId).val() + '"]');
             } else {
-                return visible;
+                return state;
             }
 
             var attributeValue = (typeof mQuery(field).attr(attribute) !== 'undefined') ? mQuery(field).attr(attribute) : null;
@@ -327,20 +330,44 @@ Mautic.switchFormFieldVisibilty = function (formName) {
         return checkValueCondition(mQuery('#' + fieldId).val(), condition);
     }
 
-    // find all fields to show
-    form.find('[data-show-on]').each(function(index, el) {
-        var field = mQuery(el);
-        var showOn = JSON.parse(field.attr('data-show-on'));
+    var processConditions = function (attribute, checkState, shouldInvert) {
+        form.find('[' + attribute + ']').each(function(_, el) {
+            var field = mQuery(el);
+            var conditions = JSON.parse(field.attr(attribute));
 
-        mQuery.each(showOn, function(fieldId, condition) {
-            var fieldParts = getFieldParts(fieldId);
+            mQuery.each(conditions, function(fieldId, condition) {
+                var fieldParts = getFieldParts(fieldId);
+                var stateId = field.attr('id');
 
-            // Treat multiple fields as OR statements
-            if (typeof fields[field.attr('id')] === 'undefined' || !fields[field.attr('id')]) {
-                fields[field.attr('id')] = checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
-            }
+                // Evaluate the condition and apply inversion if needed
+                var conditionResult = checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
+                if (shouldInvert) {
+                    conditionResult = !conditionResult;
+                }
+
+                // Set the state only if it's undefined or follows OR logic
+                if (typeof checkState[stateId] === 'undefined' || !checkState[stateId]) {
+                    checkState[stateId] = conditionResult;
+                }
+            });
         });
-    });
+    };
+
+    var resetField = function (field) {
+        // Set Yes/No toggle to No.
+        if ('Mautic.toggleYesNo(this);' === field.attr('onchange')
+            && field.val() === "1"
+            && field.is(':checked')
+        ) {
+            label = field.siblings('.toggle__label')
+            if (label.attr('aria-checked') === "true") {
+                label.trigger('click');
+            }
+        }
+    }
+
+    // find all fields to show
+    processConditions('data-show-on', visibleFields, false);
 
     // find all fields to hide
     form.find('[data-hide-on]').each(function(index, el) {
@@ -356,20 +383,39 @@ Mautic.switchFormFieldVisibilty = function (formName) {
             var fieldParts = getFieldParts(fieldId);
 
             // Treat multiple fields as OR statements
-            if (typeof fields[field.attr('id')] === 'undefined' || fields[field.attr('id')]) {
-                fields[field.attr('id')] = !checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
+            if (typeof visibleFields[field.attr('id')] === 'undefined' || visibleFields[field.attr('id')]) {
+                visibleFields[field.attr('id')] = !checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
             }
         });
     });
 
     // show/hide according to conditions
-    mQuery.each(fields, function(fieldId, show) {
-        var fieldContainer = mQuery('#' + fieldId).closest('[class*="col-"]');;
+    mQuery.each(visibleFields, function(fieldId, show) {
+        var field = mQuery('#' + fieldId);
+        var fieldContainer = field.closest('[class*="col-"]');
         if (show) {
             fieldContainer.fadeIn();
         } else {
+            resetField(field);
             fieldContainer.fadeOut();
         }
+    });
+
+    // find all fields to enable
+    processConditions('data-enable-on', disabledFields, true);
+    // find all fields to disable
+    processConditions('data-disable-on', disabledFields, false);
+
+    // disable according to conditions
+    mQuery.each(disabledFields, function(fieldId, disable) {
+        var field = mQuery('#' + fieldId)
+        if (disable) {
+            resetField(field);
+            field.addClass('disabled', disable);
+        } else {
+            field.removeClass('disabled', disable);
+        }
+
     });
 };
 
