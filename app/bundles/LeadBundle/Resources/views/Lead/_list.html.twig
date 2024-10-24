@@ -2,65 +2,76 @@
     {% set customButtons = [
       {
           'attr': {
-              'class': 'btn btn-default btn-sm btn-nospin',
+              'class': 'btn btn-ghost btn-sm btn-nospin',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_segment_batch_contact_view'),
               'data-header': 'mautic.lead.batch.lists'|trans,
           },
           'btnText': 'mautic.lead.batch.lists'|trans,
-          'iconClass': 'fa fa-pie-chart',
+          'iconClass': 'ri-pie-chart-line',
       },
       {
           'attr': {
-              'class': 'btn btn-default btn-sm btn-nospin',
+              'class': 'btn btn-ghost btn-sm btn-nospin',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'batchStages'}),
               'data-header': 'mautic.lead.batch.stages'|trans,
           },
           'btnText': 'mautic.lead.batch.stages'|trans,
-          'iconClass': 'fa fa-tachometer',
+          'iconClass': 'ri-barricade-line flip-vertically',
       },
       {
           'attr': {
-              'class': 'btn btn-default btn-sm btn-nospin',
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_tagmanager_batch_index_action'),
+              'data-header': 'mautic.tagmanager.batch.tags'|trans,
+          },
+          'btnText': 'mautic.tagmanager.batch.tags'|trans,
+          'iconClass': 'ri-hashtag',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'batchCampaigns'}),
               'data-header': 'mautic.lead.batch.campaigns'|trans,
           },
           'btnText': 'mautic.lead.batch.campaigns'|trans,
-          'iconClass': 'fa fa-clock-o',
+          'iconClass': 'ri-megaphone-line',
       },
       {
           'attr': {
-              'class': 'btn btn-default btn-sm btn-nospin',
+              'class': 'btn btn-ghost btn-sm btn-nospin',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'batchOwners'}),
               'data-header': 'mautic.lead.batch.owner'|trans,
           },
           'btnText': 'mautic.lead.batch.owner'|trans,
-          'iconClass': 'fa fa-user',
+          'iconClass': 'ri-user-2-line',
       },
       {
           'attr': {
-              'class': 'btn btn-default btn-sm btn-nospin',
+              'class': 'btn btn-ghost btn-sm btn-nospin',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'batchDnc'}),
               'data-header': 'mautic.lead.batch.dnc'|trans,
           },
           'btnText': 'mautic.lead.batch.dnc'|trans,
-          'iconClass': 'fa fa-ban text-danger',
+          'iconClass': 'ri-prohibited-line text-danger',
       },
     ] %}
 {% endif %}
 
 {% if items|length > 0 %}
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered" id="leadTable">
+        <table class="table table-hover" id="leadTable">
             <thead>
                 <tr>
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {

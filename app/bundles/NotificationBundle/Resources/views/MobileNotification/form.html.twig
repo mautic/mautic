@@ -24,12 +24,12 @@
   {% set integrationSettings = integration.integrationSettings.featureSettings %}
   {{ form_start(form) }}
   <div class="box-layout">
-      <div class="col-md-9 height-auto bg-white">
+      <div class="col-md-9 height-auto">
           <div class="row">
               <div class="col-xs-12">
 
                   <!-- tabs controls -->
-                  <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                  <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active"><a href="#notification-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
                       <li><a href="#data-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.data'|trans }}</a></li>
                       {% if integrationSettings.platforms is defined and 'ios' in integrationSettings.platforms %}
@@ -67,16 +67,12 @@
               </div>
           </div>
       </div>
-      <div class="col-md-3 bg-white height-auto bdr-l">
+      <div class="col-md-3 height-auto bdr-l">
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.category) }}
               {{ form_row(form.language) }}
               <hr />
-              <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-              <br />
-              {% for utmTag in form.utmTags %}
-                  {{ form_row(utmTag) }}
-              {% endfor %}
+              {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
               <div class="hide">
                   {{ form_row(form.isPublished) }}
                   {{ form_row(form.publishUp) }}

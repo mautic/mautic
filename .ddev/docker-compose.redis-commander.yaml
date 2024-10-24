@@ -1,9 +1,8 @@
-version: '3.6'
 services:
   redis-commander:
     container_name: ddev-${DDEV_SITENAME}-redis-commander
     hostname: ${DDEV_SITENAME}-redis-commander
-    image: rediscommander/redis-commander
+    image: ghcr.io/joeferner/redis-commander:latest
     restart: always
     ports:
       - 1358

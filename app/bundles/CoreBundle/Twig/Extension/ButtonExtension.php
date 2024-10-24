@@ -13,26 +13,14 @@ use Twig\TwigFunction;
 
 class ButtonExtension extends AbstractExtension
 {
-    protected ButtonHelper $buttonHelper;
-    protected RequestStack $requestStack;
-    protected UrlGeneratorInterface $router;
-    protected TranslatorInterface $translator;
-
     public function __construct(
-        ButtonHelper $buttonHelper,
-        RequestStack $requestStack,
-        UrlGeneratorInterface $router,
-        TranslatorInterface $translator
+        protected ButtonHelper $buttonHelper,
+        protected RequestStack $requestStack,
+        protected UrlGeneratorInterface $router,
+        protected TranslatorInterface $translator
     ) {
-        $this->buttonHelper = $buttonHelper;
-        $this->requestStack = $requestStack;
-        $this->router       = $router;
-        $this->translator   = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
@@ -48,9 +36,6 @@ class ButtonExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param null $item
-     */
     public function reset(string $location, string $groupType = ButtonHelper::TYPE_GROUP, $item = null): void
     {
         $this->buttonHelper->reset(
@@ -134,19 +119,15 @@ class ButtonExtension extends AbstractExtension
                 case 'clone':
                 case 'abtest':
                     $actionQuery = [
-                        /**
-                         * If the item has the getVariantParent(), it probably implements VariantEntityInterface,
-                         * but that doesn't have a getId() method so we can't do $item instanceof VariantEntityInterface here.
-                         */
                         'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
                             ? $item->getVariantParent()->getId() : $item->getId(),
                     ];
-                    $icon = ('clone' == $action) ? 'copy' : 'sitemap';
+                    $icon = ('clone' == $action) ? 'file-copy-line' : 'a-b';
                     $path = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     break;
                 case 'close':
-                    $closeParameters = isset($routeVars['close']) ? $routeVars['close'] : [];
-                    $icon            = 'remove';
+                    $closeParameters = $routeVars['close'] ?? [];
+                    $icon            = 'close-line';
                     $path            = $this->router->generate($indexRoute, $closeParameters);
                     $primary         = true;
                     $priority        = 200;
@@ -154,7 +135,7 @@ class ButtonExtension extends AbstractExtension
                 case 'new':
                 case 'edit':
                     $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
-                    $icon        = ('edit' == $action) ? 'pencil-square-o' : 'plus';
+                    $icon        = ('edit' == $action) ? 'edit-line' : 'add-line';
                     $path        = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     $primary     = true;
                     break;
@@ -181,17 +162,20 @@ class ButtonExtension extends AbstractExtension
 
             if ($path) {
                 $mergeAttr = (!in_array($action, ['edit', 'new'])) ? [] : $editAttr;
+                $btnClass  = in_array($action, ['new', 'edit']) ? 'btn btn-primary' : 'btn btn-tertiary';
+
                 $this->buttonHelper->addButton(
                     [
                         'attr' => array_merge(
                             [
-                                'class'       => 'btn btn-default',
+                                'class'       => $btnClass,
                                 'href'        => $path,
                                 'data-toggle' => 'ajax',
+                                'id'          => $action,
                             ],
                             $mergeAttr
                         ),
-                        'iconClass' => 'fa fa-'.$icon,
+                        'iconClass' => 'ri-'.$icon,
                         'btnText'   => $this->translator->trans('mautic.core.form.'.$action),
                         'priority'  => $priority,
                         'primary'   => $primary,

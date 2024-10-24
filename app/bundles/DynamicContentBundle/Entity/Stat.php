@@ -7,9 +7,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
     /**
@@ -23,7 +20,7 @@ class Stat
     private $dynamicContent;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
@@ -62,14 +59,15 @@ class Stat
      */
     private $tokens = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content_stats')
-            ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\StatRepository')
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
-            ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search');
+            ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search')
+            ->addIndex(['date_sent'], 'stat_dynamic_content_date_sent');
 
         $builder->addBigIntIdField();
 
@@ -107,7 +105,7 @@ class Stat
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -125,7 +123,7 @@ class Stat
             ->build();
     }
 
-    public function addSentDetails($details)
+    public function addSentDetails($details): void
     {
         $this->sentDetails[] = $details;
 
@@ -145,10 +143,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -156,7 +151,7 @@ class Stat
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = (string) $id;
     }
@@ -169,7 +164,7 @@ class Stat
         return $this->dynamicContent;
     }
 
-    public function setDynamicContent(DynamicContent $dynamicContent)
+    public function setDynamicContent(DynamicContent $dynamicContent): void
     {
         $this->dynamicContent = $dynamicContent;
     }
@@ -185,7 +180,7 @@ class Stat
     /**
      * @param Lead $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -201,7 +196,7 @@ class Stat
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -217,7 +212,7 @@ class Stat
     /**
      * @param int $sentCount
      */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): void
     {
         $this->sentCount = $sentCount;
     }
@@ -233,7 +228,7 @@ class Stat
     /**
      * @param int $lastSent
      */
-    public function setLastSent($lastSent)
+    public function setLastSent($lastSent): void
     {
         $this->lastSent = $lastSent;
     }
@@ -249,7 +244,7 @@ class Stat
     /**
      * @param array $sentDetails
      */
-    public function setSentDetails($sentDetails)
+    public function setSentDetails($sentDetails): void
     {
         $this->sentDetails = $sentDetails;
     }
@@ -265,7 +260,7 @@ class Stat
     /**
      * @param string $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         $this->source = $source;
     }
@@ -281,7 +276,7 @@ class Stat
     /**
      * @param int $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): void
     {
         $this->sourceId = $sourceId;
     }
@@ -297,7 +292,7 @@ class Stat
     /**
      * @param array $tokens
      */
-    public function setTokens($tokens)
+    public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
     }

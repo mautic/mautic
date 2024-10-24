@@ -32,7 +32,7 @@ class WidgetApiController extends CommonApiController
     /**
      * @var DashboardModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
@@ -51,7 +51,7 @@ class WidgetApiController extends CommonApiController
     /**
      * Obtains a list of available widget types.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getTypesAction()
     {
@@ -69,7 +69,7 @@ class WidgetApiController extends CommonApiController
      *
      * @param string $type of the widget
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getDataAction(Request $request, $type)
     {

@@ -22,7 +22,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getFolder()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getProperty()
      */
-    public function testGetters()
+    public function testGetters(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
 
@@ -40,7 +40,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getFolder()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getProperty()
      */
-    public function testKeyIsPathAndUser()
+    public function testKeyIsPathAndUser(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
 
@@ -55,7 +55,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getFolder()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getProperty()
      */
-    public function testIsConfigured()
+    public function testIsConfigured(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
 
@@ -70,7 +70,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getFolder()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getProperty()
      */
-    public function testIsNotConfiguredIfFolderIsMissing()
+    public function testIsNotConfiguredIfFolderIsMissing(): void
     {
         $config = $this->config;
         unset($config['folder']);
@@ -86,7 +86,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getFolder()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getProperty()
      */
-    public function testIsNotConfiguredIfHostIsMissing()
+    public function testIsNotConfiguredIfHostIsMissing(): void
     {
         $config = $this->config;
         unset($config['host']);

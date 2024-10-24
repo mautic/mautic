@@ -6,7 +6,12 @@
 
 {% block headerTitle entity.name %}
 
-{% block publishStatus include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': entity}) %}
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': entity,
+        'status': 'available'
+    }) -}}
+{% endblock %}
 
 {% block actions include('@MauticCore/Helper/page_actions.html.twig', {
     'item': entity,
@@ -32,8 +37,8 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 bg-white height-auto">
-          <div class="bg-auto">
+      <div class="col-md-9 height-auto">
+          <div>
               <!-- page detail header -->
               <div class="pr-md pl-md pt-lg pb-lg">
                   <div class="box-layout">
@@ -63,10 +68,10 @@
               </div>
               <!--/ page detail header -->
               <!-- page detail collapseable -->
-              <div class="collapse" id="page-details">
+              <div class="collapse pr-md pl-md" id="page-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-bordered table-striped mb-0">
+                          <table class="table table-hover mb-0">
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': entity}) }}
                               <tr>
@@ -86,7 +91,7 @@
               </div>
               <!--/ page detail collapseable -->
           </div>
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- page detail collapseable toggler -->
               <div class="hr-expand nm">
                   <span data-toggle="tooltip" title="Detail">
@@ -106,7 +111,7 @@
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 va-m">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
-                                          <span class="fa fa-line-chart"></span>
+                                          <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.dynamicContent.views'|trans }}
                                       </h5>
                                   </div>
@@ -123,10 +128,10 @@
               </div>
               <!--/ stats -->
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+              {{ customContent('details.stats.graph.below', _context) }}
 
               <!-- tabs controls -->
-              <ul class="nav nav-tabs pr-md pl-md">
+              <ul class="nav nav-tabs nav-tabs-contained">
                   <li class="active">
                       <a href="#clicks-container" role="tab" data-toggle="tab">
                           {{ 'mautic.trackable.click_counts'|trans }}
@@ -161,7 +166,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bg-white bdr-l height-auto">
+      <div class="col-md-3 bdr-l height-auto">
           <hr class="hr-w-2" style="width:50%">
           <!-- recent activity -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}

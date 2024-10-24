@@ -15,24 +15,27 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    public function testNewFieldVarcharFieldWith191Length(): void
+    /**
+     * @dataProvider provideFieldLength
+     */
+    public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
-        $fieldModel = self::$container->get('mautic.lead.model.field');
-        $field      = $this->createField('a');
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $field      = $this->createField('a', 'text', [], $inputLength);
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
-        $this->assertEquals(ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH, $columns[$field->getAlias()]->getLength());
+        $this->assertEquals($expectedLength, $columns[$field->getAlias()]->getLength());
     }
 
     public function testNewMultiSelectField(): void
     {
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $field      = $this->createField('s', 'select', ['properties' => ['list' => ['choice_a' => 'Choice A']]]);
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertArrayHasKey('field_s', $columns);
     }
@@ -93,9 +96,73 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param array<string, string> $properties
+     *
+     * @dataProvider dataForCreatingNewBooleanField
+     */
+    public function testCreatingNewBooleanField(array $properties, string $expectedMessage): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $domDocument = $crawler->getNode(0)->ownerDocument;
+        $yesLabel    = $domDocument->createElement('input');
+        $yesLabel->setAttribute('type', 'text');
+        $yesLabel->setAttribute('name', 'leadfield[properties][yes]');
+
+        $noLabel  = $domDocument->createElement('input');
+        $noLabel->setAttribute('type', 'text');
+        $noLabel->setAttribute('name', 'leadfield[properties][no]');
+
+        $form = $crawler->selectButton('Save')->form();
+        $form->set(new InputFormField($yesLabel));
+        $form->set(new InputFormField($noLabel));
+
+        $form['leadfield[label]']->setValue('Request a meeting');
+        $form['leadfield[type]']->setValue('boolean');
+        $form['leadfield[object]']->setValue('lead');
+        $form['leadfield[group]']->setValue('core');
+
+        $form['leadfield[properties][yes]']->setValue($properties['yes'] ?? '');
+        $form['leadfield[properties][no]']->setValue($properties['no'] ?? '');
+
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $text = strip_tags($this->client->getResponse()->getContent());
+        Assert::assertStringNotContainsString($expectedMessage, $text);
+    }
+
+    /**
+     * @return iterable<string, array<int, string|array<string, string>>>
+     */
+    public function dataForCreatingNewBooleanField(): iterable
+    {
+        yield 'No properties' => [
+            [],
+            'A \'positive\' label is required.',
+        ];
+
+        yield 'Only Yes' => [
+            [
+                'yes' => 'Yes',
+            ],
+            'A \'negative\' label is required.',
+        ];
+
+        yield 'Only No' => [
+            [
+                'no' => 'No',
+            ],
+            'A \'positive\' label is required.',
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $parameters
      */
-    private function createField(string $suffix, string $type = 'text', array $parameters = []): LeadField
+    private function createField(string $suffix, string $type = 'text', array $parameters = [], ?int $charLength = null): LeadField
     {
         $field = new LeadField();
         $field->setName("Field $suffix");
@@ -104,9 +171,21 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $field->setDateAdded(new \DateTime());
         $field->setDateModified(new \DateTime());
         $field->setType($type);
+        if (!empty($charLength)) {
+            $field->setCharLengthLimit($charLength);
+        }
         $field->setObject('lead');
         isset($parameters['properties']) && $field->setProperties($parameters['properties']);
 
         return $field;
+    }
+
+    /**
+     * @return iterable<array<mixed>>
+     */
+    public function provideFieldLength(): iterable
+    {
+        yield [ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH];
+        yield [64, null];
     }
 }

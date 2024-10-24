@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Dsn;
 
-final class Dsn
+final class Dsn implements \Stringable
 {
     private const ALLOWED_DSN_ARRAY = [
         'sync://' => ['sync', ''],

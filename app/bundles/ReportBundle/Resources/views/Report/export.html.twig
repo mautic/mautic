@@ -37,7 +37,7 @@
 
 
   {% if columnOrder is not empty %}
-      <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+      <table class="table table-hover report-list" id="reportTable">
           <thead>
           <tr>
               <th class="col-report-count"></th>
@@ -53,7 +53,7 @@
                   <tr>
                       <td>{{ count + 1 }}</td>
                       {% for k, v in data %}
-                          <td>{{ format(v, reportDataResult.getType(k)) }}</td>
+                          <td>{{ format(v, reportDataResult.getType(k))|purify }}</td>
                       {% endfor %}
                   </tr>
               {% endfor %}

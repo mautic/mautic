@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Mautic\PointBundle\Tests\Functional\EmailTriggerTest;
+namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
-use Mautic\PointBundle\Entity\Trigger;
-use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\TriggerModel;
 
 class PointTriggerFunctionalTest extends MauticMysqlTestCase
 {
+    use TriggerTrait;
+
     public function testPointsTriggerWithTagAction(): void
     {
         /** @var LeadModel $model */
@@ -140,44 +140,6 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($this->leadHasTag($lead, 'tagC'));
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
-    }
-
-    private function createTrigger(
-        string $name,
-        int $points = 0,
-        Group $group = null,
-        bool $triggerExistingLeads = false
-    ): Trigger {
-        $trigger = new Trigger();
-        $trigger->setName($name);
-        $trigger->setPoints($points);
-
-        if (isset($group)) {
-            $trigger->setGroup($group);
-        }
-        if ($triggerExistingLeads) {
-            $trigger->setTriggerExistingLeads($triggerExistingLeads);
-        }
-        $this->em->persist($trigger);
-
-        return $trigger;
-    }
-
-    private function createAddTagEvent(
-        string $tag,
-        Trigger $trigger
-    ): TriggerEvent {
-        $triggerEvent = new TriggerEvent();
-        $triggerEvent->setTrigger($trigger);
-        $triggerEvent->setName('Add '.$tag);
-        $triggerEvent->setType('lead.changetags');
-        $triggerEvent->setProperties([
-            'add_tags'    => [$tag],
-            'remove_tags' => [],
-        ]);
-        $this->em->persist($triggerEvent);
-
-        return $triggerEvent;
     }
 
     private function createGroup(

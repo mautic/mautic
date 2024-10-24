@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="panel panel-default bdr-t-wdh-0">
+    <div id="page-list-wrapper">
         <div class="page-list">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
@@ -28,7 +28,7 @@
             }) -}}
             {% if items is defined and items is not empty %}
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped table-bordered" id="groupTable">
+                    <table class="table table-hover" id="groupTable">
                         <thead>
                         <tr>
                             {{ include(

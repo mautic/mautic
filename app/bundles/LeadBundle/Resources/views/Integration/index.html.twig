@@ -4,9 +4,7 @@
     - integrations
 #}
 {% if integrations is empty %}
-  <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
-      <h4>{{ 'mautic.lead.integrations.header'|trans }}</h4>
-  </div>
+  {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.lead.integrations.header'}) }}
 {% else %}
   <div class="row">
     {% for details in integrations %}
@@ -16,7 +14,7 @@
           <div class="panel-heading">
             <h3 class="panel-title">
               {% if details.link is defined %}
-                <a href="{{ details.link }}" class="pull-right"><i class="fa fa-external-link"></i></a>
+                <a href="{{ details.link }}" class="pull-right"><i class="ri-external-link-line"></i></a>
               {% endif %}
               {{ details.integration }}
             </h3>

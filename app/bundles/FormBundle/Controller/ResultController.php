@@ -47,7 +47,7 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1)
     {
@@ -171,6 +171,7 @@ class ResultController extends CommonFormController
                         'form:forms:editother',
                         $form->getCreatedBy()
                     ),
+                    'enableExportPermission'=> $this->security->isAdmin() || $this->security->isGranted('form:export:enable', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => '@MauticForm/Result/list.html.twig',
                 'passthroughVars' => [
@@ -279,6 +280,10 @@ class ResultController extends CommonFormController
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
+        if (!$this->security->isAdmin() && !$this->security->isGranted('form:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
         if (null === $form) {
             // redirect back to form list
             return $this->postActionRedirect(
@@ -320,7 +325,7 @@ class ResultController extends CommonFormController
             'form'       => $form,
         ];
 
-        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
+        /** @var SubmissionModel $model */
         $model = $this->getModel('form.submission');
 
         return $model->exportResults($format, $form, $args);
@@ -394,26 +399,17 @@ class ResultController extends CommonFormController
         return $this->batchDeleteStandard($request);
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'form.submission';
     }
 
-    /**
-     * @return string
-     */
-    protected function getIndexRoute()
+    protected function getIndexRoute(): string
     {
         return 'mautic_form_results';
     }
 
-    /**
-     * @return string
-     */
-    protected function getActionRoute()
+    protected function getActionRoute(): string
     {
         return 'mautic_form_results_action';
     }
@@ -436,7 +432,7 @@ class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    public function getPostActionRedirectArguments(array $args, $action)
+    public function getPostActionRedirectArguments(array $args, $action): array
     {
         switch ($action) {
             case 'batchDelete':
@@ -461,8 +457,8 @@ class ResultController extends CommonFormController
         } elseif ($request->request->has('formId')) {
             $formId = $request->request->get('formId');
         } else {
-            $objectId = isset($parameters['objectId']) ? $parameters['objectId'] : 0;
-            $formId   = (isset($parameters['formId'])) ? $parameters['formId'] : $request->query->get('formId', $objectId);
+            $objectId = $parameters['objectId'] ?? 0;
+            $formId   = $parameters['formId'] ?? $request->query->get('formId', $objectId);
         }
 
         return $formId;

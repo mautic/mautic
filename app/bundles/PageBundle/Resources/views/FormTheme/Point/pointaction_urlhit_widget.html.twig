@@ -1,5 +1,6 @@
 {% block pointaction_urlhit_widget %}
 {%- set timeFrames = {
+    's': 'mautic.core.time.seconds'|trans,
     'i': 'mautic.core.time.minutes'|trans,
     'H': 'mautic.core.time.hours'|trans,
     'd': 'mautic.core.time.days'|trans,
@@ -24,7 +25,7 @@
             {{ form_widget(form['returns_within']) }}
             {%- set default = form.returns_within_unit.vars.data %}
             <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <button type="button" class="btn btn-ghost dropdown-toggle" data-toggle="dropdown">
                     <span class="returns_within_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu time-dropdown">
@@ -44,7 +45,7 @@
             {{ form_widget(form['returns_after']) }}
             {%- set default = form['returns_after_unit'].vars['data'] %}
             <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <button type="button" class="btn btn-ghost dropdown-toggle" data-toggle="dropdown">
                     <span class="returns_after_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu time-dropdown">
@@ -65,7 +66,7 @@
             {{ form_widget(form['accumulative_time']) }}
             {%- set default = form['accumulative_time_unit'].vars['data'] %}
             <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <button type="button" class="btn btn-ghost dropdown-toggle" data-toggle="dropdown">
                     <span class="accumulative_time_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu time-dropdown">

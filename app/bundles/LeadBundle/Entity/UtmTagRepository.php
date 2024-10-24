@@ -14,8 +14,6 @@ class UtmTagRepository extends CommonRepository
     /**
      * Get tag entities by lead.
      *
-     * @param $utmTags
-     *
      * @return array
      */
     public function getUtmTagsByLead(Lead $lead = null, $options = [])
@@ -38,6 +36,6 @@ class UtmTagRepository extends CommonRepository
             ));
         }
 
-        return $this->getTimelineResults($qb, $options, 'ut.utm_campaign', 'ut.date_added', ['query'], ['date_added']);
+        return $this->getTimelineResults($qb, $options, 'ut.utm_campaign', 'ut.date_added', ['query'], ['date_added'], null, 'ut.id');
     }
 }

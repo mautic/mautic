@@ -17,6 +17,7 @@ trait TimelineTrait
      * @param array<mixed> $serializedColumns     Array of columns to unserialize
      * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
      * @param mixed|null   $resultsParserCallback Callback to custom parse results
+     * @param string|null  $secondaryOrdering     Name of column for secondary sort
      *
      * @return array<mixed>
      */
@@ -27,17 +28,18 @@ trait TimelineTrait
         $timestampColumn,
         $serializedColumns = [],
         $dateTimeColumns = [],
-        $resultsParserCallback = null
+        $resultsParserCallback = null,
+        string $secondaryOrdering = null
     ) {
         if (!empty($options['unitCounts'])) {
-            list($tablePrefix, $column) = explode('.', $timestampColumn);
+            [$tablePrefix, $column] = explode('.', $timestampColumn);
 
             // Get counts grouped by unit based on date range
             /** @var ChartQuery $cq */
             $cq = $options['chartQuery'];
             $cq->modifyTimeDataQuery($query, $column, $tablePrefix);
             $cq->applyDateFilters($query, $column, $tablePrefix);
-            $data = $query->execute()->fetchAllAssociative();
+            $data = $query->executeQuery()->fetchAllAssociative();
 
             return $cq->completeTimeData($data);
         }
@@ -63,19 +65,18 @@ trait TimelineTrait
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = $eventNameColumn;
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = $timestampColumn;
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => $eventNameColumn,
+                default      => $timestampColumn,
+            };
 
             $query->orderBy($orderBy, $orderByDir);
+
+            if ($secondaryOrdering) {
+                $query->addOrderBy($secondaryOrdering, $orderByDir);
+            }
         }
 
         if (!empty($options['limit'])) {

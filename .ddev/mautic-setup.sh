@@ -10,6 +10,7 @@ setup_mautic() {
 
     cp ./.ddev/local.config.php.dist ./config/local.php
     cp ./.ddev/.env.test.local ./.env.test.local
+    cp ./.ddev/.env.local.dist ./.env.local
 
     printf "Installing Mautic...\n"
     php bin/console mautic:install "${MAUTIC_URL}"
@@ -20,11 +21,12 @@ setup_mautic() {
 
     tput setaf 2
     printf "All done! Here's some useful information:\n"
-    printf "🔒 The default login is admin/mautic\n"
+    printf "🔒 The default login is admin / Maut1cR0cks!\n"
     printf "🌐 To open the Mautic instance, go to ${MAUTIC_URL} in your browser.\n"
     printf "🌐 To open PHPMyAdmin for managing the database, go to ${PHPMYADMIN_URL} in your browser.\n"
     printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to ${MAILHOG_URL} in your browser.\n"
     printf "🚀 Run \"ddev exec composer test\" to run PHPUnit tests.\n"
+    printf "🚀 Run \"ddev exec composer e2e-test\" to run End-to-End Test Suite.\n"
     printf "🚀 Run \"ddev exec bin/console COMMAND\" (like mautic:segments:update) to use the Mautic CLI. For an overview of all available CLI commands, go to https://mau.tc/cli\n"
     printf "🔴 If you want to stop the instance, simply run \"ddev stop\".\n"
     tput sgr0

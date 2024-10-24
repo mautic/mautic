@@ -23,15 +23,15 @@
 
 {{ form_start(form) }}
 <div class="box-layout">
-    <div class="col-md-9 bg-white height-auto">
+    <div class="col-md-9 height-auto">
         <div class="row">
             <div class="col-xs-12">
-                <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
                         <a href="#details" role="tab" data-toggle="tab" class="{% if hasMainErrors %}text-danger{% endif %}">
                             {{ 'mautic.core.details'|trans }}
                             {% if hasMainErrors %}
-                                <i class="fa fa-warning"></i>
+                                <i class="ri-alert-line"></i>
                             {% endif %}
                         </a>
                     </li>
@@ -39,7 +39,7 @@
                         <a href="#filters" role="tab" data-toggle="tab" class="{% if hasFilterErrors %}text-danger{% endif %}">
                             {{ 'mautic.core.filters'|trans }}
                             {% if hasFilterErrors %}
-                                <i class="fa fa-warning"></i>
+                                <i class="ri-alert-line"></i>
                             {% endif %}
                         </a>
                     </li>
@@ -119,7 +119,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto bdr-l">
+    <div class="col-md-3 height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.category) }}
             {{ form_row(form.language) }}
@@ -134,11 +134,7 @@
                 {{ form_row(form.slotName) }}
             </div>
             <hr/>
-            <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-            <br/>
-            {% for utmTag in form.utmTags %}
-                {{ form_row(utmTag) }}
-            {% endfor %}
+            {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
             <div class="hide">
                 {{ form_row(form.publishUp) }}
                 {{ form_row(form.publishDown) }}
@@ -175,10 +171,15 @@
                 name="dwc[filters][__name__][filter]"
                 id="dwc_filters___name___filter">
             {% if form.vars[dataKey] is defined %}
-                {% for value, label in form.vars[dataKey] %}
-                    {% if label is iterable %}
-                        <optgroup label="{{ value }}">
-                        {% for optionValue, optionLabel in label %}
+                {% set index = 0 %}
+                {% for label, value in form.vars[dataKey] %}
+                    {% if value is iterable %}
+                        <optgroup label="{{ label }}">
+                        {% for optionLabel, optionValue in value %}
+                            {% if (dataKey == 'regions') %}
+                                {% set optionValue = index %}
+                                {% set index = index + 1 %}
+                            {% endif %}
                             <option value="{{ optionValue }}">{{ optionLabel }}</option>
                         {% endfor %}
                         </optgroup>

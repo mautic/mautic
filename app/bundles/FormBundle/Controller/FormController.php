@@ -35,21 +35,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $alreadyMappedFieldCollector;
-
-    /**
-     * @var MappedObjectCollector
-     */
-    private $mappedObjectCollector;
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
-        $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
-        $this->mappedObjectCollector       = $mappedObjectCollector;
-
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private MappedObjectCollector $mappedObjectCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -161,7 +162,7 @@ class FormController extends CommonFormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\FormBundle\Model\FormModel $model */
+        /** @var FormModel $model */
         $model      = $this->getModel('form');
         $activeForm = $model->getEntity($objectId);
 
@@ -295,7 +296,7 @@ class FormController extends CommonFormController
      */
     public function newAction(Request $request)
     {
-        /** @var \Mautic\FormBundle\Model\FormModel $model */
+        /** @var FormModel $model */
         $model   = $this->getModel('form');
         $entity  = $model->getEntity();
         $session = $request->getSession();
@@ -446,14 +447,14 @@ class FormController extends CommonFormController
             $modifiedFields[$keyId]['showLabel']       = 1;
             $modifiedFields[$keyId]['type']            = 'button';
             $modifiedFields[$keyId]['id']              = $keyId;
-            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
             $modifiedFields[$keyId]['formId']          = $sessionId;
             unset($modifiedFields[$keyId]['form']);
             $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);
         }
 
         // fire the form builder event
-        $customComponents = $model->getCustomComponents($sessionId);
+        $customComponents = $model->getCustomComponents();
 
         return $this->delegateView(
             [
@@ -499,10 +500,10 @@ class FormController extends CommonFormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var \Mautic\FormBundle\Model\FormModel $model */
+        /** @var FormModel $model */
         $model            = $this->getModel('form');
         $formData         = $request->request->get('mauticform');
-        $sessionId        = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+        $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
         $modifiedFields   = [];
         $deletedFields    = [];
@@ -781,7 +782,7 @@ class FormController extends CommonFormController
                 $modifiedFields[$keyId]['showLabel']       = 1;
                 $modifiedFields[$keyId]['type']            = 'button';
                 $modifiedFields[$keyId]['id']              = $keyId;
-                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
                 $modifiedFields[$keyId]['formId']          = $objectId;
                 unset($modifiedFields[$keyId]['form']);
             }
@@ -789,13 +790,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
-                    function ($a, $b) {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
-                    }
+                    fn ($a, $b): int => $a['order'] <=> $b['order']
                 );
             }
 
@@ -827,13 +822,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedActions,
-                    function ($a, $b) {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
-                    }
+                    fn ($a, $b): int => $a['order'] <=> $b['order']
                 );
             }
 
@@ -887,7 +876,7 @@ class FormController extends CommonFormController
     {
         $model = $this->getModel('form.form');
 
-        /** @var \Mautic\FormBundle\Entity\Form $entity */
+        /** @var Form $entity */
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
@@ -906,7 +895,7 @@ class FormController extends CommonFormController
 
             // Clone the forms's fields
             $fields = $entity->getFields()->toArray();
-            /** @var \Mautic\FormBundle\Entity\Field $field */
+            /** @var Field $field */
             foreach ($fields as $field) {
                 $fieldClone = clone $field;
                 $fieldClone->setForm($entity);
@@ -931,10 +920,8 @@ class FormController extends CommonFormController
      * Gives a preview of the form.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, AnalyticsHelper $analyticsHelper)
+    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, AnalyticsHelper $analyticsHelper): Response
     {
         /** @var FormModel $model */
         $model = $this->getModel('form.form');
@@ -969,7 +956,8 @@ class FormController extends CommonFormController
             $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
         }
 
-        $template = $form->getTemplate();
+        // Use form specific template or system-wide default theme
+        $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
         if (!empty($template)) {
             $theme = $themeHelper->getTheme($template);
             if ($theme->getTheme() != $template) {
@@ -1151,7 +1139,7 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session.
      */
-    public function clearSessionComponents(Request $request, $sessionId)
+    public function clearSessionComponents(Request $request, $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
@@ -1179,7 +1167,7 @@ class FormController extends CommonFormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\FormBundle\Model\FormModel $model */
+            /** @var FormModel $model */
             $model = $this->getModel('form');
             $ids   = json_decode($request->query->get('ids', ''));
             $count = 0;

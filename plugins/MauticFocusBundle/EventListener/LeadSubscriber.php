@@ -13,26 +13,14 @@ use Symfony\Component\Routing\RouterInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    private Translator $translator;
-
-    private RouterInterface $router;
-
-    private FocusModel $focusModel;
-
     public function __construct(
-        Translator $translator,
-        RouterInterface $router,
-        FocusModel $focusModel
+        private Translator $translator,
+        private RouterInterface $router,
+        private FocusModel $focusModel
     ) {
-        $this->translator     = $translator;
-        $this->router         = $router;
-        $this->focusModel     = $focusModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE      => ['onTimelineGenerate', 0],
@@ -60,7 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($leadId, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
-            $icon     = 'fa-search';
+            $icon     = 'ri-search-line';
 
             // Add the view to the event array
             foreach (array_merge($statsViewsByLead['results'] ?? [], $statsClickByLead['results'] ?? []) as $statsView) {

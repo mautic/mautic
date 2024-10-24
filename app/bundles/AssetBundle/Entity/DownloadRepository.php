@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -16,10 +17,8 @@ class DownloadRepository extends CommonRepository
 
     /**
      * Determine if the download is a unique download.
-     *
-     * @return bool
      */
-    public function isUniqueDownload($assetId, $trackingId)
+    public function isUniqueDownload($assetId, $trackingId): bool
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -64,7 +63,7 @@ class DownloadRepository extends CommonRepository
             $query->andWhere($query->expr()->like('a.title', $query->expr()->literal('%'.$options['search'].'%')));
         }
 
-        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download']);
+        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download'], null, 'd.id');
     }
 
     /**
@@ -74,12 +73,10 @@ class DownloadRepository extends CommonRepository
      * @param int          $limit
      * @param int          $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostDownloaded($query, $limit = 10, $offset = 0)
+    public function getMostDownloaded($query, $limit = 10, $offset = 0): array
     {
         $query->select('a.title, a.id, count(ad.id) as downloads')
             ->groupBy('a.id, a.title')
@@ -87,7 +84,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -97,12 +94,10 @@ class DownloadRepository extends CommonRepository
      * @param int          $limit
      * @param int          $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, $limit = 10, $offset = 0)
+    public function getTopReferrers($query, $limit = 10, $offset = 0): array
     {
         $query->select('ad.referer, count(ad.referer) as downloads')
             ->groupBy('ad.referer')
@@ -110,7 +105,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -118,18 +113,16 @@ class DownloadRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHttpStatuses($query)
+    public function getHttpStatuses($query): array
     {
         $query->select('ad.code as status, count(ad.code) as count')
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
-        $results = $query->execute()->fetchAllAssociative();
+        $results = $query->executeQuery()->fetchAllAssociative();
 
         $chart   = new PieChart();
 
@@ -141,11 +134,9 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @param \DateTime $fromDate
-     *
-     * @return mixed
+     * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
+    public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, a.source_id as id, p.title as name, p.hits as total')
@@ -183,11 +174,9 @@ class DownloadRepository extends CommonRepository
      * Get download count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
      *
-     * @param \DateTime $fromDate
-     *
-     * @return mixed
+     * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null)
+    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null): array
     {
         // link email to page hit tracking id to download tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -221,7 +210,7 @@ class DownloadRepository extends CommonRepository
         return $downloads;
     }
 
-    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
+    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
@@ -240,7 +229,7 @@ class DownloadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')

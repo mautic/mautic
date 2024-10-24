@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Tests\Helper\EventListener\EmailValidationSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailValidatorTest extends \PHPUnit\Framework\TestCase
@@ -17,17 +18,17 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject&EmailValidationEvent
      */
-    private $event;
+    private MockObject $event;
 
     private EmailValidator $emailValidator;
 
@@ -44,7 +45,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator = new EmailValidator($this->translator, $this->dispatcher);
     }
 
-    public function testValidGmailEmail()
+    public function testValidGmailEmail(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
@@ -58,7 +59,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator->validate('john@gmail.com');
     }
 
-    public function testValidGmailEmailWithPeriod()
+    public function testValidGmailEmailWithPeriod(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
@@ -72,7 +73,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator->validate('john.doe@gmail.com');
     }
 
-    public function testValidGmailEmailWithPlus()
+    public function testValidGmailEmailWithPlus(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
@@ -86,7 +87,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator->validate('john+doe@gmail.com');
     }
 
-    public function testValidGmailEmailWithNonStandardTld()
+    public function testValidGmailEmailWithNonStandardTld(): void
     {
         $this->dispatcher->expects($this->once())
         ->method('dispatch')
@@ -101,67 +102,73 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator->validate('john@mail.email');
     }
 
-    public function testValidateEmailWithoutTld()
+    public function testValidateNull(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->emailValidator->validate(null);
+    }
+
+    public function testValidateEmailWithoutTld(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('john@doe');
     }
 
-    public function testValidateEmailWithSpaceInIt()
+    public function testValidateEmailWithSpaceInIt(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo hn@gmail.com');
     }
 
-    public function testValidateEmailWithCaretInIt()
+    public function testValidateEmailWithCaretInIt(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo^hn@gmail.com');
     }
 
-    public function testValidateEmailWithApostropheInTheDomainPortion()
+    public function testValidateEmailWithApostropheInTheDomainPortion(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('john@gm\'ail.com');
     }
 
-    public function testValidateEmailWithSemicolonInIt()
+    public function testValidateEmailWithSemicolonInIt(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo;hn@gmail.com');
     }
 
-    public function testValidateEmailWithAmpersandInIt()
+    public function testValidateEmailWithAmpersandInIt(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo&hn@gmail.com');
     }
 
-    public function testValidateEmailWithStarInIt()
+    public function testValidateEmailWithStarInIt(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo*hn@gmail.com');
     }
 
-    public function testValidateEmailWithPercentInIt()
+    public function testValidateEmailWithPercentInIt(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo%hn@gmail.com');
     }
 
-    public function testValidateEmailWithDoublePeriodInIt()
+    public function testValidateEmailWithDoublePeriodInIt(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo..hn@gmail.com');
     }
 
-    public function testValidateEmailWithBadDNS()
+    public function testValidateEmailWithBadDNS(): void
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('john@doe.shouldneverexist', true);
     }
 
-    public function testIntegrationInvalidatesEmail()
+    public function testIntegrationInvalidatesEmail(): void
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new EmailValidationSubscriber());

@@ -13,20 +13,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ObjectProvider
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * Cached internal objects.
      *
      * @var ObjectInterface[]
      */
-    private $objects = [];
+    private array $objects = [];
 
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

@@ -11,7 +11,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::__construct
      */
-    public function testTheHelperIsInstantiatedWithoutAttributeCorrectly()
+    public function testTheHelperIsInstantiatedWithoutAttributeCorrectly(): void
     {
         $helper = new ColorHelper();
         $this->assertEquals(0, $helper->getRed());
@@ -24,7 +24,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::__construct
      */
-    public function testThatColorHexAreSetCorrectly()
+    public function testThatColorHexAreSetCorrectly(): void
     {
         $colors = [
             '#ccc'    => [204, 204, 204],
@@ -49,7 +49,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::setHex
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::toHex
      */
-    public function testThatColorHexAreConvertedBackToHexCorrectly()
+    public function testThatColorHexAreConvertedBackToHexCorrectly(): void
     {
         $colors = [
             '#ccc'    => '#cccccc',
@@ -72,7 +72,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::toRgb
      */
-    public function testThatColorHexAreConvertedToRgbCorrectly()
+    public function testThatColorHexAreConvertedToRgbCorrectly(): void
     {
         $colors = [
             '#ccc'    => 'rgb(204,204,204)',
@@ -89,7 +89,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testThatRgbColorsAreReturnedCorrectly()
+    public function testThatRgbColorsAreReturnedCorrectly(): void
     {
         $colors = [
             '#ccc'    => [
@@ -122,7 +122,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::toRgba
      */
-    public function testThatColorHexAreConvertedToRgbaCorrectly()
+    public function testThatColorHexAreConvertedToRgbaCorrectly(): void
     {
         $colors = [
             '#ccc'    => 'rgba(204,204,204,%g)',
@@ -136,7 +136,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
         foreach ($colors as $hex => $rgba) {
             $helper = new ColorHelper($hex);
             $randA  = round(mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax(), 2);
-            $this->assertEquals(sprintf($rgba, $randA), $helper->toRgba($randA, $randA));
+            $this->assertEquals(sprintf($rgba, $randA), $helper->toRgba($randA));
         }
     }
 
@@ -146,7 +146,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::buildRandomColor
      * @covers \Mautic\CoreBundle\Helper\ColorHelper::getColorArray
      */
-    public function testThatRandomColorIsWithinBorders()
+    public function testThatRandomColorIsWithinBorders(): void
     {
         $helper = new ColorHelper();
         $helper->buildRandomColor();

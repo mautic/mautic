@@ -4,21 +4,58 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @var int
+     */
+    private $leadId;
+
+    /**
+     * Tests that use the classic unsubscribe page. Not preference center.
+     */
+    private const UNSUBSCRIBE_TESTS = [
+        'testUnsubscribeWithEmailStat',
+        'testUnsubscribeEmail',
+    ];
+
     protected function setUp(): void
     {
-        $this->configParams['show_contact_preferences'] = 1;
+        $this->configParams['show_contact_segments']           = 0;
+        $this->configParams['show_contact_frequency']          = 0;
+        $this->configParams['show_contact_pause_dates']        = 0;
+        $this->configParams['show_contact_categories']         = 0;
+        $this->configParams['show_contact_preferred_channels'] = 0;
+
+        if (in_array($this->getName(), self::UNSUBSCRIBE_TESTS)) {
+            $this->configParams['show_contact_preferences'] = 0;
+        } else {
+            $this->configParams['show_contact_preferences'] = 1;
+        }
+
+        if (in_array($this->getName(), ['testContactPreferencesSaveMessage'])) {
+            $this->configParams['show_contact_segments']           = 1;
+            $this->configParams['show_contact_frequency']          = 1;
+            $this->configParams['show_contact_pause_dates']        = 1;
+            $this->configParams['show_contact_categories']         = 1;
+            $this->configParams['show_contact_preferred_channels'] = 1;
+        }
+
         parent::setUp();
     }
 
@@ -57,9 +94,26 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
 
         self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertTrue($this->client->getResponse()->isOk());
+    }
+
+    public function testContactPreferencesLandingPageTracking(): void
+    {
+        $lead                 = $this->createLead();
+        $preferenceCenterPage = $this->getPreferencesCenterLandingPage();
+        $stat                 = $this->getStat(null, $lead, $preferenceCenterPage);
+
+        $this->em->flush();
+
+        $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        $this->em->clear(Page::class);
+
+        $entity = $this->em->getRepository(Page::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
+        $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
     }
 
     public function testContactPreferencesSaveMessage(): void
@@ -69,13 +123,31 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
-        $this->assertStringContainsString('/email/unsubscribe/tracking_hash_unsubscribe_form_email', $crawler->filter('form')->eq(0)->attr('action'));
-        $crawler = $this->client->submitForm('Save');
+
+        self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $form = $crawler->filter('form')->form();
+
+        // Unsubscribe from email.
+        $form->setValues(['lead_contact_frequency_rules[lead_channels][subscribed_channels][0]' => false]);
+
+        $this->assertStringContainsString('/email/unsubscribe/tracking_hash_unsubscribe_form_email', $form->getUri());
+        $crawler = $this->client->submit($form);
+
+        self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
-        $expectedMessage = self::$container->get('translator')->trans('mautic.email.preferences_center_success_message.text');
+        $expectedMessage = static::getContainer()->get('translator')->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertTrue($this->client->getResponse()->isOk());
+
+        // Assert that the contact has the DNC record now.
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        \assert($dncRepository instanceof DoNotContactRepository);
+        $dncRecords = $dncRepository->findBy(['lead' => $lead->getId()]);
+        Assert::assertCount(1, $dncRecords);
+        Assert::assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
+        Assert::assertSame('email', $dncRecords[0]->getChannel());
+        Assert::assertSame($stat->getEmail()->getId(), $dncRecords[0]->getChannelId());
     }
 
     public function testUnsubscribeFormActionWithThemeWithoutFormSupport(): void
@@ -120,10 +192,49 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
+    public function testOneClickUnsubscribeAction(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('POST', '/email/unsubscribe/'.$stat->getTrackingHash(), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertEquals(1, $dncCollection->count());
+        $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
+    }
+
+    public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void
+    {
+        $lead              = $this->createLead();
+        $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
+        $stat              = $this->getStat(null, $lead, $preferencesCenter);
+        $this->em->flush();
+        $crawler    = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertEquals(1, $tokenInput->count(), $this->client->getResponse()->getContent());
+    }
+
+    private function getPreferencesCenterLandingPage(): Page
+    {
+        $page = new Page();
+        $page->setTitle('Preference center');
+        $page->setAlias('Preference-center');
+        $page->setIsPublished(true);
+        $page->setIsPreferenceCenter(true);
+        $page->setCustomHtml('<html><body>{saveprefsbutton}</body></html>');
+        $this->em->persist($page);
+
+        return $page;
+    }
+
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
-    protected function getStat(Form $form = null, Lead $lead = null): Stat
+    protected function getStat(Form $form = null, Lead $lead = null, Page $preferenceCenter = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';
@@ -133,6 +244,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setSubject($emailName);
         $email->setEmailType('template');
         $email->setUnsubscribeForm($form);
+        $email->setPreferenceCenter($preferenceCenter);
         $this->em->persist($email);
 
         // Create a test email stat.
@@ -148,7 +260,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     protected function getForm(?string $formTemplate): Form
     {
@@ -170,6 +282,20 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
 
         return $lead;
+    }
+
+    protected function createCustomPreferencesPage(string $html = ''): Page
+    {
+        $page = new Page();
+        $page->setTitle('Contact Preferences');
+        $page->setAlias('contact-preferences');
+        $page->setTemplate('blank');
+        $page->setIsPreferenceCenter(true);
+        $page->setIsPublished(true);
+        $page->setCustomHtml($html);
+        $this->em->persist($page);
+
+        return $page;
     }
 
     public function testPreviewDisabledByDefault(): void
@@ -213,5 +339,206 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/email/preview/'.$email->getId());
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @throws ORMException
+     */
+    public function testUnsubscribeEmail(): void
+    {
+        foreach ($this->getUnsubscribeProvider() as $parameters) {
+            $this->runTestUnsubscribeAction(...$parameters);
+        }
+    }
+
+    /**
+     * @throws ORMException
+     */
+    public function runTestUnsubscribeAction(
+        string $statHash,
+        string $email,
+        string $emailHash,
+        string $message,
+        bool $addedRow
+    ): void {
+        $uri = '/email/unsubscribe/'.$statHash.'/'.$email.'/'.$emailHash;
+        $this->client->request(Request::METHOD_GET, $uri);
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString($message, $clientResponse->getContent());
+        $doNotContacts       = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $this->leadId]);
+        $isAddedDoNotContact = (bool) count($doNotContacts);
+        $addedDoNotContact   = $isAddedDoNotContact ? $doNotContacts[0] : null;
+        $this->assertSame($addedRow, $isAddedDoNotContact);
+        // Cleaning
+        if ($isAddedDoNotContact) {
+            $this->em->remove($addedDoNotContact);
+            $this->em->flush();
+        }
+    }
+
+    /**
+     * @return array<string,array<string|bool>>
+     *
+     * @throws ORMException
+     *
+     * @see self::testUnsubscribeEmail()
+     */
+    private function getUnsubscribeProvider(): array
+    {
+        // Emails
+        $wrongEmail = 'test@mautictest.sk';
+        $rightEmail = 'test@mautictest.cz';
+        $lead       = new Lead();
+        $lead->setEmail($rightEmail);
+        $this->em->persist($lead);
+        // Email hash
+        $coreParametersHelper   = self::$container->get('mautic.helper.core_parameters');
+        $configSecretEmailHash  = $coreParametersHelper->get('secret_key');
+        $rightHashForWrongEmail = hash_hmac('sha256', $wrongEmail, $configSecretEmailHash);
+        $rightHashForRightEmail = hash_hmac('sha256', $rightEmail, $configSecretEmailHash);
+        $wrongHash              = hash_hmac('sha256', 'wrong', $configSecretEmailHash);
+        // Stat hash
+        $wrongStatHash = 'wrong';
+        $rightStatHash = 'right';
+        $stat          = new Stat();
+        $stat->setTrackingHash($rightStatHash);
+        $stat->setLead($lead);
+        $stat->setEmailAddress($rightEmail);
+        $stat->setDateSent(new \DateTime());
+        $this->em->persist($stat);
+        // Flush
+        $this->em->flush();
+        $this->leadId = $lead->getId();
+
+        return [
+            'ok' => [
+                $rightStatHash,
+                $rightEmail,
+                $rightHashForRightEmail,
+                'We are sorry to see you go!',
+                true,
+            ],
+            'ok_right_stat_hash' => [
+                $rightStatHash,
+                $wrongEmail,
+                $wrongHash,
+                'We are sorry to see you go!',
+                true,
+            ],
+            'ok_right_email_and_hash' => [
+                $wrongStatHash,
+                $rightEmail,
+                $rightHashForRightEmail,
+                'We are sorry to see you go!',
+                true,
+            ],
+            'ko_right_email_and_wrong_hash' => [
+                $wrongStatHash,
+                $rightEmail,
+                $wrongHash,
+                'Record not found',
+                false,
+            ],
+            'ko_wrong_email_and_right_hash' => [
+                $wrongStatHash,
+                $wrongEmail,
+                $rightHashForWrongEmail,
+                'Record not found',
+                false,
+            ],
+        ];
+    }
+
+    public function testUnsubscribeNotFoundEmailStat(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/non-existant-hash');
+        Assert::assertStringContainsString(
+            'Record not found.',
+            strip_tags((string) $this->client->getResponse()->getContent())
+        );
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testUnsubscribeWithEmailStat(): void
+    {
+        $email = new Email();
+        $email->setName('Email A');
+        $email->setSubject('Email A Subject');
+        $email->setEmailType('template');
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $emailStat = new Stat();
+        $emailStat->setEmail($email);
+        $emailStat->setLead($contact);
+        $emailStat->setEmailAddress($contact->getEmail());
+        $emailStat->setDateSent(new \DateTime());
+        $emailStat->setTrackingHash('existing-tracking-hash');
+        $this->em->persist($email);
+        $this->em->persist($contact);
+        $this->em->persist($emailStat);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/existing-tracking-hash');
+
+        Assert::assertStringContainsString(
+            'We are sorry to see you go! john@doe.email will no longer receive emails from us. If this was by mistake, click here to re-subscribe.',
+            strip_tags((string) $this->client->getResponse()->getContent())
+        );
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        /** @var DoNotContact[] $dncRecords */
+        $dncRecords = $dncRepository->findAll();
+
+        Assert::assertCount(1, $dncRecords);
+        Assert::assertSame($contact->getId(), $dncRecords[0]->getLead()->getId());
+        Assert::assertSame('email', $dncRecords[0]->getChannel());
+        Assert::assertSame((int) $email->getId(), (int) $dncRecords[0]->getChannelId());
+        Assert::assertSame('User unsubscribed.', $dncRecords[0]->getComments());
+    }
+
+    public function testUnsubscribeAllFromPreferencesPage(): void
+    {
+        // Create a lead and email stat
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+
+        // Get the unsubscribe page
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        // Assert that the response is OK
+        self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        // Assert that the link for unsubscribe all exists
+        $unsubscribeAllLink = $crawler->filter('a[href^="/email/dnc/"]')->first();
+        $this->assertNotNull($unsubscribeAllLink, 'Unsubscribe all link not found');
+        $href = $unsubscribeAllLink->attr('href');
+
+        // Click the link for unsubscribe all
+        $this->client->request('GET', $href);
+
+        // Assert that the response is OK
+        self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        // Assert that the response contains the expected string
+        $this->assertStringContainsString(
+            'We are sorry to see you go! john@doe.email will no longer receive emails from us',
+            $this->client->getResponse()->getContent()
+        );
+
+        // Assert that a DoNotContact record was created
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        /** @var DoNotContact[] $dncRecords */
+        $dncRecords = $dncRepository->findBy(['lead' => $lead]);
+
+        $this->assertCount(1, $dncRecords, 'Expected one DoNotContact record');
+        $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason(), 'Expected reason to be UNSUBSCRIBED');
+        $this->assertEquals('email', $dncRecords[0]->getChannel(), 'Expected channel to be email');
     }
 }

@@ -16,14 +16,14 @@
     <div class="row">
         {% if error is defined and error is not empty %}
         <div class="{{ (error.isPrevious is defined and error.isPrevious is not empty) or (inline is defined and inline is not empty) ? 'col-sm-12' : 'col-sm-offset-2 col-sm-8' }}">
-            <div class="bg-white pa-sm" style=" word-wrap: break-word;{% if (error.isPrevious is not defined or error.isPrevious is empty) and (inline is not defined or inline is empty) %} margin-top:100px;{% endif %}">
+            <div class="pa-sm" style=" word-wrap: break-word;{% if (error.isPrevious is not defined or error.isPrevious is empty) and (inline is not defined or inline is empty) %} margin-top:100px;{% endif %}">
             {% if inline is defined and inline is not empty %}
-                <h3><i class="fa fa-warning fa-fw text-danger pull-left"></i>{{ error.message | raw }}</h3>
+                <h3><i class="ri-alert-line ri-fw text-danger pull-left"></i>{{ error.message | raw }}</h3>
                 <h6 class="text-muted">{{ error.file |raw ~ ':'~ error.line | raw }}</h6>
-            {% else %}        
+            {% else %}
                 <div class="text-center">
-                    <i class="fa fa-warning fa-5x"></i>
-                </div>        
+                    <i class="ri-alert-line ri-5x"></i>
+                </div>
                 <div class="alert alert-danger">
                     <div>{{ error.message | raw }}</div>
                     <div class="text-muted small text-right mt-10">
@@ -45,15 +45,15 @@
     </div>
     {% elseif inline is defined and inline is not empty %}
     <div class="col-xs-12">
-        <h3><i class="fa fa-warning fa-fw text-danger"></i>{{ error.message }}</h3>
+        <h3><i class="ri-alert-line ri-fw text-danger"></i>{{ error.message }}</h3>
         {% if error.submessage is defined and error.submessage is not empty %}
         <h4 class="mt-15">{{ error.submessage | raw }}</h4>
         {% endif %}
     </div>
     {% else %}
     <div class="col-sm-offset-3 col-sm-6">
-        <div class="bg-white pa-lg text-center" style="margin-top:100px;">
-            <i class="fa fa-warning fa-5x"></i>
+        <div class="pa-lg text-center" style="margin-top:100px;">
+            <i class="ri-alert-line ri-5x"></i>
             <h2>{{ error.message | raw }}</h2>
             {% if error.submessage is defined and error.submessage is not empty %}
                 <h4 class="mt-15">{{ error.submessage | raw  }}</h4>

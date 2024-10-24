@@ -10342,7 +10342,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
   $.FE.ICON_DEFAULT_TEMPLATE = 'font_awesome';
 
   $.FE.ICON_TEMPLATES = {
-    font_awesome: '<i class="fa fa-[NAME]" aria-hidden="true"></i>',
+    font_awesome: '<i class="fa-[NAME]" aria-hidden="true"></i>',
     text: '<span style="text-align: center;">[NAME]</span>',
     image: '<img src=[SRC] alt=[ALT] />',
     svg: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">[PATH]</svg>'
@@ -10966,7 +10966,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       var html = '<div tabIndex="-1" class="fr-modal' + (editor.opts.theme ? ' ' + editor.opts.theme + '-theme' : '') + '"><div class="fr-modal-wrapper">';
 
       // Modal title.
-      var close_button = '<i title="' + editor.language.translate('Cancel') + '" class="fa fa-times fr-modal-close"></i>';
+      var close_button = '<i title="' + editor.language.translate('Cancel') + '" class="ri-close-line fr-modal-close"></i>';
       html += '<div class="fr-modal-head">' + head + close_button + '</div>';
 
       // Body.

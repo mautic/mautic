@@ -21,7 +21,7 @@ class EnvironmentSubscriberTest extends TestCase
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelperMock;
+    private MockObject $coreParametersHelperMock;
 
     protected function setUp(): void
     {

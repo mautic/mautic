@@ -50,7 +50,7 @@
 {% endif %}
 {% if inForm is defined and (true == inForm or inForm is not empty) %}
   {% if field.type in ['button', 'pagebreak'] %}
-    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' %}
   {% endif %}
 
   {% set labelAttributes = labelAttributes|merge({
@@ -97,7 +97,7 @@
   {% set required = true %}
   {% set validationMessage = field.validationMessage %}
   {% if validationMessage is empty %}
-        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) %}
   {% endif %}
   {% set containerAttributes = containerAttributes|merge({
           'class': containerAttributes.class|default([])|merge([
@@ -123,7 +123,7 @@
 
 {% if inForm is defined and true == inForm %}
   <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-      <label class="text-muted">{{ field.label }}</label>
+      <label class="text-muted">{{ field.label|purify }}</label>
   </div>
 {% else %}
   {% set inputAttributes = inputAttributes|merge({

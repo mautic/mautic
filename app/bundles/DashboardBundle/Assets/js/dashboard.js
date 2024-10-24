@@ -71,8 +71,8 @@ Mautic.dashboardFilterPreventSubmit = function() {
     let button = form.find('button:first');
     Mautic.dashboardSubmitButton = button.clone();
     button.width(button.width()+'px'); // Keep button width
-    button.html('<i class="fa fa-spin fa-spinner"></i>');
-    jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
+    button.html('<i class="ri-loader-3-line ri-spin"></i>');
+    jQuery('.widget').find('.card-body').html('<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>');
     form
         .unbind('submit')
         .on('submit', function(e){
@@ -85,9 +85,17 @@ Mautic.dashboardOnUnload = function(id) {
     mQuery('.jvectormap-tip').remove();
 };
 
+/**
+ * Render widget from XHR to DOM
+ *
+ * @param container
+ * @param response
+ */
 Mautic.widgetOnLoad = function(container, response) {
     if (!response.widgetId) return;
-    var widget = mQuery('[data-widget-id=' + response.widgetId + ']');
+    // target in DOM
+    var widget = mQuery('.widget[data-widget-id="' + response.widgetId + '"]');
+    // source from response
     var widgetHtml = mQuery(response.widgetHtml);
 
     // initialize edit button modal again
@@ -108,7 +116,12 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('width', response.widgetWidth + '%')
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
-    Mautic.renderMaps(widgetHtml);
+
+    const map = widgetHtml.find('.vector-map').first();
+    if (map.length && !map.hasClass('map-rendered')) {
+        Mautic.initMap(widgetHtml, 'regions');
+    }
+
     Mautic.initWidgetRemoveEvents();
     Mautic.initWidgetSorting();
     Mautic.initDashboardFilter();
@@ -193,10 +206,7 @@ Mautic.initWidgetSorting = function () {
             ui.helper.data("clone").hide();
         },
         sort: function(e, ui) {
-            var card = ui.item.find('.card').first();
-            // Keep the placeholder width and height of the same as that of the inner card's width to prevent the jump effect
-            ui.placeholder.width(card.width());
-            ui.placeholder.height(card.height());
+            var tile = ui.item.find('.tile').first();
             // Prevent margin from pushing the elements out of the way
             ui.placeholder.css({
                 marginTop: "5px",
@@ -290,4 +300,40 @@ Mautic.saveDashboardLayout = function(text) {
             data: {name: name}
         });
     }
+};
+
+Mautic.setDateRange = function(option) {
+    var today = new Date();
+    var fromDate, toDate;
+
+    switch(option) {
+      case 'today':
+        fromDate = today;
+        toDate = today;
+        break;
+      case 'yesterday':
+        fromDate = new Date(today.getTime() - (24 * 60 * 60 * 1000));
+        toDate = fromDate;
+        break;
+      default:
+        if (typeof option === 'number') {
+          fromDate = new Date(today.getTime() - (option * 24 * 60 * 60 * 1000));
+          toDate = today;
+        } else {
+          console.error('Invalid option');
+          return;
+        }
+    }
+
+    document.getElementById('daterange_date_from').value = Mautic.formatDate(fromDate);
+    document.getElementById('daterange_date_to').value = Mautic.formatDate(toDate);
+    document.getElementById('daterange_apply').click();
+};
+
+Mautic.formatDate = function(date) {
+    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    return monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 };

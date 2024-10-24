@@ -1,15 +1,70 @@
 //
 // Application
 // --------------------------------------------------
-// load google font
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);
+// load font
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 300;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-300.woff2') format('woff2');
+  }
+  @font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 300;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-300italic.woff2') format('woff2');
+  }
+  @font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-regular.woff2') format('woff2');
+  }
+  @font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 400;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-italic.woff2') format('woff2');
+  }
+  @font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 600;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-600.woff2') format('woff2');
+  }
+  @font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 600;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-600italic.woff2') format('woff2');
+  }
+  @font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700.woff2') format('woff2');
+  }
+  @font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 700;
+    src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700italic.woff2') format('woff2');
+  }
+
 // Core variables and mixins
 @import "app/less/variables";
 @import "app/less/mixins";
 @import "app/less/lesshat";
-@import "../../../../../node_modules/bootstrap/less/variables";
+@import "app/less/spinning";
 @import "../../../../../node_modules/bootstrap/less/mixins";
-@import "libraries/bootstrap/bootstrap-mautic-custom-variables";
 // Layouts
 @import "app/less/layouts/base";
 @import "app/less/layouts/header";
@@ -27,6 +82,7 @@
 @import "app/less/components/editor";
 @import "app/less/components/media";
 @import "app/less/components/menu";
+@import "app/less/components/grid";
 @import "app/less/components/list-group";
 @import "app/less/components/dropdowns";
 @import "app/less/components/navs";
@@ -52,4 +108,9 @@
 @import "app/less/components/timeline";
 @import "app/less/components/utilities";
 @import "app/less/components/builder";
+@import "app/less/components/maps";
+@import "app/less/components/modals";
+@import "app/less/components/accordions";
+@import "app/less/components/tiles";
 @import "app/less/custom";
+@import "app/less/components/toggle";
