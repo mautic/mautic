@@ -72,17 +72,20 @@
                                 <select class="chosen form-control" id="available_segment_filters">
                                     <option value=""></option>
                                     {% for object, field in form.vars.fields %}
-                                      {% set icon = 'company' == object ? 'building' : 'user' %}
                                       {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
-                                      <optgroup label="{{ header }}">
+                                      <optgroup label="{{ header }} some">
                                           {% for value, params in field %}
                                               {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
+                                              {% set objectLable = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans  %}
+                                              {% set label =  'mautic.lead_list.filter.field.label'|trans({'%object%': objectLable, '%field%': params.label|capitalize|trans }) %}
                                               <option value="{{ value|e }}"
                                                       id="available_{{ object }}_{{ value }}"
+                                                      data-field-label="{{ label }}"
                                                       data-field-object="{{ object }}"
                                                       data-field-type="{{ params.properties.type }}"
                                                       data-field-operators="{{ operators|e }}"
-                                                      class="segment-filter {{ icon }}">
+                                                      data-field-icon="{{ params.iconClass|default('') }}"
+                                                      class="segment-filter {{ params.iconClass|default('') }}">
                                                       {{ params.label|trans }}
                                               </option>
                                           {% endfor %}
