@@ -1,3 +1,5 @@
+{% import '@MauticForm//Field/macros.html.twig' as macros %}
+
 {% set defaultInputClass = 'button' %}
 {% set containerType = 'button-wrapper' %}
 
@@ -121,6 +123,6 @@
         'name': 'mauticform[' ~ field.alias ~ ']',
         'value': '1',
 }) %}
-<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  <button {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</button>
+<div macros.tag_attr(containerAttributes) >
+  <button {{ macros.tag_attr(inputAttributes) }} >{{ field.label|purify }}</button>
 </div>

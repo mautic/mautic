@@ -1,3 +1,5 @@
+{% import '@MauticForm//Field/macros.html.twig' as macros %}
+
 {% set containerType = 'pagebreak-wrapper' %}
 {% set defaultInputClass = 'pagebreak' %}
 
@@ -212,7 +214,7 @@
     }) %}
 {% endif %}
 
-<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  <button {% for attrName, attrValue in backButtonAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.properties.prev_page_label }}</button>
-  <button {% for attrName, attrValue in nextButtonAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.properties.next_page_label }}</button>
+<div {{ macros.tag_attr(containerAttributes) }} >
+  <button {{ macros.tag_attr(backButtonAttr) }} >{{ field.properties.prev_page_label }}</button>
+  <button {{ macros.tag_attr(nextButtonAttr) }} >{{ field.properties.next_page_label }}</button>
 </div>
