@@ -353,6 +353,19 @@ Mautic.switchFormFieldState = function (formName) {
         });
     };
 
+    var resetField = function (field) {
+        // Set Yes/No toggle to No.
+        if ('Mautic.toggleYesNo(this);' === field.attr('onchange')
+            && field.val() === "1"
+            && field.is(':checked')
+        ) {
+            label = field.siblings('.toggle__label')
+            if (label.attr('aria-checked') === "true") {
+                label.trigger('click');
+            }
+        }
+    }
+
     // find all fields to show
     processConditions('data-show-on', visibleFields, false);
 
@@ -378,10 +391,12 @@ Mautic.switchFormFieldState = function (formName) {
 
     // show/hide according to conditions
     mQuery.each(visibleFields, function(fieldId, show) {
-        var fieldContainer = mQuery('#' + fieldId).closest('[class*="col-"]');;
+        var field = mQuery('#' + fieldId);
+        var fieldContainer = field.closest('[class*="col-"]');
         if (show) {
             fieldContainer.fadeIn();
         } else {
+            resetField(field);
             fieldContainer.fadeOut();
         }
     });
@@ -395,6 +410,7 @@ Mautic.switchFormFieldState = function (formName) {
     mQuery.each(disabledFields, function(fieldId, disable) {
         var field = mQuery('#' + fieldId)
         if (disable) {
+            resetField(field);
             field.addClass('disabled', disable);
         } else {
             field.removeClass('disabled', disable);
