@@ -1,45 +1,49 @@
 {#
-  Variables:
-    - note
-    - lead
-    - permissions
+Variables:
+- note
+- lead
+- permissions
 #}
-{% set icon = 'ri-file-text-line' %}
+{% set icon = 'ri-sticky-note-2-line' %}
 {% if 'email' == note.type %}
-    {% set icon = 'ri-send-plane-line' %}
+{% set icon = 'ri-mail-line' %}
 {% elseif 'call' == note.type %}
-    {% set icon = 'ri-phone-line' %}
+{% set icon = 'ri-phone-line' %}
 {% elseif 'meeting' == note.type %}
-    {% set icon = 'ri-team-line' %}
+{% set icon = 'ri-video-chat-line' %}
 {% endif %}
-<li id="LeadNote{{ note.id }}">
-    <div class="panel ">
-        <div class="panel-body np box-layout">
-            <div class="height-auto icon bdr-r col-xs-1 text-center">
-                <h3><i class="fa ri-lg fa-fw {{ icon }}"></i></h3>
-            </div>
-            <div class="media-body col-xs-11 pa-10">
-                <div class="pull-right btn-group">
-                    {% if permissions['edit'] %}
-                        <a class="btn btn-default btn-xs" href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="ri-edit-line"></i></a>
-                    {% endif %}
-                    {% if permissions['delete'] %}
-                        <a class="btn btn-default btn-xs" data-toggle="confirmation"
-                           href="{{ path('mautic_contactnote_action', {'objectAction': 'delete', 'objectId': note.id, 'leadId': lead.id}) }}"
-                           data-message="{{ 'mautic.lead.note.confirmdelete'|trans|e }}"
-                           data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}"
-                           data-confirm-callback="executeAction"
-                           data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
+<li class="note-single mb-lg" id="LeadNote{{ note.id }}">
+    <div class="note-body d-flex np mb-md">
+        <div class="height-auto icon text-right">
+            <div class="icon-wrapper d-flex ai-center jc-center"><i class="ri-lg fs-22 {{ icon }}"></i></div>
+        </div>
+        <div class="tile media-body pa-lg">
+
+            <div class="d-flex jc-space-between ai-center mb-md fw-wrap fw-nowrap-lg">
+                <span class="fw-b ellipsis"><i class="ri-user-6-line mr-xs"></i>{{ note.createdByUser }}</span>
+                <div class="d-flex fg-1 ai-center jc-space-between jc-end-lg gap-sm">
+                    <span class="small text-muted">{{ dateToFullConcat(note.dateTime) }}</span>
+                    <div class="pull-right btn-group">
+                        {% if permissions['edit'] %}
+                        <a class="btn btn-ghost btn-icon btn-ghost btn-xs"
+                            href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}"
+                            data-toggle="ajaxmodal" data-target="#MauticSharedModal"
+                            data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="ri-edit-line"></i></a>
+                        {% endif %}
+                        {% if permissions['delete'] %}
+                        <a class="btn btn-ghost btn-icon btn-xs" data-toggle="confirmation"
+                            href="{{ path('mautic_contactnote_action', {'objectAction': 'delete', 'objectId': note.id, 'leadId': lead.id}) }}"
+                            data-message="{{ 'mautic.lead.note.confirmdelete'|trans|e }}"
+                            data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}"
+                            data-confirm-callback="executeAction"
+                            data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
                             <i class="ri-delete-bin-line text-danger"></i>
                         </a>
-                    {% endif %}
-                </div>
-                {{ note.text|purify }}
-                <div class="mt-15 text-muted">
-                  <i class="ri-time-line fa-fw"></i> <span class="small">{{ dateToFullConcat(note.dateTime) }}</span>
-                  <i class="ri-user-6-line fa-fw"></i> <span class="small">{{ note.createdByUser }}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+            <div class="fs-18">{{ note.text|purify }}</div>
         </div>
     </div>
 </li>

@@ -28,11 +28,11 @@ export default class StorageService {
 
         const restoreButton = document.createElement('button');
         restoreButton.innerHTML = '<i class="ri-arrow-go-back-line"></i> ' + Mautic.translate('mautic.core.builder.storage.restore.button')
-        restoreButton.className = 'btn btn-primary';
+        restoreButton.className = 'btn btn-primary btn-sm ml-md';
 
         const dismissButton = document.createElement('button');
         dismissButton.innerHTML = Mautic.translate('mautic.core.builder.storage.dismiss.button')
-        dismissButton.className = 'btn btn-default';
+        dismissButton.className = 'btn btn-ghost btn-sm';
         buttonContainer.append(restoreButton, dismissButton);
 
         const formattedDateTime = this.formatDateTime(storedContent.date);

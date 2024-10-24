@@ -69,7 +69,7 @@ class GrapesJsBuilder
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCustomMjml()
     {

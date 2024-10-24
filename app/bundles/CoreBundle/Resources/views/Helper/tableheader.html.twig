@@ -29,7 +29,7 @@
         </span>
 
         <div class="input-group-btn">
-            <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+            <button type="button" disabled class="btn btn-ghost btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
                 <i class="ri-more-2-line"></i>
             </button>
             <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
@@ -75,9 +75,9 @@
             />
             <span class="input-group-btn">
                 <button
-                    class="btn btn-default btn-xs"
+                    class="btn btn-ghost btn-icon btn-xs"
                     onclick="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',{{ value is defined and value is not empty ? "''," : "mQuery(this).parent().prev().val()," }}'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"                >
-                    <i class="fa fa-fw fa-lg {{ value is defined and value is not empty ? 'ri-close-line' : 'ri-filter-2-fill' }}"></i>
+                    <i class="ri-fw ri-lg {{ value is defined and value is not empty ? 'ri-close-line' : 'ri-filter-2-fill' }}"></i>
                 </button>
             </span>
         </div>

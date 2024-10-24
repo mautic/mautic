@@ -3,13 +3,13 @@
 {% set activeTab = activeTab|default('details-container') %}
 
 {{ form_start(form) }}
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs nav-tabs-contained">
     <!-- Enabled\Auth -->
     <li class="{% if 'details-container' == activeTab %} active{% endif %}" id="details-tab">
         <a href="#details-container" role="tab" data-toggle="tab">
             {{ 'mautic.plugin.integration.tab.details'|trans }}
             {% if (hasAuthErrors) %}
-                <i class="fa fa-fw ri-alert-fill text-danger"></i>
+                <i class="ri-fw ri-alert-fill text-danger"></i>
             {% endif %}
         </a>
     </li>
@@ -21,7 +21,7 @@
             <a href="#features-container" role="tab" data-toggle="tab">
                 {{ 'mautic.plugin.integration.tab.features'|trans }}
                 {% if hasFeatureErrors is not empty %}
-                <i class="fa fa-fw ri-alert-fill text-danger"></i>
+                <i class="ri-fw ri-alert-fill text-danger"></i>
                 {% endif %}
             </a>
         </li>
@@ -36,7 +36,7 @@
             <a href="#field-mappings-{{ object }}-container" role="tab" data-toggle="tab">
                 {{ 'mautic.integration.sync_field_mapping'|trans({'%object%' : objects[object]|trans }) }}
                 {% if formContainsErrors(objectFieldMapping) %}
-                    <i class="fa fa-fw ri-alert-fill text-danger"></i>
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
                 {% endif %}
             </a>
         </li>

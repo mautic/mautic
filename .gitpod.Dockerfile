@@ -1,11 +1,12 @@
 FROM gitpod/workspace-full
 SHELL ["/bin/bash", "-c"]
 
-# Add DDEV’s GPG key to your keyring
-RUN curl -fsSL https://pkg.ddev.com/apt/gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/ddev.gpg > /dev/null
+RUN sudo apt-get update && sudo apt-get install -y curl
+RUN sudo install -m 0755 -d /etc/apt/keyrings
+RUN curl -fsSL https://pkg.ddev.com/apt/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/ddev.gpg > /dev/null
+RUN sudo chmod a+r /etc/apt/keyrings/ddev.gpg
 
-# Add DDEV releases to your package repository
-RUN echo "deb [signed-by=/etc/apt/trusted.gpg.d/ddev.gpg] https://pkg.ddev.com/apt/ * *" | sudo tee /etc/apt/sources.list.d/ddev.list >/dev/null
+RUN echo "deb [signed-by=/etc/apt/keyrings/ddev.gpg] https://pkg.ddev.com/apt/ * *" | sudo tee /etc/apt/sources.list.d/ddev.list >/dev/null
 
 # Update package information and install DDEV
-RUN sudo apt update && sudo apt install -y ddev=1.22.7
+RUN sudo apt-get update && sudo apt-get install -y ddev

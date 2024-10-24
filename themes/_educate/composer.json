@@ -1,0 +1,10 @@
+{
+  "name": "mautic/theme-educate",
+  "description": "Educate",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

@@ -14,7 +14,7 @@
 {% if columnOrder is not empty or aggregatorOrder is not empty %}
     <!-- table section -->
     <div class="col-xs-12">
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div id="page-list-wrapper">
             <div class="page-list">
                 <div class="table-responsive table-responsive-force">
                     <table class="table table-hover report-list" id="reportTable">
@@ -24,7 +24,11 @@
                             {% for key in columnOrder %}
                                 {% if columns[key] is defined %}
                                     {# order by alias if exists, if not then by column name #}
-                                    {%- set orderBy = columns[key].alias|default((key starts with 'channel.') ? key|replace({'.': '_'}) : key) -%}
+                                    {%- set orderBy = (columns[key].alias is defined and columns[key].alias starts with 'channel.')
+                                        ? columns[key].alias
+                                        : key
+                                    -%}
+
                                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                         'sessionVar': 'report.' ~ report.id,
                                         'orderBy': orderBy,
@@ -82,11 +86,11 @@
                                                 {% elseif 'date' is same as cellType %}
                                                     {{ dateToShort(cellVal, 'UTC') }}
                                                 {% else %}
-                                                    {% set value = format(cellVal, cellType) %}
+                                                    {% set value = format(cellVal, cellType)|purify %}
                                                     {% if collapse == false %}
-                                                        {{ format(cellVal, cellType) }}
+                                                        {{ format(cellVal, cellType)|purify }}
                                                     {% else %}
-                                                        {% set value = htmlEntityDecode(format(cellVal, cellType)) %}
+                                                        {% set value = htmlEntityDecode(format(cellVal, cellType)|purify) %}
                                                         <div data-toggle="collapse" data-target="#audit-log-details-{{ startCount }}" class="accordion-toggle" style="cursor: pointer">
                                                             {{ value|length > 50 ? value|slice(0, 50) ~ '...' : value }}
                                                         </div>

@@ -12,10 +12,6 @@
   .media-body {
     width: auto;
   }
-  .media-object{
-    padding-right: 0;
-    margin-right: 10px;
-  }
 }
 
 // Contact image
@@ -114,40 +110,6 @@ label.required:after {
   padding: 10px 12px;
 }
 
-//Search
-.search-container {
-  position: relative;
-  line-height: 60px;
-  .transition(all 0.3s ease);
-
-  .search {
-    border: 1px solid #fff;
-    position: absolute;
-    left: 0px;
-    width: 24px;
-    height: 34px;
-    padding: 0 0 0 32px;
-    margin: 12px 0 0 5px;
-    z-index: 1;
-    .transition(all 0.5s ease);
-  }
-  a.search-button {
-    color: rgba(0, 0, 0, 0.6);
-    position: absolute;
-    left: 12px;
-    z-index: 5;
-  }
-
-  &.active {
-    .search {
-      width: 225px;
-      border: 1px solid @input-border;
-    }
-    i {
-      color: @brand-primary;
-    }
-  }
-}
 .col-actions {
   width: 100px;
 }
@@ -194,34 +156,10 @@ body.noscroll {
   }
 }
 
-.table .input-group-sm {
-  & > .input-group-addon {
-    font-size: 10px;
-    line-height: 1em;
-    background-color: transparent;
-    border: 0;
-    padding: 0;
-  }
-
-  .dropdown-toggle {
-    border: 0;
-    background-color: transparent;
-    padding: 5px 8px;
-  }
-}
-
-.input-group {
-  .input-group-btn {
-    button {
-      height: 32px;
-    }
-  }
-}
-
 .theme-selected {
-  border: 1px solid #4e5e9e;
-  -webkit-box-shadow: 0px 0px 40px #f3f3f3;
-  box-shadow: 0px 0px 40px #f3f3f3;
+  outline: 1px solid var(--focus);
+  -webkit-box-shadow: 0px 0px 40px var(--focus);
+  box-shadow: 0px 0px 40px var(--focus);
 }
 
 #app-content.content-only {
@@ -314,11 +252,6 @@ ul.media-list.media-list-feed div.media-body
   width:auto;
 }
 
-ul.media-list.media-list-feed div.media-object
-{
-  padding: 0px;
-  margin: 10px;
-}
 .ico-email:before {
   font-family: "FontAwesome";
   content: "\f1fa";
@@ -345,20 +278,11 @@ ul.media-list.media-list-feed div.media-object
 .ui-sortable-handle:active {
   cursor: grabbing;
 }
-
-.flex-column-inline {
-  display: inline-flex;
-  flex-direction: column;
-}
 .notification {
   width: inherit !important;
 }
 .notification-title {
   display: block !important;
-}
-.notification-empty {
-  width: 100px;
-  margin: 50px;
 }
 
 .flip-vertically {
@@ -390,7 +314,6 @@ ul.media-list.media-list-feed div.media-object
   }
 }
 
-
 @keyframes circle-pulse {
   0% {
       -webkit-transform: scale(0.55);
@@ -408,5 +331,70 @@ ul.media-list.media-list-feed div.media-object
       -webkit-transform: scale(0.95);
       transform: scale(1);
       opacity: 0;
+  }
+}
+
+.copy-icon {
+  display: inline-flex;
+  opacity: 0;
+  transform: translateX(-0.25rem);
+  transition: var(--transition-all-expressive);
+  margin-right: -22px;
+  background-color: var(--layer);
+  z-index: 2;
+  position: relative;
+  border-radius: 0 3px 3px 0;
+  aspect-ratio: 1 / 1;
+  color: var(--icon-interactive);
+  height: 17px;
+  vertical-align: middle;
+}
+code:hover > .copy-icon {
+  opacity: 1;
+  transform: none;
+}
+
+// Logo
+// --------------------------------------------------
+
+// mautic-brand
+.mautic-brand {
+  display: block;
+  height: @header-height;
+  padding-left: 35px;
+  padding-right: 32px;
+  width: 100%;
+  overflow: hidden;
+
+  &.pull-left {
+    width: 75%;
+  }
+
+  // mautic logo figure
+  > svg.mautic-logo-figure {
+    width: @mautic-logo-figure-width;
+    height: @header-height;
+    .circle {
+      fill: @mautic-logo-figure-circle-fill;
+    }
+    .m,
+    .m-arrow {
+      fill: @mautic-logo-figure-m-fill;
+    }
+  }
+
+  // mautic logo text
+  > svg.mautic-logo-text {
+    height: @header-height;
+    width: @mautic-logo-text-width;
+    .m,.a,.u,.t,.i,.c {
+      fill: @mautic-logo-text-fill
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  svg.mautic-logo-text {
+    display: none;
   }
 }

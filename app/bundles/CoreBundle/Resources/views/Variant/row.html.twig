@@ -76,7 +76,7 @@
                         {% endif %}
                         {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation %}
                             &nbsp;<span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
-                                <i class="fa fa-fw ri-translate"></i>
+                                <i class="ri-fw ri-translate"></i>
                             </span>
                         {% endif %}
                     </h5>
@@ -91,7 +91,7 @@
                 {% if isPublished and (totalWeight > 100 or (thisCriteria and firstCriteria != thisCriteria)) %}
                     <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">
                         <div><span class="badge">{{ weight }}%</span></div>
-                        <div><i class="fa fa-fw ri-alert-line"></i>{{ criteriaLabel }}</div>
+                        <div><i class="ri-fw ri-alert-line"></i>{{ criteriaLabel }}</div>
                     </div>
                 {% elseif isPublished and criteriaLabel %}
                     <div class="text-success">
@@ -100,7 +100,7 @@
                     </div>
                 {% else %}
                     <div class="text-muted">
-                        <div><span class="label label-default">{{ weight }}%</span></div>
+                        <div><span size="sm" class="label label-gray">{{ weight }}%</span></div>
                         <div>{{ criteriaLabel }}</div>
                     </div>
                 {% endif %}

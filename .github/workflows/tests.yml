@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0', '8.1', '8.2']
+        php-versions: ['8.1', '8.2', '8.3']
         db-types: ['mysql', 'mariadb']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -38,7 +38,7 @@ jobs:
           --shm-size=2gb
           --name=${{ matrix.db-types }}
           --tmpfs=/var/lib/mysql
-          --health-cmd="mysqladmin ping" 
+          --health-cmd="mysqladmin ping"
           --health-interval=10s 
           --health-timeout=5s 
           --health-retries=3
@@ -125,6 +125,32 @@ jobs:
       with:
         name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
         path: ./var/logs/*
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup DDEV
+      uses: ddev/github-action-setup-ddev@v1
+
+    - name: Set up environment variables for test mode
+      run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
+
+    - name: Run E2E tests
+      run: ddev exec bin/codecept run acceptance
+
+    - name: Upload test artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: e2e-test-screenshots
+        path: tests/_output
+        if-no-files-found: ignore
 
   misc:
     # We don't want the scheduled jobs to run on forks of Mautic
@@ -245,7 +271,7 @@ jobs:
           # test if media/css and media/js folder contain the same files as the tarball releases
           test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
           test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
-          
+
           # test if console is executable
           ./bin/console cache:clear
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then

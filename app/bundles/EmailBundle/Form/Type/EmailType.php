@@ -486,13 +486,45 @@ class EmailType extends AbstractType
                         'name'  => 'builder',
                         'label' => 'mautic.core.builder',
                         'attr'  => [
-                            'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
+                            'class'   => 'btn btn-ghost btn-dnd btn-nospin text-primary btn-builder',
                             'icon'    => 'ri-layout-line',
                             'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
                         ],
                     ],
                 ],
             ]
+        );
+
+        $builder->add(
+            $builder->create(
+                'preheaderText',
+                TextType::class,
+                [
+                    'label'      => 'mautic.email.preheader_text',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.email.preheader_text.tooltip',
+                    ],
+                    'required'    => false,
+                ]
+            )
+        );
+
+        $builder->add(
+            $builder->create(
+                'preheaderText',
+                TextType::class,
+                [
+                    'label'      => 'mautic.email.preheader_text',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.email.preheader_text.tooltip',
+                    ],
+                    'required'    => false,
+                ]
+            )
         );
 
         if (!empty($options['update_select'])) {

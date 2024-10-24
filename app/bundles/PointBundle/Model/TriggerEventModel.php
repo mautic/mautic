@@ -110,4 +110,32 @@ class TriggerEventModel extends CommonFormModel
 
         return array_unique($triggerIds);
     }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getPointTriggerIdsWithDependenciesOnTag(string $tagName): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'eq', 'value' => 'lead.changetags'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $triggerIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            foreach ($properties as $property) {
+                if (in_array($tagName, $property)) {
+                    $triggerIds[] = $entity->getTrigger()->getId();
+                }
+            }
+        }
+
+        return array_unique($triggerIds);
+    }
 }

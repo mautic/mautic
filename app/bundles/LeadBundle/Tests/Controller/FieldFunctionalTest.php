@@ -96,6 +96,70 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param array<string, string> $properties
+     *
+     * @dataProvider dataForCreatingNewBooleanField
+     */
+    public function testCreatingNewBooleanField(array $properties, string $expectedMessage): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $domDocument = $crawler->getNode(0)->ownerDocument;
+        $yesLabel    = $domDocument->createElement('input');
+        $yesLabel->setAttribute('type', 'text');
+        $yesLabel->setAttribute('name', 'leadfield[properties][yes]');
+
+        $noLabel  = $domDocument->createElement('input');
+        $noLabel->setAttribute('type', 'text');
+        $noLabel->setAttribute('name', 'leadfield[properties][no]');
+
+        $form = $crawler->selectButton('Save')->form();
+        $form->set(new InputFormField($yesLabel));
+        $form->set(new InputFormField($noLabel));
+
+        $form['leadfield[label]']->setValue('Request a meeting');
+        $form['leadfield[type]']->setValue('boolean');
+        $form['leadfield[object]']->setValue('lead');
+        $form['leadfield[group]']->setValue('core');
+
+        $form['leadfield[properties][yes]']->setValue($properties['yes'] ?? '');
+        $form['leadfield[properties][no]']->setValue($properties['no'] ?? '');
+
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $text = strip_tags($this->client->getResponse()->getContent());
+        Assert::assertStringNotContainsString($expectedMessage, $text);
+    }
+
+    /**
+     * @return iterable<string, array<int, string|array<string, string>>>
+     */
+    public function dataForCreatingNewBooleanField(): iterable
+    {
+        yield 'No properties' => [
+            [],
+            'A \'positive\' label is required.',
+        ];
+
+        yield 'Only Yes' => [
+            [
+                'yes' => 'Yes',
+            ],
+            'A \'negative\' label is required.',
+        ];
+
+        yield 'Only No' => [
+            [
+                'no' => 'No',
+            ],
+            'A \'positive\' label is required.',
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $parameters
      */
     private function createField(string $suffix, string $type = 'text', array $parameters = [], ?int $charLength = null): LeadField

@@ -6,58 +6,14 @@
 // ------------------------
 
 .background-blur() {
-  backdrop-filter: var(--blur);
+  backdrop-filter: blur(6px);
   background-color: var(--layer-translucent);
 }
 
 .bg-color(@bg-color; @color) {
   background-color: @bg-color !important;
-  border-color: darken(@bg-color, 3%) !important;
+  border-color: @bg-color !important;
   color: @color !important;
-
-  // lighten the base bg-color
-  &.bg-light-xs,
-  .bg-light-xs {
-    background-color: lighten(@bg-color, 1%) !important;
-    border-color: darken(@bg-color, 3%) !important;
-  }
-  &.bg-light-sm,
-  .bg-light-sm {
-    background-color: lighten(@bg-color, 3%) !important;
-    border-color: darken(@bg-color, 3%) !important;
-  }
-  &.bg-light-md,
-  .bg-light-md {
-    background-color: lighten(@bg-color, 5%) !important;
-    border-color: darken(@bg-color, 3%) !important;
-  }
-  &.bg-light-lg,
-  .bg-light-lg {
-    background-color: lighten(@bg-color, 7%) !important;
-    border-color: darken(@bg-color, 3%) !important;
-  }
-
-  // darken the base bg-color
-  &.bg-dark-xs,
-  .bg-dark-xs {
-    background-color: darken(@bg-color, 1%) !important;
-    border-color: darken(@bg-color, 3%) !important;
-  }
-  &.bg-dark-sm,
-  .bg-dark-sm {
-    background-color: darken(@bg-color, 3%) !important;
-    border-color: darken(@bg-color, 6%) !important;
-  }
-  &.bg-dark-md,
-  .bg-dark-md {
-    background-color: darken(@bg-color, 5%) !important;
-    border-color: darken(@bg-color, 9%) !important;
-  }
-  &.bg-dark-lg,
-  .bg-dark-lg {
-    background-color: darken(@bg-color, 7%) !important;
-    border-color: darken(@bg-color, 12%) !important;
-  }
 }
 
 // Text emphasis
@@ -157,7 +113,9 @@
     &:hover {
       input {
         + span {
-          border: 1px solid rgba(0,0,0,0.3);
+          border: 1px solid var(--text-primary);
+          opacity: .8;
+          .transition(var(--transition-all-productive));
         }
         &:checked {
           + span {
@@ -181,16 +139,16 @@
         right: 0;
         left: 50px;
         bottom: 0;
-        border-bottom: 1px solid lighten(@bgcolor, 1.8%);
+        border-bottom: none;
       }
     }
 
     > a {
-      color: fade(contrast(@bgcolor), 50%);
+      color: var(--text-secondary);
       &:hover,
       &:focus {
-        background-color: @bgcolor;
-        color: fade(contrast(@bgcolor), 75%);
+        background-color: var(--layer-hover);
+        color: var(--text-primary);
       }
     }
 
@@ -198,33 +156,33 @@
     &.active,
     &.open {
       > a {
-        background-color: @bgcolor;
-        color: fade(contrast(@bgcolor), 75%);
+        background-color: var(--layer-selected);
+        color: var(--text-primary);
       }
 
       // `nav-submenu`
       > .nav-submenu {
-        background-color: darken(@bgcolor, 3%);
+        background-color: var(--layer-accent);
       }
     }
 
     // nav-submenu style
     > .nav-submenu {
-      background-color: darken(@bgcolor, 1.5%);
+      background-color: var(--layer-accent);
       &:after {
-        background-color: lighten(@bgcolor, 2%);
+        background-color: var(--layer-accent-alt);
       }
       > li {
         // the dot
         &:after {
-          background-color: lighten(@bgcolor, 2.5%);
-          box-shadow: 0 0 0 2px darken(@bgcolor, 1.5%);
+          background-color: var(--layer);
+          box-shadow: none;
         }
         > a {
-          color: fade(contrast(@bgcolor), 50%);
+          color: var(--text-secondary);
           &:hover,
           &:focus {
-            color: fade(contrast(@bgcolor), 80%);
+            color: var(--text-primary);
           }
         }
 
@@ -232,7 +190,7 @@
         &.active,
         &.open {
           > a {
-            color: fade(contrast(@bgcolor), 80%);
+            color: var(--text-primary);
           }
         }
       }
@@ -257,5 +215,101 @@
   &:after,
   &:before {
     background-color: @bgcolor;
+  }
+}
+
+.outline() {
+  outline: 2px var(--outline-style) transparent;
+  outline-offset: -2px;
+  &:hover { outline: 2px var(--outline-style) transparent; }
+  &:active, &.active,
+  &:focus, &.focus { outline: 2px var(--outline-style) var(--focus); }
+}
+
+.outline-noff() {
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  &:hover { outline: 2px solid transparent; }
+  &:active, &.active,
+  &:focus, &.focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+  }
+}
+
+// Alerts
+
+.alert-variant(@background; @border; @text-color) {
+  color: var(--text-primary);
+  background-color: var(--layer);
+  border-color: @border;
+
+  hr {
+    border-top-color: var(--border-subtle);
+  }
+
+  .alert-link {
+    color: var(--text-primary);
+  }
+}
+
+.button-variant(@background, @text-color, @border-color, @hover-background, @hover-text-color, @active-background, @disabled-background, @disabled-text-color) {
+  background-color: @background;
+  color: @text-color;
+  border: 1px solid @border-color;
+  .outline();
+
+  i {
+    color: @text-color;
+  }
+
+  &:hover {
+    color: @hover-text-color;
+    background-color: @hover-background;
+    border: 1px solid @hover-background;
+
+    i {
+      color: @hover-text-color;
+    }
+  }
+
+  &:active,
+  &.active,
+  .open > .dropdown-toggle& {
+    color: @hover-text-color;
+    background-color: @active-background;
+    border: 1px solid @active-background;
+
+    i {
+      color: @hover-text-color;
+    }
+
+    &:hover,
+    &:focus,
+    &.focus {
+      color: @hover-text-color;
+      background-color: @active-background;
+      border-color: @active-background;
+    }
+  }
+
+  &:focus,
+  &.focus {
+    color: @hover-text-color;
+    background-color: @active-background;
+    border: 1px solid @active-background;
+    box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background,#ffffff);
+  }
+
+  &[disabled],
+  &.disabled,
+  fieldset[disabled] & {
+    &:hover,
+    &:focus,
+    &.focus {
+      background-color: @disabled-background;
+      color: @disabled-text-color;
+      border: 1px solid @disabled-background;
+    }
   }
 }

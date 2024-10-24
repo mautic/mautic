@@ -19,7 +19,7 @@
 
 {% block content %}
 	{% if isIndex %}
-		<div class="panel panel-default bdr-t-wdh-0 mb-0">
+		<div id="page-list-wrapper">
 
 			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue' : searchValue,
@@ -187,8 +187,8 @@
                     </td>
                     <td class="visible-md visible-lg">
                         {% set category = item.getCategory() %}
-                        {% set catName, color = (category) ? category.getTitle() : 'mautic.core.form.uncategorized'|trans, (category) ? '#' ~ category.getColor() : 'inherit' %}
-                        <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> <span>{{ catName }}</span></span>
+                        {% set catName, color = (category) ? category.getTitle() : 'mautic.core.form.uncategorized'|trans, (category) ? '#' ~ category.getColor() : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-md visible-lg">{{ item.getDownloadCount() }}</td>
                     <td class="visible-md visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
@@ -223,4 +223,8 @@
         'id'     : 'AssetPreviewModal',
         'header' : false,
 }) -}}
+
+{{ include('@MauticCore/Helper/protip.html.twig', {
+    tip: random(['mautic.protip.assets.gating', 'mautic.protip.assets.naming', 'mautic.protip.assets.repurpose', 'mautic.protip.assets.track'])
+}) }}
 {% endblock %}

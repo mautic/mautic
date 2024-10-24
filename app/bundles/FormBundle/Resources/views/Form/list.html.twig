@@ -32,18 +32,29 @@
 
 {% block content %}
   {% if isIndex %}
-    <div class="panel panel-default bdr-t-wdh-0 mb-0">
-        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue': searchValue,
-                'searchHelp': 'mautic.form.form.help.searchcommands',
-                'searchId': 'form-search',
-                'action': currentRoute,
+    <div id="page-list-wrapper">
+      {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'searchHelp': 'mautic.form.form.help.searchcommands',
+        'searchId': 'list-search',
+        'action': currentRoute,
+        'quickFilters': [
+            {
+                'search': 'has:results',
+                'label': 'mautic.core.search.quickfilter.form_results',
+                'tooltip': 'mautic.core.search.quickfilter.form_results.tooltip',
+                'icon': 'ri-file-list-2-line'
             }
-        ) }}
+        ]
+    }) }}
+
         <div class="page-list">
           {{ include('@MauticForm/Form/_list.html.twig') }}
         </div>
     </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+      tip: random(['mautic.protip.forms.redirect', 'mautic.protip.forms.minimize', 'mautic.protip.forms.language', 'mautic.protip.forms.multistep'])
+  }) }}
   {% else %}
     {{ include('@MauticForm/Form/_list.html.twig') }}
   {% endif %}

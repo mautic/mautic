@@ -118,6 +118,76 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(3, $leadCount);
     }
 
+    public function testImportWithSpecialCharacterTag(): void
+    {
+        $this->loginUser('admin');
+
+        // Count tags before import
+        $tagRepository  = $this->em->getRepository(Tag::class);
+        $tagCountBefore = $tagRepository->count([]);
+
+        $tagName = 'R&R';
+        $tag     = $this->createTag($tagName);
+
+        // Show mapping page
+        $crawler      = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadButton = $crawler->selectButton('Upload');
+        $form         = $uploadButton->form();
+        $form->setValues([
+            'lead_import[file]'       => $this->csvFile,
+            'lead_import[batchlimit]' => 100,
+            'lead_import[delimiter]'  => ',',
+            'lead_import[enclosure]'  => '"',
+            'lead_import[escape]'     => '\\',
+        ]);
+        $html = $this->client->submit($form);
+
+        // Submit import form with special character tag
+        $importButton = $html->selectButton('Import');
+        $importForm   = $importButton->form();
+        $importForm->setValues([
+            'lead_field_import[tags]' => [$tag->getId()],
+        ]);
+        $this->client->submit($importForm);
+
+        // Run import command
+        $import = $this->em->getRepository(Import::class)->findOneBy(['object' => 'lead']);
+        $output = $this->testSymfonyCommand('mautic:import', [
+            '-e'      => 'dev',
+            '--id'    => $import->getId(),
+            '--limit' => 10000,
+        ]);
+
+        // Verify import results
+        Assert::assertStringContainsString(
+            '4 lines were processed, 3 items created, 0 items updated, 1 items ignored',
+            $output->getDisplay()
+        );
+
+        // Check if contacts were created with the correct tag
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $tagRepository  = $this->em->getRepository(Tag::class);
+
+        $leads = $leadRepository->findBy(['firstname' => 'John']);
+        Assert::assertCount(3, $leads);
+
+        foreach ($leads as $lead) {
+            $leadTags = $lead->getTags();
+            Assert::assertCount(1, $leadTags);
+            Assert::assertSame($tagName, $leadTags->first()->getTag());
+        }
+
+        // Count tags after import
+        $tagCountAfter = $tagRepository->count([]);
+
+        // Verify that only one new tag was created
+        Assert::assertSame($tagCountBefore + 1, $tagCountAfter, 'Expected only one new tag to be created during import');
+
+        // Verify that the tag with special characters exists
+        $specialCharTag = $tagRepository->findOneBy(['tag' => $tagName]);
+        Assert::assertNotNull($specialCharTag, 'Tag with special characters should exist');
+    }
+
     private function createField(string $type, string $alias): void
     {
         $field = new LeadField();
