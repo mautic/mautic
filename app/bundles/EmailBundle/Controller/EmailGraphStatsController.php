@@ -57,7 +57,7 @@ class EmailGraphStatsController extends AbstractController
         [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Prepare stats for bargraph
-        if ($chartStatsSource = $request->query->get('stats', false)) {
+        if ($chartStatsSource = $request->query->get('stats')) {
             $includeVariants = ('all' === $chartStatsSource);
         } else {
             $includeVariants = (($email->isVariant() && $parent === $email) || ($email->isTranslation() && $translationParent === $email));

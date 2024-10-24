@@ -50,7 +50,7 @@ class Webhook extends FormEntity
     private $category;
 
     /**
-     * @var ArrayCollection<int, Event>
+     * @var Collection<int, Event>
      */
     private $events;
 
@@ -297,7 +297,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int, Event>
      */
     public function getEvents()
     {
@@ -305,7 +305,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param ArrayCollection<int,Event> $events
+     * @param Collection<int, Event> $events
      *
      * @return $this
      */

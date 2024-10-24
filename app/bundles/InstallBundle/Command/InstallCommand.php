@@ -48,7 +48,7 @@ class InstallCommand extends Command
                 'step',
                 InputArgument::OPTIONAL,
                 'Install process start index. 0 for requirements check, 1 for database, 2 for admin, 3 for configuration, 4 for final step. Each successful step will trigger the next until completion.',
-                0
+                '0'
             )
             ->addOption(
                 '--force',

@@ -25,9 +25,6 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $mockPageModel;
 
-    /**
-     * @var Lead|\PHPUnit\Framework\MockObject\MockObject
-     */
     private Lead $lead;
 
     public function setUp(): void

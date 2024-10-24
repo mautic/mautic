@@ -69,6 +69,9 @@ class Focus extends FormEntity
      */
     private $publishDown;
 
+    /**
+     * @var array<mixed>
+     */
     private $properties = [];
 
     /**
@@ -380,7 +383,7 @@ class Focus extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return array<mixed>
      */
     public function getProperties()
     {
@@ -388,7 +391,7 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $properties
+     * @param array<mixed> $properties
      *
      * @return Focus
      */

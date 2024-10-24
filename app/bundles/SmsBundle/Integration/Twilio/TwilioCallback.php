@@ -43,6 +43,9 @@ class TwilioCallback implements CallbackInterface
         return trim($request->get('Body'));
     }
 
+    /**
+     * @param InputBag<bool|float|int|string> $request
+     */
     private function validateRequest(InputBag $request): void
     {
         try {

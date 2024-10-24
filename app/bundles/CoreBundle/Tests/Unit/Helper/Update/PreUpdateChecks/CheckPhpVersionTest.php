@@ -27,6 +27,6 @@ class CheckPhpVersionTest extends MauticMysqlTestCase
         $result = $check->runCheck();
 
         // Just checking if we can properly detect the PHP version
-        $this->assertSame(true, $result->success);
+        $this->assertTrue($result->success);
     }
 }

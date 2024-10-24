@@ -166,7 +166,7 @@ class LeadApiController extends CommonApiController
 
         $results = $this->getModel('lead.note')->getEntities(
             [
-                'start'  => $request->query->get('start', 0),
+                'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
@@ -218,7 +218,7 @@ class LeadApiController extends CommonApiController
 
         $results = $this->getModel('lead.device')->getEntities(
             [
-                'start'  => $request->query->get('start', 0),
+                'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $request->query->get('search', ''),

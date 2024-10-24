@@ -37,7 +37,7 @@ final class EmailAddressHelperTest extends TestCase
     }
 
     /**
-     * @param array<int, array<int, array<int, string>|string>> $expected
+     * @param array<int, string> $expected
      *
      * @dataProvider variationsProvider
      */

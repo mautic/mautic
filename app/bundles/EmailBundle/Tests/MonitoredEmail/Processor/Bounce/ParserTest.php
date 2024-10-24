@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 
 class ParserTest extends \PHPUnit\Framework\TestCase
@@ -27,7 +26,7 @@ DSN;
         $parser = new Parser($message);
         $bounce = $parser->parse();
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
+        $this->assertSame('sdfgsdfg@seznan.cz', $bounce->getContactEmail());
     }
 
     /**
@@ -59,6 +58,6 @@ BODY;
         $parser = new Parser($message);
         $bounce = $parser->parse();
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
+        $this->assertSame('recipient@example.net', $bounce->getContactEmail());
     }
 }
