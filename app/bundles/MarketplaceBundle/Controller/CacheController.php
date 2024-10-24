@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
-use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -24,7 +23,6 @@ class CacheController extends CommonController
 {
     public function __construct(
         private Config $config,
-        private Allowlist $allowlist,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -48,8 +46,6 @@ class CacheController extends CommonController
         if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
             return $this->accessDenied();
         }
-
-        $this->allowlist->clearCache();
 
         return $this->forward(
             'Mautic\MarketplaceBundle\Controller\Package\ListController::listAction'
