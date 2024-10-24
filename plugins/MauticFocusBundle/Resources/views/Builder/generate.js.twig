@@ -9,8 +9,8 @@
 {%- set useScrollEvent = (props.when in ['scroll_slight', 'scroll_middle', 'scroll_bottom']) -%}
 {%- set useUnloadEvent = ('leave' == props.when) -%}
 {%- set useTimeout = props.timeout|default(0) -%}
-{%- set animate = props.animate is not defined or (props.animate is defined and props.animate is not empty) -%}
-{%- set linkActivation = props.link_activation is not defined or (props.link_activation is defined and props.link_activation is not empty) -%}
+{%- set animate = props.animate is not defined or (props.animate is defined and props.animate is not empty and props.animate != false) -%}
+{%- set linkActivation = props.link_activation is not defined or (props.link_activation is defined and props.link_activation is not empty and props.link_activation != false) -%}
 {%- set clickUrl = clickUrl|default(props.content.link_url) -%}
 
 {%- if '5seconds' == props.when -%}
