@@ -317,6 +317,7 @@ Mautic.processPageContent = function (response) {
  */
 Mautic.onPageLoad = function (container, response, inModal) {
     Mautic.initDateRangePicker(container + ' #daterange_date_from', container + ' #daterange_date_to');
+    Mautic.initSearchHelpButton();
 
     //initiate links
     Mautic.makeLinksAlive(mQuery(container + " a[data-toggle='ajax']"));

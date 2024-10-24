@@ -450,4 +450,30 @@ Mautic.showModal = function(target) {
     mQuery(target).modal('show');
 };
 
+Mautic.initSearchHelpButton = function (accordionId) {
+    const $searchHelpButton = mQuery('[data-toggle="searchhelp"]');
+    const $searchHelpModal = mQuery('#searchCommandsModal');
+    const searchId = $searchHelpButton.data('target');
+
+    // Scroll to the accordion item
+    $searchHelpModal.on('shown.bs.modal', function () {
+        const $modalBody = mQuery(this).find('.modal-content');
+        const $accordion = $modalBody.find('#specificCommandsAccordion');
+        $accordion.find('.collapse').collapse('hide');
+
+        if (searchId.length <= 1) {
+            return;
+        }
+        
+        const $accordionItem = $accordion.find(searchId);
+        $accordionItem.collapse('show');
+        const elementTop = $accordionItem.offset().top;
+        $modalBody.scrollTop($modalBody.scrollTop() + elementTop - $modalBody.offset().top);
+    });
+
+    $searchHelpButton.on('click', function (e) {
+        $searchHelpModal.modal('toggle');
+    });
+}
+
 

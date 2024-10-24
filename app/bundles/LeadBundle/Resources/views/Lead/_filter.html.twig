@@ -28,6 +28,7 @@
     {% endif %}
     <div id="page-list-wrapper">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchId': 'collapseMautic_lead_leads',
             'searchValue': searchValue|default(''),
             'searchHelp': 'mautic.lead.lead.help.searchcommands',
             'action': currentRoute,
