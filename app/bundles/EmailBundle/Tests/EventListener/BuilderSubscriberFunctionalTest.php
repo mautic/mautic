@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -127,7 +126,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
         Assert::assertSame(
             '{"success":1,"percent":100,"progress":['.$pending.','.$pending.'],"stats":{"sent":'.$pending.',"failed":0,"failedRecipients":[]}}',
             $response->getContent()

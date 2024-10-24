@@ -19,7 +19,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ],
     ]);
 
-    $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/test/appAppKernelDevDebugContainer.xml');
+    $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/dev/appAppKernelDevDebugContainer.xml');
 
     $rectorConfig->sets([
         // helps with rebase of PRs for Symfony 3 and 4, @see https://github.com/mautic/mautic/pull/12676#issuecomment-1695531274

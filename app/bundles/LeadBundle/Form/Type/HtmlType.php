@@ -11,9 +11,4 @@ class HtmlType extends AbstractType
     {
         return TextareaType::class;
     }
-
-    public function getName(): string
-    {
-        return 'html';
-    }
 }

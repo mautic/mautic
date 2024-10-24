@@ -203,7 +203,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
-        Assert::assertSame($expectedStatusCode, $response->getStatusCode(), $response->getContent());
+        self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 
         if ($expectedString) {
             Assert::assertStringContainsString($expectedString, $response->getContent());
