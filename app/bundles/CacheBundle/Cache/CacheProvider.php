@@ -12,6 +12,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * Povides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
@@ -26,7 +27,7 @@ final class CacheProvider implements CacheProviderInterface
     ) {
     }
 
-    public function getCacheAdapter(): TagAwareAdapterInterface
+    public function getCacheAdapter(): TagAwareAdapterInterface|TagAwareCacheInterface
     {
         $selectedAdapter = $this->coreParametersHelper->get('cache_adapter');
         if (!$selectedAdapter || !$this->container->has($selectedAdapter)) {
