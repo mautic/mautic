@@ -26,6 +26,7 @@ use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -110,6 +111,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|UserHelper
      */
     private MockObject $userHelper;
+
+    /**
+     * @var MockObject&FieldsWithUniqueIdentifier
+     */
+    private MockObject $fieldsWithUniqueIdentifier;
 
     /**
      * @var MockObject|EntityManager
@@ -197,18 +203,19 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->createMock(CoreParametersHelper::class)
         );
-        $this->userHelper               = $this->createMock(UserHelper::class);
-        $this->entityManager            = $this->createMock(EntityManager::class);
-        $this->submissioRepository      = $this->createMock(SubmissionRepository::class);
-        $this->leadRepository           = $this->createMock(LeadRepository::class);
-        $this->mockLogger               = $this->createMock(Logger::class);
-        $this->uploadFieldValidatorMock = $this->createMock(UploadFieldValidator::class);
-        $this->formUploaderMock         = $this->createMock(FormUploader::class);
-        $this->deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
-        $this->file1Mock                = $this->createMock(UploadedFile::class);
-        $this->router                   = $this->createMock(RouterInterface::class);
-        $this->contactTracker           = $this->createMock(ContactTracker::class);
-        $this->contactMerger            = $this->createMock(ContactMerger::class);
+        $this->userHelper                 = $this->createMock(UserHelper::class);
+        $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+        $this->entityManager              = $this->createMock(EntityManager::class);
+        $this->submissioRepository        = $this->createMock(SubmissionRepository::class);
+        $this->leadRepository             = $this->createMock(LeadRepository::class);
+        $this->mockLogger                 = $this->createMock(Logger::class);
+        $this->uploadFieldValidatorMock   = $this->createMock(UploadFieldValidator::class);
+        $this->formUploaderMock           = $this->createMock(FormUploader::class);
+        $this->deviceTrackingService      = $this->createMock(DeviceTrackingServiceInterface::class);
+        $this->file1Mock                  = $this->createMock(UploadedFile::class);
+        $this->router                     = $this->createMock(RouterInterface::class);
+        $this->contactTracker             = $this->createMock(ContactTracker::class);
+        $this->contactMerger              = $this->createMock(ContactMerger::class);
 
         $this->fieldHelper->method('getFieldFilter')->willReturn('string');
 
@@ -230,6 +237,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->dateHelper,
             $this->contactTracker,
             $this->contactMerger,
+            $this->fieldsWithUniqueIdentifier,
             $this->entityManager,
             $this->createMock(CorePermissions::class),
             $this->dispatcher,
@@ -263,8 +271,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'properties'   => [],
         ];
 
-        $this->leadFieldModel->expects($this->any())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->any())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(['eyJpc1B1Ymxpc2hlZCI6dHJ1ZSwiaXNVbmlxdWVJZGVudGlmZXIiOnRydWUsIm9iamVjdCI6ImxlYWQifQ==' => ['email' => 'Email']]);
 
         $this->leadFieldModel->expects($this->any())

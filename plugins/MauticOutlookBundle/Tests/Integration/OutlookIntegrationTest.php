@@ -33,6 +33,7 @@ final class OutlookIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
         );
+        $this->integration->setFieldsWithUniqueIdentifier($this->fieldsWithUniqueIdentifier);
     }
 
     public function testGetNameReturnsOutlook(): void

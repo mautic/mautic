@@ -49,6 +49,7 @@ use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -115,6 +116,7 @@ class LeadModel extends FormModel
         protected PathsHelper $pathsHelper,
         protected IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
+        protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected ListModel $leadListModel,
         protected FormFactoryInterface $formFactory,
         protected CompanyModel $companyModel,
@@ -807,7 +809,7 @@ class LeadModel extends FormModel
         }
 
         $lead            = new Lead();
-        $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
+        $uniqueFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueFieldData = [];
         $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
         $values          = $onlyPubliclyUpdateable ? $inQuery : $queryFields;

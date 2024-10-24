@@ -26,7 +26,6 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
@@ -482,7 +481,6 @@ class FieldModel extends FormModel
         private CustomFieldColumn $customFieldColumn,
         private FieldSaveDispatcher $fieldSaveDispatcher,
         private LeadFieldRepository $leadFieldRepository,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         private FieldList $fieldList,
         private LeadFieldSaver $leadFieldSaver,
         EntityManagerInterface $em,
@@ -1019,32 +1017,6 @@ class FieldModel extends FormModel
         }
 
         return $leadFields;
-    }
-
-    /**
-     * Retrieves a list of published fields that are unique identifers.
-     *
-     * @deprecated to be removed in 3.0
-     *
-     * @return array<mixed>
-     */
-    public function getUniqueIdentiferFields($filters = []): array
-    {
-        return $this->getUniqueIdentifierFields($filters);
-    }
-
-    /**
-     * Retrieves a list of published fields that are unique identifers.
-     *
-     * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
-     *
-     * @param array<mixed> $filters
-     *
-     * @return array<mixed>
-     */
-    public function getUniqueIdentifierFields(array $filters = []): array
-    {
-        return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }
 
     /**

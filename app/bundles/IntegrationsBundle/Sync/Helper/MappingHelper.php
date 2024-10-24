@@ -19,13 +19,13 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper
 {
     public function __construct(
-        private FieldModel $fieldModel,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         private ObjectMappingRepository $objectMappingRepository,
         private ObjectProvider $objectProvider,
         private EventDispatcherInterface $dispatcher
@@ -58,7 +58,7 @@ class MappingHelper
         }
 
         // We don't know who this is so search Mautic
-        $uniqueIdentifierFields = $this->fieldModel->getUniqueIdentifierFields(['object' => $internalObjectName]);
+        $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => $internalObjectName]);
         $identifiers            = [];
 
         foreach ($uniqueIdentifierFields as $field => $fieldLabel) {

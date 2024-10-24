@@ -30,6 +30,7 @@ use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -191,12 +192,13 @@ class FormTestAbstract extends TestCase
         $router                   = $this->createMock(RouterInterface::class);
         $contactMerger            = $this->createMock(ContactMerger::class);
         $router->method('generate')->willReturn('absolute/path/somefile.jpg');
+        $fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
         $lead                     = new Lead();
         $lead->setId(123);
 
-        $leadFieldModel->expects($this->any())
-            ->method('getUniqueIdentifierFields')
+        $fieldsWithUniqueIdentifier->expects($this->any())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(['eyJpc1B1Ymxpc2hlZCI6dHJ1ZSwiaXNVbmlxdWVJZGVudGlmZXIiOnRydWUsIm9iamVjdCI6ImxlYWQifQ==' => ['email' => 'Email']]);
 
         $contactTracker->expects($this
@@ -270,6 +272,7 @@ class FormTestAbstract extends TestCase
             $dateHelper,
             $contactTracker,
             $contactMerger,
+            $fieldsWithUniqueIdentifier,
             $entityManager,
             $this->createMock(CorePermissions::class),
             $dispatcher,
