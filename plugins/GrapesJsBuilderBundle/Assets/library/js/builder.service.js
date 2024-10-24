@@ -279,6 +279,8 @@ export default class BuilderService {
       content: '<mj-button href="https://">Button</mj-button>',
     });
 
+    this.removeSelectedElementsEmailMjml();
+
     return this.editor;
   }
 
@@ -505,6 +507,16 @@ export default class BuilderService {
         });
       }
     });
+  }
+
+  removeSelectedElementsEmailMjml() {
+
+    // Remove the RAW block (it's just not usable)
+    const rawblock = this.editor.BlockManager.get('mj-raw');
+
+    if (rawblock !== null) {
+      this.editor.BlockManager.remove(rawblock);
+    }
   }
 
   /**
