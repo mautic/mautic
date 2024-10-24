@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1db24c5e79a0d8398336d96b59bae3a0",
+    "content-hash": "d6c6cf4e227fd67f6d5233f9471b732d",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -3139,144 +3139,6 @@
             "time": "2023-05-24T07:17:17+00:00"
         },
         {
-            "name": "friendsofsymfony/oauth-server-bundle",
-            "version": "dev-upgrade-2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mautic/FOSOAuthServerBundle.git",
-                "reference": "dc8ff343363cf794d30eb1a123610d186a43f162"
-            },
-            "require": {
-                "friendsofsymfony/oauth2-php": "~1.1",
-                "php": "^7.2 || ^8.0",
-                "symfony/dependency-injection": "^4.4 || ^5.1",
-                "symfony/framework-bundle": "^4.4 || ^5.1",
-                "symfony/security-bundle": "^4.4 || ^5.1",
-                "symfony/twig-bundle": "^4.4 || ^5.1"
-            },
-            "conflict": {
-                "twig/twig": "<1.40 || >=2.0,<2.9"
-            },
-            "require-dev": {
-                "doctrine/doctrine-bundle": "^2.0",
-                "doctrine/mongodb-odm": "^2.2",
-                "doctrine/orm": "~2.2",
-                "phing/phing": "~2.4",
-                "php-mock/php-mock-phpunit": "^2.5",
-                "phpstan/phpstan": "^0.12",
-                "phpstan/phpstan-phpunit": "~0.9",
-                "phpunit/phpunit": "^8.5.23 || ^9.0",
-                "symfony/console": "^4.4 || ^5.1",
-                "symfony/form": "^4.4 || ^5.1",
-                "symfony/http-kernel": "^4.4 || ^5.1",
-                "symfony/phpunit-bridge": "^4.4 || ^5.1",
-                "symfony/security-core": "^4.4 || ^5.1",
-                "symfony/yaml": "^4.4 || ^5.1"
-            },
-            "suggest": {
-                "doctrine/doctrine-bundle": "*",
-                "doctrine/mongodb-odm-bundle": "*",
-                "symfony/console": "Needed to be able to use commands",
-                "symfony/form": "Needed to be able to use the AuthorizeFormType"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "FOS\\OAuthServerBundle\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Arnaud Le Blanc",
-                    "email": "arnaud.lb@gmail.com"
-                },
-                {
-                    "name": "FriendsOfSymfony Community",
-                    "homepage": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle/contributors"
-                }
-            ],
-            "description": "Symfony2 OAuth Server Bundle",
-            "homepage": "http://friendsofsymfony.github.com",
-            "keywords": [
-                "oauth",
-                "oauth2",
-                "server"
-            ],
-            "time": "2022-03-24T10:22:23+00:00"
-        },
-        {
-            "name": "friendsofsymfony/oauth2-php",
-            "version": "1.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/FriendsOfSymfony/oauth2-php.git",
-                "reference": "546f869d68fb79b284752e6787263d797165dba4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/oauth2-php/zipball/546f869d68fb79b284752e6787263d797165dba4",
-                "reference": "546f869d68fb79b284752e6787263d797165dba4",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9 || ^7.0.8 || ^7.1.3 || ^7.2.5 || ^8.0.0",
-                "symfony/http-foundation": "~3.0|~4.0|~5.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^5.0 || ^6.0 || ^8.0 || ^9.0.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "OAuth2\\": "lib/"
-                },
-                "exclude-from-classmap": [
-                    "/tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Arnaud Le Blanc",
-                    "email": "arnaud.lb@gmail.com"
-                },
-                {
-                    "name": "FriendsOfSymfony Community",
-                    "homepage": "https://github.com/FriendsOfSymfony/oauth2-php/contributors"
-                }
-            ],
-            "description": "OAuth2 library",
-            "homepage": "https://github.com/FriendsOfSymfony/oauth2-php",
-            "keywords": [
-                "oauth",
-                "oauth2"
-            ],
-            "support": {
-                "issues": "https://github.com/FriendsOfSymfony/oauth2-php/issues",
-                "source": "https://github.com/FriendsOfSymfony/oauth2-php/tree/1.3.1"
-            },
-            "time": "2021-04-06T17:14:49+00:00"
-        },
-        {
             "name": "friendsofsymfony/rest-bundle",
             "version": "3.6.0",
             "source": {
@@ -4816,6 +4678,159 @@
             "time": "2023-07-11T21:43:27+00:00"
         },
         {
+            "name": "klapaudius/oauth-server-bundle",
+            "version": "3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/klapaudius/FOSOAuthServerBundle.git",
+                "reference": "e6e918c8606eb7a2efadd6e7ba133f823c2cc75f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/klapaudius/FOSOAuthServerBundle/zipball/e6e918c8606eb7a2efadd6e7ba133f823c2cc75f",
+                "reference": "e6e918c8606eb7a2efadd6e7ba133f823c2cc75f",
+                "shasum": ""
+            },
+            "require": {
+                "klapaudius/oauth2-php": "~1.4",
+                "php": "^7.4.25|^8.0",
+                "symfony/dependency-injection": "~5.3",
+                "symfony/framework-bundle": "~5.3",
+                "symfony/security-bundle": "~5.3",
+                "symfony/twig-bundle": "~5.3"
+            },
+            "require-dev": {
+                "doctrine/doctrine-bundle": "~2.0",
+                "doctrine/mongodb-odm": "~2.0",
+                "doctrine/orm": "~2.2",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phing/phing": "~2.4",
+                "php-mock/php-mock-phpunit": "~1.0|~2.0",
+                "phpstan/phpstan-phpunit": "^0.12.20",
+                "phpunit/phpunit": "~6.0|~8.0",
+                "symfony/class-loader": "^2.0",
+                "symfony/console": "^5.3",
+                "symfony/form": "^5.3",
+                "symfony/phpunit-bridge": "^5.3",
+                "symfony/templating": "^5.3",
+                "symfony/yaml": "^5.3"
+            },
+            "suggest": {
+                "doctrine/doctrine-bundle": "*",
+                "doctrine/mongodb-odm-bundle": "*",
+                "symfony/console": "Needed to be able to use commands",
+                "symfony/form": "Needed to be able to use the AuthorizeFormType"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "FOS\\OAuthServerBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Klapaudius",
+                    "email": "klapaudius@gmail.com"
+                },
+                {
+                    "name": "Arnaud Le Blanc",
+                    "email": "arnaud.lb@gmail.com"
+                },
+                {
+                    "name": "FriendsOfSymfony Community",
+                    "homepage": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle/contributors"
+                }
+            ],
+            "description": "Symfony OAuth Server Bundle",
+            "homepage": "http://friendsofsymfony.github.com",
+            "keywords": [
+                "oauth",
+                "oauth2",
+                "server"
+            ],
+            "support": {
+                "issues": "https://github.com/klapaudius/FOSOAuthServerBundle/issues",
+                "source": "https://github.com/klapaudius/FOSOAuthServerBundle/tree/3.1.2"
+            },
+            "time": "2022-05-11T14:46:39+00:00"
+        },
+        {
+            "name": "klapaudius/oauth2-php",
+            "version": "1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/klapaudius/oauth2-php.git",
+                "reference": "3a1137e31f3c6c8a935ffce11363a173e1037845"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/klapaudius/oauth2-php/zipball/3a1137e31f3c6c8a935ffce11363a173e1037845",
+                "reference": "3a1137e31f3c6c8a935ffce11363a173e1037845",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9 || ^7.0.8 || ^7.1.3 || ^7.2.5 || ^8.0.0 || ^8.2.0",
+                "symfony/http-foundation": "~3.0|~4.0|~5.0|~6.0|~7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.0 || ^6.0 || ^8.0 || ^9.0.0 || ^10.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OAuth2\\": "lib/"
+                },
+                "exclude-from-classmap": [
+                    "/tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Klapaudius",
+                    "email": "klapaudius@gmail.com"
+                },
+                {
+                    "name": "Arnaud Le Blanc",
+                    "email": "arnaud.lb@gmail.com"
+                },
+                {
+                    "name": "FriendsOfSymfony Community",
+                    "homepage": "https://github.com/FriendsOfSymfony/oauth2-php/contributors"
+                }
+            ],
+            "description": "OAuth2 library",
+            "homepage": "https://github.com/klapaudius/oauth2-php",
+            "keywords": [
+                "oauth",
+                "oauth2"
+            ],
+            "support": {
+                "source": "https://github.com/klapaudius/oauth2-php/tree/1.6.0"
+            },
+            "time": "2024-01-11T22:06:13+00:00"
+        },
+        {
             "name": "knplabs/gaufrette",
             "version": "v0.9.0",
             "source": {
@@ -5383,32 +5398,109 @@
             "time": "2022-03-08T08:08:12+00:00"
         },
         {
-            "name": "lightsaml/sp-bundle",
-            "version": "dev-symfony5",
+            "name": "lightsaml2/lightsaml",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mautic/SpBundle.git",
-                "reference": "083bf6d62cb03443372068e0ea1b1c3183eed05a"
+                "url": "https://github.com/lightsaml2/lightSAML.git",
+                "reference": "4ac1e033bcd47871ea5059ef7de28484eb544664"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lightsaml2/lightSAML/zipball/4ac1e033bcd47871ea5059ef7de28484eb544664",
+                "reference": "4ac1e033bcd47871ea5059ef7de28484eb544664",
+                "shasum": ""
             },
             "require": {
-                "lightsaml/symfony-bridge": "dev-symfony5",
-                "php": ">=5.6",
-                "symfony/framework-bundle": "~2.7|~3.0|~4.0|~5.0",
-                "symfony/security-bundle": "~2.7|~3.0|~4.0|~5.0"
+                "ext-dom": "*",
+                "ext-json": "*",
+                "php": "^7.2|^8.0",
+                "psr/log": "^1|^2|^3",
+                "robrichards/xmlseclibs": "^3.0",
+                "symfony/event-dispatcher": "^4.4|^5.4|^6.0",
+                "symfony/http-foundation": "^4.4|^5.4|^6.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.7",
-                "sebastian/comparator": "^1.2.4|~2.0|~3.0",
-                "symfony/monolog-bundle": "~2.7|~3.0|~4.0",
-                "symfony/symfony": "~2.7|~3.0|~4.0"
+                "phpunit/phpunit": "^8.0|^9.0",
+                "pimple/pimple": "~3.0",
+                "symfony/css-selector": "^4.4|^5.4|^6.0",
+                "symfony/dom-crawler": "^4.4|^5.4|^6.0"
+            },
+            "suggest": {
+                "lightsaml2/sp-bundle": "Symfony SP security bundle",
+                "lightsaml2/symfony-bridge": "Symfony build container bridge"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "LightSaml\\": "src/",
+                    "LightSaml\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Milos Tomic",
+                    "email": "tmilos@gmail.com",
+                    "homepage": "https://github.com/tmilos/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Light SAML 2.0 PHP library",
+            "homepage": "https://www.lightsaml.com/",
+            "keywords": [
+                "SAML 2.0",
+                "Single Logout",
+                "Single SignOn",
+                "library",
+                "lightSAML",
+                "php"
+            ],
+            "support": {
+                "docs": "http://www.lightsaml.com/LightSAML-Core/",
+                "issues": "https://github.com/lightsaml2/lightsaml/issues",
+                "source": "https://github.com/lightSAML2/lightSAML"
+            },
+            "time": "2023-03-18T14:00:47+00:00"
+        },
+        {
+            "name": "lightsaml2/sp-bundle",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lightsaml2/SpBundle.git",
+                "reference": "76b679966f59fbeef646778db53c45c9dfdd7cb0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lightsaml2/SpBundle/zipball/76b679966f59fbeef646778db53c45c9dfdd7cb0",
+                "reference": "76b679966f59fbeef646778db53c45c9dfdd7cb0",
+                "shasum": ""
+            },
+            "require": {
+                "lightsaml2/lightsaml": "^2.0",
+                "lightsaml2/symfony-bridge": "^3.0",
+                "php": "^7.4|^8.0",
+                "symfony/framework-bundle": "^5.4|^6.0",
+                "symfony/security-bundle": "^5.4|^6.0"
+            },
+            "require-dev": {
+                "ext-simplexml": "*",
+                "phpunit/phpunit": "^9.0",
+                "symfony/monolog-bundle": "^3.0",
+                "symfony/symfony": "^5.4|^6.0"
             },
             "type": "symfony-bundle",
             "autoload": {
                 "psr-0": {
-                    "LightSaml\\SpBundle\\Tests\\": "tests/",
-                    "LightSaml\\SpBundle\\": "src/"
+                    "LightSaml\\SpBundle\\": "src/",
+                    "LightSaml\\SpBundle\\Tests\\": "tests/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -5422,37 +5514,47 @@
             ],
             "description": "Light SAML2 SP Symfony Bundle",
             "homepage": "http://www.lightsaml.com/SP-Bundle/",
-            "time": "2024-05-31T13:23:54+00:00"
+            "support": {
+                "source": "https://github.com/lightsaml2/SpBundle/tree/3.0.3"
+            },
+            "time": "2022-06-19T18:20:11+00:00"
         },
         {
-            "name": "lightsaml/symfony-bridge",
-            "version": "dev-symfony5",
+            "name": "lightsaml2/symfony-bridge",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mautic/SymfonyBridgeBundle.git",
-                "reference": "26f58d33a52b357dea90f6361d29d7321987be77"
+                "url": "https://github.com/lightsaml2/SymfonyBridgeBundle.git",
+                "reference": "42b952bbc98d22229426f12cd63643a58b816c0a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lightsaml2/SymfonyBridgeBundle/zipball/42b952bbc98d22229426f12cd63643a58b816c0a",
+                "reference": "42b952bbc98d22229426f12cd63643a58b816c0a",
+                "shasum": ""
             },
             "require": {
-                "litesaml/lightsaml": "~1.1|~4.1",
-                "php": ">=5.5.1",
-                "symfony/dependency-injection": "~2.7|~3.0|~4.0|~5.0",
-                "symfony/framework-bundle": "~2.7|~3.0|~4.0|~5.0",
-                "symfony/yaml": "~2.7|~3.0|~4.0|~5.0"
+                "lightsaml2/lightsaml": "^2.0",
+                "php": "^7.2|^8.0",
+                "symfony/dependency-injection": "^5.4|^6.0",
+                "symfony/framework-bundle": "^5.4|^6.0",
+                "symfony/yaml": "^5.4|^6.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.7",
-                "symfony/browser-kit": "~2.7|~3.0|~4.0|~5.0",
-                "symfony/filesystem": "~2.7|~3.0|~4.0|~5.0",
-                "symfony/finder": "~2.7|~3.0|~4.0|~5.0",
-                "symfony/routing": "~2.7|~3.0|~4.0|~5.0"
+                "phpunit/phpunit": "^9.0",
+                "symfony/browser-kit": "^5.4|^6.0",
+                "symfony/filesystem": "^5.4|^6.0",
+                "symfony/finder": "^5.4|^6.0",
+                "symfony/routing": "^5.4|^6.0"
             },
             "type": "symfony-bundle",
             "autoload": {
                 "psr-0": {
-                    "LightSaml\\SymfonyBridgeBundle\\Tests\\": "tests/",
-                    "LightSaml\\SymfonyBridgeBundle\\": "src/"
+                    "LightSaml\\SymfonyBridgeBundle\\": "src/",
+                    "LightSaml\\SymfonyBridgeBundle\\Tests\\": "tests/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -5466,76 +5568,10 @@
             ],
             "description": "Light SAML Symfony bridge bundle",
             "homepage": "http://www.lightsaml.com",
-            "time": "2023-04-08T06:24:20+00:00"
-        },
-        {
-            "name": "litesaml/lightsaml",
-            "version": "v4.1.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/litesaml/lightsaml.git",
-                "reference": "b6aa6f41c3a051a52e39ddc3a7b753a8601bee69"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/litesaml/lightsaml/zipball/b6aa6f41c3a051a52e39ddc3a7b753a8601bee69",
-                "reference": "b6aa6f41c3a051a52e39ddc3a7b753a8601bee69",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4",
-                "psr/event-dispatcher": "^1.0",
-                "robrichards/xmlseclibs": "~2.0|~3.0|~4.0",
-                "symfony/http-foundation": "~5.0|~6.0"
-            },
-            "require-dev": {
-                "litesaml/schemas": "~1.0.0",
-                "marcocesarato/php-conventional-changelog": "^1.15",
-                "monolog/monolog": "^2.0|^3.0",
-                "phpstan/phpstan": "^1.8",
-                "phpunit/phpunit": "~8.4|~9.5",
-                "pimple/pimple": "~3.0",
-                "squizlabs/php_codesniffer": "^3.6",
-                "symfony/css-selector": "~5.0|~6.0",
-                "symfony/dom-crawler": "~5.0|~6.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "LightSaml\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "William",
-                    "email": "work@suppo.fr"
-                },
-                {
-                    "name": "Milos Tomic",
-                    "email": "tmilos@gmail.com",
-                    "homepage": "https://github.com/tmilos/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "SAML 2.0 PHP library",
-            "keywords": [
-                "SAML 2.0",
-                "Single Logout",
-                "Single SignOn",
-                "library",
-                "lightSAML",
-                "php"
-            ],
             "support": {
-                "docs": "https://docs.litesaml.com",
-                "issues": "https://github.com/litesaml/lightsaml/issues",
-                "source": "https://github.com/litesaml/lightsaml"
+                "source": "https://github.com/lightsaml2/SymfonyBridgeBundle/tree/3.0.0"
             },
-            "time": "2023-04-14T14:11:32+00:00"
+            "time": "2022-01-01T16:23:15+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -6003,7 +6039,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "bbe9e60f7cdcbe039d47e86d71fb082917f752f6"
+                "reference": "5e1c267058955f7ad8f71dedb0866fb91186238e"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6027,7 +6063,6 @@
                 "ext-zip": "*",
                 "ext-zlib": "*",
                 "ezyang/htmlpurifier": "^4.16",
-                "friendsofsymfony/oauth-server-bundle": "dev-upgrade-2",
                 "friendsofsymfony/rest-bundle": "^3.5.0",
                 "gaufrette/aws-s3-adapter": "^0.4.0",
                 "gaufrette/extras": "^0.1.0",
@@ -6041,10 +6076,11 @@
                 "jms/serializer-bundle": "^5.4",
                 "joomla/filter": "~1.4.4",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0",
+                "klapaudius/oauth-server-bundle": "^3.1.0",
                 "knplabs/gaufrette": "~0.9.0",
                 "knplabs/knp-menu-bundle": "^3.0",
                 "leezy/pheanstalk-bundle": "dev-master",
-                "lightsaml/sp-bundle": "dev-symfony5",
+                "lightsaml2/sp-bundle": "^3.0.0",
                 "matomo/device-detector": "^4.0",
                 "matthiasmullie/minify": "^1.3",
                 "noxlogic/ratelimit-bundle": "^1.19",

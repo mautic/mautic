@@ -11,13 +11,13 @@ $container->loadFromExtension('security',
                 'http_basic' => true,
             ],
         ],
-        'encoders'  => [
-            'Symfony\Component\Security\Core\User\User' => [
+        'password_hashers'  => [
+            Symfony\Component\Security\Core\User\UserInterface::class => [
                 'algorithm'        => 'md5',
                 'encode_as_base64' => false,
                 'iterations'       => 0,
             ],
-            'Mautic\UserBundle\Entity\User' => [
+            Mautic\UserBundle\Entity\User::class => [
                 'algorithm'        => 'md5',
                 'encode_as_base64' => false,
                 'iterations'       => 0,

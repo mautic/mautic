@@ -474,10 +474,11 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('non-admin-user');
         $user->setRole($role);
 
-        /** @var PasswordHasherInterface $encoder */
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        /** @var PasswordHasherInterface $hasher */
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
 
-        $user->setPassword($encoder->hash('mautic'));
+        $passwordNonAdmin = 'mautic';
+        $user->setPassword($hasher->hash($passwordNonAdmin));
         $userRepository->saveEntity($user);
 
         /** @var User $nonAdminUser */
@@ -502,6 +503,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Check suggestions for a non admin user.
         $this->loginUser('non-admin-user');
         $this->client->setServerParameter('PHP_AUTH_USER', 'non-admin-user');
+        // Set the new password, because new authenticator system checks for it.
+        $this->client->setServerParameter('PHP_AUTH_PW', $passwordNonAdmin);
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
         $response = $this->client->getResponse();
         self::assertTrue($response->isOk());

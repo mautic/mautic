@@ -34,30 +34,21 @@ class Client extends BaseClient
      */
     protected $authCodes;
 
-    /**
-     * @var string
-     */
-    protected $randomId;
+    protected ?string $randomId = null;
+
+    protected ?string $secret = null;
 
     /**
-     * @var string
+     * @var array<string>
      */
-    protected $secret;
+    protected array $redirectUris = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
-    protected $redirectUris = [];
+    protected array $allowedGrantTypes;
 
-    /**
-     * @var array
-     */
-    protected $allowedGrantTypes;
-
-    /**
-     * @var Role|null
-     */
-    protected $role;
+    protected ?Role $role;
 
     public function __construct()
     {

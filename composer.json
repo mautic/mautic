@@ -101,14 +101,6 @@
     },
     {
       "type": "git",
-      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/SpBundle.git"
-    },
-    {
-      "type": "git",
       "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
     }
   ],

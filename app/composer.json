@@ -71,7 +71,7 @@
     "knplabs/gaufrette": "~0.9.0",
     "aws/aws-sdk-php": "~3.0",
     "friendsofsymfony/rest-bundle": "^3.5.0",
-    "friendsofsymfony/oauth-server-bundle": "dev-upgrade-2",
+    "klapaudius/oauth-server-bundle": "^3.1.0",
     "jms/serializer-bundle": "^5.4",
     "joomla/filter": "~1.4.4",
     "oneup/uploader-bundle": "^3.1.0",
@@ -82,7 +82,7 @@
     "twilio/sdk": "^5.25",
     "stack/builder": "^1.0",
     "php-http/guzzle7-adapter": "^1.0",
-    "lightsaml/sp-bundle": "dev-symfony5",
+    "lightsaml2/sp-bundle": "^3.0.0",
     "php-amqplib/rabbitmq-bundle": "^2.5.1",
     "simshaun/recurr": "^5.0",
     "ramsey/uuid": "^4.7",
@@ -119,14 +119,6 @@
     "psr/simple-cache": ">=3.0.0"
   },
   "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/SpBundle.git"
-    },
     {
       "type": "git",
       "url": "https://github.com/mautic/SymfonyBridgeBundle.git"

@@ -21,6 +21,9 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
+/**
+ * @deprecated Remove in Mautic 6.0. Use \Mautic\UserBundle\Security\Authenticator\ApiAuthenticator instead.
+ */
 final class AuthenticationListener
 {
     /**

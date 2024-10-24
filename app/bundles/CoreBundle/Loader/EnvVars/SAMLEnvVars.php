@@ -19,8 +19,9 @@ class SAMLEnvVars implements EnvVarsInterface
         }
 
         $samlEnabled = (bool) $config->get('saml_idp_metadata');
+        $envVars->set('MAUTIC_SAML_ENABLED', $samlEnabled);
 
-        $envVars->set('MAUTIC_SAML_LOGIN_PATH', $samlEnabled ? '/s/saml/login' : '/s/login');
-        $envVars->set('MAUTIC_SAML_LOGIN_CHECK_PATH', $samlEnabled ? '/s/saml/login_check' : '/s/login_check');
+        $envVars->set('MAUTIC_SAML_LOGIN_PATH', '/s/saml/login');
+        $envVars->set('MAUTIC_SAML_LOGIN_CHECK_PATH', '/s/saml/login_check');
     }
 }
