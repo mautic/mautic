@@ -48,6 +48,24 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
     }
 
     /**
+     * Download action should return the file content.
+     */
+    public function testDownloadActionById(): void
+    {
+        $assetSlug = $this->asset->getId().':';
+
+        $this->client->request('GET', '/asset/'.$assetSlug.'?stream=0');
+        ob_start();
+        $response = $this->client->getResponse();
+        $response->sendContent();
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        $this->assertStringContainsString('404 Not Found', $content);
+    }
+
+    /**
      * Download action with UTM should return the file content.
      */
     public function testDownloadActionWithUTM(): void

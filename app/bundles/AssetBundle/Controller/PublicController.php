@@ -7,6 +7,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PublicController extends CommonFormController
 {
@@ -15,9 +17,14 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function downloadAction(Request $request, CoreParametersHelper $parametersHelper, $slug)
+    public function downloadAction(Request $request, CoreParametersHelper $parametersHelper, ValidatorInterface $validator, $slug)
     {
-        // find the asset
+        $violations = $validator->validate($slug, new Regex('/.*[^\d+\s*:?].+/'));
+
+        if (count($violations) > 0) {
+            return $this->notFound();
+        }
+
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->getModel('asset');
 
