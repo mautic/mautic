@@ -84,7 +84,7 @@
                                                 {% if 'datetime' is same as cellType %}
                                                     {{ dateToFullConcat(cellVal, 'UTC') }}
                                                 {% elseif 'date' is same as cellType %}
-                                                    {{ dateToShort(cellVal, 'UTC') }}
+                                                    {{ dateToShort(cellVal, 'local', 'Y-m-d') }}
                                                 {% else %}
                                                     {% set value = format(cellVal, cellType)|purify %}
                                                     {% if collapse == false %}
