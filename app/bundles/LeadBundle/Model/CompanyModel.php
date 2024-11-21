@@ -815,6 +815,20 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
 
+        if ($company->isNew()) {
+            $granted = $this->security->isGranted('lead:leads:create');
+        } else {
+            $granted = $this->security->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $company->getPermissionUser()
+            );
+        }
+
+        if (!$granted) {
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+        }
+
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
             $company->setDateAdded($dateAdded->getUtcDateTime());
