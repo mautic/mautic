@@ -1194,7 +1194,7 @@ class LeadModel extends FormModel
         }
 
         if (!$granted) {
-            throw new \Exception('mautic.lead.import.error.unauthorized');
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
