@@ -218,8 +218,8 @@ return [
                 ],
             ],
             'mautic.security.user_token_setter' => [
-                'class'     => Mautic\UserBundle\Security\UserTokenSetter::class,
-                'arguments' => ['mautic.user.repository', 'security.token_storage'],
+                'class'     => \Mautic\UserBundle\Security\UserTokenSetter::class,
+                'arguments' => ['mautic.user.model.user', 'security.token_storage'],
             ],
             'mautic.user.model.user_token_service' => [
                 'class'     => Mautic\UserBundle\Model\UserToken\UserTokenService::class,

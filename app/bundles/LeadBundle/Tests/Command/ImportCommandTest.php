@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,7 +25,7 @@ class ImportCommandTest extends TestCase
         // Import entity
         $importMock = $this->createMock(Import::class);
         $importMock->expects($this->once())
-            ->method('getCreatedBy')
+            ->method('getModifiedBy')
             ->willReturn(42);
 
         // Import Model Mock
@@ -37,15 +37,15 @@ class ImportCommandTest extends TestCase
 
         // User Token Setter
         $user               = new User();
-        $userRepositoryMock = $this->createMock(UserRepository::class);
-        $userRepositoryMock->expects($this->once())
+        $userModelMock      = $this->createMock(UserModel::class);
+        $userModelMock->expects($this->once())
             ->method('getEntity')
             ->with(42)
             ->willReturn($user);
         $tokenStorageMock   = $this->createMock(TokenStorage::class);
         $tokenStorageMock->expects($this->once())
             ->method('setToken');
-        $userTokenSetter  = new UserTokenSetter($userRepositoryMock, $tokenStorageMock);
+        $userTokenSetter  = new UserTokenSetter($userModelMock, $tokenStorageMock);
 
         $importCommand =  new class($translatorMock, $importModelMock, new ProcessSignalService(), $userTokenSetter) extends ImportCommand {
             public function getExecute(InputInterface $input, OutputInterface $output): int
