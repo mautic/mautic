@@ -215,6 +215,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->createMock(LoggerInterface::class)
         );
 
+        $this->setSecurity($this->leadModel);
+
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
@@ -409,6 +411,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -451,6 +454,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -528,6 +532,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -769,5 +774,16 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 ]);
             }
         };
+    }
+
+    private function setSecurity(LeadModel $companyModel): void
+    {
+        $security = $this->createMock(CorePermissions::class);
+        $security->method('hasEntityAccess')
+            ->willReturn(true);
+        $security->method('isGranted')
+            ->willReturn(true);
+
+        $companyModel->setSecurity($security);
     }
 }
