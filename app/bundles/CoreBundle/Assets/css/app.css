@@ -10700,6 +10700,7 @@ code:hover > .copy-icon {
 .list-toolbar div {
   height: 48px;
   border-radius: unset;
+  margin: 0;
 }
 .list-toolbar .input-group .twitter-typeahead:last-child .tt-input:hover,
 .list-toolbar .input-group .twitter-typeahead:last-child .tt-hint:hover,
