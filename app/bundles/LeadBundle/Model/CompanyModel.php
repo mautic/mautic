@@ -817,6 +817,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
         \assert($company instanceof Company);
 
+        if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
+            return $company;
+        }
+
         if ($company->isNew()) {
             $granted = $this->security->isGranted('lead:leads:create');
         } else {
@@ -980,5 +984,17 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         if (null !== $companyLead) {
             $this->getCompanyLeadRepository()->detachEntity($companyLead);
         }
+    }
+
+    /**
+     * @param mixed[] $fields
+     * @param mixed[] $data
+     */
+    private function existDataForUpdate(array $fields, array $data): bool
+    {
+        $updateData = $this->getFieldData($fields, $data);
+        $uniqueData = $this->companyDeduper->getUniqueData($updateData);
+
+        return (bool) array_diff_assoc($updateData, $uniqueData);
     }
 }

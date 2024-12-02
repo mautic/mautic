@@ -18,6 +18,8 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -125,6 +127,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $lead = $this->createLead('existing-owned@email.tld', 'Existing-owned-before');
         $lead->setOwner($user);
         $this->em->persist($lead);
+        $this->createCompanyForLead($lead, 'Company One');
 
         $this->em->flush();
         $this->em->clear();
@@ -142,7 +145,8 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->submit($uploadForm);
         $mappingForm = $crawler->selectButton('Import')->form();
-        $crawler     = $this->client->submit($mappingForm);
+        $this->selectCompanyMapping($crawler, $mappingForm);
+        $crawler = $this->client->submit($mappingForm);
 
         Assert::assertStringContainsString('Import process was successfully created.', $crawler->html());
 
@@ -265,5 +269,16 @@ final class ImportControllerTest extends MauticMysqlTestCase
     {
         Assert::assertSame('failed', $log->getAction(), 'The insertion should fail as the user does not have permission to create contacts.');
         Assert::assertSame(sprintf('User \'%s\' has insufficient permissions', $user->getUsername()), $log->getProperties()['error'], 'There should be an insufficient permission error.');
+    }
+
+    private function selectCompanyMapping(Crawler $crawler, Form $mappingForm): void
+    {
+        $options = $crawler->filter("#lead_field_import_company > optgroup[label='Primary company']")->filter('option');
+        $values  = array_filter($options->each(function ($node) {
+            if ('Company Name' === $node->text()) {
+                return $node->attr('value');
+            }
+        }));
+        $mappingForm['lead_field_import[company]']->setValue(end($values));
     }
 }

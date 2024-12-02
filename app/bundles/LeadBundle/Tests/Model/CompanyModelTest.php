@@ -131,6 +131,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
         $companyDeduper->method('checkForDuplicateCompanies')->willReturn([$duplicatedCompany]);
+        $companyDeduper->method('getUniqueData')->willReturn([$duplicatedCompany]);
 
         return $companyDeduper;
     }
