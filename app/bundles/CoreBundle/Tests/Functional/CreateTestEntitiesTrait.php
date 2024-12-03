@@ -14,10 +14,11 @@ use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\User;
 
 trait CreateTestEntitiesTrait
 {
-    private function createLead(string $firstName, string $lastName = '', string $emailId = ''): Lead
+    private function createLead(string $firstName, string $lastName = '', string $emailId = '', User $createdBy = null): Lead
     {
         $lead = new Lead();
         $lead->setFirstname($firstName);
@@ -28,6 +29,10 @@ trait CreateTestEntitiesTrait
 
         if ($emailId) {
             $lead->setEmail($emailId);
+        }
+
+        if ($createdBy) {
+            $lead->setCreatedBy($createdBy);
         }
 
         $this->em->persist($lead);
