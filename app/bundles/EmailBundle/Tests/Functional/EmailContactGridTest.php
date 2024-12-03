@@ -68,7 +68,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
      */
     public function testEmailContactsGridWithIncompletePermissions(): void
     {
-        /** @var $email Email */
+        /** @var Email $email */
         list($email, $contactOne, $contactTwo) = $this->setupData();
 
         // create users
