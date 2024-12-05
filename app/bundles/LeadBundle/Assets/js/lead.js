@@ -1479,8 +1479,21 @@ Mautic.createLeadUtmTag = function (el) {
 
 Mautic.leadBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {
-        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length || mQuery('#contact_channels_ids').length || mQuery('#batch_tag_tags_add_tags').val() || mQuery('#batch_tag_tags_remove_tags').val()) {
-            var ids = Mautic.getCheckedListIds(false, true);
+        if (
+            mQuery('#lead_batch_remove').val() ||
+            mQuery('#lead_batch_add').val() ||
+            mQuery('#lead_batch_dnc_reason').length ||
+            mQuery('#lead_batch_stage_addstage').length ||
+            mQuery('#lead_batch_owner_addowner').length ||
+            mQuery('#contact_channels_ids').length ||
+            mQuery('#batch_tag_tags_add_tags').val() ||
+            mQuery('#batch_tag_tags_remove_tags').val()
+        ) {
+            if (mQuery('[data-toggle=selectall]').attr('data-selectall') === "1") {
+                var ids = 'all';
+            } else {
+                var ids = Mautic.getCheckedListIds(false, true);
+            }
 
             if (mQuery('#lead_batch_ids').length) {
                 mQuery('#lead_batch_ids').val(ids);

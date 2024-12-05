@@ -348,10 +348,13 @@ Mautic.executeBatchAction = function (action, el) {
         return;
     }
 
-    var items = Mautic.getCheckedListIds(el, true);
+    if (mQuery('[data-toggle=selectall]').attr('data-selectall') === "1") {
+        var items = 'all';
+    } else {
+        var items = Mautic.getCheckedListIds(el, true);
+    }
 
     var queryGlue = action.indexOf('?') >= 0 ? '&' : '?';
-
     // Append the items to the action to send with the POST
     var action = action + queryGlue + 'ids=' + items;
 

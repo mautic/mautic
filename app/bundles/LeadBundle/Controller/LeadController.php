@@ -1207,22 +1207,28 @@ class LeadController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
-            \assert($model instanceof LeadModel);
-            $ids       = json_decode($request->query->get('ids', '{}'));
+            $ids   = $request->query->get('ids');
+
+            // Make sure that ids is set before proceeding.
+            if (!empty($ids)) {
+                $filter = $this->getBatchActionFilter($request, $ids);
+            }
+
+            if (empty($filter)) {
+                return $this->accessDenied();
+            }
+
+            $entities = $model->getEntities([
+                'filter'           => $filter,
+                'ignore_paginator' => true,
+            ]);
+
             $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.lead.lead.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
+            // Loop over the entities to perform access checks pre-delete
+            foreach ($entities as $entity) {
+                if (!$this->security->hasEntityAccess(
                     'lead:leads:deleteown',
                     'lead:leads:deleteother',
                     $entity->getPermissionUser()
@@ -1232,7 +1238,7 @@ class LeadController extends FormController
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead', true);
                 } else {
-                    $deleteIds[] = $objectId;
+                    $deleteIds[] = $entity->getId();
                 }
             }
 
@@ -1589,29 +1595,23 @@ class LeadController extends FormController
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $this->getModel('campaign');
 
-        if ('POST' === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch'] ?? [];
-            $ids   = json_decode($data['ids'], true);
-
-            $entities = [];
-            if (is_array($ids)) {
-                $entities = $model->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
-                        'ignore_paginator' => true,
-                    ]
-                );
+            // Make sure that ids is set before proceeding.
+            if (isset($data['ids'])) {
+                $filter = $this->getBatchActionFilter($request, $data['ids']);
             }
+
+            if (empty($filter)) {
+                return $this->accessDenied(true);
+            }
+
+            $entities = $model->getEntities([
+                'filter'           => $filter,
+                'ignore_paginator' => true,
+            ]);
 
             foreach ($entities as $key => $lead) {
                 if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
@@ -1711,25 +1711,19 @@ class LeadController extends FormController
     {
         if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
-            $ids  = json_decode($data['ids'], true);
-
-            $entities = [];
-            if (is_array($ids)) {
-                $entities = $model->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
-                        'ignore_paginator' => true,
-                    ]
-                );
+            // Make sure that ids is set before proceeding.
+            if (isset($data['ids'])) {
+                $filter = $this->getBatchActionFilter($request, $data['ids']);
             }
+
+            if (empty($filter)) {
+                return $this->accessDenied(true);
+            }
+
+            $entities = $model->getEntities([
+                'filter'           => $filter,
+                'ignore_paginator' => true,
+            ]);
 
             $count = count($entities);
 
@@ -1787,30 +1781,24 @@ class LeadController extends FormController
      */
     public function batchStagesAction(Request $request, $objectId = 0)
     {
-        if ('POST' === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
-            $ids   = json_decode($data['ids'], true);
 
-            $entities = [];
-            if (is_array($ids)) {
-                $entities = $model->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
-                        'ignore_paginator' => true,
-                    ]
-                );
+            // Make sure that ids is set before proceeding.
+            if (isset($data['ids'])) {
+                $filter = $this->getBatchActionFilter($request, $data['ids']);
             }
 
+            if (empty($filter)) {
+                return $this->accessDenied(true);
+            }
+
+            $entities = $model->getEntities([
+                'filter'           => $filter,
+                'ignore_paginator' => true,
+            ]);
             $count = 0;
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
@@ -1897,29 +1885,23 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
-            $ids   = json_decode($data['ids'], true);
-
-            $entities = [];
-            if (is_array($ids)) {
-                $entities = $model->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
-                        'ignore_paginator' => true,
-                    ]
-                );
+            // Make sure that ids is set before proceeding.
+            if (isset($data['ids'])) {
+                $filter = $this->getBatchActionFilter($request, $data['ids']);
             }
+
+            if (empty($filter)) {
+                return $this->accessDenied(true);
+            }
+
+            $entities = $model->getEntities([
+                'filter'           => $filter,
+                'ignore_paginator' => true,
+            ]);
             $count = 0;
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
@@ -1933,7 +1915,7 @@ class LeadController extends FormController
                 }
             }
             // Save entities
-            $model->saveEntities($entities);
+            // $model->saveEntities($entities);
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
@@ -2008,9 +1990,9 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            return $this->accessDenied(true);
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            return $this->accessDenied(true);
         }
 
         $fileType = $request->get('filetype', 'csv');
@@ -2018,40 +2000,14 @@ class LeadController extends FormController
         /** @var LeadModel $model */
         $model      = $this->getModel('lead');
         $session    = $request->getSession();
-        $search     = $session->get('mautic.lead.filter', '');
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
         $orderBy    = $orderBy.$orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
-        $ids        = $request->get('ids');
-
-        $filter     = ['string' => $search, 'force' => ''];
-        $translator = $this->translator;
-        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
-        $indexMode  = $session->get('mautic.lead.indexmode', 'list');
-
-        if (!empty($ids)) {
-            $filter['force'] = [
-                [
-                    'column' => 'l.id',
-                    'expr'   => 'in',
-                    'value'  => json_decode($ids, true),
-                ],
-            ];
-        } else {
-            if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
-                // remove anonymous leads unless requested to prevent clutter
-                $filter['force'] .= " !$anonymous";
-            }
-
-            if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $mine";
-            }
-        }
-
-        $args = [
+        $ids        = $request->get('ids') ?? 'all';
+        $filter     = $this->getBatchActionFilter($request, $ids);
+        $args       = [
             'start'          => 0,
             'limit'          => 200,
             'filter'         => $filter,
@@ -2328,5 +2284,40 @@ class LeadController extends FormController
                 'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );
+    }
+
+    private function getBatchActionFilter(Request $request, $ids): array
+    {
+        $filter = [];
+
+        if ('all' === $ids) {
+            $session    = $request->getSession();
+            $search     = $session->get('mautic.lead.filter', '');
+            $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+            $filter     = ['string' => $search, 'force' => ''];
+            $translator = $this->translator;
+            $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+            $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+
+            if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
+                // remove anonymous leads unless requested to prevent clutter
+                $filter['force'] .= " !$anonymous";
+            }
+            if (!$this->security->isGranted('lead:leads:viewother')) {
+                $filter['force'] .= " $mine";
+            }
+        }
+
+        if ($ids = json_decode($ids, true)) {
+            $filter['force'] = [
+                [
+                    'column' => 'l.id',
+                    'expr'   => 'in',
+                    'value'  => $ids,
+                ],
+            ];
+        }
+
+        return $filter;
     }
 }
