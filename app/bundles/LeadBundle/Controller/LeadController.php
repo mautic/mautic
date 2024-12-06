@@ -60,6 +60,7 @@ class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
+    use LeadBatchActionTrait;
 
     /**
      * @param int $page
@@ -1915,7 +1916,7 @@ class LeadController extends FormController
                 }
             }
             // Save entities
-            // $model->saveEntities($entities);
+            $model->saveEntities($entities);
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
@@ -2284,40 +2285,5 @@ class LeadController extends FormController
                 'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );
-    }
-
-    private function getBatchActionFilter(Request $request, $ids): array
-    {
-        $filter = [];
-
-        if ('all' === $ids) {
-            $session    = $request->getSession();
-            $search     = $session->get('mautic.lead.filter', '');
-            $indexMode  = $session->get('mautic.lead.indexmode', 'list');
-            $filter     = ['string' => $search, 'force' => ''];
-            $translator = $this->translator;
-            $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-            $mine       = $translator->trans('mautic.core.searchcommand.ismine');
-
-            if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
-                // remove anonymous leads unless requested to prevent clutter
-                $filter['force'] .= " !$anonymous";
-            }
-            if (!$this->security->isGranted('lead:leads:viewother')) {
-                $filter['force'] .= " $mine";
-            }
-        }
-
-        if ($ids = json_decode($ids, true)) {
-            $filter['force'] = [
-                [
-                    'column' => 'l.id',
-                    'expr'   => 'in',
-                    'value'  => $ids,
-                ],
-            ];
-        }
-
-        return $filter;
     }
 }

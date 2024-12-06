@@ -10,6 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChannelActionModel
 {
+    public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
+
     public function __construct(
         private LeadModel $contactModel,
         private DoNotContact $doNotContact,
@@ -22,16 +24,21 @@ class ChannelActionModel
      */
     public function update(array $contactIds, array $subscribedChannels): void
     {
-        $contacts = $this->contactModel->getLeadsByIds($contactIds);
+        $contacts = $this->contactModel->getLeadsByIds($contactIds, true);
+        // Do this in chunks so that we don't run out of memory.
+        $chunks = array_chunk($contacts, self::LOAD_RESULTS_IN_CHUNKS_OF);
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $contact) {
+                if (!$this->contactModel->canEditContact($contact)) {
+                    continue;
+                }
 
-        foreach ($contacts as $contact) {
-            if (!$this->contactModel->canEditContact($contact)) {
-                continue;
+                $this->addChannels($contact, $subscribedChannels);
+                $this->removeChannels($contact, $subscribedChannels);
             }
-
-            $this->addChannels($contact, $subscribedChannels);
-            $this->removeChannels($contact, $subscribedChannels);
         }
+        // Clear the chunk from memory after each iteration.
+        unset($chunk);
     }
 
     /**

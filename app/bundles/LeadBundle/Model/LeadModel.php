@@ -747,10 +747,8 @@ class LeadModel extends FormModel
 
     /**
      * Obtains a list of leads based a list of IDs.
-     *
-     * @return Paginator
      */
-    public function getLeadsByIds(array $ids)
+    public function getLeadsByIds(array $ids, bool $ignore_paginator = false): Paginator|array
     {
         return $this->getEntities([
             'filter' => [
@@ -762,6 +760,7 @@ class LeadModel extends FormModel
                     ],
                 ],
             ],
+            'ignore_paginator' => $ignore_paginator,
         ]);
     }
 

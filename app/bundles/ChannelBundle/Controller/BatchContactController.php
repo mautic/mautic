@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Controller\LeadBatchActionTrait;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,6 +22,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
+    use LeadBatchActionTrait;
+
     public function __construct(
         private ChannelActionModel $channelActionModel,
         private FrequencyActionModel $frequencyActionModel,
@@ -43,18 +46,27 @@ class BatchContactController extends AbstractFormController
      */
     public function setAction(Request $request): JsonResponse
     {
-        $params = $request->get('contact_channels', []);
-        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $params     = $request->get('contact_channels', []);
+        $ids        = $params['ids'];
+        $contactIds = [];
 
-        if ($ids && is_array($ids)) {
+        if ('all' === $ids) {
+            $contactIds = $this->getBatchActionEntityIdsForAll($request);
+        }
+
+        if (json_decode($ids)) {
+            $contactIds = json_decode($ids);
+        }
+
+        if (!empty($contactIds)) {
             $subscribedChannels = $params['subscribed_channels'] ?? [];
             $preferredChannel   = $params['preferred_channel'] ?? null;
 
-            $this->channelActionModel->update($ids, $subscribedChannels);
-            $this->frequencyActionModel->update($ids, $params, $preferredChannel);
+            $this->channelActionModel->update($contactIds, $subscribedChannels);
+            $this->frequencyActionModel->update($contactIds, $params, $preferredChannel);
 
             $this->addFlashMessage('mautic.lead.batch_leads_affected', [
-                '%count%'     => count($ids),
+                '%count%'     => count($contactIds),
             ]);
         } else {
             $this->addFlashMessage('mautic.core.error.ids.missing');
