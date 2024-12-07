@@ -1227,20 +1227,26 @@ class LeadController extends FormController
             ]);
 
             $deleteIds = [];
-            // Loop over the entities to perform access checks pre-delete
-            foreach ($entities as $entity) {
-                if (!$this->security->hasEntityAccess(
-                    'lead:leads:deleteown',
-                    'lead:leads:deleteother',
-                    $entity->getPermissionUser()
-                )
-                ) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead', true);
-                } else {
-                    $deleteIds[] = $entity->getId();
+            // Do this in chunks so that we don't run out of memory.
+            $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
+            foreach ($chunks as $chunk) {
+                // Loop over the entities to perform access checks pre-delete
+                foreach ($chunk as $entity) {
+                    if (!$this->security->hasEntityAccess(
+                        'lead:leads:deleteown',
+                        'lead:leads:deleteother',
+                        $entity->getPermissionUser()
+                    )
+                    ) {
+                        $flashes[] = $this->accessDenied(true);
+                    } elseif ($model->isLocked($entity)) {
+                        $flashes[] = $this->isLocked($postActionVars, $entity, 'lead', true);
+                    } else {
+                        $deleteIds[] = $entity->getId();
+                    }
                 }
+                // Clear the chunk from memory after each iteration.
+                unset($chunk);
             }
 
             // Delete everything we are able to
@@ -1614,10 +1620,16 @@ class LeadController extends FormController
                 'ignore_paginator' => true,
             ]);
 
-            foreach ($entities as $key => $lead) {
-                if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                    unset($entities[$key]);
+            // Do this in chunks so that we don't run out of memory.
+            $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
+            foreach ($chunks as $chunk) {
+                foreach ($chunk as $key => $lead) {
+                    if (!$model->canEditContact($lead)) {
+                        unset($entities[$key]);
+                    }
                 }
+                // Clear the chunk from memory after each iteration.
+                unset($chunk);
             }
 
             $add    = (!empty($data['add'])) ? $data['add'] : [];
@@ -1729,10 +1741,16 @@ class LeadController extends FormController
             $count = count($entities);
 
             if ($count) {
-                foreach ($entities as $lead) {
-                    if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
+                // Do this in chunks so that we don't run out of memory.
+                $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
+                foreach ($chunks as $chunk) {
+                    foreach ($chunk as $lead) {
+                        if ($model->canEditContact($lead)) {
+                            $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
+                        }
                     }
+                    // Clear the chunk from memory after each iteration.
+                    unset($chunk);
                 }
             }
 
@@ -1800,23 +1818,28 @@ class LeadController extends FormController
                 'filter'           => $filter,
                 'ignore_paginator' => true,
             ]);
-            $count = 0;
-            foreach ($entities as $lead) {
-                if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                    ++$count;
+            $count  = 0;
+            $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
+            foreach ($chunks as $chunk) {
+                foreach ($chunk as $lead) {
+                    if ($model->canEditContact($lead)) {
+                        ++$count;
 
-                    if (!empty($data['addstage'])) {
-                        $stageModel = $this->getModel('stage');
+                        if (!empty($data['addstage'])) {
+                            $stageModel = $this->getModel('stage');
 
-                        $stage = $stageModel->getEntity((int) $data['addstage']);
-                        $model->addToStages($lead, $stage);
-                    }
+                            $stage = $stageModel->getEntity((int) $data['addstage']);
+                            $model->addToStages($lead, $stage);
+                        }
 
-                    if (!empty($data['removestage'])) {
-                        $stage = $stageModel->getEntity($data['removestage']);
-                        $model->removeFromStages($lead, $stage);
+                        if (!empty($data['removestage'])) {
+                            $stage = $stageModel->getEntity($data['removestage']);
+                            $model->removeFromStages($lead, $stage);
+                        }
                     }
                 }
+                // Clear the chunk from memory after each iteration.
+                unset($chunk);
             }
             // Save entities
             $model->saveEntities($entities);
@@ -1904,16 +1927,22 @@ class LeadController extends FormController
                 'ignore_paginator' => true,
             ]);
             $count = 0;
-            foreach ($entities as $lead) {
-                if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                    ++$count;
+            // Do this in chunks so that we don't run out of memory.
+            $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
+            foreach ($chunks as $chunk) {
+                foreach ($chunk as $lead) {
+                    if ($model->canEditContact($lead)) {
+                        ++$count;
 
-                    if (!empty($data['addowner'])) {
-                        $userModel = $this->getModel('user');
-                        $user      = $userModel->getEntity((int) $data['addowner']);
-                        $lead->setOwner($user);
+                        if (!empty($data['addowner'])) {
+                            $userModel = $this->getModel('user');
+                            $user      = $userModel->getEntity((int) $data['addowner']);
+                            $lead->setOwner($user);
+                        }
                     }
                 }
+                // Clear the chunk from memory after each iteration.
+                unset($chunk);
             }
             // Save entities
             $model->saveEntities($entities);
