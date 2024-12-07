@@ -397,6 +397,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         selectrow(this, "unchecked");
                         // Set selectall data-attribute to false
                         $('[data-toggle=selectall]').attr("data-selectall", "0");
+                        $('[data-toggle~=checkall]').prop("checked", false);
                     }
                     updateToolbarState();
                 });
