@@ -10,9 +10,9 @@ if [ $? -eq 1 ]; then
   exit 0
 fi
 
+RETURN_CODE=0
 PHP_CS_FIXER="bin/php-cs-fixer"
 HAS_PHP_CS_FIXER=false
-RETURN_CODE=0
 
 if [ -x $PHP_CS_FIXER ]; then
     HAS_PHP_CS_FIXER=true
@@ -30,13 +30,14 @@ STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.php$')
 
 if $HAS_PHP_CS_FIXER && [ ! -z "$STAGED_FILES" ]; then
     # Check changed (indexed) PHP files with php-cs-fixer
-    $PHP_CS_FIXER fix --config=$ROOT/.php-cs-fixer.php --dry-run --verbose --using-cache=no $(git diff --cached --name-only)
+    $PHP_CS_FIXER fix --config=$ROOT/.php-cs-fixer.php --dry-run --verbose --using-cache=no $STAGED_FILES
     RETURN_CODE=$?
 fi
 
-if $HAS_RECTOR && [ ! -z "$STAGED_FILES" ]; then
-    # Refactor changed (indexed) PHP files with Rector
-    $RECTOR process $STAGED_FILES --config $ROOT/rector.php
+if [ "$RETURN_CODE" -eq "0" ] && $HAS_RECTOR && [ ! -z "$STAGED_FILES" ]; then
+    # Check changed (indexed) PHP files with Rector
+    $RECTOR process $STAGED_FILES --dry-run --config $ROOT/rector.php
+    RETURN_CODE=$?
 fi
 
 if ! $HAS_PHP_CS_FIXER; then
