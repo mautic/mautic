@@ -1408,10 +1408,7 @@ class LeadModel extends FormModel
             throw new \Exception($fieldErrors);
         }
 
-        // All clear
-        foreach ($fieldData as $field => $value) {
-            $lead->addUpdatedField($field, $value);
-        }
+        $this->setFieldValues($lead, $fieldData, false, false, true);
 
         $lead->imported = true;
 
