@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -108,6 +109,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'description' => 'mautic.lead.lead.events.updatelead_descr',
             'formType'    => UpdateLeadActionType::class,
             'formTheme'   => '@MauticLead/FormTheme/ActionUpdateLead/_updatelead_action_widget.html.twig',
+
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.updatelead', $action);
@@ -654,11 +656,15 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
     {
-        return $this->leadFieldModel->getRepository()->compareDateValue(
-            $lead->getId(),
-            $event->getConfig()['field'],
-            $triggerDate->format('Y-m-d')
-        );
+        $fieldValueToCompare  = $event->getLead()->getProfileFields()[$event->getConfig()['field']] ?? null;
+
+        if (empty($fieldValueToCompare)) {
+            return false;
+        }
+
+        $dateTimeHelper = new DateTimeHelper($fieldValueToCompare);
+
+        return $dateTimeHelper->toUtcString('Y-m-d') === $triggerDate->format('Y-m-d');
     }
 
     protected function getFields(Lead $lead): array
