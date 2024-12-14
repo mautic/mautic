@@ -39,7 +39,7 @@ trait TimelineTrait
             $cq = $options['chartQuery'];
             $cq->modifyTimeDataQuery($query, $column, $tablePrefix);
             $cq->applyDateFilters($query, $column, $tablePrefix);
-            $data = $query->execute()->fetchAllAssociative();
+            $data = $query->executeQuery()->fetchAllAssociative();
 
             return $cq->completeTimeData($data);
         }

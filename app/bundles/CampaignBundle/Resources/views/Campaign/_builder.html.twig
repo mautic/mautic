@@ -8,8 +8,29 @@
 #}
 <div id="campaign-builder" class="hide builder campaign-builder live">
     <div class="btns-builder">
-        <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">{{ 'mautic.core.form.apply'|trans }}<i class="ri-save-line"></i></button>
-        <button type="button" class="btn btn-secondary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">{{ 'mautic.core.close.builder'|trans }}<i class="ri-close-line"></i></button>
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.form.apply',
+                    variant: 'primary',
+                    onclick: 'Mautic.saveCampaignFromBuilder();',
+                    icon: 'ri-save-line',
+                    attributes: {
+                        class: 'btn-apply-builder',
+                        type: 'submit'
+                    }
+                },
+                {
+                    label: 'mautic.core.close.builder',
+                    variant: 'secondary',
+                    onclick: 'Mautic.closeCampaignBuilder();',
+                    icon: 'ri-close-line',
+                    attributes: {
+                        class: 'btn-close-campaign-builder'
+                    }
+                }
+            ]
+        } %}
     </div>
     <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
     <div class="builder-content">

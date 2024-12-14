@@ -351,9 +351,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
 
-        $user->setPassword($encoder->encodePassword('password', null));
+        $user->setPassword($encoder->hash('password'));
         $this->em->persist($user);
 
         // Create a contact:

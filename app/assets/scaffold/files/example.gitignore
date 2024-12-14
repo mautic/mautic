@@ -9,6 +9,7 @@
 .ddev/mautic-preference
 /.ddev/docker-compose.host-docker-internal.yaml
 !/.ddev/.env.*.dist
+/.ddev/docker-compose.phpmyadmin_norouter.yaml
 !.gitpod.Dockerfile
 !.gitpod.yml
 !.ddev/commands/web/dd

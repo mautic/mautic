@@ -124,6 +124,12 @@ class AssetModel extends FormModel
             $request = $this->requestStack->getCurrentRequest();
         }
 
+        if (!($request instanceof Request)) {
+            // likely this download came via a cron (no request), do not bother logging the download.
+            // https://github.com/mautic/mautic/issues/13577
+            return;
+        }
+
         $download = new Download();
         $download->setDateDownload(new \DateTime());
         $download->setUtmCampaign($request->get('utm_campaign'));
@@ -256,10 +262,7 @@ class AssetModel extends FormModel
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
-
-        if (null !== $request) {
-            $download->setReferer($request->server->get('HTTP_REFERER'));
-        }
+        $download->setReferer($request->server->get('HTTP_REFERER'));
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
@@ -589,7 +592,7 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -617,6 +620,6 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

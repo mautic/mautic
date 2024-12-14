@@ -121,11 +121,12 @@ class Interval implements ScheduleModeInterface
                 $endTime,
                 $daysOfWeek
             );
-            if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
-                $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
+            $key = $groupExecutionDate->format(DateTimeHelper::FORMAT_DB);
+            if (!isset($groupedExecutionDates[$key])) {
+                $groupedExecutionDates[$key] = new GroupExecutionDateDAO($groupExecutionDate);
             }
 
-            $groupedExecutionDates[$groupExecutionDate->getTimestamp()]->addContact($contact);
+            $groupedExecutionDates[$key]->addContact($contact);
         }
 
         return $groupedExecutionDates;
@@ -136,7 +137,11 @@ class Interval implements ScheduleModeInterface
      */
     public function isContactSpecificExecutionDateRequired(Event $event): bool
     {
-        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event)) {
+        if ($this->isTriggerModeOptimized($event)) {
+            return true;
+        }
+
+        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event)) {
             return false;
         }
 
@@ -146,6 +151,11 @@ class Interval implements ScheduleModeInterface
     private function isTriggerModeInterval(Event $event): bool
     {
         return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
+    }
+
+    private function isTriggerModeOptimized(Event $event): bool
+    {
+        return Event::TRIGGER_MODE_OPTIMIZED === $event->getTriggerMode();
     }
 
     private function isRestrictedToDailyScheduling(Event $event): bool
@@ -159,6 +169,15 @@ class Interval implements ScheduleModeInterface
         return null === $event->getTriggerHour()
             && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
             && empty($event->getTriggerRestrictedDaysOfWeek());
+    }
+
+    private function isNegativePath(Event $event): bool
+    {
+        if ($event->getParent()) {
+            return Event::TYPE_DECISION === $event->getParent()->getEventType() && Event::TYPE_ACTION === $event->getEventType() && Event::PATH_INACTION === $event->getDecisionPath();
+        }
+
+        return false;
     }
 
     /**
@@ -238,11 +257,11 @@ class Interval implements ScheduleModeInterface
         $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
 
         if ($groupExecutionDate <= $testGroupHour) {
+            // Schedule for the configured hour today if it's not passed yet.
             return $testGroupHour;
-        } else {
-            $groupExecutionDate->modify('+1 day')->setTime($groupHour->format('H'), $groupHour->format('i'));
         }
 
+        // Execute rigt away if the hour has passed.
         return $groupExecutionDate;
     }
 

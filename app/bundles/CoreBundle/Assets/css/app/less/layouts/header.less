@@ -23,15 +23,13 @@
 // navbar as header
 #app-header.navbar {
   .transition(all .3s ease);
-
-  background-color: @header-bg;
   float: left;
   z-index: @header-zindex;
   min-height: @header-height;
   border-width: 0;
   border-radius: 0;
   margin-bottom: 0;
-  .box-shadow(0 1px 0 rgba(0,0,0,0.05));
+  .background-blur();
 
   // fixed header
   .header-fixed & {
@@ -39,8 +37,7 @@
     right: 0;
     left: 0;
     top: 0;
-    //box-shadow: 0 2px 2px rgba(0,0,0,0.05), 0 1px 0 rgba(0,0,0,0.05);
-    box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
+    border-bottom: 1px solid var(--border-subtle);
 
     // Add top padding to `app-content` if header is fixed
     ~ #app-content {
@@ -70,7 +67,6 @@
         .icon-bar {
           margin-left: auto;
           margin-right: auto;
-          background-color: fade(contrast(@header-bg), 60%);
           height: 2px;
           width: 18px;
           border-radius: 0;
@@ -106,7 +102,7 @@
 
         // `navbar-nav` anchor
         > a {
-          color: fade(contrast(@header-bg), 60%);
+          color: var(--text-primary);
           line-height: @header-height;
           padding-top: 0;
           padding-bottom: 0;
@@ -161,14 +157,14 @@
           // interaction
           // -------------------------
           &:hover {
-            color: fade(contrast(@header-bg), 70%);
+            color: var(--text-primary);
             background-color: transparent;
           }
           &:active,
           &:focus,
           &.active {
-            color: fade(contrast(@header-bg), 70%);
-            background-color: darken(@header-bg, 4%);
+            color: var(--text-primary);
+            background-color: var(--background-hover);
           }
         }
       }
@@ -212,27 +208,29 @@
       .open {
         // reset default bootstrap `navbar-nav` `dropdown-menu`
         .dropdown-menu {
+          background-color: var(--layer);
           position: absolute;
           top: 100%;
           margin-top: 5px;
           left: 15px;
           float: left;
-          background-color: @dropdown-bg;
           border: 1px solid @dropdown-fallback-border; // IE8 fallback
           border: 1px solid @dropdown-border;
+          border-top-left-radius: var(--border-radius-md);
+          border-top-right-radius: var(--border-radius-md);
           .box-shadow(0 3px 6px rgba(0,0,0,.06));
         }
 
         // `navbar-nav` anchor
         > a {
-          color: fade(contrast(@header-bg), 70%);
-          background-color: darken(@header-bg, 4%);
+          color: var(--text-primary);
+          background-color: var(--background-hover);
 
           // interaction
           &:hover,
           &:focus {
-            color: fade(contrast(@header-bg), 70%);
-            background-color: darken(@header-bg, 4%);
+            color: var(--text-primary);
+            background-color: var(--background-hover);
           }
 
           // badge & bullet
@@ -240,7 +238,7 @@
           > .badge,
           > .bullet,
           > .label {
-            .box-shadow(0 0 0 2px darken(@header-bg, 4%));
+            .box-shadow(0 0 0 2px var(--background-hover));
           }
         }
       }
@@ -277,14 +275,14 @@
         margin-bottom: ((@header-height - @input-height-base) / 2);
 
         // reset fontawesome color
-        .fa { color: fade(contrast(@header-bg), 60%); }
+        .fa { color: var(--text-primary); }
       }
 
       // `form-control` reset
       .form-control {
-        background-color: fade(contrast(@header-bg), 8%);
+        background-color: var(--background-hover);
         border-color: transparent;
-        .placeholder(fade(contrast(@header-bg), 50%));
+        .placeholder(var(--text-placeholder));
       }
     }
 
@@ -312,7 +310,7 @@
         bottom: -7px;
         margin-left: -8px;
         border-width: 0 8px 8px;
-        border-color: transparent transparent #fff;
+        border-color: transparent transparent var(--layer);
         position: absolute;
         content: "";
         left: 50%;

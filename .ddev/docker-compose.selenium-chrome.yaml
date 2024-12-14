@@ -2,7 +2,6 @@
 #
 # This file comes from https://github.com/ddev/ddev-selenium-standalone-chrome
 #
-version: "3.6"
 services:
   selenium-chrome:
     image: seleniarm/standalone-chromium:4.1.4-20220429

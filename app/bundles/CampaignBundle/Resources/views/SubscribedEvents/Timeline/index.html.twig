@@ -60,10 +60,10 @@
     {% endif %}
 
     {% if (item.campaign_description) %}
-        <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.campaign_description}) }}</p>
+        <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.campaign_description})|purify }}</p>
     {% endif %}
     {% if (item.event_description) %}
-        <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.event_description}) }}</p>
+        <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.event_description})|purify }}</p>
     {% endif %}
 {% endif %}
 </div>

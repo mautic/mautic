@@ -27,7 +27,6 @@
     border: 1px solid @chosen-drop-border;
     .border-bottom-radius(@chosen-border-radius);
     .box-shadow(@chosen-drop-box-shadow);
-    margin-top: -1px;
     position: absolute;
     top: 100%;
     left: -9000px;
@@ -51,22 +50,22 @@
 
     li {
       display: none;
-      line-height: var(--spacing-06);
-      max-height: var(--spacing-07);
+      line-height: 1.4em;
+      min-height: var(--spacing-07);
       list-style: none;
       margin: 0;
-      padding: 5px var(--spacing-05);
+      padding: .6em var(--spacing-05) 5px;
       transition: var(--transition-all-productive);
 
       em {
-        background: #feffde;
+        background: var(--layer-accent);
         font-style: normal;
       }
 
       &.group-result {
         display: list-item;
         cursor: default;
-        color: #999;
+        color: var(--text-primary);
         font-weight: bold;
       }
 
@@ -91,18 +90,18 @@
 
       &.disabled-result {
         display: list-item;
-        color: @gray-light;
+        color: var(--text-disabled);
       }
     }
 
     .no-results {
-      background: @gray-lighter;
+      background: var(--layer);
       display: list-item;
     }
   }
 
   .chosen-results-scroll {
-    background: white;
+    background: var(--layer);
     margin: 0 4px;
     position: absolute;
     text-align: center;
@@ -216,10 +215,12 @@
       width: 100%;
       max-width: 100%;
       transition: var(--transition-all-productive);
+      outline: 2px var(--outline-style) transparent;
+      outline-offset: -2px;
+      &:hover { outline: 2px var(--outline-style) transparent; }
+      &:active, &.active,
+      &:focus, &.focus { outline: 2px var(--outline-style) var(--focus); }
 
-      &:focus {
-        outline: 2px solid var(--focus);
-      }
     }
   }
 
@@ -291,6 +292,7 @@
         margin: 0;
         padding: 4px;
         outline: 0;
+        .transition(var(--transition-all-productive));
 
         &:hover, &:active, &:focus {
           color: var(--text-primary);
@@ -365,10 +367,12 @@
   }
 }
 
+.chosen-container.chosen-container-single.chosen-container-active .chosen-single {
+  outline: 2px var(--outline-style) var(--focus);
+}
+
 .chosen-container-active {
   .chosen-single {
-    border: @chosen-focus-border;
-    .box-shadow(@chosen-focus-box-shadow);
     .transition(@chosen-focus-transition);
   }
 
@@ -396,7 +400,7 @@
     .transition(@chosen-focus-transition);
 
     .search-field input[type="text"] {
-      color: #111 !important;
+      color: var(--text-primary) !important;
     }
   }
 

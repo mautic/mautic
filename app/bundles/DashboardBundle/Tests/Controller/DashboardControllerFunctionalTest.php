@@ -36,14 +36,10 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($widget);
 
-        $this->client->request('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()), [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-        ]);
+        $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
+        $this->assertResponseIsSuccessful();
 
-        $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
-
-        $content = $response->getContent();
+        $content = $this->client->getResponse()->getContent();
         Assert::assertJson($content);
 
         $data = json_decode($content, true);
@@ -58,6 +54,42 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
         Assert::assertArrayHasKey('widgetHtml', $data);
         Assert::assertStringContainsString('View Full Report', $data['widgetHtml']);
+    }
+
+    public function testWidgetWithBestHours(): void
+    {
+        $user    = $this->em->getRepository(User::class)->findOneBy([]);
+        $segment = $this->createSegment('A', 'a');
+        $widget  = new Widget();
+        $widget->setName('Best email read hours');
+        $widget->setType('emails.best.hours');
+        $widget->setParams(['timeFormat' => 24, 'segmentId' => $segment->getId()]);
+        $widget->setWidth(100);
+        $widget->setHeight(200);
+        $widget->setCreatedBy($user);
+        $this->em->persist($widget);
+
+        $this->em->flush();
+        $this->em->detach($widget);
+
+        $this->client->xmlHttpRequest('GET', "/s/dashboard/widget/{$widget->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $content = $this->client->getResponse()->getContent();
+        Assert::assertJson($content);
+
+        $data = json_decode($content, true);
+        Assert::assertIsArray($data);
+        Assert::assertArrayHasKey('success', $data);
+        Assert::assertSame(1, $data['success']);
+        Assert::assertArrayHasKey('widgetId', $data);
+        Assert::assertSame((string) $widget->getId(), $data['widgetId']);
+        Assert::assertArrayHasKey('widgetWidth', $data);
+        Assert::assertSame($widget->getWidth(), $data['widgetWidth']);
+        Assert::assertArrayHasKey('widgetHeight', $data);
+        Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
+        Assert::assertArrayHasKey('widgetHtml', $data);
+        Assert::assertStringContainsString('Best email read hours', $data['widgetHtml']);
     }
 
     public function testWidgetWithSegmentBuildTime(): void
@@ -80,14 +112,10 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($widget);
 
-        $this->client->request('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()), [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-        ]);
+        $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
+        $this->assertResponseIsSuccessful();
 
-        $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
-
-        $content = $response->getContent();
+        $content = $this->client->getResponse()->getContent();
         Assert::assertJson($content);
 
         $data = json_decode($content, true);

@@ -4,14 +4,15 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     private DateHelper $helper;
 
@@ -21,9 +22,9 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     private static $oldTimezone;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var CoreParametersHelper&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     public static function setUpBeforeClass(): void
     {
@@ -133,9 +134,6 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->helper->toText($now);
 
-        // Debug output
-        echo 'Result: '.$result."\n";
-
         // Assertions
         $this->assertEquals('Today', $result);
         $this->assertStringStartsWith('Today', $result);
@@ -159,23 +157,23 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('just now', $this->helper->toHumanized($now));
 
         // Test minutes ago
-        $fiveMinutesAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-5 minutes');
+        $fiveMinutesAgo = $now->modify('-5 minutes');
         $this->assertEquals('5 minute(s) ago', $this->helper->toHumanized($fiveMinutesAgo));
 
         // Test hours ago
-        $twoHoursAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-2 hours');
+        $twoHoursAgo = $now->modify('-2 hours');
         $this->assertEquals('2 hour(s) ago', $this->helper->toHumanized($twoHoursAgo));
 
         // Test days ago
-        $threeDaysAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-3 days');
+        $threeDaysAgo = $now->modify('-3 days');
         $this->assertEquals('3 day(s) ago', $this->helper->toHumanized($threeDaysAgo));
 
         // Test months ago
-        $fourMonthsAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-4 months');
-        $this->assertEquals('4 month(s) ago', $this->helper->toHumanized($fourMonthsAgo));
+        $fourMonthsAgo = $now->modify('-4 months');
+        $this->assertEquals('4 month(s) ago', $this->helper->toHumanized($fourMonthsAgo), print_r($fourMonthsAgo, true));
 
         // Test years ago
-        $oneYearAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-1 year');
+        $oneYearAgo = $now->modify('-1 year');
         $this->assertEquals('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
     }
 
@@ -185,7 +183,6 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $reflectedProperty = $reflectedClass->getProperty('helper');
         $reflectedProperty->setAccessible(true);
         $dateTimeHelper     = $reflectedProperty->getValue($this->helper);
-
         $reflectedClass     = new \ReflectionClass($dateTimeHelper);
         $reflectedProperty2 = $reflectedClass->getProperty('defaultLocalTimezone');
         $reflectedProperty2->setAccessible(true);

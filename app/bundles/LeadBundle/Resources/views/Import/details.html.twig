@@ -15,7 +15,7 @@
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
 {% endblock %}
 
-{% block actions %}
+{% block indexButton %}
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'routeBase': 'import',
             'langVar': 'lead.import',
@@ -27,6 +27,7 @@
                     'object': app.request.get('object', 'contacts'),
                 },
             },
+            'targetLabel'  : 'mautic.lead.import.list'|trans
     }) }}
 {% endblock %}
 

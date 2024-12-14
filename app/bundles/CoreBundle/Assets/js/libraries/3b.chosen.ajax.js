@@ -78,6 +78,7 @@
                     items = callback != null ? callback(data, field) : data;
                     nbItems = 0;
 
+                    var searchValue = field.val();
                     $.each(items, function (i, element) {
                         var group, text, value;
                         nbItems++;
@@ -133,7 +134,7 @@
                     if (settings.success != null) {
                         settings.success(data);
                     }
-                    var returnVar = field.val(untrimmed_val);
+                    var returnVar = field.val(searchValue);
 
                     // Force width
                     div = $('<div />');

@@ -34,11 +34,7 @@
                 {{ form_row(form.publishUp) }}
                 {{ form_row(form.publishDown) }}
                 <hr />
-                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-                <br />
-                {% for utmTag in form.utmTags %}
-                    {{ form_row(utmTag) }}
-                {% endfor %}
+                {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
             </div>
         </div>
     </div>
@@ -71,9 +67,9 @@
                 </div>
 
                 <!-- Viewport switcher -->
-                <div class="viewport-switcher text-center bdr-t-sm bdr-b-sm bdr-r-sm">
+                <div class="viewport-switcher text-center">
                     <div class="btn btn-sm btn-success btn-nospin btn-viewport" data-viewport="desktop">
-                        <i class="ri-smartphone-line ri-3x"></i>
+                        <i class="ri-smartphone-line ri-2x"></i>
                     </div>
                 </div>
 
@@ -275,7 +271,7 @@
                                     <div class="input-group">
                                         {{ form_widget(form.properties.colors.primary) }}
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="primary_site_colors"></div>
@@ -289,7 +285,7 @@
                                     <div class="input-group">
                                         {{ form_widget(form.properties.colors.text) }}
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_text" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_text" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="text_site_colors"></div>
@@ -305,7 +301,7 @@
                                         <div class="input-group">
                                             {{ form_widget(form.properties.colors.button) }}
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_site_colors"></div>
@@ -319,7 +315,7 @@
                                         <div class="input-group">
                                             {{ form_widget(form.properties.colors.button_text) }}
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_text_site_colors"></div>

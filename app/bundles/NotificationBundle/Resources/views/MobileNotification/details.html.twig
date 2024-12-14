@@ -15,16 +15,28 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : notification,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['notification:mobile_notifications:viewown'], permissions['notification:mobile_notifications:viewother'], notification.createdBy),
+        },
+        'routeBase'       : 'mobile_notification',
+        'targetLabel'     : 'mautic.notification.mobile_notifications'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item': notification,
             'templateButtons': {
                 'edit': securityHasEntityAccess(permissions['notification:mobile_notifications:editown'], permissions['notification:mobile_notifications:editother'], notification.createdBy),
                 'delete': permissions['notification:mobile_notifications:create'],
-                'close': securityHasEntityAccess(permissions['notification:mobile_notifications:viewown'], permissions['notification:mobile_notifications:viewother'], notification.createdBy),
             },
             'routeBase': 'mobile_notification',
-    }) }}
+    }) -}}
 {% endblock %}
 
 {% block publishStatus %}
