@@ -1,14 +1,20 @@
 {% if showMore is defined %}
-    <a href="{{ url('mautic_pointtrigger_index', {'search': searchString}) }}" data-toggle="ajax">
-        <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
-    </a>
+<a href="{{ url('mautic_pointtrigger_index', {'search': searchString}) }}" data-toggle="ajax">
+  <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+</a>
 {% else %}
-  {% if canEdit %}
-    <a href="{{ url('mautic_pointtrigger_index', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">
-        {{ item.name }}
-    </a>
-  {% else %}
-    <span>{{ item.name }}</span>
-  {% endif %}
-  <div class="clearfix"></div>
+{% if canEdit %}
+<a href="{{ url('mautic_pointtrigger_index', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">
+  <span class="fw-sb">{{ item.name }}</span>
+  <span class="ml-4 mr-sm">#{{ item.getId() }}</span>
+  {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+  'entity': item,
+  'status': 'active',
+  'simplified': 'true'
+  }) -}}
+</a>
+{% else %}
+<span class="fw-sb">{{ item.name }}</span>
+{% endif %}
+<div class="clearfix"></div>
 {% endif %}

@@ -4,8 +4,15 @@
     </a>
 {% else %}
     <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : email.id}) }}" data-toggle="ajax">
-        {{ email.getName() }}
-        <span size="sm" class="label label-gray pull-right" data-toggle="tooltip" title="{{ 'mautic.email.readcount'|trans }}" data-placement="left">
+        <span class="fw-sb">{{ email.getName() }}</span>
+        <span class="ml-4 mr-sm">#{{ email.getId() }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': email,
+            'status': email.getPublishUp() is not null ? 'sending' : 'available',
+            'simplified': 'true'
+        }) -}}
+        <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.email.readcount'|trans }}" data-placement="left">
+            <i class="ri-mail-open-line"></i>
             {{ email.readCount }}
         </span>
     </a>

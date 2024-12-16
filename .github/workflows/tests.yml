@@ -42,6 +42,14 @@ jobs:
           --health-interval=10s 
           --health-timeout=5s 
           --health-retries=3
+      saml:
+        image: kenchan0130/simplesamlphp
+        env:
+          SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
+          SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+        ports:
+          - 8086:8080
 
     steps:
     - uses: actions/checkout@v4
@@ -87,6 +95,7 @@ jobs:
       run: |
         rm -rf var/cache
         export DB_PORT="${{ job.services.database.ports[3306] }}"
+        export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml

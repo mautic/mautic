@@ -56,7 +56,12 @@
 
 .list-group-item {
   transition: var(--transition-all-productive);
-  
+  outline: 2px solid transparent;
+
+  &:has(a:focus) {
+    outline: 2px solid var(--focus);
+  }
+
   > a, > label, .list-group-item-text {
     position: relative;
     z-index: 1;

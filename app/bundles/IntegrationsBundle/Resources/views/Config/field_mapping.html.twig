@@ -1,5 +1,5 @@
 
-{{ form_row(form.filter-totalFieldCount) }}
+{{ form_row(form['filter-totalFieldCount']) }}
 {% for fieldName, fieldForm in form %}
     {% if fieldForm.mappedField is defined %}
         <div class="row">

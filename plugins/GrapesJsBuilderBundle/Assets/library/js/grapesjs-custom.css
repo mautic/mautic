@@ -361,3 +361,15 @@ html {
     transform: rotate(0deg); }
   100% {
     transform: rotate(360deg); } }
+
+
+/* CKEditor styles */
+.cke-modal .ck-editor .ck-content {
+  min-height: 400px;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+.cke-modal .gjs-btn-prim {
+  margin: 10px 5px 5px 0;
+}
