@@ -155,6 +155,13 @@ return [
                     'mautic.core.model.notification',
                 ],
             ],
+            'mautic.core.service.batch_delete' => [
+                'class'     => Mautic\CoreBundle\Service\BatchDeleteService::class,
+                'arguments' => [
+                    'mautic.security',
+                    'translator',
+                ],
+            ],
             'mautic.core.service.bulk_notification' => [
                 'class'     => Mautic\CoreBundle\Service\BulkNotification::class,
                 'arguments' => [

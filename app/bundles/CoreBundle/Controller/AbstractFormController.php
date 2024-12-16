@@ -52,7 +52,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      */
-    protected function isLocked($postActionVars, $entity, $model, $batch = false)
+    public function isLocked($postActionVars, $entity, $model, $batch = false)
     {
         $date                   = $entity->getCheckedOut();
         $postActionVars         = $this->refererPostActionVars($postActionVars);
