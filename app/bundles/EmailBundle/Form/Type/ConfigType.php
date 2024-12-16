@@ -43,11 +43,11 @@ class ConfigType extends AbstractType
                 [
                     'mailer_from_email'      => 'email',
                     'mailer_return_path'     => 'email',
-                    'default_signature_text' => 'html',
-                    'unsubscribe_text'       => 'html',
-                    'unsubscribe_message'    => 'html',
-                    'resubscribe_message'    => 'html',
-                    'webview_text'           => 'html',
+                    'default_signature_text' => 'strict_html',
+                    'unsubscribe_text'       => 'strict_html',
+                    'unsubscribe_message'    => 'strict_html',
+                    'resubscribe_message'    => 'strict_html',
+                    'webview_text'           => 'strict_html',
                     // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
                 ]

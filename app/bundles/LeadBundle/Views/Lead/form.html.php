@@ -11,7 +11,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $header = ($lead->getId()) ?
     $view['translator']->trans('mautic.lead.lead.header.edit',
-        ['%name%' => $view['translator']->trans($lead->getPrimaryIdentifier())]) :
+        ['%name%' => $view['translator']->trans($this->escape($lead->getPrimaryIdentifier()))]) :
     $view['translator']->trans('mautic.lead.lead.header.new');
 $view['slots']->set('headerTitle', $header);
 $view['slots']->set('mauticContent', 'lead');

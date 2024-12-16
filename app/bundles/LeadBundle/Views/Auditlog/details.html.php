@@ -99,4 +99,3 @@ switch ($type) {
         break;
 }
 echo $text;
-echo '<!-- '.PHP_EOL.json_encode($details, JSON_PRETTY_PRINT).PHP_EOL.' -->';

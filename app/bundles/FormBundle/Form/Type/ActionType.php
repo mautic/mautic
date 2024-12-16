@@ -21,7 +21,7 @@ class ActionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $masks = ['description' => 'html'];
+        $masks = ['description' => 'strict_html'];
 
         $builder->add(
             'name',

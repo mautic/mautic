@@ -27,10 +27,10 @@
             <div class="media-body">
                 <?php if (isset($log['userId']) && $log['userId']) : ?>
                     <a href="<?php echo $view['router']->path('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $log['userId']]); ?>" data-toggle="ajax">
-                        <?php echo $log['userName']; ?>
+                        <?php echo $view->escape($log['userName']); ?>
                     </a>
                 <?php elseif ($log['userName']) : ?>
-                    <?php echo $log['userName']; ?>
+                    <?php echo $view->escape($log['userName']); ?>
                 <?php else: ?>
                     <?php echo $view['translator']->trans('mautic.core.system'); ?>
                 <?php endif; ?>
@@ -38,12 +38,12 @@
 
                 <?php if (!empty($log['route'])): ?>
                 <a href="<?php echo $log['route']; ?>" data-toggle="ajax">
-                    <?php echo $log['objectName']; ?>
+                    <?php echo $view->escape($log['objectName']); ?>
                 </a>
                 <?php elseif (!empty($log['objectName'])): ?>
-                    <?php echo $log['objectName']; ?>
+                    <?php echo $view->escape($log['objectName']); ?>
                 <?php endif; ?>
-                <?php echo $log['object']; ?>
+                <?php echo $view->escape($log['object']); ?>
                 <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>
             </div>
         </li>
