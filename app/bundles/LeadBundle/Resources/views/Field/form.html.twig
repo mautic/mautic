@@ -109,6 +109,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">{{ form_row(form.isUniqueIdentifer) }}</div>
+                <div class="col-md-6">{{ form_row(form.isSearchable) }}</div>
             </div>
             <div class="row unique-identifier-warning" style="{% if not form.isUniqueIdentifer.vars.data %}display:none;{% endif %}">
                 <div class="col-md-12">

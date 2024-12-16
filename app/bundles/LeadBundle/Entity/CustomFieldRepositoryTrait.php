@@ -362,6 +362,14 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
+     * @return array<int, string>
+     */
+    public function getSearchableFieldAliases(string $object): array
+    {
+        return $this->getEntityManager()->getRepository(LeadField::class)->getSearchableFieldAliases($object);
+    }
+
+    /**
      * @param string $object
      *
      * @return array [$fields, $fixedFields]

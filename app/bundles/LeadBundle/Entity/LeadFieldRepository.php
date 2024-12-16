@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
@@ -91,6 +92,20 @@ class LeadFieldRepository extends CommonRepository
         $results = $fq->executeQuery()->fetchAllAssociative();
 
         return array_column($results, null, 'alias');
+    }
+
+    public function getSearchableFieldAliases(string $object): array
+    {
+        $fq = $this->createQueryBuilder($this->getTableAlias());
+        $fq->select($this->getTableAlias().'.alias')
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isAvailableInSearch', true))
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isPublished', true))
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.object', ':object'))
+            ->setParameter('object', $object, ParameterType::STRING);
+
+        $results = $fq->getQuery()->getResult();
+
+        return array_column($results, 'alias');
     }
 
     public function getTableAlias(): string

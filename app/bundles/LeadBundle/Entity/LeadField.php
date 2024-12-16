@@ -109,6 +109,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
     private ?bool $isIndex = false;
 
+    private ?bool $isSearchable = false;
+
     /**
      * The column in lead_fields table was not created yet if this property is true.
      * Entity cannot be published and we cannot work with it until column is created.
@@ -192,6 +194,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
         $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
         $builder->addNullableField('isIndex', 'boolean', 'is_index');
+        $builder->addNullableField('isSearchable', 'boolean', 'is_searchable');
 
         $builder->createField('charLengthLimit', 'integer')
             ->columnName('char_length_limit')
@@ -831,5 +834,15 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
     public function setIsIndex(bool $indexable): void
     {
         $this->isIndex = $indexable;
+    }
+
+    public function getIsSearchable(): ?bool
+    {
+        return $this->isSearchable;
+    }
+
+    public function setIsSearchable(?bool $isSearchable): void
+    {
+        $this->isSearchable = $isSearchable;
     }
 }

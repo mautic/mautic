@@ -640,6 +640,17 @@ class FieldType extends AbstractType
         );
 
         $builder->add(
+            'isSearchable',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.lead.field.form.isSearchable',
+                'attr'  => [
+                    'tooltip' => 'mautic.lead.field.form.isSearchable.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'object',
             ChoiceType::class,
             [
