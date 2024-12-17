@@ -98,7 +98,7 @@ class LeadFieldRepository extends CommonRepository
     {
         $fq = $this->createQueryBuilder($this->getTableAlias());
         $fq->select($this->getTableAlias().'.alias')
-            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isAvailableInSearch', true))
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isSearchable', true))
             ->andWhere($fq->expr()->eq($this->getTableAlias().'.isPublished', true))
             ->andWhere($fq->expr()->eq($this->getTableAlias().'.object', ':object'))
             ->setParameter('object', $object, ParameterType::STRING);
