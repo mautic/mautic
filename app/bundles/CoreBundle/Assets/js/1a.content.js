@@ -470,10 +470,20 @@ Mautic.onPageLoad = function (container, response, inModal) {
     Mautic.activateTabDeleteButtons(container);
 
     // Add total item count to select all buttons.
-    mQuery(container + " [data-toggle=selectall]").each(function() {
+    mQuery("[data-toggle=selectall]").each(function() {
         var totalItemCount = mQuery('.pagination-wrapper [data-item-count]').data("item-count")
         if (totalItemCount) {
-            this.append(document.createTextNode(`(${totalItemCount})`))
+            var buttonText = mQuery(this).find("span").text();
+            // Check if there's already a counter in parentheses
+            if (/\(\d+\)$/.test(buttonText)) {
+                // If there is, replace it with the new totalItemCount
+                var updatedText = buttonText.replace(/\(\d+\)$/, `(${totalItemCount})`);
+            } else {
+                // If there isn't, append the new totalItemCount in parentheses
+                var updatedText = buttonText + ` (${totalItemCount})`;
+            }
+            // Update the button's text
+            mQuery(this).find("span").text(updatedText);
         }
     })
 
