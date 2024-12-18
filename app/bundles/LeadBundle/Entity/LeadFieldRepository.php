@@ -94,14 +94,17 @@ class LeadFieldRepository extends CommonRepository
         return array_column($results, null, 'alias');
     }
 
-    public function getSearchableFieldAliases(string $object): array
+    public function getSearchableFieldAliases(string $object = null): array
     {
         $fq = $this->createQueryBuilder($this->getTableAlias());
         $fq->select($this->getTableAlias().'.alias')
             ->andWhere($fq->expr()->eq($this->getTableAlias().'.isSearchable', true))
-            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isPublished', true))
-            ->andWhere($fq->expr()->eq($this->getTableAlias().'.object', ':object'))
-            ->setParameter('object', $object, ParameterType::STRING);
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isPublished', true));
+
+        if (!empty($object)) {
+            $fq->andWhere($fq->expr()->eq($this->getTableAlias().'.object', ':object'))
+                ->setParameter('object', $object, ParameterType::STRING);
+        }
 
         $results = $fq->getQuery()->getResult();
 
