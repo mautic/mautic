@@ -2,6 +2,7 @@
 
 {% set mauticContent = 'theme' %}
 {% set headerTitle = 'mautic.core.themes'|trans %}
+{% set showSelectAllButton = false %}
 
 {% block headerTitle %}{{ headerTitle }}{% endblock %}
 
@@ -23,6 +24,7 @@
           'delete': permissions['core:themes:delete'],
       },
     },
+    'show_select_all_button': showSelectAllButton,
   } %}
     <div class="page-list">
         {% if block('mainContent') is defined %}{{ block('mainContent') }}{% endif %}
