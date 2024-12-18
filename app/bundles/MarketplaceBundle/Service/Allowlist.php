@@ -21,7 +21,7 @@ class Allowlist
     public function __construct(
         private Config $config,
         private CacheProvider $cache,
-        private ClientInterface $httpClient
+        private ClientInterface $httpClient,
     ) {
     }
 

@@ -14,9 +14,9 @@
                         <div class="panel-title">{{ 'mautic.dashboard.predefined'|trans }}</div>
                     </div>
                     <div class="panel-body">
-                        <div class="list-group bdr-w-0">
+                        <div class="list-group">
                             {% for dashboard, config in dashboards %}
-                                <div class="list-group-item mt-md {{ (dashboard == preview) ? 'active' : '' }}">
+                                <div class="list-group-item {{ (dashboard == preview) ? 'active' : '' }}">
                                     <h4 class="list-group-item-heading">{{ config.name|purify }}</h4>
                                     {% if config.description is not empty %}<p class="small">{{ config.description|purify }}</p>{% endif %}
                                     <p class="list-group-item-text">

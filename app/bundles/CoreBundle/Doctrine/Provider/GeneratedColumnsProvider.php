@@ -29,7 +29,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
 
     public function __construct(
         private VersionProviderInterface $versionProvider,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
         $this->generatedColumns = new GeneratedColumns();
     }

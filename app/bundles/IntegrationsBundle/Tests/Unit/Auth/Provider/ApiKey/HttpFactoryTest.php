@@ -24,7 +24,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(InvalidCredentialsException::class);
 
-        $credentials = new class() implements AuthCredentialsInterface {
+        $credentials = new class implements AuthCredentialsInterface {
         };
 
         (new HttpFactory())->getClient($credentials);
@@ -34,7 +34,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements HeaderCredentialsInterface {
+        $credentials = new class implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '';
@@ -51,7 +51,7 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class() implements HeaderCredentialsInterface {
+        $credentials = new class implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return 'abc';
@@ -69,7 +69,7 @@ class HttpFactoryTest extends TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credential2 = new class() implements HeaderCredentialsInterface {
+        $credential2 = new class implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '123';
@@ -87,7 +87,7 @@ class HttpFactoryTest extends TestCase
 
     public function testHeaderCredentialsSetsHeader(): void
     {
-        $credentials = new class() implements HeaderCredentialsInterface {
+        $credentials = new class implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '123';
@@ -102,15 +102,14 @@ class HttpFactoryTest extends TestCase
         $factory = new HttpFactory();
 
         $client  = $factory->getClient($credentials);
-        $headers = $client->getConfig('headers');
-
+        $headers = $client->getConfig('headers'); /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
         $this->assertArrayHasKey('abc', $headers);
         $this->assertEquals('123', $headers['abc']);
     }
 
     public function testParameterCredentialsAppendsToken(): void
     {
-        $credentials = new class() implements ParameterCredentialsInterface {
+        $credentials = new class implements ParameterCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '123';

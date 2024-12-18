@@ -14,7 +14,7 @@ class TimelineSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadEventLogRepository $eventLogRepository,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

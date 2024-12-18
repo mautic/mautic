@@ -220,48 +220,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getIntegrationCampaignsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
-    {
-        $integration = $request->query->get('integration');
-        $dataArray   = ['success' => 0];
-
-        if (!empty($integration)) {
-            /** @var IntegrationHelper $helper */
-            $helper = $this->factory->getHelper('integration');
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
-            $object = $helper->getIntegrationObject($integration);
-            $data   = [];
-            if ($object) {
-                $campaigns = $object->getCampaigns();
-                if (isset($campaigns['records']) && !empty($campaigns['records'])) {
-                    foreach ($campaigns['records'] as $campaign) {
-                        $data[$campaign['Id']] = $campaign['Name'];
-                    }
-                }
-                $form = $this->createForm('integration_campaigns', $data, [
-                    'integration'     => $integration,
-                    'campaigns'       => $data,
-                    'csrf_protection' => false,
-                ]);
-
-                $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                    'form'      => $form->createView(),
-                    'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
-                    'function'  => 'row',
-                    'variables' => [
-                        'campaigns'   => $data,
-                        'integration' => $object,
-                    ],
-                ])->getContent();
-
-                $dataArray['success'] = 1;
-                $dataArray['html']    = $html;
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
     public function matchFieldsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration       = $request->request->get('integration');

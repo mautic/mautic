@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -17,6 +18,8 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testContactTrackingTagsXss(string $payload, ?string $expectedSanitized): void
     {
+        $this->logoutUser();
+
         $page = new Page();
         $page->setIsPublished(true);
         $page->setTitle('XSS Test');
@@ -106,34 +109,35 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMtcEventCompanyXss(): void
     {
+        $this->logoutUser();
+
         $this->client->request('POST', '/mtc/event', [
             'page_url' => 'https://example.com?Company=%3Cimg+src+onerror%3Dalert%28%27Company%27%29%3E',
         ]);
-        $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk());
+        $this->assertResponseIsSuccessful();
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $this->loginUser($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->client->request('GET', sprintf('/s/contacts/view/%d', $response['id']));
-        $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk());
-        $content = $clientResponse->getContent();
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
 
         Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
 
-        $crawler        = $this->client->request('GET', sprintf('/s/contacts/edit/%d', $response['id']));
-        $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk());
-        $content = $clientResponse->getContent();
+        $crawler = $this->client->request('GET', sprintf('/s/contacts/edit/%d', $response['id']));
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
 
         Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
 
         $buttonCrawlerNode = $crawler->selectButton('Save & Close');
-        $form              = $buttonCrawlerNode->form();
+        Assert::assertCount(1, $buttonCrawlerNode, $crawler->html());
+        $form = $buttonCrawlerNode->form();
         $this->client->submit($form);
-        $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk());
-        $content = $clientResponse->getContent();
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
         Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
     }
 }

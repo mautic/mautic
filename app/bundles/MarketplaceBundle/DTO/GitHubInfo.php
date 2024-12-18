@@ -10,7 +10,7 @@ final class GitHubInfo
         public int $stars,
         public int $watchers,
         public int $forks,
-        public int $openIssues
+        public int $openIssues,
     ) {
     }
 }

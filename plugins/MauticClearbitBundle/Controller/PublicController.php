@@ -45,7 +45,7 @@ class PublicController extends FormController
         }
 
         /** @var array $result */
-        $result           = $request->request->get('body') ?? [];
+        $result           = $request->request->all()['body'] ?? [];
         $oid              = $request->request->get('id');
         $validatedRequest = $lookupHelper->validateRequest($oid, $request->request->get('type'));
 

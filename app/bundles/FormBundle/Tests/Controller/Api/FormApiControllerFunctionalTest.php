@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -101,7 +102,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
         }
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
 
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);
@@ -124,7 +125,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/forms/{$formId}/edit", ['name' => $expectedResponse['newName']]);
         $clientResponse = $this->client->getResponse();
         $responsePatch  = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($formId, $responsePatch['form']['id'], 'ID of the created form does not match with the edited one.');
         $this->assertEquals($expectedResponse['newName'], $responsePatch['form']['name']);
         $this->assertEquals($payload['formType'], $responsePatch['form']['formType']);
@@ -275,7 +276,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $formId = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -347,7 +348,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $fieldCount     = $fieldCount + 1;
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals('API form renamed', $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -362,7 +363,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PUT, "/api/forms/{$formId}/edit", $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals('Form created via API test renamed', $response['form']['description']);
@@ -375,7 +376,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -386,7 +387,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_apiform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[email]'       => 'john@doe.test',
@@ -435,15 +436,15 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Doe Corp', $company->getName());
         Assert::assertSame('+420444555666', $company->getPhone());
 
-        // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony($this->configParams);
+        // The previous request changes user to anonymous.
+        $this->loginUser($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
 
         // Delete:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertNull($response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -456,7 +457,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_NOT_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, $clientResponse->getContent());
         $this->assertSame(Response::HTTP_NOT_FOUND, $response['errors'][0]['code']);
     }
 
@@ -512,7 +513,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
         }
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
 
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);
@@ -565,7 +566,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $lastValidFormId = $response['form']['id'];
         $this->assertGreaterThan(0, $lastValidFormId);
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
 
         // Get the last correctly saved form
         $this->client->request(Request::METHOD_GET, '/api/forms/'.$lastValidFormId);
@@ -606,7 +607,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertNotEmpty($response['errors'], 'No errors were returned when trying to save an invalid form');
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response['errors'][0]['code'], 'Return code must be 400.');
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), 'Return code must be 400.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, 'Return code must be 400.');
         $this->assertSame($expectedMessage, $response['errors'][0]['message'], 'Returned message is different than expected');
     }
 
@@ -638,6 +639,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertNotEmpty($responseContent->errors, 'No errors were returned when trying to save an invalid form');
         $this->assertSame('Form Field ID 123 not found', $responseContent->errors[0]->message);
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode(), 'Return code must be 404.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, 'Return code must be 404.');
     }
 }

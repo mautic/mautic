@@ -11,7 +11,7 @@ class MonitoredEmailEvent extends Event
 
     public function __construct(
         private FormBuilderInterface $formBuilder,
-        private array $data
+        private array $data,
     ) {
     }
 

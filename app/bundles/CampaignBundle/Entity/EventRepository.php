@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -81,6 +82,14 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('c.publishUp'),
+                        $q->expr()->lt('c.publishUp', 'CURRENT_TIMESTAMP()'),
+                    ),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('c.publishDown'),
+                        $q->expr()->gt('c.publishDown', 'CURRENT_TIMESTAMP()'),
+                    ),
                     $q->expr()->isNull('c.deleted'),
                     $q->expr()->eq('e.type', ':type'),
                     $q->expr()->isNull('e.deleted'),
@@ -149,7 +158,7 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
-            ->orderBy('e.order', \Doctrine\Common\Collections\Criteria::ASC);
+            ->orderBy('e.order', Order::Ascending->value);
 
         if ($ignoreDeleted) {
             $q->andWhere($q->expr()->isNull('e.deleted'));
@@ -290,32 +299,6 @@ class EventRepository extends CommonRepository
     public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
-    }
-
-    /**
-     * @param string $eventType
-     */
-    public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
-    {
-        $q = $this->getEntityManager()->createQueryBuilder();
-
-        $q->select('e')
-            ->from(Event::class, 'e', 'e.id')
-            ->where('e.channel = :channel')
-            ->setParameter('channel', $channel);
-
-        if ($campaignId) {
-            $q->andWhere('IDENTITY(e.campaign) = :campaignId')
-                ->setParameter('campaignId', $campaignId)
-                ->orderBy('e.order');
-        }
-
-        if ($eventType) {
-            $q->andWhere('e.eventType', ':eventType')
-            ->setParameter('eventType', $eventType);
-        }
-
-        return $q->getQuery()->getResult();
     }
 
     /**

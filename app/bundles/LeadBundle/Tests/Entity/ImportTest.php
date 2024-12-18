@@ -95,7 +95,7 @@ class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity()
             ->setLineCount(100);
 
-        $this->assertSame(0, $import->getProgressPercentage());
+        $this->assertSame(0.0, $import->getProgressPercentage());
 
         $import->setIgnoredCount(3);
 
@@ -120,7 +120,6 @@ class ImportTest extends StandardImportTestHelper
         $startDate = $import->getDateStarted();
 
         $this->assertSame(Import::IN_PROGRESS, $import->getStatus());
-        $this->assertTrue($startDate instanceof \DateTime);
 
         // But the date started will not change when started for the second time.
         $import->end(false);
@@ -173,7 +172,7 @@ class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0, $import->getSpeed());
+        $this->assertSame(0.0, $import->getSpeed());
 
         $import->setInsertedCount(900);
         $import->end(false);
@@ -187,12 +186,12 @@ class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0, $import->getSpeed());
+        $this->assertSame(0.0, $import->getSpeed());
 
         $import->setInsertedCount(3);
         $import->end(false);
 
-        $this->assertSame(3, $import->getSpeed());
+        $this->assertSame(3.0, $import->getSpeed());
     }
 
     /**

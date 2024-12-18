@@ -20,7 +20,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 class ObjectChangeGenerator
 {
     public function __construct(
-        private ValueHelper $valueHelper
+        private ValueHelper $valueHelper,
     ) {
     }
 
@@ -34,7 +34,7 @@ class ObjectChangeGenerator
         MappingManualDAO $mappingManual,
         ObjectMappingDAO $objectMapping,
         ReportObjectDAO $internalObject,
-        ReportObjectDAO $integrationObject
+        ReportObjectDAO $integrationObject,
     ) {
         $objectChange = new ObjectChangeDAO(
             $mappingManual->getIntegration(),
@@ -89,7 +89,7 @@ class ObjectChangeGenerator
         MappingManualDAO $mappingManual,
         ReportObjectDAO $internalObject,
         ReportObjectDAO $integrationObject,
-        ObjectChangeDAO $objectChange
+        ObjectChangeDAO $objectChange,
     ): void {
         // Skip adding fields for the push process that should sync to Mautic only.
         if (ObjectMappingDAO::SYNC_TO_MAUTIC === $fieldMappingDAO->getSyncDirection()) {

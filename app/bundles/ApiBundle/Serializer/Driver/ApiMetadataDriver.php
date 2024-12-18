@@ -14,19 +14,13 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * @var PropertyMetadata[]
      */
-    private $properties = [];
+    private array $properties = [];
 
     private string $groupPrefix = '';
 
-    /**
-     * @var null
-     */
-    private $defaultVersion = '1.0';
+    private string $defaultVersion = '1.0';
 
-    /**
-     * @var null
-     */
-    private $currentPropertyName;
+    private ?string $currentPropertyName = null;
 
     /**
      * @throws \ReflectionException
@@ -85,7 +79,7 @@ class ApiMetadataDriver implements DriverInterface
      *
      * @return $this
      */
-    public function setDefaultVersion($version)
+    public function setDefaultVersion(string $version)
     {
         $this->defaultVersion = $version;
 

@@ -335,7 +335,7 @@ class FormModel extends AbstractCommonModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      *
      * @throws NotFoundHttpException
      */
@@ -403,7 +403,7 @@ class FormModel extends AbstractCommonModel
         string $prefix = '',
         int $maxLength = 0,
         string $spaceCharacter = '_',
-        array $allowedCharacters = []
+        array $allowedCharacters = [],
     ): string {
         // Transliterate to latin characters
         $alias = InputHelper::transliterate(trim($alias));

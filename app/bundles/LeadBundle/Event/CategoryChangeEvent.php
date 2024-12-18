@@ -21,7 +21,7 @@ class CategoryChangeEvent extends Event
     public function __construct(
         Lead|array $leads,
         private Category $category,
-        private bool $added = true
+        private bool $added = true,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;

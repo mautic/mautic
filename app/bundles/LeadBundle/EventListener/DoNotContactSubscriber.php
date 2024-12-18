@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class DoNotContactSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private DoNotContact $doNotContact
+        private DoNotContact $doNotContact,
     ) {
     }
 

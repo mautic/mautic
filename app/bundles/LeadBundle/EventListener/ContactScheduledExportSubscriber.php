@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ContactScheduledExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private ContactExportSchedulerModel $contactExportSchedulerModel
+        private ContactExportSchedulerModel $contactExportSchedulerModel,
     ) {
     }
 

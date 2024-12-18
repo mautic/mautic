@@ -16,7 +16,7 @@ class KickoffContactFinder
     public function __construct(
         private LeadRepository $leadRepository,
         private CampaignRepository $campaignRepository,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

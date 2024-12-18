@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 final class DummyToken extends AbstractToken
 {
-    public function getCredentials()
+    public function getCredentials(): ?string
     {
         return null;
     }

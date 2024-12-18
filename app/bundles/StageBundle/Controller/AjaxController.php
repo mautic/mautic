@@ -6,11 +6,13 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\StageBundle\Form\Type\StageActionType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Environment;
 
 class AjaxController extends CommonAjaxController
 {
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory, Environment $twig): JsonResponse
     {
         $dataArray = [
             'success' => 0,
@@ -34,7 +36,7 @@ class AjaxController extends CommonAjaxController
 
                 $form = $formFactory->create(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
                 $html = $this->renderView('@MauticStage/Stage/actionform.html.twig', [
-                    'form' => $this->setFormTheme($form, '@MauticStage/Stage/actionform.html.twig', $themes),
+                    'form' => $this->setFormTheme($form, $twig, $themes),
                 ]);
 
                 $html                 = str_replace('stageaction', 'stage', $html);

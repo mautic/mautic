@@ -25,7 +25,7 @@ class ReportSubscriber implements EventSubscriberInterface
     public function __construct(
         private CompanyReportData $companyReportData,
         private HitRepository $hitRepository,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

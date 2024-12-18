@@ -25,6 +25,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class OwnerSubscriberTest extends TestCase
 {
@@ -240,7 +241,7 @@ class OwnerSubscriberTest extends TestCase
         $mockLeadModel->method('getRepository')
             ->willReturn($mockLeadRepository);
 
-        /** @var MauticFactory|MockObject $mockFactory */
+        /** @var MauticFactory&MockObject $mockFactory */
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -295,7 +296,6 @@ class OwnerSubscriberTest extends TestCase
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
-        /** @var MauticFactory|MockObject $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         /** @var FromEmailHelper|MockObject $fromEmaiHelper */
@@ -313,20 +313,23 @@ class OwnerSubscriberTest extends TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+        /** @var MockObject&Environment $twig */
+        $twig = $this->createMock(Environment::class);
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $twig);
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;
     }
 
     /**
-     * @return Translator|MockObject
+     * @return Translator&MockObject
      */
     protected function getMockTranslator()
     {
-        /** @var Translator|MockObject $translator */
+        /** @var Translator&MockObject $translator */
         $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('hasId')
@@ -354,7 +357,7 @@ class OwnerSubscriberTest extends TestCase
 
     protected function getUser(): User
     {
-        $user = new class() extends User {
+        $user = new class extends User {
             public function setId(int $id): void
             {
                 $this->id = $id;

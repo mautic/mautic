@@ -31,7 +31,7 @@ class EventScheduler
         private OptimizedScheduler $optimizedScheduler,
         private EventCollector $collector,
         private EventDispatcherInterface $dispatcher,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

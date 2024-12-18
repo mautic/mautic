@@ -28,10 +28,10 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionValid(): void
     {
-        $crawler                = $this->client->request('GET', '/s/users/edit/1');
-        $buttonCrawlerNode      = $crawler->selectButton('Save & Close');
-        $form                   = $buttonCrawlerNode->form();
-        $form['user[username]'] = 'test';
+        $crawler                 = $this->client->request('GET', '/s/users/edit/1');
+        $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
+        $form                    = $buttonCrawlerNode->form();
+        $form['user[firstName]'] = 'test';
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
@@ -172,7 +172,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         string $object,
         int $objectId,
         string $action,
-        array $details
+        array $details,
     ): AuditLog {
         $auditLog = new AuditLog();
         $auditLog->setUserId($userId);

@@ -12,7 +12,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private HitRepository $hitRepository,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

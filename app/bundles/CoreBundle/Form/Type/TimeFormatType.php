@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TimeFormatType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -33,7 +33,7 @@ class TimeFormatType extends AbstractType
         ]);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

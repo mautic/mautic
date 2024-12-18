@@ -73,7 +73,7 @@ class ReportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 

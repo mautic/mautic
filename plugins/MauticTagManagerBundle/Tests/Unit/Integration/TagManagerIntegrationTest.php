@@ -14,7 +14,7 @@ class TagManagerIntegrationTest extends TestCase
     {
         parent::setUp();
 
-        $this->tagManagerIntegration = new class() extends TagManagerIntegration {
+        $this->tagManagerIntegration = new class extends TagManagerIntegration {
             public function __construct()
             {
             }

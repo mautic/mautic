@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private BroadcastExecutioner $broadcastExecutioner
+        private BroadcastExecutioner $broadcastExecutioner,
     ) {
     }
 

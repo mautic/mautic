@@ -49,6 +49,7 @@ use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -115,6 +116,7 @@ class LeadModel extends FormModel
         protected PathsHelper $pathsHelper,
         protected IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
+        protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected ListModel $leadListModel,
         protected FormFactoryInterface $formFactory,
         protected CompanyModel $companyModel,
@@ -132,7 +134,7 @@ class LeadModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         $this->leadFieldModel       = $leadFieldModel;
 
@@ -703,10 +705,7 @@ class LeadModel extends FormModel
         ]);
     }
 
-    /**
-     * @return bool
-     */
-    public function canEditContact(Lead $contact)
+    public function canEditContact(Lead $contact): bool
     {
         return $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
     }
@@ -807,7 +806,7 @@ class LeadModel extends FormModel
         }
 
         $lead            = new Lead();
-        $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
+        $uniqueFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueFieldData = [];
         $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
         $values          = $onlyPubliclyUpdateable ? $inQuery : $queryFields;
@@ -1250,7 +1249,7 @@ class LeadModel extends FormModel
             $log->setType('lead');
             $log->setEventName($this->translator->trans('mautic.lead.import.event.name'));
             $log->setActionName($this->translator->trans('mautic.lead.import.action.name', [
-                '%name%' => $this->userHelper->getUser()->getUsername(),
+                '%name%' => $this->userHelper->getUser()->getUserIdentifier(),
             ]));
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
@@ -1284,7 +1283,7 @@ class LeadModel extends FormModel
                 $this->translator->trans(
                     'mautic.stage.import.action.name',
                     [
-                        '%name%' => $this->userHelper->getUser()->getUsername(),
+                        '%name%' => $this->userHelper->getUser()->getUserIdentifier(),
                     ]
                 )
             );
@@ -1298,7 +1297,7 @@ class LeadModel extends FormModel
             $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if (null !== $doNotEmail) {
                 $reason = $this->translator->trans('mautic.lead.import.by.user', [
-                    '%user%' => $this->userHelper->getUser()->getUsername(),
+                    '%user%' => $this->userHelper->getUser()->getUserIdentifier(),
                 ]);
 
                 // The email must be set for successful unsubscribtion
@@ -1624,7 +1623,7 @@ class LeadModel extends FormModel
             $val = InputHelper::_($val, 'string');
         });
         // Remove any tags that became empty after filtering
-        $tags = array_filter($tags, 'strlen');
+        $tags = array_filter($tags, fn ($tag) => strlen($tag) > 0);
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1664,7 +1663,7 @@ class LeadModel extends FormModel
                 $val = InputHelper::_($val, 'string');
             });
             // Remove any tags that became empty after filtering
-            $removeTags = array_filter($removeTags, 'strlen');
+            $removeTags = array_filter($removeTags, fn ($tag) => strlen($tag) > 0);
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);

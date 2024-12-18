@@ -23,10 +23,10 @@ class ParameterLoader
     /**
      * @var array<string, mixed>
      */
-    private static $defaultParameters = [];
+    private static array $defaultParameters = [];
 
     public function __construct(
-        private string $rootPath = __DIR__.'/../../../'
+        private string $rootPath = __DIR__.'/../../../',
     ) {
         $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 

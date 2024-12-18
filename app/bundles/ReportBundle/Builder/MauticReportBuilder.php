@@ -90,7 +90,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         private EventDispatcherInterface $dispatcher,
         private Connection $db,
         private Report $entity,
-        private ChannelListHelper $channelListHelper
+        private ChannelListHelper $channelListHelper,
     ) {
     }
 

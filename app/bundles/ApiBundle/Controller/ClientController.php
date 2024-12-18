@@ -40,7 +40,7 @@ class ClientController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -147,10 +147,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * @param int $clientId
-     *
-     * @return Response
      */
-    public function revokeAction(Request $request, $clientId)
+    public function revokeAction(Request $request, $clientId): Response
     {
         $success = 0;
         $flashes = [];

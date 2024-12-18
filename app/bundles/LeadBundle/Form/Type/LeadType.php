@@ -33,7 +33,7 @@ class LeadType extends AbstractType
         private TranslatorInterface $translator,
         private CompanyModel $companyModel,
         private EntityManager $entityManager,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

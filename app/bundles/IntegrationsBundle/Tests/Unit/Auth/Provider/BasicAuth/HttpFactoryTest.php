@@ -21,7 +21,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getUsername(): ?string
             {
                 return '';
@@ -40,7 +40,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getUsername(): ?string
             {
                 return '123';
@@ -57,7 +57,7 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getUsername(): ?string
             {
                 return 'foo';
@@ -75,7 +75,7 @@ class HttpFactoryTest extends TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credentials2 = new class() implements CredentialsInterface {
+        $credentials2 = new class implements CredentialsInterface {
             public function getUsername(): ?string
             {
                 return 'bar';
@@ -93,7 +93,7 @@ class HttpFactoryTest extends TestCase
 
     public function testHeaderIsSet(): void
     {
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getUsername(): ?string
             {
                 return 'foo';

@@ -13,7 +13,7 @@ use Mautic\PageBundle\Model\PageModel;
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private PageModel $pageModel
+        private PageModel $pageModel,
     ) {
     }
 

@@ -128,7 +128,7 @@ class ConfigController extends FormController
 
                             $cacheHelper->refreshConfig();
 
-                            if ($isValid && !empty($formData['coreconfig']['last_shown_tab'])) {
+                            if (!empty($formData['coreconfig']['last_shown_tab'])) {
                                 $openTab = $formData['coreconfig']['last_shown_tab'];
                             }
                         } catch (\RuntimeException $exception) {

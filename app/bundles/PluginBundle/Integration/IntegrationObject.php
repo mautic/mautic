@@ -10,7 +10,7 @@ class IntegrationObject
      */
     public function __construct(
         private $type,
-        private $internalType
+        private $internalType,
     ) {
     }
 

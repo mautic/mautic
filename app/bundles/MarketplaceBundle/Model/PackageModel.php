@@ -12,7 +12,7 @@ class PackageModel
 {
     public function __construct(
         private Connection $connection,
-        private Allowlist $allowlist
+        private Allowlist $allowlist,
     ) {
     }
 

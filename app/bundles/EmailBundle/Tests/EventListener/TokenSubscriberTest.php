@@ -20,6 +20,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -43,6 +44,9 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+        /** @var MockObject&Environment $twig */
+        $twig = $this->createMock(Environment::class);
+
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
         $coreParametersHelper->method('get')
@@ -55,7 +59,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper, $router);
+        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper, $router, $twig);
         $mailHelper->setTokens($tokens);
 
         $email = new Email();

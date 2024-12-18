@@ -15,7 +15,7 @@ class RemappedObjectDAO
         private string $oldObjectName,
         private $oldObjectId,
         private string $newObjectName,
-        private $newObjectId
+        private $newObjectId,
     ) {
     }
 

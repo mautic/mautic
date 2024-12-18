@@ -38,11 +38,12 @@ final class EmailStatModelTest extends TestCase
                 }
             );
 
-        $dispatcher = new class() extends EventDispatcher {
+        $dispatcher = new class extends EventDispatcher {
             public int $dispatchMethodCounter = 0;
 
             public function __construct()
             {
+                parent::__construct();
             }
 
             public function dispatch(object $event, string $eventName = null): object

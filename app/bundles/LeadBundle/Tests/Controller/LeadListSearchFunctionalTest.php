@@ -85,7 +85,9 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
      */
     private function assertSearchResult(string $search, array $expectedLeads, array $notExpectedLeads): void
     {
-        $responseText = $this->client->request(Request::METHOD_GET, '/s/contacts?search='.$search)->text();
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search='.$search);
+        self::assertResponseIsSuccessful();
+        $responseText = $crawler->text();
 
         foreach ($expectedLeads as $expectedLead) {
             Assert::assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));

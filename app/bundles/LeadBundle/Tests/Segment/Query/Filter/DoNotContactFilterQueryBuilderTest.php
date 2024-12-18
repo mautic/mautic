@@ -72,7 +72,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
                 /**
                  * @var array<string, mixed>
                  */
-                private array $batchLimiters
+                private array $batchLimiters,
             ) {
             }
 

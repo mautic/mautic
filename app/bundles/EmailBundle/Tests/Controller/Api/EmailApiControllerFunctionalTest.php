@@ -17,6 +17,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -317,6 +318,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         // Get the email reply that was just created from the stat API.
         $statReplyQuery = ['where' => [['col' => 'stat_id', 'expr' => 'eq', 'val' => $stat->getId()]]];
         $this->client->request('GET', '/api/stats/email_stat_replies', $statReplyQuery);
+        $this->assertResponseIsSuccessful();
         $fetchedReplyData = json_decode($this->client->getResponse()->getContent(), true);
 
         // Check that the email reply was created correctly.
@@ -351,9 +353,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
 
-        $user->setPassword($encoder->hash('password'));
+        $user->setPassword($hasher->hash('password'));
         $this->em->persist($user);
 
         // Create a contact:

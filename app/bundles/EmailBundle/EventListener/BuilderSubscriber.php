@@ -40,7 +40,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         private TrackableModel $pageTrackableModel,
         private RedirectModel $pageRedirectModel,
         private TranslatorInterface $translator,
-        private MailHashHelper $mailHash
+        private MailHashHelper $mailHash,
     ) {
     }
 

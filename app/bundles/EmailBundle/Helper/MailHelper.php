@@ -22,7 +22,6 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -32,6 +31,7 @@ use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 class MailHelper
@@ -60,11 +60,6 @@ class MailHelper
      * @var TransportInterface
      */
     protected $transport;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
 
     protected ?EventDispatcherInterface $dispatcher = null;
 
@@ -101,10 +96,7 @@ class MailHelper
      */
     protected $internalSend = false;
 
-    /**
-     * @var null
-     */
-    protected $idHash;
+    protected ?string $idHash = null;
 
     /**
      * @var bool
@@ -240,7 +232,8 @@ class MailHelper
         private Mailbox $mailbox,
         private LoggerInterface $logger,
         private MailHashHelper $mailHashHelper,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private Environment $twig,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -719,10 +712,6 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->twig) {
-            $this->twig = $this->factory->getTwig();
-        }
-
         $content = $this->twig->render($template, $vars);
 
         unset($vars);
@@ -865,10 +854,8 @@ class MailHelper
 
     /**
      * Set to address(es).
-     *
-     * @return bool
      */
-    public function setTo($addresses, $name = null)
+    public function setTo($addresses, $name = null): bool
     {
         $name = $this->cleanName($name);
 
@@ -905,10 +892,8 @@ class MailHelper
      *
      * @param string      $address
      * @param string|null $name
-     *
-     * @return bool
      */
-    public function addTo($address, $name = null)
+    public function addTo($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients();
 
@@ -931,10 +916,8 @@ class MailHelper
      * @param ?string               $name
      *
      * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
-     *
-     * @return bool
      */
-    public function setCc($addresses, $name = null)
+    public function setCc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
@@ -960,10 +943,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addCc($address, $name = null)
+    public function addCc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'cc');
 
@@ -985,10 +966,8 @@ class MailHelper
      * @param ?string               $name
      *
      * //TODO: same bug for the name as the one we have in setCc
-     *
-     * @return bool
      */
-    public function setBcc($addresses, $name = null)
+    public function setBcc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
@@ -1015,10 +994,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addBcc($address, $name = null)
+    public function addBcc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'bcc');
 

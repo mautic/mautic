@@ -53,7 +53,7 @@ class PointModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private PointGroupModel $pointGroupModel
+        private PointGroupModel $pointGroupModel,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -250,6 +250,10 @@ class PointModel extends CommonFormModel
 
                 $pass = [];
                 foreach ($reflection->getParameters() as $param) {
+                    if ('factory' === $param->getName()) {
+                        @\trigger_error('Using "factory" parameter is deprecated. Use dependency injection instead. Usage of "factory" parameter will be removed in 6.0.', \E_USER_DEPRECATED);
+                    }
+
                     if (isset($args[$param->getName()])) {
                         $pass[] = $args[$param->getName()];
                     } else {

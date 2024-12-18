@@ -22,7 +22,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         private GrapesJsBuilderModel $grapesJsBuilderModel,
         private Environment $twig,
         private RequestStack $requestStack,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

@@ -24,7 +24,7 @@ class ContactNotificationHandler implements HandlerInterface
         private Writer $writer,
         private LeadEventLogRepository $leadEventRepository,
         private EntityManagerInterface $em,
-        private UserSummaryNotificationHelper $userNotificationHelper
+        private UserSummaryNotificationHelper $userNotificationHelper,
     ) {
     }
 

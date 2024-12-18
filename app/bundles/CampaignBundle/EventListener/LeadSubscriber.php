@@ -21,7 +21,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private EventCollector $eventCollector,
         private TranslatorInterface $translator,
         private EntityManagerInterface $entityManager,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

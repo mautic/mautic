@@ -20,7 +20,7 @@ class MenuBuilder
         private FactoryInterface $factory,
         private MatcherInterface $matcher,
         EventDispatcherInterface $dispatcher,
-        private MenuHelper $menuHelper
+        private MenuHelper $menuHelper,
     ) {
         $this->dispatcher = $dispatcher;
     }

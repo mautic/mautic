@@ -68,7 +68,7 @@ class LeadApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
@@ -166,7 +166,7 @@ class LeadApiController extends CommonApiController
 
         $results = $this->getModel('lead.note')->getEntities(
             [
-                'start'  => $request->query->get('start', 0),
+                'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
@@ -218,7 +218,7 @@ class LeadApiController extends CommonApiController
 
         $results = $this->getModel('lead.device')->getEntities(
             [
-                'start'  => $request->query->get('start', 0),
+                'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
@@ -398,7 +398,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($request->get('filters', [])));
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($request->query->all()['filters'] ?? $request->request->all()['filters'] ?? []));
         $limit   = (int) $request->get('limit', 25);
         $page    = (int) $request->get('page', 1);
         $order   = InputHelper::clean($request->get('order', ['timestamp', 'DESC']));

@@ -22,7 +22,7 @@ final class AllowlistEntry
         /**
          * Maximum Mautic version in semver format (e.g. 4.1.2).
          */
-        public ?string $maximumMauticVersion
+        public ?string $maximumMauticVersion,
     ) {
     }
 

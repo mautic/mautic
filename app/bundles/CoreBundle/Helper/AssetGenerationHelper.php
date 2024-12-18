@@ -78,7 +78,7 @@ class AssetGenerationHelper
         private BundleHelper $bundleHelper,
         private PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
-        AppVersion $appVersion
+        AppVersion $appVersion,
     ) {
         $this->version = substr(hash('sha1', $coreParametersHelper->get('secret_key').$appVersion->getVersion()), 0, 8);
     }

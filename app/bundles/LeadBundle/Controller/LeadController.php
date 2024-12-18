@@ -52,6 +52,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class LeadController extends FormController
 {
@@ -67,7 +68,7 @@ class LeadController extends FormController
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
-        $page = 1
+        $page = 1,
     ) {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -238,7 +239,7 @@ class LeadController extends FormController
         );
     }
 
-    public function quickAddAction(Request $request): Response
+    public function quickAddAction(Request $request, TokenStorageInterface $tokenStorage): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -306,7 +307,7 @@ class LeadController extends FormController
         $quickForm = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
-        $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+        $currentUser = $tokenStorage->getToken()->getUser();
         $quickForm->get('owner')->setData($currentUser);
 
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -483,7 +484,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -507,7 +508,7 @@ class LeadController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // get custom field values
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -593,7 +594,7 @@ class LeadController extends FormController
                     }
                 } else {
                     if ($request->get('qf', false)) {
-                        return $this->quickAddAction($request);
+                        return $this->quickAddAction($request, $tokenStorage);
                     }
 
                     $formErrors = $this->getFormErrorMessages($form);
@@ -625,7 +626,7 @@ class LeadController extends FormController
             }
         } else {
             // set the default owner to the currently logged in user
-            $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+            $currentUser = $tokenStorage->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
         }
 
@@ -718,7 +719,7 @@ class LeadController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -1186,10 +1187,8 @@ class LeadController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1378,10 +1377,8 @@ class LeadController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0)
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -2063,8 +2060,7 @@ class LeadController extends FormController
         ];
 
         $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
-
-        $response              = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();

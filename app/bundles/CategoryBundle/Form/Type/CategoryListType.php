@@ -22,7 +22,7 @@ class CategoryListType extends AbstractType
         private EntityManager $em,
         private TranslatorInterface $translator,
         private CategoryModel $model,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
@@ -72,18 +72,12 @@ class CategoryListType extends AbstractType
         $resolver->setRequired(['bundle']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'category';
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

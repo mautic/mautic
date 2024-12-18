@@ -13,7 +13,7 @@ use Twig\TwigFunction;
 class MenuExtension extends AbstractExtension
 {
     public function __construct(
-        protected MenuHelper $menuHelper
+        protected MenuHelper $menuHelper,
     ) {
     }
 

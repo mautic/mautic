@@ -90,7 +90,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
 
-        $divClass = $crawler->filter('#mauticform_postActionProperty')->parents()->first()->attr('class');
+        $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
 
         $this->assertStringContainsString('has-error', $divClass);
     }
@@ -178,13 +178,13 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $this->client->submit($formElement);
         $this->assertTrue($this->client->getResponse()->isOk());
 
-        $this->client->request('GET', sprintf('/s/forms/field/edit/%d?formId=%d', $field->getId(), $form->getId()), [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', sprintf('/s/forms/field/edit/%d?formId=%d', $field->getId(), $form->getId()));
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertJson($response->getContent());

@@ -13,7 +13,7 @@ class ContactExportEvent extends Event
      */
     public function __construct(
         private array $args,
-        private string $object
+        private string $object,
     ) {
     }
 

@@ -6,28 +6,34 @@ use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FinalizeUpdateStepTest extends AbstractStepTest
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|PathsHelper
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
     /**
-     * @var MockObject|Session
+     * @var MockObject&Session
      */
     private MockObject $session;
 
     /**
-     * @var MockObject|AppVersion
+     * @var MockObject&RequestStack
+     */
+    private MockObject $requestStack;
+
+    /**
+     * @var MockObject&AppVersion
      */
     private MockObject $appVersion;
 
@@ -37,12 +43,15 @@ class FinalizeUpdateStepTest extends AbstractStepTest
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
-        $this->session     = $this->createMock(Session::class);
-        $this->appVersion  = $this->createMock(AppVersion::class);
+        $this->translator   = $this->createMock(TranslatorInterface::class);
+        $this->pathsHelper  = $this->createMock(PathsHelper::class);
+        $this->session      = $this->createMock(Session::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->appVersion   = $this->createMock(AppVersion::class);
 
-        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->session, $this->appVersion);
+        $this->requestStack->method('getSession')->willReturn($this->session);
+
+        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->requestStack, $this->appVersion);
     }
 
     public function testFinalizationCleansUpFiles(): void

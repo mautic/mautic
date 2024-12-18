@@ -14,7 +14,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ORMPurgerFactory implements PurgerFactory
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -22,7 +22,7 @@ class ORMPurgerFactory implements PurgerFactory
         ?string $emName,
         EntityManagerInterface $em,
         array $excluded = [],
-        bool $purgeWithTruncate = false
+        bool $purgeWithTruncate = false,
     ): PurgerInterface {
         $this->eventDispatcher->dispatch(
             new PreExecuteEvent(

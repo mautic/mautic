@@ -40,6 +40,6 @@ interface SyncJudgeInterface
     public function adjudicate(
         $mode,
         InformationChangeRequestDAO $leftChangeRequest,
-        InformationChangeRequestDAO $rightChangeRequest
+        InformationChangeRequestDAO $rightChangeRequest,
     );
 }

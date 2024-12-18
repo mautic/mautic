@@ -25,7 +25,7 @@ class CookieHelper implements EventSubscriberInterface
         private ?string $domain,
         private bool $secure,
         private bool $httponly,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 

@@ -41,7 +41,7 @@ class MessageQueueModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -72,7 +72,7 @@ class MessageQueueModel extends FormModel
         $messageQueue = null,
         $statTableName = 'email_stats',
         $statContactColumn = 'lead_id',
-        $statSentColumn = 'date_sent'
+        $statSentColumn = 'date_sent',
     ): array {
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
@@ -136,7 +136,7 @@ class MessageQueueModel extends FormModel
         $maxAttempts = 1,
         $priority = 1,
         $campaignEventId = null,
-        $options = []
+        $options = [],
     ): bool {
         $messageQueues = [];
 

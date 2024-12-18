@@ -20,7 +20,7 @@ class Interval implements ScheduleModeInterface
 
     public function __construct(
         private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -121,11 +121,12 @@ class Interval implements ScheduleModeInterface
                 $endTime,
                 $daysOfWeek
             );
-            if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
-                $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
+            $key = $groupExecutionDate->format(DateTimeHelper::FORMAT_DB);
+            if (!isset($groupedExecutionDates[$key])) {
+                $groupedExecutionDates[$key] = new GroupExecutionDateDAO($groupExecutionDate);
             }
 
-            $groupedExecutionDates[$groupExecutionDate->getTimestamp()]->addContact($contact);
+            $groupedExecutionDates[$key]->addContact($contact);
         }
 
         return $groupedExecutionDates;
@@ -189,7 +190,7 @@ class Interval implements ScheduleModeInterface
         \DateTimeInterface $hour = null,
         \DateTimeInterface $startTime = null,
         \DateTimeInterface $endTime = null,
-        array $daysOfWeek = []
+        array $daysOfWeek = [],
     ) {
         $this->logger->debug(
             sprintf('CAMPAIGN: Comparing calculated executed time for event ID %s and contact ID %s with %s', $eventId, $contact->getId(), $compareFromDateTime->format('Y-m-d H:i:s e'))
@@ -256,11 +257,11 @@ class Interval implements ScheduleModeInterface
         $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
 
         if ($groupExecutionDate <= $testGroupHour) {
+            // Schedule for the configured hour today if it's not passed yet.
             return $testGroupHour;
-        } else {
-            $groupExecutionDate->modify('+1 day')->setTime($groupHour->format('H'), $groupHour->format('i'));
         }
 
+        // Execute rigt away if the hour has passed.
         return $groupExecutionDate;
     }
 
@@ -272,7 +273,7 @@ class Interval implements ScheduleModeInterface
         \DateTimeInterface $startTime,
         \DateTimeInterface $endTime,
         $eventId,
-        \DateTimeInterface $compareFromDateTime
+        \DateTimeInterface $compareFromDateTime,
     ) {
         /* @var \DateTime $startTime */
         $startTime = clone $startTime;

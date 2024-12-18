@@ -67,7 +67,7 @@ class TweetController extends FormController
         $request = $this->getCurrentRequest();
 
         return ('POST' === $request->getMethod())
-            ? $request->request->get('twitter_tweet[updateSelect]', false)
+            ? ($request->request->all()['twitter_tweet']['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
     }
 

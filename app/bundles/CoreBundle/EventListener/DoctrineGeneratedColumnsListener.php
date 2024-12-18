@@ -13,7 +13,7 @@ class DoctrineGeneratedColumnsListener
 {
     public function __construct(
         protected GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 

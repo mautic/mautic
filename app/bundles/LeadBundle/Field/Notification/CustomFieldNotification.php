@@ -16,7 +16,7 @@ class CustomFieldNotification
     public function __construct(
         private NotificationModel $notificationModel,
         private UserModel $userModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

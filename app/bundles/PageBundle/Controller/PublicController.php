@@ -152,7 +152,7 @@ class PublicController extends AbstractFormController
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
                                 // if not the parent, show the specific variant already displayed to the visitor
-                                if ($variantCookie !== $entity->getId()) {
+                                if ((string) $variantCookie !== (string) $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
                                 } // otherwise proceed with displaying parent
                             }
@@ -277,7 +277,8 @@ class PublicController extends AbstractFormController
                 }
             }
 
-            $assetsHelper->addScript($router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $assetsHelper->addScript(
+                $router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'
@@ -378,7 +379,7 @@ class PublicController extends AbstractFormController
 
             $content = $response->getContent();
         } else {
-            $content = str_replace('</head>', $analytics.$this->renderView('@MauticPage/Page/preview_header.html.twig')."\n</head>", $content);
+            $content = str_replace('</head>', $analytics."\n</head>", $content);
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
@@ -416,7 +417,7 @@ class PublicController extends AbstractFormController
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
         TrackingHelper $trackingHelper,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
     ) {
         $notSuccessResponse = new JsonResponse(
             [
@@ -466,7 +467,7 @@ class PublicController extends AbstractFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
-        $redirectId
+        $redirectId,
     ): \Symfony\Component\HttpFoundation\RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
@@ -629,7 +630,7 @@ class PublicController extends AbstractFormController
     /**
      * Track video views.
      */
-    public function hitVideoAction(Request $request)
+    public function hitVideoAction(Request $request): JsonResponse|Response
     {
         // Only track XMLHttpRequests, because the hit should only come from there
         if ($request->isXmlHttpRequest()) {

@@ -448,15 +448,9 @@ return [
                 'class'     => Mautic\LeadBundle\Deduplicate\ContactDeduper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
+                    'mautic.lead.field.fields_with_unique_identifier',
                     'mautic.lead.merger',
                     'mautic.lead.repository.lead',
-                ],
-            ],
-            'mautic.company.deduper' => [
-                'class'     => Mautic\LeadBundle\Deduplicate\CompanyDeduper::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.repository.company',
                 ],
             ],
             'mautic.lead.helper.primary_company' => [

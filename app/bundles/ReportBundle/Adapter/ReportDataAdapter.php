@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Model\ReportModel;
 class ReportDataAdapter
 {
     public function __construct(
-        private ReportModel $reportModel
+        private ReportModel $reportModel,
     ) {
     }
 

@@ -41,6 +41,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -82,6 +83,7 @@ class SubmissionModel extends CommonFormModel
         private DateHelper $dateHelper,
         private ContactTracker $contactTracker,
         private ContactMerger $contactMerger,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -89,7 +91,7 @@ class SubmissionModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -760,7 +762,7 @@ class SubmissionModel extends CommonFormModel
         \DateTime $dateTo,
         $dateFormat = null,
         $filter = [],
-        $canViewOthers = true
+        $canViewOthers = true,
     ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -892,7 +894,7 @@ class SubmissionModel extends CommonFormModel
             $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
         }
 
-        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentifierFields();
+        $uniqueLeadFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
 
         // Closure to get data and unique fields
         $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
@@ -955,7 +957,7 @@ class SubmissionModel extends CommonFormModel
         $this->logger->debug('FORM: Unique fields submitted include '.implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
-        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
+        /** @var Lead[] $leads */
         $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(Lead::class)->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId

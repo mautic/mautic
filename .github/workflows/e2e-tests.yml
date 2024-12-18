@@ -1,0 +1,51 @@
+name: Verify E2E tests
+
+on:
+  # Triggers the workflow on push events to branches matching '[0-9].*'
+  # (e.g., 1.x, 2.0) and changes in the 'tests/' folder
+  push:
+    branches:
+      - '[0-9].*' # Matches branch names starting with a number
+    paths:
+      - 'tests/**' # Only runs if changes are made to files in the 'tests/' folder
+  # Triggers the workflow on pull requests that modify files in the 'tests/' folder
+  pull_request:
+    paths:
+      - 'tests/**'
+  # Allows manual execution of the workflow from the GitHub Actions UI
+  workflow_dispatch:
+
+permissions:
+  contents: read # Minimal permissions required to fetch code via actions/checkout
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        iteration: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] # Executes tests 10 times to detect flakiness
+      fail-fast: true # Stops all matrix runs immediately if one fails
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup DDEV
+        uses: ddev/github-action-setup-ddev@v1
+
+      - name: Set up environment variables for test mode
+        run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
+
+      - name: Run E2E tests
+        run: ddev exec bin/codecept run acceptance
+
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-screenshots
+          path: tests/_output
+          if-no-files-found: ignore

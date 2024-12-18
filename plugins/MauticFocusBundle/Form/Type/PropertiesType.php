@@ -174,10 +174,7 @@ class PropertiesType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'focus_entity_properties';
     }

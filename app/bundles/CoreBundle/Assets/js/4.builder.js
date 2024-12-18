@@ -1621,7 +1621,7 @@ Mautic.initSlotListeners = function() {
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
 
-                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
 
                 var builderEl = parent.mQuery('.builder');
 
@@ -1636,9 +1636,6 @@ Mautic.initSlotListeners = function() {
                 };
 
                 if (builderEl.length && builderEl.hasClass('email-builder')) {
-                    buttons = parent.mQuery.grep(buttons, function (value) {
-                        return value != 'insertGatedVideo';
-                    });
                     froalaOptions.imageOutputSize = true;
                 }
 
@@ -1807,30 +1804,6 @@ Mautic.initSlotListeners = function() {
                         params.slot.find('a.button').css(fieldParam, '#' + color);
                     }
                 }
-            }
-        } else if (/gatedvideo/.test(fieldParam)) {
-            // Handle gatedVideo replacements
-            var toInsert = fieldParam.split('-')[1];
-            var insertVal = params.field.val();
-
-            if (toInsert === 'url') {
-                var videoProvider = Mautic.getVideoProvider(insertVal);
-
-                if (videoProvider == null) {
-                    Mautic.slotFormError(fieldParam, 'Please enter a valid YouTube, Vimeo, or MP4 url.');
-                } else {
-                    params.slot.find('source')
-                        .attr('src', insertVal)
-                        .attr('type', videoProvider);
-                }
-            } else if (toInsert === 'gatetime') {
-                params.slot.find('video').attr('data-gate-time', insertVal);
-            } else if (toInsert === 'formid') {
-                params.slot.find('video').attr('data-form-id', insertVal);
-            } else if (toInsert === 'height') {
-                params.slot.find('video').attr('height', insertVal);
-            } else if (toInsert === 'width') {
-                params.slot.find('video').attr('width', insertVal);
             }
         } else if (fieldParam === 'separator-color') {
             params.slot.find('hr').css('border-color', '#' + params.field.val());

@@ -15,7 +15,7 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
 {
     public function __construct(
         private NotificationModel $notificationModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

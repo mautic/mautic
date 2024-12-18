@@ -18,10 +18,7 @@ class EventCanvasSettingsType extends AbstractType
         $builder->add('droppedY', HiddenType::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'campaignevent_canvassettings';
     }

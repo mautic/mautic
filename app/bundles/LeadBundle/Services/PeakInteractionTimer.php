@@ -46,7 +46,7 @@ class PeakInteractionTimer
         private StatRepository $statRepository,
         private HitRepository $hitRepository,
         private SubmissionRepository $submissionRepository,
-        private CacheProviderInterface $cacheProvider
+        private CacheProviderInterface $cacheProvider,
     ) {
         $this->cacheTimeout          = $this->coreParametersHelper->get('peak_interaction_timer_cache_timeout');
         $this->bestDefaultHourStart  = $this->coreParametersHelper->get('peak_interaction_timer_best_default_hour_start');

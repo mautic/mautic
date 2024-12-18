@@ -30,10 +30,7 @@ class SlotImageType extends SlotType
         parent::buildForm($builder, $options);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'slot_image';
     }

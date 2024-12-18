@@ -5,9 +5,8 @@ namespace Mautic\UserBundle\Security\Authentication\Token;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 
-class PluginToken extends AbstractToken implements GuardTokenInterface
+class PluginToken extends AbstractToken
 {
     private ?string $providerKey;
 
@@ -21,7 +20,7 @@ class PluginToken extends AbstractToken implements GuardTokenInterface
         $user = null,
         private string $credentials = '',
         array $roles = [],
-        private ?Response $response = null
+        private ?Response $response = null,
     ) {
         parent::__construct($roles);
 
@@ -29,12 +28,15 @@ class PluginToken extends AbstractToken implements GuardTokenInterface
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
+        if (is_string($user)) {
+            $user = null;
+        }
+
         if (null !== $user) {
             $this->setUser($user);
         }
-        $this->providerKey           = $providerKey;
 
-        $this->setAuthenticated(count($roles) > 0);
+        $this->providerKey = $providerKey;
     }
 
     public function getCredentials(): string

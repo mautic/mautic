@@ -36,7 +36,7 @@ class KickoffExecutioner implements ExecutionerInterface
         private KickoffContactFinder $kickoffContactFinder,
         private TranslatorInterface $translator,
         private EventExecutioner $executioner,
-        private EventScheduler $scheduler
+        private EventScheduler $scheduler,
     ) {
     }
 

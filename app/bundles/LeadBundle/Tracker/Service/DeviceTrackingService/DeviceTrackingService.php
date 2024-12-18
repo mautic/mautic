@@ -24,7 +24,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         private LeadDeviceRepository $leadDeviceRepository,
         private RandomHelperInterface $randomHelper,
         private RequestStack $requestStack,
-        private CorePermissions $security
+        private CorePermissions $security,
     ) {
     }
 
