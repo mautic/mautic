@@ -763,10 +763,10 @@ class CompanyController extends FormController
             $model = $this->getModel('lead.company');
             \assert($model instanceof CompanyModel);
             $flashes = $this->batchDeleteService->batchDelete(
-                $request,
                 $model,
                 $postActionVars,
-                'company',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.company.filter', '')),
                 'lead.company',
                 [$this, 'isLocked'],
             );

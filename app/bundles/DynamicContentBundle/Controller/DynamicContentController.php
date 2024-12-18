@@ -533,10 +533,10 @@ class DynamicContentController extends FormController
             $model = $this->getModel('dynamicContent');
             \assert($model instanceof DynamicContentModel);
             $flashes = $this->batchDeleteService->batchDelete(
-                $request,
                 $model,
                 $postActionVars,
-                'dynamicContent',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.dynamicContent.filter', '')),
                 'dynamicContent',
                 [$this, 'isLocked'],
             );

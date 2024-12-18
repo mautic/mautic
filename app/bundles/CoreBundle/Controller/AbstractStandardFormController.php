@@ -95,16 +95,17 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function batchDeleteStandard(Request $request)
     {
-        $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
-        $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);
-        $flashes   = [];
+        $sessionBase = $this->getSessionBase();
+        $page        = $request->getSession()->get('mautic.'.$sessionBase.'.page', 1);
+        $returnUrl   = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);
+        $flashes     = [];
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
             'contentTemplate' => $this->getControllerBase().'::'.$this->getPostActionControllerAction('batchDelete').'Action',
             'passthroughVars' => [
-                'activeLink'    => '#mautic_'.$this->getSessionBase().'_index',
+                'activeLink'    => '#mautic_'.$sessionBase.'_index',
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
             ],
         ];
@@ -112,10 +113,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model     = $this->getModel($this->getModelName());
             $flashes   = $this->batchDeleteService->batchDelete(
-                $request,
                 $model,
                 $postActionVars,
-                $this->getSessionBase(),
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.'.$sessionBase.'.filter', '')),
                 $this->getModelName(),
                 [$this, 'isLocked'],
             );

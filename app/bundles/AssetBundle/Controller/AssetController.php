@@ -671,10 +671,10 @@ class AssetController extends FormController
 
         if (Request::METHOD_POST === $request->getMethod()) {
             $flashes = $this->batchDeleteService->batchDelete(
-                $request,
                 $model,
                 $postActionVars,
-                'asset',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.asset.filter', '')),
                 'asset.asset',
                 [$this, 'isLocked'],
             );

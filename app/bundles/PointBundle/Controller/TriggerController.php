@@ -585,11 +585,11 @@ class TriggerController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('point.trigger');
             \assert($model instanceof TriggerModel);
-            $flashes   = $this->batchDeleteService->batchDelete(
-                $request,
+            $flashes = $this->batchDeleteService->batchDelete(
                 $model,
                 $postActionVars,
-                'point.trigger',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.point.trigger.filter', '')),
                 'point.trigger',
                 [$this, 'isLocked'],
             );

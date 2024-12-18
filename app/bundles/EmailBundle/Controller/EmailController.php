@@ -1423,11 +1423,11 @@ class EmailController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('email');
             \assert($model instanceof EmailModel);
-            $flashes   = $this->batchDeleteService->batchDelete(
-                $request,
+            $flashes = $this->batchDeleteService->batchDelete(
                 $model,
                 $postActionVars,
-                'email',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.email.filter', '')),
                 $this->getModelName(),
                 [$this, 'isLocked'],
             );

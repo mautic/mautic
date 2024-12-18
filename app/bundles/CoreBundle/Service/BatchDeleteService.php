@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\HttpFoundation\Request;
 
 final class BatchDeleteService
 {
@@ -25,23 +24,19 @@ final class BatchDeleteService
      *               Array of flash messages
      */
     public function batchDelete(
-        Request $request,
         MauticModelInterface $model,
         array $postActionVars,
-        string $searchKey,
+        string $ids,
+        string $searchValue,
         string $modelName,
         callable $isLocked,
     ): array {
-        $ids            = $request->query->get('ids');
         $flashes        = [];
         $deleteIds      = [];
 
         // When user select 'all'.
         if ('all' === $ids) {
-            // Retrieve search query.
-            $textSearch = $request->getSession()->get('mautic.'.$searchKey.'.filter', '');
-            $search     = $request->get('search', $textSearch);
-            $filter     = ['string' => $search, 'force' => []];
+            $filter     = ['string' => $searchValue, 'force' => []];
         }
         // When user select specific entities.
         if (json_decode($ids)) {

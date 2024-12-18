@@ -237,10 +237,10 @@ class ReportController extends FormController
             $model = $this->getModel('report');
             \assert($model instanceof ReportModel);
             $flashes = $this->batchDeleteService->batchDelete(
-                $request,
                 $model,
                 $postActionVars,
-                'report',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.report.filter', '')),
                 'report.report',
                 [$this, 'isLocked'],
             );

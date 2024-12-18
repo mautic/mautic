@@ -665,11 +665,11 @@ class MobileNotificationController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('notification');
             \assert($model instanceof NotificationModel);
-            $flashes   = $this->batchDeleteService->batchDelete(
-                $request,
+            $flashes = $this->batchDeleteService->batchDelete(
                 $model,
                 $postActionVars,
-                'mobile_notification',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.mobile_notification.filter', '')),
                 'notification',
                 [$this, 'isLocked'],
             );

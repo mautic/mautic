@@ -1084,10 +1084,10 @@ class FormController extends CommonFormController
             $model = $this->getModel('form');
             \assert($model instanceof FormModel);
             $flashes = $this->batchDeleteService->batchDelete(
-                $request,
                 $model,
                 $postActionVars,
-                'form',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.form.filter', '')),
                 $this->getModelName(),
                 [$this, 'isLocked'],
             );

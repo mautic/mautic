@@ -768,10 +768,10 @@ class PageController extends FormController
             /** @var PageModel $model */
             $model     = $this->getModel('page');
             $flashes   = $this->batchDeleteService->batchDelete(
-                $request,
                 $model,
                 $postActionVars,
-                'page',
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.page.filter', '')),
                 $this->getModelName(),
                 [$this, 'isLocked'],
             );
