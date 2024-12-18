@@ -151,7 +151,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 'comp.companyname',
                 'comp.companyemail',
             ],
-            $availableForSearch ?? [],
+            $availableForSearch,
         );
 
         return $this->addStandardCatchAllWhereClause(
