@@ -492,7 +492,7 @@ class FieldController extends FormController
             ],
         ];
 
-        if ('POST' === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var FieldModel $model */
             $model     = $this->getModel('lead.field');
             $ids       = json_decode($request->query->get('ids', '{}'));

@@ -2,7 +2,7 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class NotificationController extends AbstractFormController
+class NotificationController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
@@ -583,62 +583,7 @@ class NotificationController extends AbstractFormController
      */
     public function deleteAction(Request $request, $objectId)
     {
-        $page      = $request->getSession()->get('mautic.notification.page', 1);
-        $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
-        $flashes   = [];
-
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
-            'passthroughVars' => [
-                'activeLink'    => 'mautic_notification_index',
-                'mauticContent' => 'notification',
-            ],
-        ];
-
-        if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('notification');
-            \assert($model instanceof NotificationModel);
-            $entity = $model->getEntity($objectId);
-
-            if (null === $entity) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.notification.error.notfound',
-                    'msgVars' => ['%id%' => $objectId],
-                ];
-            } elseif (!$this->security->hasEntityAccess(
-                'notification:notifications:deleteown',
-                'notification:notifications:deleteother',
-                $entity->getCreatedBy()
-            )
-            ) {
-                return $this->accessDenied();
-            } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity, 'notification');
-            }
-
-            $model->deleteEntity($entity);
-
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => [
-                    '%name%' => $entity->getName(),
-                    '%id%'   => $objectId,
-                ],
-            ];
-        } // else don't do anything
-
-        return $this->postActionRedirect(
-            array_merge(
-                $postActionVars,
-                [
-                    'flashes' => $flashes,
-                ]
-            )
-        );
+        return $this->deleteStandard($request, $objectId);
     }
 
     /**
@@ -646,73 +591,7 @@ class NotificationController extends AbstractFormController
      */
     public function batchDeleteAction(Request $request): Response
     {
-        $page      = $request->getSession()->get('mautic.notification.page', 1);
-        $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
-        $flashes   = [];
-
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_notification_index',
-                'mauticContent' => 'notification',
-            ],
-        ];
-
-        if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('notification');
-            \assert($model instanceof NotificationModel);
-            $ids = json_decode($request->query->get('ids', '{}'));
-
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.notification.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    'notification:notifications:viewown',
-                    'notification:notifications:viewother',
-                    $entity->getCreatedBy()
-                )
-                ) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'notification', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.notification.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
-        } // else don't do anything
-
-        return $this->postActionRedirect(
-            array_merge(
-                $postActionVars,
-                [
-                    'flashes' => $flashes,
-                ]
-            )
-        );
+        return $this->batchDeleteStandard($request);
     }
 
     public function previewAction($objectId): Response
@@ -753,5 +632,10 @@ class NotificationController extends AbstractFormController
             'notification',
             'notification_id'
         );
+    }
+
+    protected function getModelName(): string
+    {
+        return 'notification';
     }
 }

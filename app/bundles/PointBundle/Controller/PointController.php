@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Model\PointModel;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PointController extends AbstractFormController
+class PointController extends AbstractStandardFormController
 {
     /**
      * @param int $page
@@ -361,61 +361,11 @@ class PointController extends AbstractFormController
     /**
      * Deletes the entity.
      *
-     * @param int $objectId
-     *
      * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, int $objectId)
     {
-        $page      = $request->getSession()->get('mautic.point.page', 1);
-        $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $page]);
-        $flashes   = [];
-
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_point_index',
-                'mauticContent' => 'point',
-            ],
-        ];
-
-        if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('point');
-            \assert($model instanceof PointModel);
-            $entity = $model->getEntity($objectId);
-
-            if (null === $entity) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.point.error.notfound',
-                    'msgVars' => ['%id%' => $objectId],
-                ];
-            } elseif (!$this->security->isGranted('point:points:delete')) {
-                return $this->accessDenied();
-            } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity, 'point');
-            }
-
-            $model->deleteEntity($entity);
-
-            $identifier = $this->translator->trans($entity->getName());
-            $flashes[]  = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => [
-                    '%name%' => $identifier,
-                    '%id%'   => $objectId,
-                ],
-            ];
-        } // else don't do anything
-
-        return $this->postActionRedirect(
-            array_merge($postActionVars, [
-                'flashes' => $flashes,
-            ])
-        );
+        return $this->deleteStandard($request, $objectId);
     }
 
     /**
@@ -423,63 +373,11 @@ class PointController extends AbstractFormController
      */
     public function batchDeleteAction(Request $request): Response
     {
-        $page      = $request->getSession()->get('mautic.point.page', 1);
-        $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $page]);
-        $flashes   = [];
+        return $this->batchDeleteStandard($request);
+    }
 
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_point_index',
-                'mauticContent' => 'point',
-            ],
-        ];
-
-        if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('point');
-            \assert($model instanceof PointModel);
-            $ids       = json_decode($request->query->get('ids', '{}'));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.point.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->isGranted('point:points:delete')) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'point', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.point.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
-        } // else don't do anything
-
-        return $this->postActionRedirect(
-            array_merge($postActionVars, [
-                'flashes' => $flashes,
-            ])
-        );
+    protected function getModelName(): string
+    {
+        return 'point';
     }
 }

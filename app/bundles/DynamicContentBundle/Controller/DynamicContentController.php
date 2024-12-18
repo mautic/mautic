@@ -532,46 +532,14 @@ class DynamicContentController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('dynamicContent');
             \assert($model instanceof DynamicContentModel);
-            $ids = json_decode($request->query->get('ids', '{}'));
-
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.dynamicContent.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    'dynamiccontent:dynamiccontents:viewown',
-                    'dynamiccontent:dynamiccontents:viewother',
-                    $entity->getCreatedBy()
-                )
-                ) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'dynamicContent', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.dynamicContent.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes = $this->batchDeleteService->batchDelete(
+                $request,
+                $model,
+                $postActionVars,
+                'dynamicContent',
+                'dynamicContent',
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));

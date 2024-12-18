@@ -1423,46 +1423,14 @@ class EmailController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('email');
             \assert($model instanceof EmailModel);
-            $ids = json_decode($request->query->get('ids', '{}'));
-
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.email.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
-                    $entity->getCreatedBy()
-                )
-                ) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'email', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.email.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes   = $this->batchDeleteService->batchDelete(
+                $request,
+                $model,
+                $postActionVars,
+                'email',
+                $this->getModelName(),
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

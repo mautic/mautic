@@ -104,11 +104,12 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'viewParameters'  => ['page' => $page],
             'contentTemplate' => $this->getControllerBase().'::'.$this->getPostActionControllerAction('batchDelete').'Action',
             'passthroughVars' => [
+                'activeLink'    => '#mautic_'.$this->getSessionBase().'_index',
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
             ],
         ];
 
-        if (Request::METHOD_POST == $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model     = $this->getModel($this->getModelName());
             $flashes   = $this->batchDeleteService->batchDelete(
                 $request,
@@ -230,11 +231,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Deletes the entity.
      *
-     * @param int $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function deleteStandard(Request $request, $objectId)
+    protected function deleteStandard(Request $request, int $objectId)
     {
         $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
         $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);
@@ -247,6 +246,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'viewParameters'  => ['page' => $page],
             'contentTemplate' => $this->getControllerBase().'::'.$this->getPostActionControllerAction('delete').'Action',
             'passthroughVars' => [
+                'activeLink'    => '#mautic_'.$this->getSessionBase().'_index',
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
             ],
             'entity' => $entity,

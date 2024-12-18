@@ -28,20 +28,20 @@ final class BatchDeleteService
         Request $request,
         MauticModelInterface $model,
         array $postActionVars,
-        string $sessionBase,
+        string $searchKey,
         string $modelName,
         callable $isLocked,
     ): array {
         $ids            = $request->query->get('ids');
-        $permissionBase = $model->getPermissionBase();
         $flashes        = [];
         $deleteIds      = [];
 
         // When user select 'all'.
         if ('all' === $ids) {
             // Retrieve search query.
-            $search = $request->get('search', $request->getSession()->get('mautic.'.$sessionBase.'.filter', ''));
-            $filter = ['string' => $search, 'force' => []];
+            $textSearch = $request->getSession()->get('mautic.'.$searchKey.'.filter', '');
+            $search     = $request->get('search', $textSearch);
+            $filter     = ['string' => $search, 'force' => []];
         }
         // When user select specific entities.
         if (json_decode($ids)) {
@@ -60,12 +60,17 @@ final class BatchDeleteService
                 'filter'           => $filter,
                 'ignore_paginator' => true,
             ]);
-
+            $permissionBase = $model->getPermissionBase();
             // Do this in chunks so that we don't run out of memory.
             $chunks = array_chunk($entities, 200);
             foreach ($chunks as $chunk) {
                 // Loop over the entities to perform access checks pre-delete.
                 foreach ($chunk as $entity) {
+                    // In case getEntities does not return array of entities (eg: Form).
+                    if (is_array($entity)) {
+                        $entity = reset($entity);
+                    }
+
                     if (!$this->security->hasEntityAccess(
                         $permissionBase.':deleteown',
                         $permissionBase.':deleteother',
