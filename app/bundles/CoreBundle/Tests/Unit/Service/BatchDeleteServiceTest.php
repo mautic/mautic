@@ -3,12 +3,13 @@
 namespace Mautic\CoreBundle\Tests\Unit\Service;
 
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Model\CompanyModel;
 
 class BatchDeleteServiceTest extends MauticMysqlTestCase
 {
@@ -19,7 +20,6 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         // Mock the dependencies
         $this->securityMock       = $this->createMock(CorePermissions::class);
         $this->translatorMock     = $this->createMock(Translator::class);
@@ -28,27 +28,73 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
 
     public function testBatchDeleteCompanies(): void
     {
-        $companyA = $this->createEntity(Company::class);
-        $companyB = $this->createEntity(Company::class);
+        /** @var CompanyModel $model */
+        $model = static::getContainer()->get('mautic.lead.model.company');
+        $this->createEntity($model, Company::class, 'compA');
+        $this->createEntity($model, Company::class, 'compB');
 
-        $model = $this->createMock(CompanyModel::class);
+        $this->securityMock->expects(self::exactly(2))
+            ->method('hasEntityAccess')
+            ->willReturn(true);
+
+        $this->translatorMock->expects(self::once())
+            ->method('hasId')
+            ->with('mautic.lead.company.notice.batch_deleted', 'flashes')
+            ->willReturn(true);
+
+        $flashes = $this->batchDeleteService->batchDelete(
+            $model,
+            [],
+            'all',
+            '',
+            'lead.company',
+            [$this, 'isLocked'],
+        );
+        $successFlash = $flashes[0];
+
+        $this->assertArrayHasKey('msg', $successFlash);
+        $this->assertEquals(2, $successFlash['msgVars']['%count%']);
     }
 
-    public function testBatchDeleteDynamicContent(): void
+    public function testBatchDeleteCompanyAccessDenied(): void
     {
-        $dcA = $this->createEntity(DynamicContent::class);
-        $dcB = $this->createEntity(DynamicContent::class);
+        /** @var CompanyModel $model */
+        $model = static::getContainer()->get('mautic.lead.model.company');
+        $this->createEntity($model, Company::class, 'compA');
+        $this->createEntity($model, Company::class, 'compB');
 
-        $model = $this->createMock(DynamicContentModel::class);
+        $this->securityMock->expects(self::exactly(2))
+            ->method('hasEntityAccess')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $flashes = $this->batchDeleteService->batchDelete(
+            $model,
+            [],
+            'all',
+            '',
+            'lead.company',
+            [$this, 'isLocked'],
+        );
+
+        $this->assertEquals('mautic.core.error.accessdenied', $flashes[0]['msg']);
+        $this->assertEquals('mautic.core.notice.batch_deleted', $flashes[1]['msg']);
     }
 
-    private function createEntity(FormEntity $entityName): FormEntity
+    private function createEntity(FormModel $model, string $entityType, string $entityName): FormEntity
     {
-        $entity = new $entityName();
-
-        $this->em->persist($entity);
-        $this->em->flush();
+        $entity = (new $entityType())
+            ->setName($entityName)
+            ->setCreatedBy(1);
+        $model->saveEntity($entity);
 
         return $entity;
+    }
+
+    public function isLocked(): array
+    {
+        return [
+            'type'    => 'error',
+            'msg'     => 'mautic.core.error.locked',
+        ];
     }
 }
