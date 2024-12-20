@@ -2,34 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Mautic\InstallBundle\InstallFixtures\ORM;
+namespace MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
+class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    private ?ContainerInterface $container = null;
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
+    {
+    }
 
     public static function getGroups(): array
     {
         return ['group_install', 'group_mautic_install_data'];
     }
 
-    public function setContainer(ContainerInterface $container = null): void
-    {
-        $this->container = $container;
-    }
-
     public function load(ObjectManager $manager): void
     {
-        $applicationDir           = $this->container->get('kernel')->getApplicationDir();
+        $applicationDir           = $this->coreParametersHelper->get('mautic.application_dir');
         $grapeJsBuilderConfigPath = $applicationDir.'/plugins/GrapesJsBuilderBundle/Config/config.php';
 
         if (!file_exists($grapeJsBuilderConfigPath)) {

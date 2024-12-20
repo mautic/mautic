@@ -38,7 +38,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         FlashBag $flashBag,
         ?RequestStack $requestStack,
         ?CorePermissions $security,
-        private AuthorizationCheckerInterface $authorizationChecker
+        private AuthorizationCheckerInterface $authorizationChecker,
     ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -63,8 +63,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
     /**
      * Generates login form and processes login.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
     {

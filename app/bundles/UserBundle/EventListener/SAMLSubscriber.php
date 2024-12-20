@@ -11,7 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 class SAMLSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

@@ -142,7 +142,7 @@ class PluginController extends FormController
 
         $session   = $request->getSession();
 
-        $integrationDetailsPost = $request->request->get('integration_details') ?? [];
+        $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */

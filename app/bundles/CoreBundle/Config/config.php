@@ -158,7 +158,6 @@ return [
             'mautic.core.service.flashbag' => [
                 'class'     => Mautic\CoreBundle\Service\FlashBag::class,
                 'arguments' => [
-                    '@session',
                     'translator',
                     'request_stack',
                     'mautic.core.model.notification',
@@ -494,7 +493,7 @@ return [
             'mautic.page.helper.factory' => [
                 'class'     => Mautic\CoreBundle\Factory\PageHelperFactory::class,
                 'arguments' => [
-                    'session',
+                    'request_stack',
                     'mautic.helper.core_parameters',
                 ],
             ],
@@ -588,7 +587,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
                     '%kernel.cache_dir%',
-                    'session',
+                    'request_stack',
                     'mautic.helper.paths',
                     'kernel',
                 ],
@@ -770,7 +769,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.helper.paths',
-                    'session',
+                    'request_stack',
                     'mautic.helper.app_version',
                 ],
                 'tag' => 'mautic.update_step',

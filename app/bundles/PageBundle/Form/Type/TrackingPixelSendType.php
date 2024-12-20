@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class TrackingPixelSendType extends AbstractType
 {
     public function __construct(
-        protected TrackingHelper $trackingHelper
+        protected TrackingHelper $trackingHelper,
     ) {
     }
 
@@ -90,10 +90,7 @@ class TrackingPixelSendType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'tracking_pixel_send_action';
     }

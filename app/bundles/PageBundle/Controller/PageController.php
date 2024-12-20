@@ -273,7 +273,7 @@ class PageController extends FormController
         }
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_page_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -495,7 +495,7 @@ class PageController extends FormController
         RouterInterface $routerHelper,
         CoreParametersHelper $coreParametersHelper,
         $objectId,
-        $ignorePost = false
+        $ignorePost = false,
     ) {
         /** @var PageModel $model */
         $model    = $this->getModel('page.page');
@@ -748,10 +748,8 @@ class PageController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.page.page', 1);
         $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);

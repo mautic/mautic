@@ -27,7 +27,7 @@ class AjaxController extends CommonAjaxController
         }
 
         // get the selected types
-        $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
+        $selectedTypes = InputHelper::cleanArray($request->request->all()['types']) ?? [];
         $payloadPaths  = $this->getPayloadPaths($selectedTypes);
         $payloads      = $this->loadPayloads($payloadPaths);
         $now           = new \DateTime();

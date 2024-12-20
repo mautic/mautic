@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleEvent;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,6 +38,11 @@ class UpdateSchemaStepTest extends AbstractStepTest
      */
     private MockObject $eventDispatcher;
 
+    /**
+     * @var MockObject&HelperSet
+     */
+    private MockObject $helperSet;
+
     private UpdateSchemaStep $step;
 
     protected function setUp(): void
@@ -44,8 +50,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
         parent::setUp();
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
-
         $this->kernel         = $this->createMock(KernelInterface::class);
+        $this->helperSet      = $this->createMock(HelperSet::class);
         $this->kernel
             ->method('getBundles')
             ->willReturn([]);
@@ -58,7 +64,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn([]);
+            ->willReturn($this->helperSet);
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')
@@ -86,7 +92,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $container->method('hasParameter')
             ->will($this->returnValueMap([
                 ['console.command.ids', true],
-                ['console.laze_command.ids', false],
+                ['console.lazy_command.ids', false],
             ]));
 
         $container->method('getParameter')

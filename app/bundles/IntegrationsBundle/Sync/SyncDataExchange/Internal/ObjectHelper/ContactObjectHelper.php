@@ -43,7 +43,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         private Connection $connection,
         private DoNotContactModel $dncModel,
         private FieldList $fieldList,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 

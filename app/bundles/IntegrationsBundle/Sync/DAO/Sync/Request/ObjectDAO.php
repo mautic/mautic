@@ -30,7 +30,7 @@ class ObjectDAO
         /**
          * @deprecated Not used. To be removed in Mautic 6. Use SyncDateHelper instead
          */
-        private ?\DateTimeInterface $objectLastSyncDateTime = null
+        private ?\DateTimeInterface $objectLastSyncDateTime = null,
     ) {
     }
 

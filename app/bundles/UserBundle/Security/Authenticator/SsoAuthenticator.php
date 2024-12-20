@@ -17,7 +17,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -29,6 +28,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * This is a modified copy of the \Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator
@@ -71,7 +71,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
             return false;
         }
 
-        if (true === $this->options['form_only'] && 'form' !== $request->getContentType()) {
+        if (true === $this->options['form_only'] && 'form' !== $request->getContentTypeFormat()) {
             return false;
         }
 
@@ -190,7 +190,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
 
         $credentials['username'] = trim($credentials['username']);
 
-        if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
+        if (\strlen($credentials['username']) > UserBadge::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Invalid username.');
         }
 
@@ -198,7 +198,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string or null, "%s" given.', $this->options['integration_parameter'], \gettype($credentials['integration'])));
         }
 
-        $request->getSession()->set(Security::LAST_USERNAME, $credentials['username']);
+        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['username']);
 
         if (!\is_string($credentials['password'])) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['password_parameter'], \gettype($credentials['password'])));

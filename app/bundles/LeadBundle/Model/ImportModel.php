@@ -53,7 +53,7 @@ class ImportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private ProcessSignalService $processSignalService
+        private ProcessSignalService $processSignalService,
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 
@@ -136,7 +136,7 @@ class ImportModel extends FormModel
                     ),
                     'info',
                     false,
-                    $this->translator->trans('mautic.lead.import.failed'),
+                    $this->translator->trans('mautic.lead.import.failed', ['%reason%' =>  $import->getStatusInfo()]),
                     'ri-download-line',
                     null,
                     $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())

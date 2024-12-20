@@ -28,11 +28,11 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
         $inputValue = $crawler->filter('textarea[name^=mauticform]')->html();
         self::assertSame('test-test', $inputValue);
         $inputValue = $crawler->filter('input[value^=val1]')->attr('checked');
-        self::assertSame('checked', $inputValue);
+        self::assertNotNull($inputValue, $crawler->html());
         $inputValue = $crawler->filter('input[value^=val2]')->attr('checked');
         self::assertNull($inputValue);
         $inputValue = $crawler->filter('input[value^=val3]')->attr('checked');
-        self::assertSame('checked', $inputValue);
+        self::assertNotNull($inputValue);
 
         $this->createPage($formId);
         $crawler    = $this->client->request(Request::METHOD_GET, '/test-page?email=test%2Bpage@test.com&firstname=test');

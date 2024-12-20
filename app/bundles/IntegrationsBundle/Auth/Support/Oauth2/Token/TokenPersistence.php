@@ -15,14 +15,12 @@ class TokenPersistence implements TokenPersistenceInterface
     private ?Integration $integration = null;
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper
+        private IntegrationsHelper $integrationsHelper,
     ) {
     }
 
     /**
      * Restore the token data into the give token.
-     *
-     * @param TokenInterface|IntegrationToken $token
      *
      * @return TokenInterface|IntegrationToken Restored token
      */
@@ -40,8 +38,6 @@ class TokenPersistence implements TokenPersistenceInterface
 
     /**
      * Save the token data.
-     *
-     * @param TokenInterface|IntegrationToken $token
      */
     public function saveToken(TokenInterface $token): void
     {

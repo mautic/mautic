@@ -32,7 +32,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private VideoModel $pageVideoModel,
         private TranslatorInterface $translator,
         RouterInterface $router,
-        ModelFactory $modelFactory
+        ModelFactory $modelFactory,
     ) {
         $this->router         = $router;
 

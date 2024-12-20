@@ -84,7 +84,7 @@ class PageModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         $this->dateTimeHelper       = new DateTimeHelper();
 
@@ -482,7 +482,7 @@ class PageModel extends FormModel
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDate = null
+        \DateTimeInterface $hitDate = null,
     ): void {
         // Store Page/Redirect association
         if ($page) {

@@ -68,7 +68,7 @@ class LeadApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
@@ -398,7 +398,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($request->get('filters', [])));
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($request->query->all()['filters'] ?? $request->request->all()['filters'] ?? []));
         $limit   = (int) $request->get('limit', 25);
         $page    = (int) $request->get('page', 1);
         $order   = InputHelper::clean($request->get('order', ['timestamp', 'DESC']));

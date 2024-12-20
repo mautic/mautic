@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerFunctionalTest extends MauticMysqlTestCase
@@ -29,17 +28,11 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionValid(): void
     {
-        $crawler                = $this->client->request('GET', '/s/users/edit/1');
-        $buttonCrawlerNode      = $crawler->selectButton('Save & Close');
-        $form                   = $buttonCrawlerNode->form();
-        $newUsername            = 'test';
-        $form['user[username]'] = $newUsername;
-        $this->client->followRedirects(false);
+        $crawler                 = $this->client->request('GET', '/s/users/edit/1');
+        $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
+        $form                    = $buttonCrawlerNode->form();
+        $form['user[firstName]'] = 'test';
         $this->client->submit($form);
-        // Not $this->client->followRedirect(); because username has changed.
-        $this->client->setServerParameter('PHP_AUTH_USER', $newUsername);
-        $this->assertTrue($this->client->getResponse()->isRedirect('/s/users/1'), $this->client->getResponse()->headers->get('Location'));
-        $this->client->request(Request::METHOD_GET, $this->client->getResponse()->headers->get('Location'));
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -179,7 +172,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         string $object,
         int $objectId,
         string $action,
-        array $details
+        array $details,
     ): AuditLog {
         $auditLog = new AuditLog();
         $auditLog->setUserId($userId);

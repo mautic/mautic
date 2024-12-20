@@ -25,7 +25,7 @@ class InstallCommand extends Command
 
     public function __construct(
         private InstallService $installer,
-        private ManagerRegistry $doctrineRegistry
+        private ManagerRegistry $doctrineRegistry,
     ) {
         parent::__construct();
     }

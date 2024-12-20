@@ -15,10 +15,8 @@ class ProfileController extends FormController
 {
     /**
      * Generate's account profile.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, TokenStorageInterface $tokenStorage)
+    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, TokenStorageInterface $tokenStorage): \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         // get current user
         $me = $tokenStorage->getToken()->getUser();
@@ -146,7 +144,7 @@ class ProfileController extends FormController
             $request->getSession()->set('formProcessed', 1);
 
             // check to see if the password needs to be rehashed
-            $formUser              = $request->request->get('user') ?? [];
+            $formUser              = $request->request->all()['user'] ?? [];
             $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
             $overrides['password'] = $model->checkNewPassword($me, $hasher, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {

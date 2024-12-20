@@ -502,7 +502,7 @@ class QueryBuilderTest extends TestCase
 
     private function createConnectionFake(): Connection
     {
-        return new class() extends Connection {
+        return new class extends Connection {
             /** @noinspection PhpMissingParentConstructorInspection */
             public function __construct()
             {

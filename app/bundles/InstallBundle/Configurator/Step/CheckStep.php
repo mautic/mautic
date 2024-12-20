@@ -55,7 +55,7 @@ class CheckStep implements StepInterface
         Configurator $configurator,
         private string $projectDir,
         RequestStack $requestStack,
-        private OpenSSLCipher $openSSLCipher
+        private OpenSSLCipher $openSSLCipher,
     ) {
         $request = $requestStack->getCurrentRequest();
 

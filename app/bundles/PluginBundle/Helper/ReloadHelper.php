@@ -16,7 +16,7 @@ class ReloadHelper
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
-        private MauticFactory $factory
+        private MauticFactory $factory,
     ) {
     }
 

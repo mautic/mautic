@@ -65,7 +65,7 @@ class BulkNotificationTest extends TestCase
 
     private function createNotificationModelFake(): NotificationModel
     {
-        return new class() extends NotificationModel {
+        return new class extends NotificationModel {
             /**
              * @var mixed[]
              */

@@ -59,10 +59,7 @@ class MergeType extends AbstractType
         $resolver->setRequired(['leads']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'lead_merge';
     }

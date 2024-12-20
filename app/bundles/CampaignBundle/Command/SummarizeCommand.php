@@ -23,7 +23,7 @@ class SummarizeCommand extends ModeratedCommand
         private TranslatorInterface $translator,
         private SummaryModel $summaryModel,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
-        private MonitoringModel $monitoringModel
+        private MonitoringModel $monitoringModel,
     ) {
         parent::__construct();
     }

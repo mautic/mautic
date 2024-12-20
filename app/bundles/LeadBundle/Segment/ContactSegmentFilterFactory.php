@@ -24,7 +24,7 @@ class ContactSegmentFilterFactory
         private TableSchemaColumnsCache $schemaCache,
         private Container $container,
         private DecoratorFactory $decoratorFactory,
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -86,11 +86,9 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * @return FilterQueryBuilderInterface
-     *
      * @throws \Exception
      */
-    private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate): ?FilterQueryBuilderInterface
     {
         $qbServiceId = $decorator->getQueryType($contactSegmentFilterCrate);
 

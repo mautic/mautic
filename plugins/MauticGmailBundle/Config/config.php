@@ -13,7 +13,6 @@ return [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
                     'doctrine.orm.entity_manager',
-                    'session',
                     'request_stack',
                     'router',
                     'translator',

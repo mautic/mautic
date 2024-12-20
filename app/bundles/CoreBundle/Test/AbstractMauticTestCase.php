@@ -13,14 +13,13 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -34,6 +33,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected array $clientOptions = [];
 
+    // Credentials for API authentication
     protected array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'Maut1cR0cks!',
@@ -49,6 +49,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'messenger_dsn_hit'                 => 'sync://',
         'messenger_dsn_failed'              => 'in-memory://default',
     ];
+
+    protected bool $authenticateApi = false;
 
     protected AbstractDatabaseTool $databaseTool;
 
@@ -96,19 +98,28 @@ abstract class AbstractMauticTestCase extends WebTestCase
         EnvLoader::load();
 
         self::ensureKernelShutdown();
-        $this->client = static::createClient($this->clientOptions, $this->clientServer);
+        $this->client = static::createClient($this->clientOptions, $this->authenticateApi ? $this->clientServer : []);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
         $this->em = static::getContainer()->get('doctrine')->getManager();
         \assert($this->em instanceof EntityManagerInterface);
         $this->connection = $this->em->getConnection();
-
-        $this->router = static::getContainer()->get('router');
-        $scheme       = $this->router->getContext()->getScheme();
-        $secure       = 0 === strcasecmp($scheme, 'https');
+        $this->router     = static::getContainer()->get('router');
+        $scheme           = $this->router->getContext()->getScheme();
+        $secure           = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', (string) $secure);
+    }
+
+    public function loginUser(User $user): void
+    {
+        $this->client->loginUser($user, 'mautic');
+    }
+
+    protected function logoutUser(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/logout');
     }
 
     /**
@@ -142,49 +153,17 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->loadFixtures($classNames);
     }
 
+    public function setCsrfHeader(string $intention = 'mautic_ajax_post'): void
+    {
+        $this->client->setServerParameter('HTTP_X-CSRF-Token', $this->getCsrfToken($intention));
+    }
+
     /**
      * Use when POSTing directly to forms.
-     *
-     * @param string $intention
-     *
-     * @return string
      */
-    protected function getCsrfToken($intention)
+    protected function getCsrfToken(string $intention): string
     {
         return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention)->getValue();
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function createAjaxHeaders(): array
-    {
-        return [
-            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
-        ];
-    }
-
-    protected function loginUser(string $username): User
-    {
-        /** @var User|null $user */
-        $user = $this->em->getRepository(User::class)
-            ->findOneBy(['username' => $username]);
-
-        if (!$user) {
-            throw new \InvalidArgumentException(sprintf('User with username "%s" not found.', $username));
-        }
-
-        $firewall = 'mautic';
-        $session  = static::getContainer()->get('session');
-        $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
-        $session->set('_security_'.$firewall, serialize($token));
-        $session->save();
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $this->client->getCookieJar()->set($cookie);
-
-        return $user;
     }
 
     /**

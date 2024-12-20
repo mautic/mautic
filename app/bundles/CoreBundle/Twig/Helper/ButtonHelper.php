@@ -80,10 +80,7 @@ final class ButtonHelper
      */
     private $buttons = [];
 
-    /**
-     * @var int
-     */
-    private $buttonCount = 0;
+    private int $buttonCount = 0;
 
     private bool $buttonsFetched = false;
 
@@ -94,15 +91,12 @@ final class ButtonHelper
      */
     private $item;
 
-    /**
-     * @var int
-     */
-    private $listMarker = 3;
+    private int $listMarker = 3;
 
     public function __construct(
         private Environment $twig,
         private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

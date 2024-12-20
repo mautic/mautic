@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class CampaignEventPointType extends AbstractType
 {
     public function __construct(
-        private TypeOperatorProviderInterface $typeOperatorProvider
+        private TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
     }
 

@@ -24,8 +24,6 @@ class ApiUserSubscriber implements EventSubscriberInterface
     /**
      * Execute the authentication if authentication is oAuth and has no UserLoader set.
      * Sets permissions, and if user is not yet fetched - gets the user from TokenStorage, or creates one.
-     *
-     * This is a copy of the app/bundles/UserBundle/Security/Firewall/AuthenticationListener.php:128
      */
     public function onCheckPassport(CheckPassportEvent $event): void
     {
@@ -74,8 +72,6 @@ class ApiUserSubscriber implements EventSubscriberInterface
     /**
      * Transfers User instance from \Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions::setActivePermissionsOnAuthToken
      * to the token, to be authorized later.
-     *
-     * This is a copy of the functionality app/bundles/UserBundle/Security/Firewall/AuthenticationListener.php:128
      */
     public function onTokenCreated(AuthenticationTokenCreatedEvent $event): void
     {

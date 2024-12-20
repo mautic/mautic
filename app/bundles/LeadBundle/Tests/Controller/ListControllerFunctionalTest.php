@@ -16,22 +16,13 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ListControllerFunctionalTest extends MauticMysqlTestCase
+final class ListControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ListModel
-     */
-    protected $listModel;
+    private ListModel $listModel;
 
-    /**
-     * @var LeadListRepository
-     */
-    protected $listRepo;
+    private LeadListRepository $listRepo;
 
-    /**
-     * @var LeadRepository
-     */
-    protected $leadRepo;
+    private LeadRepository $leadRepo;
 
     protected function setUp(): void
     {
@@ -40,8 +31,8 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         \assert($this->listModel instanceof ListModel);
         $this->listRepo = $this->listModel->getRepository();
         \assert($this->listRepo instanceof LeadListRepository);
-        /** @var LeadModel $leadModel */
-        $leadModel      = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        \assert($leadModel instanceof LeadModel);
         $this->leadRepo = $leadModel->getRepository();
     }
 
@@ -74,12 +65,12 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
         $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode());
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
-        $this->client->restart();
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
+        $this->assertResponseIsSuccessful();
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
     }
 
@@ -98,13 +89,13 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $rows = $this->listRepo->findAll();
         $this->assertCount(2, $rows);
@@ -186,7 +177,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Remove 1 contact from segment.
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
         self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         // Check segment count UI for 3 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
@@ -197,7 +188,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $parameters = ['ids' => [$contact1Id]];
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
         self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
@@ -214,7 +205,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Remove 1 contact from segment.
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
         self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         // Check segment count AJAX for 3 contacts.
         $parameter = ['id' => $segmentId];
@@ -227,7 +218,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $parameters = ['ids' => [$contact1Id]];
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
         self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         // Check segment count AJAX for 4 contacts.
         $parameter = ['id' => $segmentId];
@@ -299,13 +290,12 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/clone/'.$segment->getId());
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[alias]']->setValue('clonesegment2');
         $this->client->submit($form);
-
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->client->submit($form);
 

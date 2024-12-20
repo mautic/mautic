@@ -163,7 +163,7 @@ trait FrequencyRuleTrait
         $request = $this->requestStack->getCurrentRequest();
         \assert(null !== $request);
         // iF subscribed_channels are enabled in form, then touch DNC
-        if (isset($request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
+        if (isset($request->request->all()['lead_contact_frequency_rules']['lead_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
                 if (!isset($leadChannels[$contactChannel])) {
                     $contactable = $dncModel->isContactable($lead, $contactChannel);

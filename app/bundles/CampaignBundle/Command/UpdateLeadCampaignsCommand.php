@@ -32,7 +32,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         private LoggerInterface $logger,
         private FormatterHelper $formatterHelper,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }

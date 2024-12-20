@@ -905,7 +905,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return ArrayCollection<int, LeadList>
      */
     public function getLists()
     {
@@ -947,7 +947,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return Collection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return Collection<int, LeadList>
      */
     public function getExcludedLists(): Collection
     {
@@ -1162,10 +1162,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Calculate Read Percentage for each Email.
-     *
-     * @return int
      */
-    public function getReadPercentage($includevariants = false)
+    public function getReadPercentage($includevariants = false): float|int
     {
         if ($this->getSentCount($includevariants) > 0) {
             return round($this->getReadCount($includevariants) / $this->getSentCount($includevariants) * 100, 2);

@@ -32,7 +32,7 @@ class DynamicContentHelper
         protected DynamicContentModel $dynamicContentModel,
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
-        protected LeadModel $leadModel
+        protected LeadModel $leadModel,
     ) {
     }
 

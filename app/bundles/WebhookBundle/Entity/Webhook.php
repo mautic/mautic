@@ -5,6 +5,7 @@ namespace Mautic\WebhookBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -110,7 +111,7 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => Criteria::DESC])
+        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => Order::Descending->value])
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
@@ -178,8 +179,8 @@ class Webhook extends FormEntity
             new Assert\Choice(
                 [
                     null,
-                    Criteria::ASC,
-                    Criteria::DESC,
+                    Order::Ascending->value,
+                    Order::Descending->value,
                 ]
             )
         );

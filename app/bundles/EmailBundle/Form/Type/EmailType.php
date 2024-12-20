@@ -635,7 +635,7 @@ class EmailType extends AbstractType
         $view->vars['stages']    = $stageChoices;
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'emailform';
     }

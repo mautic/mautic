@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -27,7 +28,8 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCreateNewCampaign(): void
     {
-        $user = $this->loginUser('admin');
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
 
         $segment = new LeadList();
         $segment->setName('test');

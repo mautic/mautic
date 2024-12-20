@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -521,8 +522,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->expr()->in('c.id', ':ids')
         )
             ->setParameter('ids', array_keys($companies))
-            ->orderBy('c.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
-            ->addOrderBy('c.id', \Doctrine\Common\Collections\Criteria::DESC);
+            ->orderBy('c.dateAdded', Order::Descending->value)
+            ->addOrderBy('c.id', Order::Descending->value);
 
         $entities = $q->getQuery()
             ->getResult();

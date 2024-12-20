@@ -5,6 +5,12 @@
 </div>
 {% else %}
 <a href="{{ url('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaign.id}) }}" data-toggle="ajax">
-    {{ campaign.name }}
+    <span class="fw-sb">{{ campaign.name }}</span>
+    <span class="ml-4 mr-sm">#{{ campaign.getId() }}</span>
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': campaign,
+        'status': 'active',
+        'simplified': 'true'
+    }) -}}
 </a>
 {% endif %}

@@ -17,7 +17,7 @@ final class Version
         public array $keywords,
         public ?string $type,
         public ?string $directoryName,
-        public ?string $displayName
+        public ?string $displayName,
     ) {
     }
 

@@ -48,7 +48,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private AbstractNotificationApi $notificationApi,
         private EventDispatcherInterface $dispatcher,
         private DoNotContactModel $doNotContact,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

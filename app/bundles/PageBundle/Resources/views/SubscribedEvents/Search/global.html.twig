@@ -4,8 +4,15 @@
 </a>
 {% else %}
 <a href="{{ url('mautic_page_action', {'objectAction': 'view', 'objectId': page.id}) }}" data-toggle="ajax">
-    {{ page.title|purify }}
-    <span size="sm" class="label label-gray pull-right" data-toggle="tooltip" title="{{ 'mautic.page.hits'|trans }}" data-placement="left">
+    <span class="fw-sb">{{ page.title|purify }}</span>
+    <span class="ml-4 mr-sm">#{{ page.getId() }}</span>
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': page,
+        'status': 'available',
+        'simplified': 'true'
+    }) -}}
+    <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.page.hits'|trans }}" data-placement="left">
+        <i class="ri-eye-line"></i>
         {{ page.hits }}
     </span>
 </a>

@@ -30,7 +30,7 @@ class FieldType extends AbstractType
         private TranslatorInterface $translator,
         private ObjectCollectorInterface $objectCollector,
         private FieldCollectorInterface $fieldCollector,
-        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector
+        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
     ) {
     }
 
@@ -615,7 +615,7 @@ class FieldType extends AbstractType
         $resolver->setDefined(['customParameters']);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'formfield';
     }

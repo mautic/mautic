@@ -21,7 +21,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function __construct(
         private LeadModel $leadModel,
         private TrackingHelper $trackingHelper,
-        private RealTimeExecutioner $realTimeExecutioner
+        private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
 

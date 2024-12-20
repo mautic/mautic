@@ -19,7 +19,7 @@ class InternalObjectOwnerEvent extends Event
      */
     public function __construct(
         private ObjectInterface $object,
-        private array $objectIds
+        private array $objectIds,
     ) {
     }
 

@@ -11,7 +11,6 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -22,16 +21,18 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    public function __construct(protected UserRepository $userRepository, protected PermissionRepository $permissionRepository, protected Session $session, protected EventDispatcherInterface $dispatcher, protected UserPasswordHasher $encoder)
-    {
+    public function __construct(
+        protected UserRepository $userRepository,
+        protected PermissionRepository $permissionRepository,
+        protected EventDispatcherInterface $dispatcher,
+        protected UserPasswordHasher $encoder,
+    ) {
     }
 
     /**
      * @param string $username
-     *
-     * @return User
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): User
     {
         return $this->loadUserByIdentifier($username);
     }
@@ -67,7 +68,7 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $class = $user::class;
         if (!$this->supportsClass($class)) {

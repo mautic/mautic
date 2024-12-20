@@ -36,7 +36,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($role);
 
-        $this->loginUser(self::USERNAME);
+        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', self::USERNAME);
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 

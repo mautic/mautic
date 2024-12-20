@@ -29,7 +29,7 @@ class LookupHelper
         protected Logger $logger,
         protected Router $router,
         protected LeadModel $leadModel,
-        protected CompanyModel $companyModel
+        protected CompanyModel $companyModel,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }

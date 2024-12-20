@@ -118,14 +118,12 @@ final class Oauth2Test extends MauticMysqlTestCase
         $form['client[redirectUris]']->setValue('https://test.org');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $clientPublicKey = $crawler->filter('input#client_publicId')->attr('value');
         $clientSecretKey = $crawler->filter('input#client_secret')->attr('value');
 
-        // Disable the default logging in via username and password.
-        $this->clientServer = [];
-        $this->setUpSymfony($this->configParams);
+        $this->logoutUser();
 
         // Get the access token.
         $this->client->request(
@@ -138,9 +136,8 @@ final class Oauth2Test extends MauticMysqlTestCase
             ],
         );
 
-        $response = $this->client->getResponse();
-        self::assertResponseIsSuccessful($response->getContent());
-        $payload     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertResponseIsSuccessful();
+        $payload     = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $accessToken = $payload['access_token'];
         Assert::assertNotEmpty($accessToken);
 
@@ -155,8 +152,7 @@ final class Oauth2Test extends MauticMysqlTestCase
             ],
         );
 
-        $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('"users":[', $response->getContent());
+        Assert::assertStringContainsString('"users":[', $this->client->getResponse()->getContent());
     }
 }

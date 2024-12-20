@@ -160,7 +160,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private StatRepository $statRepository,
         private EmailRepository $emailRepository,
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private FieldsBuilder $fieldsBuilder
+        private FieldsBuilder $fieldsBuilder,
     ) {
     }
 

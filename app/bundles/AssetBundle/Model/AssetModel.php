@@ -63,7 +63,7 @@ class AssetModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -122,6 +122,12 @@ class AssetModel extends FormModel
 
         if (null == $request) {
             $request = $this->requestStack->getCurrentRequest();
+        }
+
+        if (!($request instanceof Request)) {
+            // likely this download came via a cron (no request), do not bother logging the download.
+            // https://github.com/mautic/mautic/issues/13577
+            return;
         }
 
         $download = new Download();
@@ -256,10 +262,7 @@ class AssetModel extends FormModel
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
-
-        if (null !== $request) {
-            $download->setReferer($request->server->get('HTTP_REFERER'));
-        }
+        $download->setReferer($request->server->get('HTTP_REFERER'));
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {

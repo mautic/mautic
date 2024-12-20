@@ -11,7 +11,7 @@ class ReportFileWriter
 {
     public function __construct(
         private CsvExporter $csvExporter,
-        private ExportHandler $exportHandler
+        private ExportHandler $exportHandler,
     ) {
     }
 

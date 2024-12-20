@@ -19,7 +19,6 @@ final class OutlookIntegrationTest extends AbstractIntegrationTestCase
             $this->dispatcher,
             $this->cache,
             $this->em,
-            $this->session,
             $this->request,
             $this->router,
             $this->translator,

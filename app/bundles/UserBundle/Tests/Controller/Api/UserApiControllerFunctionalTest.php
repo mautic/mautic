@@ -30,7 +30,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => 99999]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('"message":"role: This value is not valid."', $clientResponse->getContent());
+        Assert::assertStringContainsString('"message":"role: The selected choice is invalid."', $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiGivesErrorResponseWithInvalidRequestFormat(): void
@@ -39,7 +39,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => ['id' => 2]]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('"message":"role: This value is not valid."', $clientResponse->getContent());
+        Assert::assertStringContainsString('"message":"role: The selected choice is invalid."', $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotHaveValidPermissionToUpdate(): void
@@ -54,7 +54,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Login newly created non-admin user
-        $this->loginUser($user->getUserIdentifier());
+        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
@@ -77,7 +77,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Login newly created admin user
-        $this->loginUser($user->getUserIdentifier());
+        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
@@ -98,7 +98,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->loginUser($user->getUserIdentifier());
+        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
@@ -120,7 +120,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->loginUser($user->getUserIdentifier());
+        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', $weakPassword);
 

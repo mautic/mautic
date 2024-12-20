@@ -20,7 +20,7 @@ class NotificationSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private TrackableModel $trackableModel,
         private PageTokenHelper $pageTokenHelper,
-        private AssetTokenHelper $assetTokenHelper
+        private AssetTokenHelper $assetTokenHelper,
     ) {
     }
 

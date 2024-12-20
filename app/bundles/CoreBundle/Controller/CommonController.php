@@ -50,7 +50,7 @@ class CommonController extends AbstractController implements MauticController
         protected Translator $translator,
         private FlashBag $flashBag,
         private ?RequestStack $requestStack,
-        protected ?CorePermissions $security
+        protected ?CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();
     }
@@ -90,7 +90,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return AbstractCommonModel<object>
      */
-    protected function getModel($modelNameKey)
+    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -199,10 +199,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
-     *
-     * @return RedirectResponse
      */
-    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper)
+    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): RedirectResponse
     {
         return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
     }
@@ -210,7 +208,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects /s and /s/ to /s/dashboard.
      */
-    public function redirectSecureRootAction()
+    public function redirectSecureRootAction(): RedirectResponse
     {
         return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
@@ -219,10 +217,8 @@ class CommonController extends AbstractController implements MauticController
      * Redirects controller if not ajax or retrieves html output for ajax request.
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
-     *
-     * @return Response
      */
-    public function postActionRedirect(array $args = [])
+    public function postActionRedirect(array $args = []): RedirectResponse|Response
     {
         $request = $this->getCurrentRequest();
 
@@ -291,7 +287,7 @@ class CommonController extends AbstractController implements MauticController
             $ajaxRouteName = false;
 
             try {
-                $routeParams   = $this->get('router')->match($routePath);
+                $routeParams   = $this->container->get('router')->match($routePath);
                 $ajaxRouteName = $routeParams['_route'];
 
                 $request->attributes->set('ajaxRoute',
@@ -321,8 +317,9 @@ class CommonController extends AbstractController implements MauticController
             if ($forward) {
                 // the content is from another controller action so we must retrieve the response from it instead of
                 // directly parsing the template
-                $query              = ['ignoreAjax' => true, 'request' => $request, 'subrequest' => true];
-                $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
+                $query                 = ['ignoreAjax' => true, 'subrequest' => true];
+                $parameters['request'] = $request;
+                $newContentResponse    = $this->forward($contentTemplate, $parameters, $query);
                 if ($newContentResponse instanceof RedirectResponse) {
                     $passthrough['redirect'] = $newContentResponse->getTargetUrl();
                     $passthrough['route']    = false;
@@ -565,10 +562,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders flashes' HTML.
-     *
-     * @return string
      */
-    protected function getFlashContent()
+    protected function getFlashContent(): string
     {
         return $this->renderView('@MauticCore/Notification/flash_messages.html.twig');
     }
@@ -628,10 +623,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * @param array|\Iterator $toExport
-     *
-     * @return StreamedResponse
      */
-    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper)
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));

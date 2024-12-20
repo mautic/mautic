@@ -58,7 +58,7 @@ class AuthenticationEvent extends Event
         protected Request $request,
         protected $isLoginCheck = false,
         protected $authenticatingService = null,
-        protected $integrations = null
+        protected $integrations = null,
     ) {
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
 
@@ -123,10 +123,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get the username used.
-     *
-     * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->token->getUserIdentifier();
     }

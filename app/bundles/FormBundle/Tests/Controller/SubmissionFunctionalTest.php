@@ -25,7 +25,8 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected $useCleanupRollback   = false;
+    protected bool $authenticateApi = true;
 
     public function testRedirectPostAction(): void
     {
@@ -560,6 +561,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // fetch form submissions as Admin User
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $submission     = $response['submissions'][0];
@@ -718,7 +720,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler, $crawler->html());
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[f_all]' => 'test',

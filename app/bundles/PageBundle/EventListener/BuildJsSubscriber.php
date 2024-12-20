@@ -13,7 +13,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TrackingHelper $trackingHelper,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

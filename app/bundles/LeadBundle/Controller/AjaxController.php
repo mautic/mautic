@@ -75,7 +75,7 @@ class AjaxController extends CommonAjaxController
     public function getLeadIdsByFieldValueAction(Request $request, LeadModel $leadModel): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
-        $value     = InputHelper::clean($request->query->get('value'));
+        $value     = InputHelper::clean($request->query->all()['value'] ?? '');
         $ignore    = (int) $request->query->get('ignore');
         $dataArray = ['items' => []];
 
@@ -185,7 +185,7 @@ class AjaxController extends CommonAjaxController
         Request $request,
         FormFactoryInterface $formFactory,
         FormAdjustmentsProviderInterface $formAdjustmentsProvider,
-        ListModel $listModel
+        ListModel $listModel,
     ): JsonResponse {
         $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
         $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
@@ -328,8 +328,8 @@ class AjaxController extends CommonAjaxController
     protected function updateTimelineAction(Request $request, Session $session): JsonResponse
     {
         $dataArray     = ['success' => 0];
-        $includeEvents = InputHelper::clean($request->request->get('includeEvents') ?? []);
-        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents') ?? []);
+        $includeEvents = InputHelper::clean($request->request->all()['includeEvents'] ?? []);
+        $excludeEvents = InputHelper::clean($request->request->all()['excludeEvents'] ?? []);
         $search        = InputHelper::clean($request->request->get('search'));
         $leadId        = (int) $request->request->get('leadId');
 

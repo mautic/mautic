@@ -72,7 +72,7 @@ class SubmissionEvent extends CommonEvent
         Submission $submission,
         private $post,
         private $server,
-        private Request $request
+        private Request $request,
     ) {
         $this->entity  = $submission;
     }

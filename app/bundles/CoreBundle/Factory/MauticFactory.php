@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -48,7 +49,7 @@ class MauticFactory
         private IntegrationHelper $integrationHelper,
         private SlotsHelper $slotsHelper,
         private AssetsHelper $assetsHelper,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -137,22 +138,7 @@ class MauticFactory
         return $this->translator;
     }
 
-    /**
-     * Retrieves twig service.
-     *
-     * @return \Twig\Environment
-     */
-    public function getTwig()
-    {
-        return $this->container->get('twig');
-    }
-
-    /**
-     * Retrieves event dispatcher.
-     *
-     * @return EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function getDispatcher(): ?EventDispatcherInterface
     {
         return $this->container->get('event_dispatcher');
     }
@@ -199,12 +185,7 @@ class MauticFactory
         return new DateTimeHelper($string, $format, $tz);
     }
 
-    /**
-     * Get Router.
-     *
-     * @return Router
-     */
-    public function getRouter()
+    public function getRouter(): ?Router
     {
         return $this->container->get('router');
     }
@@ -372,12 +353,7 @@ class MauticFactory
         }
     }
 
-    /**
-     * Get's the Symfony kernel.
-     *
-     * @return \AppKernel
-     */
-    public function getKernel()
+    public function getKernel(): ?KernelInterface
     {
         return $this->container->get('kernel');
     }
@@ -419,10 +395,7 @@ class MauticFactory
         return $this->container->get('mautic.helper.bundle')->getBundleConfig($bundleName, $configKey, $includePlugins);
     }
 
-    /**
-     * @return bool
-     */
-    public function serviceExists($service)
+    public function serviceExists($service): bool
     {
         return $this->container->has($service);
     }

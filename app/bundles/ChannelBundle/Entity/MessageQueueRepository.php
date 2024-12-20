@@ -2,6 +2,7 @@
 
 namespace Mautic\ChannelBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -43,7 +44,7 @@ class MessageQueueRepository extends CommonRepository
             ->setParameter('processStarted', $processStarted)
             ->indexBy('mq', 'mq.id');
 
-        $q->orderBy('mq.priority, mq.scheduledDate', \Doctrine\Common\Collections\Criteria::ASC);
+        $q->orderBy('mq.priority, mq.scheduledDate', Order::Ascending->value);
 
         if ($limit) {
             $q->setMaxResults((int) $limit);

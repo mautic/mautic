@@ -132,52 +132,14 @@ return [
                 'arguments' => Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
-            'mautic.user.form_guard_authenticator' => [
-                'class'     => Mautic\UserBundle\Security\Authenticator\FormAuthenticator::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'security.password_hasher',
-                    'event_dispatcher',
-                    'request_stack',
-                    'security.csrf.token_manager',
-                    'router',
-                    'mautic.user.model.password_strength_estimator',
-                ],
-            ],
-            'mautic.user.preauth_authenticator' => [
-                'class'     => Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'event_dispatcher',
-                    'request_stack',
-                    '', // providerKey
-                    '', // User provider
-                ],
-                'public' => false,
-            ],
             'mautic.user.provider' => [
                 'class'     => Mautic\UserBundle\Security\Provider\UserProvider::class,
                 'arguments' => [
                     'mautic.user.repository',
                     'mautic.permission.repository',
-                    'session',
                     'event_dispatcher',
                     'security.password_hasher',
                 ],
-            ],
-            'mautic.security.authentication_listener' => [
-                'class'     => Mautic\UserBundle\Security\Firewall\AuthenticationListener::class,
-                'arguments' => [
-                    'mautic.security.authentication_handler',
-                    'security.token_storage',
-                    'security.authentication.manager',
-                    'monolog.logger',
-                    'event_dispatcher',
-                    '', // providerKey
-                    'mautic.permission.repository',
-                    'doctrine.orm.default_entity_manager',
-                ],
-                'public' => false,
             ],
             'mautic.security.authentication_handler' => [
                 'class'     => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,

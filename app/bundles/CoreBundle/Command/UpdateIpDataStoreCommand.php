@@ -16,7 +16,7 @@ class UpdateIpDataStoreCommand extends Command
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private AbstractLookup $ipService
+        private AbstractLookup $ipService,
     ) {
         parent::__construct();
     }

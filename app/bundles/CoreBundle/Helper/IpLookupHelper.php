@@ -41,7 +41,7 @@ class IpLookupHelper
         protected RequestStack $requestStack,
         protected EntityManager $em,
         CoreParametersHelper $coreParametersHelper,
-        protected ?AbstractLookup $ipLookup = null
+        protected ?AbstractLookup $ipLookup = null,
     ) {
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
         $this->doNotTrackBots        = $coreParametersHelper->get('do_not_track_bots');

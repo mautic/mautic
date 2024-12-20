@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -435,8 +436,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Doe Corp', $company->getName());
         Assert::assertSame('+420444555666', $company->getPhone());
 
-        // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony($this->configParams);
+        // The previous request changes user to anonymous.
+        $this->loginUser($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
 
         // Delete:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");

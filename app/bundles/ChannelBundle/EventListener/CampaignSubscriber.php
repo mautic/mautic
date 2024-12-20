@@ -38,7 +38,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private ActionDispatcher $actionDispatcher,
         private EventCollector $eventCollector,
         private LoggerInterface $logger,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

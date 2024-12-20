@@ -134,7 +134,7 @@ class UserController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user') ?? [];
+                $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
 
@@ -276,7 +276,7 @@ class UserController extends FormController
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user') ?? [];
+                $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
                 $newEmail          = $formUser['email'] ?? null;
@@ -432,10 +432,8 @@ class UserController extends FormController
      * Contacts a user.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId)
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -461,7 +459,7 @@ class UserController extends FormController
         $currentUser = $this->user;
 
         if ('POST' === $request->getMethod()) {
-            $contact   = $request->request->get('contact') ?? [];
+            $contact   = $request->request->all()['contact'] ?? [];
             $formUrl   = $contact['returnUrl'] ?? '';
             $returnUrl = $formUrl ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;
@@ -551,10 +549,8 @@ class UserController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.user.page', 1);
         $returnUrl = $this->generateUrl('mautic_user_index', ['page' => $page]);

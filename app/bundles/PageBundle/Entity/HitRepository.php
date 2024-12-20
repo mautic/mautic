@@ -93,7 +93,7 @@ class HitRepository extends CommonRepository
     public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
     {
         $query = $this->createQueryBuilder('h');
-        $query->select('count(distinct(h.trackingId)) as "hitCount"');
+        $query->select('count(distinct(h.trackingId)) as hitCount');
         $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
 
         if (null != $sourceId) {

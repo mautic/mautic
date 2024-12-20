@@ -17,7 +17,7 @@ class UploadSubscriber implements EventSubscriberInterface
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
         private AssetModel $assetModel,
-        private FileUploadValidator $fileUploadValidator
+        private FileUploadValidator $fileUploadValidator,
     ) {
     }
 

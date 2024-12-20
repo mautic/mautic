@@ -6,13 +6,17 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PageHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private MockObject&SessionInterface $session;
 
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject&RequestStack $requestStack;
+
+    private MockObject&CoreParametersHelper $coreParametersHelper;
 
     private PageHelper $pageHelper;
 
@@ -20,8 +24,11 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $this->session              = $this->createMock(SessionInterface::class);
+        $this->requestStack         = $this->createMock(RequestStack::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pageHelper           = new PageHelper($this->session, $this->coreParametersHelper, 'mautic.test', 0);
+        $this->pageHelper           = new PageHelper($this->requestStack, $this->coreParametersHelper, 'mautic.test', 0);
+
+        $this->requestStack->method('getSession')->willReturn($this->session);
     }
 
     /**

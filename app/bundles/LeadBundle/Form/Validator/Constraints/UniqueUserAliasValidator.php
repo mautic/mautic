@@ -26,7 +26,7 @@ class UniqueUserAliasValidator extends ConstraintValidator
         $this->userHelper        = $userHelper;
     }
 
-    public function validate($list, Constraint $constraint): void
+    public function validate(mixed $list, Constraint $constraint): void
     {
         $field = $constraint->field;
 

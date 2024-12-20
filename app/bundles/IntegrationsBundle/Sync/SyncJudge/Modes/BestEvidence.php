@@ -17,7 +17,7 @@ class BestEvidence implements JudgementModeInterface
      */
     public static function adjudicate(
         InformationChangeRequestDAO $leftChangeRequest,
-        InformationChangeRequestDAO $rightChangeRequest
+        InformationChangeRequestDAO $rightChangeRequest,
     ): InformationChangeRequestDAO {
         try {
             return HardEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);

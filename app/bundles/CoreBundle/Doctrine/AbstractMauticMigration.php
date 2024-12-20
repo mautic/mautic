@@ -8,7 +8,7 @@ use Doctrine\Migrations\Exception\AbortMigration;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface
+abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface /** @phpstan-ignore-line ContainerAwareInterface is deprecated. This will need bigger refactoring. See https://github.com/doctrine/DoctrineMigrationsBundle/issues/521 */
 {
     protected const TABLE_NAME = null;
 

@@ -44,7 +44,7 @@ class ContactTracker
         private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         private EventDispatcherInterface $dispatcher,
-        FieldModel $leadFieldModel
+        FieldModel $leadFieldModel,
     ) {
         $this->leadFieldModel         = $leadFieldModel;
     }

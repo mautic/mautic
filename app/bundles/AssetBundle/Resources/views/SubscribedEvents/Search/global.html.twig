@@ -3,9 +3,18 @@
     <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining})|escape }}</span>
 </a>
 {% else %}
-<a href="{{ url('mautic_asset_action', {'objectAction' : 'view', 'objectId' : asset.getId()}) }}" data-toggle="ajax">
-    {{ asset.getTitle()|escape }}
-    <span size="sm" class="label label-gray pull-right" data-toggle="tooltip" title="{% trans %}mautic.asset.downloadcount{% endtrans %}" data-placement="left">
+<a class="gsearch--results-common" href="{{ url('mautic_asset_action', {'objectAction' : 'view', 'objectId' : asset.getId()}) }}" data-toggle="ajax">
+        <i class="{{ asset.getIconClass() }} gsearch--results-common__icon mr-3"></i>
+        <span class="fw-sb">{{ asset.getTitle()|escape }}</span>
+        <span class="ml-4 mr-4">#{{ asset.getId() }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': asset,
+            'status': 'available',
+            'simplified': 'true'
+        }) -}}
+
+    <span size="sm" class="pull-right" data-toggle="tooltip" title="{% trans %}mautic.asset.downloadcount{% endtrans %}" data-placement="left">
+        <i class="ri-download-line"></i>
         {{ asset.getDownloadCount() }}
     </span>
 </a>

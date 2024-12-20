@@ -274,7 +274,7 @@ class EmailController extends FormController
         $page = $request->getSession()->get('mautic.email.page', 1);
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -494,7 +494,7 @@ class EmailController extends FormController
         // set the page we came from
         $page         = $session->get('mautic.email.page', 1);
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
-        $emailForm    = $request->request->get('emailform') ?? [];
+        $emailForm    = $request->request->all()['emailform'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailForm['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -649,7 +649,7 @@ class EmailController extends FormController
         EmailModel $model,
         $objectId,
         $ignorePost = false,
-        $forceTypeSelection = false
+        $forceTypeSelection = false,
     ) {
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
@@ -699,7 +699,7 @@ class EmailController extends FormController
 
         // Create the form
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $emailform    = $request->request->get('emailform') ?? [];
+        $emailform    = $request->request->all()['emailform'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailform['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -953,7 +953,6 @@ class EmailController extends FormController
         if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                $formData = $request->request->get('emailform');
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
@@ -1512,7 +1511,7 @@ class EmailController extends FormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FieldModel $fieldModel)
+    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FieldModel $fieldModel): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -1670,7 +1669,7 @@ class EmailController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,

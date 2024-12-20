@@ -17,7 +17,7 @@ class Installer
      * @param string $translationsDirectory
      */
     public function __construct(
-        private $translationsDirectory
+        private $translationsDirectory,
     ) {
         $this->filesystem            = new Filesystem();
     }

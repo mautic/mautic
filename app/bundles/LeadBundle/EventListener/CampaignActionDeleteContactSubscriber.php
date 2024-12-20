@@ -14,7 +14,7 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadModel $leadModel,
-        private RemovedContactTracker $removedContactTracker
+        private RemovedContactTracker $removedContactTracker,
     ) {
     }
 

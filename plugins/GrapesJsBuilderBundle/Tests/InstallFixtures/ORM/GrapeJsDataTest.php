@@ -2,36 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Mautic\InstallBundle\Tests\InstallFixtures\ORM;
+namespace MauticPlugin\GrapesJsBuilderBundle\Tests\InstallFixtures\ORM;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
+use MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM\GrapesJsData;
 use PHPUnit\Framework\Assert;
 
 class GrapeJsDataTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    private GrapesJsData $fixture;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->fixture = new GrapesJsData();
-        $this->fixture->setContainer(static::getContainer());
-    }
-
     public function testGetGroups(): void
     {
         Assert::assertSame(['group_install', 'group_mautic_install_data'], GrapesJsData::getGroups());
-    }
-
-    public function testGetOrder(): void
-    {
-        Assert::assertSame(1, $this->fixture->getOrder());
     }
 
     public function testLoad(): void
@@ -46,7 +31,7 @@ class GrapeJsDataTest extends MauticMysqlTestCase
         $plugin = $this->em->getRepository(Plugin::class)->findOneBy($findOneByCriteria);
         self::assertNull($plugin);
 
-        $this->fixture->load($this->em);
+        $this->loadFixtures([GrapesJsData::class]);
 
         $plugin = $this->em->getRepository(Plugin::class)->findOneBy($findOneByCriteria);
         self::assertInstanceOf(Plugin::class, $plugin);

@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -25,11 +25,15 @@ class MailchimpType extends AbstractType
     public function __construct(
         private IntegrationHelper $integrationHelper,
         private PluginModel $pluginModel,
-        protected SessionInterface $session,
-        protected CoreParametersHelper $coreParametersHelper
+        protected RequestStack $requestStack,
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration $mailchimp */
@@ -88,7 +92,7 @@ class MailchimpType extends AbstractType
 
             $formModifier = function (FormInterface $form, $data) use ($mailchimp, $leadFields): void {
                 $integrationName = $mailchimp->getName();
-                $session         = $this->session;
+                $session         = $this->requestStack->getSession();
                 $limit           = $session->get(
                     'mautic.plugin.'.$integrationName.'.lead.limit',
                     $this->coreParametersHelper->get('default_pagelimit')
@@ -162,10 +166,7 @@ class MailchimpType extends AbstractType
         $resolver->setDefined(['form_area']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'emailmarketing_mailchimp';
     }

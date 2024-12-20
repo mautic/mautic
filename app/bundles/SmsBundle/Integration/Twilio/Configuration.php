@@ -23,7 +23,7 @@ class Configuration
     private $authToken;
 
     public function __construct(
-        private IntegrationHelper $integrationHelper
+        private IntegrationHelper $integrationHelper,
     ) {
     }
 

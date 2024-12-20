@@ -22,7 +22,7 @@ class InactiveContactFinder
     public function __construct(
         private LeadRepository $leadRepository,
         private CampaignLeadRepository $campaignLeadRepository,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

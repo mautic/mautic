@@ -119,7 +119,7 @@ class Event implements ChannelInterface
     private $campaign;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
+     * @var ArrayCollection<int, Event>
      **/
     private $children;
 
@@ -139,7 +139,7 @@ class Event implements ChannelInterface
     private $tempId;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog>
+     * @var ArrayCollection<int, LeadEventLog>
      */
     private $log;
 
@@ -936,7 +936,7 @@ class Event implements ChannelInterface
     /**
      * Used by the API.
      *
-     * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
+     * @return LeadEventLog[]|Collection|static
      */
     public function getContactLog(Contact $contact = null)
     {

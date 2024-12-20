@@ -17,7 +17,8 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ExportControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected $useCleanupRollback   = false;
+    protected bool $authenticateApi = true;
 
     public const PERMISSION_LEAD_EXPORT     = 'lead:export:enable';
     public const PERMISSION_FORM_EXPORT     = 'form:export:enable';
@@ -41,7 +42,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
     {
         $permissions = [
             1024 => 'form:export:enable',
-            34   => 'form:forms:create',
+            38   => 'form:forms:create', // + viewown, viewother
         ];
         $this->createAndLoginUser($permissions);
 
@@ -58,7 +59,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $permissions = [
             1024 => 'report:export:enable',
             34   => 'lead:leads:create',
-            36   => 'report:reports:create',
+            38   => 'report:reports:create', // + viewown, viewother
         ];
         $this->createAndLoginUser($permissions);
 
@@ -80,12 +81,12 @@ final class ExportControllerTest extends MauticMysqlTestCase
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'');
         $this->assertStringContainsString('Export to CSV', $this->client->getResponse()->getContent());
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'/export');
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -104,11 +105,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
 
         $this->em->flush();
         $this->em->detach($role);
-        /** @phpstan-ignore-next-line  */
-        $this->loginUser($user->getUsername());
-        /** @phpstan-ignore-next-line  */
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+        $this->loginUser($user);
 
         return $user;
     }

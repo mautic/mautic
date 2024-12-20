@@ -2,7 +2,7 @@
 
 namespace Mautic\WebhookBundle\Model;
 
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManager;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -129,7 +129,7 @@ class WebhookModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         $this->setConfigProps($coreParametersHelper);
 
@@ -671,6 +671,6 @@ class WebhookModel extends FormModel
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
         $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', self::WEBHOOK_LOG_MAX);
         $this->queueMode        = $coreParametersHelper->get('queue_mode');
-        $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
+        $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Order::Ascending->value);
     }
 }

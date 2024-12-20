@@ -15,7 +15,7 @@ class BuilderTokenHelperFactory
         private CorePermissions $security,
         private ModelFactory $modelFactory,
         private Connection $connection,
-        private UserHelper $userHelper
+        private UserHelper $userHelper,
     ) {
     }
 
@@ -23,7 +23,7 @@ class BuilderTokenHelperFactory
         string $modelName,
         ?string $viewPermissionBase = null,
         ?string $bundleName = null,
-        ?string $langVar = null
+        ?string $langVar = null,
     ): BuilderTokenHelper {
         $builderTokenHelper = new BuilderTokenHelper($this->security, $this->modelFactory, $this->connection, $this->userHelper);
         $builderTokenHelper->configure($modelName, $viewPermissionBase, $bundleName, $langVar);

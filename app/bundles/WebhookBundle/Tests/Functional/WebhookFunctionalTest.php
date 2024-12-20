@@ -22,6 +22,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->authenticateApi = true;
         parent::setUp();
 
         $this->setUpSymfony(

@@ -17,7 +17,7 @@ class SegmentDependencies
         private ActionModel $actionModel,
         private ListModel $listModel,
         private TriggerEventModel $triggerEventModel,
-        private ReportModel $reportModel
+        private ReportModel $reportModel,
     ) {
     }
 

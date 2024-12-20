@@ -16,7 +16,7 @@ class Shortener
     private array $services = [];
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

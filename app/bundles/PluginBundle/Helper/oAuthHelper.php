@@ -25,7 +25,7 @@ class oAuthHelper
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private ?Request $request = null,
-        $settings = []
+        $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
@@ -204,5 +204,21 @@ class oAuthHelper
         }
 
         return $result;
+    }
+
+    /**
+     * @param string[] $data
+     *
+     * @return string[]
+     */
+    public static function sanitizeHeaderData(array $data): array
+    {
+        foreach ($data as &$value) {
+            if (preg_match('/Authorization:\s+(Bearer|Basic)\s+(\S+)/', $value, $match)) {
+                $value = sprintf('Authorization: %s %s', $match[1], '[REDACTED]');
+            }
+        }
+
+        return $data;
     }
 }

@@ -12,7 +12,7 @@ use Twig\TwigFunction;
 class DncReasonExtension extends AbstractExtension
 {
     public function __construct(
-        protected DncReasonHelper $helper
+        protected DncReasonHelper $helper,
     ) {
     }
 

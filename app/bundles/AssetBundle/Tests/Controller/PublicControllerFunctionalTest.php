@@ -51,6 +51,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
      */
     public function testDownloadActionWithUTM(): void
     {
+        $this->logoutUser();
         $assetSlug = $this->asset->getId().':'.$this->asset->getAlias().'?utm_source=test2&utm_medium=test3&utm_campaign=test6&utm_term=test4&utm_content=test5';
 
         $this->client->request('GET', '/asset/'.$assetSlug);
@@ -67,10 +68,8 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
 
         $downloadRepo = $this->em->getRepository(Download::class);
 
-        /**
-         * @var Download $download
-         */
         $download = $downloadRepo->findOneBy(['asset' => $this->asset]);
+        \assert($download instanceof Download);
         $this->assertSame('test2', $download->getUtmSource());
         $this->assertSame('test3', $download->getUtmMedium());
         $this->assertSame('test4', $download->getUtmTerm());

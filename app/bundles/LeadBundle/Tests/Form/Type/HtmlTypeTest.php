@@ -8,8 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 final class HtmlTypeTest extends TestCase
 {
-    /** @var HtmlType */
-    private $htmlType;
+    private HtmlType $htmlType;
 
     public function setUp(): void
     {

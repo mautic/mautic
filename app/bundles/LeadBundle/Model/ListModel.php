@@ -71,7 +71,7 @@ class ListModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -1103,10 +1103,8 @@ class ListModel extends FormModel
 
     /**
      * @param $segmentId *
-     *
-     * @return array
      */
-    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name'): array
     {
         $filter = [
             'force'  => [

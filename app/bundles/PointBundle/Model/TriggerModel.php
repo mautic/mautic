@@ -57,7 +57,7 @@ class TriggerModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -360,10 +360,7 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function invokeCallback($event, Lead $lead, array $settings)
+    private function invokeCallback($event, Lead $lead, array $settings): mixed
     {
         $args = [
             'event'   => $event,

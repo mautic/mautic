@@ -48,7 +48,7 @@ trait EntityContactsTrait
         $orderByDir = null,
         $count = null,
         \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null
+        \DateTimeInterface $dateTo = null,
     ) {
         if ($permission && !$this->security->isGranted($permission)) {
             return $this->accessDenied();

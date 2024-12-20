@@ -31,7 +31,7 @@ class PublicController extends CommonFormController
         }
         $isAjax        = $request->query->get('ajax');
         $form          = null;
-        $post          = $request->request->get('mauticform');
+        $post          = $request->request->all()['mauticform'] ?? [];
         $messengerMode = (!empty($post['messenger']));
         $server        = $request->server->all();
         $return        = $post['return'] ?? false;

@@ -94,7 +94,7 @@ class NotificationModel extends FormModel
         \DateTime $datetime = null,
         User $user = null,
         string $deduplicateValue = null,
-        \DateTime $deduplicateDateTimeFrom = null
+        \DateTime $deduplicateDateTimeFrom = null,
     ): void {
         if (null === $user) {
             $user = $this->userHelper->getUser();

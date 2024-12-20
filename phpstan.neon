@@ -5,7 +5,6 @@ parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
 	reportUnmatchedIgnoredErrors: false
-	checkGenericClassInNonGenericObjectType: false
 	parallel:
 		# maximumNumberOfProcesses: 4
 		processTimeout: 1000.0
@@ -27,6 +26,7 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		- identifier: missingType.generics
 		- '/Variable \$\w+ might not be defined\./'
 		# resolve later with translator interface generics
 		- '#Method (.*?)::getTranslatedEntity\(\) return type has no value type specified in iterable type array#'
@@ -67,6 +67,7 @@ parameters:
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
+		- vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
 	doctrine:
 		objectManagerLoader: tests/object-manager.php
 		allowNullablePropertyForRequiredField: true

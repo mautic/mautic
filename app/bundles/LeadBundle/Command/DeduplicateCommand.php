@@ -21,7 +21,7 @@ class DeduplicateCommand extends Command
 
     public function __construct(
         private ContactDeduper $contactDeduper,
-        private ParameterBagInterface $params
+        private ParameterBagInterface $params,
     ) {
         parent::__construct();
     }

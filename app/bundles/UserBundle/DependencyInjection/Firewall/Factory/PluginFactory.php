@@ -3,13 +3,12 @@
 namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class PluginFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface
+class PluginFactory implements AuthenticatorFactoryInterface
 {
     public const PRIORITY = -30;
 
@@ -55,18 +54,13 @@ class PluginFactory implements AuthenticatorFactoryInterface, SecurityFactoryInt
 
     /**
      * @deprecated Remove in Mautic 6.0. Use new authentication system.
-     *
-     * @return string
      */
-    public function getPosition()
+    public function getPosition(): int
     {
-        return 'pre_auth';
+        return 0;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return 'mautic_plugin_auth';
     }

@@ -11,7 +11,7 @@ class StageBuilderEvent extends Event
     private array $actions = [];
 
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

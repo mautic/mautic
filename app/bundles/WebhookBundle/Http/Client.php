@@ -14,7 +14,7 @@ class Client
      */
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
-        private $httpClient
+        private $httpClient,
     ) {
     }
 

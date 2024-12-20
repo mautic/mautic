@@ -68,7 +68,7 @@ class LeadController extends FormController
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
-        $page = 1
+        $page = 1,
     ) {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -508,7 +508,7 @@ class LeadController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // get custom field values
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -719,7 +719,7 @@ class LeadController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -1187,10 +1187,8 @@ class LeadController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1379,10 +1377,8 @@ class LeadController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0)
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -2064,8 +2060,7 @@ class LeadController extends FormController
         ];
 
         $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
-
-        $response              = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();

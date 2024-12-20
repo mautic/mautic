@@ -552,7 +552,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createGroup(
-        string $name
+        string $name,
     ): Group {
         $group = new Group();
         $group->setName($name);
@@ -564,7 +564,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     private function addGroupContactScore(
         Lead $lead,
         Group $group,
-        int $score
+        int $score,
     ): void {
         $groupContactScore = new GroupContactScore();
         $groupContactScore->setContact($lead);

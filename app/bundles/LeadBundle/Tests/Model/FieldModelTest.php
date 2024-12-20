@@ -36,7 +36,7 @@ class FieldModelTest extends MauticMysqlTestCase
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
 
         // Create an unpublished lead field.
         $field = new LeadField();
@@ -211,7 +211,7 @@ class FieldModelTest extends MauticMysqlTestCase
     {
         // Log queries so we can detect if alter queries were executed
         /**  $stack */
-        $stack                    = new class() implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
+        $stack                    = new class implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
             /** @var array<mixed> */
             private array $indexQueries = [];
 

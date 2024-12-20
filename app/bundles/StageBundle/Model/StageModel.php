@@ -37,7 +37,7 @@ class StageModel extends CommonFormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

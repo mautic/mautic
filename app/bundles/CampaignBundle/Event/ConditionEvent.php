@@ -13,7 +13,7 @@ class ConditionEvent extends CampaignExecutionEvent
 
     public function __construct(
         private AbstractEventAccessor $eventConfig,
-        private LeadEventLog $eventLog
+        private LeadEventLog $eventLog,
     ) {
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(

@@ -3,19 +3,14 @@
 namespace Mautic\Middleware;
 
 use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
-use Stack\StackedHttpKernel;
 
 class MiddlewareBuilder
 {
-    /**
-     * @var \AppKernel
-     */
-    private $app;
+    private \AppKernel $app;
 
-    /**
-     * @var string
-     */
-    private $cacheFile;
+    private string $cacheFile;
+
+    private \SplPriorityQueue $specs;
 
     public function __construct(\AppKernel $app)
     {

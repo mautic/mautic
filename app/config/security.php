@@ -58,7 +58,7 @@ $firewalls = [
     ],
     'main' => [
         'pattern'       => '^/(s/|elfinder|efconnect)',
-        'saml'          => [
+        'light_saml_sp' => [
             'provider'        => 'user_provider',
             'success_handler' => 'mautic.security.authentication_handler',
             'failure_handler' => 'mautic.security.authentication_handler',
@@ -68,7 +68,7 @@ $firewalls = [
             // If saml is disabled, these still must contain a proper saml login URLs.
             // Otherwise, this prevents handling of the
             // \LightSaml\SpBundle\Security\Http\Authenticator\SamlServiceProviderAuthenticator::supports
-            'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',,
+            'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',
             'check_path'      => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
         ],
         'form_login' => [
@@ -156,6 +156,7 @@ $container->loadFromExtension(
         ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',
+            'request'  => Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore::class,
         ],
     ]
 );

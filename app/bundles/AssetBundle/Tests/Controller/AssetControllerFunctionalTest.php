@@ -129,12 +129,10 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $this->em->flush();
         $this->em->clear();
 
-        // Logout admin.
-        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->logoutUser();
 
-        $this->loginUser(self::SALES_USER);
+        $this->loginUser($userEditor);
 
-        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
         $this->client->request(Request::METHOD_GET, "/s/assets/{$route}/{$asset->getId()}");
 
         Assert::assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode());

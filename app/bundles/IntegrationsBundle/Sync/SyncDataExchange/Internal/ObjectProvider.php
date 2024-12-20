@@ -20,7 +20,7 @@ class ObjectProvider
     private array $objects = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

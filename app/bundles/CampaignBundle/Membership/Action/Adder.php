@@ -15,7 +15,7 @@ class Adder
 
     public function __construct(
         private LeadRepository $leadRepository,
-        private LeadEventLogRepository $leadEventLogRepository
+        private LeadEventLogRepository $leadEventLogRepository,
     ) {
     }
 

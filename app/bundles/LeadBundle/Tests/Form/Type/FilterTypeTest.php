@@ -18,12 +18,12 @@ use Symfony\Component\Form\FormInterface;
 final class FilterTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormAdjustmentsProviderInterface
+     * @var MockObject&FormAdjustmentsProviderInterface
      */
     private MockObject $formAdjustmentsProvider;
 
     /**
-     * @var MockObject|ListModel
+     * @var MockObject&ListModel
      */
     private MockObject $listModel;
 
@@ -168,7 +168,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                     FormEvents::PRE_SET_DATA,
                     $this->callback(
                         function (callable $formModifier) {
-                            $form = new class() extends Form {
+                            $form = new class extends Form {
                                 public int $addMethodCallCounter = 0;
 
                                 public function __construct()
@@ -178,16 +178,16 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                 /**
                                  * @return FormInterface<FormInterface<mixed>>
                                  */
-                                public function get(string $name)
+                                public function get(string $name): FormInterface
                                 {
                                     Assert::assertSame('properties', $name);
 
-                                    return new class() extends Form {
+                                    return new class extends Form {
                                         public function __construct()
                                         {
                                         }
 
-                                        public function setData($modelData)
+                                        public function setData($modelData): static
                                         {
                                             Assert::assertSame(
                                                 [
@@ -206,7 +206,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                  * @param FormInterface<FormInterface<mixed>>|string $child
                                  * @param mixed[]                                    $options
                                  */
-                                public function add($child, string $type = null, array $options = [])
+                                public function add($child, string $type = null, array $options = []): static
                                 {
                                     ++$this->addMethodCallCounter;
 

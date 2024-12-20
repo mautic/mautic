@@ -36,7 +36,7 @@ class TwitterCommandHelper
         private PostCountModel $postCountModel,
         private Translator $translator,
         private EntityManagerInterface $em,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
         $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');

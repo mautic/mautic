@@ -59,7 +59,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private DoNotContact $doNotContact,
         private PointGroupModel $groupModel,
-        private FilterOperatorProvider $filterOperatorProvider
+        private FilterOperatorProvider $filterOperatorProvider,
     ) {
     }
 

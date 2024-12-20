@@ -14,7 +14,7 @@ class IpLookupFactory
         protected ?LoggerInterface $logger = null,
         protected ?Client $client = null,
         protected ?string $cacheDir = null,
-        protected ?CoreParametersHelper $coreParametersHelper = null
+        protected ?CoreParametersHelper $coreParametersHelper = null,
     ) {
     }
 

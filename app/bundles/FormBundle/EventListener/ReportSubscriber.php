@@ -30,7 +30,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private ReportHelper $reportHelper,
         private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

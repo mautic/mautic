@@ -16,7 +16,7 @@ class ProcessFetchEmailCommand extends Command
 {
     public function __construct(
         private CoreParametersHelper $parametersHelper,
-        private Fetcher $fetcher
+        private Fetcher $fetcher,
     ) {
         parent::__construct();
     }

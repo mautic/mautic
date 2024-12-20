@@ -318,6 +318,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         // Get the email reply that was just created from the stat API.
         $statReplyQuery = ['where' => [['col' => 'stat_id', 'expr' => 'eq', 'val' => $stat->getId()]]];
         $this->client->request('GET', '/api/stats/email_stat_replies', $statReplyQuery);
+        $this->assertResponseIsSuccessful();
         $fetchedReplyData = json_decode($this->client->getResponse()->getContent(), true);
 
         // Check that the email reply was created correctly.

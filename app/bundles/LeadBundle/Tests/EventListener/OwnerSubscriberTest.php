@@ -25,6 +25,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class OwnerSubscriberTest extends TestCase
 {
@@ -312,9 +313,12 @@ class OwnerSubscriberTest extends TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+        /** @var MockObject&Environment $twig */
+        $twig = $this->createMock(Environment::class);
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $twig);
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;
@@ -353,7 +357,7 @@ class OwnerSubscriberTest extends TestCase
 
     protected function getUser(): User
     {
-        $user = new class() extends User {
+        $user = new class extends User {
             public function setId(int $id): void
             {
                 $this->id = $id;

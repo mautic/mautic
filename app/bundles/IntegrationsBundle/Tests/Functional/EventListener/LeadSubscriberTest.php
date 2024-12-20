@@ -29,7 +29,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         static::getContainer()->set(
             'mautic.integrations.helper.sync_integrations',
-            new class() extends SyncIntegrationsHelper {
+            new class extends SyncIntegrationsHelper {
                 public function __construct()
                 {
                 }

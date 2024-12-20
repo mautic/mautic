@@ -79,7 +79,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private BuilderTokenHelperFactory $builderTokenHelperFactory,
         private TranslatorInterface $translator,
         private Connection $connection,
-        private Environment $twig
+        private Environment $twig,
     ) {
     }
 

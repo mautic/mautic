@@ -19,7 +19,7 @@ class Remover
         private LeadRepository $leadRepository,
         private LeadEventLogRepository $leadEventLogRepository,
         TranslatorInterface $translator,
-        DateHelper $dateHelper
+        DateHelper $dateHelper,
     ) {
         $dateRemoved              = $dateHelper->toFull(new \DateTime());
         $this->unscheduledMessage = $translator->trans('mautic.campaign.member.removed', ['%date%' => $dateRemoved]);

@@ -7,7 +7,7 @@ use Mautic\PageBundle\Model\PageModel;
 class TokenHelper
 {
     public function __construct(
-        protected PageModel $model
+        protected PageModel $model,
     ) {
     }
 

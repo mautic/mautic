@@ -18,7 +18,7 @@ class ComposerHelper
 {
     public function __construct(
         private KernelInterface $kernel,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

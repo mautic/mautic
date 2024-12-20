@@ -41,7 +41,7 @@ class DashboardController extends AbstractFormController
         }
 
         $action          = $this->generateUrl('mautic_dashboard_index');
-        $dateRangeFilter = $request->get('daterange', []);
+        $dateRangeFilter = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
 
         // Set new date range to the session
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -249,10 +249,8 @@ class DashboardController extends AbstractFormController
      * Deletes entity if exists.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$request->isXmlHttpRequest()) {
             throw new BadRequestHttpException();
@@ -554,11 +552,9 @@ class DashboardController extends AbstractFormController
     /**
      * Gets name from request and defaults it to the timestamp if not provided.
      *
-     * @return string
-     *
      * @throws \Exception
      */
-    private function getNameFromRequest(Request $request)
+    private function getNameFromRequest(Request $request): string
     {
         return $request->get('name', (new \DateTime())->format('Y-m-dTH:i:s'));
     }

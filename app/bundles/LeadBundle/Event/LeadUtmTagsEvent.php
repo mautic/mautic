@@ -12,7 +12,7 @@ class LeadUtmTagsEvent extends CommonEvent
      */
     public function __construct(
         Lead $lead,
-        protected array $utmtags
+        protected array $utmtags,
     ) {
         $this->entity  = $lead;
     }
