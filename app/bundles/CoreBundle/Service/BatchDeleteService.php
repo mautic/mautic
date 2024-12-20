@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Translation\Translator;
 
 final class BatchDeleteService
 {
+    private array $canNotBeDeleted = [];
+
     public function __construct(
         private readonly CorePermissions $security,
         private readonly Translator $translator,
@@ -57,8 +59,14 @@ final class BatchDeleteService
             ]);
             $permissionBase = $model->getPermissionBase();
             // Do this in chunks so that we don't run out of memory.
-            $chunks = array_chunk($entities, 200);
+            $chunks = array_chunk($entities, 200, true);
             foreach ($chunks as $chunk) {
+                // Check if any entities cannot be deleted
+                if (method_exists($model, 'canNotBeDeleted')) {
+                    $canNotBeDeleted       = $model->canNotBeDeleted(array_keys($chunk));
+                    $this->canNotBeDeleted = array_merge($this->canNotBeDeleted, $canNotBeDeleted);
+                    $chunk                 = array_diff_key($chunk, $canNotBeDeleted);
+                }
                 // Loop over the entities to perform access checks pre-delete.
                 foreach ($chunk as $entity) {
                     // In case getEntities does not return array of entities (eg: Form).
@@ -92,6 +100,14 @@ final class BatchDeleteService
                 'msgVars' => [
                     '%count%' => count($entities),
                 ],
+            ];
+        }
+
+        if (!empty($this->canNotBeDeleted)) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.'.$modelName.'.error.cannot.delete.batch',
+                'msgVars' => ['%entities%' => implode(', ', $this->canNotBeDeleted)],
             ];
         }
 

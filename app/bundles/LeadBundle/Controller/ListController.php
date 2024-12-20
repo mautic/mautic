@@ -576,53 +576,14 @@ class ListController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var ListModel $model */
             $model           = $this->getModel('lead.list');
-            $ids             = json_decode($request->query->get('ids', '{}'));
-            $canNotBeDeleted = $model->canNotBeDeleted($ids);
-
-            if (!empty($canNotBeDeleted)) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
-                    'msgVars' => ['%segments%' => implode(', ', $canNotBeDeleted)],
-                ];
-            }
-
-            $toBeDeleted = array_diff($ids, array_keys($canNotBeDeleted));
-            $deleteIds   = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($toBeDeleted as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.lead.list.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
-                )) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.list', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.lead.list.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes         = $this->batchDeleteService->batchDelete(
+                $model,
+                $postActionVars,
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.segment.filter', '')),
+                'lead.list',
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(
