@@ -731,6 +731,8 @@ Mautic.segmentFilter = function() {
                     {'opacity': 0},
                     'fast',
                     function () {
+                        // Remove existing tooltip
+                        mQuery('*[role="tooltip"]').tooltip('destroy');
                         mQuery(this).remove();
                         Mautic.reorderSegmentFilters();
                     }

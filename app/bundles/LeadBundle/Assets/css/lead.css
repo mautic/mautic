@@ -299,3 +299,8 @@ ul.tag-cloud li {
     border-bottom: 1px solid #eee;
     font-size: 14px;
 }
+
+.segment-button {
+    display: flex;
+    justify-content: flex-end;
+}
