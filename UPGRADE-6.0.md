@@ -5,3 +5,13 @@
     - The `friendsofsymfony/oauth-server-bundle` package was replaced with a maintained fork `klapaudius/oauth-server-bundle`
     - The `lightsaml/sp-bundle` package was replaced with a maintained fork `javer/sp-bundle`
 - Deprecated `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentiferFields` and `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentifierFields` were removed. Use `Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier` instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getDebugMode` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getMauticBundles` use BundleHelper instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getPluginBundles` use BundleHelper instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getBundleConfig` use BundleHelper instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getUser` use UserHelper instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getTranslator` use Translator instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getRouter` use Router or UrlGeneratorInterface instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getLocalConfigFile` use dependency injection with KernelInterface, which will retrieve \AppKernel, then invoke getLocalConfigFile().
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getEnvironment` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getIpAddress` use IpLookupHelper instead.
