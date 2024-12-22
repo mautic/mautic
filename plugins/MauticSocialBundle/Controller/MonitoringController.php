@@ -565,10 +565,6 @@ class MonitoringController extends FormController
      */
     public function batchDeleteAction(Request $request)
     {
-        if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
-            return $this->accessDenied();
-        }
-
         $session   = $request->getSession();
         $page      = $session->get('mautic.social.monitoring.page', 1);
         $returnUrl = $this->generateUrl('mautic_social_index', ['page' => $page]);
@@ -584,42 +580,17 @@ class MonitoringController extends FormController
             ],
         ];
 
-        if ('POST' === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var MonitoringModel $model */
-            $model = $this->getModel('social.monitoring');
-
-            $ids       = json_decode($request->query->get('ids', ''));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.social.monitoring.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'monitoring', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.social.monitoring.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $model   = $this->getModel('social.monitoring');
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                $postActionVars,
+                $request->query->get('ids', ''),
+                $request->get('search', $session->get('mautic.social.monitoring.filter', '')),
+                'social.monitoring',
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

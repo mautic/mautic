@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Controller;
 
-use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
@@ -576,52 +575,17 @@ class TagController extends FormController
             ],
         ];
 
-        if ('POST' === $request->getMethod()) {
-            $ids             = json_decode($request->query->get('ids', '{}'));
-            $deleteIds       = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.tagmanager.tag.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->isGranted('tagManager:tagManager:delete')) {
-                    $flashes[] = $this->accessDenied(true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                try {
-                    $entities = $model->deleteEntities($deleteIds);
-                } catch (ForeignKeyConstraintViolationException) {
-                    $flashes[] = [
-                        'type'    => 'notice',
-                        'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',
-                    ];
-
-                    return $this->postActionRedirect(
-                        array_merge($postActionVars, [
-                            'flashes' => $flashes,
-                        ])
-                    );
-                }
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.tagmanager.tag.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+        if (Request::METHOD_POST === $request->getMethod()) {
+            /** @var TagModel $model */
+            $model           = $this->getModel('lead.tag');
+            $flashes         = $this->batchDeleteService->batchDelete(
+                $model,
+                $postActionVars,
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.tags.filter', '')),
+                'lead.tag',
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(
