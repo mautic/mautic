@@ -12,12 +12,14 @@ use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
@@ -44,7 +46,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadField>
  */
-class FieldModel extends FormModel
+class FieldModel extends FormModel implements CannotBeDeletedInterface
 {
     public static $coreFields = [
         // Listed according to $order for installation
@@ -1034,5 +1036,28 @@ class FieldModel extends FormModel
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);
+    }
+
+    public function cannotBeDeleted(array $ids): array
+    {
+        $usedFields = [];
+        foreach ($ids as $id) {
+            $field    = $this->getEntity($id);
+            $segments = $this->getFieldSegments($field);
+            if (0 === $segments->count()) {
+                continue;
+            }
+            $segmentNames = [];
+            /** @var LeadList $segment */
+            foreach ($segments as $segment) {
+                $segmentNames[] = $segment->getName();
+            }
+            $usedFields[$id] = [
+                'name'     => $field->getName(),
+                'segments' => $segmentNames,
+            ];
+        }
+
+        return $usedFields;
     }
 }

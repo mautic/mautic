@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -50,7 +51,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadList>
  */
-class ListModel extends FormModel implements GlobalSearchInterface
+class ListModel extends FormModel implements GlobalSearchInterface, CannotBeDeletedInterface
 {
     use OperatorListTrait;
 
@@ -1220,9 +1221,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
      *
-     * @param array $segmentIds
+     * @param array $ids
      */
-    public function canNotBeDeleted($segmentIds): array
+    public function cannotBeDeleted($ids): array
     {
         $entities = $this->getEntities(
             [
@@ -1258,16 +1259,20 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
             }
         }
+        // Iterate over dependencies and remove the ones that are also set for deletion.
         foreach ($dependency as $key => $value) {
-            if (array_intersect($value, $segmentIds) === $value) {
+            if (array_intersect($value, $ids) === $value) {
                 $idsNotToBeDeleted = array_unique(array_diff($idsNotToBeDeleted, [$key]));
             }
         }
 
-        $idsNotToBeDeleted = array_intersect($segmentIds, $idsNotToBeDeleted);
+        $idsNotToBeDeleted = array_intersect($ids, $idsNotToBeDeleted);
 
         foreach ($idsNotToBeDeleted as $val) {
-            $namesNotToBeDeleted[$val] = $this->getEntity($val)->getName();
+            $namesNotToBeDeleted[$val] = [
+                'name'     => $this->getEntity($val)->getName(),
+                'segments' => $this->getSegmentsWithDependenciesOnSegment($val),
+            ];
         }
 
         return $namesNotToBeDeleted;

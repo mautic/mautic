@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Translation\Translator;
 
 final class BatchDeleteService
 {
-    private array $canNotBeDeleted = [];
+    private array $cannotBeDeleted = [];
 
     public function __construct(
         private readonly CorePermissions $security,
@@ -62,10 +62,10 @@ final class BatchDeleteService
             $chunks = array_chunk($entities, 200, true);
             foreach ($chunks as $chunk) {
                 // Check if any entities cannot be deleted
-                if (method_exists($model, 'canNotBeDeleted')) {
-                    $canNotBeDeleted       = $model->canNotBeDeleted(array_keys($chunk));
-                    $this->canNotBeDeleted = array_merge($this->canNotBeDeleted, $canNotBeDeleted);
-                    $chunk                 = array_diff_key($chunk, $canNotBeDeleted);
+                if (method_exists($model, 'cannotBeDeleted')) {
+                    $cannotBeDeleted       = $model->cannotBeDeleted(array_keys($chunk));
+                    $this->cannotBeDeleted = array_merge($this->cannotBeDeleted, $cannotBeDeleted);
+                    $chunk                 = array_diff_key($chunk, $cannotBeDeleted);
                 }
                 // Loop over the entities to perform access checks pre-delete.
                 foreach ($chunk as $entity) {
@@ -74,11 +74,7 @@ final class BatchDeleteService
                         $entity = reset($entity);
                     }
 
-                    if (!$this->security->hasEntityAccess(
-                        $permissionBase.':deleteown',
-                        $permissionBase.':deleteother',
-                        $entity->getCreatedBy()
-                    )) {
+                    if (!$this->checkPermission($permissionBase, $entity)) {
                         $flashes[] =  ['msg' => 'mautic.core.error.accessdenied'];
                     } elseif ($model->isLocked($entity)) {
                         // Use isLocked callback.
@@ -103,15 +99,32 @@ final class BatchDeleteService
             ];
         }
 
-        if (!empty($this->canNotBeDeleted)) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.'.$modelName.'.error.cannot.delete.batch',
-                'msgVars' => ['%entities%' => implode(', ', $this->canNotBeDeleted)],
-            ];
+        if (!empty($this->cannotBeDeleted)) {
+            foreach ($this->cannotBeDeleted as $notDeleted) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.'.$modelName.'.error.cannot.delete.batch',
+                    'msgVars' => [
+                        '%name%'     => $notDeleted['name'],
+                        '%segments%' => implode(',<br>', $notDeleted['segments']),
+                    ],
+                ];
+            }
         }
 
         return $flashes;
+    }
+
+    private function checkPermission(string $permissionBase, $entity): bool
+    {
+        if (method_exists($entity, 'getCreatedBy')) {
+            return $this->security->hasEntityAccess(
+                $permissionBase.':deleteown',
+                $permissionBase.':deleteother',
+                $entity->getCreatedBy());
+        }
+
+        return $this->security->isGranted($permissionBase.':delete');
     }
 
     /**
