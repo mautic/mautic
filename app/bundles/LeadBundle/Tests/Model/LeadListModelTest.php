@@ -14,7 +14,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
     {
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getEntities', 'getEntity'])
+            ->onlyMethods(['getEntities', 'getEntity', 'getSegmentsWithDependenciesOnSegment'])
             ->getMock();
 
         $mockListModel->expects($this->any())
@@ -31,6 +31,9 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
 
                 return $mockEntity;
             });
+        $mockListModel->expects($this->any())
+            ->method('getSegmentsWithDependenciesOnSegment')
+            ->willReturn(['2']);
 
         $filters = 'a:1:{i:0;a:7:{s:4:"glue";s:3:"and";s:5:"field";s:8:"leadlist";s:6:"object";s:4:"lead";s:4:"type";s:8:"leadlist";s:6:"filter";a:2:{i:0;i:1;i:1;i:3;}s:7:"display";N;s:8:"operator";s:2:"in";}}';
 
@@ -39,7 +42,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity = $this->createMock(LeadList::class);
 
         $mockEntity1 = clone $mockEntity;
-        $mockEntity1->expects($this->once())
+        $mockEntity1->expects($this->atLeastOnce())
             ->method('getFilters')
             ->willReturn([]);
         $mockEntity1->expects($this->any())
@@ -47,7 +50,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         $mockEntity2 = clone $mockEntity;
-        $mockEntity2->expects($this->once())
+        $mockEntity2->expects($this->atLeastOnce())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters));
         $mockEntity2->expects($this->any())
@@ -55,7 +58,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(2);
 
         $mockEntity3 = clone $mockEntity;
-        $mockEntity3->expects($this->once())
+        $mockEntity3->expects($this->atLeastOnce())
             ->method('getFilters')
             ->willReturn([]);
         $mockEntity3->expects($this->any())
@@ -63,14 +66,14 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(3);
 
         $mockEntity4 = clone $mockEntity;
-        $mockEntity4->expects($this->once())
+        $mockEntity4->expects($this->atLeastOnce())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters4));
         $mockEntity4->expects($this->any())
             ->method('getId')
             ->willReturn(4);
 
-        $mockListModel->expects($this->once())
+        $mockListModel->expects($this->atLeastOnce())
             ->method('getEntities')
             ->willReturn([
                 1 => $mockEntity1,
@@ -85,7 +88,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('segmentTestDataProvider')]
     public function testSegmentsCanBeDeletedCorrecty(array $arg, array $expected, $message): void
     {
-        $result = $this->fixture->canNotBeDeleted($arg);
+        $result = $this->fixture->cannotBeDeleted($arg);
 
         $this->assertEquals($expected, $result, $message);
     }
@@ -95,12 +98,17 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [1],
-                [1 => '1'],
+                [
+                    1 => ['name' => '1', 'segments' => ['2']],
+                ],
                 '2 is dependent on 1, so 1 cannot be deleted.',
             ],
             [
                 [1, 3],
-                [1 => '1', 3 => '3'],
+                [
+                    1 => ['name' => '1', 'segments' => ['2']],
+                    3 => ['name' => '3', 'segments' => ['2']],
+                ],
                 '2 is dependent on 1 & 3, so 1 & 3 cannot be deleted.',
             ],
             [
