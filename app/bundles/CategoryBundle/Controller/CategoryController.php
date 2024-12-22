@@ -2,16 +2,16 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -19,10 +19,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class CategoryController extends AbstractFormController
+class CategoryController extends AbstractStandardFormController
 {
     public function __construct(
         private FormFactoryInterface $formFactory,
@@ -35,8 +34,9 @@ class CategoryController extends AbstractFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        BatchDeleteService $batchDeleteService,
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
     /**
@@ -519,10 +519,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @param string $bundle
      */
-    public function batchDeleteAction(Request $request, $bundle): Response
+    public function batchDeleteAction(Request $request, string $bundle): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -546,51 +544,14 @@ class CategoryController extends AbstractFormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('category');
             \assert($model instanceof CategoryModel);
-            $ids       = json_decode($request->query->get('ids', '{}'));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks and delete
-            $deletedExceptions = [];
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.category.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':delete')) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);
-                } else {
-                    try {
-                        // Delete everything we are able to
-                        $model->deleteEntity($entity);
-                        $deleteIds[] = $objectId;
-                    } catch (RecordCanNotBeDeletedException $exception) {
-                        $deletedExceptions[] = $exception;
-                    }
-                }
-            }
-
-            if (!empty($deleteIds)) {
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.category.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($deleteIds),
-                    ],
-                ];
-            }
-
-            foreach ($deletedExceptions as $deletedException) {
-                $flashes[] = [
-                    'type' => 'notice',
-                    'msg'  => $deletedException->getMessage(),
-                ];
-            }
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                $postActionVars,
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.category.filter', '')),
+                'category',
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(
@@ -609,5 +570,10 @@ class CategoryController extends AbstractFormController
         }
 
         return (int) $inForm;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'category';
     }
 }

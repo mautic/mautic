@@ -2,7 +2,7 @@
 
 namespace Mautic\StageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class StageController extends AbstractFormController
+class StageController extends AbstractStandardFormController
 {
     /**
      * @param int $page
@@ -468,66 +468,11 @@ class StageController extends AbstractFormController
      */
     public function batchDeleteAction(Request $request): Response
     {
-        $page      = $request->getSession()->get('mautic.stage.page', 1);
-        $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $page]);
-        $flashes   = [];
+        return $this->batchDeleteStandard($request);
+    }
 
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_stage_index',
-                'mauticContent' => 'stage',
-            ],
-        ];
-
-        if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('stage');
-            \assert($model instanceof StageModel);
-            $ids       = json_decode($request->query->get('ids', '{}'));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.stage.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->isGranted('stage:stages:delete')) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'stage', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.stage.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
-        } // else don't do anything
-
-        return $this->postActionRedirect(
-            array_merge(
-                $postActionVars,
-                [
-                    'flashes' => $flashes,
-                ]
-            )
-        );
+    protected function getModelName(): string
+    {
+        return 'stage';
     }
 }
