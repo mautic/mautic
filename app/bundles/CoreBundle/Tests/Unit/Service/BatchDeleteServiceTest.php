@@ -17,6 +17,8 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
     private CorePermissions $securityMock;
     private Translator $translatorMock;
 
+    private CompanyModel $model;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -24,15 +26,14 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
         $this->securityMock       = $this->createMock(CorePermissions::class);
         $this->translatorMock     = $this->createMock(Translator::class);
         $this->batchDeleteService = new BatchDeleteService($this->securityMock, $this->translatorMock);
+        // Create entities to be deleted
+        $this->model = static::getContainer()->get('mautic.lead.model.company');
+        $this->createEntity($this->model, Company::class, 'compA');
+        $this->createEntity($this->model, Company::class, 'compB');
     }
 
     public function testBatchDeleteCompanies(): void
     {
-        /** @var CompanyModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.company');
-        $this->createEntity($model, Company::class, 'compA');
-        $this->createEntity($model, Company::class, 'compB');
-
         $this->securityMock->expects(self::exactly(2))
             ->method('hasEntityAccess')
             ->willReturn(true);
@@ -43,7 +44,7 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
             ->willReturn(true);
 
         $flashes = $this->batchDeleteService->batchDelete(
-            $model,
+            $this->model,
             [],
             'all',
             '',
@@ -58,17 +59,12 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
 
     public function testBatchDeleteCompanyAccessDenied(): void
     {
-        /** @var CompanyModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.company');
-        $this->createEntity($model, Company::class, 'compA');
-        $this->createEntity($model, Company::class, 'compB');
-
         $this->securityMock->expects(self::exactly(2))
             ->method('hasEntityAccess')
             ->willReturnOnConsecutiveCalls(true, false);
 
         $flashes = $this->batchDeleteService->batchDelete(
-            $model,
+            $this->model,
             [],
             'all',
             '',
