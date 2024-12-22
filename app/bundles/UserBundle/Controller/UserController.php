@@ -570,46 +570,14 @@ class UserController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('user');
             \assert($model instanceof UserModel);
-            $ids         = json_decode($request->query->get('ids', ''));
-            $deleteIds   = [];
-            $currentUser = $this->user;
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if ((int) $currentUser->getId() === (int) $objectId) {
-                    $flashes[] = [
-                        'type' => 'error',
-                        'msg'  => 'mautic.user.user.error.cannotdeleteself',
-                    ];
-                } elseif (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.user.user.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->isGranted('user:users:delete')) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'user', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.user.user.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                $postActionVars,
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.user.filter', '')),
+                'user.user',
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

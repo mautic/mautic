@@ -5,6 +5,7 @@ namespace Mautic\UserBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -31,7 +32,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<User>
  */
-class UserModel extends FormModel implements GlobalSearchInterface
+class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDeletedInterface
 {
     public function __construct(
         protected MailHelper $mailHelper,
@@ -390,5 +391,24 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function getOwnerListChoices(): array
     {
         return $this->getRepository()->getOwnerListChoices();
+    }
+
+    /**
+     * Current user cannot be deleted.
+     */
+    public function cannotBeDeleted(array $ids): array
+    {
+        $currentUser   = $this->userHelper->getUser();
+        $currentUserId = $currentUser->getId();
+        if (in_array($currentUserId, $ids)) {
+            return [
+                $currentUserId => [
+                    'name'     => $currentUser->getName(),
+                    'segments' => [],
+                ],
+            ];
+        }
+
+        return [];
     }
 }
