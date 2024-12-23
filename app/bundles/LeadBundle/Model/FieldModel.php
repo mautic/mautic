@@ -1053,8 +1053,8 @@ class FieldModel extends FormModel implements CannotBeDeletedInterface
                 $segmentNames[] = $segment->getName();
             }
             $usedFields[$id] = [
-                'name'     => $field->getName(),
-                'segments' => $segmentNames,
+                'name'         => $field->getName(),
+                'dependencies' => $segmentNames,
             ];
         }
 

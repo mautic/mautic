@@ -204,6 +204,18 @@ class UserRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
+    /**
+     * Given role id, return an array of users which match the role.
+     */
+    public function findByRole(int $id): array
+    {
+        $q = $this->createQueryBuilder('u')
+            ->where('u.role IN (:id)')
+            ->setParameter('id', $id);
+
+        return $q->getQuery()->getArrayResult();
+    }
+
     protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(

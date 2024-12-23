@@ -2,10 +2,12 @@
 
 namespace Mautic\UserBundle\Model;
 
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
@@ -17,7 +19,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Role>
  */
-class RoleModel extends FormModel implements GlobalSearchInterface
+class RoleModel extends FormModel implements GlobalSearchInterface, CannotBeDeletedInterface
 {
     public function getRepository(): RoleRepository
     {
@@ -80,7 +82,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        $users = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
+        $users = $this->em->getRepository(User::class)->findByRole($entity->getId());
         if (count($users)) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
@@ -147,5 +149,23 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         }
 
         return null;
+    }
+
+    public function cannotBeDeleted(array $ids): array
+    {
+        $userRepo  = $this->em->getRepository(User::class);
+        $usedRoles = [];
+        foreach ($ids as $id) {
+            $users = $userRepo->findByRole($id);
+            if (empty($users)) {
+                continue;
+            }
+            $usedRoles[$id] = [
+                'name'         => $this->getEntity($id)->getName(),
+                'dependencies' => [],
+            ];
+        }
+
+        return $usedRoles;
     }
 }

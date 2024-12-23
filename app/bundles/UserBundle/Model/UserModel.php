@@ -403,8 +403,8 @@ class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDele
         if (in_array($currentUserId, $ids)) {
             return [
                 $currentUserId => [
-                    'name'     => $currentUser->getName(),
-                    'segments' => [],
+                    'name'         => $currentUser->getName(),
+                    'dependencies' => [],
                 ],
             ];
         }

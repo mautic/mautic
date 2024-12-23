@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity;
 use Mautic\UserBundle\Entity\PermissionRepository;
-use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -431,49 +430,14 @@ class RoleController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $ids       = json_decode($request->query->get('ids', ''));
-            $deleteIds = [];
-            $userRepo  = $this->doctrine->getRepository(Entity\User::class);
-            \assert($userRepo instanceof UserRepository);
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-                $users  = $userRepo->findByRole($entity);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.user.role.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (count($users)) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.user.role.error.deletenotallowed',
-                        'msgVars' => ['%name%' => $entity->getName()],
-                    ];
-                } elseif (!$this->security->isGranted('user:roles:delete')) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'user.role', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.user.role.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                $postActionVars,
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.role.filter', '')),
+                'user.role',
+                [$this, 'isLocked'],
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

@@ -61,11 +61,12 @@ final class BatchDeleteService
             // Do this in chunks so that we don't run out of memory.
             $chunks = array_chunk($entities, 200);
             foreach ($chunks as $chunk) {
-                // Check if any entities cannot be deleted
+                // Check if any entities cannot be deleted.
                 if (method_exists($model, 'cannotBeDeleted')) {
                     $cannotBeDeleted       = $model->cannotBeDeleted(array_map(fn ($entity) => $entity->getId(), $chunk));
                     $this->cannotBeDeleted = array_merge($this->cannotBeDeleted, $cannotBeDeleted);
-                    $chunk                 = array_diff_key($chunk, $cannotBeDeleted);
+                    // Filter out the entities that cannot be deleted.
+                    $chunk = array_filter($chunk, fn ($entity) => !isset($cannotBeDeleted[$entity->getId()]));
                 }
                 // Loop over the entities to perform access checks pre-delete.
                 foreach ($chunk as $entity) {
@@ -105,8 +106,8 @@ final class BatchDeleteService
                     'type'    => 'error',
                     'msg'     => 'mautic.'.$modelName.'.error.cannot.delete.batch',
                     'msgVars' => [
-                        '%name%'     => $notDeleted['name'],
-                        '%segments%' => implode(',<br>', $notDeleted['segments']),
+                        '%name%'         => $notDeleted['name'],
+                        '%dependencies%' => implode(',<br>', $notDeleted['dependencies']),
                     ],
                 ];
             }
