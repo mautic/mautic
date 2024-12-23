@@ -19,7 +19,7 @@ final class SecurityHelper
         private CorePermissions $security,
         private RequestStack $requestStack,
         private EventDispatcherInterface $dispatcher,
-        private CsrfTokenManagerInterface $tokenManager
+        private CsrfTokenManagerInterface $tokenManager,
     ) {
     }
 

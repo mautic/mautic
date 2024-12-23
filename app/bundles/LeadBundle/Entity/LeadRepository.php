@@ -591,7 +591,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         array $additionalJoins = null,
         $contactColumnName = 'lead_id',
         \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null
+        \DateTimeInterface $dateTo = null,
     ): array {
         $qb = $this->getEntitiesDbalQueryBuilder();
 

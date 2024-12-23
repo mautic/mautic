@@ -16,7 +16,7 @@ final class FinalizeUpdateStep implements StepInterface
         private TranslatorInterface $translator,
         private PathsHelper $pathsHelper,
         private RequestStack $requestStack,
-        private AppVersion $appVersion
+        private AppVersion $appVersion,
     ) {
     }
 

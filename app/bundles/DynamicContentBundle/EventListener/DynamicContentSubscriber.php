@@ -41,7 +41,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private CorePermissions $security,
         private ContactTracker $contactTracker,
-        private CompanyModel $companyModel
+        private CompanyModel $companyModel,
     ) {
     }
 

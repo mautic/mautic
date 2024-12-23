@@ -19,7 +19,7 @@ class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private WebhookModel $webhookModel,
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
     ) {
     }
 

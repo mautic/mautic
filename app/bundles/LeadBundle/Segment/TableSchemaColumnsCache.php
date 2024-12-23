@@ -9,7 +9,7 @@ class TableSchemaColumnsCache
     private array $cache;
 
     public function __construct(
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
     ) {
         $this->cache         = [];
     }

@@ -16,7 +16,7 @@ class UpdateLeadActionType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        private FieldModel $fieldModel
+        private FieldModel $fieldModel,
     ) {
     }
 

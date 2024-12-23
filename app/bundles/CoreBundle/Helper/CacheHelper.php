@@ -16,7 +16,7 @@ class CacheHelper
         private string $cacheDir,
         private RequestStack $requestStack,
         private PathsHelper $pathsHelper,
-        private KernelInterface $kernel
+        private KernelInterface $kernel,
     ) {
     }
 

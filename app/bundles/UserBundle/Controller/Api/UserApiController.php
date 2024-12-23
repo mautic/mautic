@@ -46,7 +46,7 @@ class UserApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
     ) {
         $userModel     = $modelFactory->getModel('user.user');
         \assert($userModel instanceof UserModel);

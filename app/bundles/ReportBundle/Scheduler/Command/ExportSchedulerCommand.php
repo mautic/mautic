@@ -17,7 +17,7 @@ class ExportSchedulerCommand extends Command
     public function __construct(
         private ReportExporter $reportExporter,
         private ReportCleanup $reportCleanup,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
         parent::__construct();
     }

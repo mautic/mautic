@@ -18,10 +18,14 @@ class ConfigType extends AbstractType
 
     public function __construct(
         private TransportChain $transportChain,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices    = [];

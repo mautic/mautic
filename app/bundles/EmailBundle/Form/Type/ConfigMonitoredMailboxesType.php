@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints\Email;
 class ConfigMonitoredMailboxesType extends AbstractType
 {
     public function __construct(
-        private Mailbox $imapHelper
+        private Mailbox $imapHelper,
     ) {
     }
 

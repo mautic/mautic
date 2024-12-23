@@ -25,7 +25,7 @@ class FieldBuilder
     public function __construct(
         private Router $router,
         private FieldHelper $fieldHelper,
-        private ContactObjectHelper $contactObjectHelper
+        private ContactObjectHelper $contactObjectHelper,
     ) {
         $this->valueNormalizer = new ValueNormalizer();
     }
@@ -38,7 +38,7 @@ class FieldBuilder
         array $mauticObject,
         RequestObjectDAO $requestObject,
         string $integration,
-        string $defaultState = ReportFieldDAO::FIELD_CHANGED
+        string $defaultState = ReportFieldDAO::FIELD_CHANGED,
     ): ReportFieldDAO {
         $this->mauticObject  = $mauticObject;
         $this->requestObject = $requestObject;

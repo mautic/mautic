@@ -18,7 +18,7 @@ class Widget
     public function __construct(
         private DashboardModel $dashboardModel,
         private UserHelper $userHelper,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -59,7 +59,7 @@ class Widget
             return;
         }
 
-        $dateRangeFilter = $request->get('daterange', []);
+        $dateRangeFilter = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
 
         if (!empty($dateRangeFilter['date_from'])) {
             $from = new \DateTime($dateRangeFilter['date_from']);

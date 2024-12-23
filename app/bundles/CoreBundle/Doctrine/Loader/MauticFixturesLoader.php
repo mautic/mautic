@@ -10,7 +10,7 @@ use Doctrine\Bundle\FixturesBundle\Loader\SymfonyFixturesLoader;
 final class MauticFixturesLoader implements FixturesLoaderInterface
 {
     public function __construct(
-        private SymfonyFixturesLoader $fixturesLoader
+        private SymfonyFixturesLoader $fixturesLoader,
     ) {
     }
 

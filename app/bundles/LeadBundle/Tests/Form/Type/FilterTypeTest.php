@@ -168,7 +168,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                     FormEvents::PRE_SET_DATA,
                     $this->callback(
                         function (callable $formModifier) {
-                            $form = new class() extends Form {
+                            $form = new class extends Form {
                                 public int $addMethodCallCounter = 0;
 
                                 public function __construct()
@@ -182,7 +182,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                 {
                                     Assert::assertSame('properties', $name);
 
-                                    return new class() extends Form {
+                                    return new class extends Form {
                                         public function __construct()
                                         {
                                         }

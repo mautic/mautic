@@ -362,7 +362,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         string $email,
         string $emailHash,
         string $message,
-        bool $addedRow
+        bool $addedRow,
     ): void {
         $uri = '/email/unsubscribe/'.$statHash.'/'.$email.'/'.$emailHash;
         $this->client->request(Request::METHOD_GET, $uri);

@@ -26,7 +26,7 @@ class InternalObjectFindEvent extends Event
     private array $fieldValues = [];
 
     public function __construct(
-        private ObjectInterface $object
+        private ObjectInterface $object,
     ) {
     }
 

@@ -17,7 +17,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         private AssetsHelper $assetsHelper,
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

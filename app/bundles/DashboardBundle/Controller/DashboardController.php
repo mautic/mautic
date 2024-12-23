@@ -41,7 +41,7 @@ class DashboardController extends AbstractFormController
         }
 
         $action          = $this->generateUrl('mautic_dashboard_index');
-        $dateRangeFilter = $request->get('daterange', []);
+        $dateRangeFilter = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
 
         // Set new date range to the session
         if ($request->isMethod(Request::METHOD_POST)) {

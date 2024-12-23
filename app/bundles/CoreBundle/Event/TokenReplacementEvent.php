@@ -35,7 +35,7 @@ class TokenReplacementEvent extends CommonEvent
         protected $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
-        private bool $internalSend = false
+        private bool $internalSend = false,
     ) {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;

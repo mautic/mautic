@@ -77,7 +77,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     private function createEmailStat(
         Lead $lead,
         Email $email,
-        string $trackingHash
+        string $trackingHash,
     ): Stat {
         /** @var StatRepository $statRepository */
         $statRepository = static::getContainer()->get('mautic.email.repository.stat');
@@ -94,7 +94,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createLead(
-        string $email
+        string $email,
     ): Lead {
         $lead = new Lead();
         $lead->setEmail($email);
@@ -119,7 +119,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createGroup(
-        string $name
+        string $name,
     ): Group {
         $group = new Group();
         $group->setName($name);

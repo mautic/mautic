@@ -35,7 +35,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         protected ModelFactory $modelFactory,
         protected TranslatorInterface $translator,
         protected Connection $connection,
-        protected $options = []
+        protected $options = [],
     ) {
         if (is_array($options)) {
             $options = (new OptionsResolver())->setDefaults($options);

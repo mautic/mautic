@@ -14,7 +14,7 @@ class PreUpAssertionMigrationTest extends TestCase
 {
     public function testPreUpWithoutSkipAssertions(): void
     {
-        $migration = new class() extends PreUpAssertionMigration {
+        $migration = new class extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -44,7 +44,7 @@ class PreUpAssertionMigrationTest extends TestCase
 
     public function testPreUpSkipped(): void
     {
-        $migration = new class() extends PreUpAssertionMigration {
+        $migration = new class extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -94,7 +94,7 @@ class PreUpAssertionMigrationTest extends TestCase
 
     public function testPreUpNotSkipped(): void
     {
-        $migration = new class() extends PreUpAssertionMigration {
+        $migration = new class extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */

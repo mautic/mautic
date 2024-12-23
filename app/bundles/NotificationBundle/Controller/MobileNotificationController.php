@@ -192,7 +192,7 @@ class MobileNotificationController extends FormController
         $logs = $auditLogModel->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
@@ -742,7 +742,7 @@ class MobileNotificationController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,

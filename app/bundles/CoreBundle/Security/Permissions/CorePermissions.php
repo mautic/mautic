@@ -30,7 +30,7 @@ class CorePermissions implements ResetInterface
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
         private array $bundles,
-        private array $pluginBundles
+        private array $pluginBundles,
     ) {
         $this->registerPermissionClasses();
     }

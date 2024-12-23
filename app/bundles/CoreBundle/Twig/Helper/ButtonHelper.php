@@ -96,7 +96,7 @@ final class ButtonHelper
     public function __construct(
         private Environment $twig,
         private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

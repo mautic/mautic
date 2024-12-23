@@ -12,7 +12,7 @@ final class PageHelper implements PageHelperInterface
         private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         private string $sessionPrefix,
-        private int $page
+        private int $page,
     ) {
     }
 

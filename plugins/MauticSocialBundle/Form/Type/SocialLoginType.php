@@ -17,7 +17,7 @@ class SocialLoginType extends AbstractType
     public function __construct(
         private IntegrationHelper $helper,
         private FormModel $formModel,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

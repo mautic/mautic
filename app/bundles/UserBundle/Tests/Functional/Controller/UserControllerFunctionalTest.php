@@ -172,7 +172,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         string $object,
         int $objectId,
         string $action,
-        array $details
+        array $details,
     ): AuditLog {
         $auditLog = new AuditLog();
         $auditLog->setUserId($userId);

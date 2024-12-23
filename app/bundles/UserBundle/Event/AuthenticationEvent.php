@@ -58,7 +58,7 @@ class AuthenticationEvent extends Event
         protected Request $request,
         protected $isLoginCheck = false,
         protected $authenticatingService = null,
-        protected $integrations = null
+        protected $integrations = null,
     ) {
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
 

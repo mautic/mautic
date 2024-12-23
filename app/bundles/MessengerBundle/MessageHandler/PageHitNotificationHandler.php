@@ -25,7 +25,7 @@ class PageHitNotificationHandler
         private LeadRepository $leadRepository,
         private LoggerInterface $logger,
         private RedirectRepository $redirectRepository,
-        private PageModel $pageModel
+        private PageModel $pageModel,
     ) {
     }
 

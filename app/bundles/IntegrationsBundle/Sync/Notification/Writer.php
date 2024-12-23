@@ -14,7 +14,7 @@ class Writer
     public function __construct(
         private NotificationModel $notificationModel,
         private AuditLogModel $auditLogModel,
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
     ) {
     }
 

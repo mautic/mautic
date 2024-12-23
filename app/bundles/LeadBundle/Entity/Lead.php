@@ -106,29 +106,29 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $updatedPoints;
 
     /**
-     * @var Collection<int, \Mautic\LeadBundle\Entity\PointsChangeLog>
+     * @var Collection<int, PointsChangeLog>
      */
     private $pointsChangeLog;
 
     private ?int $actualPoints = null;
 
     /**
-     * @var Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
+     * @var Collection<int, CompanyChangeLog>
      */
     private $companyChangeLog;
 
     /**
-     * @var Collection<string, \Mautic\LeadBundle\Entity\DoNotContact>
+     * @var Collection<string, DoNotContact>
      */
     private $doNotContact;
 
     /**
-     * @var Collection<string, \Mautic\CoreBundle\Entity\IpAddress>
+     * @var Collection<string, IpAddress>
      */
     private $ipAddresses;
 
     /**
-     * @var Collection<int, \Mautic\NotificationBundle\Entity\PushID>
+     * @var Collection<int, PushID>
      */
     private $pushIds;
 
@@ -175,7 +175,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $dateIdentified;
 
     /**
-     * @var Collection<int, \Mautic\LeadBundle\Entity\LeadNote>
+     * @var Collection<int, LeadNote>
      */
     private $notes;
 
@@ -190,7 +190,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public $imported = false;
 
     /**
-     * @var Collection<string, \Mautic\LeadBundle\Entity\Tag>
+     * @var Collection<string, Tag>
      */
     private $tags;
 
@@ -200,17 +200,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $stage;
 
     /**
-     * @var Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
+     * @var Collection<int, StagesChangeLog>
      */
     private $stageChangeLog;
 
     /**
-     * @var Collection<int, \Mautic\LeadBundle\Entity\UtmTag>
+     * @var Collection<int, UtmTag>
      */
     private $utmtags;
 
     /**
-     * @var Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
+     * @var Collection<int, FrequencyRule>
      */
     private $frequencyRules;
 
@@ -942,7 +942,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
+     * @return Collection<int, StagesChangeLog>
      */
     public function getStageChangeLog()
     {
@@ -1057,7 +1057,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return Collection<int, \Mautic\NotificationBundle\Entity\PushID>
+     * @return Collection<int, PushID>
      */
     public function getPushIDs()
     {
@@ -1118,7 +1118,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return Collection<string, \Mautic\LeadBundle\Entity\DoNotContact>
+     * @return Collection<string, DoNotContact>
      */
     public function getDoNotContact(): Collection
     {
@@ -1425,7 +1425,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get frequency rules.
      *
-     * @return Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
+     * @return Collection<int, FrequencyRule>
      */
     public function getFrequencyRules()
     {

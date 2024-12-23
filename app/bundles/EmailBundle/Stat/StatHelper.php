@@ -18,7 +18,7 @@ class StatHelper
     private array $deleteUs = [];
 
     public function __construct(
-        private EmailStatModel $emailStatModel
+        private EmailStatModel $emailStatModel,
     ) {
     }
 

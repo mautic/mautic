@@ -21,7 +21,7 @@ class FlashBag
     public function __construct(
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
-        private NotificationModel $notificationModel
+        private NotificationModel $notificationModel,
     ) {
     }
 

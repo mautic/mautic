@@ -13,7 +13,7 @@ use Symfony\Component\Finder\Finder;
 class PermissionClassMetadata
 {
     public function __construct(
-        private BundleMetadata $metadata
+        private BundleMetadata $metadata,
     ) {
     }
 

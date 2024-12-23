@@ -21,7 +21,7 @@ class ChannelListHelper
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private Translator $translator
+        private Translator $translator,
     ) {
     }
 

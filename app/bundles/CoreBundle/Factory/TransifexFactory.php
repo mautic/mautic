@@ -20,7 +20,7 @@ class TransifexFactory
 
     public function __construct(
         private ClientInterface $client,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

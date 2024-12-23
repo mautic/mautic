@@ -33,7 +33,7 @@ class UserType extends AbstractType
     public function __construct(
         private TranslatorInterface $translator,
         private UserModel $model,
-        private LanguageHelper $languageHelper
+        private LanguageHelper $languageHelper,
     ) {
     }
 

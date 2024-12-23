@@ -37,7 +37,7 @@ class ContactRequestHelper
         private RequestStack $requestStack,
         private Logger $logger,
         private EventDispatcherInterface $eventDispatcher,
-        private ContactMerger $contactMerger
+        private ContactMerger $contactMerger,
     ) {
     }
 

@@ -61,11 +61,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testgetWhereFromRequestWithNoWhere(): void
     {
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request]);
+        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [new Request()]);
 
         $this->assertEquals([], $result);
     }
@@ -80,15 +76,8 @@ class CommonApiControllerTest extends CampaignTestAbstract
             ],
         ];
 
-        $request = $this->getMockBuilder(Request::class)
-            ->onlyMethods(['get'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $request->method('get')
-            ->willReturn($where);
-
-        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request]);
+        $request = new Request(['where' => $where]);
+        $result  = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request]);
 
         $this->assertEquals($where, $result);
     }

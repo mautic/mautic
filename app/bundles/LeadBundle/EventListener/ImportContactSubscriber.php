@@ -26,7 +26,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         private FieldList $fieldList,
         private CorePermissions $corePermissions,
         private LeadModel $contactModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

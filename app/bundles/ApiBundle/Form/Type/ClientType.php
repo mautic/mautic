@@ -30,7 +30,7 @@ class ClientType extends AbstractType
         private RequestStack $requestStack,
         private TranslatorInterface $translator,
         private ValidatorInterface $validator,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

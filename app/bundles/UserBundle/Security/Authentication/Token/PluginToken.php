@@ -20,7 +20,7 @@ class PluginToken extends AbstractToken
         $user = null,
         private string $credentials = '',
         array $roles = [],
-        private ?Response $response = null
+        private ?Response $response = null,
     ) {
         parent::__construct($roles);
 

@@ -16,7 +16,7 @@ use Twig\TwigFunction;
 class CoreHelpersExtension extends AbstractExtension
 {
     public function __construct(
-        private TranslatorInterface $translate
+        private TranslatorInterface $translate,
     ) {
     }
 
@@ -98,7 +98,7 @@ class CoreHelpersExtension extends AbstractExtension
         string $jsCallback,
         array $jsArguments,
         ?string $baseUrl,
-        string $queryString
+        string $queryString,
     ): string {
         if (!$active) {
             return 'href="javascript:void(0);"';

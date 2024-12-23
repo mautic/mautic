@@ -12,7 +12,7 @@ class LogoutEvent extends Event
 
     public function __construct(
         private User $user,
-        private Request $request
+        private Request $request,
     ) {
     }
 

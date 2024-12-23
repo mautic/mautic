@@ -20,7 +20,7 @@ final class AvatarHelper
         private AssetsHelper $assetsHelper,
         private PathsHelper $pathsHelper,
         private GravatarHelper $gravatarHelper,
-        private DefaultAvatarHelper $defaultAvatarHelper
+        private DefaultAvatarHelper $defaultAvatarHelper,
     ) {
     }
 

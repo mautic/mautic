@@ -28,7 +28,7 @@ class MappingHelper
         private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         private ObjectMappingRepository $objectMappingRepository,
         private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

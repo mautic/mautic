@@ -51,7 +51,7 @@
 @font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
 @font-family-base:        @font-family-sans-serif;
 
-@font-size-base:          13px;
+@font-size-base:          14px;
 @font-size-large:         ceil((@font-size-base * 1.20)); // ~16px
 @font-size-small:         12px;
 
@@ -678,20 +678,20 @@
 
 @list-group-disabled-text-color: @list-group-disabled-color;
 //** `.list-group-item` border color
-@list-group-border:             transparent;
+@list-group-border:             @hr-border;
 //** List group border radius
-@list-group-border-radius:      0px;
+@list-group-border-radius:      @border-radius-small;
 
 //** Background color of single list items on hover
 @list-group-hover-bg:           var(--layer-hover);
 //** Text color of active list items
-@list-group-active-color:       var(--text-inverse);
+@list-group-active-color:       var(--text-primary);
 //** Background color of active list items
-@list-group-active-bg:          var(--layer-selected-inverse);
+@list-group-active-bg:          @list-group-hover-bg;
 //** Border color of active list elements
 @list-group-active-border:      @hr-border;
 //** Text color for content within active list items
-@list-group-active-text-color:  var(--text-inverse);
+@list-group-active-text-color:  var(--text-primary);
 
 //** Text color of disabled list items
 @list-group-disabled-color:      var(--text-disabled);

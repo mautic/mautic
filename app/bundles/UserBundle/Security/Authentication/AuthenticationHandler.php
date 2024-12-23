@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
     public function __construct(
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

@@ -16,7 +16,7 @@ class SortableListTransformer implements DataTransformerInterface
      */
     public function __construct(
         private $withLabels = true,
-        private $useKeyValuePairs = false
+        private $useKeyValuePairs = false,
     ) {
     }
 

@@ -25,7 +25,7 @@ class FrequencyRuleRepository extends CommonRepository
         $defaultFrequencyTime,
         $statTable = 'email_stats',
         $statContactColumn = 'lead_id',
-        $statSentColumn = 'date_sent'
+        $statSentColumn = 'date_sent',
     ): array {
         if (empty($leadIds)) {
             return [];
@@ -167,7 +167,7 @@ class FrequencyRuleRepository extends CommonRepository
         $defaultFrequencyTime,
         $statTable,
         $statContactColumn,
-        $statSentColumn
+        $statSentColumn,
     ) {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

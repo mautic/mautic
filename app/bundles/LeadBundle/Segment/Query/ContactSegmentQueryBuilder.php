@@ -31,7 +31,7 @@ class ContactSegmentQueryBuilder
     public function __construct(
         private EntityManager $entityManager,
         private RandomParameterName $randomParameterName,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

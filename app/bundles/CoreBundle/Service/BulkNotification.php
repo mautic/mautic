@@ -15,7 +15,7 @@ final class BulkNotification implements BulkNotificationInterface
     private array $notifications = [];
 
     public function __construct(
-        private NotificationModel $notificationModel
+        private NotificationModel $notificationModel,
     ) {
     }
 
@@ -26,7 +26,7 @@ final class BulkNotification implements BulkNotificationInterface
         string $header = null,
         string $iconClass = null,
         \DateTime $datetime = null,
-        User $user = null
+        User $user = null,
     ): void {
         if (isset($this->notifications[$deduplicateValue])) {
             return;

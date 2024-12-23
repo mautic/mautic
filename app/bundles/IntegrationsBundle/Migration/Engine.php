@@ -15,7 +15,7 @@ class Engine
         private EntityManager $entityManager,
         private string $tablePrefix,
         string $pluginPath,
-        private string $bundleName
+        private string $bundleName,
     ) {
         $this->migrationsPath = $pluginPath.'/Migrations/';
     }

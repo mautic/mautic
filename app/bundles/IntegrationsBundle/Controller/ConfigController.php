@@ -57,7 +57,7 @@ class ConfigController extends AbstractFormController
         FieldValidationHelper $fieldValidator,
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
-        string $integration
+        string $integration,
     ) {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
@@ -99,7 +99,7 @@ class ConfigController extends AbstractFormController
         EventDispatcherInterface $eventDispatcher,
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
-        FormInterface $form
+        FormInterface $form,
     ): JsonResponse|Response {
         if ($this->isFormCancelled($form)) {
             return $this->closeForm($request);

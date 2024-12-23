@@ -54,7 +54,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         IntegrationEntityModel $integrationEntityModel,
         DoNotContact $doNotContact,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        protected UserHelper $userHelper
+        protected UserHelper $userHelper,
     ) {
         parent::__construct(
             $eventDispatcher,

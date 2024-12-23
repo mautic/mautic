@@ -15,7 +15,7 @@ class CompanyDeduper
     public function __construct(
         FieldModel $fieldModel,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private CompanyRepository $companyRepository
+        private CompanyRepository $companyRepository,
     ) {
         $this->fieldModel                 = $fieldModel;
         $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;

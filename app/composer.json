@@ -81,7 +81,7 @@
     "guzzlehttp/guzzle": "^7.6",
     "twilio/sdk": "^5.25",
     "php-http/guzzle7-adapter": "^1.0",
-    "lightsaml2/sp-bundle": "^3.0.0",
+    "javer/sp-bundle": "^2.0",
     "php-amqplib/rabbitmq-bundle": "^2.5.1",
     "simshaun/recurr": "^5.0",
     "ramsey/uuid": "^4.7",

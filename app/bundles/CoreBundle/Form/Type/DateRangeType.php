@@ -16,7 +16,7 @@ class DateRangeType extends AbstractType
 {
     public function __construct(
         private RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

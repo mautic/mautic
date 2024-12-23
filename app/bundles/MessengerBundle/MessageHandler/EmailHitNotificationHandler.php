@@ -19,7 +19,7 @@ class EmailHitNotificationHandler
 
     public function __construct(
         private EmailModel $emailModel,
-        CoreParametersHelper $parametersHelper
+        CoreParametersHelper $parametersHelper,
     ) {
         $this->isSyncTransport = str_starts_with($parametersHelper->get('messenger_dsn_hit'), 'sync://');
     }

@@ -23,7 +23,7 @@ class SendChannelBroadcastCommand extends ModeratedCommand
         private TranslatorInterface $translator,
         private EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }

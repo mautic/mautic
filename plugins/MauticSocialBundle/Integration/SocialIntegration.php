@@ -49,7 +49,7 @@ abstract class SocialIntegration extends AbstractIntegration
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         IntegrationEntityModel $integrationEntityModel,
         DoNotContact $doNotContact,
-        protected IntegrationHelper $integrationHelper
+        protected IntegrationHelper $integrationHelper,
     ) {
         parent::__construct(
             $eventDispatcher,

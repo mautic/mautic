@@ -527,7 +527,7 @@ class CommonRepository extends ServiceEntityRepository
         $alias = null,
         $setNowParameter = true,
         $setTrueParameter = true,
-        $allowNullForPublishedUp = true
+        $allowNullForPublishedUp = true,
     ) {
         $isORM = $q instanceof QueryBuilder;
 

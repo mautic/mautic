@@ -14,7 +14,7 @@ class TokenHelper
     public function __construct(
         protected FocusModel $model,
         protected RouterInterface $router,
-        protected CorePermissions $security
+        protected CorePermissions $security,
     ) {
     }
 

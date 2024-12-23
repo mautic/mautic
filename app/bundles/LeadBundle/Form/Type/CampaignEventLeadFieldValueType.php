@@ -23,7 +23,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
     public function __construct(
         protected Translator $translator,
         protected LeadModel $leadModel,
-        protected FieldModel $fieldModel
+        protected FieldModel $fieldModel,
     ) {
     }
 

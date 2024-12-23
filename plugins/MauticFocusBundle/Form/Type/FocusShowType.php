@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class FocusShowType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 

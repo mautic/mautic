@@ -13,7 +13,7 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildCollectionForNoObject(): void
     {
-        $fieldCollector                            = new class() implements FieldCollectorInterface {
+        $fieldCollector                            = new class implements FieldCollectorInterface {
             public int $getFieldsMethodCallCounter = 0;
 
             public function getFields(string $object): FieldCollection
@@ -32,7 +32,7 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildCollectionForOneObject(): void
     {
-        $fieldCollector                            = new class() implements FieldCollectorInterface {
+        $fieldCollector                            = new class implements FieldCollectorInterface {
             public int $getFieldsMethodCallCounter = 0;
 
             public function getFields(string $object): FieldCollection
@@ -52,7 +52,7 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildCollectionForMultipleObjects(): void
     {
-        $fieldCollector                            = new class() implements FieldCollectorInterface {
+        $fieldCollector                            = new class implements FieldCollectorInterface {
             public int $getFieldsMethodCallCounter = 0;
 
             public function getFields(string $object): FieldCollection

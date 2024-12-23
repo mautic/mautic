@@ -18,7 +18,7 @@ class ValidateEventCommand extends Command
     public function __construct(
         private InactiveExecutioner $inactiveExecution,
         private TranslatorInterface $translator,
-        private FormatterHelper $formatterHelper
+        private FormatterHelper $formatterHelper,
     ) {
         parent::__construct();
     }

@@ -14,7 +14,7 @@ class MessageSchedule
         private TranslatorInterface $translator,
         private FileProperties $fileProperties,
         private CoreParametersHelper $coreParametersHelper,
-        private UrlGeneratorInterface $router
+        private UrlGeneratorInterface $router,
     ) {
     }
 

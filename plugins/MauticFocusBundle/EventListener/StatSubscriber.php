@@ -15,7 +15,7 @@ class StatSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FocusModel $model,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 

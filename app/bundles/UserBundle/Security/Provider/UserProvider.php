@@ -25,7 +25,7 @@ class UserProvider implements UserProviderInterface
         protected UserRepository $userRepository,
         protected PermissionRepository $permissionRepository,
         protected EventDispatcherInterface $dispatcher,
-        protected UserPasswordHasher $encoder
+        protected UserPasswordHasher $encoder,
     ) {
     }
 

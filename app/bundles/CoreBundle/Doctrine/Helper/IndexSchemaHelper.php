@@ -51,7 +51,7 @@ class IndexSchemaHelper
      */
     public function __construct(
         protected Connection $db,
-        protected $prefix
+        protected $prefix,
     ) {
         $this->sm = $this->db->createSchemaManager();
     }

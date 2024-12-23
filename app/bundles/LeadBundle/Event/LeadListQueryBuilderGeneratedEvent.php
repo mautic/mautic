@@ -10,7 +10,7 @@ class LeadListQueryBuilderGeneratedEvent extends Event
 {
     public function __construct(
         private LeadList $segment,
-        private QueryBuilder $queryBuilder
+        private QueryBuilder $queryBuilder,
     ) {
     }
 

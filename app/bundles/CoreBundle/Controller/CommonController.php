@@ -50,7 +50,7 @@ class CommonController extends AbstractController implements MauticController
         protected Translator $translator,
         private FlashBag $flashBag,
         private ?RequestStack $requestStack,
-        protected ?CorePermissions $security
+        protected ?CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();
     }

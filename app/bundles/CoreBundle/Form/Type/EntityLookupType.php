@@ -34,7 +34,7 @@ class EntityLookupType extends AbstractType
         private ModelFactory $modelFactory,
         private TranslatorInterface $translator,
         private Connection $connection,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

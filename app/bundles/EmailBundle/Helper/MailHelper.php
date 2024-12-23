@@ -233,7 +233,7 @@ class MailHelper
         private LoggerInterface $logger,
         private MailHashHelper $mailHashHelper,
         private RouterInterface $router,
-        private Environment $twig
+        private Environment $twig,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');

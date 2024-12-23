@@ -961,7 +961,7 @@ class Asset extends FormEntity
         // Search for icon name by file extension.
         foreach ($fileTypes as $icon => $extensions) {
             if (in_array($fileType, $extensions)) {
-                return 'ri-file-'.$icon.'-fill';
+                return 'ri-file-'.$icon.'-line';
             }
         }
 
@@ -1018,7 +1018,7 @@ class Asset extends FormEntity
             'audio' => [
                 'mp3',
             ],
-            'archive' => [
+            'zip' => [
                 'zip',
                 'rar',
                 'iso',
@@ -1049,7 +1049,7 @@ class Asset extends FormEntity
                 'htm',
                 'sql',
             ],
-            'powerpoint' => [
+            'ppt' => [
                 'ppt',
                 'pptx',
                 'pptm',

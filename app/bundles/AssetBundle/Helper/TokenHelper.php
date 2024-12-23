@@ -7,7 +7,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 class TokenHelper
 {
     public function __construct(
-        protected AssetModel $model
+        protected AssetModel $model,
     ) {
     }
 

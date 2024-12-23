@@ -86,7 +86,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoStat(): void
     {
-        $message = new class() extends MauticMessage {
+        $message = new class extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -108,7 +108,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoRetry(): void
     {
-        $message = new class() extends MauticMessage {
+        $message = new class extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -175,7 +175,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWith4Retry(): void
     {
-        $message = new class() extends MauticMessage {
+        $message = new class extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 

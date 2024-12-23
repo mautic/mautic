@@ -30,7 +30,7 @@ class IntegrationEntityRepository extends CommonRepository
         $push = false,
         $start = 0,
         $limit = 0,
-        $integrationEntityIds = null
+        $integrationEntityIds = null,
     ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity, i.internal_entity')
@@ -171,7 +171,7 @@ class IntegrationEntityRepository extends CommonRepository
         $fromDate = null,
         $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
-        $excludeIntegrationIds = []
+        $excludeIntegrationIds = [],
     ): array {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';

@@ -231,7 +231,7 @@ class ThemeHelperTest extends TestCase
     public function testCopyWithNoNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class() extends PathsHelper {
+            new class extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -244,17 +244,17 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class() extends Translator {
+            new class extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class() extends CoreParametersHelper {
+            new class extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class() extends Filesystem {
+            new class extends Filesystem {
                 public function __construct()
                 {
                 }
@@ -294,7 +294,7 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class() extends Finder {
+            new class extends Finder {
                 /** @var SplFileInfo[] */
                 private array $dirs = [];
 
@@ -325,7 +325,7 @@ class ThemeHelperTest extends TestCase
     public function testCopyWithNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class() extends PathsHelper {
+            new class extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -338,17 +338,17 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class() extends Translator {
+            new class extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class() extends CoreParametersHelper {
+            new class extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class() extends Filesystem {
+            new class extends Filesystem {
                 public function __construct()
                 {
                 }
@@ -388,7 +388,7 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class() extends Finder {
+            new class extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */

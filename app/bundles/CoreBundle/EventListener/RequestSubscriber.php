@@ -18,7 +18,7 @@ class RequestSubscriber implements EventSubscriberInterface
     public function __construct(
         private CsrfTokenManagerInterface $tokenManager,
         private TranslatorInterface $translator,
-        private Environment $twig
+        private Environment $twig,
     ) {
     }
 

@@ -27,7 +27,7 @@ class DateOptionFactory
     public function __construct(
         private DateDecorator $dateDecorator,
         private RelativeDate $relativeDate,
-        private TimezoneResolver $timezoneResolver
+        private TimezoneResolver $timezoneResolver,
     ) {
     }
 

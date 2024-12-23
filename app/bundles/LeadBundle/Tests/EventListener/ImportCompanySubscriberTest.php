@@ -40,7 +40,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $subscriber = new ImportCompanySubscriber(
             $this->getFieldListFake(),
-            new class() extends CorePermissions {
+            new class extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -67,7 +67,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $subscriber = new ImportCompanySubscriber(
             $this->getFieldListFake(),
-            new class() extends CorePermissions {
+            new class extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -110,7 +110,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnFieldMapping(): void
     {
         $subscriber = new ImportCompanySubscriber(
-            new class() extends FieldList {
+            new class extends FieldList {
                 public function __construct()
                 {
                 }
@@ -169,7 +169,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new ImportCompanySubscriber(
             $this->getFieldListFake(),
             $this->getCorePermissionsFake(),
-            new class() extends CompanyModel {
+            new class extends CompanyModel {
                 public function __construct()
                 {
                 }
@@ -247,7 +247,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getFieldListFake(): FieldList
     {
-        return new class() extends FieldList {
+        return new class extends FieldList {
             public function __construct()
             {
             }
@@ -256,7 +256,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getCorePermissionsFake(): CorePermissions
     {
-        return new class() extends CorePermissions {
+        return new class extends CorePermissions {
             public function __construct()
             {
             }
@@ -265,7 +265,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getCompanyModelFake(): CompanyModel
     {
-        return new class() extends CompanyModel {
+        return new class extends CompanyModel {
             public function __construct()
             {
             }
@@ -274,7 +274,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getTranslatorFake(): TranslatorInterface
     {
-        return new class() extends Translator {
+        return new class extends Translator {
             public function __construct()
             {
             }

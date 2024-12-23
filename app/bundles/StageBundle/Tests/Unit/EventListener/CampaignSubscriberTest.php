@@ -23,7 +23,7 @@ final class CampaignSubscriberTest extends TestCase
 {
     public function testOnCampaignTriggerStageChangeWhenStageNotFound(): void
     {
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -38,13 +38,13 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
+        $contactModel = new class extends LeadModel {
             public function __construct()
             {
             }
         };
 
-        $stageModel = new class() extends StageModel {
+        $stageModel = new class extends StageModel {
             public function __construct()
             {
             }
@@ -75,7 +75,7 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerStageChangeWhenStageUnpublished(): void
     {
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -90,13 +90,13 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
+        $contactModel = new class extends LeadModel {
             public function __construct()
             {
             }
         };
 
-        $stageModel = new class() extends StageModel {
+        $stageModel = new class extends StageModel {
             public function __construct()
             {
             }
@@ -105,7 +105,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 123;
@@ -136,7 +136,7 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerStageChangeWhenContactHasNoStage(): void
     {
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -155,7 +155,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
+        $contactModel = new class extends LeadModel {
             public function __construct()
             {
             }
@@ -165,7 +165,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $stageModel = new class() extends StageModel {
+        $stageModel = new class extends StageModel {
             public function __construct()
             {
             }
@@ -174,7 +174,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 123;
@@ -201,7 +201,7 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerStageChangeWhenContactHasTheSameStage(): void
     {
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -209,7 +209,7 @@ final class CampaignSubscriberTest extends TestCase
 
             public function getStage()
             {
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 123;
@@ -232,13 +232,13 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
+        $contactModel = new class extends LeadModel {
             public function __construct()
             {
             }
         };
 
-        $stageModel = new class() extends StageModel {
+        $stageModel = new class extends StageModel {
             public function __construct()
             {
             }
@@ -247,7 +247,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 123;
@@ -280,7 +280,7 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithGreaterWeight(): void
     {
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -288,7 +288,7 @@ final class CampaignSubscriberTest extends TestCase
 
             public function getStage()
             {
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 444;
@@ -313,13 +313,13 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
+        $contactModel = new class extends LeadModel {
             public function __construct()
             {
             }
         };
 
-        $stageModel = new class() extends StageModel {
+        $stageModel = new class extends StageModel {
             public function __construct()
             {
             }
@@ -328,7 +328,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 123;
@@ -362,7 +362,7 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithLowerWeight(): void
     {
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -370,7 +370,7 @@ final class CampaignSubscriberTest extends TestCase
 
             public function getStage()
             {
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 444;
@@ -395,7 +395,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
+        $contactModel = new class extends LeadModel {
             public function __construct()
             {
             }
@@ -405,7 +405,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $stageModel = new class() extends StageModel {
+        $stageModel = new class extends StageModel {
             public function __construct()
             {
             }
@@ -414,7 +414,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class() extends Stage {
+                $stage = new class extends Stage {
                     public function getId()
                     {
                         return 123;
@@ -442,7 +442,7 @@ final class CampaignSubscriberTest extends TestCase
 
     private function createTranslatorMock(): TranslatorInterface
     {
-        return new class() implements TranslatorInterface {
+        return new class implements TranslatorInterface {
             public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';

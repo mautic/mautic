@@ -113,7 +113,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         protected FieldModel $fieldModel,
         protected IntegrationEntityModel $integrationEntityModel,
         protected DoNotContactModel $doNotContact,
-        protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+        protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
@@ -823,7 +823,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $internalEntity,
         $internalEntityId,
         array $internal = null,
-        $persist = true
+        $persist = true,
     ): ?IntegrationEntity {
         $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();

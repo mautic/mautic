@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 final class ConfigHelper
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

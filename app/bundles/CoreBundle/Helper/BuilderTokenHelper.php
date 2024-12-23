@@ -28,7 +28,7 @@ class BuilderTokenHelper
         private CorePermissions $security,
         private ModelFactory $modelFactory,
         private Connection $connection,
-        private UserHelper $userHelper
+        private UserHelper $userHelper,
     ) {
     }
 
@@ -39,7 +39,7 @@ class BuilderTokenHelper
         string $modelName,
         ?string $viewPermissionBase = null,
         ?string $bundleName = null,
-        ?string $langVar = null
+        ?string $langVar = null,
     ): void {
         $this->modelName          = $modelName;
         $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";
@@ -71,7 +71,7 @@ class BuilderTokenHelper
         $filter = '',
         $labelColumn = 'name',
         $valueColumn = 'id',
-        CompositeExpression $expr = null
+        CompositeExpression $expr = null,
     ) {
         if (!$this->isConfigured) {
             throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');

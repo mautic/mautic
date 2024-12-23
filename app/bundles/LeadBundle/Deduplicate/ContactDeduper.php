@@ -18,7 +18,7 @@ class ContactDeduper
         FieldModel $fieldModel,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         private ContactMerger $contactMerger,
-        private LeadRepository $leadRepository
+        private LeadRepository $leadRepository,
     ) {
         $this->fieldModel                 = $fieldModel;
         $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;

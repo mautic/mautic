@@ -20,7 +20,7 @@ class Fetcher
     public function __construct(
         private Mailbox $imapHelper,
         private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

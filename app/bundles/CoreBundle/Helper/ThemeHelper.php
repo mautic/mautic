@@ -100,7 +100,7 @@ class ThemeHelper implements ThemeHelperInterface
         private CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper
+        private BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;

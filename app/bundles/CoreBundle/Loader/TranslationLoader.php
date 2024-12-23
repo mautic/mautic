@@ -13,7 +13,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
     public function __construct(
         private BundleHelper $bundleHelper,
-        private PathsHelper $pathsHelper
+        private PathsHelper $pathsHelper,
     ) {
     }
 

@@ -92,49 +92,6 @@ input[style] {
   border-bottom-color: transparent;
 }
 
-//Search
-.search-container {
-  display: flex;
-  align-items: center;
-  .transition(all 0.3s ease);
-
-  .search {
-    border: none;
-    background-color: transparent !important; // JS libraries apply inline styles, showing a weird rectangle background behind the icon.
-    position: absolute;
-    left: 0px;
-    width: 24px;
-    height: 34px;
-    padding: 0 0 0 32px;
-    z-index: 1;
-    .transition(all 0.5s ease);
-  }
-
-  a.search-button {
-    color: var(--icon-secondary);
-    position: absolute;
-    display: inline-flex;
-    left: 12px;
-    z-index: 5;
-    transition: var(--transition-all-productive);
-
-    &:hover {
-      color: var(--icon-primary);
-    }
-  }
-
-  &.active {
-    .search {
-      width: 225px;
-      border: 1px solid @input-border;
-    }
-
-    i {
-      color: var(--icon-interactive);
-    }
-  }
-}
-
 // stacked form
 .form-stack {
   .form-control {

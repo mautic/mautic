@@ -213,7 +213,7 @@ class LeadEventLogRepository extends CommonRepository
         $all = false,
         \DateTimeInterface $dateFrom = null,
         \DateTimeInterface $dateTo = null,
-        int $eventId = null
+        int $eventId = null,
     ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
 

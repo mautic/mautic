@@ -61,7 +61,16 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.permission.repository', Mautic\UserBundle\Entity\PermissionRepository::class);
     $services->alias('mautic.user.model.password_strength_estimator', Mautic\UserBundle\Model\PasswordStrengthEstimatorModel::class);
     $services->get(Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class)->tag('validator.constraint_validator');
-    $services->alias('lightsaml.system.time_provider', LightSaml\Provider\TimeProvider\TimeProviderInterface::class);
+
+    $services->load('Mautic\\UserBundle\\Security\\SAML\Store\\Request\\', '../Security/SAML/Store/Request/*.php');
+    $services->get(Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore::class)
+        ->arg('$prefix', '%lightsaml.store.request_session_prefix%')
+        ->arg('$suffix', '%lightsaml.store.request_session_sufix%');
     $services->get(MainEntryPoint::class)->arg('$samlEnabled', '%env(MAUTIC_SAML_ENABLED)%');
     $services->get(ApiUserSubscriber::class)->arg('$userProvider', service('security.user_providers'));
+
+    // Below are fixes for autowiring of SAML SpBundle.
+    $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
+    $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
+        ->tag('controller.service_arguments');
 };

@@ -129,7 +129,7 @@ class WebhookModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         $this->setConfigProps($coreParametersHelper);
 

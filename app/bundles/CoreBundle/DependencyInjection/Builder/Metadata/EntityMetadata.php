@@ -13,7 +13,7 @@ class EntityMetadata
     private array $serializerConfig = [];
 
     public function __construct(
-        private BundleMetadata $metadata
+        private BundleMetadata $metadata,
     ) {
     }
 

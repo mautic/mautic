@@ -38,7 +38,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         FlashBag $flashBag,
         ?RequestStack $requestStack,
         ?CorePermissions $security,
-        private AuthorizationCheckerInterface $authorizationChecker
+        private AuthorizationCheckerInterface $authorizationChecker,
     ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

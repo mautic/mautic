@@ -32,7 +32,7 @@ class FormSubscriber implements EventSubscriberInterface
         MailHelper $mailer,
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private LanguageHelper $languageHelper
+        private LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }

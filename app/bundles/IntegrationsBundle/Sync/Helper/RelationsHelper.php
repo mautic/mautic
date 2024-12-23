@@ -19,7 +19,7 @@ class RelationsHelper
     private array $objectsToSynchronize = [];
 
     public function __construct(
-        private MappingHelper $mappingHelper
+        private MappingHelper $mappingHelper,
     ) {
     }
 

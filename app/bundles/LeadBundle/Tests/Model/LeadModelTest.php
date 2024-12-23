@@ -736,7 +736,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         return new class($id) extends Lead {
             public function __construct(
-                private int $id
+                private int $id,
             ) {
                 parent::__construct();
             }
@@ -753,7 +753,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     private function getFieldPaginatorFake(): Paginator
     {
-        return new class() extends Paginator {
+        return new class extends Paginator {
             public function __construct()
             {
             }

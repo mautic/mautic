@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class VariantType extends AbstractType
 {
     public function __construct(
-        private EmailModel $emailModel
+        private EmailModel $emailModel,
     ) {
     }
 

@@ -41,7 +41,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         string $object,
         string $type,
         string $operator,
-        array $additionalValue = []
+        array $additionalValue = [],
     ): void {
         $fieldDetails = [
             'alias'               => 'select_field',
@@ -129,7 +129,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         Event $yesEvent,
         Event $noEvent,
         array $yesEventLeads,
-        array $noEventLeads
+        array $noEventLeads,
     ): void {
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
             ->findBy(['campaign' => $campaign, 'event' => $yesEvent], ['event' => 'ASC']);
@@ -265,7 +265,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         string $eventType,
         array $property = null,
         string $decisionPath = '',
-        Event $parentEvent = null
+        Event $parentEvent = null,
     ): Event {
         $event = new Event();
         $event->setName($name);
@@ -328,7 +328,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         string $object,
         array $fieldDetails,
         array $additionalValue,
-        int $index
+        int $index,
     ): Lead {
         $fieldValue      = !empty($fieldDetails) ?
             array_merge($fieldDetails, ['value' => array_merge(['v'.$index], $additionalValue)]) : [];

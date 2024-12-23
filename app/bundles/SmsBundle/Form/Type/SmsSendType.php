@@ -15,10 +15,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class SmsSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(

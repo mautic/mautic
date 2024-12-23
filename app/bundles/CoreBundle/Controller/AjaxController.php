@@ -63,7 +63,7 @@ class AjaxController extends CommonController
      */
     public function delegateAjaxAction(
         Request $request,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
     ) {
         // process ajax actions
         $action     = $request->get('action');
@@ -121,7 +121,7 @@ class AjaxController extends CommonController
     public function executeAjaxAction(
         Request $request,
         $action,
-        $bundle = null
+        $bundle = null,
     ) {
         if (method_exists($this, $action.'Action')) {
             return $this->forwardWithPost(
@@ -495,7 +495,7 @@ class AjaxController extends CommonController
         PathsHelper $pathsHelper,
         LanguageHelper $languageHelper,
         CookieHelper $cookieHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ): JsonResponse {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;

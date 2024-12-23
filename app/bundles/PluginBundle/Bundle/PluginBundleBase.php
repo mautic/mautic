@@ -80,7 +80,7 @@ abstract class PluginBundleBase extends Bundle
         Plugin $plugin,
         MauticFactory $factory,
         $metadata = null,
-        Schema $installedSchema = null
+        Schema $installedSchema = null,
     ): void {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         // self::updatePluginSchema($metadata, $installedSchema, $factory);

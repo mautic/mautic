@@ -11,7 +11,7 @@ class IdStore implements IdStoreInterface
 {
     public function __construct(
         private ObjectManager $manager,
-        private TimeProviderInterface $timeProvider
+        private TimeProviderInterface $timeProvider,
     ) {
     }
 

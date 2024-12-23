@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserStepType extends AbstractType
 {
     public function __construct(
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 

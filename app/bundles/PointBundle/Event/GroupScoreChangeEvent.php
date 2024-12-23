@@ -12,7 +12,7 @@ final class GroupScoreChangeEvent
     public function __construct(
         private GroupContactScore $groupContactScore,
         private int $oldScore,
-        private int $newScore
+        private int $newScore,
     ) {
     }
 

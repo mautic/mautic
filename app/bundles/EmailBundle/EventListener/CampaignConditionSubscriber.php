@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailValidator $validator
+        private EmailValidator $validator,
     ) {
     }
 

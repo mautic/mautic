@@ -65,7 +65,7 @@ class ImportController extends FormController
         Translator $translator,
         FlashBag $flashBag,
         private RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         /** @var ImportModel $model */
         $model = $modelFactory->getModel($this->getModelName());

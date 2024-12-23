@@ -34,7 +34,7 @@ class PartialObjectReportBuilder
         private FieldHelper $fieldHelper,
         private FieldBuilder $fieldBuilder,
         private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

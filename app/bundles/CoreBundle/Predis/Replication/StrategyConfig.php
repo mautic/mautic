@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Predis\Replication;
 final class StrategyConfig
 {
     public function __construct(
-        private bool $primaryOnly
+        private bool $primaryOnly,
     ) {
     }
 

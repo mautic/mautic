@@ -24,10 +24,14 @@ class IcontactType extends AbstractType
         private IntegrationHelper $integrationHelper,
         private PluginModel $pluginModel,
         protected RequestStack $requestStack,
-        protected CoreParametersHelper $coreParametersHelper
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration $object */

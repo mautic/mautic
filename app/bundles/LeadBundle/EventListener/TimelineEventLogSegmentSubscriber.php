@@ -22,7 +22,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         LeadEventLogRepository $eventLogRepository,
         private UserHelper $userHelper,
         Translator $translator,
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
     ) {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;

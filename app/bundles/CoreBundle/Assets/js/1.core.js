@@ -345,7 +345,7 @@ var Mautic = {
         });
 
         Mautic.addKeyboardShortcut('f /', 'Global Search', function (e) {
-            mQuery('#globalSearchContainer .search-button').click();
+            mQuery('.search-button').click();
         });
 
         Mautic.addKeyboardShortcut('/', 'Search current list', function (e) {

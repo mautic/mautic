@@ -34,7 +34,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         UrlGeneratorInterface $router,
         ClientManagerInterface $clientManager,
         EventDispatcherInterface $eventDispatcher,
-        private Environment $twig
+        private Environment $twig,
     ) {
         parent::__construct(
             $requestStack,

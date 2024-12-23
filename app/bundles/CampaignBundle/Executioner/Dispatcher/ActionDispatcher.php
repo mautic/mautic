@@ -24,7 +24,7 @@ class ActionDispatcher
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private EventScheduler $scheduler,
-        private LegacyEventDispatcher $legacyDispatcher
+        private LegacyEventDispatcher $legacyDispatcher,
     ) {
     }
 

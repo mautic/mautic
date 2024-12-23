@@ -51,7 +51,7 @@ class ChannelBroadcastEvent extends Event
          * Specific ID of a specific channel.
          */
         protected string|int|null $id,
-        protected OutputInterface $output
+        protected OutputInterface $output,
     ) {
     }
 

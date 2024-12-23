@@ -24,7 +24,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         private FieldList $fieldList,
         private CorePermissions $corePermissions,
         private CompanyModel $companyModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

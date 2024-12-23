@@ -68,7 +68,7 @@ class LeadController extends FormController
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
-        $page = 1
+        $page = 1,
     ) {
         // set some permissions
         $permissions = $this->security->isGranted(

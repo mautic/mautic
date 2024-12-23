@@ -53,8 +53,24 @@
             </a>
             <!--/ brand -->
          </li>
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.search_everything',
+                    tooltip_placement: 'right',
+                    variant: 'ghost',
+                    icon: 'ri-search-line ri-xl',
+                    icon_only: true,
+                    attributes: {
+                    'type': 'button',
+                    'data-toggle': 'modal',
+                    'data-target': '#gsearchModal',
+                    'class': 'search-button'
+                }
+                }
+            ]
+        } %}
 
-        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
     </ul>
     <!--/ end: left nav -->
 

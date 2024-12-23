@@ -15,7 +15,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
     public function __construct(
         private ListModel $segmentModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

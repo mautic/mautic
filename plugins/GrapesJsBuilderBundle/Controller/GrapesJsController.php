@@ -37,7 +37,7 @@ class GrapesJsController extends CommonController
         AssetsHelper $assetsHelper,
         FormFactoryInterface $formFactory,
         $objectType,
-        $objectId
+        $objectId,
     ) {
         if (!in_array($objectType, self::OBJECT_TYPE)) {
             throw new \Exception('Object not authorized to load custom builder', Response::HTTP_CONFLICT);

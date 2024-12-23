@@ -417,7 +417,7 @@ class PublicController extends AbstractFormController
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
         TrackingHelper $trackingHelper,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
     ) {
         $notSuccessResponse = new JsonResponse(
             [
@@ -467,7 +467,7 @@ class PublicController extends AbstractFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
-        $redirectId
+        $redirectId,
     ): \Symfony\Component\HttpFoundation\RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 

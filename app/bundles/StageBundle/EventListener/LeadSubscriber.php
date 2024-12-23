@@ -17,7 +17,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private StagesChangeLogRepository $stagesChangeLogRepository,
         private LeadStageLogRepository $leadStageLogRepository,
         private TranslatorInterface $translator,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

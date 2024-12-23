@@ -274,7 +274,7 @@ class EmailController extends FormController
         $page = $request->getSession()->get('mautic.email.page', 1);
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -649,7 +649,7 @@ class EmailController extends FormController
         EmailModel $model,
         $objectId,
         $ignorePost = false,
-        $forceTypeSelection = false
+        $forceTypeSelection = false,
     ) {
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
@@ -1669,7 +1669,7 @@ class EmailController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,

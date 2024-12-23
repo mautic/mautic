@@ -22,7 +22,7 @@ final class SyncJudge implements SyncJudgeInterface
     public function adjudicate(
         $mode,
         InformationChangeRequestDAO $leftChangeRequest,
-        InformationChangeRequestDAO $rightChangeRequest
+        InformationChangeRequestDAO $rightChangeRequest,
     ) {
         if ($leftChangeRequest->getNewValue() === $rightChangeRequest->getNewValue()) {
             return $leftChangeRequest;

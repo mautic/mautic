@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SlotChannelFrequencyType extends SlotType
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -14,7 +14,7 @@ class RetryStrategy implements RetryStrategyInterface
     private RetryStrategyInterface $retryStrategy;
 
     public function __construct(
-        private CoreParametersHelper $parametersHelper
+        private CoreParametersHelper $parametersHelper,
     ) {
     }
 

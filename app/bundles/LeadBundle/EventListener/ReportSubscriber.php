@@ -72,7 +72,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private CompanyModel $companyModel,
         private CompanyReportData $companyReportData,
         private FieldsBuilder $fieldsBuilder,
-        private Translator $translator
+        private Translator $translator,
     ) {
     }
 

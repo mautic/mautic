@@ -12,7 +12,7 @@ class ClientSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel
+        private AuditLogModel $auditLogModel,
     ) {
     }
 

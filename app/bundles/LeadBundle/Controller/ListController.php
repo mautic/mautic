@@ -728,7 +728,7 @@ class ListController extends FormController
 
         if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
             $filters = [
-                'includeEvents' => InputHelper::clean($request->get('includeEvents', [])),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
             ];
             $request->getSession()->set('mautic.segment.filters', $filters);
         } else {
@@ -767,7 +767,7 @@ class ListController extends FormController
         $translator = $this->translator;
         /** @var ListModel $listModel */
         $listModel                    = $this->getModel('lead.list');
-        $dateRangeValues              = $request->get('daterange', []);
+        $dateRangeValues              = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action                       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm                = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $segmentContactsLineChartData = $listModel->getSegmentContactsLineChartData(
@@ -945,7 +945,7 @@ class ListController extends FormController
         $listFilters     = ['manually_removed' => $manuallyRemoved];
         if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
             $filters = [
-                'includeEvents' => InputHelper::clean($request->get('includeEvents', [])),
+                'includeEvents' => InputHelper::clean($request->query->all()['includeEvents'] ?? $request->request->all()['includeEvents'] ?? []),
             ];
             $request->getSession()->set('mautic.segment.filters', $filters);
         } else {

@@ -21,7 +21,7 @@ class FilterType extends AbstractType
 {
     public function __construct(
         private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
-        private ListModel $listModel
+        private ListModel $listModel,
     ) {
     }
 

@@ -18,7 +18,7 @@ class EncryptionHelper
     private $key;
 
     public function __construct(
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $nonCipherArgs = 1;
         for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {

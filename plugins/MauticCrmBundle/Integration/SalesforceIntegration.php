@@ -1607,7 +1607,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $limit,
         $fromDate,
         $toDate,
-        &$totalCount
+        &$totalCount,
     ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
         $toUpdate = $this->getIntegrationEntityRepository()->findLeadsToUpdate(
@@ -1661,7 +1661,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fromDate,
         $toDate,
         &$totalCount,
-        $progress = null
+        $progress = null,
     ) {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $leadsToCreate         = $integrationEntityRepo->findLeadsToCreate(
@@ -1733,7 +1733,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $object,
         &$entity,
         $objectId = null,
-        $sfRecord = null
+        $sfRecord = null,
     ): array {
         $body         = [];
         $updateEntity = [];
@@ -2101,7 +2101,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $objectFields,
         $mauticLeadFieldString,
         $sfEntityRecords,
-        $progress = null
+        $progress = null,
     ) {
         foreach ($sfEntityRecords['records'] as $sfKey => $sfEntityRecord) {
             $skipObject = false;
@@ -2247,7 +2247,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$mauticData,
         &$checkEmailsInSF,
         &$processedLeads,
-        $objectFields
+        $objectFields,
     ) {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
@@ -2840,7 +2840,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$companiesToSync,
         $objectFields,
         $sfEntityRecords,
-        $progress = null
+        $progress = null,
     ) {
         foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
             $syncCompany = false;
@@ -2929,7 +2929,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$mauticData,
         &$checkCompaniesInSF,
         &$processedCompanies,
-        $objectFields
+        $objectFields,
     ) {
         foreach ($checkCompaniesInSF as $key => $company) {
             if (!empty($company['integration_entity_id']) and array_key_exists($key, $processedCompanies)) {
@@ -2965,7 +2965,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fromDate,
         $toDate,
         &$totalCount,
-        $internalEntity
+        $internalEntity,
     ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
         $toUpdate = $this->getIntegrationEntityRepository()->findLeadsToUpdate(
@@ -2997,7 +2997,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fromDate,
         $toDate,
         &$totalCount,
-        $progress = null
+        $progress = null,
     ) {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $entitiesToCreate      = $integrationEntityRepo->findLeadsToCreate(

@@ -47,7 +47,7 @@ class CacheStorageHelper
         protected $namespace = null,
         protected ?Connection $connection = null,
         $cacheDir = null,
-        protected $defaultExpiration = 0
+        protected $defaultExpiration = 0,
     ) {
         $this->cacheDir          = $cacheDir.'/data';
 

@@ -36,7 +36,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(InvalidCredentialsException::class);
 
-        $credentials = new class() implements AuthCredentialsInterface {
+        $credentials = new class implements AuthCredentialsInterface {
         };
 
         (new HttpFactory())->getClient($credentials);
@@ -46,7 +46,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return '';
@@ -70,7 +70,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -94,7 +94,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -118,7 +118,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements PasswordCredentialsGrantInterface {
+        $credentials = new class implements PasswordCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -152,7 +152,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements PasswordCredentialsGrantInterface {
+        $credentials = new class implements PasswordCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -184,7 +184,7 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -207,7 +207,7 @@ class HttpFactoryTest extends TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credentials2 = new class() implements ClientCredentialsGrantInterface {
+        $credentials2 = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -256,7 +256,7 @@ class HttpFactoryTest extends TestCase
 
     public function testPasswordGrantTypeIsUsed(): void
     {
-        $credentials = new class() implements PasswordCredentialsGrantInterface {
+        $credentials = new class implements PasswordCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -293,7 +293,7 @@ class HttpFactoryTest extends TestCase
 
     public function testClientCredentialsGrantTypeIsUsed(): void
     {
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
@@ -387,7 +387,7 @@ class HttpFactoryTest extends TestCase
      */
     private function getCredentials(): PasswordCredentialsGrantInterface
     {
-        return new class() implements PasswordCredentialsGrantInterface, StateInterface, ScopeInterface, CredentialsInterface {
+        return new class implements PasswordCredentialsGrantInterface, StateInterface, ScopeInterface, CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';

@@ -16,6 +16,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TriggerEventType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks = ['description' => 'html'];

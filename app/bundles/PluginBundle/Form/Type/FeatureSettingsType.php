@@ -21,10 +21,14 @@ class FeatureSettingsType extends AbstractType
     public function __construct(
         protected RequestStack $requestStack,
         protected CoreParametersHelper $coreParametersHelper,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObject = $options['integration_object'];

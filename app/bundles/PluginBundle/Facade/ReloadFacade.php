@@ -11,7 +11,7 @@ class ReloadFacade
     public function __construct(
         private PluginModel $pluginModel,
         private ReloadHelper $reloadHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

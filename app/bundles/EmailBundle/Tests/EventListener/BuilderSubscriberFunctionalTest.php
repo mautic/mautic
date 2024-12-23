@@ -77,7 +77,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, LEAD>
+     * @return array<string, Lead>
      */
     private function createContacts(int $count, LeadList $segment): array
     {

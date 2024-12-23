@@ -22,7 +22,7 @@ class CategoryListType extends AbstractType
         private EntityManager $em,
         private TranslatorInterface $translator,
         private CategoryModel $model,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

@@ -63,7 +63,7 @@ class LeadSubscriber implements EventSubscriberInterface
         ModelFactory $modelFactory,
         private CoreParametersHelper $coreParametersHelper,
         private CompanyLeadRepository $companyLeadRepository,
-        private $isTest = false
+        private $isTest = false,
     ) {
         $this->router              = $router;
 

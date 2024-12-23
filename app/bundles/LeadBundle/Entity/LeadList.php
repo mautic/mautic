@@ -65,7 +65,7 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
+     * @var ArrayCollection<ListLead>
      */
     private $leads;
 

@@ -24,7 +24,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         array $startDate,
         array $endDate,
         array $accumulativeTime,
-        array $page
+        array $page,
     ): void {
         // Fetch the campaign condition form.
         $uri = 's/campaigns/events/new?type=lead.pageHit&eventType=condition&campaignId=3&anchor=leadsource&anchorEventType=source&_=1682493324393&mauticUserLastActive=897&mauticLastNotificationId=';

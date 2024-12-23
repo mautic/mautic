@@ -746,7 +746,7 @@ class UpdateHelperTest extends TestCase
 
     private function getFailingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class() extends AbstractPreUpdateCheck {
+        return new class extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('Dummy')]);
@@ -756,7 +756,7 @@ class UpdateHelperTest extends TestCase
 
     private function getPassingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class() extends AbstractPreUpdateCheck {
+        return new class extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(true, null);

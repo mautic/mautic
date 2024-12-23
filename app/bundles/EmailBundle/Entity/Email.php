@@ -905,7 +905,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return ArrayCollection<int, LeadList>
      */
     public function getLists()
     {
@@ -947,7 +947,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return Collection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return Collection<int, LeadList>
      */
     public function getExcludedLists(): Collection
     {

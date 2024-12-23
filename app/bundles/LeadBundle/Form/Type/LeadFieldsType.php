@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class LeadFieldsType extends AbstractType
 {
     public function __construct(
-        protected FieldModel $fieldModel
+        protected FieldModel $fieldModel,
     ) {
     }
 

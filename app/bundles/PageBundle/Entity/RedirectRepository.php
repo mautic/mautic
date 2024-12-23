@@ -61,7 +61,7 @@ class RedirectRepository extends CommonRepository
         $createdByUserId = null,
         $companyId = null,
         $campaignId = null,
-        $segmentId = null
+        $segmentId = null,
     ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->addSelect('pr.url')

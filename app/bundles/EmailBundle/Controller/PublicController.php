@@ -91,7 +91,7 @@ class PublicController extends CommonFormController
         Request $request,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
-        string $idHash
+        string $idHash,
     ): Response {
         try {
             $messageBus->dispatch(new EmailHitNotification($idHash, $request));

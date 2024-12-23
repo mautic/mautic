@@ -13,7 +13,7 @@ trait ControllerTrait
         string $routeAlias,
         string $column,
         string $tableAlias,
-        string $column2
+        string $column2,
     ): void {
         $crawler         = $this->client->request('GET', '/s/'.$urlAlias);
         $clientResponse  = $this->client->getResponse();

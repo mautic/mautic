@@ -12,7 +12,7 @@ class CsvExporter
     public function __construct(
         protected FormatterHelper $formatterHelper,
         private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

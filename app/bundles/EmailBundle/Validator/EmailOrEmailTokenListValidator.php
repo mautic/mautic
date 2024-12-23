@@ -22,7 +22,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
 
     public function __construct(
         private EmailValidator $emailValidator,
-        private CustomFieldValidator $customFieldValidator
+        private CustomFieldValidator $customFieldValidator,
     ) {
         $this->transformer = new ArrayStringTransformer();
     }

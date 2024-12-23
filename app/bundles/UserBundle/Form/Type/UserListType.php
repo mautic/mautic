@@ -18,7 +18,7 @@ class UserListType extends AbstractType
     private array $choices = [];
 
     public function __construct(
-        private UserModel $userModel
+        private UserModel $userModel,
     ) {
     }
 

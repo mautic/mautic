@@ -19,7 +19,7 @@ class PageSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private FocusModel $model,
         private RouterInterface $router,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
 

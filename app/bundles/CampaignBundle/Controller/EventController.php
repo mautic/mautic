@@ -49,7 +49,7 @@ class EventController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
-        private CampaignModel $campaignModel
+        private CampaignModel $campaignModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -545,7 +545,7 @@ class EventController extends CommonFormController
     private function eventViewVars(
         array $event,
         string $campaignId,
-        string $action
+        string $action,
     ): array {
         // Merge default event properties with provided event data
         $event = array_merge((new Event())->convertToArray(), $event);

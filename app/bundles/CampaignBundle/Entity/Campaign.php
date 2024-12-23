@@ -61,17 +61,17 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $events;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Lead>
+     * @var ArrayCollection<int, Lead>
      */
     private $leads;
 
     /**
-     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<int, LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Form>
+     * @var ArrayCollection<int, Form>
      */
     private $forms;
 
@@ -430,7 +430,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Set publishUp.
      *
-     * @param \DateTime $publishUp
+     * @param ?\DateTime $publishUp
      *
      * @return Campaign
      */
@@ -455,7 +455,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Set publishDown.
      *
-     * @param \DateTimeInterface $publishDown
+     * @param ?\DateTime $publishDown
      *
      * @return Campaign
      */

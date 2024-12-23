@@ -16,10 +16,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class IntegrationCampaignsTaskType extends AbstractType
 {
     public function __construct(
-        private ConnectwiseIntegration $connectwiseIntegration
+        private ConnectwiseIntegration $connectwiseIntegration,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(

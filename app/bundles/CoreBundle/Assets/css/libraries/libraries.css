@@ -1069,7 +1069,7 @@ html {
 }
 body {
   font-family: "Source Sans 3", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.3856;
   color: #3c4650;
   background-color: #fff;
@@ -1130,8 +1130,8 @@ img {
   border-radius: 50%;
 }
 hr {
-  margin-top: 18px;
-  margin-bottom: 18px;
+  margin-top: 19px;
+  margin-bottom: 19px;
   border: 0;
   border-top: 1px solid var(--border-subtle);
 }
@@ -1208,8 +1208,8 @@ h2,
 .h2,
 h3,
 .h3 {
-  margin-top: 18px;
-  margin-bottom: 9px;
+  margin-top: 19px;
+  margin-bottom: 9.5px;
 }
 h1 small,
 .h1 small,
@@ -1231,8 +1231,8 @@ h5,
 .h5,
 h6,
 .h6 {
-  margin-top: 9px;
-  margin-bottom: 9px;
+  margin-top: 9.5px;
+  margin-bottom: 9.5px;
 }
 h4 small,
 .h4 small,
@@ -1250,45 +1250,45 @@ h6 .small,
 }
 h1,
 .h1 {
-  font-size: 33px;
+  font-size: 36px;
 }
 h2,
 .h2 {
-  font-size: 27px;
+  font-size: 30px;
 }
 h3,
 .h3 {
-  font-size: 20px;
+  font-size: 21px;
 }
 h4,
 .h4 {
-  font-size: 16px;
+  font-size: 17px;
 }
 h5,
 .h5 {
-  font-size: 14px;
+  font-size: 15px;
 }
 h6,
 .h6 {
-  font-size: 13px;
+  font-size: 14px;
 }
 p {
-  margin: 0 0 9px;
+  margin: 0 0 9.5px;
 }
 .lead {
-  margin-bottom: 18px;
-  font-size: 14px;
+  margin-bottom: 19px;
+  font-size: 16px;
   font-weight: 300;
   line-height: 1.4;
 }
 @media (min-width: 768px) {
   .lead {
-    font-size: 19.5px;
+    font-size: 21px;
   }
 }
 small,
 .small {
-  font-size: 92%;
+  font-size: 85%;
 }
 mark,
 .mark {
@@ -1394,14 +1394,14 @@ a.bg-danger:focus {
   background-color: #e4b9b9;
 }
 .page-header {
-  padding-bottom: 8px;
-  margin: 36px 0 18px;
+  padding-bottom: 8.5px;
+  margin: 38px 0 19px;
   border-bottom: 1px solid #ebedf0;
 }
 ul,
 ol {
   margin-top: 0;
-  margin-bottom: 9px;
+  margin-bottom: 9.5px;
 }
 ul ul,
 ol ul,
@@ -1425,7 +1425,7 @@ ol ol {
 }
 dl {
   margin-top: 0;
-  margin-bottom: 18px;
+  margin-bottom: 19px;
 }
 dt,
 dd {
@@ -1460,9 +1460,9 @@ abbr[data-original-title] {
   text-transform: uppercase;
 }
 blockquote {
-  padding: 9px 18px;
-  margin: 0 0 18px;
-  font-size: 16.25px;
+  padding: 9.5px 19px;
+  margin: 0 0 19px;
+  font-size: 17.5px;
   border-left: 5px solid var(--border-no-color);
 }
 blockquote p:last-child,
@@ -1508,7 +1508,7 @@ blockquote.pull-right .small:after {
   content: "\00A0 \2014";
 }
 address {
-  margin-bottom: 18px;
+  margin-bottom: 19px;
   font-style: normal;
   line-height: 1.3856;
 }
@@ -1541,9 +1541,9 @@ kbd kbd {
 }
 pre {
   display: block;
-  padding: 8.5px;
-  margin: 0 0 9px;
-  font-size: 12px;
+  padding: 9px;
+  margin: 0 0 9.5px;
+  font-size: 13px;
   line-height: 1.3856;
   color: var(--text-primary);
   word-break: break-all;
@@ -1590,7 +1590,7 @@ th {
 .table {
   width: 100%;
   max-width: 100%;
-  margin-bottom: 18px;
+  margin-bottom: 19px;
 }
 .table > thead > tr > th,
 .table > tbody > tr > th,
@@ -1762,7 +1762,7 @@ th {
 @media screen and (max-width: 767px) {
   .table-responsive {
     width: 100%;
-    margin-bottom: 13.5px;
+    margin-bottom: 14.25px;
     overflow-y: hidden;
     -ms-overflow-style: -ms-autohiding-scrollbar;
     border: 1px solid var(--border-subtle);
@@ -1814,8 +1814,8 @@ legend {
   display: block;
   width: 100%;
   padding: 0;
-  margin-bottom: 18px;
-  font-size: 19.5px;
+  margin-bottom: 19px;
+  font-size: 21px;
   line-height: inherit;
   color: var(--text-primary);
   border: 0;
@@ -1868,16 +1868,16 @@ input[type="checkbox"]:focus {
 output {
   display: block;
   padding-top: 7px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.3856;
   color: #596776;
 }
 .form-control {
   display: block;
   width: 100%;
-  height: 32px;
+  height: 33px;
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.3856;
   color: #596776;
   background-color: var(--field);
@@ -1928,7 +1928,7 @@ textarea.form-control {
   input[type="time"].form-control,
   input[type="datetime-local"].form-control,
   input[type="month"].form-control {
-    line-height: 32px;
+    line-height: 33px;
   }
   input[type="date"].input-sm,
   input[type="time"].input-sm,
@@ -1948,7 +1948,7 @@ textarea.form-control {
   .input-group-lg input[type="time"],
   .input-group-lg input[type="datetime-local"],
   .input-group-lg input[type="month"] {
-    line-height: 42px;
+    line-height: 44px;
   }
 }
 .form-group {
@@ -1969,7 +1969,7 @@ fieldset[disabled] .checkbox label {
 }
 .radio label,
 .checkbox label {
-  min-height: 18px;
+  min-height: 19px;
   padding-left: 20px;
   margin-bottom: 0;
   font-weight: 400;
@@ -2009,7 +2009,7 @@ fieldset[disabled] .checkbox-inline {
   margin-left: 10px;
 }
 .form-control-static {
-  min-height: 31px;
+  min-height: 33px;
   padding-top: 7px;
   padding-bottom: 7px;
   margin-bottom: 0;
@@ -2051,53 +2051,53 @@ select[multiple].input-sm {
 }
 .form-group-sm .form-control-static {
   height: 29px;
-  min-height: 30px;
+  min-height: 31px;
   padding: 6px 10px;
   font-size: 12px;
   line-height: 1.456;
 }
 .input-lg {
-  height: 42px;
+  height: 44px;
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.25;
   border-radius: 6px;
 }
 select.input-lg {
-  height: 42px;
-  line-height: 42px;
+  height: 44px;
+  line-height: 44px;
 }
 textarea.input-lg,
 select[multiple].input-lg {
   height: auto;
 }
 .form-group-lg .form-control {
-  height: 42px;
+  height: 44px;
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.25;
   border-radius: 6px;
 }
 .form-group-lg select.form-control {
-  height: 42px;
-  line-height: 42px;
+  height: 44px;
+  line-height: 44px;
 }
 .form-group-lg textarea.form-control,
 .form-group-lg select[multiple].form-control {
   height: auto;
 }
 .form-group-lg .form-control-static {
-  height: 42px;
-  min-height: 34px;
+  height: 44px;
+  min-height: 36px;
   padding: 11px 16px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.25;
 }
 .has-feedback {
   position: relative;
 }
 .has-feedback .form-control {
-  padding-right: 40px;
+  padding-right: 41.25px;
 }
 .form-control-feedback {
   position: absolute;
@@ -2105,18 +2105,18 @@ select[multiple].input-lg {
   right: 0;
   z-index: 2;
   display: block;
-  width: 32px;
-  height: 32px;
-  line-height: 32px;
+  width: 33px;
+  height: 33px;
+  line-height: 33px;
   text-align: center;
   pointer-events: none;
 }
 .input-lg + .form-control-feedback,
 .input-group-lg + .form-control-feedback,
 .form-group-lg .form-control + .form-control-feedback {
-  width: 42px;
-  height: 42px;
-  line-height: 42px;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
 }
 .input-sm + .form-control-feedback,
 .input-group-sm + .form-control-feedback,
@@ -2216,7 +2216,7 @@ select[multiple].input-lg {
   color: #a94442;
 }
 .has-feedback label ~ .form-control-feedback {
-  top: 23px;
+  top: 24px;
 }
 .has-feedback label.sr-only ~ .form-control-feedback {
   top: 0;
@@ -2287,7 +2287,7 @@ select[multiple].input-lg {
 }
 .form-horizontal .radio,
 .form-horizontal .checkbox {
-  min-height: 25px;
+  min-height: 26px;
 }
 .form-horizontal .form-group {
   margin-right: -15px;
@@ -2306,7 +2306,7 @@ select[multiple].input-lg {
 @media (min-width: 768px) {
   .form-horizontal .form-group-lg .control-label {
     padding-top: 11px;
-    font-size: 16px;
+    font-size: 17px;
   }
 }
 @media (min-width: 768px) {
@@ -2327,7 +2327,7 @@ select[multiple].input-lg {
   background-image: none;
   border: 1px solid transparent;
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.3856;
   border-radius: 32px;
   -webkit-user-select: none;
@@ -2724,7 +2724,7 @@ fieldset[disabled] .btn-link:focus {
 .btn-lg,
 .btn-group-lg > .btn {
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.25;
   border-radius: 32px;
 }
@@ -2814,7 +2814,7 @@ tbody.collapse.in {
   min-width: 160px;
   padding: 5px 0;
   margin: 2px 0 0;
-  font-size: 13px;
+  font-size: 14px;
   text-align: left;
   list-style: none;
   background-color: var(--layer-translucent);
@@ -2831,7 +2831,7 @@ tbody.collapse.in {
 }
 .dropdown-menu .divider {
   height: 1px;
-  margin: 8px 0;
+  margin: 8.5px 0;
   overflow: hidden;
   background-color: var(--border-no-color);
 }
@@ -3122,17 +3122,17 @@ tbody.collapse.in {
 .input-group-lg > .form-control,
 .input-group-lg > .input-group-addon,
 .input-group-lg > .input-group-btn > .btn {
-  height: 42px;
+  height: 44px;
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.25;
   border-radius: 6px;
 }
 select.input-group-lg > .form-control,
 select.input-group-lg > .input-group-addon,
 select.input-group-lg > .input-group-btn > .btn {
-  height: 42px;
-  line-height: 42px;
+  height: 44px;
+  line-height: 44px;
 }
 textarea.input-group-lg > .form-control,
 textarea.input-group-lg > .input-group-addon,
@@ -3183,7 +3183,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .input-group-addon {
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1;
   color: #596776;
@@ -3199,7 +3199,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .input-group-addon.input-lg {
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 17px;
   border-radius: 6px;
 }
 .input-group-addon input[type="radio"],
@@ -3294,7 +3294,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .nav .nav-divider {
   height: 1px;
-  margin: 8px 0;
+  margin: 8.5px 0;
   overflow: hidden;
   background-color: #e5e5e5;
 }
@@ -3452,7 +3452,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar {
   position: relative;
   min-height: 50px;
-  margin-bottom: 18px;
+  margin-bottom: 19px;
   border: 1px solid transparent;
 }
 @media (min-width: 768px) {
@@ -3558,9 +3558,9 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-brand {
   float: left;
   height: 50px;
-  padding: 16px 15px;
-  font-size: 16px;
-  line-height: 18px;
+  padding: 15.5px 15px;
+  font-size: 17px;
+  line-height: 19px;
 }
 .navbar-brand:hover,
 .navbar-brand:focus {
@@ -3605,12 +3605,12 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-nav {
-  margin: 8px -15px;
+  margin: 7.75px -15px;
 }
 .navbar-nav > li > a {
   padding-top: 10px;
   padding-bottom: 10px;
-  line-height: 18px;
+  line-height: 19px;
 }
 @media (max-width: 767px) {
   .navbar-nav .open .dropdown-menu {
@@ -3627,7 +3627,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     padding: 5px 15px 5px 25px;
   }
   .navbar-nav .open .dropdown-menu > li > a {
-    line-height: 18px;
+    line-height: 19px;
   }
   .navbar-nav .open .dropdown-menu > li > a:hover,
   .navbar-nav .open .dropdown-menu > li > a:focus {
@@ -3643,8 +3643,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     float: left;
   }
   .navbar-nav > li > a {
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding-top: 15.5px;
+    padding-bottom: 15.5px;
   }
 }
 .navbar-form {
@@ -3655,8 +3655,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   border-bottom: 1px solid transparent;
   -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
-  margin-top: 9px;
-  margin-bottom: 9px;
+  margin-top: 8.5px;
+  margin-bottom: 8.5px;
 }
 @media (min-width: 768px) {
   .navbar-form .form-group {
@@ -3746,8 +3746,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   border-bottom-left-radius: 0;
 }
 .navbar-btn {
-  margin-top: 9px;
-  margin-bottom: 9px;
+  margin-top: 8.5px;
+  margin-bottom: 8.5px;
 }
 .navbar-btn.btn-sm {
   margin-top: 10.5px;
@@ -3758,8 +3758,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   margin-bottom: 14px;
 }
 .navbar-text {
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: 15.5px;
+  margin-bottom: 15.5px;
 }
 @media (min-width: 768px) {
   .navbar-text {
@@ -3982,7 +3982,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 }
 .breadcrumb {
   padding: 8px 15px;
-  margin-bottom: 18px;
+  margin-bottom: 19px;
   list-style: none;
   background-color: #f5f5f5;
   border-radius: 10.8px;
@@ -4001,7 +4001,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination {
   display: inline-block;
   padding-left: 0;
-  margin: 18px 0;
+  margin: 19px 0;
   border-radius: 10.8px;
 }
 .pagination > li {
@@ -4065,7 +4065,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination-lg > li > a,
 .pagination-lg > li > span {
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.25;
 }
 .pagination-lg > li:first-child > a,
@@ -4096,7 +4096,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 }
 .pager {
   padding-left: 0;
-  margin: 18px 0;
+  margin: 19px 0;
   text-align: center;
   list-style: none;
 }
@@ -4191,7 +4191,7 @@ a.badge:focus {
 }
 .jumbotron p {
   margin-bottom: 15px;
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 200;
 }
 .jumbotron > hr {
@@ -4218,13 +4218,13 @@ a.badge:focus {
   }
   .jumbotron h1,
   .jumbotron .h1 {
-    font-size: 59px;
+    font-size: 63px;
   }
 }
 .thumbnail {
   display: block;
   padding: 4px;
-  margin-bottom: 18px;
+  margin-bottom: 19px;
   line-height: 1.3856;
   background-color: transparent;
   border: 1px solid var(--border-subtle);
@@ -4249,7 +4249,7 @@ a.thumbnail.active {
 }
 .alert {
   padding: 15px;
-  margin-bottom: 18px;
+  margin-bottom: 19px;
   border: 1px solid transparent;
   border-radius: 10.8px;
 }
@@ -4339,8 +4339,8 @@ a.thumbnail.active {
   }
 }
 .progress {
-  height: 18px;
-  margin-bottom: 18px;
+  height: 19px;
+  margin-bottom: 19px;
   overflow: hidden;
   background-color: #f5f5f5;
   border-radius: 10.8px;
@@ -4352,7 +4352,7 @@ a.thumbnail.active {
   width: 0%;
   height: 100%;
   font-size: 12px;
-  line-height: 18px;
+  line-height: 19px;
   color: #fff;
   text-align: center;
   background-color: var(--background-brand);
@@ -4465,16 +4465,16 @@ a.thumbnail.active {
   padding: 10px 15px;
   margin-bottom: -1px;
   background-color: transparent;
-  border: 1px solid transparent;
+  border: 1px solid var(--border-subtle);
 }
 .list-group-item:first-child {
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
 }
 .list-group-item:last-child {
   margin-bottom: 0;
-  border-bottom-right-radius: 0px;
-  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
 }
 .list-group-item.disabled,
 .list-group-item.disabled:hover,
@@ -4497,8 +4497,8 @@ a.thumbnail.active {
 .list-group-item.active:hover,
 .list-group-item.active:focus {
   z-index: 2;
-  color: var(--text-inverse);
-  background-color: var(--layer-selected-inverse);
+  color: var(--text-primary);
+  background-color: var(--layer-hover);
   border-color: var(--border-subtle);
 }
 .list-group-item.active .list-group-item-heading,
@@ -4515,7 +4515,7 @@ a.thumbnail.active {
 .list-group-item.active .list-group-item-text,
 .list-group-item.active:hover .list-group-item-text,
 .list-group-item.active:focus .list-group-item-text {
-  color: var(--text-inverse);
+  color: var(--text-primary);
 }
 a.list-group-item,
 button.list-group-item {
@@ -4662,7 +4662,7 @@ button.list-group-item-danger.active:focus {
   line-height: 1.3;
 }
 .panel {
-  margin-bottom: 18px;
+  margin-bottom: 19px;
   background-color: var(--background);
   border: 1px solid transparent;
   border-radius: 15.6px;
@@ -4684,7 +4684,7 @@ button.list-group-item-danger.active:focus {
 .panel-title {
   margin-top: 0;
   margin-bottom: 0;
-  font-size: 15px;
+  font-size: 16px;
   color: inherit;
 }
 .panel-title > a,
@@ -4874,7 +4874,7 @@ button.list-group-item-danger.active:focus {
   border: 0;
 }
 .panel-group {
-  margin-bottom: 18px;
+  margin-bottom: 19px;
 }
 .panel-group .panel {
   margin-bottom: 0;
@@ -5054,7 +5054,7 @@ button.list-group-item-danger.active:focus {
 }
 .close {
   float: right;
-  font-size: 19.5px;
+  font-size: 21px;
   font-weight: normal;
   line-height: 1;
   color: var(--text-primary);
@@ -5338,7 +5338,7 @@ button.close {
   word-spacing: normal;
   word-wrap: normal;
   white-space: normal;
-  font-size: 13px;
+  font-size: 14px;
   background-color: transparent;
   background-clip: padding-box;
   border: 1px solid #ccc;
@@ -5438,7 +5438,7 @@ button.close {
 .popover-title {
   padding: 8px 14px;
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   background-color: #000;
   border-bottom: 1px solid #000000;
   border-radius: 14.6px 14.6px 0 0;
@@ -17231,7 +17231,7 @@ a > .fa {
 }
 .chosen-container {
   display: inline-block;
-  font-size: 13px;
+  font-size: 14px;
   position: relative;
   vertical-align: middle;
 }
@@ -17345,9 +17345,9 @@ a > .fa {
   -webkit-box-shadow: none;
   box-shadow: none;
   display: block;
-  height: 32px;
+  height: 33px;
   overflow: hidden;
-  line-height: 32px;
+  line-height: 33px;
   padding: 0 0 0 var(--spacing-05);
   position: relative;
   text-decoration: none;
@@ -17368,7 +17368,7 @@ a > .fa {
   height: 10px;
   position: absolute;
   right: 26px;
-  top: 11px;
+  top: 11.5px;
   width: 12px;
 }
 .chosen-container-single .chosen-single abbr:hover {
@@ -17484,7 +17484,7 @@ a > .fa {
   -webkit-box-shadow: none;
   box-shadow: none;
   color: var(--text-secondary);
-  height: 30px;
+  height: 31px;
   margin: 0;
   padding: 4px;
   outline: 0;
@@ -22236,16 +22236,16 @@ select[multiple].input-group.input-group-sm .twitter-typeahead .tt-hint {
 }
 .input-group.input-group-lg .twitter-typeahead .tt-input,
 .input-group.input-group-lg .twitter-typeahead .tt-hint {
-  height: 42px;
+  height: 44px;
   padding: 10px 16px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.25;
   border-radius: 15.6px;
 }
 select.input-group.input-group-lg .twitter-typeahead .tt-input,
 select.input-group.input-group-lg .twitter-typeahead .tt-hint {
-  height: 42px;
-  line-height: 42px;
+  height: 44px;
+  line-height: 44px;
 }
 textarea.input-group.input-group-lg .twitter-typeahead .tt-input,
 textarea.input-group.input-group-lg .twitter-typeahead .tt-hint,
@@ -22298,7 +22298,7 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   padding: 5px 0;
   margin: 2px 0 0;
   list-style: none;
-  font-size: 13px;
+  font-size: 14px;
   background-color: var(--layer-translucent);
   border: 1px solid #eee;
   border: 1px solid rgba(0, 0, 0, 0.06);

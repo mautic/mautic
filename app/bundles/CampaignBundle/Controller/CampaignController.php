@@ -99,7 +99,7 @@ class CampaignController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         private RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -159,7 +159,7 @@ class CampaignController extends AbstractStandardFormController
         $page = 1,
         $count = null,
         \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null
+        \DateTimeInterface $dateTo = null,
     ) {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
@@ -1095,7 +1095,7 @@ class CampaignController extends AbstractStandardFormController
         array &$events,
         int $leadCount,
         array $campaignLogCounts,
-        array $campaignLogCountsProcessed
+        array $campaignLogCountsProcessed,
     ): void {
         foreach ($events as &$event) {
             $event['logCountForPending'] =

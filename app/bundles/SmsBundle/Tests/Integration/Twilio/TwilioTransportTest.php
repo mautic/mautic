@@ -18,7 +18,7 @@ class TwilioTransportTest extends TestCase
     private TwilioTransport $twilioTransport;
 
     /**
-     * @var MockObject&\Monolog\Logger
+     * @var MockObject&Logger
      */
     private MockObject $logger;
 

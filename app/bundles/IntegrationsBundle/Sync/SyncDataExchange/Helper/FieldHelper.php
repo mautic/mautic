@@ -42,7 +42,7 @@ class FieldHelper
         private ChannelListHelper $channelListHelper,
         private TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        private ObjectProvider $objectProvider
+        private ObjectProvider $objectProvider,
     ) {
         $this->eventDispatcher         = $eventDispatcher;
     }
