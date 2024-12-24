@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Translation\Translator;
 
 final class BatchDeleteService
 {
+    public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
+
     private array $cannotBeDeleted = [];
 
     public function __construct(
@@ -35,20 +37,7 @@ final class BatchDeleteService
     ): array {
         $flashes        = [];
         $deleteIds      = [];
-
-        // When user select 'all'.
-        if ('all' === $ids) {
-            $filter     = ['string' => $searchValue, 'force' => []];
-        }
-        // When user select specific entities.
-        if (json_decode($ids)) {
-            $alias           = $model->getRepository()->getTableAlias();
-            $filter['force'] = [[
-                'column' => $alias.'.id',
-                'expr'   => 'in',
-                'value'  => json_decode($ids),
-            ]];
-        }
+        $filter         = $this->getBatchActionFilter($ids, $searchValue, $model);
 
         if (empty($filter)) {
             $flashes[] = ['msg' => 'mautic.core.error.ids.missing'];
@@ -59,7 +48,7 @@ final class BatchDeleteService
             ]);
             $permissionBase = $model->getPermissionBase();
             // Do this in chunks so that we don't run out of memory.
-            $chunks = array_chunk($entities, 200);
+            $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
             foreach ($chunks as $chunk) {
                 // Check if any entities cannot be deleted.
                 if (method_exists($model, 'cannotBeDeleted')) {
@@ -114,6 +103,26 @@ final class BatchDeleteService
         }
 
         return $flashes;
+    }
+
+    public function getBatchActionFilter(string $ids, string $searchValue, FormModel $model)
+    {
+        $filter = [];
+        // When user select 'all'.
+        if ('all' === $ids) {
+            $filter     = ['string' => $searchValue, 'force' => []];
+        }
+        // When user select specific entities.
+        if (json_decode($ids)) {
+            $alias           = $model->getRepository()->getTableAlias();
+            $filter['force'] = [[
+                'column' => $alias.'.id',
+                'expr'   => 'in',
+                'value'  => json_decode($ids),
+            ]];
+        }
+
+        return $filter;
     }
 
     private function checkPermission(string $permissionBase, $entity): bool
