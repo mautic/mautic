@@ -11,6 +11,8 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class EmailActionModel
 {
+    public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
+
     public function __construct(
         private EmailModel $emailModel,
         private EmailRepository $emailRepository,
@@ -28,14 +30,18 @@ class EmailActionModel
         $emails = $this->emailRepository->findBy(['id' => $emailsIds]);
 
         $affected = [];
-
-        foreach ($emails as $email) {
-            if (!$this->canEdit($email)) {
-                continue;
+        // Do this in chunks so that we don't run out of memory.
+        $chunks = array_chunk($emails, self::LOAD_RESULTS_IN_CHUNKS_OF);
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $email) {
+                if (!$this->canEdit($email)) {
+                    continue;
+                }
+                $email->setCategory($newCategory);
+                $affected[] = $email;
             }
-
-            $email->setCategory($newCategory);
-            $affected[] = $email;
+            // Clear the chunk from memory after each iteration.
+            unset($chunk);
         }
 
         if ($affected) {
@@ -43,6 +49,14 @@ class EmailActionModel
         }
 
         return $affected;
+    }
+
+    public function getEmails($filter): array
+    {
+        return $this->emailModel->getEntities([
+            'filter'           => $filter,
+            'ignore_paginator' => true,
+        ]);
     }
 
     private function canEdit(Email $email): bool
