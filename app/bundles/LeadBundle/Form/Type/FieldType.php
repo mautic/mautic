@@ -591,7 +591,8 @@ class FieldType extends AbstractType
 
         $constraints = [];
 
-        if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
+        $isNewIndexAllowed = $this->indexHelper->isNewIndexAllowed();
+        if (false === $options['data']->isIsindex() && false === $isNewIndexAllowed) {
             $constraints[] = new IsFalse(['message' => 'mautic.lead.field.form.index_count.error']);
         }
 
@@ -638,6 +639,18 @@ class FieldType extends AbstractType
                 ],
             ]
         );
+
+        // If the field is set to be searchable, ensure it is indexed for faster searches.
+        // The field will be included in the index only if it is within the allowed index count limit.
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($isNewIndexAllowed): void {
+            $data         = $event->getData();
+            $isSearchable = $data['isSearchable'] ?? false;
+            $isIndex      = $data['isIndex'] ?? false;
+            if ($isSearchable && !$isIndex && $isNewIndexAllowed) {
+                $data['isIndex'] = true;
+                $event->setData($data);
+            }
+        });
 
         $builder->add(
             'isSearchable',
