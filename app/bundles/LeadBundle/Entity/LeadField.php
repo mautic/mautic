@@ -109,7 +109,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
     private ?bool $isIndex = false;
 
-    private ?bool $isSearchable = false;
+    private bool $isSearchable = false;
 
     /**
      * The column in lead_fields table was not created yet if this property is true.

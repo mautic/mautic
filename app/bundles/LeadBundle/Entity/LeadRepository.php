@@ -670,7 +670,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
-        $customFields       = $this->getSearchableFieldAliases('lead');
+        $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'lead');
         $availableForSearch = array_map(fn ($alias) => 'l.'.$alias, $customFields);
 
         $columns = array_merge(
