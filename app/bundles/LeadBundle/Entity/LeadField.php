@@ -194,7 +194,11 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
         $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
         $builder->addNullableField('isIndex', 'boolean', 'is_index');
-        $builder->addNullableField('isSearchable', 'boolean', 'is_searchable');
+
+        $builder->createField('isSearchable', 'boolean')
+            ->columnName('is_searchable')
+            ->option('default', false)
+            ->build();
 
         $builder->createField('charLengthLimit', 'integer')
             ->columnName('char_length_limit')
@@ -836,12 +840,12 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         $this->isIndex = $indexable;
     }
 
-    public function getIsSearchable(): ?bool
+    public function getIsSearchable(): bool
     {
         return $this->isSearchable;
     }
 
-    public function setIsSearchable(?bool $isSearchable): void
+    public function setIsSearchable(bool $isSearchable): void
     {
         $this->isSearchable = $isSearchable;
     }
