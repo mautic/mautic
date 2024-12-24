@@ -18,6 +18,35 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    public function testWhenCreatingCustomFieldSearchableItMakesFieldIndexableAsWell(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $form = $crawler->selectButton('Save')->form();
+        $form->setValues([
+            'leadfield[label]'          => 'Custom field',
+            'leadfield[alias]'          => 'custom_field',
+            'leadfield[object]'         => 'lead',
+            'leadfield[type]'           => 'text',
+            'leadfield[group]'          => 'core',
+            'leadfield[isSearchable]'   => 1,
+        ]);
+
+        $formValuesSubmitted = $form->getValues();
+
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertSame('0', $formValuesSubmitted['leadfield[isIndex]']);
+        $this->assertSame('1', $formValuesSubmitted['leadfield[isSearchable]']);
+
+        $form              = $crawler->selectButton('Save')->form();
+        $formValuesUpdated = $form->getValues();
+        $this->assertNotSame($formValuesUpdated['leadfield[isIndex]'], $formValuesSubmitted['leadfield[isIndex]']);
+        $this->assertSame('1', $formValuesUpdated['leadfield[isIndex]']);
+        $this->assertSame('1', $formValuesUpdated['leadfield[isSearchable]']);
+    }
+
     public function testGlobalSearchForContactsUsingCustomFieldsData(): void
     {
         // Create a custom field for Contact
