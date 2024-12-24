@@ -576,14 +576,14 @@ class TagController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            /** @var TagModel $model */
-            $model           = $this->getModel('lead.tag');
+            $model           = $this->getModel('tagmanager.tag');
+            \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
             $flashes         = $this->batchDeleteService->batchDelete(
                 $model,
                 $postActionVars,
                 $request->query->get('ids', ''),
                 $request->get('search', $request->getSession()->get('mautic.tags.filter', '')),
-                'lead.tag',
+                'tagmanager.tag',
                 [$this, 'isLocked'],
             );
         } // else don't do anything

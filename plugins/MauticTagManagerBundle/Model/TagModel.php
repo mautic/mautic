@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
@@ -10,7 +11,7 @@ use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class TagModel extends BaseTagModel implements GlobalSearchInterface
+class TagModel extends BaseTagModel implements GlobalSearchInterface, CannotBeDeletedInterface
 {
     /**
      * @return TagRepository
@@ -36,5 +37,20 @@ class TagModel extends BaseTagModel implements GlobalSearchInterface
         }
 
         return $formFactory->create(TagEntityType::class, $entity, $options);
+    }
+
+    public function cannotBeDeleted(array $ids): array
+    {
+        $tagCounts   = $this->getRepository()->countByLeads($ids);
+        $usedTagCount= array_filter($tagCounts, fn ($count) => $count > 0);
+        $usedTags    = [];
+        foreach ($usedTagCount as $id => $count) {
+            $usedTags[$id] = [
+                'name'         => $this->getEntity($id)->getTag(),
+                'dependencies' => [(string) $count],
+            ];
+        }
+
+        return $usedTags;
     }
 }
