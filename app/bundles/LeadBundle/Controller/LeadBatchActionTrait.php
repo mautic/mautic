@@ -6,8 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 trait LeadBatchActionTrait
 {
-    public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
-
     /**
      * Return entity query filter for batch action based on ids.
      *
@@ -74,7 +72,7 @@ trait LeadBatchActionTrait
 
         $ids = [];
         // Do this in chunks so that we don't run out of memory.
-        $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
+        $chunks = array_chunk($entities, 200);
         foreach ($chunks as $chunk) {
             foreach ($chunk as $entity) {
                 $ids[] = $entity->getId();
