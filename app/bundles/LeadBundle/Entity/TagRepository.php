@@ -151,19 +151,24 @@ class TagRepository extends CommonRepository
         if (empty($tags)) {
             return $result;
         }
-
-        foreach ($leadIds as $leadId) {
-            $lead = $this->_em->find(Lead::class, $leadId);
-            foreach ($tags as $tag) {
-                if ('add' === $addOrRemove) {
-                    $lead->addTag($tag);
-                } else {
-                    $lead->removeTag($tag);
+        // Do this in chunks so that we don't run out of memory.
+        $chunks = array_chunk($leadIds, 200);
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $leadId) {
+                $lead = $this->_em->find(Lead::class, $leadId);
+                foreach ($tags as $tag) {
+                    if ('add' === $addOrRemove) {
+                        $lead->addTag($tag);
+                    } else {
+                        $lead->removeTag($tag);
+                    }
+                    $result[$leadId][$tag->getId()] = true;
                 }
-                $result[$leadId][$tag->getId()] = true;
+                $this->_em->persist($lead);
+                $this->_em->flush();
             }
-            $this->_em->persist($lead);
-            $this->_em->flush();
+            // Clear the chunk from memory after each iteration.
+            unset($chunk);
         }
 
         return $result;
