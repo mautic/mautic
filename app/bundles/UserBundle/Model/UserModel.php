@@ -403,8 +403,11 @@ class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDele
         if (in_array($currentUserId, $ids)) {
             return [
                 $currentUserId => [
-                    'name'         => $currentUser->getName(),
-                    'dependencies' => [],
+                    'type'    => 'error',
+                    'msg'     => 'mautic.user.user.error.cannot.delete.batch',
+                    'msgVars' => [
+                        '%name%' => $currentUser->getName(),
+                    ],
                 ],
             ];
         }

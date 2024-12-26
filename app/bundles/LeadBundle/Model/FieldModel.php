@@ -732,14 +732,6 @@ class FieldModel extends FormModel implements CannotBeDeletedInterface
     }
 
     /**
-     * Filter used field ids.
-     */
-    public function filterUsedFieldIds(array $ids): array
-    {
-        return array_filter($ids, fn ($id): bool => false === $this->isUsedField($this->getEntity($id)));
-    }
-
-    /**
      * Reorder fields based on passed entity position.
      */
     public function reorderFieldsByEntity($entity): void
@@ -1043,6 +1035,17 @@ class FieldModel extends FormModel implements CannotBeDeletedInterface
         $usedFields = [];
         foreach ($ids as $id) {
             $field    = $this->getEntity($id);
+            if ($field->isFixed()) {
+                $usedFields[$id] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.lead.field.error.cannot.delete.is_fixed',
+                    'msgVars' => [
+                        '%name%' => $field->getName(),
+                    ],
+                ];
+                continue;
+            }
+
             $segments = $this->getFieldSegments($field);
             if (0 === $segments->count()) {
                 continue;
@@ -1053,8 +1056,12 @@ class FieldModel extends FormModel implements CannotBeDeletedInterface
                 $segmentNames[] = $segment->getName();
             }
             $usedFields[$id] = [
-                'name'         => $field->getName(),
-                'dependencies' => $segmentNames,
+                'type'    => 'error',
+                'msg'     => 'mautic.lead.field.error.cannot.delete.batch',
+                'msgVars' => [
+                    '%name%'         => $field->getName(),
+                    '%dependencies%' => implode(',<br>', $segmentNames),
+                ],
             ];
         }
 

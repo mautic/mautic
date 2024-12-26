@@ -1270,8 +1270,12 @@ class ListModel extends FormModel implements GlobalSearchInterface, CannotBeDele
 
         foreach ($idsNotToBeDeleted as $val) {
             $namesNotToBeDeleted[$val] = [
-                'name'         => $this->getEntity($val)->getName(),
-                'dependencies' => $this->getSegmentsWithDependenciesOnSegment($val),
+                'type'    => 'error',
+                'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                'msgVars' => [
+                    '%name%'         => $this->getEntity($val)->getName(),
+                    '%dependencies%' => implode(',<br>', $this->getSegmentsWithDependenciesOnSegment($val)),
+                ],
             ];
         }
 

@@ -9,8 +9,9 @@ interface CannotBeDeletedInterface
      * <code>
      *    return [
      *       entityId => [
-     *          'name' => 'entityName',
-     *          'dependencies' => ['dependentEntityName'],
+     *         'type'    => 'error',
+     *         'msg'     => 'mautic.modelName.error.cannot.delete.batch',
+     *         'msgVars' => []
      *       ]
      *    ];
      * </code>.
@@ -19,9 +20,7 @@ interface CannotBeDeletedInterface
      *                   Ids selected for deletion
      *
      * @return array
-     *               An associative array where each key is an entity ID, and the value is an array containing:
-     *               - 'name' => the entity's name
-     *               - 'dependencies' => an array of entity names where the entity is used
+     *               An associative array where each key is an entity ID, and the value is a flash message for why entity cannot be deleted
      */
     public function cannotBeDeleted(array $ids): array;
 }

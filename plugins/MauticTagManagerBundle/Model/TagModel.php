@@ -46,8 +46,12 @@ class TagModel extends BaseTagModel implements GlobalSearchInterface, CannotBeDe
         $usedTags    = [];
         foreach ($usedTagCount as $id => $count) {
             $usedTags[$id] = [
-                'name'         => $this->getEntity($id)->getTag(),
-                'dependencies' => [(string) $count],
+                'type'    => 'error',
+                'msg'     => 'mautic.tagmanager.tag.error.cannot.delete.batch',
+                'msgVars' => [
+                    '%name%'  => $this->getEntity($id)->getTag(),
+                    '%count%' => $count,
+                ],
             ];
         }
 

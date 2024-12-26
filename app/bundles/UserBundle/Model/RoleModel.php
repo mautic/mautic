@@ -161,8 +161,11 @@ class RoleModel extends FormModel implements GlobalSearchInterface, CannotBeDele
                 continue;
             }
             $usedRoles[$id] = [
-                'name'         => $this->getEntity($id)->getName(),
-                'dependencies' => [],
+                'type'    => 'error',
+                'msg'     => 'mautic.user.role.error.cannot.delete.batch',
+                'msgVars' => [
+                    '%name%' => $this->getEntity($id)->getName(),
+                ],
             ];
         }
 

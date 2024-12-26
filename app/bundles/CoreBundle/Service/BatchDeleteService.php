@@ -11,8 +11,6 @@ final class BatchDeleteService
 {
     public const LOAD_RESULTS_IN_CHUNKS_OF = 200;
 
-    private array $cannotBeDeleted = [];
-
     public function __construct(
         private readonly CorePermissions $security,
         private readonly Translator $translator,
@@ -53,7 +51,7 @@ final class BatchDeleteService
                 // Check if any entities cannot be deleted.
                 if (method_exists($model, 'cannotBeDeleted')) {
                     $cannotBeDeleted       = $model->cannotBeDeleted(array_map(fn ($entity) => $entity->getId(), $chunk));
-                    $this->cannotBeDeleted = array_merge($this->cannotBeDeleted, $cannotBeDeleted);
+                    $flashes               = array_merge($flashes, $cannotBeDeleted);
                     // Filter out the entities that cannot be deleted.
                     $chunk = array_filter($chunk, fn ($entity) => !isset($cannotBeDeleted[$entity->getId()]));
                 }
@@ -87,19 +85,6 @@ final class BatchDeleteService
                     '%count%' => count($entities),
                 ],
             ];
-        }
-
-        if (!empty($this->cannotBeDeleted)) {
-            foreach ($this->cannotBeDeleted as $notDeleted) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.'.$modelName.'.error.cannot.delete.batch',
-                    'msgVars' => [
-                        '%name%'         => $notDeleted['name'],
-                        '%dependencies%' => implode(',<br>', $notDeleted['dependencies']),
-                    ],
-                ];
-            }
         }
 
         return $flashes;

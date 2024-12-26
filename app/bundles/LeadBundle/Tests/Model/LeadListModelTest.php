@@ -99,15 +99,36 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
             [
                 [1],
                 [
-                    1 => ['name' => '1', 'segments' => ['2']],
+                    1 => [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                        'msgVars' => [
+                            '%name%'         => '1',
+                            '%dependencies%' => '2',
+                        ],
+                    ],
                 ],
                 '2 is dependent on 1, so 1 cannot be deleted.',
             ],
             [
                 [1, 3],
                 [
-                    1 => ['name' => '1', 'segments' => ['2']],
-                    3 => ['name' => '3', 'segments' => ['2']],
+                    1 => [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                        'msgVars' => [
+                            '%name%'         => '1',
+                            '%dependencies%' => '2',
+                        ],
+                    ],
+                    3 => [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                        'msgVars' => [
+                            '%name%'         => '3',
+                            '%dependencies%' => '2',
+                        ],
+                    ],
                 ],
                 '2 is dependent on 1 & 3, so 1 & 3 cannot be deleted.',
             ],
