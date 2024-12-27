@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
+use Mautic\LeadBundle\Controller\LeadBatchActionTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticClearbitBundle\Form\Type\BatchLookupType;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClearbitController extends FormController
 {
+    use LeadBatchActionTrait;
+
     /**
      * @param string $objectId
      *
@@ -130,22 +133,11 @@ class ClearbitController extends FormController
         if (array_key_exists('ids', $data)) {
             $ids = $data['ids'];
 
-            if (!is_array($ids)) {
-                $ids = json_decode($ids, true);
-            }
-
-            if (is_array($ids) && count($ids)) {
+            $filter = $this->getBatchActionFilter($request, $ids);
+            if (!empty($filter)) {
                 $entities = $model->getEntities(
                     [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
+                        'filter'           => $filter,
                         'ignore_paginator' => true,
                     ]
                 );
@@ -383,22 +375,28 @@ class ClearbitController extends FormController
         if (array_key_exists('ids', $data)) {
             $ids = $data['ids'];
 
-            if (!is_array($ids)) {
-                $ids = json_decode($ids, true);
+            if ('all' === $ids) {
+                $filter = [
+                    'string' => $request->get('search', $request->getSession()->get('mautic.company.filter', '')),
+                    'force'  => [],
+                ];
+            } elseif (json_decode($ids)) {
+                $ids    = json_decode($ids, true);
+                $filter = [
+                    'force' => [
+                        [
+                            'column' => 'comp.id',
+                            'expr'   => 'in',
+                            'value'  => $ids,
+                        ],
+                    ],
+                ];
             }
 
-            if (is_array($ids) && count($ids)) {
+            if (!empty($filter)) {
                 $entities = $model->getEntities(
                     [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'comp.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
+                        'filter'           => $filter,
                         'ignore_paginator' => true,
                     ]
                 );

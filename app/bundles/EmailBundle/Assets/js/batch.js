@@ -2,15 +2,8 @@
 Mautic.emailBatchSubmit = function() {
     if (Mautic.batchActionPrecheck("")) {
         if (mQuery('#email_batch_newCategory').val()) {
-            const $emailBatchIds = mQuery('#email_batch_ids');
-            let ids = '';
-            if (mQuery('[data-toggle=selectall]').attr('data-selectall') === "1") {
-                ids = 'all';
-            } else if ($emailBatchIds.length) {
-                ids = Mautic.getCheckedListIds(false, true);
-            }
-            $emailBatchIds.val(ids);
-
+            ids = Mautic.getSelectedIds(false, true);
+            mQuery('#email_batch_ids').val(ids);
             return true;
         }
     }

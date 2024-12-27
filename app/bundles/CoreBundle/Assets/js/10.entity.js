@@ -347,12 +347,7 @@ Mautic.executeBatchAction = function (action, el) {
         // Action is currently being executed
         return;
     }
-
-    if (mQuery('[data-toggle=selectall]').attr('data-selectall') === "1") {
-        var items = 'all';
-    } else {
-        var items = Mautic.getCheckedListIds(el, true);
-    }
+    var items = Mautic.getSelectedIds(el, true);
 
     var queryGlue = action.indexOf('?') >= 0 ? '&' : '?';
     // Append the items to the action to send with the POST
@@ -405,3 +400,19 @@ Mautic.getCheckedListIds = function(el, stringify) {
 
     return items;
 };
+
+/**
+ * Based on data-selectall attribute, return all or list of ids.
+ *
+ * @param el
+ * @param stringify
+ * @returns {*}
+ */
+Mautic.getSelectedIds = function(el, stringify) {
+    if (mQuery('[data-toggle=selectall]').attr('data-selectall') === "1") {
+        return 'all'
+    }
+    else {
+        return Mautic.getCheckedListIds(el, stringify)
+    }
+}
