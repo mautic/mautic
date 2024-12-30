@@ -237,7 +237,7 @@ class SearchStringHelper
             $string = trim(strtolower($string));
 
             // remove operators and empty values
-            if (in_array($string, ['', 'or', 'and'])) {
+            if (in_array($string, ['', 'or', 'and']) && count($filters->{$baseName}) > 1) {
                 unset($filters->{$baseName}[$keyCount]);
 
                 return;
