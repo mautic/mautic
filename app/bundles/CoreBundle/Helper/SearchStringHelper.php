@@ -159,7 +159,7 @@ class SearchStringHelper
                 // arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
                 if (' ' != $string) {
                     $string = trim($string);
-                    $type   = ('or' == strtolower($string) || 'and' == strtolower($string)) ? $string : '';
+                    $type   = ('OR' === $string || 'AND' === $string) ? $string : '';
                     $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, !empty($chars));
                 }
                 continue;
@@ -232,12 +232,12 @@ class SearchStringHelper
         $setUpNext = true): void
     {
         if (!empty($type)) {
-            $filters->{$baseName}[$keyCount]->type = strtolower($type);
+            $filters->{$baseName}[$keyCount]->type = ('OR' === $type || 'AND' === $type) ? strtolower($type) : 'and';
         } elseif ($setFilter) {
-            $string = trim(strtolower($string));
+            $string = trim($string);
 
             // remove operators and empty values
-            if (in_array($string, ['', 'or', 'and']) && count($filters->{$baseName}) > 1) {
+            if (in_array($string, ['', 'OR', 'AND'])) {
                 unset($filters->{$baseName}[$keyCount]);
 
                 return;
