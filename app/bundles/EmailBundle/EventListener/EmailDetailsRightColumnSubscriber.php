@@ -8,22 +8,14 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\EmailBundle\Model\AbTest\EmailStatus;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailDetailsRightColumnSubscriber implements EventSubscriberInterface
 {
     public function __construct(private EmailModel $emailModel)
     {
     }
-
 
     /**
      * @return mixed[]
@@ -38,18 +30,15 @@ class EmailDetailsRightColumnSubscriber implements EventSubscriberInterface
     public function injectContent(CustomContentEvent $event): void
     {
         if ($event->checkContext('@MauticEmail/Email/details.html.twig', 'right.section.start')) {
-            $vars = $event->getVars();
+            $vars  = $event->getVars();
             $email = $vars['email'];
 
             $data = [
-                'email' => $email,
+                'email'          => $email,
                 'emailStatus'    => new EmailStatus($email, 0, $this->emailModel->getPublishStatus($email)),
-
             ];
             $event->addTemplate('@MauticEmail/Email/abdetails.html.twig', $data);
-
         }
-
     }
 
     /**

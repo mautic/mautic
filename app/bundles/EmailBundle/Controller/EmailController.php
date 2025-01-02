@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
-use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
@@ -41,7 +40,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailController extends FormController
 {
@@ -390,7 +388,7 @@ class EmailController extends FormController
                     'publishStatus'  => $model->getPublishStatus($email),
                     'variants'       => $variants,
                     'translations'   => $translations,
-                    'permissions' => $security->isGranted(
+                    'permissions'    => $security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -1209,7 +1207,7 @@ class EmailController extends FormController
             $clone->setVariantParent($entity);
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $model, $entityManager,  $abTestSettingsService, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $model, $entityManager, $abTestSettingsService, $clone);
     }
 
     /**

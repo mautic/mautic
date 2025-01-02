@@ -23,11 +23,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class VariantType extends AbstractType
 {
     public const DEFAULT_WINNER_DELAY = 24;
-    public const DEFAULT_WEIGHT = 10;
+    public const DEFAULT_WEIGHT       = 10;
 
     public function __construct(
         private EmailModel $emailModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

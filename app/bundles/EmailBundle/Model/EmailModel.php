@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
@@ -2327,11 +2326,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if ($email->isSegmentEmail() && $email->getPublishUp()) {
             if ('published' == $publishStatus) {
                 $pendingCount = $email->getPendingCount() || $this->getRepository()->getEmailPendingLeads(
-                        $email->getId(),
-                        null,
-                        null,
-                        true
-                    );
+                    $email->getId(),
+                    null,
+                    null,
+                    true
+                );
                 if ($email->isContinueSending()) {
                     $publishStatus = 'running';
                 } elseif ($pendingCount) {

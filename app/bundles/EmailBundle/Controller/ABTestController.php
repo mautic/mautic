@@ -35,7 +35,7 @@ class ABTestController extends AbstractFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -91,10 +91,10 @@ class ABTestController extends AbstractFormController
 
     protected function updateExistingParentVariant(\Mautic\EmailBundle\Entity\Email $parent, array $data): void
     {
-        $variantSettings = $parent->getVariantSettings();
-        $variantSettings['winnerCriteria'] = $data['winnerCriteria'] ?? 'email.openrate';
+        $variantSettings                    = $parent->getVariantSettings();
+        $variantSettings['winnerCriteria']  = $data['winnerCriteria'] ?? 'email.openrate';
         $variantSettings['sendWinnerDelay'] = $data['sendWinnerDelay'] ?? self::DEFAULT_DELAY;
-        $variantSettings['totalWeight'] = $data['totalWeight'] ?? AbTestSettingsService::DEFAULT_AB_WEIGHT;
+        $variantSettings['totalWeight']     = $data['totalWeight'] ?? AbTestSettingsService::DEFAULT_AB_WEIGHT;
         $variantSettings['enableAbTest']    = 1;
 
         $parent->setVariantSettings($variantSettings);

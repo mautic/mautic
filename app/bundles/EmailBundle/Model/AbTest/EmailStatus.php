@@ -14,15 +14,15 @@ class EmailStatus
     {
         if ($email->isEnableAbTest()) {
             [$this->parent, $this->children] = $this->email->getVariants();
-            $variantsPendingCount = $this->parent ? $this->parent->getVariantsPendingCount($pendingCount) : 0;
+            $variantsPendingCount            = $this->parent ? $this->parent->getVariantsPendingCount($pendingCount) : 0;
 
             if (!$this->hasChildren()) {
                 $this->status = 'prepare';
             } elseif (!$this->hasBeenStarted() && in_array($this->email->getPublishStatus(), ['published', 'unpublished'])) {
                 $this->status = $this->email->getPublishUp() ? 'running' : 'prepare';
-            } elseif ($this->publishStatus === 'pending') {
+            } elseif ('pending' === $this->publishStatus) {
                 $this->status = 'pending';
-            } elseif ($this->publishStatus === 'running') {
+            } elseif ('running' === $this->publishStatus) {
                 if ($this->email->waitingToDetermineWinner($variantsPendingCount) || $this->email->waitingToSendTestsEmails($variantsPendingCount)) {
                     $this->status = 'running';
                 }
