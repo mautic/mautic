@@ -120,7 +120,7 @@ class HitRepository extends CommonRepository
      *
      * @param int $code
      */
-    public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200): array
+    public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200, \DateTime $toDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -137,6 +137,12 @@ class HitRepository extends CommonRepository
             $dateHelper = new DateTimeHelper($fromDate);
             $q->andwhere($q->expr()->gte('h.date_hit', ':date'))
                 ->setParameter('date', $dateHelper->toUtcString());
+        }
+
+        if (null != $toDate) {
+            $dateHelper = new DateTimeHelper($toDate);
+            $q->andwhere($q->expr()->lte('h.date_hit', ':dateTo'))
+                ->setParameter('dateTo', $dateHelper->toUtcString());
         }
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));

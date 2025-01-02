@@ -323,7 +323,7 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int $emailIds
      */
-    public function getOpenedRates($emailIds, \DateTime $fromDate = null): array
+    public function getOpenedRates($emailIds, \DateTime $fromDate = null, \DateTime $toDate = null)
     {
         $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 
@@ -344,6 +344,18 @@ class StatRepository extends CommonRepository
                 $sq->expr()->gte('e.date_sent', $sq->expr()->literal($dt->toUtcString()))
             );
         }
+
+        if (null !== $toDate) {
+            $dt = new DateTimeHelper($toDate);
+            $sq->andWhere(
+                $sq->expr()->lte('e.date_sent', $sq->expr()->literal($dt->toUtcString())),
+                $sq->expr()->or(
+                    $sq->expr()->lte('e.date_read', $sq->expr()->literal($dt->toUtcString())),
+                    $sq->expr()->isNull('e.date_read')
+                )
+            );
+        }
+
         $sq->groupBy('e.email_id');
 
         // get a total number of sent emails first
@@ -545,7 +557,7 @@ class StatRepository extends CommonRepository
      *
      * @param array $emailIds
      */
-    public function getSentCounts($emailIds = [], \DateTime $fromDate = null): array
+    public function getSentCounts($emailIds = [], \DateTime $fromDate = null, \DateTime $toDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
@@ -562,6 +574,13 @@ class StatRepository extends CommonRepository
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
                 $q->expr()->gte('e.date_read', $q->expr()->literal($dt->toUtcString()))
+            );
+        }
+        if (null !== $toDate) {
+            // make sure the date is UTC
+            $dt = new DateTimeHelper($toDate);
+            $q->andWhere(
+                $q->expr()->lte('e.date_read', $q->expr()->literal($dt->toUtcString()))
             );
         }
         $q->groupBy('e.email_id');
@@ -824,5 +843,25 @@ class StatRepository extends CommonRepository
         $queryBuilder->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @param int $emailId
+     *
+     * @return string
+     */
+    public function getEmailSentLastDate($emailId)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('max(s.date_sent) as last_sent_date')
+            ->join('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
+            ->where('s.email_id = :email')
+            ->orWhere('e.variant_parent_id = :email')
+            ->setParameter('email', $emailId);
+
+        $result = $query->execute()->fetch();
+
+        return $result['last_sent_date'];
     }
 }

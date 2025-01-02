@@ -1,0 +1,118 @@
+{% if 'list' == email.emailType and not email.isEnableAbTest() and email.getSentCount() == 0 %}
+
+    <div class="col-xs-12">
+        <button class="btn btn-primary btn-block"
+                href="{{ path('mautic_abtest_generate', {'objectId': email.getId()}) }}"
+                data-toggle="ajaxmodal"
+                data-target="#MauticSharedModal"
+                data-header="{{ 'mautic.email.abtest.button'|trans }}">
+            <i class="ri-refresh-line"></i>
+            {{ 'mautic.email.abtest.button'|trans }}
+        </button>
+    </div>
+{% elseif email.isEnableAbTest() %}
+    {# @var \Mautic\EmailBundle\Model\AbTest\EmailStatus emailStatus #}
+    <!-- AB test -->
+    <div class="panel panel-default shd-none bdr-rds-0 bdr-w-0 mb-0" style="border:0 none">
+            <div class="panel-heading">
+                <a href="{{ path('mautic_abtest_generate', {'objectId': parentId}) }}"
+                   data-toggle="ajaxmodal"
+                   data-target="#MauticSharedModal"
+                   data-header="{{ 'mautic.email.abtest.settings'|trans }}"
+                   class="btn btn-ghost btn-icon pull-right"
+                   title="{{ 'mautic.core.ab_test.form.winner.send'|trans }}">
+                    <i class="ri-settings-3-line ri-lg"></i>
+                </a>
+                <h3 class="panel-title">
+                        <i class="ri-node-tree"></i>
+                        {{ 'mautic.core.variants.abtest'|trans }}
+                        {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': variants.parent, 'model': 'email', 'status': email.getPublishStatus(), 'size' : 'ri-xl'}) -}}
+                </h3>
+            </div>
+        <div class="panel-body">
+            <h6 class="mb-3">
+                <strong>{{ 'mautic.email.abtest.button.variants'|trans }} <span size="sm" class="label label-cool-gray mr-sm font-normal">{{ 1 + email.getVariantChildren()|length }}</span></strong>
+            </h6>
+            
+            {{- include('@MauticEmail/Variant/index.html.twig', {
+                'activeEntity': email,
+                'variants': variants,
+                'abTestResults': abTestResults,
+                'model': 'email',
+                'actionRoute': 'mautic_email_action'
+            }) -}}
+            <div class="row mt-3">
+                <div class="col-xs-12">
+                    {% if emailStatus.getStatus() == 'prepare' %}
+                        {% if not emailStatus.hasChildren() %}
+                            <div class="alert alert-warning">{{ 'mautic.email.abtest.not_ready'|trans|raw }}</div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                {{ 'mautic.email.ab.test.start.sending.start.tooltip'|trans({
+                                    '%percentage%': variants.abTestSettings.totalWeight,
+                                    '%hours%': variants.abTestSettings.sendWinnerDelay
+                                }) }}
+                            </div>
+                        {% endif %}
+
+                        <div class="btn-group">
+                            <a href="{{ path('mautic_email_action', {'objectAction': 'abTest', 'objectId': parentId}) }}"
+                               data-toggle="ajax"
+                               class="btn btn-default btn-tertiary btn-small"
+                               title="{{ 'mautic.email.ab_test.form.abtest.add'|trans }}">
+                                <i class="ri-add-line"></i>
+                                {{ 'mautic.email.ab_test.form.abtest.add'|trans }}
+                            </a>
+
+                            {% if emailStatus.hasChildren() %}
+                                <a href="{{ path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': parentId}) }}"
+                                   data-toggle="ajaxmodal"
+                                   data-target="#MauticSharedModal"
+                                   data-header="{{ 'mautic.email.send.schedule.abtest'|trans }}"
+                                   class="btn btn-primary btn-small"
+                                   title="{{ 'mautic.email.send.schedule.abtest'|trans }}">
+                                    <i class="ri-send-plane-line"></i>
+                                    {{ 'mautic.email.ab_test.form.abtest.schedule.sending'|trans }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% elseif emailStatus.getStatus() == 'pending' %}
+                        <div class="alert alert-info">
+                            {{ 'mautic.core.form.pending.start_at'|trans({
+                                '%date%': dateToFullConcat(email.getPublishUp())
+                            }) }}
+                        </div>
+                        <a href="{{ path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': parentId}) }}"
+                           data-toggle="ajaxmodal"
+                           data-target="#MauticSharedModal"
+                           data-header="{{ 'mautic.email.send.schedule.abtest'|trans }}"
+                           class="btn btn-default btn-primary btn-small">
+                            <i class="ri-time-line"></i>
+                            {{ 'mautic.email.reschedule.send'|trans }}
+                        </a>
+
+                    {% elseif emailStatus.getStatus() == 'running' %}
+                        {% if variants.hoursLeftToDetermineWinner is not null %}
+                            <div class="alert alert-info">
+                                {{ 'mautic.ab.test.hours.left.determine.winner'|trans({'%hours%': variants.hoursLeftToDetermineWinner.hours, '%minutes%': variants.hoursLeftToDetermineWinner.minutes}) }}
+                            </div>
+                        {% endif %}
+                        <a href="#" data-toggle="modal" data-target="#abStatsModal"
+                           class="btn btn-primary btn-small">
+                            <i class="ri-pie-chart-line"></i>
+                            {{ 'mautic.core.ab_test.stats'|trans }}
+                        </a>
+
+                    {% else %}
+                        <a href="#" data-toggle="modal" data-target="#abStatsModal"
+                           class="btn btn-primary btn-small">
+                            <i class="ri-pie-chart-line"></i>
+                            {{ 'mautic.core.ab_test.stats'|trans }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+<!--/ AB test -->

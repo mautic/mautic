@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -13,6 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
@@ -78,6 +80,7 @@ class PageModel extends FormModel
         private ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
         private ContactRequestHelper $contactRequestHelper,
+        private VariantConverterService $variantConverterService,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -1193,6 +1196,22 @@ class PageModel extends FormModel
         }
 
         return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
+    }
+
+    /**
+     * Converts a variant to the main item and the original main item a variant.
+     */
+    public function convertWinnerVariant(VariantEntityInterface $entity): void
+    {
+        // let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        $this->variantConverterService->convertWinnerVariant($entity);
+        /** @var iterable<Page> $save */
+        $save = $this->variantConverterService->getUpdatedVariants();
+
+        // save the entities
+        $this->saveEntities($save, false);
     }
 
     /*

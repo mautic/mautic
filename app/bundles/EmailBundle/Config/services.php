@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
@@ -19,6 +20,7 @@ return function (ContainerConfigurator $configurator): void {
         'MonitoredEmail/Processor',
         'Stat/Reference.php',
         'Helper/DTO',
+        'Model/AbTest/EmailStatus.php',
     ];
 
     $services->load('Mautic\\EmailBundle\\', '../')
@@ -28,6 +30,9 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+    $services->set(Mautic\EmailBundle\Mailer\Transport\TransportFactory::class);
+    $services->alias(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+    $services->alias('mautic.email.variant.converter', EmailVariantConverterService::class);
     $services->set(Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
         ->decorate('mailer.transport_factory');
 

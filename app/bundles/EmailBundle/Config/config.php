@@ -31,6 +31,10 @@ return [
                 'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
+            'mautic_abtest_generate' => [
+                'path'       => '/email/abtest/generate/{objectId}',
+                'controller' => 'Mautic\EmailBundle\Controller\ABTestController::generateABTestAction',
+            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [

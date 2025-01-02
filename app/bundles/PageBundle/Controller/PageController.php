@@ -12,6 +12,8 @@ use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
@@ -174,7 +176,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, $objectId)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page.page');
@@ -215,61 +217,14 @@ class PageController extends FormController
         }
 
         // get A/B test information
-        [$parent, $children]     = $activePage->getVariants();
-        $properties              = [];
-        $variantError            = false;
-        $weight                  = 0;
-        if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
-
-                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
-                        if (!isset($lastCriteria)) {
-                            $lastCriteria = $variantSettings['winnerCriteria'];
-                        }
-
-                        // make sure all the variants are configured with the same criteria
-                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                            $variantError = true;
-                        }
-
-                        $weight += $variantSettings['weight'];
-                    }
-                } else {
-                    $variantSettings['winnerCriteria'] = '';
-                    $variantSettings['weight']         = 0;
-                }
-
-                $properties[$c->getId()] = $variantSettings;
-            }
-
-            $properties[$parent->getId()]['weight']         = 100 - $weight;
-            $properties[$parent->getId()]['winnerCriteria'] = '';
-        }
+        [$parent, $children] = $activePage->getVariants();
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
-        if (!empty($lastCriteria) && empty($variantError)) {
-            // there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
-            if (isset($criteria['criteria'][$lastCriteria])) {
-                $testSettings = $criteria['criteria'][$lastCriteria];
 
-                $args = [
-                    'page'       => $activePage,
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties,
-                ];
-
-                $event = new DetermineWinnerEvent($args);
-                $this->dispatcher->dispatch(
-                    $event,
-                    $testSettings['event']
-                );
-
-                $abTestResults = $event->getAbTestResults();
-            }
+        if (count($children) > 0) {
+            $abTestSettings      = $abTestSettingsService->getAbTestSettings($parent);
+            $abTestResults       = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
         }
 
         // Init the date range filter form
@@ -311,10 +266,20 @@ class PageController extends FormController
                 'objectId'     => $activePage->getId(), ]
             ),
             'viewParameters' => [
-                'activePage'   => $activePage,
-                'variants'     => $variants,
-                'translations' => $translations,
-                'permissions'  => $security->isGranted([
+                'activePage' => $activePage,
+                'variants'   => [
+                    'parent'             => $parent,
+                    'children'           => $children,
+                    'properties'         => isset($abTestSettings) ? $abTestSettings['variants'] : null,
+                    'criteria'           => $criteria['criteria'],
+                    'winnerCriteria'     => isset($abTestSettings) ? $abTestSettings['winnerCriteria'] : null,
+                    'configurationError' => isset($abTestSettings) ? $abTestSettings['configurationError'] : null,
+                ],
+                'translations' => [
+                    'parent'   => $translationParent,
+                    'children' => $translationChildren,
+                ],
+                'permissions' => $security->isGranted([
                     'page:pages:viewown',
                     'page:pages:viewother',
                     'page:pages:create',
@@ -956,7 +921,7 @@ class PageController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'page.page');
             }
 
-            $model->convertVariant($entity);
+            $model->convertWinnerVariant($entity);
 
             $flashes[] = [
                 'type'    => 'notice',

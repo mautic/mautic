@@ -2,16 +2,10 @@
 
 namespace Mautic\EmailBundle\Stats\Helper;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 trait FilterTrait
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
     /**
      * @param int|null $companyId
      * @param string   $fromAlias

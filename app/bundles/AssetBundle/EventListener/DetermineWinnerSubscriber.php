@@ -50,7 +50,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
         $startDate = $parent->getVariantStartDate();
         if (null != $startDate && !empty($ids)) {
-            $counts = ('page' == $type) ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate);
+            $counts = ('page' == $type) ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate, $parent->getVariantEndDate());
 
             $translator = $this->translator;
             if ($counts) {

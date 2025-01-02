@@ -1,7 +1,5 @@
 {% extends isEmbedded ? '@MauticCore/Default/raw_output.html.twig' : '@MauticCore/Default/content.html.twig' %}
 
-{% block headerTitle email.name %}
-
 {% block mauticContent 'email' %}
 
 {% block indexButton %}
@@ -23,14 +21,25 @@
 {% endblock %}
 
 {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
-        'activeEntity': email,
-        'variants': variants,
-        'abTestResults': abTestResults,
-        'model': 'email',
-        'actionRoute': 'mautic_email_action',
+    'activeEntity': email,
+    'variants': variants,
+    'abTestResults': abTestResults,
+    'model': 'email',
+    'actionRoute': 'mautic_email_action',
 }) %}
 
+{% set parentId = email.isEnableAbTest() and email.getVariantParent() ? email.getVariantParent().getId() : email.getId() %}
 {% set showVariants = variantContent is defined and variantContent|trim is not empty %}
+
+
+{% block headerTitle %}
+    {{ email.getName() }}
+    {% if not isEmbedded %}
+        {% if showVariants %}
+            <i title="{{ 'mautic.email.icon_tooltip.abtest.part'|trans }}" class="ri-node-tree"></i>
+        {% endif %}
+    {% endif %}
+{% endblock %}
 
 {% set translationContent = include('@MauticCore/Translation/index.html.twig',
     {
@@ -51,6 +60,7 @@
 
 {% if not isEmbedded %}
     {% if 'list' == emailType %}
+        {% if not email.isEnableAbTest %}
         {% set sendButton = {
             'attr'      : {
                 'data-toggle' : 'ajax',
@@ -67,9 +77,10 @@
         {% endif %}
 
         {% set customButtons = customButtons|merge([sendButton]) %}
+        {% endif %}
     {% endif %}
     {% set sendButtons = [] %}
-    {% if 'list' == emailType %}
+    {% if 'list' == emailType and not email.isEnableAbTest %}
         {% set scheduleButton = {
             'attr': {
                 'class'       : 'btn btn-tertiary btn-nospin',
@@ -116,7 +127,9 @@
 {% endif %}
 
 {# Only show A/B test button if not already a translation of an a/b test #}
-{% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
+{% set allowAbTest = email.isEnableAbTest() %}
+{% set allowAddABVariant = emailType == 'list' and allowAbTest and permissions['email:emails:create'] and not email.getVariantSentCount(true) %}
+
 
 {% block publishStatus %}
     {% if not isEmbedded %}
@@ -166,7 +179,6 @@
                     email.getCreatedBy(),
                 ),
                 'clone'  : permissions['email:emails:create'],
-                'abtest' : (allowAbTest and permissions['email:emails:create']),
                 'delete' : securityHasEntityAccess(
                     permissions['email:emails:deleteown'],
                     permissions['email:emails:deleteother'],
@@ -180,35 +192,37 @@
 {% endblock %}
 
 {% block content %}
-  <!-- start: box layout -->
-  <div class="box-layout">
-      <!-- left section -->
-      <div class="col-md-9 height-auto">
-          <div>
-              <!-- email detail header -->
-              <div class="pr-md pl-md pt-lg pb-lg">
-                  <div class="box-layout">
-                      <div class="col-xs-10">
-                          <div>{{ email.subject }}</div>
-                          <div class="text-muted">{{ emailPreview }}</div>
-                          {% if email.isVariant(true) %}
-                            <div class="small">
-                              <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.variant_of'|trans ({'%parent%' : variants.parent.name}) -}}
-                              </a>
-                            </div>
-                          {% endif %}
-                          {% if email.isTranslation(true) %}
-                            <div class="small">
-                              <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}) -}}
-                              </a>
-                            </div>
-                          {% endif %}
-                      </div>
-                  </div>
-              </div>
-              <!--/ email detail header -->
+    <!-- start: box layout -->
+    <div class="box-layout">
+        <!-- left section -->
+        <div class="col-md-9 height-auto">
+            <div>
+                <!-- email detail header -->
+                <div class="pr-md pl-md pt-lg pb-lg">
+                    <div class="box-layout">
+                        <div class="col-xs-10">
+                            <div>{{ email.subject }}</div>
+                            <div class="text-muted">{{ emailPreview }}</div>
+                            {% if email.isVariant(true) %}
+                                <div class="small">
+                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}) }}"
+                                       data-toggle="ajax">
+                                        {{- 'mautic.core.variant_of'|trans ({'%parent%' : variants.parent.name}) -}}
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if email.isTranslation(true) %}
+                                <div class="small">
+                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id}) }}"
+                                       data-toggle="ajax">
+                                        {{- 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}) -}}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!--/ email detail header -->
 
               <!-- email detail collapseable -->
               <div class="collapse pr-md pl-md" id="email-details">
@@ -297,16 +311,17 @@
               <!--/ email detail collapseable -->
           </div>
 
-          <div>
-              <!-- email detail collapseable toggler -->
-              <div class="hr-expand nm">
+            <div>
+                <!-- email detail collapseable toggler -->
+                <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#email-details">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#email-details">
                       <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                     </a>
                 </span>
-              </div>
-              <!--/ email detail collapseable toggler -->
+                </div>
+                <!--/ email detail collapseable toggler -->
 
               {% set isVariant = showTranslations or showVariants ?: 0 %}
               {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
@@ -328,12 +343,12 @@
                   </ul>
                   <!--/ tabs controls -->
 
-                  <div class="date-range">
-                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
-                          'dateRangeForm': dateRangeForm,
-                      }) }}
-                  </div>
-              </div>
+                    <div class="date-range">
+                        {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                            'dateRangeForm': dateRangeForm,
+                        }) }}
+                    </div>
+                </div>
 
               <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
                   <div class="tab-pane active bdr-w-0" id="stats-container">
@@ -369,13 +384,6 @@
                           {{ 'mautic.email.associated.contacts'|trans }}
                       </a>
                   </li>
-                  {% if showVariants %}
-                      <li>
-                          <a href="#variants-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.core.variants'|trans }}
-                          </a>
-                      </li>
-                  {% endif %}
                   {% if showTranslations %}
                       <li>
                           <a href="#translation-container" role="tab" data-toggle="tab">
@@ -387,41 +395,36 @@
               <!--/ tabs controls -->
           </div>
 
-          <!-- start: tab-content -->
-          <div class="tab-content pa-md">
-              <div class="tab-pane active bdr-w-0" id="clicks-container">
-                  {{- include('@MauticPage/Trackable/click_counts.html.twig', {
-                      'trackables'  : trackables,
-                      'entity'      : email,
-                      'channel'     : 'email',
-                  }) -}}
-              </div>
+            <!-- start: tab-content -->
+            <div class="tab-content pa-md">
+                <div class="tab-pane active bdr-w-0" id="clicks-container">
+                    {{- include('@MauticPage/Trackable/click_counts.html.twig', {
+                        'trackables'  : trackables,
+                        'entity'      : email,
+                        'channel'     : 'email',
+                    }) -}}
+                </div>
 
-              <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
-                  {{ contacts | raw }}
-              </div>
+                <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
+                    {{ contacts | raw }}
+                </div>
 
-              {% if showVariants %}
-                  <!-- #variants-container -->
-                  <div class="tab-pane bdr-w-0" id="variants-container">
-                      {{ variantContent|raw }}
-                  </div>
-                  <!--/ #variants-container -->
-              {% endif %}
-
-              <!-- #translation-container -->
-              {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
-                      {{ translationContent|raw }}
-                  </div>
-              {% endif %}
-              <!--/ #translation-container -->
-          </div>
-      </div>
-      <!--/ left section -->
+                <!-- #translation-container -->
+                {% if showTranslations %}
+                    <div class="tab-pane bdr-w-0" id="translation-container">
+                        {{ translationContent|raw }}
+                    </div>
+                {% endif %}
+                <!--/ #translation-container -->
+            </div>
+        </div>
+        <!--/ left section -->
 
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
+
+          {{ customContent('right.section.start', _context) }}
+
           <!-- preview URL -->
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
@@ -480,13 +483,13 @@
                                     ]
                                 } %}
                           </span>
-                              <input type="hidden" id="content_preview_settings_object_id" value="{{ email.id }}">
-                              <input type="hidden" id="content_preview_settings_contact_id" value="">
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
+                                <input type="hidden" id="content_preview_settings_object_id" value="{{ email.id }}">
+                                <input type="hidden" id="content_preview_settings_contact_id" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
           <!-- Draft preview URL -->
           {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
@@ -526,11 +529,11 @@
               </div>
           </div>
 
-          <!-- activity feed -->
-          {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
+            <!-- activity feed -->
+            {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
 
-      </div>
-      <!-- right section -->
-      <input name="entityId" id="entityId" type="hidden" value="{{ email.id|escape }}"/>
-  </div>
+        </div>
+        <!-- right section -->
+        <input name="entityId" id="entityId" type="hidden" value="{{ email.id|escape }}"/>
+    </div>
 {% endblock %}

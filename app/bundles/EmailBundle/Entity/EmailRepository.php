@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -179,17 +180,19 @@ class EmailRepository extends CommonRepository
         $dncQb->select('dnc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $dncQb->expr()->and(
+                $dncQb->expr()->andX(
                     $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
                     $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
-                ));
+                )
+            );
 
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $mqQb->select('mq.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
             ->where(
-                $mqQb->expr()->and(
+                $mqQb->expr()->andX(
+                    $mqQb->expr()->eq('mq.lead_id', 'l.id'),
                     $mqQb->expr()->eq('mq.lead_id', 'l.id'),
                     $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT)),
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email'))
@@ -197,22 +200,23 @@ class EmailRepository extends CommonRepository
             );
 
         // Do not include leads that have already been emailed
-        $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $statQb->select('stat.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
-
-        $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
-
-        if ($variantIds) {
-            if (!in_array($emailId, $variantIds)) {
-                $variantIds[] = (string) $emailId;
-            }
-            $statQb->andWhere($statQb->expr()->in('stat.email_id', $variantIds));
-            $mqQb->andWhere($mqQb->expr()->in('mq.channel_id', $variantIds));
-        } else {
-            $statQb->andWhere($statQb->expr()->eq('stat.email_id', (int) $emailId));
-            $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
+        $statQb     = [];
+        $variantIds = $variantIds ?? [$emailId];
+        if (!in_array($emailId, $variantIds)) {
+            $variantIds[] = (int) $emailId;
         }
+        foreach ($variantIds as $variantId) {
+            $statQb[$variantId] = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $statQb[$variantId]->select('null')->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
+            $statQb[$variantId]->andWhere($statQb[$variantId]->expr()->eq('stat.email_id', $variantId));
+            $statQb[$variantId]->andWhere($statQb[$variantId]->expr()->eq('stat.lead_id', 'l.id'));
+            if (true === $this->segmentEmailOnceToEmailAddress) {
+                $statQb2[$variantId] = clone $statQb[$variantId];
+                $statQb2[$variantId]->innerJoin('stat', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = stat.lead_id');
+                $statQb2[$variantId]->andWhere(
+                    $statQb2[$variantId]->expr()->eq('ld.email', 'l.email')
+                );
+            }
 
         // Only include those who belong to the associated lead lists
         if (is_null($listIds)) {
@@ -269,11 +273,15 @@ class EmailRepository extends CommonRepository
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('l.id IN (%s)', $segmentQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
+            ->andWhere(sprintf('EXISTS (%s)', $segmentQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
+
+            foreach ($statQb as $estatQbi) {
+                $q->andWhere(sprintf('NOT EXISTS (%s)', $estatQbi->getSQL()));
+            }
+
 
         $excludedListQb = $this->getExcludedListQuery((int) $emailId);
 
@@ -358,7 +366,7 @@ class EmailRepository extends CommonRepository
         $results = $q->executeQuery()->fetchAllAssociative();
 
         if ($countOnly && $countWithMaxMin) {
-            // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
+            // ret  urns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
             return $results[0];
         } elseif ($countOnly) {
             return (isset($results[0])) ? $results[0]['count'] : 0;
@@ -655,6 +663,33 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * Clones email list cross-reference records and updates child emails to match the parent email.
+     *
+     * @param Email $entity the parent email entity
+     */
+    public function cloneFromParentToVariant(Email $entity): void
+    {
+        $parent    = $entity->getVariantParent() ?: $entity;
+        $hasParent = !empty($entity->getVariantParent());
+
+        if ($hasParent) {
+            $entity->setPublishUp($parent->getPublishUp());
+            $entity->setPublishDown($parent->getPublishDown());
+            $entity->setIsPublished($parent->getIsPublished());
+            $entity->setLists($parent->getLists()->toArray());
+        } else {
+            $variantsToUpdateFromParent = $entity->getVariantChildren()->toArray();
+            foreach ($variantsToUpdateFromParent as $variant) {
+                $variant->setPublishUp($parent->getPublishUp());
+                $variant->setPublishDown($parent->getPublishDown());
+                $variant->setIsPublished($parent->getIsPublished());
+                $variant->setLists(!empty($parent->getLists()) ? $parent->getLists()->toArray() : []);
+            }
+            $this->saveEntities($variantsToUpdateFromParent);
+        }
+    }
+
+    /**
      * Up the read/sent counts.
      *
      * @deprecated use upCountSent or incrementRead method
@@ -889,4 +924,28 @@ class EmailRepository extends CommonRepository
 
         return $queryBuilder;
     }
+
+        /**
+         * Gets emails with published variants.
+         *
+         * @return array<Email>
+         */
+        public function getPublishedEmailsWithVariant()
+        {
+            $qb = $this->getEntityManager()
+                ->createQueryBuilder();
+            $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+
+            $qb->select($this->getTableAlias())
+                ->from('MauticEmailBundle:Email', $this->getTableAlias())
+                ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
+                    $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+                    $qb->expr()->eq('v.isPublished', true)
+                ))
+                ->where($expr);
+
+            $result = $qb->getQuery()->getResult();
+
+            return $result;
+        }
 }

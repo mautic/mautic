@@ -39,6 +39,7 @@ class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            EmailEvents::EMAIL_PRE_SAVE       => ['cloneParentEmailDataForVariant', 0],
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
             EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
             EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
@@ -48,6 +49,14 @@ class EmailSubscriber implements EventSubscriberInterface
             EmailEvents::ON_EMAIL_EDIT_SUBMIT => ['manageEmailDraft'],
             EmailEvents::EMAIL_PRE_DELETE     => ['deleteEmailDraft'],
         ];
+    }
+
+    public function cloneParentEmailDataForVariant(Events\EmailEvent $event): void
+    {
+        $email = $event->getEmail();
+        if ($email->isVariant()) {
+            $this->emailModel->getRepository()->cloneFromParentToVariant($email);
+        }
     }
 
     /**

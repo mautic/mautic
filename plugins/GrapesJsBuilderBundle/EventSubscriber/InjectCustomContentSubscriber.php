@@ -60,9 +60,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
             $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
             if ('POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
                 if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getIsClone()) {
-                    $grapesJsBuilder = $this->grapesJsBuilderModel->getGrapesJsFromEmailId(
-                        $parameters['email']->getClonedId()
-                    );
+                    $brickBuilder = $this->brickBuilderModel->getBrickBuilderFromEmailId($parameters['email']->getIsClone());
                 }
 
                 if ($grapesJsBuilder instanceof GrapesJsBuilder) {

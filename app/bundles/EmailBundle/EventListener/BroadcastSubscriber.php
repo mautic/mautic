@@ -28,20 +28,71 @@ class BroadcastSubscriber implements EventSubscriberInterface
 
     public function onBroadcast(ChannelBroadcastEvent $event): void
     {
-        if (!$event->checkContext('email')) {
+        if (!$event->checkContext('email') && !$event->checkContext('email-abtest')) {
             return;
         }
+
+        $limit      = $event->getLimit();
+        $batch      = $event->getBatch();
 
         // Get list of published broadcasts or broadcast if there is only a single ID
         $emails = $this->model->getRepository()->getPublishedBroadcastsIterable($event->getId());
 
         foreach ($emails as $email) {
             $emailEntity                                        = $email;
+            if ($emailEntity->isVariant(true)) {
+                continue;
+            }
+
+            if ($emailEntity->isVariant(true)) {
+                continue;
+            }
+
+            // AB tests send with separate channel
+            if (!$emailEntity->isEnableAbTest() && $event->checkContext('email-abtest')) {
+                continue;
+            }
+
+            // winner send with standard sending
+            if ($emailEntity->isWinner() && $event->checkContext('email-abtest')) {
+                continue;
+            }
+
+            // is a/b testings
+            if ($emailEntity->isEnableAbTest()) {
+                $totalPendingCount         = $this->model->getPendingLeads($emailEntity, null, true);
+                $totalLeadCountForVariants = $emailEntity->getVariantsPendingCount($totalPendingCount);
+                $emailEntity->setPendingCount($totalPendingCount);
+
+                if ($emailEntity->waitingToDetermineWinner($totalLeadCountForVariants)) {
+                    continue;
+                }
+                if ($emailEntity->waitingToSendTestsEmails($totalLeadCountForVariants)) {
+                    if (!$event->checkContext('email-abtest')) {
+                        continue;
+                    }
+
+                    // only 1 thread for AB
+                    if ($threadId && $threadId > 1) {
+                        continue;
+                    }
+
+                    // test sending without batch and threads
+                    $batch      = null;
+                    $maxThreads = null;
+                    $threadId   = null;
+
+                    // a/b test first sending without limit
+                    $limit = $this->getLimitForABTest($limit, $emailEntity, $totalLeadCountForVariants);
+                    $this->setStartDateOfABTesting($emailEntity);
+                }
+            }
+
             [$sentCount, $failedCount, $failedRecipientsByList] = $this->model->sendEmailToLists(
                 $emailEntity,
                 null,
-                $event->getLimit(),
-                $event->getBatch(),
+                $limit,
+                $batch,
                 $event->getOutput(),
                 $event->getMinContactIdFilter(),
                 $event->getMaxContactIdFilter(),

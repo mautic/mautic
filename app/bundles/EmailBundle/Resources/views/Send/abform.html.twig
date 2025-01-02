@@ -1,0 +1,50 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% set mauticContent = 'emailSend' %}
+{% set header = 'mautic.email.send.list'|trans({'%name%': email.getName()}) %}
+
+{% block headerTitle %}
+    {{ 'mautic.email.send.list'|trans({'%name%': email.getName()})|raw }}
+    <i title="{{ 'mautic.email.icon_tooltip.abtest.part'|trans }}" class="fa fa-fw fa-sitemap"></i>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-offset-3 col-sm-6">
+        <div class="ml-lg mr-lg mt-md pa-lg">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title text-center">
+                        <p>{{ 'mautic.email.absend.instructions'|trans }}</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {{ form_start(form) }}
+                    <div class="col-xs-8 col-xs-offset-2">
+                        <div class="well mt-lg">
+                            <div class="input-group">
+                                <span class="input-group-btn text-center">
+                                    {{- include('@MauticCore/Helper/confirm.html.twig', {
+                                        'message'         : 'mautic.email.form.confirmsend'|trans({'%name%' : email.getName()}),
+                                        'confirmText'     : 'mautic.email.send'|trans,
+                                        'confirmCallback' : 'submitAbSendForm',
+                                        'iconClass'       : 'fa fa-send-o',
+                                        'btnText'         : 'mautic.email.send'|trans,
+                                        'btnClass'        : 'btn btn-primary btn-send' ~ ((pending) ? '' : ' disabled')
+                                    }) -}}
+                                </span>
+                            </div>
+                            <div class="text-center">
+                                <span class="label label-primary mt-lg">{{ 'mautic.email.send.pending'|trans({'%count%': pending}) }}</span>
+                                <div class="mt-sm">
+                                    <a class="text-danger mt-md" href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': email.getId()}) }}" data-toggle="ajax">{{ 'mautic.core.form.cancel'|trans }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

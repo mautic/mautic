@@ -159,9 +159,11 @@ EOT
 
         $results = $event->getResults();
 
-        $rows = [];
+        $rows                 = [];
+        $totalEmailsProcessed =0;
         foreach ($results as $channel => $counts) {
             $rows[] = [$channel, $counts['success'], $counts['failed']];
+            $totalEmailsProcessed += $counts['success'] + $counts['failed'];
         }
 
         // Put a blank line after anything the event spits out
@@ -173,6 +175,7 @@ EOT
             ->setHeaders([$this->translator->trans('mautic.core.channel'), $this->translator->trans('mautic.core.channel.broadcast_success_count'), $this->translator->trans('mautic.core.channel.broadcast_failed_count')])
             ->setRows($rows);
         $table->render();
+        $output->writeln("emails processed: $totalEmailsProcessed");
 
         $this->completeRun();
 

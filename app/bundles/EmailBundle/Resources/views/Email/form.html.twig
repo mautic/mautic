@@ -29,9 +29,13 @@
     {{ 'mautic.email.header.new'|trans }}
   {% endif %}
 
-  {% if email.variantParent %}
+    {% if isVariant %}
+        <i title="{{ 'mautic.email.icon_tooltip.abtest.part'|trans }}" class="fa fa-fw fa-sitemap"></i>
+    {% endif %}
+
+    {% if email.variantParent %}
     <div><span class="small">{{ 'mautic.core.variant_of'|trans({'%name%': email.name, '%parent%' : variantParent.name}) }}</span></div>
-  {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -170,12 +174,6 @@
                 {{ form_row(form.name) }}
                 {{ form_row(form.preheaderText) }}
                 {% if isVariant %}
-                    {{ form_row(form.variantSettings) }}
-                    {{ form_row(form.isPublished) }}
-                    <div id="scheduleOptions" class="hide">
-                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
-                    </div>
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
                         {{ form_row(form.lists) }}
@@ -190,8 +188,7 @@
                         {{ form_row(form.templateTranslationParent) }}
                     </div>
                 {% endif %}
-
-                {% if not isVariant %}
+                {% if email.isEnableAbTest() and isVariant %}<div class="hide">{% endif %}
                     {{ form_row(form.isPublished, {
                         'attr': {
                             'data-none': 'mautic.core.form.sending_paused',
@@ -204,14 +201,34 @@
                         {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
                         {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
                     </div>
-
-                {% endif %}
+                {% if email.isEnableAbTest() and isVariant %}</div>{% endif %}
 
                 {{ form_row(form.unsubscribeForm) }}
                 {% if permissions['page:preference_center:viewown'] is not empty or permissions['page:preference_center:viewother'] is not empty %}
                     {{ form_row(form.preferenceCenter) }}
                 {% endif %}
                 <hr/>
+
+                {% if email.isEnableAbTest() or not isExisting %}
+                    <div id="ab-test" class="hide">
+                        <h5>{{ 'mautic.core.ab_test.form.abtest_settings'|trans }}</h5>
+                        <br/>
+                        {% if not isExisting and not isVariant %}
+                            {{ form_row(form.variantSettings.enableAbTest) }}
+                        {% endif %}
+
+                        {% if isVariant %}
+                            {{ form_row(form.variantSettings.weight) }}
+                        {% else %}
+                            {{ form_row(form.variantSettings.winnerCriteria) }}
+                            {{ form_row(form.variantSettings.totalWeight) }}
+                            {{ form_row(form.variantSettings.sendWinnerDelay) }}
+                        {% endif %}
+                        <hr/>
+                    </div>
+                {% endif %}
+
+
                 {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
 
             </div>

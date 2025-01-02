@@ -176,7 +176,7 @@ class DownloadRepository extends CommonRepository
      *
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null): array
+    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null, \DateTime $toDate = null): array
     {
         // link email to page hit tracking id to download tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -198,6 +198,12 @@ class DownloadRepository extends CommonRepository
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());
+        }
+
+        if (null != $toDate) {
+            $dh = new DateTimeHelper($toDate);
+            $q->andWhere($q->expr()->lte('a.date_download', ':dateTo'))
+                ->setParameter('dateTo', $dh->toUtcString());
         }
 
         $results = $q->executeQuery()->fetchAllAssociative();
