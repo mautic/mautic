@@ -493,6 +493,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -784,6 +785,9 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $security->method('isGranted')
             ->willReturn(true);
 
-        $companyModel->setSecurity($security);
+        $reflection = new \ReflectionClass($companyModel);
+        $property   = $reflection->getProperty('security');
+        $property->setAccessible(true);
+        $property->setValue($companyModel, $security);
     }
 }

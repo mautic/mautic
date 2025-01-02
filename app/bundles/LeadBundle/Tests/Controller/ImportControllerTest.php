@@ -6,6 +6,8 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -133,8 +135,8 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Login newly created non-admin user
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
@@ -216,6 +218,25 @@ final class ImportControllerTest extends MauticMysqlTestCase
         return $lead;
     }
 
+    private function createCompanyForLead(Lead $lead, string $companyName): void
+    {
+        $company = new Company();
+        $company->setName($companyName);
+        $this->em->persist($company);
+
+        // add company to lead
+        $lead->setCompany($companyName);
+        $this->em->persist($lead);
+
+        // set primary company for lead
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(true);
+        $this->em->persist($companyLead);
+    }
+
     /**
      * @param array<mixed> $permission
      */
@@ -268,7 +289,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     private function assertInsufficientPermissionError(LeadEventLog $log, User $user): void
     {
         Assert::assertSame('failed', $log->getAction(), 'The insertion should fail as the user does not have permission to create contacts.');
-        Assert::assertSame(sprintf('User \'%s\' has insufficient permissions', $user->getUsername()), $log->getProperties()['error'], 'There should be an insufficient permission error.');
+        Assert::assertSame(sprintf('User \'%s\' has insufficient permissions', $user->getUserIdentifier()), $log->getProperties()['error'], 'There should be an insufficient permission error.');
     }
 
     private function selectCompanyMapping(Crawler $crawler, Form $mappingForm): void

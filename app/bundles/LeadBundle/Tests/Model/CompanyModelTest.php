@@ -204,6 +204,9 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $security->method('isGranted')
             ->willReturn(true);
 
-        $companyModel->setSecurity($security);
+        $reflection = new \ReflectionClass($companyModel);
+        $property   = $reflection->getProperty('security');
+        $property->setAccessible(true);
+        $property->setValue($companyModel, $security);
     }
 }
