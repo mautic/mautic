@@ -210,13 +210,7 @@ class EmailRepository extends CommonRepository
             $statQb[$variantId]->select('null')->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
             $statQb[$variantId]->andWhere($statQb[$variantId]->expr()->eq('stat.email_id', $variantId));
             $statQb[$variantId]->andWhere($statQb[$variantId]->expr()->eq('stat.lead_id', 'l.id'));
-            if (true === $this->segmentEmailOnceToEmailAddress) {
-                $statQb2[$variantId] = clone $statQb[$variantId];
-                $statQb2[$variantId]->innerJoin('stat', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = stat.lead_id');
-                $statQb2[$variantId]->andWhere(
-                    $statQb2[$variantId]->expr()->eq('ld.email', 'l.email')
-                );
-            }
+        }
 
         // Only include those who belong to the associated lead lists
         if (is_null($listIds)) {
@@ -278,10 +272,9 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
-            foreach ($statQb as $estatQbi) {
-                $q->andWhere(sprintf('NOT EXISTS (%s)', $estatQbi->getSQL()));
-            }
-
+        foreach ($statQb as $estatQbi) {
+            $q->andWhere(sprintf('NOT EXISTS (%s)', $estatQbi->getSQL()));
+        }
 
         $excludedListQb = $this->getExcludedListQuery((int) $emailId);
 
@@ -925,27 +918,27 @@ class EmailRepository extends CommonRepository
         return $queryBuilder;
     }
 
-        /**
-         * Gets emails with published variants.
-         *
-         * @return array<Email>
-         */
-        public function getPublishedEmailsWithVariant()
-        {
-            $qb = $this->getEntityManager()
-                ->createQueryBuilder();
-            $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+    /**
+     * Gets emails with published variants.
+     *
+     * @return array<Email>
+     */
+    public function getPublishedEmailsWithVariant()
+    {
+        $qb = $this->getEntityManager()
+            ->createQueryBuilder();
+        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
 
-            $qb->select($this->getTableAlias())
-                ->from('MauticEmailBundle:Email', $this->getTableAlias())
-                ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
-                    $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
-                    $qb->expr()->eq('v.isPublished', true)
-                ))
-                ->where($expr);
+        $qb->select($this->getTableAlias())
+            ->from('MauticEmailBundle:Email', $this->getTableAlias())
+            ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
+                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+                $qb->expr()->eq('v.isPublished', true)
+            ))
+            ->where($expr);
 
-            $result = $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
 
-            return $result;
-        }
+        return $result;
+    }
 }
