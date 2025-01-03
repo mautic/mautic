@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -784,7 +785,7 @@ class PageController extends FormController
      *
      * @return Response
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
+    public function builderAction(Request $request, SlotsHelper $slotsHelper, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page.page');
@@ -825,7 +826,7 @@ class PageController extends FormController
 
         $this->processSlots($slotsHelper, $slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
         return $this->render($logicalName, [
             'isNew'       => $isNew,

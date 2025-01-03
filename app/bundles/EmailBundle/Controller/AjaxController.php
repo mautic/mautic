@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -127,7 +128,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Tests monitored email connection settings.
      */
-    public function testMonitoredEmailServerConnectionAction(Request $request): JsonResponse
+    public function testMonitoredEmailServerConnectionAction(Request $request, Mailbox $mailbox): JsonResponse
     {
         $dataArray = ['success' => 0, 'message' => ''];
 
@@ -141,12 +142,9 @@ class AjaxController extends CommonAjaxController
                 }
             }
 
-            /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $helper */
-            $helper = $this->factory->getHelper('mailbox');
-
             try {
-                $helper->setMailboxSettings($settings);
-                $folders = $helper->getListingFolders();
+                $mailbox->setMailboxSettings($settings);
+                $folders = $mailbox->getListingFolders();
                 if (!empty($folders)) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {

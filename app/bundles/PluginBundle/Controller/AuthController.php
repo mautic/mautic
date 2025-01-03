@@ -4,6 +4,7 @@ namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -16,13 +17,11 @@ class AuthController extends FormController
      *
      * @return JsonResponse
      */
-    public function authCallbackAction(Request $request, $integration): JsonResponse|RedirectResponse
+    public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
         $session = $request->getSession();
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
         // check to see if the service exists
@@ -95,10 +94,8 @@ class AuthController extends FormController
         return $this->render($postAuthTemplate, ['message' => $message, 'alert' => $alert, 'data' => $userData]);
     }
 
-    public function authUserAction($integration): RedirectResponse
+    public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse
     {
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
         $settings['method']      = 'GET';

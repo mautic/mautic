@@ -228,7 +228,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Updates the cache and gets returns updated HTML.
      */
-    public function updateSocialProfileAction(Request $request): JsonResponse
+    public function updateSocialProfileAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $dataArray = ['success' => 0];
         $network   = InputHelper::clean($request->request->get('network'));
@@ -240,9 +240,7 @@ class AjaxController extends CommonAjaxController
             $lead  = $model->getEntity($leadId);
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
-                $leadFields = $lead->getFields();
-                /** @var IntegrationHelper $integrationHelper */
-                $integrationHelper = $this->factory->getHelper('integration');
+                $leadFields        = $lead->getFields();
                 $socialProfiles    = $integrationHelper->getUserProfiles($lead, $leadFields, true, $network);
                 $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
                 $integrations      = [];
@@ -286,7 +284,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Clears the cache for a network.
      */
-    public function clearSocialProfileAction(Request $request): JsonResponse
+    public function clearSocialProfileAction(Request $request, IntegrationHelper $helper): JsonResponse
     {
         $dataArray = ['success' => 0];
         $network   = InputHelper::clean($request->request->get('network'));
@@ -299,10 +297,8 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
-                /** @var IntegrationHelper $helper */
-                $helper         = $this->factory->getHelper('integration');
-                $socialProfiles = $helper->clearIntegrationCache($lead, $network);
-                $socialCount    = count($socialProfiles);
+                $socialProfiles       = $helper->clearIntegrationCache($lead, $network);
+                $socialCount          = count($socialProfiles);
 
                 if (empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView(

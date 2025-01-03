@@ -4,6 +4,8 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
@@ -47,6 +49,11 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&Environment $twig */
         $twig = $this->createMock(Environment::class);
 
+        $slotsHelper = new SlotsHelper();
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
         $coreParametersHelper->method('get')
@@ -59,7 +66,19 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper, $router, $twig);
+        $mailHelper = new MailHelper(
+            $mockFactory,
+            new Mailer(new SmtpTransport()),
+            $fromEmailHelper,
+            $coreParametersHelper,
+            $mailbox,
+            $logger,
+            $mailHashHelper,
+            $router,
+            $twig,
+            $themeHelper,
+            $slotsHelper,
+        );
         $mailHelper->setTokens($tokens);
 
         $email = new Email();
