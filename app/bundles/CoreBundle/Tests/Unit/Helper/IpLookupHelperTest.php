@@ -19,6 +19,15 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        // Set trusted proxies - this is set by Mautic normally in app/middlewards/TrustMiddleware
+        Request::setTrustedProxies(['10.8.0.2', '192.168.0.1'], Request::HEADER_X_FORWARDED_FOR);
+    }
+
+    protected function tearDown(): void
+    {
+        // Reset trusted proxies
+        Request::setTrustedProxies([], 0);
     }
 
     /**
@@ -40,7 +49,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testClientIpIsReturnedFromProxy(): void
     {
-        $request = new Request([], [], [], [], [], ['HTTP_X_FORWARDED_FOR' => '73.77.245.52,10.8.0.2,192.168.0.1']);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1', 'HTTP_X_FORWARDED_FOR' => '1.2.3.4,73.77.245.52,10.8.0.2,192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
         $this->assertEquals('73.77.245.52', $ip->getIpAddress());

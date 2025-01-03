@@ -57,37 +57,13 @@ class IpLookupHelper
      */
     public function getIpAddressFromRequest()
     {
+        // Use Symfony's request stack to get the client IP
+        // This will ensure that trusted proxies are correctly handled
+        // And it will ensure that only trusted headers are handled
+        // @see https://symfony.com/doc/5.x/create_framework/http_foundation.html
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null !== $request) {
-            $ipHolders = [
-                'HTTP_CLIENT_IP',
-                'HTTP_X_FORWARDED_FOR',
-                'HTTP_X_FORWARDED',
-                'HTTP_X_CLUSTER_CLIENT_IP',
-                'HTTP_FORWARDED_FOR',
-                'HTTP_FORWARDED',
-                'REMOTE_ADDR',
-            ];
-
-            foreach ($ipHolders as $key) {
-                if ($request->server->get($key)) {
-                    $ip = trim($request->server->get($key));
-
-                    if (str_contains($ip, ',')) {
-                        $ip = $this->getClientIpFromProxyList($ip);
-                    }
-
-                    // Validate IP
-                    if (null !== $ip && $this->ipIsValid($ip)) {
-                        return $ip;
-                    }
-                }
-            }
-        }
-
-        // if everything else fails
-        return '127.0.0.1';
+        return $request ? $request->getClientIp() : '127.0.0.1';
     }
 
     /**
@@ -211,32 +187,6 @@ class IpLookupHelper
             FILTER_VALIDATE_IP,
             FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | $filterFlagNoPrivRange | FILTER_FLAG_NO_RES_RANGE
         );
-    }
-
-    protected function getClientIpFromProxyList($ip)
-    {
-        // Proxies are included
-        $ips = explode(',', $ip);
-        array_walk(
-            $ips,
-            function (&$val): void {
-                $val = trim($val);
-            }
-        );
-
-        if ($this->doNotTrackInternalIps) {
-            $ips = array_diff($ips, $this->doNotTrackInternalIps);
-        }
-
-        // https://en.wikipedia.org/wiki/X-Forwarded-For
-        // X-Forwarded-For: client, proxy1, proxy2
-        foreach ($ips as $ip) {
-            if ($this->ipIsValid($ip)) {
-                return $ip;
-            }
-        }
-
-        return null;
     }
 
     /**
