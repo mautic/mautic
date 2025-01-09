@@ -114,7 +114,7 @@
     <div class="marketplace-header bg-picture col-xs-12 ai-center jc-center mb-lg" style="background-color: hsl({{ hue }}, 100%, var(--custom-bg-colored-lightness));">
         <h1 class="fw-b fs-46 text-center">{{ packageDetail.packageBase.getHumanPackageName()|escape }}</h1>
         {% if packageDetail.packageBase.description %}
-            <div class="text-muted mt-md">{{ packageDetail.packageBase.description|purify }}</div>
+            <div class="text-muted mt-sm">{{ packageDetail.packageBase.description|purify }}</div>
         {% endif %}
     </div>
 
