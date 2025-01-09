@@ -989,11 +989,13 @@
 /// Dynamic lightness for custom backgrounds
 //// Themes with light background
 :root[theme^="light"] {
-    --custom-bg-colored-lightness: 75%;
+    --custom-bg-colored-lightness: 80%;
+    --custom-bg-overlay-opacity: 0.025;
 }
 //// Themes with dark background
 :root[theme^="dark"] {
     --custom-bg-colored-lightness: 30%;
+    --custom-bg-overlay-opacity: 0.05;
 }
 
 // Layering model
