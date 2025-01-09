@@ -111,22 +111,12 @@
 {% set hue = (input_string|length * 37 + input_string|split('')|reduce((carry, char) => carry + char|length * 11, 0)) % 360 %}
 
 <div class="marketplace-header bg-picture col-xs-12 ai-center jc-center mb-lg" style="background-color: hsl({{ hue }}, 100%, var(--custom-bg-colored-lightness));">
-
-
     <h1 class="fw-b fs-46 text-center">{{ packageDetail.packageBase.getHumanPackageName()|escape }}</h1>
+    {% if packageDetail.packageBase.description %}
+        <div class="text-muted mt-md">{{ packageDetail.packageBase.description|purify }}</div>
+    {% endif %}
 </div>
 <div class="col-md-9">
-    {% if packageDetail.packageBase.description %}
-    <div>
-        <div class="pr-md pl-md pt-lg pb-lg">
-            <div class="box-layout">
-                <div class="col-xs-10">
-                    <div class="text-muted">{{ packageDetail.packageBase.description|purify }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     <div class="panel">
         <div class="panel-heading">
