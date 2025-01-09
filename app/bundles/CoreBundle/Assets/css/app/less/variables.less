@@ -986,6 +986,16 @@
     --ck-color-tooltip-text: var(--text-secondary);
 }
 
+/// Dynamic lightness for custom backgrounds
+//// Themes with light background
+:root[theme^="light"] {
+    --custom-bg-colored-lightness: 75%;
+}
+//// Themes with dark background
+:root[theme^="dark"] {
+    --custom-bg-colored-lightness: 30%;
+}
+
 // Layering model
 /// Default
 :root,
