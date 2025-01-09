@@ -243,6 +243,11 @@ class SearchStringHelper
                 return;
             }
 
+            // Convert search terms to lowercase, but only after checking for operators
+            if (!empty($filters->{$baseName}[$keyCount]->command)) {
+                $string = strtolower($string);
+            }
+
             if (!isset($filters->{$baseName}[$keyCount]->strict)) {
                 $filters->{$baseName}[$keyCount]->strict = 0;
             }
