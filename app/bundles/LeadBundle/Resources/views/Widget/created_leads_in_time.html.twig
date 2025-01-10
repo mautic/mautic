@@ -79,8 +79,14 @@ defined %}
 {% endif %}
 
 {% set dateRange = '' %}
-{% if totalDays <= 7 %} {% set dateRange='week' %} {% elseif totalDays <=31 %} {% set dateRange='month' %} {% else %} {%
-    set dateRange='year' %} {% endif %} <div class="dropdown slug {% if dateRange=='year' %}hide{% endif %}">
+{% if totalDays <= 7 %}
+    {% set dateRange = 'week' %}
+{% elseif totalDays >= 28 and totalDays <= 32 %}
+    {% set dateRange = 'month' %}
+{% else %}
+    {% set dateRange = 'year' %}
+{% endif %}
+ <div class="dropdown slug {% if dateRange=='year' %}hide{% endif %}">
     <a class="dropdown-toggle slug-button slug-default" size="2xs" data-toggle="dropdown" href="#">
         {{ 'mautic.widget.created_leads_in_time.mi'|trans }}
     </a>
