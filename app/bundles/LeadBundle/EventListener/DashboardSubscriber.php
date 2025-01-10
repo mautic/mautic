@@ -93,8 +93,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $interval  = $params['dateFrom']->diff($params['dateTo']);
                 $totalDays = $interval->days + 1; // +1 to include the last day
 
-                $previousDateTo   = clone $params['dateFrom'];
-                $previousDateFrom = (clone $previousDateTo)->sub($interval);
+                $previousDateTo   = (clone $params['dateFrom'])->sub(new \DateInterval('P1D'));
+                $previousDateFrom = (clone $previousDateTo)->sub($interval)->add(new \DateInterval('P1D'));
 
                 $previousPeriodData = $this->leadModel->getLeadsLineChartData(
                     $params['timeUnit'],
