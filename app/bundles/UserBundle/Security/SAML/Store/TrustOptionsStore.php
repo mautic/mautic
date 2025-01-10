@@ -12,7 +12,7 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
-        private string $entityId
+        private string $entityId,
     ) {
     }
 

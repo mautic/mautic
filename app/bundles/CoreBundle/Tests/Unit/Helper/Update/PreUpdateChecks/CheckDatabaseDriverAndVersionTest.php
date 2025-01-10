@@ -27,7 +27,7 @@ class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
         $result = $check->runCheck();
 
         // Just checking if we can properly detect the database driver + version
-        $this->assertSame(true, $result->success);
+        $this->assertTrue($result->success);
     }
 
     public function testDatabaseDriverAndVersionTooLow(): void
@@ -49,6 +49,6 @@ class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
         $result = $check->runCheck();
 
         // The check should've failed as our current database version is lower than 99.99.99
-        $this->assertSame(false, $result->success);
+        $this->assertFalse($result->success);
     }
 }

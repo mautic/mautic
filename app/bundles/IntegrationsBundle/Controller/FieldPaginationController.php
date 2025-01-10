@@ -27,7 +27,7 @@ class FieldPaginationController extends CommonController
         ConfigIntegrationsHelper $integrationsHelper,
         string $integration,
         string $object,
-        int $page
+        int $page,
     ) {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {

@@ -25,8 +25,8 @@ function launchBuilderGrapesjs(formName) {
   const $builder = mQuery('.builder');
   $builder.addClass('builder-active').removeClass('hide');
 
-  const assetsConfig = AssetService.getAssetsConfig();
-  const builder = new BuilderService(assetsConfig);
+  const assetService = new AssetService();
+  const builder = new BuilderService(assetService);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
 
@@ -36,9 +36,14 @@ function launchBuilderGrapesjs(formName) {
   builder.editor.trigger('show');
 
   // Load and add assets
-  AssetService.getAssetsXhr(function (result) {
-    builder.editor.AssetManager.add(result.data);
-  });
+  (async () => {
+    try {
+      const result = await assetService.getAssetsXhr();
+      builder.editor.AssetManager.add(result.data);
+    } catch (error) {
+      console.error('Error loading initial assets:', error);
+    }
+  })();
 }
 
 /**
@@ -80,10 +85,12 @@ function setThemeHtml(theme) {
       }
 
       // If MJML template, generate HTML before save
-      // if (!textareaHtml.val().length && textareaMjml.val().length) {
-      //   builder.mjmlToHtml(textareaMjml, textareaHtml);
-      // }
-      // }
+      if (!textareaHtml.val().length && textareaMjml.val().length) {
+        const assetService = new AssetService();
+        const builder = new BuilderService(assetService);
+
+        textareaHtml.val(builder.mjmlToHtml(response.templateMjml));
+      }
     },
     error(request, textStatus) {
       console.log(`setThemeHtml - Request failed: ${textStatus}`);

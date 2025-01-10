@@ -29,7 +29,7 @@ class FormSubscriber implements EventSubscriberInterface
         private AssetsHelper $assetsHelper,
         private ThemeHelperInterface $themeHelper,
         private Environment $twig,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

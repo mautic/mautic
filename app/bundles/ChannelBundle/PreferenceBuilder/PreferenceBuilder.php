@@ -19,7 +19,7 @@ class PreferenceBuilder
         ArrayCollection $logs,
         private Event $event,
         array $channels,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
         $this->buildRules($logs, $channels);
     }

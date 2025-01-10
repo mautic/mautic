@@ -13,7 +13,7 @@ class UserNotificationBuilder
         private UserHelper $userHelper,
         private OwnerProvider $ownerProvider,
         private RouteHelper $routeHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

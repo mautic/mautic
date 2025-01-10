@@ -16,7 +16,7 @@ final class PreUpdateChecksStep implements StepInterface
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private UpdateHelper $updateHelper
+        private UpdateHelper $updateHelper,
     ) {
     }
 

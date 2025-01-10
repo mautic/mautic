@@ -44,7 +44,7 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs([
                 $this->createMock(HttpKernelInterface::class),
                 $this->request,
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
             ])
             ->getMock();
 

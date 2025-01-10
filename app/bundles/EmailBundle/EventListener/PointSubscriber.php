@@ -20,7 +20,7 @@ class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private PointModel $pointModel,
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
     ) {
     }
 

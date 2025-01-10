@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ListChangeEvent extends Event
 {
-    private ?Lead $lead;
+    private Lead $lead;
 
     /**
      * @var Lead[]|null
@@ -22,7 +22,7 @@ class ListChangeEvent extends Event
         Lead|array $leads,
         private LeadList $list,
         private bool $added = true,
-        private ?\DateTime $date = null
+        private ?\DateTime $date = null,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;

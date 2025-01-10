@@ -32,6 +32,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
+use Twig\Runtime\EscaperRuntime;
 
 /**
  * @extends FormModel<Focus>
@@ -51,7 +52,7 @@ class FocusModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->dispatcher     = $dispatcher;
 
@@ -180,7 +181,7 @@ class FocusModel extends FormModel
             $focusContent .= $cached['form'];
         }
 
-        $focusContent = twig_escape_filter($this->twig, $focusContent, 'js');
+        $focusContent = $this->twig->getRuntime(EscaperRuntime::class)->escape($focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }

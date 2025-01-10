@@ -49,7 +49,7 @@ class FormController extends CommonFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -221,7 +221,7 @@ class FormController extends CommonFormController
         $logs = $auditLogModel->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -307,7 +307,7 @@ class FormController extends CommonFormController
 
         // set the page we came from
         $page       = $request->getSession()->get('mautic.form.page', 1);
-        $mauticform = $request->request->get('mauticform') ?? [];
+        $mauticform = $request->request->all()['mauticform'] ?? [];
         $sessionId  = $mauticform['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
 
         // set added/updated fields
@@ -447,7 +447,7 @@ class FormController extends CommonFormController
             $modifiedFields[$keyId]['showLabel']       = 1;
             $modifiedFields[$keyId]['type']            = 'button';
             $modifiedFields[$keyId]['id']              = $keyId;
-            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
             $modifiedFields[$keyId]['formId']          = $sessionId;
             unset($modifiedFields[$keyId]['form']);
             $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);
@@ -502,7 +502,7 @@ class FormController extends CommonFormController
     {
         /** @var FormModel $model */
         $model            = $this->getModel('form');
-        $formData         = $request->request->get('mauticform');
+        $formData         = $request->request->all()['mauticform'] ?? [];
         $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
         $modifiedFields   = [];
@@ -782,7 +782,7 @@ class FormController extends CommonFormController
                 $modifiedFields[$keyId]['showLabel']       = 1;
                 $modifiedFields[$keyId]['type']            = 'button';
                 $modifiedFields[$keyId]['id']              = $keyId;
-                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
                 $modifiedFields[$keyId]['formId']          = $objectId;
                 unset($modifiedFields[$keyId]['form']);
             }
@@ -1062,10 +1062,8 @@ class FormController extends CommonFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
@@ -1150,7 +1148,7 @@ class FormController extends CommonFormController
         $this->alreadyMappedFieldCollector->removeAllForForm((string) $sessionId);
     }
 
-    public function batchRebuildHtmlAction(Request $request)
+    public function batchRebuildHtmlAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);

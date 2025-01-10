@@ -19,7 +19,7 @@ class FieldValidationHelper
 
     public function __construct(
         private FieldHelper $fieldHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -63,7 +63,7 @@ class FieldValidationHelper
         $hasMissingFields  = false;
         $errorsOnGivenPage = false;
 
-        if (!$hasMissingFields && !empty($missingFields)) {
+        if (!empty($missingFields)) {
             $hasMissingFields = true;
         }
 

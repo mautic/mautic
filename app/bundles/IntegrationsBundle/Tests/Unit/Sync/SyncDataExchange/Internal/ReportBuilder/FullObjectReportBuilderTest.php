@@ -205,7 +205,7 @@ class FullObjectReportBuilderTest extends TestCase
             )
             ->willReturn(true, true);
 
-        $contactEntity = new class() extends Lead {
+        $contactEntity = new class extends Lead {
             public function getId(): int
             {
                 return 1;
@@ -310,7 +310,7 @@ class FullObjectReportBuilderTest extends TestCase
             )
             ->willReturn(true, true);
 
-        $companyEntity = new class() extends CompanyEntity {
+        $companyEntity = new class extends CompanyEntity {
             public function getId(): int
             {
                 return 1;

@@ -8,7 +8,6 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Recurr\Recurrence;
-use Recurr\RecurrenceCollection;
 
 class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,8 +19,6 @@ class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
         $events = $schedulerBuilder->getNextEvent($schedulerEntity);
-
-        $this->assertInstanceOf(RecurrenceCollection::class, $events);
 
         $event = $events[0];
         $this->assertInstanceOf(Recurrence::class, $event);
@@ -38,8 +35,6 @@ class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
         $events = $schedulerBuilder->getNextEvents($schedulerEntity, 3);
-
-        $this->assertInstanceOf(RecurrenceCollection::class, $events);
 
         $event = $events[0];
         $this->assertInstanceOf(Recurrence::class, $event);

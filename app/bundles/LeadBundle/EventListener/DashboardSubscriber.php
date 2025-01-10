@@ -60,7 +60,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         protected ListModel $leadListModel,
         protected RouterInterface $router,
         protected TranslatorInterface $translator,
-        protected DateHelper $dateHelper
+        protected DateHelper $dateHelper,
     ) {
     }
 

@@ -158,7 +158,7 @@ Mautic.launchBuilder = function (formName, actionName) {
         }
     });
 
-    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="ri-loader-3-line ri-spin ri-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
     // Disable the close button until everything is loaded
     btnCloseBuilder.prop('disabled', true);
@@ -1272,7 +1272,7 @@ Mautic.getSlotDeleteLink = function() {
         Mautic.deleteLink = mQuery('<a><i class="ri-lg ri-close-line"></i></a>')
             .attr('data-slot-action', 'delete')
             .attr('alt', 'delete')
-            .addClass('btn btn-delete btn-default');
+            .addClass('btn btn-delete btn-ghost');
     }
 
     return Mautic.deleteLink;
@@ -1621,7 +1621,7 @@ Mautic.initSlotListeners = function() {
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
 
-                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
 
                 var builderEl = parent.mQuery('.builder');
 
@@ -1636,9 +1636,6 @@ Mautic.initSlotListeners = function() {
                 };
 
                 if (builderEl.length && builderEl.hasClass('email-builder')) {
-                    buttons = parent.mQuery.grep(buttons, function (value) {
-                        return value != 'insertGatedVideo';
-                    });
                     froalaOptions.imageOutputSize = true;
                 }
 
@@ -1706,27 +1703,6 @@ Mautic.initSlotListeners = function() {
         // Store the slot to a global var
         Mautic.builderSlots.push({slot: slot, type: type});
     });
-
-    Mautic.getPredefinedLinks = function(callback) {
-        var linkList = [];
-        Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
-            if (tokens.length) {
-                mQuery.each(tokens, function(token, label) {
-                    if (token.startsWith('{pagelink=') ||
-                        token.startsWith('{assetlink=') ||
-                        token.startsWith('{webview_url') ||
-                        token.startsWith('{unsubscribe_url')) {
-
-                        linkList.push({
-                            text: label,
-                            href: token
-                        });
-                    }
-                });
-            }
-            return callback(linkList);
-        });
-    };
 
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
@@ -1828,30 +1804,6 @@ Mautic.initSlotListeners = function() {
                         params.slot.find('a.button').css(fieldParam, '#' + color);
                     }
                 }
-            }
-        } else if (/gatedvideo/.test(fieldParam)) {
-            // Handle gatedVideo replacements
-            var toInsert = fieldParam.split('-')[1];
-            var insertVal = params.field.val();
-
-            if (toInsert === 'url') {
-                var videoProvider = Mautic.getVideoProvider(insertVal);
-
-                if (videoProvider == null) {
-                    Mautic.slotFormError(fieldParam, 'Please enter a valid YouTube, Vimeo, or MP4 url.');
-                } else {
-                    params.slot.find('source')
-                        .attr('src', insertVal)
-                        .attr('type', videoProvider);
-                }
-            } else if (toInsert === 'gatetime') {
-                params.slot.find('video').attr('data-gate-time', insertVal);
-            } else if (toInsert === 'formid') {
-                params.slot.find('video').attr('data-form-id', insertVal);
-            } else if (toInsert === 'height') {
-                params.slot.find('video').attr('height', insertVal);
-            } else if (toInsert === 'width') {
-                params.slot.find('video').attr('width', insertVal);
             }
         } else if (fieldParam === 'separator-color') {
             params.slot.find('hr').css('border-color', '#' + params.field.val());
@@ -2196,7 +2148,8 @@ Mautic.getPredefinedLinks = function(callback) {
                 if (token.startsWith('{pagelink=') ||
                     token.startsWith('{assetlink=') ||
                     token.startsWith('{webview_url') ||
-                    token.startsWith('{unsubscribe_url')) {
+                    token.startsWith('{unsubscribe_url') ||
+                    token.startsWith('{resubscribe_url')) {
 
                     linkList.push({
                         text: label,

@@ -17,41 +17,49 @@
 
 {% block headerTitle %}{{ 'mautic.companies.menu.root'|trans }}{% endblock %}
 
-{% block actions %}
-  {% if permissions['lead:leads:create'] %}
-      {% set pageButtons = [
-        {
-          'attr': {
-              'href': path('mautic_import_action', {'object': 'companies', 'objectAction': 'new'}),
-          },
-          'iconClass': 'ri-import-line',
-          'btnText': 'mautic.lead.lead.import',
-        },
-        {
-          'attr': {
-              'href': path('mautic_import_index', {'object': 'companies'}),
-          },
-          'iconClass': 'ri-history-line',
-          'btnText': 'mautic.lead.lead.import.index',
-        },
-      ] %}
-  {% endif %}
-  {{ include('@MauticCore/Helper/page_actions.html.twig', {
-          'templateButtons': {'new': permissions['lead:leads:create']},
-          'routeBase': 'company',
-          'customButtons': pageButtons|default([]),
-  }) }}
-{% endblock %}
+
 
 {% block content %}
   {% if isIndex %}
-    <div class="panel panel-default bdr-t-wdh-0 mb-0">
-        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue': searchValue,
-                'searchHelp': 'mautic.core.help.searchcommands',
-                'action': currentRoute,
-        }) }}
-        <div class="page-list">
+    <div id="page-list-wrapper" class="panel panel-default">
+      {%- set pageButtons = [] %}
+{% if permissions['lead:leads:create'] %}
+    {% set pageButtons = pageButtons|merge([
+        {
+            'attr': {
+                'href': path('mautic_import_action', {'object': 'companies', 'objectAction': 'new'}),
+            },
+            'iconClass': 'ri-import-line',
+            'btnText': 'mautic.lead.lead.import',
+        },
+        {
+            'attr': {
+                'href': path('mautic_import_index', {'object': 'companies'}),
+            },
+            'iconClass': 'ri-history-line',
+            'btnText': 'mautic.lead.lead.import.index',
+        }
+    ]) %}
+{% endif %}
+
+{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+    'searchValue': searchValue,
+    'action': currentRoute,
+    'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+        'templateButtons': {'new': permissions['lead:leads:create']},
+        'routeBase': 'company',
+        'customButtons': pageButtons,
+    }),
+    'quickFilters': [
+        {
+            'search': 'mautic.core.searchcommand.ismine',
+            'label': 'mautic.core.searchcommand.ismine.label',
+            'tooltip': 'mautic.core.searchcommand.ismine.description',
+            'icon': 'ri-user-line'
+        }
+    ]
+}) -}}
+    <div class="page-list">
   {% endif %}
 
   {% if items|length > 0 %}
@@ -134,9 +142,7 @@
                       </td>
                       <td>
                           {% if fields.core.companyemail is defined %}
-                            <div class="text-muted mt-4">
-                                <small>{{ fields.core.companyemail.value|purify }}</small>
-                            </div>
+                            {{ fields.core.companyemail.value|purify }}
                           {% endif %}
                       </td>
 
@@ -146,10 +152,10 @@
                           {% endif %}
                       </td>
                       <td class="visible-md visible-lg">
-                          {{ item.score }}
+                          <span size="sm" class="label label-gray">{{ item.score }}</span>
                       </td>
                       <td class="visible-md visible-lg">
-                          <a class="label label-primary"
+                          <a size="sm" class="label label-gray"
                              href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans~':'~item.id}) }}"
                              data-toggle="ajax"
                              {% if 0 == leadCounts[item.id] %}disabled="disabled"{% endif %}>

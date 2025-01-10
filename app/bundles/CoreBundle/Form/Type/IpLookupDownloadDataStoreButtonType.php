@@ -19,7 +19,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
     public function __construct(
         private DateHelper $dateHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -33,7 +33,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
             [
                 'label' => ($localDataExists) ? 'mautic.core.ip_lookup.update_data' : 'mautic.core.ip_lookup.fetch_data',
                 'attr'  => [
-                    'class'   => 'btn btn-'.($localDataExists ? 'success' : 'danger'),
+                    'class'   => 'btn btn-tertiary btn-sm',
                     'onclick' => 'Mautic.downloadIpLookupDataStore()',
                 ],
             ]
@@ -60,7 +60,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'iplookup_download_data_store_button';
     }

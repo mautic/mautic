@@ -40,7 +40,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     public function __construct(
         protected AssetModel $assetModel,
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 

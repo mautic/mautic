@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FocusModel $model
+        private FocusModel $model,
     ) {
     }
 

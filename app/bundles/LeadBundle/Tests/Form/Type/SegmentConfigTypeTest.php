@@ -31,7 +31,6 @@ final class SegmentConfigTypeTest extends TestCase
     {
         $blockPrefix = $this->segmentConfigType->getBlockPrefix();
         $this->assertNotEmpty($blockPrefix);
-        $this->assertTrue(is_string($blockPrefix));
     }
 
     public function testThatBuildFormMethodAddsSegmentBuildAndRebuildTimeWarningOption(): void

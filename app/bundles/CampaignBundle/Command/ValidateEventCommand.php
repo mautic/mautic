@@ -18,7 +18,7 @@ class ValidateEventCommand extends Command
     public function __construct(
         private InactiveExecutioner $inactiveExecution,
         private TranslatorInterface $translator,
-        private FormatterHelper $formatterHelper
+        private FormatterHelper $formatterHelper,
     ) {
         parent::__construct();
     }
@@ -58,6 +58,15 @@ class ValidateEventCommand extends Command
 
         $decisionId = $input->getOption('decision-id');
         $contactId  = $input->getOption('contact-id');
+
+        if (is_numeric($decisionId)) {
+            $decisionId = (int) $decisionId;
+        }
+
+        if (is_numeric($contactId)) {
+            $contactId = (int) $contactId;
+        }
+
         $contactIds = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
 
         if (!$contactIds && !$contactId) {

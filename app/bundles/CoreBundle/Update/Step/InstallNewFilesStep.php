@@ -19,7 +19,7 @@ final class InstallNewFilesStep implements StepInterface
     public function __construct(
         private TranslatorInterface $translator,
         private UpdateHelper $updateHelper,
-        private PathsHelper $pathsHelper
+        private PathsHelper $pathsHelper,
     ) {
     }
 

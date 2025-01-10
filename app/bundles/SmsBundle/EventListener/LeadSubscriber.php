@@ -14,7 +14,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private EntityManager $em
+        private EntityManager $em,
     ) {
     }
 

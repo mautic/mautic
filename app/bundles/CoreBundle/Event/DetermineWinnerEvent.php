@@ -24,7 +24,7 @@ class DetermineWinnerEvent extends Event
      * } $parameters
      */
     public function __construct(
-        private array $parameters
+        private array $parameters,
     ) {
     }
 

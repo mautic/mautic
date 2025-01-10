@@ -83,6 +83,8 @@ class ThemeController extends FormController
                             );
                         }
                     }
+                } else {
+                    $form->addError(new FormError($form->getErrors(true)));
                 }
             }
         }
@@ -172,10 +174,8 @@ class ThemeController extends FormController
 
     /**
      * Deletes the theme.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
+    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId): Response
     {
         $flashes = [];
 
@@ -193,10 +193,8 @@ class ThemeController extends FormController
 
     /**
      * Deletes a group of themes.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request, ThemeHelperInterface $themeHelper)
+    public function batchDeleteAction(Request $request, ThemeHelperInterface $themeHelper): Response
     {
         $flashes = [];
 

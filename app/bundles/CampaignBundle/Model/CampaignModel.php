@@ -55,7 +55,7 @@ class CampaignModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -104,8 +104,6 @@ class CampaignModel extends CommonFormModel
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
@@ -213,10 +211,7 @@ class CampaignModel extends CommonFormModel
         }
     }
 
-    /**
-     * @return array
-     */
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
+    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -581,10 +576,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Saves a campaign lead, logs the error if saving fails.
-     *
-     * @return bool
      */
-    public function saveCampaignLead(CampaignLead $campaignLead)
+    public function saveCampaignLead(CampaignLead $campaignLead): bool
     {
         try {
             $this->getCampaignLeadRepository()->saveEntity($campaignLead);

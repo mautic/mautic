@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
@@ -32,7 +33,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @throws \Exception
      */
-    public function fetchRemoteFilesAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function fetchRemoteFilesAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
@@ -42,9 +43,6 @@ class AjaxController extends CommonAjaxController
         if (!$dispatcher->hasListeners($name)) {
             return $this->sendJsonResponse(['success' => 0]);
         }
-
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integration */
         $integration = $integrationHelper->getIntegrationObject($provider);

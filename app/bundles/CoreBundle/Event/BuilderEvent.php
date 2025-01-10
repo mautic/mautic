@@ -27,7 +27,7 @@ class BuilderEvent extends Event
         protected $translator,
         protected $entity = null,
         protected $requested = 'all',
-        protected string $tokenFilter = ''
+        protected string $tokenFilter = '',
     ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
@@ -296,7 +296,7 @@ class BuilderEvent extends Event
         $tokens,
         $labelColumn = 'name',
         $valueColumn = 'id',
-        $convertToLinks = false
+        $convertToLinks = false,
     ): void {
         $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
         if (null == $tokens) {

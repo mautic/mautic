@@ -78,7 +78,7 @@ class AssetGenerationHelper
         private BundleHelper $bundleHelper,
         private PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
-        AppVersion $appVersion
+        AppVersion $appVersion,
     ) {
         $this->version = substr(hash('sha1', $coreParametersHelper->get('secret_key').$appVersion->getVersion()), 0, 8);
     }
@@ -193,6 +193,19 @@ class AssetGenerationHelper
                                 if (file_exists($assetFile)) {
                                     // delete it
                                     unlink($assetFile);
+                                }
+
+                                $missing = [];
+                                foreach ($files as $file) {
+                                    if (file_exists($file['fullPath'])) {
+                                        continue;
+                                    }
+
+                                    $missing[] = $file['fullPath'];
+                                }
+
+                                if ([] !== $missing) {
+                                    throw new \ErrorException('These files are missing: '.implode(', ', $missing).'. Have you forgot to install/update modules?');
                                 }
 
                                 if ('css' == $type) {

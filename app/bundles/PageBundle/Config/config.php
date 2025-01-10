@@ -48,10 +48,6 @@ return [
                 'path'       => '/page/preview/{id}',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::previewAction',
             ],
-            'mautic_gated_video_hit' => [
-                'path'       => '/video/hit',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::hitVideoAction',
-            ],
         ],
         'api' => [
             'mautic_api_pagesstandard' => [

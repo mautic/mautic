@@ -10,7 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SlotSavePrefsButtonType extends SlotType
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -117,10 +117,7 @@ class SlotSavePrefsButtonType extends SlotType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'slot_saveprefsbutton';
     }

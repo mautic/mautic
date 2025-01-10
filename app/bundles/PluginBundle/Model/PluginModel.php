@@ -33,7 +33,7 @@ class PluginModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -95,7 +95,7 @@ class PluginModel extends FormModel
     /**
      * Loads all installed Plugin entities from database.
      *
-     * @return array
+     * @return Plugin[]
      */
     public function getInstalledPlugins()
     {

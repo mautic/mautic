@@ -15,7 +15,7 @@ class FieldSaveDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
     ) {
     }
 

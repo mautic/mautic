@@ -10,10 +10,9 @@
   border: 1px solid @panel-default-border;
   background-color: var(--background);
   transition: var(--transition-all-productive);
-  .box-shadow(0px 1px 1px darken(@body-bg, 2%));
   //background-clip: padding-box;
 
-  &:hover { border-color: var(--border-subtle-alternate); }
+  &:hover { border-color: var(--border-subtle-02); }
 }
 
 // Panel heading
@@ -52,16 +51,9 @@
   }
 }
 
-// Panel footer
-.panel-footer {
-  overflow: hidden;
-  background-color: transparent;
-  border-top: none;
-}
-
 .panel-toolbar-wrapper {
   display: block;
-  background-color: #fbfbfb;
-  border-bottom: 1px solid #cfd9db;
+  background-color: var(--layer);
+  border-bottom: 1px solid var(--border-subtle);
   padding: 0px 15px;
 }

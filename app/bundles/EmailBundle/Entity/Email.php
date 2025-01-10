@@ -9,6 +9,7 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -24,6 +25,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -58,6 +60,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var bool|null
      */
     private $useOwnerAsMailer;
+
+    private ?string $preheaderText = null;
 
     /**
      * @var string|null
@@ -140,22 +144,22 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<LeadList>
      */
     private $excludedLists;
 
     /**
-     * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
+     * @var ArrayCollection<Stat>
      */
     private $stats;
 
@@ -180,7 +184,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection<\Mautic\AssetBundle\Entity\Asset>
+     * @var ArrayCollection<Asset>
      */
     private $assetAttachments;
 
@@ -203,6 +207,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var int
      */
     private $queuedCount = 0;
+
+    private ?EmailDraft $draft = null;
 
     private bool $isCloned = false;
 
@@ -232,6 +238,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
+        $this->setDraft(null);
 
         parent::__clone();
     }
@@ -264,6 +271,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->addIdColumns();
         $builder->addNullableField('subject', Types::TEXT);
+        $builder->addNullableField('preheaderText', Types::STRING, 'preheader_text');
         $builder->addNullableField('fromAddress', Types::STRING, 'from_address');
         $builder->addNullableField('fromName', Types::STRING, 'from_name');
         $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
@@ -328,6 +336,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('headers', Types::JSON);
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
+
+        $builder->createOneToOne('draft', EmailDraft::class)
+            ->mappedBy('email')
+            ->fetchExtraLazy()
+            ->cascadeAll()
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -346,6 +360,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             new NotBlank(
                 [
                     'message' => 'mautic.core.subject.required',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'subject',
+            new Length(
+                [
+                    'max'        => 190,
+                    'maxMessage' => 'mautic.email.subject.length',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'preheaderText',
+            new Length(
+                [
+                    'max'        => 130,
+                    'maxMessage' => 'mautic.email.preheader_text.length',
                 ]
             )
         );
@@ -422,6 +456,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'bccAddress',
                     'useOwnerAsMailer',
                     'utmTags',
+                    'preheaderText',
                     'customHtml',
                     'plainText',
                     'template',
@@ -474,10 +509,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
+     * @param ?string $name
+     *
      * @return $this
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -492,12 +530,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $description
+     * @param ?string $description
      *
      * @return Email
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -519,7 +558,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return ?Category
      */
     public function getCategory()
     {
@@ -736,6 +775,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function getPreheaderText(): ?string
+    {
+        return $this->preheaderText;
+    }
+
+    public function setPreheaderText(?string $preheaderText): Email
+    {
+        $this->isChanged('preheaderText', $preheaderText);
+        $this->preheaderText = $preheaderText;
+
+        return $this;
+    }
+
     /**
      * @return mixed
      */
@@ -853,7 +905,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return ArrayCollection<int, LeadList>
      */
     public function getLists()
     {
@@ -895,7 +947,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return Collection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return Collection<int, LeadList>
      */
     public function getExcludedLists(): Collection
     {
@@ -1110,10 +1162,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Calculate Read Percentage for each Email.
-     *
-     * @return int
      */
-    public function getReadPercentage($includevariants = false)
+    public function getReadPercentage($includevariants = false): float|int
     {
         if ($this->getSentCount($includevariants) > 0) {
             return round($this->getReadCount($includevariants) / $this->getSentCount($includevariants) * 100, 2);
@@ -1211,6 +1261,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $this->initListChanges($property);
         $this->changes[$property][1] = array_diff($this->changes[$property][1], [$id]);
+    }
+
+    public function getDraft(): ?EmailDraft
+    {
+        return $this->draft;
+    }
+
+    public function setDraft(?EmailDraft $draft): void
+    {
+        $this->draft = $draft;
+    }
+
+    public function hasDraft(): bool
+    {
+        return null !== $this->getDraft();
+    }
+
+    public function getDraftContent(): ?string
+    {
+        return $this->getDraft()?->getHtml();
     }
 
     /**

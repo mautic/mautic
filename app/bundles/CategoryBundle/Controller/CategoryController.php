@@ -35,7 +35,7 @@ class CategoryController extends AbstractFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -514,10 +514,8 @@ class CategoryController extends AbstractFormController
      * Deletes a group of entities.
      *
      * @param string $bundle
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request, $bundle)
+    public function batchDeleteAction(Request $request, $bundle): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -588,7 +586,7 @@ class CategoryController extends AbstractFormController
     {
         $inForm = $request->get('inForm', 0);
         if (Request::METHOD_POST == $method) {
-            $category_form = $request->request->get('category_form');
+            $category_form = $request->request->all()['category_form'] ?? [];
             $inForm        = $category_form['inForm'] ?? 0;
         }
 

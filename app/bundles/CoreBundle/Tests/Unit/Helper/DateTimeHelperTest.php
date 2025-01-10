@@ -53,6 +53,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testvalidateMysqlDateTimeUnitWillNotThrowExceptionOnExpectedUnit(): void
     {
+        $this->expectNotToPerformAssertions();
         DateTimeHelper::validateMysqlDateTimeUnit('s');
         DateTimeHelper::validateMysqlDateTimeUnit('i');
         DateTimeHelper::validateMysqlDateTimeUnit('H');
@@ -60,8 +61,6 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         DateTimeHelper::validateMysqlDateTimeUnit('W');
         DateTimeHelper::validateMysqlDateTimeUnit('m');
         DateTimeHelper::validateMysqlDateTimeUnit('Y');
-
-        $this->assertTrue(true, 'Just to avoid the risky test warning...');
     }
 
     public function testGetLocalTimezoneOffset(): void

@@ -27,7 +27,7 @@
             'attr': {
                 'target': '_new',
                 'data-toggle': '',
-                'class': 'btn btn-default btn-nospin',
+                'class': 'btn btn-ghost btn-nospin',
                 'href': path('mautic_form_export', {'objectId': form.id, 'format': 'html'}),
             },
             'btnText': 'mautic.form.result.export.html'|trans,
@@ -38,7 +38,7 @@
         {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': '',
-                'class': 'btn btn-default btn-nospin',
+                'class': 'btn btn-ghost btn-nospin',
                 'href': path('mautic_form_export', {'objectId': form.id, 'format': 'csv'}),
             },
             'btnText': 'mautic.form.result.export.csv'|trans,
@@ -51,7 +51,7 @@
             {% set buttons = buttons|merge([{
                 'attr': {
                     'data-toggle': '',
-                    'class': 'btn btn-default btn-nospin',
+                    'class': 'btn btn-ghost btn-nospin',
                     'href': path('mautic_form_export', {'objectId': form.id, 'format': 'xlsx'}),
                 },
                 'btnText': 'mautic.form.result.export.xlsx'|trans,
@@ -63,7 +63,7 @@
 
   {% set buttons = buttons|merge([{
       'attr': {
-          'class': 'btn btn-default',
+          'class': 'btn btn-ghost',
           'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}),
           'data-toggle': 'ajax',
       },

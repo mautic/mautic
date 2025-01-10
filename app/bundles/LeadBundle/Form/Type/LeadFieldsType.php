@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class LeadFieldsType extends AbstractType
 {
     public function __construct(
-        protected FieldModel $fieldModel
+        protected FieldModel $fieldModel,
     ) {
     }
 
@@ -48,18 +48,12 @@ class LeadFieldsType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadfields_choices';
     }

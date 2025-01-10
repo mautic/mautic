@@ -8,6 +8,8 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Response;
 
 final class AuditLogControllerTest extends MauticMysqlTestCase
 {
@@ -26,9 +28,6 @@ final class AuditLogControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/s/contacts/auditlog/batchExport/'.$contact->getId());
         $this->assertResponseIsSuccessful();
-
-        $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testBatchExportActionAsUserNotPermission(): void
@@ -37,11 +36,9 @@ final class AuditLogControllerTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $this->loginUser(self::SALES_USER);
-        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => self::SALES_USER]);
+        $this->loginUser($user);
         $this->client->request('GET', '/s/contacts/auditlog/batchExport/'.$contact->getId());
-
-        $response = $this->client->getResponse();
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 }

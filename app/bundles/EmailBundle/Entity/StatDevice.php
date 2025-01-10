@@ -16,10 +16,7 @@ class StatDevice
      */
     private $id;
 
-    /**
-     * @var Stat|null
-     */
-    private $stat;
+    private ?Stat $stat;
 
     /**
      * @var LeadDevice|null
@@ -99,18 +96,12 @@ class StatDevice
         $this->ipAddress = $ip;
     }
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): ?Stat
     {
         return $this->stat;
     }
 
-    /**
-     * @param Stat
-     */
-    public function setStat(Stat $stat): void
+    public function setStat(?Stat $stat): void
     {
         $this->stat = $stat;
     }

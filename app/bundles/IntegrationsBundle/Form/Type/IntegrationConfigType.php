@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class IntegrationConfigType extends AbstractType
 {
     public function __construct(
-        private ConfigIntegrationsHelper $integrationsHelper
+        private ConfigIntegrationsHelper $integrationsHelper,
     ) {
     }
 

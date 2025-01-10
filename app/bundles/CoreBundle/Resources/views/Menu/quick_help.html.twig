@@ -1,0 +1,31 @@
+<div class="dropup d-flex quick-help">
+    <a class="dropdown-toggle btn btn-icon btn-nospin quick-help" size="sm" data-toggle="dropdown" href="#">
+        <i class="ri-question-mark ri-1x"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a data-toggle="modal" data-target="#keyboardShortcutsModal">
+                <span>
+                    <i class="ri-keyboard-box-line"></i>
+                    <span>{{ 'mautic.keyboard.shortcuts'|trans }}</span>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a data-toggle="modal" data-target="#searchCommandsModal">
+                <span>
+                    <i class="ri-menu-search-line"></i>
+                    <span>{{ 'mautic.core.help.searchcommands.title'|trans }}</span>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a data-toggle="modal" data-target="#tokenPlaceholdersModal">
+                <span>
+                    <i class="ri-braces-line"></i>
+                    <span>{{ 'mautic.placeholder_tokens.placeholder_tokens'|trans }}</span>
+                </span>
+            </a>
+        </li>
+    </ul>
+</div>

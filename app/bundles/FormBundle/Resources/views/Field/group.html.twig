@@ -55,7 +55,7 @@
 
 {% if inForm is defined and (true == inForm or inForm is not empty) %}
   {% if field.type in ['button', 'pagebreak'] %}
-    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' %}
   {% endif %}
 
   {% set labelAttributes = labelAttributes|merge({

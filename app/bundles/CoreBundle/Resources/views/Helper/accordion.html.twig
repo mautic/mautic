@@ -1,0 +1,25 @@
+{# accordion.html.twig #}
+{% macro generate_id(string) -%}
+    {% set parts = string|split('.') %}
+    {% set id_parts = parts|slice(-3) %}
+    {{- id_parts|join('_')|lower|trim -}}
+{%- endmacro %}
+
+<!-- Accordion -->
+<ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+    {%- for item in items -%}
+    {%- set itemId = (item.id ?? _self.generate_id(item.title))|trim -%}
+    {%- set padding_inline = item.padding_inline ?? true -%}
+        <li class="panel">
+            <a role="button" id="heading{{- itemId -}}" class="accordion-heading collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse{{- itemId -}}" aria-expanded="false" aria-controls="collapse{{- itemId -}}">
+                <i class="ri-arrow-down-s-line accordion-arrow"></i>
+                <span class="accordion-title">{{ item.title|trans }}</span>
+            </a>
+            <div id="collapse{{- itemId -}}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{- itemId -}}">
+                <div class="accordion-content{% if not padding_inline %} accordion-content--slim{% endif %}">
+                    {{- item.content|raw -}}
+                </div>
+            </div>
+        </li>
+    {%- endfor -%}
+</ul>

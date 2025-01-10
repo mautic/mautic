@@ -28,10 +28,7 @@ class DashboardHitsInTimeWidgetType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'page_dashboard_hits_in_time_widget';
     }

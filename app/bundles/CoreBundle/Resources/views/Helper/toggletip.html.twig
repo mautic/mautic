@@ -1,0 +1,32 @@
+{# @MauticCore/Helper/toggletip.html.twig #}
+{% set classes = ['btn', 'btn-nospin', 'btn-ghost'] %}
+{% set is_icon_only = not (label is defined and label) %}
+{% set size_class = is_icon_only and not (size is defined and size) ? 'btn-toggletip' : (size is defined and size ? 'btn-' ~ size : 'btn-xs') %}
+{% set classes = classes|merge([size_class]) %}
+
+{% if is_icon_only %}
+    {% set classes = classes|merge(['btn-icon', icon|default('ri-information-2-line'), 'ri-1x']) %}
+{% else %}
+    {% set classes = classes|merge(['gap-5']) %}
+{% endif %}
+
+<span data-toggle="tooltip" title="{{ tooltip|default('mautic.core.toggletip')|trans }}" data-placement="top">
+    <button type="button"
+        class="{{ classes|join(' ') }}"
+        data-toggle="popover"
+        data-container="body"
+        data-placement="{{ placement|default('right') }}"
+        data-html="{{ html is defined and html ? 'true' : 'false' }}"
+        data-trigger="{{ trigger|default('focus') }}"
+        {% if selector is defined and selector %} data-selector="{{ selector }}" {% endif %}
+        {% if title is defined and title %} title="{{ title|trans }}" {% endif %}
+        {% if content is defined and content %} data-content="{{ content|trans }}" {% endif %}
+        aria-haspopup="true"
+        aria-label="{% if not is_icon_only and label is defined and label %}{{ label|trans }}{% elseif is_icon_only %}{{ 'mautic.core.toggletip'|trans }}{% endif %}"
+    >
+        {% if not is_icon_only %}
+            <i class="{{ icon|default('ri-information-2-line') }} ri-1x"></i>
+        {% endif %}
+        {% if label is defined and label %} {{ label|trans }} {% endif %}
+    </button>
+</span>

@@ -12,7 +12,7 @@ class Category
     public function __construct(
         private $category,
         private $type,
-        private $isPermanent
+        private $isPermanent,
     ) {
         return $this;
     }

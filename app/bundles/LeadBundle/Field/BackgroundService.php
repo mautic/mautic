@@ -23,7 +23,7 @@ class BackgroundService
         private CustomFieldColumn $customFieldColumn,
         private LeadFieldSaver $leadFieldSaver,
         private FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
-        private CustomFieldNotification $customFieldNotification
+        private CustomFieldNotification $customFieldNotification,
     ) {
     }
 

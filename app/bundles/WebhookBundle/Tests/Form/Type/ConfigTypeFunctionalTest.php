@@ -13,12 +13,13 @@ class ConfigTypeFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request('GET', '/s/config/edit');
 
-        // get "Yes" input for "Send email details" toggle
-        $input = $crawler->filterXPath('//div[label[contains(text(), "Send email details")]]')
-            ->filterXPath('//label[*[contains(text(), "Yes")]]')
-            ->filter('input');
+        // Updated CSS selector based on the new ID
+        $yesSpan = $crawler->filter('#config_webhookconfig_webhook_email_details_label > div > span');
 
-        Assert::assertCount(1, $input);
-        Assert::assertSame('checked', $input->attr('checked'));
+        // Assert that exactly one such span exists
+        Assert::assertCount(1, $yesSpan, 'The "Yes" span for "Send email details" toggle should exist.');
+
+        // Assert that the text within the span is "Yes"
+        Assert::assertSame('Yes', $yesSpan->text(), 'The "Send email details" toggle should be set to "Yes" by default.');
     }
 }

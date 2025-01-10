@@ -39,7 +39,7 @@ class Bounce implements ProcessorInterface
         protected LeadModel $leadModel,
         protected TranslatorInterface $translator,
         protected LoggerInterface $logger,
-        protected DoNotContact $doNotContact
+        protected DoNotContact $doNotContact,
     ) {
     }
 

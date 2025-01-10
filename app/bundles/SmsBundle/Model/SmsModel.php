@@ -55,7 +55,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -115,9 +115,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $options
+     * @param mixed[] $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
@@ -198,6 +197,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($fetchContacts) {
+            /** @var Lead[] $foundContacts */
             $foundContacts = $this->leadModel->getEntities(
                 [
                     'ids' => $fetchContacts,

@@ -9,7 +9,7 @@ use Mautic\PointBundle\Entity\Group;
 final class GroupEvent
 {
     public function __construct(
-        private Group $entity
+        private Group $entity,
     ) {
     }
 

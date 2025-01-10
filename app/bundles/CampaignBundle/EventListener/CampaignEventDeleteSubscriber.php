@@ -19,7 +19,7 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
         private LeadEventLogRepository $leadEventLogRepository,
         private CampaignConfig $campaignConfig,
         private CampaignModel $campaignModel,
-        private EventModel $eventModel
+        private EventModel $eventModel,
     ) {
     }
 

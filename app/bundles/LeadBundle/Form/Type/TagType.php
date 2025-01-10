@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\LeadBundle\Entity\Tag;
@@ -17,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class TagType extends AbstractType
 {
     public function __construct(
-        private EntityManager $em
+        private EntityManager $em,
     ) {
     }
 
@@ -40,7 +41,7 @@ class TagType extends AbstractType
             [
                 'label'           => 'mautic.lead.tags',
                 'class'           => Tag::class,
-                'query_builder'   => fn (EntityRepository $er) => $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC),
+                'query_builder'   => fn (EntityRepository $er) => $er->createQueryBuilder('t')->orderBy('t.tag', Order::Ascending->value),
                 'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,
@@ -50,18 +51,12 @@ class TagType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'lead_tag';
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return EntityType::class;
     }

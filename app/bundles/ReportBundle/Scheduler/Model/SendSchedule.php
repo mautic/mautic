@@ -18,7 +18,7 @@ class SendSchedule
         MailHelper $mailer,
         private MessageSchedule $messageSchedule,
         private FileHandler $fileHandler,
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
         $this->mailer = $mailer->getMailer();
     }

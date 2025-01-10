@@ -1,0 +1,82 @@
+{% set dateFormats_help %}
+<div class="d-flex fd-column">
+    <h4 class="fw-b mt-lg mb-sm">{{ 'mautic.core.config.header.defaults.dates'|trans }}</h4>
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <strong>{{ 'mautic.core.config.locale.us_format'|trans }}:</strong>
+                <code>m/d/Y h:i A</code>
+                {{ 'mautic.core.config.locale.example'|trans }}: 06/24/2024 08:20 AM
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <strong>{{ 'mautic.core.config.locale.uk_format'|trans }}:</strong>
+                <code>d/m/Y H:i</code>
+                {{ 'mautic.core.config.locale.example'|trans }}: 24/06/2024 08:20
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <strong>{{ 'mautic.core.config.locale.iso_format'|trans }}:</strong>
+                <code>Y-m-d\TH:i:sP</code>
+                {{ 'mautic.core.config.locale.example'|trans }}: 2024-06-24T08:20:00+00:00
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <strong>{{ 'mautic.core.config.locale.rfc_format'|trans }}:</strong>
+                <code>D, d M Y H:i:s O</code>
+                {{ 'mautic.core.config.locale.example'|trans }}: Mon, 24 Jun 2024 08:20:00 +0000
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <strong>{{ 'mautic.core.config.locale.full_month_format'|trans }}:</strong>
+                <code>l, F j, Y g:i A</code>
+                {{ 'mautic.core.config.locale.example'|trans }}: Monday, June 24, 2024 8:20 AM
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <strong>{{ 'mautic.core.config.locale.short_format'|trans }}:</strong>
+                <code>d-M-y H:i</code>
+                {{ 'mautic.core.config.locale.example'|trans }}: 24-Jun-24 08:20
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                <strong>{{ 'mautic.core.config.locale.year_day_format'|trans }}:</strong>
+                <code>Y-z H:i:s</code>
+                {{ 'mautic.core.config.locale.example'|trans }}: 2024-176 08:20:00
+            </p>
+        </div>
+    </div>
+</div>
+{% endset %}
+<div>
+    {% include '@MauticCore/Helper/toggletip.html.twig' with {
+        size: 'sm',
+        content: dateFormats_help,
+        html: true,
+        trigger: 'click'
+    } %}
+</div>

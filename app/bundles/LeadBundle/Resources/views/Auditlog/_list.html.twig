@@ -5,9 +5,9 @@
 #}
 <!-- filter form -->
 <form method="post" action="{{ path('mautic_contact_auditlog_action', {'leadId': lead.id}) }}" class="panel" id="auditlog-filters">
-    <div class="form-control-icon pa-xs">
+    <div class="form-control-icon pa-md">
         <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events['filters']['search']|e }}">
-        <span class="the-icon ri-search-line text-muted mt-xs"></span>
+        <span class="the-icon ri-search-line text-muted"></span>
     </div>
     {% if events.types is defined and events.types is iterable %}
         <div class="history-search panel-footer text-muted">
@@ -34,11 +34,21 @@
                 </div>
                 <div class="col-sm-2 mt-lg">
                     {% if enableExportPermission %}
-                    <a class="btn btn-default btn-block mt-lg" href="{{ url('mautic_contact_auditlog_export_action', {'leadId': lead.id}) }}" data-toggle="download">
-                        <span>
-                            <i class="ri-download-line"></i> <span>{{ 'mautic.core.export'|trans }}</span>
-                        </span>
-                    </a>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                href: url('mautic_contact_auditlog_export_action', {'leadId': lead.id}),
+                                icon: 'ri-download-line',
+                                label: 'mautic.core.export',
+                                size: 'sm',
+                                attributes: {
+                                    'data-toggle': 'download'
+                                },
+                                variant: 'tertiary',
+                                icon_only: false
+                            }
+                        ]
+                    } %}
                     {% endif %}
                 </div>
             </div>

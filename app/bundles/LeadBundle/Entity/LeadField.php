@@ -66,7 +66,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
     /**
      * @var bool
      */
-    private $isShortVisible = true;
+    private $isShortVisible = false;
 
     /**
      * @var bool

@@ -3,6 +3,8 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
@@ -28,7 +30,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         protected Translator $translator,
         protected UserHelper $userHelper,
         protected LoggerInterface $logger,
-        protected CoreParametersHelper $coreParametersHelper
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -85,7 +87,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return object[]|array<int,mixed>|iterable<object>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
      */
     public function getEntities(array $args = [])
     {
@@ -100,6 +102,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Get a specific entity.
+     *
+     * @param string|int|mixed[]|null $id
      */
     public function getEntity($id = null): ?object
     {

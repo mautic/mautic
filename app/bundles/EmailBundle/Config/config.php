@@ -3,6 +3,14 @@
 return [
     'routes' => [
         'main' => [
+            'mautic_email_batch_categories_view' => [
+                'path'       => '/emails/batch/categories/view',
+                'controller' => 'Mautic\EmailBundle\Controller\BatchEmailController::indexAction',
+            ],
+            'mautic_email_batch_categories_set' => [
+                'path'       => '/emails/batch/categories/set',
+                'controller' => 'Mautic\EmailBundle\Controller\BatchEmailController::execAction',
+            ],
             'mautic_email_index' => [
                 'path'       => '/emails/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
@@ -66,6 +74,11 @@ return [
             'mautic_email_unsubscribe' => [
                 'path'       => '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
+                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
+            ],
+            'mautic_email_unsubscribe_all' => [
+                'path'       => '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAllAction',
                 'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_resubscribe' => [
@@ -308,6 +321,7 @@ return [
         'show_contact_categories'                                           => false,
         'show_contact_segments'                                             => false,
         'disable_trackable_urls'                                            => false,
+        'email_draft_enabled'                                               => false,
         'theme_email_default'                                               => 'blank',
         'mailer_memory_msg_limit'                                           => 100,
         Mautic\EmailBundle\Form\Type\ConfigType::MINIFY_EMAIL_HTML          => false,

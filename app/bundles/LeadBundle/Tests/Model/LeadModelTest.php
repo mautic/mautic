@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\IpAddressModel;
@@ -70,6 +71,11 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|FieldModel
      */
     private MockObject $fieldModelMock;
+
+    /**
+     * @var MockObject&FieldsWithUniqueIdentifier
+     */
+    private MockObject $fieldsWithUniqueIdentifier;
 
     /**
      * @var MockObject|ListModel
@@ -164,6 +170,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelperMock                  = $this->createMock(PathsHelper::class);
         $this->integrationHelperkMock           = $this->createMock(IntegrationHelper::class);
         $this->fieldModelMock                   = $this->createMock(FieldModel::class);
+        $this->fieldsWithUniqueIdentifier       = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->listModelMock                    = $this->createMock(ListModel::class);
         $this->formFactoryMock                  = $this->createMock(FormFactory::class);
         $this->companyModelMock                 = $this->createMock(CompanyModel::class);
@@ -187,6 +194,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->pathsHelperMock,
             $this->integrationHelperkMock,
             $this->fieldModelMock,
+            $this->fieldsWithUniqueIdentifier,
             $this->listModelMock,
             $this->formFactoryMock,
             $this->companyModelMock,
@@ -215,7 +223,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->mockGetLeadRepository();
 
         $entity    = new Lead();
-        $ipAddress = new IpAddress();
+        $ipAddress = new IpAddress('some.ip');
 
         $ipAddress->setIpDetails(['organization' => 'Doctors Without Borders']);
 
@@ -246,7 +254,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $companyFromIpLookup = 'Doctors Without Borders';
         $entity              = new Lead();
-        $ipAddress           = new IpAddress();
+        $ipAddress           = new IpAddress('some.ip');
 
         $ipAddress->setIpDetails(['organization' => $companyFromIpLookup]);
 
@@ -280,7 +288,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $companyFromIpLookup = 'Doctors Without Borders';
         $companyFromEntity   = 'Red Cross';
         $entity              = new Lead();
-        $ipAddress           = new IpAddress();
+        $ipAddress           = new IpAddress('some.ip');
 
         $entity->setCompany($companyFromEntity);
         $ipAddress->setIpDetails(['organization' => $companyFromIpLookup]);
@@ -305,8 +313,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with(false, false, ['isPublished' => true, 'object' => 'lead'])
             ->willReturn(['email' => 'Email', 'firstname' => 'First Name']);
 
-        $this->fieldModelMock->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(['email' => 'Email']);
 
         $this->fieldModelMock->expects($this->once())
@@ -328,6 +336,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'fieldsWithUniqueIdentifier', $this->fieldsWithUniqueIdentifier);
 
         // The availableLeadFields property should start empty.
         $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
@@ -345,8 +354,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with(false, false, ['isPublished' => true, 'object' => 'lead', 'isPubliclyUpdatable' => true])
             ->willReturn(['email' => 'Email']);
 
-        $this->fieldModelMock->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(['email' => 'Email']);
 
         $this->fieldModelMock->expects($this->once())
@@ -369,6 +378,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'fieldsWithUniqueIdentifier', $this->fieldsWithUniqueIdentifier);
 
         // The availableLeadFields property should start empty.
         $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
@@ -726,7 +736,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         return new class($id) extends Lead {
             public function __construct(
-                private int $id
+                private int $id,
             ) {
                 parent::__construct();
             }
@@ -743,7 +753,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     private function getFieldPaginatorFake(): Paginator
     {
-        return new class() extends Paginator {
+        return new class extends Paginator {
             public function __construct()
             {
             }

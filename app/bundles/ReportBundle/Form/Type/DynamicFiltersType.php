@@ -84,7 +84,7 @@ class DynamicFiltersType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'report_dynamicfilters';
     }

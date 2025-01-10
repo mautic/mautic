@@ -4,6 +4,8 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
@@ -20,6 +22,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -43,6 +47,14 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+        /** @var MockObject&Environment $twig */
+        $twig = $this->createMock(Environment::class);
+
+        $slotsHelper = new SlotsHelper();
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
         $coreParametersHelper->method('get')
@@ -55,7 +67,20 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper, $router);
+        $mailHelper = new MailHelper(
+            $mockFactory,
+            new Mailer(new SmtpTransport()),
+            $fromEmailHelper,
+            $coreParametersHelper,
+            $mailbox,
+            $logger,
+            $mailHashHelper,
+            $router,
+            $twig,
+            $themeHelper,
+            $slotsHelper,
+            $this->createMock(EventDispatcherInterface::class)
+        );
         $mailHelper->setTokens($tokens);
 
         $email = new Email();

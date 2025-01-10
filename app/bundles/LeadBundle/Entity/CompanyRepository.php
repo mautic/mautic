@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -356,25 +357,23 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies grouped by column.
      *
-     * @param QueryBuilder $query
-     *
-     * @return array
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getCompaniesByGroup($query, $column)
+    public function getCompaniesByGroup($query, $column): array
     {
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)
             ->andWhere(
-                $query->expr()->andX(
+                $query->expr()->and(
                     $query->expr()->isNotNull($column),
                     $query->expr()->neq($column, $query->expr()->literal(''))
                 )
             );
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -523,8 +522,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->expr()->in('c.id', ':ids')
         )
             ->setParameter('ids', array_keys($companies))
-            ->orderBy('c.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
-            ->addOrderBy('c.id', \Doctrine\Common\Collections\Criteria::DESC);
+            ->orderBy('c.dateAdded', Order::Descending->value)
+            ->addOrderBy('c.id', Order::Descending->value);
 
         $entities = $q->getQuery()
             ->getResult();

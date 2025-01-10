@@ -22,7 +22,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     public function __construct(
         private array $redisConfiguration,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $redisOptions = PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'session:'.$coreParametersHelper->get('db_name').':');
 
@@ -56,9 +56,9 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function gc($maxlifetime): bool
+    public function gc($maxlifetime): int|false
     {
-        return true;
+        return 1;
     }
 
     public function updateTimestamp($sessionId, $data): bool

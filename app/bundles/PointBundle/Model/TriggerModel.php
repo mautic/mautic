@@ -57,7 +57,7 @@ class TriggerModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -360,10 +360,7 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function invokeCallback($event, Lead $lead, array $settings)
+    private function invokeCallback($event, Lead $lead, array $settings): mixed
     {
         $args = [
             'event'   => $event,
@@ -383,6 +380,10 @@ class TriggerModel extends CommonFormModel
 
         $pass = [];
         foreach ($reflection->getParameters() as $param) {
+            if ('factory' === $param->getName()) {
+                @\trigger_error('Using "factory" parameter is deprecated. Use dependency injection instead. Usage of "factory" parameter will be removed in 6.0.', \E_USER_DEPRECATED);
+            }
+
             if (isset($args[$param->getName()])) {
                 $pass[] = $args[$param->getName()];
             } else {

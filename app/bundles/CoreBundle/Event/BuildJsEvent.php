@@ -13,7 +13,7 @@ class BuildJsEvent extends Event
      */
     public function __construct(
         protected $js,
-        protected $debugMode = false
+        protected $debugMode = false,
     ) {
     }
 

@@ -17,7 +17,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
     }
 
     public function __construct(
-        private RoleModel $roleModel
+        private RoleModel $roleModel,
     ) {
     }
 

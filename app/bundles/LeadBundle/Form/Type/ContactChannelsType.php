@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ContactChannelsType extends AbstractType
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

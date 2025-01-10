@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class StageType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security
+        private CorePermissions $security,
     ) {
     }
 

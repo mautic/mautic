@@ -55,7 +55,7 @@ class NormalizedValueDAO
     public function __construct(
         private $type,
         private $value,
-        $normalizedValue = null
+        $normalizedValue = null,
     ) {
         $this->normalizedValue = $normalizedValue ?: $value;
     }

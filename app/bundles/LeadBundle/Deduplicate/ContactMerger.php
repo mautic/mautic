@@ -31,7 +31,7 @@ class ContactMerger
         protected LeadModel $leadModel,
         protected MergeRecordRepository $repo,
         protected EventDispatcherInterface $dispatcher,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 

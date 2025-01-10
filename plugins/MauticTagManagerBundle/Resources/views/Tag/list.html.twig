@@ -12,27 +12,20 @@
 
 {% set listCommand = 'mautic.tagmanager.tag.searchcommand.list'|trans %}
 
-{% block actions %}
-    {{- include(
-        '@MauticCore/Helper/page_actions.html.twig',
-        {
-            'templateButtons': {
-            'new': security.isGranted('tagManager:tagManager:create')
-        },
-            'routeBase': 'tagmanager',
-            'langVar': 'tag.list'
-        }
-    ) -}}
-{% endblock %}
-
 {% block content %}
-    <div class="panel panel-default bdr-t-wdh-0">
-        <div class="page-list">
+    <div id="page-list-wrapper" class="panel panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-            'searchValue' : searchValue,
-            'searchHelp'  : 'mautic.lead.list.help.searchcommands',
-            'action'      : currentRoute,
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                'templateButtons': {
+                    'new': security.isGranted('tagManager:tagManager:create')
+                },
+                'routeBase': 'tagmanager',
+                'langVar': 'tag.list'
+            })
         }) -}}
+        <div class="page-list">
             {% if items is defined and items is not empty %}
                 <div class="table-responsive">
                     <table class="table table-hover" id="tagsTable">
@@ -125,7 +118,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="visible-md visible-lg">
-                                    <a class="label label-primary" href="{{-  path('mautic_contact_index', {
+                                    <a size="sm" class="label label-gray" href="{{-  path('mautic_contact_index', {
                                         'search' : "#{'mautic.tagmanager.lead.searchcommand.list'|trans}:\"#{item.getTag()}\"",
                                     }) -}}" data-toggle="ajax" {{- 0 == tagsCount[item.getId()] ? 'disabled=disabled' : '' -}}>
                                     {{- 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}) -}}
@@ -151,4 +144,7 @@
             {% endif %}
         </div>
     </div>
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+        tip: random(['mautic.protip.tags.segmentation', 'mautic.protip.tags.multivalue', 'mautic.protip.tags.creation'])
+    }) }}
 {% endblock %}

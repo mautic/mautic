@@ -1,3 +1,9 @@
+body:has(.s-dashboard) {
+    background-color: var(--layer);
+    --field: var(--field-02);
+    --field-hover: var(--field-hover-02);
+}
+
 .input-group-addon label {
     margin-bottom: 0px;
 }
@@ -25,19 +31,17 @@
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     padding: 10px;
-
 }
-.dashboard-widgets .card {
+.dashboard-widgets .tile {
+    --layer: var(--background);
     margin: 5px;
-    background: #FEFEFE;
-    border: 1px solid rgba(0, 0, 0, 0.1);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-transition-property: background-color, box-shadow, -moz-transform;
-    -o-transition-property: background-color, box-shadow, text-shadow, -o-transform;
-    -webkit-transition-property: background-color, box-shadow, text-shadow, -webkit-transform;
-    transition-property: background-color, box-shadow, text-shadow, transform;
+    -moz-transition-property: background-color, box-shadow, -moz-transform, border;
+    -o-transition-property: background-color, box-shadow, text-shadow, -o-transform, border;
+    -webkit-transition-property: background-color, box-shadow, text-shadow, -webkit-transform, border;
+    transition-property: background-color, box-shadow, text-shadow, transform, border;
     -moz-transition-duration: 0.2s;
     -o-transition-duration: 0.2s;
     -webkit-transition-duration: 0.2s;
@@ -48,24 +52,53 @@
     transition-timing-function: linear;
     position: relative;
 }
-.dashboard-widgets .card-header h4 {
-    padding: 10px 15px;
+.dashboard-widgets .ui-sortable-helper .tile {
+    box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    max-width: 170px;
+    max-height: 170px;
+    overflow: hidden;
+    transform: rotate(1deg);
+    -webkit-animation: squareToCircle 1.5s .5s infinite alternate;
+}
+
+@-webkit-keyframes squareToCircle {
+    0% {border-radius: 0 0 0 0;}
+
+    100% {border-radius: 20px 20px 20px 20px;}
+}
+
+.dashboard-widgets .widget-overlay {
+    content: '';
+    width: 101%;
+    height: 101%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: var(--transition-all-expressive);
+    backdrop-filter: blur(0);
+    pointer-events: none;
+    opacity: 0;
+}
+.dashboard-widgets .ui-sortable-helper .widget-overlay {
+    backdrop-filter: blur(8px);
+    opacity: 1;
+}
+
+.dashboard-widgets h4 {
     cursor: -moz-grab;
     cursor: -webkit-grab;
     cursor: grab;
 }
-.dashboard-widgets .card-header .dropdown {
-    position: absolute;
-    top: 6px;
-    right: 3px;
-}
-.dashboard-widgets .card-header .dropdown-toggle .ri-more-2-fill {
+.dashboard-widgets .dropdown-toggle .ri-more-2-fill {
     display: inline-block;
     font-size: 15px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--icon-secondary);
+    transition: var(--transition-all-productive);
     width: 30px;
+    margin: -10px;
     text-align: center;
     line-height: 30px;
+    border-radius: var(--border-radius-md);
 }
 .dashboard-widgets .card-header h4 {
     width: 90%;
@@ -73,15 +106,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.dashboard-widgets .card table {
+.dashboard-widgets .tile table {
     table-layout: fixed;
 }
-.dashboard-widgets .card table td {
+.dashboard-widgets .tile table td {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.dashboard-widgets .card table td:last-child {
+.dashboard-widgets .tile table td:last-child {
     width: 30px;
 }
 

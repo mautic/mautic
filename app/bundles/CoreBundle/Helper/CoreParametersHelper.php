@@ -12,7 +12,7 @@ class CoreParametersHelper
     private ?array $resolvedParameters = null;
 
     public function __construct(
-        private ContainerInterface $container
+        private ContainerInterface $container,
     ) {
         $loader = new ParameterLoader();
 

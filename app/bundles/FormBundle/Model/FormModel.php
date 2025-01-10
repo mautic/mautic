@@ -64,7 +64,7 @@ class FormModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -845,10 +845,8 @@ class FormModel extends CommonFormModel
      * @param int   $limit
      * @param array $filters
      * @param array $options
-     *
-     * @return array
      */
-    public function getFormList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = [])
+    public function getFormList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')
@@ -864,7 +862,7 @@ class FormModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**

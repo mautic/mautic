@@ -19,7 +19,7 @@ class EmailDependencies
         private ActionModel $actionModel,
         private PointModel $pointModel,
         private TriggerEventModel $triggerEventModel,
-        private ReportModel $reportModel
+        private ReportModel $reportModel,
     ) {
     }
 

@@ -37,7 +37,7 @@ class GrapesJsController extends CommonController
         AssetsHelper $assetsHelper,
         FormFactoryInterface $formFactory,
         $objectType,
-        $objectId
+        $objectId,
     ) {
         if (!in_array($objectType, self::OBJECT_TYPE)) {
             throw new \Exception('Object not authorized to load custom builder', Response::HTTP_CONFLICT);
@@ -280,7 +280,7 @@ class GrapesJsController extends CommonController
      */
     private function checkForMjmlTemplate($template)
     {
-        $twig = $this->get('twig');
+        $twig = $this->container->get('twig');
 
         if ($twig->getLoader()->exists($template)) {
             return $template;

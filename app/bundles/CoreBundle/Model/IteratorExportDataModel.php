@@ -14,7 +14,7 @@ class IteratorExportDataModel implements \Iterator
 
     private $data;
 
-    private $totalResult;
+    private int $totalResult;
 
     /**
      * @param AbstractCommonModel<T> $model
@@ -26,7 +26,7 @@ class IteratorExportDataModel implements \Iterator
         private AbstractCommonModel $model,
         private array $args,
         callable $callback,
-        private bool $skipOrdering = false
+        private bool $skipOrdering = false,
     ) {
         $this->callback     = $callback;
         $this->position     = 0;
@@ -121,5 +121,18 @@ class IteratorExportDataModel implements \Iterator
         $this->totalResult = $this->data ? count($this->data) : 0;
         $this->total += $this->totalResult;
         $this->position = 0;
+    }
+
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getArgs(): array
+    {
+        return $this->args;
     }
 }

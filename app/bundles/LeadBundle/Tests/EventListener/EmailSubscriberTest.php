@@ -23,7 +23,7 @@ class EmailSubscriberTest extends TestCase
 
         $event           = new TokenReplacementEvent($value, $contact);
         $emailSubscriber = new EmailSubscriber(
-            new class() extends BuilderTokenHelperFactory {
+            new class extends BuilderTokenHelperFactory {
                 public function __construct()
                 {
                 }

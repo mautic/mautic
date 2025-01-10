@@ -8,30 +8,27 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Environment;
 
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory)
+    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, PageModel $pageModel, Environment $twig): JsonResponse
     {
-        return $this->getAbTestForm(
+        return $this->sendJsonResponse($this->getAbTestForm(
             $request,
-            $formFactory,
-            'page',
-            AbTestPropertiesType::class,
+            $pageModel,
+            fn ($formType, $formOptions) => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn ($form)                   => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
             'page_abtest_settings',
-            'page',
-            '@MauticPage/AbTest/form.html.twig',
-            ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page']
-        );
+            'page'
+        ));
     }
 
-    public function pageListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function pageListAction(Request $request): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
         $pageModel = $this->getModel('page.page');
@@ -49,7 +46,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function setBuilderContentAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function setBuilderContentAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
         $entityId  = InputHelper::clean($request->request->get('entity'));
@@ -59,7 +56,7 @@ class AjaxController extends CommonAjaxController
             $sessionVar = 'mautic.pagebuilder.'.$entityId.'.content';
 
             // Check for an array of slots
-            $slots   = InputHelper::_($request->request->get('slots') ?? [], 'html');
+            $slots   = InputHelper::_($request->request->all()['slots'] ?? [], 'html');
             $content = $session->get($sessionVar, []);
 
             if (!is_array($content)) {

@@ -7,6 +7,10 @@
 Mautic.campaignOnLoad = function (container, response) {
     Mautic.lazyLoadContactListOnCampaignDetail();
 
+    const $flashes = mQuery('#flashes');
+    const $builder = mQuery('#campaign-builder');
+    const isCampaignPreview = $builder.hasClass('preview');
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
@@ -24,7 +28,7 @@ Mautic.campaignOnLoad = function (container, response) {
         });
 
         // set hover and double click functions for the event buttons
-        if (!(mQuery('.preview').length)) {
+        if (!isCampaignPreview) {
             mQuery('#CampaignCanvas .list-campaign-event, #CampaignCanvas .list-campaign-source').off('.eventbuttons')
                 .on('mouseover.eventbuttons', function() {
                     mQuery(this).find('.campaign-event-buttons').removeClass('hide');
@@ -112,8 +116,6 @@ Mautic.campaignOnLoad = function (container, response) {
             }
         });
 
-        const $flashes = mQuery('#flashes');
-        const $builder = mQuery('#campaign-builder');
         $builder.on('campaign-builder:show', function () {
             $builder.addClass('builder-active').removeClass('hide');
             $flashes.addClass('alert-offset');
@@ -146,6 +148,10 @@ Mautic.campaignOnLoad = function (container, response) {
                 Mautic.campaignEventInsertOnError(event, jqxhr);
             }
         });
+
+        if (isCampaignPreview) {
+            Mautic.previewCampaignLabels();
+        }
     }
 };
 
@@ -1123,27 +1129,23 @@ Mautic.campaignHoverCallback = function(sourceEndpoint, endpoint, event) {
  * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
  */
 Mautic.campaignToggleTimeframes = function() {
-    if (mQuery('#campaignevent_triggerMode_2').length) {
-        var immediateChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
-        var intervalChecked = mQuery('#campaignevent_triggerMode_1').prop('checked');
-        var dateChecked = mQuery('#campaignevent_triggerMode_2').prop('checked');
-    } else {
-        var immediateChecked = false;
-        var intervalChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
-        var dateChecked = mQuery('#campaignevent_triggerMode_1').prop('checked');
+    const triggerModes = {
+        immediate: mQuery('#campaignevent_triggerMode_0').prop('checked'),
+        interval: mQuery('#campaignevent_triggerMode_1').prop('checked'),
+        date: mQuery('#campaignevent_triggerMode_2').prop('checked'),
+        optimal: mQuery('#campaignevent_triggerMode_3').prop('checked')
+    };
+
+    if (!mQuery('#campaignevent_triggerMode_2').length) {
+        triggerModes.date = triggerModes.interval;
+        triggerModes.interval = triggerModes.immediate;
+        triggerModes.immediate = false;
     }
 
     if (mQuery('#campaignevent_triggerInterval').length) {
-        if (immediateChecked) {
-            mQuery('#triggerInterval').addClass('hide');
-            mQuery('#triggerDate').addClass('hide');
-        } else if (intervalChecked) {
-            mQuery('#triggerInterval').removeClass('hide');
-            mQuery('#triggerDate').addClass('hide');
-        } else if (dateChecked) {
-            mQuery('#triggerInterval').addClass('hide');
-            mQuery('#triggerDate').removeClass('hide');
-        }
+        mQuery('#triggerInterval').toggleClass('hide', !triggerModes.interval);
+        mQuery('#triggerDate').toggleClass('hide', !triggerModes.date);
+        mQuery('#triggerOptimized').toggleClass('hide', !triggerModes.optimal);
     }
 };
 
@@ -1166,7 +1168,7 @@ Mautic.closeCampaignBuilder = function() {
         spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
-    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="ri-loader-3-line ri-spin ri-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
     mQuery('#builder-errors').hide('fast').text('');
 
@@ -1821,7 +1823,7 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
                 left: (leftPos >=0 ) ? leftPos : 10,
                 top: topPos,
                 width: newWidth,
-                height: Mautic.campaignBuilderIsEventCloneAllowed ? 372 : 280
+
             });
 
         mQuery('#CampaignEventPanel').removeClass('hide');
@@ -1841,7 +1843,6 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
             left: (leftPos >= 0) ? leftPos : 10,
             top: topPos,
             width: 300,
-            height: 80,
         });
 
         mQuery('#CampaignEventPanelGroups').addClass('hide');
@@ -2269,4 +2270,35 @@ Mautic.clearCampaignEventClone = function() {
 
 Mautic.hideCampaignEventPanel = function() {
     mQuery('#CampaignEventPanel').addClass('hide');
+}
+
+Mautic.previewCampaignLabels = function() {
+    const campaignBuilder = Mautic.campaignBuilderInstance;
+    const managedElements = Mautic.campaignBuilderInstance.getManagedElements();
+    const allElements = Object.values(managedElements).map(el => el.el);
+
+    allElements.forEach(function(element) {
+        const id = element.id;
+        const connections = campaignBuilder.getConnections({source: id});
+
+        connections.forEach(function(connection) {
+            const connectionAnchor = connection.target.dataset.connected ?? null;
+            if (connectionAnchor === 'yes') {
+                connection.addOverlay(["Label", {
+                    label: element.dataset.eventYesPercent + '%',
+                    location: 0.44,
+                    cssClass: 'jtk-label jtk-label--success',
+                    id: element.id + 'yes-path-label'
+                }]);
+            }
+            if (connectionAnchor === 'no') {
+                connection.addOverlay(["Label", {
+                    label: element.dataset.eventNoPercent + '%',
+                    location: 0.44,
+                    cssClass: 'jtk-label jtk-label--error',
+                    id: element.id + 'no-path-label'
+                }]);
+            }
+        });
+    });
 }

@@ -15,7 +15,7 @@ class CategorySubscriber implements EventSubscriberInterface
     public function __construct(
         private BundleHelper $bundleHelper,
         private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel
+        private AuditLogModel $auditLogModel,
     ) {
     }
 

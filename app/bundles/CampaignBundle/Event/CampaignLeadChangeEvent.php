@@ -25,7 +25,7 @@ class CampaignLeadChangeEvent extends Event
     public function __construct(
         private Campaign $campaign,
         $leads,
-        private $action
+        private $action,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;

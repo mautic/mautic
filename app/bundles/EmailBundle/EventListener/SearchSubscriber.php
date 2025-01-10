@@ -16,7 +16,7 @@ class SearchSubscriber implements EventSubscriberInterface
         private UserHelper $userHelper,
         private EmailModel $emailModel,
         private CorePermissions $security,
-        private Environment $twig
+        private Environment $twig,
     ) {
     }
 

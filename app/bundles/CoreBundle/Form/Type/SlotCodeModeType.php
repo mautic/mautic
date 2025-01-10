@@ -24,10 +24,7 @@ class SlotCodeModeType extends SlotType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'slot_codemode';
     }

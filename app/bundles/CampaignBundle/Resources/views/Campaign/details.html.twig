@@ -1,5 +1,20 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': campaign,
+    'templateButtons': {
+        'close': securityHasEntityAccess(
+            permissions['campaign:campaigns:viewown'],
+            permissions['campaign:campaigns:viewother'],
+            campaign.createdBy
+        ),
+    },
+    'routeBase': 'campaign',
+    'targetLabel': 'mautic.campaign.campaigns'|trans
+  }) -}}
+{% endblock %}
+
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
@@ -15,11 +30,6 @@
         'delete': securityHasEntityAccess(
             permissions['campaign:campaigns:deleteown'],
             permissions['campaign:campaigns:deleteother'],
-            campaign.createdBy
-        ),
-        'close': securityHasEntityAccess(
-            permissions['campaign:campaigns:viewown'],
-            permissions['campaign:campaigns:viewother'],
             campaign.createdBy
         ),
     },
@@ -38,13 +48,7 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- campaign detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <div class="text-white dark-sm mb-0">{{ campaign.description|purify }}</div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': campaign.description} %}
             <!--/ campaign detail header -->
 
             <!-- campaign detail collapseable -->
@@ -110,7 +114,7 @@
                     }) }}
                 </div>
             </div>
-            <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
+            <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
                 <div class="tab-pane active bdr-w-0" id="stats-container">
                     <div id="emailGraphStats">
                         {{- include('@MauticCore/Helper/chart.html.twig', {

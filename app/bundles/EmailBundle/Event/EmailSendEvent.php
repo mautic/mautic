@@ -61,7 +61,7 @@ class EmailSendEvent extends CommonEvent
     public function __construct(
         private ?MailHelper $helper = null,
         $args = [],
-        private $isDynamicContentParsing = false
+        private $isDynamicContentParsing = false,
     ) {
         $this->content     = $args['content'] ?? '';
         $this->plainText   = $args['plainText'] ?? '';
@@ -108,7 +108,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Returns the Email entity.
      *
-     * @return Email|null
+     * @return ?Email
      */
     public function getEmail()
     {

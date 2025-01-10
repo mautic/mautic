@@ -32,7 +32,7 @@ class LegacyEventDispatcher
         private EventScheduler $scheduler,
         private LoggerInterface $logger,
         private MauticFactory $factory,
-        private ContactTracker $contactTracker
+        private ContactTracker $contactTracker,
     ) {
     }
 
@@ -40,7 +40,7 @@ class LegacyEventDispatcher
         AbstractEventAccessor $config,
         ArrayCollection $logs,
         $wasBatchProcessed,
-        PendingEvent $pendingEvent
+        PendingEvent $pendingEvent,
     ): void {
         $settings = $config->getConfig();
 

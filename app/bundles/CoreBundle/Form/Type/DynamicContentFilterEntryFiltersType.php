@@ -22,7 +22,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
 
     public function __construct(
         private TranslatorInterface $translator,
-        private ListModel $listModel
+        private ListModel $listModel,
     ) {
     }
 

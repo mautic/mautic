@@ -17,7 +17,7 @@ class HardEvidence implements JudgementModeInterface
      */
     public static function adjudicate(
         InformationChangeRequestDAO $leftChangeRequest,
-        InformationChangeRequestDAO $rightChangeRequest
+        InformationChangeRequestDAO $rightChangeRequest,
     ): InformationChangeRequestDAO {
         if (null === $leftChangeRequest->getCertainChangeDateTime() || null === $rightChangeRequest->getCertainChangeDateTime()) {
             throw new ConflictUnresolvedException();

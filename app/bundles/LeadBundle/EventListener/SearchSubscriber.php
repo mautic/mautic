@@ -25,7 +25,7 @@ class SearchSubscriber implements EventSubscriberInterface
         private EmailRepository $emailRepository,
         private TranslatorInterface $translator,
         private CorePermissions $security,
-        private Environment $twig
+        private Environment $twig,
     ) {
         $this->leadRepo        = $leadModel->getRepository();
     }

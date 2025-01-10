@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EmailToUserSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SendEmailToUser $sendEmailToUser
+        private SendEmailToUser $sendEmailToUser,
     ) {
     }
 

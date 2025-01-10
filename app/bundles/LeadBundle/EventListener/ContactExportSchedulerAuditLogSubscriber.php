@@ -14,7 +14,7 @@ class ContactExportSchedulerAuditLogSubscriber implements EventSubscriberInterfa
 {
     public function __construct(
         private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 

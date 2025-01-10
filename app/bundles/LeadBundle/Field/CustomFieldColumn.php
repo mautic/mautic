@@ -24,7 +24,7 @@ class CustomFieldColumn
         private LeadFieldSaver $leadFieldSaver,
         private CustomFieldIndex $customFieldIndex,
         private FieldColumnDispatcher $fieldColumnDispatcher,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

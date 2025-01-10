@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
 class CampaignControllerTest extends MauticMysqlTestCase
@@ -14,8 +13,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
     public function testIndexActionWhenNotFiltered(): void
     {
         $this->client->request('GET', '/s/campaigns');
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -24,8 +22,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/campaigns?search=has%3Aresults&tmpl=list');
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -34,8 +31,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
     public function testNewActionCampaign(): void
     {
         $this->client->request('GET', '/s/campaigns/new/');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -46,13 +42,11 @@ class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionCampaignCancel(): void
     {
-        $crawler                = $this->client->request('GET', '/s/campaigns/new/');
-        $clientResponse         = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $crawler = $this->client->request('GET', '/s/campaigns/new/');
+        self::assertResponseIsSuccessful();
 
         $form = $crawler->filter('form[name="campaign"]')->selectButton('campaign_buttons_cancel')->form();
         $this->client->submit($form);
-        $clientResponse         = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
     }
 }

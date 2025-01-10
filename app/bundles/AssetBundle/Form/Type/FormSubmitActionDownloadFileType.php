@@ -49,10 +49,7 @@ class FormSubmitActionDownloadFileType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'asset_submitaction_downloadfile';
     }

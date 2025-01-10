@@ -129,7 +129,7 @@ class StageController extends AbstractFormController
         // set the page we came from
         $page       = $request->getSession()->get('mautic.stage.page', 1);
         $method     = $request->getMethod();
-        $stage      = $request->request->get('stage') ?? [];
+        $stage      = $request->request->all()['stage'] ?? [];
         $actionType = 'POST' === $method ? ($stage['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
         $actions    = $model->getStageActions();
@@ -465,10 +465,8 @@ class StageController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.stage.page', 1);
         $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $page]);

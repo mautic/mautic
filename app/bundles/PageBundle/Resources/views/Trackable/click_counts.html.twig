@@ -25,7 +25,7 @@
                             <td class="long-text"><a href="{{ link.url }}">{{ link.url }}</a></td>
                             <td class="text-center">{{ link.hits }}</td>
                             <td class="text-center">
-                                <span class="mt-xs label label-primary has-click-event clickable-stat">
+                                <span class="mt-xs label label-primary">
                         {% if channel is defined and entity is defined %}
                             <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.page_source'|trans ~ ':' ~ channel ~ ' ' ~ 'mautic.lead.lead.searchcommand.page_source_id'|trans ~ ':' ~ entity.getId() ~ ' ' ~ 'mautic.lead.lead.searchcommand.page_id'|trans ~ ':' ~ link.id}) }}"
                                 data-toggle="tooltip"
@@ -49,7 +49,7 @@
                     <td class="long-text">{{ 'mautic.trackable.total_clicks'|trans }}</td>
                     <td class="text-center">{{ totalClicks }}</td>
                     <td class="text-center">
-                        <span class="mt-xs label label-primary has-click-event clickable-stat">
+                        <span class="mt-xs label label-primary">
                         {% if channel is defined and entity is defined %}
                             <a href="{{ path('mautic_contact_index',
                                 {'search' : 'mautic.lead.lead.searchcommand.page_source'|trans ~ ':' ~ channel ~ ' ' ~ 'mautic.lead.lead.searchcommand.page_source_id'|trans ~ ':' ~ entity.getId()}) }}"
