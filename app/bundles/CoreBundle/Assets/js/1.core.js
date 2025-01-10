@@ -106,6 +106,18 @@ mQuery( document ).ready(function() {
         });
     }
 
+    mQuery('[data-toggle="tooltip"]').tooltip();
+
+    // Handle dropdown events
+    mQuery(document).on('shown.bs.dropdown', '.dropdown', function() {
+        var $dropdown = mQuery(this);
+
+        // Reinitialize tooltips in dropdown
+        $dropdown.find('[data-toggle="tooltip"]')
+            .tooltip('destroy')
+            .tooltip();
+    });
+
     Mautic.initListGroupToggle('body');
 
     // Prevent backspace from activating browser back
