@@ -11,7 +11,7 @@
                         </span>
                     </div>
                     <div class="media-body">
-                        {% if log.userName == system_user or (log.userId is not defined or log.userId is empty) %}
+                        {% if log.userId is not defined or log.userId == 0 %}
                             {{ system_user }}
                         {% else %}
                             <a href="{{ path('mautic_user_action', {'objectAction': 'edit', 'objectId': log.userId}) }}" data-toggle="ajax">
