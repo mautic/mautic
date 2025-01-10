@@ -20,7 +20,7 @@
                         {% endif %}
                         {{ ('mautic.dashboard.'~log.action~'.past.tense')|trans }}
 
-                        {% if log.route is defined and log.route is not empty and (log.userId is not defined or log.userId == 0) %}
+                        {% if log.route is defined and log.route is not empty and log.userId != 0 %}
                             <a href="{{ log.route }}" data-toggle="ajax">
                                 {{ log.objectName }}
                             </a>
