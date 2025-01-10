@@ -43,7 +43,8 @@ defined %}
 <!--/ Total count -->
 
 <!-- Comparison with previous period -->
-{% if previousPeriodData is defined and previousPeriodData.datasets is defined and previousPeriodData.datasets[0].data is defined %}
+{% if previousPeriodData is defined and previousPeriodData.datasets is defined and previousPeriodData.datasets[0].data
+is defined %}
 {% set currentDataValues = chartData.datasets[0].data %}
 {% set previousDataValues = previousPeriodData.datasets[0].data %}
 
@@ -54,17 +55,14 @@ defined %}
     <span>{{'mautic.dashboard.widget.stats.increased'|trans}} {{currentTotal}}</span>
     {% elseif previousTotal > 0 %}
     {% set percentageChange = ((currentTotal - previousTotal) / previousTotal * 100)|round(2) %}
-    {% if percentageChange > 500 %}
-    <span class="text-success">{{'mautic.dashboard.widget.stats.large_increase'|trans}}</span>
-    {% elseif percentageChange > 0 %}
+    {% if percentageChange > 0 %}
     <span class="fw-sb">{{ percentageChange }}%</span>
     <i class="text-success ri-arrow-up-line"></i>
-    <span>{{'mautic.dashboard.widget.stats.comparison'|trans}}</span>
-    {% elseif percentageChange < 0 %}
+    {% else %}
     <span class="fw-sb">{{ percentageChange|abs }}%</span>
     <i class="text-danger ri-arrow-down-line"></i>
-    <span>{{'mautic.dashboard.widget.stats.comparison'|trans}}</span>
     {% endif %}
+    <span>{{'mautic.dashboard.widget.stats.comparison'|trans}}</span>
     {% else %}
     <span class="text-danger">{{'mautic.dashboard.widget.stats.decreased'|trans}}</span>
     {% endif %}
@@ -74,8 +72,6 @@ defined %}
 </div>
 {% endif %}
 <!--/ Comparison with previous period -->
-
-
 {% endif %}
 
 {% set dateRange = '' %}
