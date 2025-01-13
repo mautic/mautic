@@ -10941,7 +10941,6 @@ code:hover > .copy-icon {
 .marketplace-header {
   overflow: hidden;
   border-radius: clamp(4px, var(--border-radius-lg), 32px);
-  box-shadow: rgba(99, 99, 99, 0.1) 0px 1px 24px 0px;
   border: 2px solid rgba(0, 0, 0, 0.03);
 }
 .marketplace-header:before {
