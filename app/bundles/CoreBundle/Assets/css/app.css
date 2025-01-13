@@ -6401,6 +6401,10 @@ a.label:focus,
   color: var(--label-color-green);
 }
 .label-primary {
+  background-color: var(--label-background-primary);
+  color: var(--label-color-primary);
+}
+.label-brand {
   background-color: var(--label-background-brand);
   color: var(--label-color-brand);
 }
@@ -6520,11 +6524,20 @@ a.label:focus,
 }
 .label[href].label-primary,
 .label:has(> a).label-primary {
-  border: 1px solid var(--label-border-brand);
-  color: var(--label-color-brand);
+  border: 1px solid var(--label-border-primary);
+  color: var(--label-color-primary);
 }
 .label[href].label-primary:hover,
 .label:has(> a).label-primary:hover {
+  background-color: var(--label-background-hover-primary);
+}
+.label[href].label-brand,
+.label:has(> a).label-brand {
+  border: 1px solid var(--label-border-brand);
+  color: var(--label-color-brand);
+}
+.label[href].label-brand:hover,
+.label:has(> a).label-brand:hover {
   background-color: var(--label-background-hover-brand);
 }
 .label-default {
