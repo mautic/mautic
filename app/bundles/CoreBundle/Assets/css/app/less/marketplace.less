@@ -1,7 +1,7 @@
 .marketplace-header {
     overflow: hidden;
     border-radius: clamp(4px, var(--border-radius-lg), 32px);
-    border: 2px solid rgb(0 0 0 / 3%);
+    border: 2px solid rgb(0 0 0 / var(--custom-bg-overlay-opacity));
 
     &:before {
         content: "";
@@ -19,6 +19,7 @@
         -webkit-backface-visibility: hidden;
         animation: marketplacefadeIn 0.5s ease-in-out forwards;
         pointer-events: none;
+        z-index: -1;
     }
 
     &.mautic-plugin:before {
@@ -38,19 +39,4 @@
         opacity: var(--custom-bg-overlay-opacity);
         transform: scale(1) rotate(-10deg);
     }
-}
-
-.marketplace-icon {
-    background-color: var(--background);
-    padding: 1px;
-    border-radius: 60px;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 25px;
-    font-size: 1.2em;
 }
