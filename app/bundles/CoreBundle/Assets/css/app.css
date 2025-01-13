@@ -6129,7 +6129,7 @@ ul.dropdown-menu-form {
 .nav-tabs > li.active > a {
   overflow: hidden;
   border-top-color: transparent;
-  font-weight: bold;
+  font-weight: 600;
 }
 .nav-tabs > li.active > a:after {
   background-color: var(--border-interactive);
