@@ -107,7 +107,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-md-9">
+<div class="col-md-8">
     <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 jc-center pt-lg pb-lg">
 
         <h1 class="fw-b fs-46">{{ packageDetail.packageBase.getHumanPackageName()|escape }}</h1>
@@ -116,36 +116,58 @@
         {% endif %}
         <hr>
         <div class="d-flex gap-3 mt-sm">
-            <!-- Start label -->
-            <span class="label label-warning" size="md" title="{{ 'marketplace.package.github.stars'|trans }}" data-toggle="tooltip">
-                <i class="ri-star-s-fill ri-lg"></i>
-                {{ packageDetail.githubInfo.stars|escape }}
-            </span>
+            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                tags: [
+                    {
+                        type: 'read-only',
+                        color: 'warning',
+                        label: packageDetail.githubInfo.stars|escape,
+                        icon: 'ri-star-s-fill ri-lg',
+                        attributes: {
+                            'title': 'marketplace.package.github.stars'|trans,
+                            'data-toggle': 'tooltip',
+                            'size': 'md'
+                        }
+                    },
+                    {
+                        type: 'read-only',
+                        color: 'warm-gray',
+                        label: packageDetail.packageBase.downloads|escape,
+                        icon: 'ri-download-line',
+                        attributes: {
+                            'title': 'marketplace.package.total.downloads'|trans,
+                            'data-toggle': 'tooltip',
+                            'size': 'md'
+                        }
+                    },
+                    {
+                        type: 'read-only',
+                        color: 'warm-gray',
+                        label: packageDetail.packageBase.type == 'theme'
+                            ? 'marketplace.package.type.theme'|trans
+                            : 'marketplace.package.type.plugin'|trans,
+                        icon: packageDetail.packageBase.type == 'theme'
+                            ? 'ri-paint-brush-line marketplace-icon'
+                            : 'ri-plug-line',
+                        attributes: {
+                            'title': 'marketplace.package.type'|trans,
+                            'data-toggle': 'tooltip',
+                            'size': 'md'
+                        }
+                    },
+                    {
+                        type: 'read-only',
+                        color: 'warm-gray',
+                        label: latestVersion is not empty
+                            ? ('marketplace.package.last_updated'|trans ~ ' ' ~ dateToHumanized(latestVersion.time))
+                            : '',
+                        attributes: {
+                            'size': 'md'
+                        }
+                    }
+                ]
+            } %}
 
-            <!-- Downloads label -->
-            <span class="label label-warm-gray" size="md" title="{{'marketplace.package.total.downloads'|trans }}" data-toggle="tooltip">
-                <i class="ri-download-line"></i>
-                {{ packageDetail.packageBase.downloads|escape }}
-            </span>
-
-            <!-- Type label -->
-            <span class="label label-warm-gray" size="md" title="{{ 'marketplace.package.type'|trans }}" data-toggle="tooltip">
-                {% if packageDetail.packageBase.type == 'theme' %}
-                <i class="ri-paint-brush-line marketplace-icon"></i>
-                {{ 'marketplace.package.type.theme'|trans }}
-                {% else %}
-                <i class="ri-plug-line"></i>
-                {{ 'marketplace.package.type.plugin'|trans }}
-                {% endif %}
-            </span>
-
-            <!-- Last updated label -->
-            <span class="label label-warm-gray" size="md">
-                {% if latestVersion is not empty %}
-                    {{'marketplace.package.last_updated'|trans }}
-                    {{ dateToHumanized(latestVersion.time) }}
-                {% endif %}
-            </span>
         </div>
     </div>
     <hr>
@@ -164,40 +186,37 @@
         'style': 'line'
     } %}
 
-
-
-
 </div>
 
-<div class="col-md-3 pb-lg">
+<div class="col-md-4 pb-lg">
     <!-- Maintainers -->
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans %}marketplace.package.maintainers{% endtrans %}</h3>
         </div>
-        <div class="panel-body">
-            {% for maintainer in packageDetail.maintainers %}
-            <div class="box-layout">
-                <div class="col-xs-3 va-m">
-                    <div class="panel-body">
-                        <span class="img-wrapper img-rounded">
-                            <img class="img" src="{{ maintainer.avatar|escape }}">
-                        </span>
-                    </div>
-                </div>
-                <div class="col-xs-9 va-t">
-                    <div class="panel-body">
-                        <h4 class="fw-sb mb-xs ellipsis">
-                            {{ maintainer.name|title|escape }}
-                        </h4>
-                        <a href="https://packagist.org/packages/{{ maintainer.name|escape }}" target="_blank" rel="noopener noreferrer">
-                            {{ 'marketplace.other.packages'|trans({'%name%' : maintainer.name}) }}
-                        </a>
-                    </div>
+
+        {% for maintainer in packageDetail.maintainers %}
+        <div class="box-layout">
+            <div class="col-xs-3 va-m">
+                <div class="panel-body">
+                    <span class="img-wrapper img-rounded">
+                        <img class="img" src="{{ maintainer.avatar|escape }}">
+                    </span>
                 </div>
             </div>
-        {% endfor %}
+            <div class="col-xs-9 va-t">
+                <div class="panel-body">
+                    <h4 class="fw-sb mb-xs ellipsis">
+                        {{ maintainer.name|title|escape }}
+                    </h4>
+                    <a href="https://packagist.org/packages/{{ maintainer.name|escape }}" target="_blank" rel="noopener noreferrer">
+                        {{ 'marketplace.other.packages'|trans({'%name%' : maintainer.name}) }}
+                    </a>
+                </div>
+            </div>
         </div>
+    {% endfor %}
+
     </div>
     <hr>
 
