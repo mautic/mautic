@@ -68,6 +68,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.webroot',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.core.config.form.webroot.help',
                 'attr'       => [
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.core.config.form.webroot.tooltip',
@@ -85,6 +86,7 @@ class ConfigType extends AbstractType
             [
                 'label'         => 'mautic.core.config.form.404_page',
                 'label_attr'    => ['class' => 'control-label'],
+                'help'          => 'mautic.core.config.form.404_page.help',
                 'attr'          => [
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
@@ -179,6 +181,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
+                'help'              => 'mautic.core.config.form.locale.help',
                 'placeholder'       => false,
             ]
         );
@@ -195,7 +198,8 @@ class ConfigType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.trusted.hosts.tooltip',
                     ],
-                    'required' => false,
+                    'help'       => 'mautic.core.config.form.trusted_hosts.help',
+                    'required'   => false,
                 ]
             )->addViewTransformer($arrayStringTransformer)
         );
@@ -434,6 +438,7 @@ class ConfigType extends AbstractType
                 'label_attr'        => [
                     'class' => 'control-label',
                 ],
+                'help'              => 'mautic.core.config.form.ip.lookup.service.help',
                 'required'          => false,
                 'attr'              => [
                     'class'    => 'form-control',
@@ -574,6 +579,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.link.max_entity_lock_time',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.core.config.form.link.max_entity_lock_time.help',
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.link.max_entity_lock_time.tooltip',
@@ -613,6 +619,7 @@ class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.config.cors.restrict.domains',
+                'help'  => 'mautic.core.config.cors.restrict.domains.help',
                 'data'  => (array_key_exists('cors_restrict_domains', $options['data']) && !empty($options['data']['cors_restrict_domains'])),
                 'attr'  => [
                     'class'   => 'form-control',
@@ -634,6 +641,7 @@ class ConfigType extends AbstractType
                         'tooltip'      => 'mautic.core.config.cors.valid.domains.tooltip',
                         'data-show-on' => '{"config_coreconfig_cors_restrict_domains_1":"checked"}',
                     ],
+                    'help'       => 'mautic.core.config.form.cors_valid_domains.help',
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
         );

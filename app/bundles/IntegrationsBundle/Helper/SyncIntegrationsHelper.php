@@ -51,8 +51,6 @@ class SyncIntegrationsHelper
 
     /**
      * @return array<int,string>|null
-     *
-     * @throws IntegrationNotFoundException
      */
     public function getEnabledIntegrations()
     {

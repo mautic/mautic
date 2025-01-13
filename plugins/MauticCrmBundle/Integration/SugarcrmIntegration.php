@@ -795,32 +795,28 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
                 if ('6' == $SUGAR_VERSION) {
                     foreach ($record['name_value_list'] as $item) {
-                        if ('Activity' !== $object) {
-                            if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
-                                $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
-                                $dataObject[$item['name'].$newName] = $convertedMultiSelectString;
-                            } else {
-                                $dataObject[$item['name'].$newName] = $item['value'];
-                            }
-                            if ('date_entered' == $item['name']) {
-                                $itemDateEntered = new \DateTime($item['value']);
-                            }
-                            if ('date_modified' == $item['name']) {
-                                $itemDateModified = new \DateTime($item['value']);
-                            }
+                        if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
+                            $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
+                            $dataObject[$item['name'].$newName] = $convertedMultiSelectString;
+                        } else {
+                            $dataObject[$item['name'].$newName] = $item['value'];
+                        }
+                        if ('date_entered' == $item['name']) {
+                            $itemDateEntered = new \DateTime($item['value']);
+                        }
+                        if ('date_modified' == $item['name']) {
+                            $itemDateModified = new \DateTime($item['value']);
                         }
                     }
                 } else {
-                    if ('Activity' !== $object) {
-                        if (isset($record['date_entered']) && '' != $record['date_entered']) {
-                            $itemDateEntered = new \DateTime($record['date_entered']);
-                        }
-                        if (isset($record['date_modified']) && '' != $record['date_modified']) {
-                            $itemDateEntered = new \DateTime($record['date_modified']);
-                        }
-                        foreach ($record as $k => $item) {
-                            $dataObject[$k.$newName] = $item;
-                        }
+                    if (isset($record['date_entered']) && '' != $record['date_entered']) {
+                        $itemDateEntered = new \DateTime($record['date_entered']);
+                    }
+                    if (isset($record['date_modified']) && '' != $record['date_modified']) {
+                        $itemDateEntered = new \DateTime($record['date_modified']);
+                    }
+                    foreach ($record as $k => $item) {
+                        $dataObject[$k.$newName] = $item;
                     }
                 }
                 if ('Leads' == $object && isset($dataObject['email1__Leads']) && null != $dataObject['email1__Leads']

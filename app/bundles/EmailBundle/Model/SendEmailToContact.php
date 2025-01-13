@@ -15,11 +15,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
-    /**
-     * @var string|null
-     */
-    private $singleEmailMode;
-
     private array $failedContacts = [];
 
     private array $errorMessages = [];
@@ -66,8 +61,6 @@ class SendEmailToContact
             // Check to see if failed recipients were stored by the transport
             if (!empty($sendFailures['failures'])) {
                 $this->processSendFailures($sendFailures);
-            } elseif ($this->singleEmailMode) {
-                $this->errorMessages[$this->singleEmailMode] = implode('; ', $sendFailures);
             }
         }
 
@@ -196,7 +189,6 @@ class SendEmailToContact
         $this->emailEntityErrors = null;
         $this->emailEntityId     = null;
         $this->emailSentCounts   = [];
-        $this->singleEmailMode   = null;
         $this->listId            = null;
         $this->statBatchCounter  = 0;
         $this->contact           = [];

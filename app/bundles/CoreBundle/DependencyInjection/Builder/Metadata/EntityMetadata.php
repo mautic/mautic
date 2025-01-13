@@ -33,7 +33,6 @@ class EntityMetadata
         $bundleNamespace = $this->metadata->getNamespace();
         $bundleName      = $this->metadata->getBundleName();
 
-        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             // Check to see if entities are organized by subfolder
             $subFolder = $file->getRelativePath() ? $file->getRelativePath().'\\' : '';

@@ -176,6 +176,14 @@ class UserType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'preferences',
+            UserPreferencesType::class,
+            [
+                'label'      => false,
+            ]
+        );
+
         $defaultSignature = '';
         if (isset($options['data']) && null === $options['data']->getSignature()) {
             $defaultSignature = $this->translator->trans('mautic.email.default.signature', ['%from_name%' => '|FROM_NAME|']);

@@ -476,7 +476,7 @@ class SugarcrmApi extends CrmApi
                         $res[$fields['id']] = $fields['email1'];
                     } elseif (isset($fields['email1'])) {
                         $res[$fields['email1']] = $fields['id'];
-                    } elseif ('BYEMAIL' == $type && !isset($fields['email1'])) {
+                    } elseif (!isset($fields['email1'])) {
                         $res[$query['emails'][0]] = $fields['id'];
                     }
                 }

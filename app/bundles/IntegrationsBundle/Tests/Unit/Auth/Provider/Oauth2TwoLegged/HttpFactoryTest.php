@@ -52,12 +52,12 @@ class HttpFactoryTest extends TestCase
                 return '';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return '';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -76,12 +76,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return '';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -100,12 +100,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -124,22 +124,22 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return '';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return '';
             }
@@ -158,22 +158,22 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'foo';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return '';
             }
@@ -190,12 +190,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
@@ -213,12 +213,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'bar';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'foo';
             }
@@ -262,22 +262,22 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'username';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return 'password';
             }
@@ -299,12 +299,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
@@ -393,32 +393,32 @@ class HttpFactoryTest extends TestCase
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'username';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return 'password';
             }
 
-            public function getState(): ?string
+            public function getState(): string
             {
                 return 'state';
             }
 
-            public function getScope(): ?string
+            public function getScope(): string
             {
                 return 'scope';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'secret';
             }

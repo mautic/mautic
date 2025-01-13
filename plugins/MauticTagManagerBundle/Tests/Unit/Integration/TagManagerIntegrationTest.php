@@ -30,14 +30,12 @@ class TagManagerIntegrationTest extends TestCase
     public function testGetDisplayNameReturnsName(): void
     {
         $displayName = $this->tagManagerIntegration->getDisplayName();
-        Assert::assertIsString($displayName);
         Assert::assertNotEmpty($displayName);
     }
 
     public function testGetAuthenticationTypeReturnsNonEmptyValue(): void
     {
         $authenticationType = $this->tagManagerIntegration->getAuthenticationType();
-        Assert::assertIsString($authenticationType);
         Assert::assertNotEmpty($authenticationType);
     }
 }

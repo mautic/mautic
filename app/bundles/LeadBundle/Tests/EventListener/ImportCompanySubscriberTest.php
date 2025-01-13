@@ -174,11 +174,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                /**
-                 * @param array<mixed> $fields
-                 * @param array<mixed> $data
-                 */
-                public function import($fields, $data, $owner = null, $skipIfExists = false): bool
+                public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false): bool
                 {
                     return true;
                 }

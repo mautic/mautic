@@ -3,8 +3,11 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -112,7 +115,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, $idHash, string $urlEmail = null, string $secretHash = null)
     {
         $stat                   = $model->getEmailStatus($idHash);
         $message                = '';
@@ -163,11 +166,11 @@ class PublicController extends CommonFormController
             $template = $formTemplate;
         }
 
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
-        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+        $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
         if (!empty($stat) || $isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
 
@@ -328,7 +331,7 @@ class PublicController extends CommonFormController
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
-                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+                $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
             } else {
                 $viewParams['content'] = '';
                 $viewParams['message'] = $message.$formContent;
@@ -354,7 +357,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, MailHashHelper $mailHash, $idHash): Response
+    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
         $stat = $model->getEmailStatus($idHash);
 
@@ -409,25 +412,25 @@ class PublicController extends CommonFormController
 
         $template = (!empty($email) && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
 
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
 
         // Ensure template still exists
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
         if (empty($theme) || $theme->getTheme() !== $template) {
             $template = $this->coreParametersHelper->get('theme');
         }
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $analytics = $analyticsHelper->getCode();
 
         if (!empty($analytics)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            $assetsHelper->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
 
         return $this->render(
             $logicalName,
@@ -457,7 +460,7 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
+    public function previewAction(AnalyticsHelper $analyticsHelper, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
     {
         $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
@@ -505,15 +508,13 @@ class PublicController extends CommonFormController
 
         if (empty($content) && !empty($BCcontent)) {
             $template = $emailEntity->getTemplate();
-            $slots    = $this->factory->getTheme($template)->getSlots('email');
-
-            $assetsHelper = $this->factory->getHelper('template.assets');
+            $slots    = $themeHelper->getTheme($template)->getSlots('email');
 
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
 
-            $this->processSlots($slots, $emailEntity);
+            $this->processSlots($slotsHelper, $slots, $emailEntity);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $response = $this->render(
                 $logicalName,
@@ -582,11 +583,8 @@ class PublicController extends CommonFormController
     /**
      * @param Email $entity
      */
-    public function processSlots($slots, $entity): void
+    public function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
         $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {

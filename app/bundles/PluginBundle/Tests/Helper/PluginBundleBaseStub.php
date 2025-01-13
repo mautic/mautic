@@ -12,17 +12,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 abstract class PluginBundleBaseStub extends Bundle
 {
-    /**
-     * @throws \Exception
-     */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
     {
     }
 
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
-     *
-     * @throws \Exception
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
     {

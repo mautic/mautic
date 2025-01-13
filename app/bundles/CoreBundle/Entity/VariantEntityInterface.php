@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * Interface VariantEntityInterface.
- */
 interface VariantEntityInterface
 {
     /**
@@ -68,7 +65,7 @@ interface VariantEntityInterface
     /**
      * Get all entities for variant parent/children.
      *
-     * @return array[$parent, $children]
+     * @return array [$parent, $children]
      */
     public function getVariants();
 

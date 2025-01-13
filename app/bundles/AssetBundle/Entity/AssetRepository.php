@@ -95,7 +95,7 @@ class AssetRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('a.language', ":$unique"),
                     $q->expr()->like('a.language', ":$langUnique")
                 );

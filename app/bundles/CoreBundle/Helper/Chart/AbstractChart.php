@@ -159,9 +159,9 @@ abstract class AbstractChart
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
      */
-    public function addOneUnitMinusOneSec(\DateTime &$date): void
+    public function addOneUnitMinusOneSec(\DateTime|\DateTimeImmutable &$date): \DateTime|\DateTimeImmutable
     {
-        $date->add($this->getUnitInterval())->modify('-1 sec');
+        return $date->add($this->getUnitInterval())->modify('-1 sec');
     }
 
     /**

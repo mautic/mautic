@@ -559,7 +559,7 @@ class EmailRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
@@ -717,7 +717,7 @@ class EmailRepository extends CommonRepository
         }
     }
 
-    public function incrementRead(int $emailId, int $statId, bool $isVariant = false): void
+    public function incrementRead(int $emailId, string $statId, bool $isVariant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

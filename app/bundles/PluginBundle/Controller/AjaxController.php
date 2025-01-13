@@ -108,17 +108,15 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for integration properties.
      */
-    public function getIntegrationConfigAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
-            /** @var IntegrationHelper $helper */
-            $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
-            $object = $helper->getIntegrationObject($integration);
+            $object = $integrationHelper->getIntegrationObject($integration);
 
             if ($object) {
                 $data           = $statusData           = [];
@@ -164,7 +162,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getIntegrationCampaignStatusAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationCampaignStatusAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $campaign    = $request->query->get('campaign');
@@ -172,10 +170,8 @@ class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
-            /** @var IntegrationHelper $helper */
-            $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
-            $object = $helper->getIntegrationObject($integration);
+            $object = $integrationHelper->getIntegrationObject($integration);
 
             if ($object) {
                 if (method_exists($object, 'getCampaignMemberStatus')) {
@@ -220,7 +216,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function matchFieldsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function matchFieldsAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration       = $request->request->get('integration');
         $integration_field = $request->request->get('integrationField');
@@ -228,8 +224,7 @@ class AjaxController extends CommonAjaxController
         $update_mautic     = $request->request->get('updateMautic');
         $object            = $request->request->get('object');
 
-        $helper             = $this->factory->getHelper('integration');
-        $integration_object = $helper->getIntegrationObject($integration);
+        $integration_object = $integrationHelper->getIntegrationObject($integration);
         $entity             = $integration_object->getIntegrationSettings();
         $featureSettings    = $entity->getFeatureSettings();
         $doNotMatchField    = ('-1' === $mautic_field || '' === $mautic_field);

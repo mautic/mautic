@@ -85,10 +85,7 @@ class ContactSegmentFilterFactory
         return new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder, $batchLimiters);
     }
 
-    /**
-     * @throws \Exception
-     */
-    private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate): ?FilterQueryBuilderInterface
+    private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate): FilterQueryBuilderInterface
     {
         $qbServiceId = $decorator->getQueryType($contactSegmentFilterCrate);
 
@@ -145,7 +142,7 @@ class ContactSegmentFilterFactory
             }
         }
 
-        return array_values($shrinkedFilters);
+        return $shrinkedFilters;
     }
 
     /**

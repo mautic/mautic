@@ -21,9 +21,7 @@ class ConfigType extends AbstractType
             [
                 'label' => 'mautic.api.config.form.api.enabled',
                 'data'  => isset($options['data']['api_enabled']) && (bool) $options['data']['api_enabled'],
-                'attr'  => [
-                    'tooltip' => 'mautic.api.config.form.api.enabled.tooltip',
-                ],
+                'help'  => 'mautic.api.config.form.api.enabled.help',
             ]
         );
 

@@ -629,7 +629,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select('comp.companycity as title, count(comp.companycity) as quantity')
                         ->groupBy('comp.companycity')
                         ->andWhere(
-                            $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->and(
                                 $queryBuilder->expr()->isNotNull('comp.companycity'),
                                 $queryBuilder->expr()->neq('comp.companycity', $queryBuilder->expr()->literal(''))
                             )

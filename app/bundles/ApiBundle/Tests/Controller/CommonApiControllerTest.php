@@ -116,7 +116,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
              *
              * @return mixed[]
              */
-            public function testGetBatchEntities(array $parameters, array $errors, AbstractCommonModel $model): ?array
+            public function testGetBatchEntities(array $parameters, array $errors, AbstractCommonModel $model): array
             {
                 return $this->getBatchEntities($parameters, $errors, false, 'id', $model);
             }

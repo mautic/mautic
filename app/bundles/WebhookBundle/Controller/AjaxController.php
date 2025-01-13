@@ -35,7 +35,6 @@ class AjaxController extends CommonAjaxController
         $payloads['timestamp'] = $now->format('c');
 
         // set the response
-        /** @var Psr\Http\Message\ResponseInterface $response */
         $response = $client->post($url, $payloads, InputHelper::string($request->request->get('secret')));
 
         // default to an error message
@@ -47,7 +46,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         // if we get a 2xx response convert to success message
-        if (2 == substr($response->getStatusCode(), 0, 1)) {
+        if (2 == substr((string) $response->getStatusCode(), 0, 1)) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')

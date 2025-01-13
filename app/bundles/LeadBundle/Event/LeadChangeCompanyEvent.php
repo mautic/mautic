@@ -50,10 +50,7 @@ class LeadChangeCompanyEvent extends Event
         return $this->leads;
     }
 
-    /**
-     * @return Company/Company
-     */
-    public function getCompany()
+    public function getCompany(): Company
     {
         return $this->company;
     }

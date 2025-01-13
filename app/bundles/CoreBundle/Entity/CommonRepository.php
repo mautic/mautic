@@ -1342,17 +1342,13 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param QueryBuilder|DbalQueryBuilder $query
      * @param array                         $clauses [['col' => 'column_a', 'dir' => 'ASC']]
-     *
-     * @return array
      */
-    protected function buildOrderByClauseFromArray($query, array $clauses)
+    protected function buildOrderByClauseFromArray($query, array $clauses): void
     {
-        if ($clauses && is_array($clauses)) {
-            foreach ($clauses as $clause) {
-                $clause = $this->validateOrderByClause($clause);
-                $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
-                $query->addOrderBy($column, $clause['dir']);
-            }
+        foreach ($clauses as $clause) {
+            $clause = $this->validateOrderByClause($clause);
+            $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+            $query->addOrderBy($column, $clause['dir']);
         }
     }
 

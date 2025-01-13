@@ -13,7 +13,7 @@ class Reference
      */
     private $leadId = 0;
 
-    private ?int $statId;
+    private ?string $statId;
 
     public function __construct(Stat $stat)
     {
@@ -40,10 +40,7 @@ class Reference
         return $this->leadId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getStatId()
+    public function getStatId(): ?string
     {
         return $this->statId;
     }

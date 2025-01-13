@@ -518,7 +518,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert that the link for unsubscribe all exists
         $unsubscribeAllLink = $crawler->filter('a[href^="/email/dnc/"]')->first();
-        $this->assertNotNull($unsubscribeAllLink, 'Unsubscribe all link not found');
+        $this->assertCount(1, $unsubscribeAllLink, 'Unsubscribe all link not found');
         $href = $unsubscribeAllLink->attr('href');
 
         // Click the link for unsubscribe all

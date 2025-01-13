@@ -275,7 +275,7 @@ class ConfigController extends FormController
             foreach ($form['parameters'] as $key => $value) {
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
-                } elseif (array_key_exists($key, $localParams)) {
+                } elseif (array_key_exists($key, $localParams)) {// @phpstan-ignore function.impossibleType (Not sure what this is about)
                     $paramValue               = $localParams[$key];
                     $form['parameters'][$key] = $paramValue;
                 }

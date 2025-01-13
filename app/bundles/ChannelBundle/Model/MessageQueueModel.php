@@ -337,6 +337,8 @@ class MessageQueueModel extends FormModel
     }
 
     /**
+     * @param ?object $entity
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

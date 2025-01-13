@@ -235,7 +235,7 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->with($this->equalTo(AssetEvents::ASSET_ON_LOAD))
             ->willReturn(false);
 
-        /** @var Download $download */
+        /** @var ?Download $download */
         $download = null;
 
         $this->entityManager->expects($this->once())

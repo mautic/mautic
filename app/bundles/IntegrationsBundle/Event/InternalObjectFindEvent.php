@@ -44,7 +44,7 @@ class InternalObjectFindEvent extends Event
     }
 
     /**
-     * @param int[] $ids
+     * @param int[]|string[] $ids
      */
     public function setIds(array $ids): void
     {

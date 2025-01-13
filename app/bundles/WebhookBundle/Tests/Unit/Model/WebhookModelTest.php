@@ -214,7 +214,7 @@ class WebhookModelTest extends TestCase
     public function testProcessWebhook(): void
     {
         $webhook = new class extends Webhook {
-            public function getId(): ?int
+            public function getId(): int
             {
                 return 1;
             }
@@ -268,7 +268,7 @@ class WebhookModelTest extends TestCase
     public function testMinAndMaxQueueIdWhenNoneIsSet(): void
     {
         $webhook = new class extends Webhook {
-            public function getId(): ?int
+            public function getId(): int
             {
                 return 1;
             }
@@ -309,7 +309,7 @@ class WebhookModelTest extends TestCase
     public function testMinAndMaxQueueIdWhenBothSet(): void
     {
         $webhook = new class extends Webhook {
-            public function getId(): ?int
+            public function getId(): int
             {
                 return 1;
             }

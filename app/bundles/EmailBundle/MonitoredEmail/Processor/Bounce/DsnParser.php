@@ -1228,11 +1228,9 @@ class DsnParser
             }
         }
 
-        if (false === $result['bounce_type']) {
-            $categoryObject        = CategoryMapper::map($result['rule_cat']);
-            $result['bounce_type'] = $categoryObject->getType();
-            $result['remove']      = $categoryObject->isPermanent();
-        }
+        $categoryObject        = CategoryMapper::map($result['rule_cat']);
+        $result['bounce_type'] = $categoryObject->getType();
+        $result['remove']      = $categoryObject->isPermanent();
 
         return $result;
     }

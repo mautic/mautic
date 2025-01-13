@@ -5,7 +5,9 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
@@ -24,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -279,15 +282,6 @@ class OwnerSubscriberTest extends TestCase
         $mockMailboxHelper->method('isConfigured')
             ->willReturn(false);
 
-        $mockFactory->method('getHelper')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['mailbox', $mockMailboxHelper],
-                    ]
-                )
-            );
-
         return $mockFactory;
     }
 
@@ -316,9 +310,27 @@ class OwnerSubscriberTest extends TestCase
         /** @var MockObject&Environment $twig */
         $twig = $this->createMock(Environment::class);
 
+        $slotsHelper = new SlotsHelper();
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $twig);
+        $mailerHelper = new MailHelper(
+            $mockFactory,
+            $mailer,
+            $fromEmaiHelper,
+            $coreParametersHelper,
+            $mailbox,
+            $logger,
+            $this->mailHashHelper,
+            $router,
+            $twig,
+            $themeHelper,
+            $slotsHelper,
+            $this->createMock(EventDispatcherInterface::class)
+        );
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;

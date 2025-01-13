@@ -4,7 +4,11 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -237,7 +241,7 @@ class PublicController extends CommonFormController
     /**
      * Displays a message.
      */
-    public function messageAction(Request $request): Response
+    public function messageAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper): Response
     {
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);
@@ -245,13 +249,13 @@ class PublicController extends CommonFormController
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
         $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $analytics = $analyticsHelper->getCode();
 
         if (!empty($analytics)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            $assetsHelper->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig');
 
         return $this->render($logicalName, [
             'message'  => $msg,
@@ -263,14 +267,12 @@ class PublicController extends CommonFormController
     /**
      * Gives a preview of the form.
      *
-     * @param int $id
-     *
      * @return Response
      *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, $id = 0)
+    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, SlotsHelper $slotsHelper, int $id = 0)
     {
         $model = $this->getModel('form.form');
         \assert($model instanceof FormModel);
@@ -301,7 +303,7 @@ class PublicController extends CommonFormController
             // Use form specific template or system-wide default theme
             $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
             if (!empty($template)) {
-                $theme = $this->factory->getTheme($template);
+                $theme = $themeHelper->getTheme($template);
                 if ($theme->getTheme() != $template) {
                     $config = $theme->getConfig();
                     if (in_array('form', $config['features'])) {
@@ -316,15 +318,14 @@ class PublicController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
-            $assetsHelper = $this->factory->getHelper('template.assets');
-            $analytics    = $this->factory->getHelper('twig.analytics')->getCode();
+            $logicalName  = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+            $analytics    = $analyticsHelper->getCode();
 
             foreach ($customStylesheets as $css) {
                 $assetsHelper->addStylesheet($css);
             }
 
-            $this->factory->getHelper('template.slots')->set('pageTitle', $form->getName());
+            $slotsHelper->set('pageTitle', $form->getName());
 
             if (!empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);

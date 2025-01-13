@@ -156,9 +156,9 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @return mixed[]|string
+     * @return mixed[]|string|false
      */
-    public static function formatList($format, $choices)
+    public static function formatList(string $format, $choices)
     {
         switch ($format) {
             case self::FORMAT_JSON:
@@ -188,6 +188,8 @@ abstract class AbstractFormFieldHelper
 
                 return $array;
         }
+
+        return false;
     }
 
     protected static function parseChoiceList(array $list, bool $labelsAsKeys = false)

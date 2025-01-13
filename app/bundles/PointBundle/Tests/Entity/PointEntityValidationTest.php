@@ -84,8 +84,6 @@ class PointEntityValidationTest extends MauticMysqlTestCase
 
     /**
      * @return iterable<string, array<mixed>>
-     *
-     * @throws \Exception
      */
     public static function deltaScenariosProvider(): iterable
     {

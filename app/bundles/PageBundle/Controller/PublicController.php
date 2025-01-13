@@ -6,11 +6,13 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -47,6 +49,8 @@ class PublicController extends AbstractFormController
         CookieHelper $cookieHelper,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
+        ThemeHelper $themeHelper,
+        SlotsHelper $slotsHelper,
         Tracking404Model $tracking404Model,
         RouterInterface $router,
         $slug)
@@ -220,6 +224,7 @@ class PublicController extends AbstractFormController
                         $lead,
                         $request
                     );
+                    \assert($translatedEntity instanceof Page);
 
                     if ($translationParent && $translatedEntity !== $entity) {
                         if (!$request->get('ntrd', 0)) {
@@ -244,17 +249,17 @@ class PublicController extends AbstractFormController
                  */
                 $template = $entity->getTemplate();
                 // all the checks pass so display the content
-                $slots   = $this->factory->getTheme($template)->getSlots('page');
+                $slots   = $themeHelper->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
 
-                $this->processSlots($slots, $entity);
+                $this->processSlots($assetsHelper, $slotsHelper, $slots, $entity);
 
                 // Add the GA code to the template assets
                 if (!empty($analytics)) {
-                    $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+                    $assetsHelper->addCustomDeclaration($analytics);
                 }
 
-                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+                $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
                 $response = $this->render(
                     $logicalName,
@@ -306,7 +311,7 @@ class PublicController extends AbstractFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, CorePermissions $security, int $id)
+    public function previewAction(Request $request, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, SlotsHelper $slotsHelper, int $id)
     {
         $contactId = (int) $request->query->get('contactId');
 
@@ -326,7 +331,7 @@ class PublicController extends AbstractFormController
             return $this->notFound();
         }
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $analytics = $analyticsHelper->getCode();
 
         $BCcontent = $page->getContent();
         $content   = $page->getCustomHtml();
@@ -354,17 +359,17 @@ class PublicController extends AbstractFormController
         if (empty($content) && !empty($BCcontent)) {
             $template = $page->getTemplate();
             // all the checks pass so display the content
-            $slots   = $this->factory->getTheme($template)->getSlots('page');
+            $slots   = $themeHelper->getTheme($template)->getSlots('page');
             $content = $page->getContent();
 
-            $this->processSlots($slots, $page);
+            $this->processSlots($assetsHelper, $slotsHelper, $slots, $page);
 
             // Add the GA code to the template assets
             if (!empty($analytics)) {
-                $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+                $assetsHelper->addCustomDeclaration($analytics);
             }
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
             $response = $this->render(
                 $logicalName,
@@ -555,13 +560,8 @@ class PublicController extends AbstractFormController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processSlots($slots, $entity): void
+    private function processSlots(AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, $slots, $entity): void
     {
-        /** @var AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
         $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {

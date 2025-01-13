@@ -61,7 +61,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
         ], $options);
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         if (true === $this->options['post_only'] && !$request->isMethod(Request::METHOD_POST)) {
             return false;
@@ -161,7 +161,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
         return $this->successHandler->onAuthenticationSuccess($request, $token);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->failureHandler->onAuthenticationFailure($request, $exception);
     }

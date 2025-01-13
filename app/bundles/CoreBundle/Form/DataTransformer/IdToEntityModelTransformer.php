@@ -92,7 +92,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf('Entities with a/an '.$this->id.' of "%s" does not exist!', $id));
+            throw new TransformationFailedException(sprintf('Entities with a/an '.$this->id.' of "%s" does not exist!', json_encode($id)));
         }
 
         return $entities;

@@ -9,6 +9,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\Facade\ReloadFacade;
 use Mautic\PluginBundle\Form\Type\DetailsType;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
@@ -24,7 +25,7 @@ class PluginController extends FormController
     /**
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, IntegrationHelper $integrationHelper)
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -54,8 +55,6 @@ class PluginController extends FormController
 
         $session->set('mautic.integrations.filter', $pluginFilter);
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
         $integrations       = $foundPlugins       = [];
 
@@ -131,7 +130,7 @@ class PluginController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -145,8 +144,6 @@ class PluginController extends FormController
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
@@ -360,7 +357,7 @@ class PluginController extends FormController
     /**
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function infoAction($name)
+    public function infoAction(IntegrationHelper $integrationHelper, $name)
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -378,9 +375,6 @@ class PluginController extends FormController
         if (!$bundle) {
             return $this->accessDenied();
         }
-
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
 
         $bundle->splitDescriptions();
 

@@ -47,11 +47,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @method pushLead(Lead $lead, array $config = [])
- * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
- * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
- * @method getCompanies(array $params)
- *
  * @deprecated To be removed in Mautic 6.0. Please use the IntegrationsBundle instead, which is meant to be a drop-in replacement for AbstractIntegration.
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
@@ -577,7 +572,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Generic error parser.
      *
-     * @return string
+     * @return string|mixed[]
      */
     public function getErrorsFromResponse($response)
     {
@@ -1049,8 +1044,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param array $settings
-     * @param array $parameters
+     * @param mixed[] $settings
+     * @param mixed[] $parameters
      *
      * @return bool|string false if no error; otherwise the error string
      *
@@ -1495,7 +1490,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Match lead data with integration fields.
      *
-     * @return array
+     * @param Lead|mixed[] $lead
+     * @param mixed[]      $config
+     *
+     * @return mixed[]
      */
     public function populateLeadData($lead, $config = [])
     {
@@ -1550,7 +1548,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
-                if (isset($fields[$mauticKey]) && '' !== $fields[$mauticKey] && null !== $fields[$mauticKey]) {
+                if (isset($fields[$mauticKey]) && '' !== $fields[$mauticKey]) {
                     $matched[$matchIntegrationKey] = $this->cleanPushData(
                         $fields[$mauticKey],
                         $field['type'] ?? 'string'
@@ -1827,7 +1825,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         foreach ($available as $field => $fieldDetails) {
             if (is_array($data)) {
-                if (!isset($data[$field]) and !is_object($data)) {
+                if (!isset($data[$field])) {
                     $info[$field] = '';
                     continue;
                 } else {
@@ -2425,8 +2423,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @param string $channel
      *
      * @return int
-     *
-     * @throws ApiErrorException
      */
     public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
     {

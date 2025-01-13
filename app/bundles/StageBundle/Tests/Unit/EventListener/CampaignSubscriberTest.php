@@ -101,7 +101,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null): ?Stage
+            public function getEntity($id = null): Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -170,7 +170,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null): ?Stage
+            public function getEntity($id = null): Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -207,7 +207,7 @@ final class CampaignSubscriberTest extends TestCase
                 return 333;
             }
 
-            public function getStage()
+            public function getStage(): Stage
             {
                 $stage = new class extends Stage {
                     public function getId()
@@ -243,7 +243,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null): ?Stage
+            public function getEntity($id = null): Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -286,7 +286,7 @@ final class CampaignSubscriberTest extends TestCase
                 return 333;
             }
 
-            public function getStage()
+            public function getStage(): Stage
             {
                 $stage = new class extends Stage {
                     public function getId()
@@ -324,7 +324,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null): ?Stage
+            public function getEntity($id = null): Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -368,7 +368,7 @@ final class CampaignSubscriberTest extends TestCase
                 return 333;
             }
 
-            public function getStage()
+            public function getStage(): Stage
             {
                 $stage = new class extends Stage {
                     public function getId()
@@ -410,7 +410,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null): ?Stage
+            public function getEntity($id = null): Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -443,6 +443,9 @@ final class CampaignSubscriberTest extends TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class implements TranslatorInterface {
+            /**
+             * @param array<string, mixed> $parameters
+             */
             public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';

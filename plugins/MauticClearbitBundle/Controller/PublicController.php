@@ -19,7 +19,7 @@ class PublicController extends FormController
      *
      * @param string    $message   Message of the notification
      * @param string    $header    Header for message
-     * @param string    $iconClass Font Awesome CSS class for the icon (e.g. ri-eye-line)
+     * @param string    $iconClass CSS class for the icon (e.g. ri-eye-line)
      * @param User|null $user      User object; defaults to current user
      */
     public function addNewNotification($message, $header, $iconClass, User $user): void

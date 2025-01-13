@@ -22,12 +22,12 @@ class HttpFactoryTest extends TestCase
         $this->expectException(PluginNotConfiguredException::class);
 
         $credentials = new class implements CredentialsInterface {
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return '';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return '123';
             }
@@ -41,12 +41,12 @@ class HttpFactoryTest extends TestCase
         $this->expectException(PluginNotConfiguredException::class);
 
         $credentials = new class implements CredentialsInterface {
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return '123';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return '';
             }
@@ -58,12 +58,12 @@ class HttpFactoryTest extends TestCase
     public function testInstantiatedClientIsReturned(): void
     {
         $credentials = new class implements CredentialsInterface {
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'foo';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return 'bar';
             }
@@ -76,12 +76,12 @@ class HttpFactoryTest extends TestCase
         $this->assertTrue($client1 === $client2);
 
         $credentials2 = new class implements CredentialsInterface {
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'bar';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return 'foo';
             }
@@ -94,12 +94,12 @@ class HttpFactoryTest extends TestCase
     public function testHeaderIsSet(): void
     {
         $credentials = new class implements CredentialsInterface {
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'foo';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return 'bar';
             }

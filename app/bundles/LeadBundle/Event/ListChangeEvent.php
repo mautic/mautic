@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ListChangeEvent extends Event
 {
-    private ?Lead $lead;
+    private Lead $lead;
 
     /**
      * @var Lead[]|null

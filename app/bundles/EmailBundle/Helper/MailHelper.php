@@ -7,6 +7,8 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
@@ -60,8 +62,6 @@ class MailHelper
      * @var TransportInterface
      */
     protected $transport;
-
-    protected ?EventDispatcherInterface $dispatcher = null;
 
     /**
      * @var bool|MauticMessage
@@ -234,6 +234,9 @@ class MailHelper
         private MailHashHelper $mailHashHelper,
         private RouterInterface $router,
         private Environment $twig,
+        private ThemeHelper $themeHelper,
+        private SlotsHelper $slotsHelper,
+        private EventDispatcherInterface $dispatcher,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -1231,16 +1234,16 @@ class MailHelper
         // Process emails created by Mautic v1
         if (empty($customHtml) && $template) {
             if (empty($slots)) {
-                $slots    = $this->factory->getTheme($template)->getSlots('email');
+                $slots    = $this->themeHelper->getTheme($template)->getSlots('email');
             }
 
             if (isset($slots[$template])) {
                 $slots = $slots[$template];
             }
 
-            $this->processSlots($slots, $email);
+            $this->processSlots($this->slotsHelper, $slots, $email);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+            $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
                 'slots'    => $slots,
@@ -1445,10 +1448,6 @@ class MailHelper
      */
     public function dispatchSendEvent(): void
     {
-        if (null == $this->dispatcher) {
-            $this->dispatcher = $this->factory->getDispatcher();
-        }
-
         if (null === $this->bodyInitial) {
             $this->bodyInitial = $this->body;
         }
@@ -1812,11 +1811,8 @@ class MailHelper
     /**
      * @param Email $entity
      */
-    public function processSlots($slots, $entity): void
+    public function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
         $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {
@@ -2124,14 +2120,6 @@ class MailHelper
 
     public function dispatchPreSendEvent(): void
     {
-        if (null === $this->dispatcher) {
-            $this->dispatcher = $this->factory->getDispatcher();
-        }
-
-        if (empty($this->dispatcher)) {
-            return;
-        }
-
         $event = new EmailSendEvent($this);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
 

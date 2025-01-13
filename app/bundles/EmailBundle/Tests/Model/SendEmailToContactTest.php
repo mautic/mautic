@@ -5,6 +5,8 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -29,6 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -248,10 +251,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 new NullLogger()
             );
-        $factoryMock->method('getDispatcher')
-            ->willReturn(
-                new EventDispatcher()
-            );
         $routerMock = $this->createMock(Router::class);
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
@@ -259,8 +258,13 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
 
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+        $slotsHelper = new SlotsHelper();
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig, $themeHelper, $slotsHelper, $this->createMock(EventDispatcherInterface::class)])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -366,8 +370,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     return $event;
                 }
             );
-        $factoryMock->method('getDispatcher')
-            ->willReturn($mockDispatcher);
         $routerMock = $this->createMock(Router::class);
 
         $copyRepoMock   = $this->createMock(CopyRepository::class);
@@ -381,8 +383,13 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+        $slotsHelper = new SlotsHelper();
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig, $themeHelper, $slotsHelper, $mockDispatcher])
             ->onlyMethods([])
             ->getMock();
 
@@ -444,17 +451,18 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 new NullLogger()
             );
-        $factoryMock->method('getDispatcher')
-            ->willReturn(
-                new EventDispatcher()
-            );
         $routerMock = $this->createMock(Router::class);
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+        $slotsHelper = new SlotsHelper();
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig, $themeHelper, $slotsHelper, $this->createMock(EventDispatcherInterface::class)])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -547,13 +555,17 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')->willReturn(new AddressDTO('someone@somewhere.com'));
         $factoryMock->method('getLogger')->willReturn(new NullLogger());
-        $factoryMock->method('getDispatcher')->willReturn(new EventDispatcher());
         $routerMock = $this->createMock(Router::class);
         $twig       = $this->createMock(Environment::class);
 
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+        $slotsHelper = new SlotsHelper();
+
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $twig])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $twig, $themeHelper, $slotsHelper, $this->createMock(EventDispatcherInterface::class)])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -606,10 +618,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that sending an email with invalid Bcc address is handled
-     *
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
      */
     public function testThatInvalidBccFailureIsHandled(): void
     {
@@ -645,6 +653,11 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&Environment $twig */
         $twig = $this->createMock(Environment::class);
 
+        $slotsHelper = new SlotsHelper();
+        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -654,7 +667,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             );
 
         $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $twig);
+        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $twig, $themeHelper, $slotsHelper, $this->createMock(EventDispatcherInterface::class));
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(TranslatorInterface::class);
         $model          = new SendEmailToContact($mailHelper, $this->statHelper, $dncModel, $translator);

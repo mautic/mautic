@@ -188,9 +188,6 @@ class PageModel extends FormModel
         parent::deleteEntity($entity);
     }
 
-    /**
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Page) {
@@ -801,41 +798,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * @deprecated Use getUniqueVsReturningPieChartData() instead.
-     *
-     * Get data for pie chart showing new vs returning leads.
-     * Returning leads are even leads who visit 2 different page once.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
-     */
-    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
-    {
-        $chart              = new PieChart();
-        $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
-        $filters['lead_id'] = [
-            'expression' => 'isNull',
-        ];
-        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
-
-        if (!$canViewOthers) {
-            $this->limitQueryToCreator($allQ);
-            $this->limitQueryToCreator($returnQ);
-        }
-
-        $all       = $query->fetchCount($allQ);
-        $returning = $query->fetchCount($returnQ);
-        $unique    = $all - $returning;
-        $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
-        $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
-
-        return $chart->render();
-    }
-
-    /**
      * Get data for pie chart showing new vs returning leads.
      * Returning leads are even leads who visits 2 different page once.
      *
@@ -965,10 +927,8 @@ class PageModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -996,10 +956,8 @@ class PageModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

@@ -49,11 +49,9 @@ class ColorHelper
     /**
      * Populate color from hexadecimal code.
      *
-     * @param  string in format #xxxxxx or #xxx
-     *
-     * @return ColorHelper
+     * @param string $hex in format #xxxxxx or #xxx
      */
-    public function setHex($hex)
+    public function setHex(string $hex): self
     {
         if (4 === strlen($hex)) {
             $format          = '#%1s%1s%1s';
@@ -88,7 +86,7 @@ class ColorHelper
     /**
      * Returns array of [R, G, B] of current state with alpha.
      *
-     * @param  float (0 - 1)
+     * @param float $alpha (0 - 1)
      */
     public function toRgba($alpha = 1): string
     {

@@ -89,7 +89,7 @@ class CorePermissions implements ResetInterface
             $permissionObject = $this->findPermissionObject($bundle);
         } catch (\UnexpectedValueException $e) {
             try {
-                $permissionObject = $this->instantiatePermissionObject($bundle);
+                $permissionObject = $this->instantiatePermissionObject($bundle); // @phpstan-ignore method.deprecated
                 $this->setPermissionObject($permissionObject);
             } catch (\InvalidArgumentException $e) {
                 if ($throwException) {

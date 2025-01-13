@@ -40,7 +40,7 @@ class Clearbit_Base
     }
 
     /**
-     * @param string $hdr
+     * @param mixed[] $hdr
      */
     private function _update_rate_limit($hdr): void
     {
@@ -93,9 +93,9 @@ class Clearbit_Base
 
         // open connection
         $connection = curl_init($fullUrl);
-        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($connection, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
-        curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
+        curl_setopt($connection, CURLOPT_HEADER, true); // return HTTP headers with response
         curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->api_key]);
 
         // execute request

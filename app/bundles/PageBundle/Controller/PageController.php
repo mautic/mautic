@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
@@ -365,7 +366,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
+    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, $entity = null)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page.page');
@@ -418,7 +419,7 @@ class PageController extends FormController
                         $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity->getId(), true);
+                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $entity->getId(), true);
                     }
                 }
             } else {
@@ -461,7 +462,7 @@ class PageController extends FormController
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
-                'themes'        => $this->factory->getInstalledThemes('page', true),
+                'themes'        => $themeHelper->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
@@ -494,6 +495,7 @@ class PageController extends FormController
         Translator $translator,
         RouterInterface $routerHelper,
         CoreParametersHelper $coreParametersHelper,
+        ThemeHelper $themeHelper,
         $objectId,
         $ignorePost = false,
     ) {
@@ -618,7 +620,7 @@ class PageController extends FormController
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
-                'themes'        => $this->factory->getInstalledThemes('page', true),
+                'themes'        => $themeHelper->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
@@ -653,7 +655,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model  = $this->getModel('page.page');
@@ -682,7 +684,7 @@ class PageController extends FormController
             $session->set($contentName, $entity->getCustomHtml());
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $entity);
     }
 
     /**
@@ -820,7 +822,7 @@ class PageController extends FormController
      *
      * @return Response
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
+    public function builderAction(Request $request, SlotsHelper $slotsHelper, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page.page');
@@ -847,7 +849,7 @@ class PageController extends FormController
         if (empty($template)) {
             throw new \InvalidArgumentException('No template found');
         }
-        $slots    = $this->factory->getTheme($template)->getSlots('page');
+        $slots = $themeHelper->getTheme($template)->getSlots('page');
 
         // merge any existing changes
         $newContent = $request->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', []);
@@ -861,7 +863,7 @@ class PageController extends FormController
 
         $this->processSlots($slotsHelper, $slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
         return $this->render($logicalName, [
             'isNew'       => $isNew,
@@ -879,7 +881,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model  = $this->getModel('page.page');
@@ -910,7 +912,7 @@ class PageController extends FormController
         $clone->setIsPublished(false);
         $clone->setVariantParent($entity);
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $clone);
     }
 
     /**

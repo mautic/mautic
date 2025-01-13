@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -294,9 +294,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param FormBuilder $builder
-     * @param array       $data
-     * @param string      $formArea
+     * @param FormBuilderInterface $builder
+     * @param mixed[]              $data
+     * @param string               $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {

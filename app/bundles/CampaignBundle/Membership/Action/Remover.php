@@ -13,7 +13,7 @@ class Remover
 {
     public const NAME = 'removed';
 
-    private ?string $unscheduledMessage;
+    private string $unscheduledMessage;
 
     public function __construct(
         private LeadRepository $leadRepository,

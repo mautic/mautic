@@ -72,8 +72,6 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-     * @throws \Exception
-     *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
     public static function onPluginUpdate(

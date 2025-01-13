@@ -136,7 +136,7 @@ class CacheStorageHelper
     }
 
     /**
-     * @return CacheStorageHelper;
+     * @return CacheStorageHelper
      */
     public function getCache($namespace = null, $defaultExpiration = 0)
     {
