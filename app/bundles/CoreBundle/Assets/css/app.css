@@ -10939,6 +10939,7 @@ code:hover > .copy-icon {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   animation: marketplacefadeIn 0.5s ease-in-out forwards;
+  pointer-events: none;
 }
 @keyframes marketplacefadeIn {
   from {
