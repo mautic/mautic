@@ -86,7 +86,7 @@
                         <div id="slot-type-container" class="col-md-12">
                             {% for slotKey, slot in slots %}
                                 <div class="slot-type-handle btn btn-ghost btn-lg btn-nospin" data-slot-type="{{ slotKey }}">
-                                    <i class="fa fa-{{ slot.icon }}" aria-hidden="true"></i>
+                                    <i class="ri-{{ slot.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ slot.header|raw }}</span>
                                     <!-- slot template: "{{ slot.content }}" -->
@@ -111,7 +111,7 @@
                         <div id="section-type-container" class="col-md-12">
                             {% for sectionKey, section in sections %}
                                 <div class="section-type-handle btn btn-ghost btn-lg btn-nospin" data-section-type="{{ sectionKey }}">
-                                    <i class="fa fa-{{ section.icon }}" aria-hidden="true"></i>
+                                    <i class="ri-{{ section.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ section.header }}</span>
                                     <!-- section template: "{{ section.content }}" -->

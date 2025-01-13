@@ -569,7 +569,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-flag-checkered',
+                            'iconClass' => 'ri-flag-line',
                         ]
                     );
                     break;
@@ -608,7 +608,7 @@ class ReportSubscriber implements EventSubscriberInterface
                             [
                                 'data'      => $chart->render(),
                                 'name'      => $g,
-                                'iconClass' => 'fa-flag-checkered',
+                                'iconClass' => 'ri-flag-line',
                             ]
                         );
                     }

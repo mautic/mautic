@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  
+
 
   $.extend($.FE.DEFAULTS, {
     codeMirror: true,
@@ -282,7 +282,7 @@
 
       // Exit code view button for inline toolbar.
       if (!editor.$box.hasClass('fr-basic')) {
-        $back_button = $('<a data-cmd="html" title="Code View" class="fr-command fr-btn html-switch' + (editor.helpers.isMobile() ? '' : ' fr-desktop') + '" role="button" tabIndex="-1"><i class="fa fa-code"></i></button>');
+        $back_button = $('<a data-cmd="html" title="Code View" class="fr-command fr-btn html-switch' + (editor.helpers.isMobile() ? '' : ' fr-desktop') + '" role="button" tabIndex="-1"><i class="ri-code-line"></i></button>');
         editor.$box.append($back_button);
 
         editor.events.bindClick(editor.$box, 'a.html-switch', function () {

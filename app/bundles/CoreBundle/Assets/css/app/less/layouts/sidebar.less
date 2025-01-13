@@ -180,16 +180,12 @@
             transition: var(--transition-all-expressive);
           }
           .arrow {
-            .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+            .transition(var(--transition-all-expressive));
             opacity: 1;
             margin-left: 0;
-            font-family: 'FontAwesome';
             position: relative;
             top: 1px;
             display: block;
-            &:after {
-              content: "\f0da";
-            }
           }
         }
         // Open and active state
@@ -197,9 +193,7 @@
         &.active {
           > a {
             .arrow {
-              &:after {
-                content: "\f0d7";
-              }
+              transform: scaleY(-1);
             }
             .icon {
               color: var(--icon-interactive);

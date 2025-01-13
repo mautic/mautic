@@ -945,7 +945,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Returns Font Awesome icon class based on file type.
+     * Returns icon class based on file type.
      */
     public function getIconClass(): string
     {
