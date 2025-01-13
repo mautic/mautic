@@ -828,7 +828,6 @@
   --ck-color-tooltip-text: var(--text-secondary);
 }
 :root[theme^="light"] {
-  --custom-bg-colored-lightness: 80%;
   --custom-bg-overlay-opacity: 0.025;
 }
 :root[theme^="dark"] {
@@ -6188,6 +6187,9 @@ ul.dropdown-menu-form {
   .nav-tabs {
     flex-wrap: nowrap;
   }
+}
+.tab-content.contained {
+  background-color: var(--layer);
 }
 /*
 .tab-content {
