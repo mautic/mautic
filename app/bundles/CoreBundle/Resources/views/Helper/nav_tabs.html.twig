@@ -20,7 +20,7 @@
     </ul>
 
     {# Tab content #}
-    <div class="tab-content">
+    <div class="tab-content {% if style|default('') == 'contained' %}contained{% endif %}">
         {% for tab in tabs %}
             {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
             <div role="tabpanel"
