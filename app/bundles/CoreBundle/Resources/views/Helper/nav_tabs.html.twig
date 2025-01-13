@@ -24,7 +24,7 @@
         {% for tab in tabs %}
             {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
             <div role="tabpanel"
-                 class="tab-pane{% if loop.first %} active{% endif %}{% if style|default('line') == 'contained' %} layer-{{ layer|default('two') }}{% endif %}"
+                 class="tab-pane fade{% if loop.first %} in active{% endif %}{% if style|default('line') == 'contained' %} layer-{{ layer|default('two') }}{% endif %}"
                  id="{{ tabId }}">
                 {{ tab.content|raw }}
             </div>
