@@ -1,19 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -124,6 +116,21 @@ class ContentType extends AbstractType
                 ],
                 'required'    => false,
                 'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'css',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.focus.form.custom.css',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'rows'         => 6,
+                    'onchange'     => 'Mautic.focusUpdatePreview()',
+                ],
+                'required' => false,
             ]
         );
     }

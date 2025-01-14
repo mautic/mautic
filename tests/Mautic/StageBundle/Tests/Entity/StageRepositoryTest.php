@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\StageBundle\Tests\Entity;
 
@@ -18,7 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 
-class StageRepositoryTest extends \PHPUnit_Framework_TestCase
+class StageRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject

@@ -15,3 +15,5 @@ markComment: >
 # Comment to post when closing a stale issue. Set to `false` to disable
 closeComment: >
   This issue or PR has been automatically closed because it has not had recent activity. In the case of issues, if it persists in the latest version of Mautic, please create a new issue and link back to this one for reference.  With PRs if you wish to pick up the PR and update it so that it can be considered for a future release, please comment and we will re-open it. Thank you for your contributions.
+# Limit to only `issues` or `pulls`
+only: issues

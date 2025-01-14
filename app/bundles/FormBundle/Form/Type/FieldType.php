@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -151,6 +142,29 @@ class FieldType extends AbstractType
                     break;
             }
         }
+
+        // disable progressing profiling  for conditional fields
+        if (!empty($options['data']['parent'])) {
+            $addBehaviorFields = false;
+            $builder->add(
+                'conditions',
+                FormFieldConditionType::class,
+                [
+                    'label'      => false,
+                    'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
+                    'formId'     => $options['data']['formId'],
+                    'parent'     => isset($options['data']['parent']) ? $options['data']['parent'] : null,
+                ]
+            );
+        }
+
+        $builder->add(
+            'parent',
+            HiddenType::class,
+            [
+                'label'=> false,
+            ]
+        );
 
         // Build form fields
         $builder->add(

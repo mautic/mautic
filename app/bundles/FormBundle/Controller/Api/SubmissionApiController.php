@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -31,7 +22,7 @@ class SubmissionApiController extends CommonApiController
         $this->entityClass      = Submission::class;
         $this->entityNameOne    = 'submission';
         $this->entityNameMulti  = 'submissions';
-        $this->permissionBase   = 'forms:form';
+        $this->permissionBase   = 'form:forms';
         $this->serializerGroups = ['submissionDetails', 'formList', 'ipAddressList', 'leadBasicList', 'pageList'];
 
         parent::initialize($event);

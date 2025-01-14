@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
-                <?php if (in_array($name, ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url'])) : ?>
+                <?php if (in_array($name, ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url', 'do_not_track_404_anonymous'])) : ?>
                         <div class="col-md-6">
                             <?php echo $view['form']->row($f); ?>
                         </div>

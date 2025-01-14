@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
@@ -34,6 +25,13 @@ class BatchIdToEntityHelperTest extends TestCase
         $parameters = ['ids' => '1,2,3'];
         $helper     = new BatchIdToEntityHelper($parameters);
         $this->assertEquals([1, 2, 3], $helper->getIds());
+    }
+
+    public function testIdIsExtractedFromIdKeyWithNumericValue(): void
+    {
+        $parameters = ['ids' => '12'];
+        $helper     = new BatchIdToEntityHelper($parameters);
+        $this->assertEquals([12], $helper->getIds());
     }
 
     public function testErrorSetForIdKeyThatsNotRecognized()
@@ -234,7 +232,6 @@ class BatchIdToEntityHelperTest extends TestCase
         $orderedEntities = $helper->orderByOriginalKey($entities);
         $this->assertEquals([0, 1, 2, 3], array_keys($orderedEntities));
         foreach ($parameters as $key => $contact) {
-            var_dump($orderedEntities[$key]->getId());
             Assert::assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
         }
 

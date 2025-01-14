@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -25,6 +16,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -291,7 +283,11 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $model->hitPage($entity, $this->request, 404);
+        /** @var Tracking404Model $tracking404Model */
+        $tracking404Model = $this->get('mautic.page.model.tracking.404');
+        if ($tracking404Model->isTrackable()) {
+            $tracking404Model->hitPage($entity, $this->request);
+        }
 
         return $this->notFound();
     }
@@ -379,17 +375,24 @@ class PublicController extends CommonFormController
      */
     public function trackingAction(Request $request)
     {
+        $notSuccessResponse = new JsonResponse(
+            [
+                'success' => 0,
+            ]
+        );
         if (!$this->get('mautic.security')->isAnonymous()) {
-            return new JsonResponse(
-                [
-                    'success' => 0,
-                ]
-            );
+            return $notSuccessResponse;
         }
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+
+        try {
+            $model->hitPage(null, $this->request);
+        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+            // do not track invalid ct
+            return $notSuccessResponse;
+        }
 
         /** @var ContactTracker $contactTracker */
         $contactTracker = $this->get(ContactTracker::class);
@@ -453,7 +456,7 @@ class PublicController extends CommonFormController
         $query = $this->request->query->all();
 
         // Unset the clickthrough from the URL query
-        $ct = $query['ct'];
+        $ct = $query['ct'] ?? null;
         unset($query['ct']);
 
         // Tak on anything left to the URL
@@ -464,34 +467,41 @@ class PublicController extends CommonFormController
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
-        if ($ipAddress->isTrackable()) {
-            // Search replace lead fields in the URL
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
 
-            /** @var PageModel $pageModel */
-            $pageModel = $this->getModel('page');
+        if (isset($ct)) {
+            if ($ipAddress->isTrackable()) {
+                // Search replace lead fields in the URL
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
 
-            try {
-                $lead = $leadModel->getContactFromRequest(['ct' => $ct]);
-                $pageModel->hitPage($redirect, $this->request, 200, $lead);
-            } catch (InvalidDecodedStringException $e) {
-                // Invalid ct value so we must unset it
-                // and process the request without it
+                /** @var PageModel $pageModel */
+                $pageModel = $this->getModel('page');
 
-                $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                try {
+                    $lead = $leadModel->getContactFromRequest(['ct' => $ct]);
+                    $pageModel->hitPage($redirect, $this->request, 200, $lead);
+                } catch (InvalidDecodedStringException $e) {
+                    // Invalid ct value so we must unset it
+                    // and process the request without it
 
-                $this->request->request->set('ct', '');
-                $this->request->query->set('ct', '');
-                $lead = $leadModel->getContactFromRequest();
-                $pageModel->hitPage($redirect, $this->request, 200, $lead);
+                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+
+                    $this->request->request->set('ct', '');
+                    $this->request->query->set('ct', '');
+                    $lead = $leadModel->getContactFromRequest();
+                    $pageModel->hitPage($redirect, $this->request, 200, $lead);
+                }
+
+                /** @var PrimaryCompanyHelper $primaryCompanyHelper */
+                $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
+                $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+
+                $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
-            /** @var PrimaryCompanyHelper $primaryCompanyHelper */
-            $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
-            $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
-
-            $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+            if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+                $url .= '?ct='.$ct;
+            }
         }
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);

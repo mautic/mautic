@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -38,7 +29,7 @@ class IpAddress
     private $ipAddress;
 
     /**
-     * @var array
+     * @var array<string,string>
      */
     private $ipDetails;
 
@@ -90,7 +81,7 @@ class IpAddress
     /**
      * IpAddress constructor.
      *
-     * @param null $ipAddress
+     * @param string|null $ipAddress
      */
     public function __construct($ipAddress = null)
     {
@@ -134,7 +125,7 @@ class IpAddress
     /**
      * Set ipDetails.
      *
-     * @param string $ipDetails
+     * @param array<string,string> $ipDetails
      *
      * @return IpAddress
      */
@@ -148,7 +139,7 @@ class IpAddress
     /**
      * Get ipDetails.
      *
-     * @return string
+     * @return array<string,string>
      */
     public function getIpDetails()
     {

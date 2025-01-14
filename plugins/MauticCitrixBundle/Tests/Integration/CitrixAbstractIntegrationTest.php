@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Tests\Integration;
 
 use MauticPlugin\MauticCitrixBundle\Integration\CitrixAbstractIntegration;
@@ -26,8 +17,11 @@ class CitrixAbstractIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->citrixTestIntegration       = new class() extends CitrixAbstractIntegration {
-            public array $keys             = [];
+        $this->citrixTestIntegration = new class() extends CitrixAbstractIntegration {
+            /**
+             * @var array<string,string>
+             */
+            public array $keys = [];
 
             /** @noinspection PhpMissingParentConstructorInspection */
             public function __construct()

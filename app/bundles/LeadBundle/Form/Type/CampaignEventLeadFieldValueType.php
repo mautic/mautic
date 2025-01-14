@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -115,7 +106,8 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 $fieldValues = FormFieldHelper::getTimezonesChoices();
                                 break;
                             case 'locale':
-                                $fieldValues = FormFieldHelper::getLocaleChoices();
+                                // Locales are flipped. And yes, we will flip the array again below.
+                                $fieldValues = array_flip(FormFieldHelper::getLocaleChoices());
                                 break;
                             case 'date':
                             case 'datetime':

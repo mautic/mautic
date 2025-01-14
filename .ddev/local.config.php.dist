@@ -14,4 +14,5 @@ $parameters = [
     'db_password'           => 'db',
     'admin_email'           => 'mautic@ddev.local',
     'admin_password'        => 'mautic',
+    'install_source'        => 'DDEV',
 ];

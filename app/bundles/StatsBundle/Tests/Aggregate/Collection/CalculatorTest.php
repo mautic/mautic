@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 
 use Mautic\StatsBundle\Aggregate\Calculator;
@@ -475,12 +466,113 @@ class CalculatorTest extends TestCase
         $this->assertEquals($expected, $this->getCalculator()->getSumsByDay('Y-m-d')->getStats());
     }
 
+    public function testSumByWeekReturnsExpectedCount(): void
+    {
+        $expected = [
+            '2018-49' => 600,
+            '2018-50' => 0,
+            '2018-51' => 0,
+            '2018-52' => 0,
+            '2018-01' => 0,
+            '2019-02' => 0,
+            '2019-03' => 0,
+            '2019-04' => 0,
+            '2019-05' => 0,
+            '2019-06' => 0,
+            '2019-07' => 0,
+            '2019-08' => 0,
+            '2019-09' => 0,
+            '2019-10' => 0,
+            '2019-11' => 0,
+            '2019-12' => 0,
+            '2019-13' => 0,
+            '2019-14' => 0,
+            '2019-15' => 0,
+            '2019-16' => 0,
+            '2019-17' => 0,
+            '2019-18' => 0,
+            '2019-19' => 0,
+            '2019-20' => 0,
+            '2019-21' => 0,
+            '2019-22' => 0,
+            '2019-23' => 0,
+            '2019-24' => 0,
+            '2019-25' => 0,
+            '2019-26' => 0,
+            '2019-27' => 0,
+            '2019-28' => 0,
+            '2019-29' => 0,
+            '2019-30' => 0,
+            '2019-31' => 0,
+            '2019-32' => 0,
+            '2019-33' => 0,
+            '2019-34' => 0,
+            '2019-35' => 0,
+            '2019-36' => 0,
+            '2019-37' => 0,
+            '2019-38' => 0,
+            '2019-39' => 0,
+            '2019-40' => 0,
+            '2019-41' => 0,
+            '2019-42' => 0,
+            '2019-43' => 0,
+            '2019-44' => 0,
+            '2019-45' => 200,
+            '2019-46' => 0,
+            '2019-47' => 0,
+            '2019-48' => 0,
+            '2019-49' => 100,
+        ];
+        $this->assertEquals($expected, $this->getCalculator()->getSumsByWeek('Y-W')->getStats());
+    }
+
+    public function testSumByHoursReturnsExpectedCount(): void
+    {
+        $stats = new StatsDAO();
+        $stats->getYear(2021)
+            ->getMonth(12)
+            ->getDay(7)
+            ->getHour(1)
+            ->setCount(100);
+
+        $stats->getYear(2021)
+            ->getMonth(12)
+            ->getDay(7)
+            ->getHour(3)
+            ->setCount(200);
+
+        $stats->getYear(2021)
+            ->getMonth(12)
+            ->getDay(7)
+            ->getHour(12)
+            ->setCount(50);
+
+        $expected = [
+            '2021-12-07 01' => 100,
+            '2021-12-07 02' => 0,
+            '2021-12-07 03' => 200,
+            '2021-12-07 04' => 0,
+            '2021-12-07 05' => 0,
+            '2021-12-07 06' => 0,
+            '2021-12-07 07' => 0,
+            '2021-12-07 08' => 0,
+            '2021-12-07 09' => 0,
+            '2021-12-07 10' => 0,
+            '2021-12-07 11' => 0,
+            '2021-12-07 12' => 50,
+        ];
+
+        $dateFrom = new \DateTime('2021-12-07');
+        $dateTo   = new \DateTime('2021-12-07');
+
+        $calculatorObj = new Calculator($stats, $dateFrom, $dateTo);
+        $this->assertEquals($expected, $calculatorObj->getCountsByHour()->getStats());
+    }
+
     /**
-     * @return Calculator
-     *
      * @throws \Exception
      */
-    private function getCalculator()
+    private function getCalculator(): Calculator
     {
         $stats = new StatsDAO();
 
@@ -520,6 +612,9 @@ class CalculatorTest extends TestCase
             ->getHour(12)
             ->setCount(100);
 
-        return new Calculator($stats);
+        $dateFrom = new \DateTime('2018-12-07');
+        $dateTo   = new \DateTime('2019-12-07');
+
+        return new Calculator($stats, $dateFrom, $dateTo);
     }
 }

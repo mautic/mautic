@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticCitrixBundle",
+            "directory": "plugins/MauticCitrixBundle",
+            "target": "git@github.com:mautic/plugin-citrix.git"
+        }
+    ]
+}

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
@@ -124,10 +115,10 @@ class CampaignModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param object      $entity
+     * @param object      $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
@@ -708,9 +699,9 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of hits.
      *
-     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
+     * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string      $dateFormat
+     * @param array       $filter
      *
      * @return array
      */
@@ -741,19 +732,24 @@ class CampaignModel extends CommonFormModel
                 foreach ($events as $type => $eventIds) {
                     $filter['event_id'] = $eventIds;
 
-                    // Exclude failed events
-                    $failedSq = $this->em->getConnection()->createQueryBuilder();
-                    $failedSq->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
-                        ->where(
-                            $failedSq->expr()->eq('fe.log_id', 't.id')
-                        );
-                    $filter['failed_events'] = [
-                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL()),
-                    ];
+                    if ($this->coreParametersHelper->get('campaign_use_summary')) {
+                        $q       = $query->prepareTimeDataQuery('campaign_summary', 'date_triggered', $filter, 'triggered_count + non_action_path_taken_count', 'sum');
+                        $rawData = $q->execute()->fetchAll();
+                    } else {
+                        // Exclude failed events
+                        $failedSq = $this->em->getConnection()->createQueryBuilder();
+                        $failedSq->select('null')
+                            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
+                            ->where(
+                                $failedSq->expr()->eq('fe.log_id', 't.id')
+                            );
+                        $filter['failed_events'] = [
+                            'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL()),
+                        ];
 
-                    $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                    $rawData = $q->execute()->fetchAll();
+                        $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                        $rawData = $q->execute()->fetchAll();
+                    }
 
                     if (!empty($rawData)) {
                         $triggers = $query->completeTimeData($rawData);
@@ -769,7 +765,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param          $hierarchy
-     * @param          $events
      * @param Campaign $entity
      * @param string   $root
      * @param int      $order

@@ -1,33 +1,19 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getField
      */
-    public function testGetField()
+    public function testGetField(): void
     {
         $customMappedDecorator = $this->getDecorator();
 
@@ -41,7 +27,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getTable
      */
-    public function testGetTable()
+    public function testGetTable(): void
     {
         $customMappedDecorator = $this->getDecorator();
 
@@ -55,7 +41,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getQueryType
      */
-    public function testGetQueryType()
+    public function testGetQueryType(): void
     {
         $customMappedDecorator = $this->getDecorator();
 
@@ -72,7 +58,8 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     private function getDecorator()
     {
         $contactSegmentFilterOperator   = $this->createMock(ContactSegmentFilterOperator::class);
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
+        $dispatcherMock                 = $this->createMock(EventDispatcherInterface::class);
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($dispatcherMock);
 
         return new CustomMappedDecorator($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
     }

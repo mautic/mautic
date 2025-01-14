@@ -6,6 +6,7 @@
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_url'); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_count'); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_unique_count'); ?></td>
+                <?php echo $view['content']->getCustomContent('click_counts_headers', $mauticTemplateVars); ?>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_track_id'); ?></td>
             </tr>
             </thead>
@@ -34,6 +35,8 @@
                             <?php echo $link['unique_hits']; ?>
                         <?php endif; ?>
                         </span>
+                            </td>
+                            <?php echo $view['content']->getCustomContent('click_counts', array_merge($mauticTemplateVars, ['redirect_id' => $link['redirect_id']])); ?>
                             <td><?php echo $link['redirect_id']; ?></td>
                         </tr>
                 <?php endforeach; ?>

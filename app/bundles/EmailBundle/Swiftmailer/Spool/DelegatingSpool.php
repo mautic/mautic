@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Spool;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -91,7 +82,7 @@ class DelegatingSpool extends \Swift_FileSpool
         $rootPath = realpath(__DIR__.'/../../../../');
 
         if (!$filePath) {
-            return $rootPath.'../var/spool';
+            return $rootPath.'/../var/spool';
         }
 
         return str_replace('%kernel.root_dir%', $rootPath, $filePath);

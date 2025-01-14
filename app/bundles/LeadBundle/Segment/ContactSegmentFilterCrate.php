@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
 class ContactSegmentFilterCrate
@@ -55,12 +46,13 @@ class ContactSegmentFilterCrate
 
     public function __construct(array $filter)
     {
-        $this->glue        = isset($filter['glue']) ? $filter['glue'] : null;
-        $this->field       = isset($filter['field']) ? $filter['field'] : null;
-        $this->object      = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
-        $this->type        = isset($filter['type']) ? $filter['type'] : null;
-        $this->filter      = isset($filter['filter']) ? $filter['filter'] : null;
-        $this->nullValue   = isset($filter['null_value']) ? $filter['null_value'] : null;
+        $bcFilter          = $filter['filter'] ?? null;
+        $this->glue        = $filter['glue'] ?? null;
+        $this->field       = $filter['field'] ?? null;
+        $this->object      = $filter['object'] ?? self::CONTACT_OBJECT;
+        $this->type        = $filter['type'] ?? null;
+        $this->filter      = $filter['properties']['filter'] ?? $bcFilter;
+        $this->nullValue   = $filter['null_value'] ?? null;
         $this->sourceArray = $filter;
 
         $this->setOperator($filter);
@@ -166,7 +158,7 @@ class ContactSegmentFilterCrate
     /**
      * @return string|null
      */
-    private function getType()
+    public function getType()
     {
         return $this->type;
     }
@@ -206,5 +198,10 @@ class ContactSegmentFilterCrate
     public function getNullValue()
     {
         return $this->nullValue;
+    }
+
+    public function getObject(): ?string
+    {
+        return $this->object;
     }
 }

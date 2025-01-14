@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -54,7 +45,7 @@ class YesNoButtonGroupType extends AbstractType
                         return null;
                     }
 
-                    return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (bool) $choiceKey;
+                    return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (int) $choiceKey;
                 },
                 'expanded'          => true,
                 'multiple'          => false,
@@ -63,9 +54,9 @@ class YesNoButtonGroupType extends AbstractType
                 'placeholder'       => false,
                 'required'          => false,
                 'no_label'          => 'mautic.core.form.no',
-                'no_value'          => false,
+                'no_value'          => 0,
                 'yes_label'         => 'mautic.core.form.yes',
-                'yes_value'         => true,
+                'yes_value'         => 1,
             ]
         );
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Loader;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
@@ -36,5 +27,12 @@ class ParameterLoaderTest extends TestCase
         $this->assertEquals('-1 day', getenv('MAUTIC_DEFAULT_DATERANGE_FILTER'));
 
         putenv('MAUTIC_CONFIG_PARAMETERS=');
+    }
+
+    public function testDefaultParametersAreLoaded(): void
+    {
+        $loader = new ParameterLoader(__DIR__.'/TestRoot');
+        $this->assertIsArray($loader->getDefaultParameters());
+        $this->assertFalse($loader->getDefaultParameters()['api_enabled']);
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Test\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -35,7 +26,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]],
@@ -43,12 +34,8 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnDataCleanup()
+    public function testOnDataCleanup(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', 'mautic');
-        }
-
         $dateTime         = new \DateTimeImmutable();
         $format           = 'Y-m-d H:i:s';
         $rowCount         = 2;

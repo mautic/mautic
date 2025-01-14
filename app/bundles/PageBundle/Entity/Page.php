@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -99,6 +90,16 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @var string
      */
+    private $headScript;
+
+    /**
+     * @var string
+     */
+    private $footerScript;
+
+    /**
+     * @var string
+     */
     private $redirectType;
 
     /**
@@ -185,6 +186,16 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         $builder->createField('metaDescription', 'string')
             ->columnName('meta_description')
+            ->nullable()
+            ->build();
+
+        $builder->createField('headScript', 'text')
+            ->columnName('head_script')
+            ->nullable()
+            ->build();
+
+        $builder->createField('footerScript', 'text')
+            ->columnName('footer_script')
             ->nullable()
             ->build();
 
@@ -374,7 +385,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set content.
      *
-     * @param string $content
+     * @param array<string> $content
      *
      * @return Page
      */
@@ -389,7 +400,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get content.
      *
-     * @return string
+     * @return array<string>
      */
     public function getContent()
     {
@@ -519,6 +530,54 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public function getMetaDescription()
     {
         return $this->metaDescription;
+    }
+
+    /**
+     * Set headScript.
+     *
+     * @param string $headScript
+     *
+     * @return Page
+     */
+    public function setHeadScript($headScript)
+    {
+        $this->headScript = $headScript;
+
+        return $this;
+    }
+
+    /**
+     * Get headScript.
+     *
+     * @return string
+     */
+    public function getHeadScript()
+    {
+        return $this->headScript;
+    }
+
+    /**
+     * Set footerScript.
+     *
+     * @param string $footerScript
+     *
+     * @return Page
+     */
+    public function setFooterScript($footerScript)
+    {
+        $this->footerScript = $footerScript;
+
+        return $this;
+    }
+
+    /**
+     * Get footerScript.
+     *
+     * @return string
+     */
+    public function getFooterScript()
+    {
+        return $this->footerScript;
     }
 
     /**

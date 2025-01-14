@@ -1,0 +1,17 @@
+{% if code >= 200 and code < 300 %}
+    <span class="label label-success">
+        {{ code }}
+    </span>
+{% elseif code >= 300 and code < 500 %}
+    <span class="label label-warning">
+        {{ code }}
+    </span>
+{% elseif code >= 500 %}
+    <span class="label label-warning">
+        {{ code }}
+    </span>
+{% else %}
+    <span class="label label-default">
+        {{ code }}
+    </span>
+{% endif %}

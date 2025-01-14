@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\IntegrationsBundle\Entity\FieldChange;
@@ -126,7 +117,11 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadPostDelete(Events\LeadEvent $event): void
     {
-        $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getLead()->deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+        if ($event->getLead()->isAnonymous()) {
+            return;
+        }
+
+        $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getLead()->deletedId, Lead::class);
         $this->objectMappingRepository->deleteEntitiesForObject((int) $event->getLead()->deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
     }
 

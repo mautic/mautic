@@ -1,22 +1,16 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Portability\Statement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -46,15 +40,13 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->connection    = $this->createMock(Connection::class);
         $this->repository    = new LeadFieldRepository($this->entityManager, $this->classMetadata);
     }
 
-    public function testCompareDateValueForContactField()
+    public function testCompareDateValueForContactField(): void
     {
         $contactId        = 12;
         $fieldAlias       = 'date_field';
@@ -147,7 +139,7 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->repository->compareDateValue($contactId, $fieldAlias, $value));
     }
 
-    public function testCompareDateValueForCompanyField()
+    public function testCompareDateValueForCompanyField(): void
     {
         $contactId        = 12;
         $fieldAlias       = 'date_field';
@@ -245,5 +237,60 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id' => 456]);
 
         $this->assertTrue($this->repository->compareDateValue($contactId, $fieldAlias, $value));
+    }
+
+    public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing(): void
+    {
+        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
+
+        $this->entityManager->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects(self::once())
+            ->method('select')
+            ->willReturnSelf();
+
+        $queryBuilder->expects(self::once())
+            ->method('from')
+            ->willReturnSelf();
+
+        $expr = $this->createMock(Query\Expr::class);
+        $queryBuilder->expects(self::once())
+            ->method('expr')
+            ->willReturn($expr);
+
+        $comparison = $this->createMock(Query\Expr\Comparison::class);
+        $expr->expects(self::once())
+            ->method('eq')
+            ->willReturn($comparison);
+
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->with($comparison)
+            ->willReturnSelf();
+
+        $queryBuilder->expects(self::once())
+            ->method('orderBy')
+            ->willReturnSelf();
+
+        $queryBuilder->expects(self::once())
+            ->method('setMaxResults')
+            ->with(1)
+            ->willReturnSelf();
+
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $leadField = $this->createMock(LeadField::class);
+        $query->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->willReturn($leadField);
+
+        self::assertSame(
+            $leadField,
+            $this->repository->getFieldThatIsMissingColumn()
+        );
     }
 }

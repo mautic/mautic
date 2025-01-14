@@ -1,0 +1,58 @@
+# Docker image
+image:
+  file: .gitpod.Dockerfile
+
+# ddev and composer are running as part of the prebuild
+# when starting a workspace all docker images are ready
+tasks:
+  - name: Startup 
+  - command: |
+      bash .ddev/gitpod-setup-ddev.sh 
+      gp ports await 8080 && gp preview $(gp url 8080)/index_dev.php 
+
+# VScode xdebug extension
+vscode:
+  extensions:
+    - felixfbecker.php-debug
+    - bmewburn.vscode-intelephense-client
+    - ziyasal.vscode-open-in-github
+
+ports:
+  # Ddev db port
+  - port: 3306
+    onOpen: ignore
+  # phpmyadmin https port
+  - port: 8027
+    onOpen: ignore
+  # mailhog https port
+  - port: 8036
+    onOpen: ignore
+  # Main web port
+  - port: 8080
+    onOpen: ignore
+    visibility: public
+  # router https port that we're ignoring.
+  - port: 8443
+    onOpen: ignore
+  # xdebug port
+  - port: 9000
+    onOpen: ignore
+
+github:
+  prebuilds:
+    # enable for the master/default branch (defaults to true)
+    master: true
+    # enable for all branches in this repo (defaults to false)
+    branches: true
+    # enable for pull requests coming from this repo (defaults to true)
+    pullRequests: true
+    # enable for pull requests coming from forks (defaults to false)
+    pullRequestsFromForks: true
+    # add a check to pull requests (defaults to true)
+    addCheck: false
+    # add a "Review in Gitpod" button as a comment to pull requests (defaults to false)
+    addComment: false
+    # add a "Review in Gitpod" button to the pull request's description (defaults to false)
+    addBadge: true
+    # add a label once the prebuild is ready to pull requests (defaults to false)
+    addLabel: false

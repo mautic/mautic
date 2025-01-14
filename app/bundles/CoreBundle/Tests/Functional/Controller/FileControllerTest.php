@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -68,8 +59,10 @@ class FileControllerTest extends MauticMysqlTestCase
         return realpath(dirname(__FILE__).'/../../Fixtures/').'/';
     }
 
-    protected function beforeTearDown(): void
+    protected function tearDown(): void
     {
+        parent::tearDown();
+
         if ($this->uploadedFilePath && file_exists($this->uploadedFilePath)) {
             unlink($this->uploadedFilePath);
         }

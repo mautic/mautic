@@ -1,18 +1,13 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Event\PluginInstallEvent;
+use Mautic\PluginBundle\Event\PluginUpdateEvent;
+use Mautic\PluginBundle\PluginEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Caution: none of the methods persist data.
@@ -24,9 +19,12 @@ class ReloadHelper
      */
     private $factory;
 
-    public function __construct(MauticFactory $factory)
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher, MauticFactory $factory)
     {
-        $this->factory = $factory;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->factory         = $factory;
     }
 
     /**
@@ -96,6 +94,10 @@ class ReloadHelper
 
                     $callback::onPluginUpdate($plugin, $this->factory, $metadata, $installedSchema);
 
+                    $event = new PluginUpdateEvent($plugin, $oldVersion);
+
+                    $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_UPDATE);
+
                     unset($metadata, $installedSchema);
 
                     $updatedPlugins[$plugin->getBundle()] = $plugin;
@@ -129,6 +131,10 @@ class ReloadHelper
                 }
 
                 $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
+
+                $event = new PluginInstallEvent($entity);
+
+                $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL);
 
                 $installedPlugins[$entity->getBundle()] = $entity;
             }

@@ -51,6 +51,10 @@ Mautic.reportOnLoad = function (container) {
         Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
     });
     Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.ajaxifyForm('daterange');
+    });
 };
 
 Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {

@@ -66,4 +66,13 @@ Mautic.observeConfigTabs = function() {
         }
     });
 }
+
+Mautic.resetEmailsToNotification = function(obj) {
+    const send_to_owner = obj.value;
+    if (parseInt(send_to_owner, 10) === 1)
+    {
+        mQuery(obj).closest('.panel-body').find('.notification_email_addresses').val('');
+    }
+};
+
 mQuery(Mautic.observeConfigTabs);

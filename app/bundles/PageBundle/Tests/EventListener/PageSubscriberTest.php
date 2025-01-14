@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -34,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageSubscriberTest extends TestCase
 {
-    public function testGetTokens_WhenCalled_ReturnsValidTokens()
+    public function testGetTokensWhenCalledReturnsValidTokens()
     {
         $translator       = $this->createMock(Translator::class);
         $pageBuilderEvent = new PageBuilderEvent($translator);
@@ -44,7 +35,7 @@ class PageSubscriberTest extends TestCase
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
 
-    public function testOnPageHit_WhenCalled_AcknowledgesHit()
+    public function testOnPageHitWhenCalledAcknowledgesHit()
     {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();
@@ -59,7 +50,7 @@ class PageSubscriberTest extends TestCase
         $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
     }
 
-    public function testOnPageHit_WhenCalled_RejectsBadHit()
+    public function testOnPageHitWhenCalledRejectsBadHit()
     {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();

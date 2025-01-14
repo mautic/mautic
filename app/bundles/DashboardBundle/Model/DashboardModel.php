@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Model;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -321,13 +312,12 @@ class DashboardModel extends FormModel
         $dateRangeStart->modify($dateRangeDefault);
 
         $today    = new \DateTime();
-        $dateFrom = $this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00'));
-        $dateFrom = new \DateTime($dateFrom);
+        $dateFrom = new \DateTime($this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
         $dateTo   = new \DateTime($this->session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,
-            'dateTo'   => $dateTo,
+            'dateTo'   => $dateTo->modify('23:59:59'), // till end of the 'to' date selected
         ];
     }
 }

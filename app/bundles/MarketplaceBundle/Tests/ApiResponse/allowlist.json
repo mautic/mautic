@@ -1,0 +1,15 @@
+{
+    "allowlist": [
+        {
+            "package": "koco\/mautic-recaptcha-bundle",
+            "display_name": "KocoCaptcha",
+            "minimum_mautic_version": "4.1.0",
+            "maximum_mautic_version": null
+        },
+        {
+            "package": "maatoo\/mautic-referrals-bundle",
+            "minimum_mautic_version": "4.1.0",
+            "maximum_mautic_version": null
+        }
+    ]
+}

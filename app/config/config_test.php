@@ -124,10 +124,6 @@ $container->loadFromExtension('liip_test_fixtures', [
     'keep_database_and_schema' => true,
 ]);
 
-// Enable api by default
-$container->setParameter('mautic.api_enabled', true);
-$container->setParameter('mautic.api_enable_basic_auth', true);
-
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
@@ -158,7 +154,12 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
     ->addArgument('test')
     ->setPublic(true);
 
-// Stub HTTP client to prevent accidental request to third parties
+// HTTP client mock handler providing response queue
+$container->register('mautic.http.client.mock_handler', \GuzzleHttp\Handler\MockHandler::class)
+    ->setClass('\GuzzleHttp\Handler\MockHandler');
+
+// Stub Guzzle HTTP client to prevent accidental request to third parties
 $container->register('mautic.http.client', \GuzzleHttp\Client::class)
+    ->setPublic(true)
     ->setFactory('\Mautic\CoreBundle\Test\Guzzle\ClientFactory::stub')
-    ->setPublic(true);
+    ->addArgument(new Reference('mautic.http.client.mock_handler'));

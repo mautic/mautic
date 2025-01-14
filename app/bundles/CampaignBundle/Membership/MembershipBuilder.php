@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Membership;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -112,15 +103,10 @@ class MembershipBuilder
     }
 
     /**
-     * @param $totalContactsProcessed
-     *
-     * @return int
-     *
      * @throws RunLimitReachedException
      */
-    private function addNewlyQualifiedMembers($totalContactsProcessed)
+    private function addNewlyQualifiedMembers(int $totalContactsProcessed): int
     {
-        $progress          = null;
         $contactsProcessed = 0;
 
         if ($this->output) {
@@ -165,7 +151,11 @@ class MembershipBuilder
             }
 
             // Get next batch
-            $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments($this->campaign->getId(), $this->contactLimiter);
+            $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments(
+                $this->campaign->getId(),
+                $this->contactLimiter,
+                $this->campaign->allowRestart()
+            );
         }
 
         $this->finishProgressBar();
@@ -174,15 +164,10 @@ class MembershipBuilder
     }
 
     /**
-     * @param $totalContactsProcessed
-     *
-     * @return int
-     *
      * @throws RunLimitReachedException
      */
-    private function removeUnqualifiedMembers($totalContactsProcessed)
+    private function removeUnqualifiedMembers(int $totalContactsProcessed): int
     {
-        $progress          = null;
         $contactsProcessed = 0;
 
         if ($this->output) {
@@ -234,10 +219,7 @@ class MembershipBuilder
         return $contactsProcessed;
     }
 
-    /**
-     * @param $total
-     */
-    private function startProgressBar($total)
+    private function startProgressBar(int $total): void
     {
         if (!$this->output) {
             $this->progressBar = null;
@@ -253,7 +235,7 @@ class MembershipBuilder
         $this->manager->setProgressBar($this->progressBar);
     }
 
-    private function finishProgressBar()
+    private function finishProgressBar(): void
     {
         if ($this->progressBar) {
             $this->progressBar->finish();

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
@@ -124,6 +115,12 @@ EOT
 
         // Define this just in case
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', (isset($options['env'])) ? $options['env'] : 'prod');
+
+        if (true === $this->coreParametersHelper->get('composer_updates', false)) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');
+
+            return 1;
+        }
 
         try {
             if (empty($options['finish'])) {

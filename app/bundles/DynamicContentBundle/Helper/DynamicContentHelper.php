@@ -1,55 +1,42 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var RealTimeExecutioner
-     */
-    protected $realTimeExecutioner;
+    protected RealTimeExecutioner $realTimeExecutioner;
+    protected EventDispatcherInterface $dispatcher;
+    protected DynamicContentModel $dynamicContentModel;
+    protected LeadModel $leadModel;
 
-    /**
-     * @var ContainerAwareEventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var DynamicContentModel
-     */
-    protected $dynamicContentModel;
-
-    public function __construct(DynamicContentModel $dynamicContentModel, RealTimeExecutioner $realTimeExecutioner, EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        DynamicContentModel $dynamicContentModel,
+        RealTimeExecutioner $realTimeExecutioner,
+        EventDispatcherInterface $dispatcher,
+        LeadModel $leadModel
+    ) {
         $this->dynamicContentModel = $dynamicContentModel;
         $this->realTimeExecutioner = $realTimeExecutioner;
         $this->dispatcher          = $dispatcher;
+        $this->leadModel           = $leadModel;
     }
 
     /**
-     * @param            $slot
+     * @param string     $slot
      * @param Lead|array $lead
      *
      * @return string
@@ -97,7 +84,7 @@ class DynamicContentHelper
             if ($dwc->getIsCampaignBased()) {
                 continue;
             }
-            if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
+            if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadArray)) {
                 return $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
             }
         }
@@ -170,9 +157,8 @@ class DynamicContentHelper
     }
 
     /**
-     * @param $slot
-     * @param $lead
-     * @param $dwc
+     * @param string       $slot
+     * @param Lead|mixed[] $lead
      *
      * @return string
      */
@@ -247,5 +233,30 @@ class DynamicContentHelper
                 ),
             ]
         );
+    }
+
+    /**
+     * @param mixed[] $filters
+     * @param mixed[] $contactArray
+     */
+    private function filtersMatchContact(array $filters, array $contactArray): bool
+    {
+        if (empty($contactArray['id'])) {
+            return false;
+        }
+
+        //  We attempt even listeners first
+        if ($this->dispatcher->hasListeners(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)) {
+            /** @var Lead $contact */
+            $contact = $this->leadModel->getEntity($contactArray['id']);
+
+            $event = new ContactFiltersEvaluateEvent($filters, $contact);
+            $this->dispatcher->dispatch(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE, $event);
+            if ($event->isMatch()) {
+                return true;
+            }
+        }
+
+        return $this->matchFilterForLead($filters, $contactArray);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace  MauticPlugin\MauticCrmBundle\Entity;
+namespace MauticPlugin\MauticCrmBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;

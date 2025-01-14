@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
@@ -44,7 +35,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
         switch ($type) {
             case 'social.tweet':
             case 'tweet':
-
                 if (isset($filter['tweet_text'])) {
                     // This tweet was created as the campaign action param and these params are not the filter. Clear the filter.
                     $filter = '';

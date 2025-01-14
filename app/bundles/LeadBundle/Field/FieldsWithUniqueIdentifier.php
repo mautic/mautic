@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field;
 
 class FieldsWithUniqueIdentifier
@@ -31,7 +22,7 @@ class FieldsWithUniqueIdentifier
     }
 
     /**
-     * Retrieves a list of published fields that are unique identifers.
+     * Retrieves a list of published fields that are unique identifiers.
      *
      * @return mixed
      */

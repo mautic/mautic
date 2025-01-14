@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Extension;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -19,6 +10,11 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 
+trigger_deprecation('mautic/core', '4.3', 'The "%s" class is deprecated, will be removed in 5.0.', CustomFormExtension::class);
+
+/**
+ * @deprecated since M4, will be removed in M5 because it's not used
+ */
 class CustomFormExtension extends AbstractTypeExtension
 {
     /**
@@ -26,9 +22,6 @@ class CustomFormExtension extends AbstractTypeExtension
      */
     protected $dispatcher;
 
-    /**
-     * FormTypeCaptchaExtension constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -66,10 +59,10 @@ class CustomFormExtension extends AbstractTypeExtension
     }
 
     /**
-     * @return string
+     * @return iterable<string>
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return FormType::class;
+        return [FormType::class];
     }
 }

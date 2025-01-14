@@ -697,7 +697,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
 
     var operators = mQuery(selectedOption).data('field-operators');
     mQuery('#' + filterIdBase + '_operator').html('');
-    mQuery.each(operators, function (value, label) {
+    mQuery.each(operators, function (label, value) {
         var newOption = mQuery('<option/>').val(value).text(label);
         newOption.appendTo(mQuery('#' + filterIdBase + '_operator'));
     });

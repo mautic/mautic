@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -212,7 +203,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],
@@ -235,7 +226,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],

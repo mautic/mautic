@@ -16,7 +16,7 @@ $view['slots']->set('mauticContent', 'leadImport');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads', ['%object%' => $objectName]));
 
 ?>
-<?php if (isset($form['file'])): ?>
+<?php if (isset($step) && \Mautic\LeadBundle\Controller\ImportController::STEP_UPLOAD_CSV === $step): ?>
 <?php echo $view->render('MauticLeadBundle:Import:upload_form.html.php', ['form' => $form]); ?>
 <?php else: ?>
 <?php echo $view->render('MauticLeadBundle:Import:mapping_form.html.php', ['form' => $form]); ?>

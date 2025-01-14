@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class ScheduleController extends CommonAjaxController
 {
@@ -60,19 +50,19 @@ class ScheduleController extends CommonAjaxController
         if (empty($report)) {
             $this->addFlash('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
-            return $this->flushFlash(Response::HTTP_NOT_FOUND);
+            return $this->flushFlash();
         }
 
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->addFlash('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
-            return $this->flushFlash(Response::HTTP_FORBIDDEN);
+            return $this->flushFlash();
         }
 
         if ($report->isScheduled()) {
             $this->addFlash('mautic.report.scheduled.already', ['%id%' => $reportId], FlashBag::LEVEL_ERROR);
 
-            return $this->flushFlash(Response::HTTP_PROCESSING);
+            return $this->flushFlash();
         }
 
         $report->setAsScheduledNow($this->user->getEmail());
@@ -83,15 +73,13 @@ class ScheduleController extends CommonAjaxController
             ['%id%' => $reportId, '%email%' => $this->user->getEmail()]
         );
 
-        return $this->flushFlash(Response::HTTP_OK);
+        return $this->flushFlash();
     }
 
     /**
-     * @param string $status
-     *
      * @return JsonResponse
      */
-    private function flushFlash($status)
+    private function flushFlash()
     {
         return new JsonResponse(['flashes' => $this->getFlashContent()]);
     }

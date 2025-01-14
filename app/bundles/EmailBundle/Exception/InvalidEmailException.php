@@ -1,22 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Exception;
 
+use Mautic\CoreBundle\Exception\InvalidValueException;
 use Throwable;
 
-/**
- * Class InvalidEmailException.
- */
-class InvalidEmailException extends \Exception
+class InvalidEmailException extends InvalidValueException
 {
     /**
      * @var string
@@ -24,8 +13,6 @@ class InvalidEmailException extends \Exception
     protected $emailAddress;
 
     /**
-     * InvalidEmailException constructor.
-     *
      * @param string $emailAddress
      * @param string $message
      * @param int    $code

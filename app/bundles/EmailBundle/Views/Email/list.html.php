@@ -37,7 +37,6 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'e.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-email-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -54,6 +53,41 @@ if ('index' == $tmpl) {
 
                 <th class="visible-sm visible-md visible-lg col-email-stats"><?php echo $view['translator']->trans('mautic.core.stats'); ?></th>
 
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-lg col-email-dateAdded',
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.dateModified',
+                        'defaultDir' => 'DESC',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-lg col-email-dateModified',
+                        'default'    => true,
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-lg col-email-createdByUser',
+                    ]
+                );
+                ?>
                 <?php
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
@@ -217,6 +251,13 @@ if ('index' == $tmpl) {
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
                     </td>
+                    <td class="visible-lg" title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
+                        <?php echo $item->getDateAdded() ? $view['date']->toDate($item->getDateAdded()) : ''; ?>
+                    </td>
+                    <td class="visible-lg" title="<?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?>">
+                        <?php echo $item->getDateModified() ? $view['date']->toDate($item->getDateModified()) : ''; ?>
+                    </td>
+                    <td class="visible-lg"><?php echo $view->escape($item->getCreatedByUser()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

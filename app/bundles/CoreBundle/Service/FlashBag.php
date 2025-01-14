@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Service;
 
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -70,11 +61,11 @@ class FlashBag
             //message is already translated
             $translatedMessage = $message;
         } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $this->translator->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $this->translator->trans($message, $messageVars, $domain);
+            if (isset($messageVars['pluralCount']) && empty($messageVars['%count%'])) {
+                $messageVars['%count%'] = $messageVars['pluralCount'];
             }
+
+            $translatedMessage = $this->translator->trans($message, $messageVars, $domain);
         }
 
         $this->session->getFlashBag()->add($level, $translatedMessage);

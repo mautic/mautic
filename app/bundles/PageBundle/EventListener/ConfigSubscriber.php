@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -70,6 +61,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'google_analytics_trackingpage_enabled' => false,
                 'google_analytics_landingpage_enabled'  => false,
                 'google_analytics_anonymize_ip'         => false,
+                'do_not_track_404_anonymous'            => false,
             ],
         ]);
     }

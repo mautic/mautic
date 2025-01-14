@@ -111,9 +111,9 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                             $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
                                                             $choices   = ('boolean' === $params['properties']['type'])
                                                                 ?
-                                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
+                                                                array_flip(\Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list))
                                                                 :
-                                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
+                                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseListForChoices($list);
                                                             $list     = json_encode($choices);
                                                             $callback = (!empty($params['properties']['callback']))
                                                                 ? $params['properties']['callback'] : '';
