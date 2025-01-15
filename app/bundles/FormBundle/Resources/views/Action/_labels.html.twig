@@ -1,0 +1,22 @@
+{% set footerContent %}
+
+    {# Add to points #}
+    {% if action.properties.score is defined %}
+        <span class="label
+            {% if action.properties.score < 0 %}
+                label-red
+            {% elseif action.properties.score == 0 %}
+                label-warm-gray
+            {% else %}
+                label-green
+            {% endif %}">
+            {{ 'mautic.form.form.change_points_by'|trans({'%value%': action.properties.score}) }}
+        </span>
+    {% endif %}
+{% endset %}
+
+{% if footerContent|trim is not empty %}
+    <div class="d-flex panel-footer as-stretch gap-3 ai-center">
+        {{ footerContent|raw }}
+    </div>
+{% endif %}
