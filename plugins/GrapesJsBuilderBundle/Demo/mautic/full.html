@@ -10,7 +10,7 @@
     <link rel="icon" sizes="192x192" href="http://mautic.ddev.site/media/images/favicon.ico" />
     <link rel="apple-touch-icon" href="http://mautic.ddev.site/media/images/apple-touch-icon.png" />
 
-    <!-- froala editor 
+    <!-- froala editor
     <link
       rel="stylesheet"
       href="http://mautic.ddev.site/app/bundles/CoreBundle/Assets/css/libraries/builder.css"
@@ -700,7 +700,7 @@
                     <div class="btn-group toolbar-standard hidden-xs hidden-sm">
                       <button
                         type="button"
-                        class="btn btn-ghost btn-dnd btn-nospin text-primary btn-builder btn-copy"
+                        class="btn btn-ghost btn-dnd btn-nospin text-interactive btn-builder btn-copy"
                         id="emailform_buttons_builder_toolbar"
                         onclick="Mautic.launchBuilder('emailform')"
                       >
@@ -842,7 +842,7 @@
                                 <h3>Code Mode</h3>
                                 <div class="panel-body text-center" style="height: 250px">
                                   <i
-                                    class="ri-code-s-slash-line ri-5x text-muted"
+                                    class="ri-code-s-slash-line ri-5x text-secondary"
                                     aria-hidden="true"
                                     style="padding-top: 75px; color: #e4e4e4"
                                   ></i>
@@ -4065,7 +4065,7 @@ Default Dynamic Content</textarea
                       type="button"
                       id="emailform_buttons_builder"
                       name="emailform[buttons][builder]"
-                      class="btn btn-ghost btn-dnd btn-nospin text-primary btn-builder"
+                      class="btn btn-ghost btn-dnd btn-nospin text-interactive btn-builder"
                       onclick="Mautic.launchBuilder('emailform', 'email');"
                     >
                       <i class="ri-instance-fill"></i>
@@ -4196,20 +4196,20 @@ required="required" class="form-control editor editor-dynamic-content" autocompl
                   <div class="col-xs-6 col-sm-3 field-name">
                       <i class="object-icon ri-user-6-line"></i> <span>__label__</span>
                   </div>
-          
+
                   <div class="col-xs-6 col-sm-3 padding-none">
                       <select
                   id="emailform_dynamicContent_0_filters_0_filters___name___operator" name="emailform[dynamicContent][0][filters][0][filters][__name__][operator]"
           class="form-control not-chosen" onchange="Mautic.convertLeadFilterInput(this)" autocomplete="false"    >
                       </select>        </div>
-          
+
                           <div class="col-xs-10 col-sm-5 padding-none">
                       <input type="text"
                   id="emailform_dynamicContent_0_filters_0_filters___name___filter" name="emailform[dynamicContent][0][filters][0][filters][__name__][filter]"
           required="required" class="form-control" data-toggle="field-lookup" data-target="" data-action="lead:fieldList" placeholder="filter value" autocomplete="false" />                        <input type="hidden"
                   id="emailform_dynamicContent_0_filters_0_filters___name___display" name="emailform[dynamicContent][0][filters][0][filters][__name__][display]"
           autocomplete="false" />                    </div>
-          
+
                   <div class="col-xs-2 col-sm-1">
                       <a href="javascript: void(0);" class="remove-selected btn btn-ghost text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
                   </div>

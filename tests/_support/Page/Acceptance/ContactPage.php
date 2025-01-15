@@ -29,7 +29,7 @@ class ContactPage
 
     // Contact Details Page
     public static $editButton = '#toolbar > div.std-toolbar > a:nth-child(1)';
-    public static $dropDown   = '#toolbar .std-toolbar > button';
+    public static $dropDown   = 'button#core-options';
     public static $delete     = '#toolbar > div.std-toolbar.open > ul > li:nth-child(5) > a';
 
     // Contact Page

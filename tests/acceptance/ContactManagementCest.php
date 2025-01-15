@@ -17,7 +17,7 @@ class ContactManagementCest
 
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -43,7 +43,7 @@ class ContactManagementCest
 
     public function createContactFromForm(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -72,7 +72,7 @@ class ContactManagementCest
 
     public function accessEditContactFormFromList(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -92,7 +92,7 @@ class ContactManagementCest
 
     public function editContactFromProfile(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -128,7 +128,7 @@ class ContactManagementCest
 
     public function deleteContactFromList(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -149,7 +149,7 @@ class ContactManagementCest
 
     public function deleteContactFromProfile(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -162,6 +162,15 @@ class ContactManagementCest
         // Wait for the contact details page to load and confirm we're on the correct page
         $I->waitForText($contactName, 30);
         $I->see($contactName);
+
+        // Ensure the dropdown button is visible on the page
+        $I->waitForElementVisible(ContactPage::$dropDown, 10);
+
+        // Scroll to the dropdown button to bring it into view
+        $I->scrollTo(ContactPage::$dropDown, 0, -100);
+
+        // Wait until the dropdown button is clickable
+        $I->waitForElementClickable(ContactPage::$dropDown, 10);
 
         // Click the dropdown caret to show the delete option
         $I->click(ContactPage::$dropDown);
@@ -180,7 +189,7 @@ class ContactManagementCest
 
     public function batchDeleteContacts(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -210,7 +219,7 @@ class ContactManagementCest
     public function batchAddToCampaign(
         AcceptanceTester $I,
         ContactStep $contact,
-        CampaignStep $campaign
+        CampaignStep $campaign,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -254,7 +263,7 @@ class ContactManagementCest
     public function batchRemoveFromCampaign(
         AcceptanceTester $I,
         ContactStep $contact,
-        CampaignStep $campaign
+        CampaignStep $campaign,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -447,7 +456,7 @@ class ContactManagementCest
 
     public function importCSV(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 

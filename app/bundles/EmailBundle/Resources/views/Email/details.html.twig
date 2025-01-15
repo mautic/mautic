@@ -170,7 +170,7 @@
                   <div class="box-layout">
                       <div class="col-xs-10">
                           <div>{{ email.subject }}</div>
-                          <div class="text-muted">{{ emailPreview }}</div>
+                          <div class="text-secondary">{{ emailPreview }}</div>
                           {% if email.isVariant(true) %}
                             <div class="small">
                               <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}) }}" data-toggle="ajax">
@@ -281,7 +281,7 @@
               <!-- email detail collapseable toggler -->
               <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#email-details">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#email-details">
                       <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                     </a>
                 </span>

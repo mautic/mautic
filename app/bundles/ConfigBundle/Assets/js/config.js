@@ -100,13 +100,10 @@ Mautic.configDsnTestDisable = function(element) {
 
 
 Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
-    if (parseInt(anonymize_ip, 10) === 1)
-    {
-        mQuery('.anonymize_ip_address').removeClass('hide');
-    }
-    else
-    {
+    if (mQuery(anonymize_ip).siblings('.toggle__label').attr('aria-checked') === 'true') {
         mQuery('.anonymize_ip_address').addClass('hide');
+    } else {
+        mQuery('.anonymize_ip_address').removeClass('hide');
     }
 };
 
