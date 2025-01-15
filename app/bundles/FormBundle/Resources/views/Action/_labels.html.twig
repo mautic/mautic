@@ -34,6 +34,52 @@
             {{ 'mautic.form.form.send_to_contact'|trans }}
         </span>
     {% endif %}
+
+    {# Email to send to contact #}
+    {% if action.properties.email is defined %}
+        <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : action.properties.email }) }}" class="label label-gray" size="sm">{{ 'mautic.email.email'|trans }} ({{ action.properties.email }})</a>
+    {% endif %}
+
+    {# Email to send to user #}
+    {% if action.properties.useremail is defined and action.properties.useremail.email is defined %}
+        <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : action.properties.useremail.email }) }}" class="label label-gray" size="sm">
+            {{ 'mautic.email.email'|trans }} ({{ action.properties.useremail.email }})
+        </a>
+    {% endif %}
+
+    {# Send email to users #}
+    {% if action.properties.user_id is defined and action.properties.user_id is not empty %}
+        {% for userId in action.properties.user_id %}
+            {% if securityIsGranted('user:users:edit') %}
+                <a href="{{ path('mautic_user_action', {'objectAction': 'edit', 'objectId': userId }) }}" class="label label-gray" size="sm">
+                    {{ 'mautic.user.user.form.user'|trans }} ({{ userId }})
+                </a>
+            {% else %}
+                <span class="label label-default">
+                    {{ 'mautic.user.user.form.user'|trans }} ({{ userId }})
+                </span>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+
+    {# Add to lists #}
+    {% if action.properties.addToLists is defined and action.properties.addToLists is not empty %}
+        {% for listId in action.properties.addToLists %}
+            <span class="label label-green">
+                <i class="ri-pie-chart-line"></i> {{ listId }}
+            </span>
+        {% endfor %}
+    {% endif %}
+
+    {# Remove from lists #}
+    {% if action.properties.removeFromLists is defined and action.properties.removeFromLists is not empty %}
+        {% for listId in action.properties.removeFromLists %}
+            <span class="label label-red">
+                <i class="ri-pie-chart-line"></i> {{ listId }}
+            </span>
+        {% endfor %}
+    {% endif %}
 {% endset %}
 
 {% if footerContent|trim is not empty %}
