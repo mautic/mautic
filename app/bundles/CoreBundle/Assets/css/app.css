@@ -6317,7 +6317,8 @@ ul.dropdown-menu-form {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.label.label-category {
+.label.label-category,
+.label.label-icon {
   min-width: auto;
   aspect-ratio: 1/1;
 }
