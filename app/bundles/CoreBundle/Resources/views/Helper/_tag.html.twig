@@ -22,6 +22,10 @@
     {% set translated_label = tag.label|trans %}
     {% set classes = ['label', 'label-' ~ color] %}
 
+    {% if icon_only %}
+        {% set classes = classes|merge(['label-icon']) %}
+    {% endif %}
+
     {# Merge additional classes #}
     {% if attributes.class is defined %}
         {% set classes = attributes.class is iterable ? classes|merge(attributes.class) : classes|merge([attributes.class]) %}
