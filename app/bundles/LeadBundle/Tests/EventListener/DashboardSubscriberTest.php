@@ -14,8 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateHelperStub
 {
-    public function formatRange(\DateInterval $interval)
-    {
+    public function formatRange(\DateInterval $interval): string {
         return $interval->format('%H:%I:%S');
     }
 }
