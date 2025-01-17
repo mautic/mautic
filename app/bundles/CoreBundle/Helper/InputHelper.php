@@ -418,9 +418,13 @@ class InputHelper
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
             try {
-                $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
+                if (mb_check_encoding($value, 'UTF-8')) {
+                    $hasUnicode = true;
+                } else {
+                    $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
+                }
             } catch (\ErrorException) {
-                $hasUnicode = 'UTF-8"' === mb_detect_encoding($value);
+                $hasUnicode = 'UTF-8' === mb_detect_encoding($value);
             }
 
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
