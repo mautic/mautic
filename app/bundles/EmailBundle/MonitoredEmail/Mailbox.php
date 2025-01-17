@@ -1054,7 +1054,10 @@ class Mailbox
         if ($string && $fromEncoding != $toEncoding) {
             $convertedString = @iconv($fromEncoding, $toEncoding.'//IGNORE', $string);
             if (!$convertedString && extension_loaded('mbstring')) {
-                $convertedString = @mb_convert_encoding($string, $toEncoding, $fromEncoding);
+                $listEncodings = mb_list_encodings();
+                if (in_array($fromEncoding, $listEncodings)) {
+                    $convertedString = @mb_convert_encoding($string, $toEncoding, $fromEncoding);
+                }
             }
         }
 
