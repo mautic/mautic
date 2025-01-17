@@ -13,13 +13,21 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private FixtureHelper $campaignFixturesHelper;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->campaignFixturesHelper = new FixtureHelper($this->em);
+    }
+
     public function testCancelScheduledCampaignEventAction(): void
     {
-        $fixtureHelper = new FixtureHelper($this->em);
-        $contact       = $fixtureHelper->createContact('some@contact.email');
-        $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
-        $fixtureHelper->addContactToCampaign($contact, $campaign);
-        $fixtureHelper->createCampaignWithScheduledEvent($campaign);
+        $this->campaignFixturesHelper = new FixtureHelper($this->em);
+        $contact                      = $this->campaignFixturesHelper->createContact('some@contact.email');
+        $campaign                     = $this->campaignFixturesHelper->createCampaign('Scheduled event test');
+        $this->campaignFixturesHelper->addContactToCampaign($contact, $campaign);
+        $this->campaignFixturesHelper->createCampaignWithScheduledEvent($campaign);
         $this->em->flush();
 
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);

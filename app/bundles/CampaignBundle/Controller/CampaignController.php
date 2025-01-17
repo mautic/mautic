@@ -929,6 +929,9 @@ class CampaignController extends AbstractStandardFormController
                 $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
                 $this->prepareCampaignEventsForEdit($entity, $objectId, true);
 
+                $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);
+                $showEmailStats      = $isEmailStatsEnabled && $entity->isEmailCampaign();
+
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
@@ -940,6 +943,7 @@ class CampaignController extends AbstractStandardFormController
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
                         'campaignEvents'  => $events,
+                        'showEmailStats'  => $showEmailStats,
                     ]
                 );
                 break;

@@ -82,6 +82,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'campaign_email_stats_enabled',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.campaignconfig.campaign_email_stats_enabled',
+                'label_attr' => ['class' => 'control-label'],
+                'data'       => $options['data']['campaign_email_stats_enabled'] ?? true,
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.campaignconfig.campaign_email_stats_enabled.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'peak_interaction_timer_best_default_hour_start',
             NumberType::class,
             [

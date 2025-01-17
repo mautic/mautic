@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -50,6 +51,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&Environment $twig */
         $twig = $this->createMock(Environment::class);
 
+        $requestStack = new RequestStack();
+
         $slotsHelper = new SlotsHelper();
         $themeHelper = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())
@@ -79,7 +82,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $twig,
             $themeHelper,
             $slotsHelper,
-            $this->createMock(EventDispatcherInterface::class)
+            $this->createMock(EventDispatcherInterface::class),
+            $requestStack,
         );
         $mailHelper->setTokens($tokens);
 
