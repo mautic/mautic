@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -34,7 +35,8 @@ class EventLogger
         private LeadEventLogRepository $leadEventLogRepository,
         private LeadRepository $leadRepository,
         private SummaryModel $summaryModel,
-        private LeadBundleLeadRpository $leadBundleLeadRpository
+        private LeadBundleLeadRpository $leadBundleLeadRpository,
+        private EntityManager $em,
     ) {
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
@@ -72,6 +74,7 @@ class EventLogger
         if (null === $contact) {
             $contact = $this->contactTracker->getContact();
         }
+
         $log->setLead($contact);
 
         if ($isInactiveEvent) {
@@ -189,7 +192,9 @@ class EventLogger
             if (isset($this->contactRotations[$contact->getId()]) && $this->contactRotations[$contact->getId()]['manually_removed']) {
                 continue;
             }
-            $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
+
+            $freshContact = $this->em->getReference(Lead::class, $contact->getId());
+            $log          = $this->buildLogEntry($event, $freshContact, $isInactiveEntry);
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());
             ChannelExtractor::setChannel($log, $event, $config);
