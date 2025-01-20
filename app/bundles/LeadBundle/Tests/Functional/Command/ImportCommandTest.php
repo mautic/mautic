@@ -40,8 +40,8 @@ class ImportCommandTest extends MauticMysqlTestCase
     public function testImportNotification(): void
     {
         // Create contact import for ghosting.
-        $this->createCsvContactImport(2);
-        $this->createCsvContactImport(2);
+        $this->createCsvContactImport(Import::IN_PROGRESS);
+        $this->createCsvContactImport(Import::IN_PROGRESS);
 
         // Create another import to be run
         $import = $this->createCsvContactImport();
@@ -71,7 +71,7 @@ class ImportCommandTest extends MauticMysqlTestCase
         return $tmpFile;
     }
 
-    private function createCsvContactImport(int $status = 1): Import
+    private function createCsvContactImport(int $status = Import::QUEUED): Import
     {
         $csvFile = $this->generateSmallCSV();
 

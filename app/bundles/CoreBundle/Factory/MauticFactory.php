@@ -9,8 +9,6 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @deprecated 2.0 to be removed in 3.0
@@ -23,7 +21,6 @@ class MauticFactory
     public function __construct(
         private ContainerInterface $container,
         private ModelFactory $modelFactory,
-        private RequestStack $requestStack,
         private ManagerRegistry $doctrine,
         private LoggerInterface $logger,
     ) {
@@ -62,24 +59,6 @@ class MauticFactory
     public function getDatabase()
     {
         return $this->doctrine->getConnection();
-    }
-
-    /**
-     * Retrieves request.
-     *
-     * @return Request|null
-     */
-    public function getRequest()
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (empty($request)) {
-            // likely in a test as the request is not populated for outside the container
-            $request      = Request::createFromGlobals();
-            $requestStack = new RequestStack();
-            $requestStack->push($request);
-        }
-
-        return $request;
     }
 
     /**

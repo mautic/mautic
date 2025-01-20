@@ -24,6 +24,7 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -237,6 +238,7 @@ class MailHelper
         private ThemeHelper $themeHelper,
         private SlotsHelper $slotsHelper,
         private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -1423,9 +1425,15 @@ class MailHelper
             }
         }
 
-        $request = $this->factory->getRequest();
+        $request = $this->requestStack->getMainRequest();
+        if (null !== $request) {
+            $baseUrl = $request->getSchemeAndHttpHost().$request->getBasePath();
+        } else {
+            $baseUrl = $this->coreParametersHelper->get('site_url');
+        }
+
         $parser  = new PlainTextHelper([
-            'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
+            'base_url' => $baseUrl,
         ]);
 
         $this->plainText = $parser->setHtml($content)->getText();

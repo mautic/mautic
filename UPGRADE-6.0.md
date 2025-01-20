@@ -13,6 +13,7 @@
     - The `lightsaml/sp-bundle` package was replaced with a maintained fork `javer/sp-bundle`
 - Deprecated `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentiferFields` and `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentifierFields` were removed. Use `Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier` instead.
 - The signature for the `Mautic\PluginBundle\Integration\AbstractIntegration::__construct()` had to be changed as the `SessionInterface` service no longer exists in Symfony 6. So it was removed from the constructor and session is being fetched from the `RequestStack` instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getRequest` use dependency injection with RequestStack instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getHelper` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getDebugMode` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getMauticBundles` use BundleHelper instead.
