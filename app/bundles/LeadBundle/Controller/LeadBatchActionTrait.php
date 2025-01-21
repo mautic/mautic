@@ -60,7 +60,7 @@ trait LeadBatchActionTrait
      * @param Request $request
      *                         HTTP request
      *
-     * @return array
+     * @return int[]
      *               Array of entity ids
      */
     protected function getBatchActionEntityIdsForAll(Request $request): array
