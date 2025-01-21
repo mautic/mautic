@@ -33,7 +33,7 @@ class SysinfoController extends FormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
-        BatchDeleteService $batchDeleteService
+        BatchDeleteService $batchDeleteService,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
