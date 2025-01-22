@@ -185,40 +185,114 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
     }
 
-    public function testConvertStringEncoding(): void
+    public function testEncodingConversionWithValidEncoding(): void
     {
-        $mailbox = $this->getMockBuilder(\Mautic\EmailBundle\MonitoredEmail\Mailbox::class)
-                        ->disableOriginalConstructor()
-                        ->getMock();
-
-        $reflection = new \ReflectionClass(\Mautic\EmailBundle\MonitoredEmail\Mailbox::class);
-        $method     = $reflection->getMethod('convertStringEncoding');
-        $method->setAccessible(true);
-
-        $this->assertTrue(extension_loaded('mbstring'), 'mbstring extension is loaded');
-
-        // Prepare 1. test data: valid fromEncoding
         $string       = 'some UTF8 text with öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
         $fromEncoding = 'UTF-8';
         $toEncoding   = 'ISO-8859-1';
-        $result       = $method->invoke($mailbox, $string, $fromEncoding, $toEncoding);
 
-        // Assert the expected outcome
-        $this->assertNotNull($result);
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+
         $this->assertNotSame($string, $result, 'Converted string should differ from the original string.');
+    }
 
-        // Prepare 2. test data: fromEncoding not differ from toEncoding
-        $fromEncoding2 = $toEncoding2 = 'UTF-8';
-        $result2       = $method->invoke($mailbox, $string, $fromEncoding2, $toEncoding2);
-        $this->assertNotNull($result);
-        $this->assertSame($string, $result2, 'The string should not differ from the original string.');
+    public function testEncodingConversionWithInvalidEncoding(): void
+    {
+        $string       = 'some text with non-ascii chars öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'INVALID-ENC';
+        $toEncoding   = 'ISO-8859-1';
 
-        // Prepare 3. test data: with invalid fromEncoding
-        $string3       = 'some text with special chars: öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
-        $fromEncoding3 = 'unicode-1-1-utf'; // invalid fromEncoding
-        $toEncoding3   = 'UTF-8';
-        $result3       = $method->invoke($mailbox, $string3, $fromEncoding3, $toEncoding3);
-        $this->assertNotNull($result);
-        $this->assertSame($string3, $result3, 'The string should not differ from the original string.');
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+
+        $this->assertSame($string, $result, 'Conversion with invalid encodings should return the original string.');
+    }
+
+    public function testEncodingConversionFallback(): void
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('Test skipped as the mbstring extension is not installed.');
+        }
+
+        $string       = 'some UTF-8 text with non-ascii chars öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'UTF-8';
+        $toEncoding   = 'ISO-8859-1';
+
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $listEncodings = mb_list_encodings();
+        if (in_array($fromEncoding, $listEncodings)) {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertNotSame($string, $result, 'Converted string should differ from the original string if conversion succeeds.');
+        } else {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertSame($string, $result, 'Conversion with invalid encodings should return the original string.');
+        }
+    }
+
+    public function testEncodingConversionFallbackWithInvalidEncoding(): void
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('Test skipped as the mbstring extension is not installed.');
+        }
+
+        $string       = 'some text with non-ascii chars öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'INVALID-ENC';
+        $toEncoding   = 'ISO-8859-1';
+
+        // Mock dependencies
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
+
+        $listEncodings = mb_list_encodings();
+        if (in_array($fromEncoding, $listEncodings)) {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertNotSame($string, $result, 'Converted string should differ from the original string if conversion succeeds.');
+        } else {
+            $result = $this->invokeConvertStringEncoding($mailbox, $string, $fromEncoding, $toEncoding);
+            $this->assertSame($string, $result, 'Conversion with invalid encodings should return the original string.');
+        }
+    }
+
+    private function invokeConvertStringEncoding(Mailbox $mailbox, string $string, string $fromEncoding, string $toEncoding): string
+    {
+        $reflection = new \ReflectionClass($mailbox);
+        $method     = $reflection->getMethod('convertStringEncoding');
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($mailbox, [$string, $fromEncoding, $toEncoding]);
     }
 }
