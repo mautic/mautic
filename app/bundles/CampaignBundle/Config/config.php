@@ -161,7 +161,6 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.lead',
                     'mautic.campaign.model.summary',
-                    'mautic.lead.repository.lead',
                     'doctrine.orm.entity_manager',
                 ],
             ],

@@ -13,7 +13,6 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository as LeadBundleLeadRpository;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
@@ -35,7 +34,6 @@ class EventLogger
         private LeadEventLogRepository $leadEventLogRepository,
         private LeadRepository $leadRepository,
         private SummaryModel $summaryModel,
-        private LeadBundleLeadRpository $leadBundleLeadRpository,
         private EntityManager $em,
     ) {
         $this->persistQueue = new ArrayCollection();
@@ -117,26 +115,11 @@ class EventLogger
             return $this;
         }
 
-        $leadIds = [];
         foreach ($collection as $leadEventLog) {
             $lead = $leadEventLog->getLead();
-            if ($lead && !in_array($lead->getId(), $leadIds)) {
-                $leadIds[] = $lead->getId();
-            }
-        }
-
-        $managedLeads = $this->leadBundleLeadRpository
-            ->findBy(['id' => $leadIds]);
-
-        $managedLeadMap = [];
-        foreach ($managedLeads as $lead) {
-            $managedLeadMap[$lead->getId()] = $lead;
-        }
-
-        foreach ($collection as $leadEventLog) {
-            $lead = $leadEventLog->getLead();
-            if ($lead && isset($managedLeadMap[$lead->getId()])) {
-                $leadEventLog->setLead($managedLeadMap[$lead->getId()]);
+            if ($lead && null !== $lead->getId()) {
+                $freshContact = $this->em->getReference(Lead::class, $lead->getId());
+                $leadEventLog->setLead($freshContact);
             }
         }
 
