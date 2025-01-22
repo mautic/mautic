@@ -350,6 +350,9 @@ class CommonController extends AbstractController implements MauticController
                     $newContent = $newContentResponse->getContent();
                 }
             } else {
+                $parameters['mauticTemplate']     = $contentTemplate;
+                $parameters['mauticTemplateVars'] = $parameters;
+
                 $GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'] = 1; // for error handling
                 $newContent                           = $this->eventAwareRenderView($contentTemplate, $parameters, $request);
 
