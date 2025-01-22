@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
 class MailboxTest extends \PHPUnit\Framework\TestCase
 {
