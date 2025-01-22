@@ -18,33 +18,79 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    public function testWhenCreatingCustomFieldSearchableItMakesFieldIndexableAsWell(): void
+    /**
+     * @dataProvider dataTestCreatingCustomFieldIndexableAndSearchable
+     *
+     * @param array<string, string> $formValues
+     * @param array<string, string> $expectedValues
+     */
+    public function testCreatingCustomFieldIndexableAndSearchable(array $formValues, array $expectedValues): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful('Failed to load the form: '.$this->client->getResponse()->getContent());
 
         $form = $crawler->selectButton('Save')->form();
-        $form->setValues([
-            'leadfield[label]'          => 'Custom field',
-            'leadfield[alias]'          => 'custom_field',
-            'leadfield[object]'         => 'lead',
-            'leadfield[type]'           => 'text',
-            'leadfield[group]'          => 'core',
-            'leadfield[isSearchable]'   => 1,
-        ]);
 
-        $formValuesSubmitted = $form->getValues();
+        $defaultValues = [
+            'leadfield[label]'  => 'Custom field',
+            'leadfield[alias]'  => 'custom_field',
+            'leadfield[object]' => 'lead',
+            'leadfield[type]'   => 'text',
+            'leadfield[group]'  => 'core',
+        ];
 
-        $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertSame('0', $formValuesSubmitted['leadfield[isIndex]']);
-        $this->assertSame('1', $formValuesSubmitted['leadfield[isSearchable]']);
+        $form->setValues(array_merge($defaultValues, $formValues));
 
-        $form              = $crawler->selectButton('Save')->form();
+        $this->client->submit($form);
         $formValuesUpdated = $form->getValues();
-        $this->assertNotSame($formValuesUpdated['leadfield[isIndex]'], $formValuesSubmitted['leadfield[isIndex]']);
-        $this->assertSame('1', $formValuesUpdated['leadfield[isIndex]']);
-        $this->assertSame('1', $formValuesUpdated['leadfield[isSearchable]']);
+
+        foreach ($expectedValues as $alias => $expectedValue) {
+            $this->assertSame($expectedValue, $formValuesUpdated[$alias], "Mismatch for field {$alias}");
+        }
+    }
+
+    /**
+     * @return iterable<string, array{0: array<string, string>, 1: array<string, string>}>
+     */
+    public function dataTestCreatingCustomFieldIndexableAndSearchable(): iterable
+    {
+        yield 'Only Indexable enabled' => [
+            // input
+            [
+                'leadfield[isIndex]' => '1',
+            ],
+            // expected
+            [
+                'leadfield[isIndex]'      => '1',
+                'leadfield[isSearchable]' => '0',
+            ],
+        ];
+
+        yield 'Indexable enabled and no searchable' => [
+            // input
+            [
+                'leadfield[isIndex]'      => '1',
+                'leadfield[isSearchable]' => '0',
+            ],
+            // expected
+            [
+                'leadfield[isIndex]'      => '1',
+                'leadfield[isSearchable]' => '0',
+            ],
+        ];
+
+        yield 'Indexable and searchable enabled' => [
+            // input
+            [
+                'leadfield[isIndex]'      => '1',
+                'leadfield[isSearchable]' => '1',
+            ],
+            // expected
+            [
+                'leadfield[isIndex]'      => '1',
+                'leadfield[isSearchable]' => '1',
+            ],
+        ];
     }
 
     public function testGlobalSearchForContactsUsingCustomFieldsData(): void

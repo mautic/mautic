@@ -514,6 +514,10 @@ class FieldType extends AbstractType
                     $data['charLengthLimit'] = null;
                 }
 
+                if (!isset($data['isSearchable'])) {
+                    $data['isSearchable'] = false;
+                }
+
                 $event->setData($data);
                 $setupOrderField($event->getForm());
             }
@@ -639,26 +643,14 @@ class FieldType extends AbstractType
             ]
         );
 
-        $isNewIndexAllowed = $this->indexHelper->isNewIndexAllowed();
-        // If the field is set to be searchable, ensure it is indexed for faster searches.
-        // The field will be included in the index only if it is within the allowed index count limit.
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($isNewIndexAllowed): void {
-            $data         = $event->getData();
-            $isSearchable = $data['isSearchable'] ?? false;
-            $isIndex      = $data['isIndex'] ?? false;
-            if ($isSearchable && !$isIndex && $isNewIndexAllowed) {
-                $data['isIndex'] = true;
-                $event->setData($data);
-            }
-        });
-
         $builder->add(
             'isSearchable',
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.isSearchable',
                 'attr'  => [
-                    'tooltip' => 'mautic.lead.field.form.isSearchable.tooltip',
+                    'tooltip'        => 'mautic.lead.field.form.isSearchable.tooltip',
+                    'data-enable-on' => '{"leadfield_isIndex_1":"checked"}',
                 ],
             ]
         );
