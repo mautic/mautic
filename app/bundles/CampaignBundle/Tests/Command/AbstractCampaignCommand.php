@@ -128,11 +128,12 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return $lead;
     }
 
-    protected function createCampaign(string $campaignName): Campaign
+    protected function createCampaign(string $campaignName, bool $allowRestart = false): Campaign
     {
         $campaign = new Campaign();
         $campaign->setName($campaignName);
         $campaign->setIsPublished(true);
+        $campaign->setAllowRestart($allowRestart);
         $this->em->persist($campaign);
 
         return $campaign;
