@@ -27,7 +27,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $this->assertEquals($expected, $mailbox->getMailboxSettings());
     }
@@ -70,7 +70,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->will($this->returnValue(__DIR__.'/../../../../cache/'));
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $settings = $mailbox->getMailboxSettings('EmailBundle', 'bounces');
 
@@ -117,7 +117,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->will($this->returnValue(__DIR__.'/../../../../cache/'));
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $settings = $mailbox->getMailboxSettings('EmailBundle', 'bounces');
 
@@ -152,7 +152,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        new Mailbox($parametersHelper, $pathsHelper);
 
         // Test $this->settings['use_attachments'] == true
         // dir creation is not failing
@@ -183,7 +183,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->with('tmp', true)
             ->will($this->returnValue(__DIR__.'/../../../../cache/tmp'));
 
-        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        new Mailbox($parametersHelper, $pathsHelper);
     }
 
     public function testEncodingConversionWithValidEncoding(): void
