@@ -184,4 +184,41 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
 
         new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
     }
+
+    public function testConvertStringEncoding(): void
+    {
+        $mailbox = $this->getMockBuilder(\Mautic\EmailBundle\MonitoredEmail\Mailbox::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+
+        $reflection = new \ReflectionClass(\Mautic\EmailBundle\MonitoredEmail\Mailbox::class);
+        $method     = $reflection->getMethod('convertStringEncoding');
+        $method->setAccessible(true);
+
+        $this->assertTrue(extension_loaded('mbstring'), 'mbstring extension is loaded');
+
+        // Prepare 1. test data: valid fromEncoding
+        $string       = 'some UTF8 text with öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding = 'UTF-8';
+        $toEncoding   = 'ISO-8859-1';
+        $result       = $method->invoke($mailbox, $string, $fromEncoding, $toEncoding);
+
+        // Assert the expected outcome
+        $this->assertNotNull($result);
+        $this->assertNotSame($string, $result, 'Converted string should differ from the original string.');
+
+        // Prepare 2. test data: fromEncoding not differ from toEncoding
+        $fromEncoding2 = $toEncoding2 = 'UTF-8';
+        $result2       = $method->invoke($mailbox, $string, $fromEncoding2, $toEncoding2);
+        $this->assertNotNull($result);
+        $this->assertSame($string, $result2, 'The string should not differ from the original string.');
+
+        // Prepare 3. test data: with invalid fromEncoding
+        $string3       = 'some text with special chars: öüóőúéáűíä and ÖÜÓŐÚÉÁŰÍßÄŁ';
+        $fromEncoding3 = 'unicode-1-1-utf'; // invalid fromEncoding
+        $toEncoding3   = 'UTF-8';
+        $result3       = $method->invoke($mailbox, $string3, $fromEncoding3, $toEncoding3);
+        $this->assertNotNull($result);
+        $this->assertSame($string3, $result3, 'The string should not differ from the original string.');
+    }
 }
