@@ -1,33 +1,36 @@
 {% set target = target is defined ? target : '.page-list' %}
 
 {% if checkall is defined and checkall is not empty %}
-    {{ buttonReset(
-    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
-    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
-    ) }}
-
-    {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
-    {# Workaround to get variables from action_button_helper here #}
-    {{ restore('action_button_helper') }}
-
-    {% if templateButtons.delete is defined and templateButtons.delete is not empty %}
-        {{ buttonAdd({
-            confirm: {
-                message: translatorHasId(translationBase ~ '.form.confirmbatchdelete')
-                    ? (translationBase ~ '.form.confirmbatchdelete')|trans
-                    : 'mautic.core.form.confirmbatchdelete'|trans,
-                confirmAction: path(actionRoute, query|merge({objectAction: 'batchDelete'})),
-                template: 'batchdelete'
-            },
-            priority: -1
-        }) }}
-    {% endif %}
 <th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ tooltip|trans }}"{% endif %}>
     <div class="input-group input-group-sm">
         <span class="input-group-addon">
             <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="{{ target }}">
         </span>
 
+        {% if templateButtons is defined and templateButtons is not empty or customButtons is defined and customButtons is not empty %}
+
+        {{ buttonReset(
+        constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
+        constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
+        ) }}
+
+        {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+        {# Workaround to get variables from action_button_helper here #}
+        {{ restore('action_button_helper') }}
+
+        {% if templateButtons.delete is defined and templateButtons.delete is not empty %}
+            {{ buttonAdd({
+                confirm: {
+                    message: translatorHasId(translationBase ~ '.form.confirmbatchdelete')
+                        ? (translationBase ~ '.form.confirmbatchdelete')|trans
+                        : 'mautic.core.form.confirmbatchdelete'|trans,
+                    confirmAction: path(actionRoute, query|merge({objectAction: 'batchDelete'})),
+                    template: 'batchdelete'
+                },
+                priority: -1
+            }) }}
+        {% endif %}
+        
         <div class="ml-xs">
             {% include '@MauticCore/Helper/button.html.twig' with {
                 buttons: [
@@ -51,6 +54,7 @@
                 {{ buttonsRender() }}
             </ul>
         </div>
+        {% endif %}
     </div>
 </th>
 {% elseif sessionVar is not defined or sessionVar is empty %}

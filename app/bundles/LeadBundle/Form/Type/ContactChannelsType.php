@@ -73,7 +73,7 @@ class ContactChannelsType extends AbstractType
                     IntegerType::class,
                     [
                         'label'      => 'mautic.lead.list.frequency.number',
-                        'label_attr' => ['class' => 'text-muted fw-n label1'],
+                        'label_attr' => ['class' => 'text-secondary fw-n label1'],
                         'attr'       => array_merge(
                             $attr,
                             [
@@ -94,7 +94,7 @@ class ContactChannelsType extends AbstractType
                             'mautic.core.time.months' => FrequencyRule::TIME_MONTH,
                         ],
                         'label'      => 'mautic.lead.list.frequency.times',
-                        'label_attr' => ['class' => 'text-muted fw-n frequency-label label2'],
+                        'label_attr' => ['class' => 'text-secondary fw-n frequency-label label2'],
                         'multiple'   => false,
                         'required'   => false,
                         'attr'       => array_merge(
@@ -130,7 +130,7 @@ class ContactChannelsType extends AbstractType
                         $this->configureDateTypeOptions([
                             'widget'     => 'single_text',
                             'label'      => false,
-                            'label_attr' => ['class' => 'text-muted fw-n label3'],
+                            'label_attr' => ['class' => 'text-secondary fw-n label3'],
                             'attr'       => $attributes,
                             'required'   => false,
                         ], $options['public_view'])
@@ -141,7 +141,7 @@ class ContactChannelsType extends AbstractType
                         $this->configureDateTypeOptions([
                             'widget'     => 'single_text',
                             'label'      => 'mautic.lead.frequency.contact.end.date',
-                            'label_attr' => ['class' => 'frequency-label text-muted fw-n label4'],
+                            'label_attr' => ['class' => 'frequency-label text-secondary fw-n label4'],
                             'attr'       => $attributes,
                             'required'   => false,
                         ], $options['public_view'])

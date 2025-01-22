@@ -1,0 +1,17 @@
+{% if showMore is defined %}
+    <a href="{{ url('mautic_segment_index', {'search': searchString}) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+    </a>
+{% else %}
+    <div class="d-flex ai-center">
+        <a class="fg-1" href="{{ url('mautic_segment_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+            <span class="fw-sb">{{ item.name }}</span>
+            {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+                'entity': item,
+                'status': 'available',
+                'simplified': 'true'
+            }) -}}
+        </a>
+        <div class="clearfix"></div>
+    </div>
+{% endif %}

@@ -39,7 +39,7 @@
                                {% if isChecked %}checked{% endif %}>
                     </th>
                     <td class="col-md-1" style="vertical-align: top">
-                        <div id="is-contactable-{{ channel.value }}" class="{% if not isContactable %}text-muted{% endif %} fw-sb">
+                        <div id="is-contactable-{{ channel.value }}" class="{% if not isContactable %}text-secondary{% endif %} fw-sb">
                             {{ getChannelLabel(channel.value) }}
                         </div>
                     </td>
@@ -70,7 +70,7 @@
                         <div id="frequency_{{ channel.value }}"
                              class="{% if isHidden %}hide{% endif %}">
                             <div>
-                                <label class="text-muted fw-n">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                                <label class="text-secondary fw-n">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                             </div>
                             <div>
                                 {{ form_widget(form['lead_channels']['contact_pause_start_date_' ~ channel.value]) }}

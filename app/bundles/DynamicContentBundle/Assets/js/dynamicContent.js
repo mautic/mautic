@@ -7,6 +7,137 @@ Mautic.toggleDwcFilters = function () {
     }
 };
 
+Mautic.dwcGenerator = (function() {
+    // Selectors
+    const copyBtnSelector = '#generator-copy-dynamic-content-slot';
+    const pluginTabSelector = '#dwc--generator-plugins';
+    const htmlTabSelector = '#dwc--generator-html';
+    const codeContainerSelector = '.dwc--generator-content-code';
+    const inputSelector = '.dwc--generator-content-input';
+    const switchCodeWrapperBtnSelector = '#generator-switch-code-wrapper';
+    const switchHtmlTagBtnSelector = '#generator-switch-html-tag';
+
+    // State variables
+    let isPluginBracketMode = true; // True means {mautic ...}, false means [mautic ...]
+    let isUsingDiv = true; // True means using <div> for HTML snippet, false means using <span>
+
+    // Determine the active tab (plugin or HTML)
+    const getActiveTabType = () => {
+        const activePane = document.querySelector('.tab-pane.active.in') || document.querySelector('.tab-pane.active');
+        if (!activePane) return 'plugin'; // Default to 'plugin' if none found
+        return activePane.id === 'dwc--generator-plugins' ? 'plugin' : 'html';
+    };
+
+    const toggleState = (currentState) => !currentState;
+
+    // Restore input value after content changes
+    const updateInputValue = (container, inputValue) => {
+        const input = container.querySelector(inputSelector);
+        if (input && inputValue !== null) input.value = inputValue;
+    };
+
+    // Toggle between {mautic ...} and [mautic ...] in the plugin tab
+    const switchCodeWrapper = () => {
+        const pluginTab = document.querySelector(pluginTabSelector);
+        if (!pluginTab) return;
+
+        const pre = pluginTab.querySelector(codeContainerSelector);
+        if (!pre) return;
+
+        const input = pluginTab.querySelector(inputSelector);
+        const inputValue = input ? input.value : '';
+        let code = pre.innerHTML;
+
+        if (isPluginBracketMode) {
+            // Convert {mautic ...} to [mautic ...]
+            code = code
+                .replace(/\{mautic/g, '[mautic')
+                .replace(/slot=".*?"\}/g, match => match.replace('}', ']')) // Replace } with ] in the first part
+                .replace(/\{\/mautic\}/g, '[/mautic]');
+        } else {
+            // Convert [mautic ...] to {mautic ...}
+            code = code
+                .replace(/\[mautic/g, '{mautic')
+                .replace(/slot=".*?"\]/g, match => match.replace(']', '}')) // Replace ] with } in the first part
+                .replace(/\[\/mautic\]/g, '{/mautic}');
+        }
+
+        pre.innerHTML = code;
+        updateInputValue(pluginTab, inputValue);
+        isPluginBracketMode = toggleState(isPluginBracketMode);
+    };
+
+    // Toggle between <div> and <span> in the HTML tab
+    const switchHtmlTag = () => {
+        const htmlTab = document.querySelector(htmlTabSelector);
+        if (!htmlTab) return;
+
+        const pre = htmlTab.querySelector(codeContainerSelector);
+        if (!pre) return;
+
+        const input = htmlTab.querySelector(inputSelector);
+        const inputValue = input ? input.value : '';
+        let code = pre.innerHTML;
+
+        // Replace HTML tags based on the current state
+        code = isUsingDiv
+            ? code.replace(/&lt;div/g, '&lt;span').replace(/&lt;\/div&gt;/g, '&lt;/span&gt;')
+            : code.replace(/&lt;span/g, '&lt;div').replace(/&lt;\/span&gt;/g, '&lt;/div&gt;');
+
+        pre.innerHTML = code;
+        updateInputValue(htmlTab, inputValue);
+        isUsingDiv = toggleState(isUsingDiv);
+    };
+
+    // Copy the current code snippet to the clipboard, customized for the active tab
+    const copyCode = () => {
+        const activeTab = getActiveTabType();
+        const container = document.querySelector(
+            `${activeTab === 'plugin' ? pluginTabSelector : htmlTabSelector} ${codeContainerSelector}`
+        );
+
+        if (!container) return;
+
+        const input = container.querySelector(inputSelector);
+        const userValue = (input ? input.value : '').trim();
+        let code;
+
+        if (activeTab === 'plugin') {
+            const slotMatch = container.textContent.match(/slot="([^"]+)"/);
+            const slotName = slotMatch ? slotMatch[1] : '';
+            const wrapper = isPluginBracketMode
+                ? { open: `{mautic type="content" slot="${slotName}"}`, close: '{/mautic}' }
+                : { open: `[mautic type="content" slot="${slotName}"]`, close: '[/mautic]' };
+
+            code = `${wrapper.open}${userValue}${wrapper.close}`.trim();
+        } else {
+            const tag = isUsingDiv ? 'div' : 'span';
+            const slotMatch = container.innerHTML.match(/data-param-slot-name="([^"]+)"/);
+            const slotName = slotMatch ? slotMatch[1] : '';
+            code = `<${tag} data-slot="dwc" data-param-slot-name="${slotName}">${userValue}</${tag}>`;
+        }
+
+        navigator.clipboard.writeText(code).then(() => {
+            const flashMessage = Mautic.addInfoFlashMessage(Mautic.translate('mautic.core.copied'));
+            Mautic.setFlashes(flashMessage);
+        });
+    };
+
+    // Initialize event listeners for all buttons
+    const init = () => {
+        const copyBtn = document.querySelector(copyBtnSelector);
+        if (copyBtn) copyBtn.addEventListener('click', copyCode);
+
+        const switchCodeBtn = document.querySelector(switchCodeWrapperBtnSelector);
+        if (switchCodeBtn) switchCodeBtn.addEventListener('click', switchCodeWrapper);
+
+        const switchTagBtn = document.querySelector(switchHtmlTagBtnSelector);
+        if (switchTagBtn) switchTagBtn.addEventListener('click', switchHtmlTag);
+    };
+
+    return { init };
+})();
+
 Mautic.dynamicContentOnLoad = function (container, response) {
     if (typeof container !== 'object') {
         if (mQuery(container + ' #list-search').length) {
@@ -18,6 +149,7 @@ Mautic.dynamicContentOnLoad = function (container, response) {
     Mautic.activateChosenSelect(availableFilters, false);
 
     Mautic.dynamicFiltersOnLoad('div.dwc-filter');
+    Mautic.dwcGenerator.init();
 };
 
 Mautic.dynamicFiltersOnLoad = function(container, response) {

@@ -24,12 +24,18 @@
         'searchValue': searchValue,
         'searchHelp': 'mautic.page.help.searchcommands',
         'action': currentRoute,
-        'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+        'page_actions': {
             'templateButtons': {
                 'new': permissions['dynamiccontent:dynamiccontents:create'],
             },
             'routeBase': 'dynamicContent',
-        }),
+        },
+        'bulk_actions': {
+          'routeBase': 'dynamicContent',
+          'templateButtons': {
+              'delete': permissions['dynamiccontent:dynamiccontents:deleteown'] or permissions['dynamiccontent:dynamiccontents:deleteother'],
+          },
+        },
         'quickFilters': [
             {
                 'search': 'mautic.core.searchcommand.ispublished',

@@ -115,11 +115,15 @@
 }
 
 // Danger item
-.dropdown-menu > li a.danger {
+.dropdown-menu > li a#delete {
+  background-color: transparent;
+  border-color: transparent;
+  &, i { color: var(--text-secondary); }
+
   &:hover,
   &:focus {
     background-color: var(--support-error);
-    color: var(--text-on-color);
+    &, i { color: var(--text-on-color); }
   }
 }
 

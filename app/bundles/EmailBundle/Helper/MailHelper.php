@@ -7,6 +7,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -24,6 +25,7 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -236,7 +238,9 @@ class MailHelper
         private Environment $twig,
         private ThemeHelper $themeHelper,
         private SlotsHelper $slotsHelper,
+        private PathsHelper $pathsHelper,
         private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -821,7 +825,7 @@ class MailHelper
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
                 if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
                     $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
-                    $path = $this->factory->getSystemPath('root', true).$path;
+                    $path = $this->pathsHelper->getSystemPath('root', true).$path;
                 }
 
                 if ($imageContent = file_get_contents($path)) {
@@ -1423,9 +1427,15 @@ class MailHelper
             }
         }
 
-        $request = $this->factory->getRequest();
+        $request = $this->requestStack->getMainRequest();
+        if (null !== $request) {
+            $baseUrl = $request->getSchemeAndHttpHost().$request->getBasePath();
+        } else {
+            $baseUrl = $this->coreParametersHelper->get('site_url');
+        }
+
         $parser  = new PlainTextHelper([
-            'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
+            'base_url' => $baseUrl,
         ]);
 
         $this->plainText = $parser->setHtml($content)->getText();

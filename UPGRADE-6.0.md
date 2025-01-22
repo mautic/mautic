@@ -13,21 +13,28 @@
     - The `lightsaml/sp-bundle` package was replaced with a maintained fork `javer/sp-bundle`
 - Deprecated `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentiferFields` and `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentifierFields` were removed. Use `Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier` instead.
 - The signature for the `Mautic\PluginBundle\Integration\AbstractIntegration::__construct()` had to be changed as the `SessionInterface` service no longer exists in Symfony 6. So it was removed from the constructor and session is being fetched from the `RequestStack` instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getRequest` use dependency injection with RequestStack instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getHelper` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getDebugMode` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getMauticBundles` use BundleHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getKernel` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getVersion` use dependency injection with KernelInterface, which will retrieve \AppKernel, then invoke getVersion() method.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getPluginBundles` use BundleHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getBundleConfig` use BundleHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getUser` use UserHelper instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getSystemPath` use PathsHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTranslator` use Translator instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getRouter` use Router or UrlGeneratorInterface instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getLocalConfigFile` use dependency injection with KernelInterface, which will retrieve \AppKernel, then invoke getLocalConfigFile().
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getEnvironment` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getIpAddress` use IpLookupHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getSecurity` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::get` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::serviceExists` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getSecurityContext` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getDispatcher` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getMailer` use dependency injection instead with \Mautic\EmailBundle\Helper\MailHelper.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getLogger` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTwig` use DI with the `\Twig\Environment` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTheme` use DI with the `\Mautic\CoreBundle\Helper\ThemeHelper` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getInstalledThemes` use DI with the `\Mautic\CoreBundle\Helper\ThemeHelper` instead.

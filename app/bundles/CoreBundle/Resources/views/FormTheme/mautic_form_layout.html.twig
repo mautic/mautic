@@ -54,7 +54,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
         <label class="btn {{ class }} btn-block mt-0 list-group-item">
             {{ form_widget(child, {'attr': attr}) }}
-            <span class="list-group-item-text btn-block text-left">{{ child.vars.label|trans }}</span>
+            <span class="list-group-item-heading btn-block text-left">{{ child.vars.label|trans }}</span>
         </label>
     {% endfor %}
 </div>
@@ -599,7 +599,8 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
                onclick="Mautic.toggleYesNo(this);"
                role="switch"
                tabindex="0"
-               onkeydown="Mautic.handleKeyDown(event, this)">
+               onkeydown="Mautic.handleKeyDown(event, this)"
+               aria-checked="{{ value == yes_choice.value ? 'true' : 'false' }}">
             <div class="toggle__appearance" {% if size %}size="{{ size }}"{% endif %}>
                 <div class="toggle__switch {% if value == yes_choice.value %}toggle__switch--checked{% endif %}">
                     <svg class="toggle__check" width="6px" height="5px" viewBox="0 0 6 5">

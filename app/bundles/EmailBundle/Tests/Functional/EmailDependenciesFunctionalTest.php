@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
-use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -20,9 +17,20 @@ use Mautic\ReportBundle\Entity\Report;
 
 final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 {
+    private FixtureHelper $campaignFixturesHelper;
+    private EmailFixturesHelper $emailFixturesHelper;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->campaignFixturesHelper = new FixtureHelper($this->em);
+        $this->emailFixturesHelper    = new EmailFixturesHelper($this->em);
+    }
+
     public function testEmailUsageInSegments(): void
     {
-        $email = $this->createEmail();
+        $email = $this->emailFixturesHelper->createEmail();
+        $this->em->flush();
 
         $segmentRead = $this->createSegment('read-email', [
             [
@@ -69,11 +77,10 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailUsageInCampaigns(): void
     {
-        $email = $this->createEmail();
-        $this->em->persist($email);
+        $email = $this->emailFixturesHelper->createEmail();
         $this->em->flush();
 
-        $campaign = $this->createCampaignWithEmailSent($email->getId());
+        $campaign = $this->campaignFixturesHelper->createCampaignWithEmailSent($email->getId());
 
         $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
@@ -85,8 +92,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailUsageWithoutDuplicates(): void
     {
-        $email = $this->createEmail();
-        $this->em->persist($email);
+        $email = $this->emailFixturesHelper->createEmail();
         $this->em->flush();
 
         $formWithEmailSend = $this->createForm('form-with-email-send');
@@ -103,8 +109,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailUsageInForms(): void
     {
-        $email = $this->createEmail();
-        $this->em->persist($email);
+        $email = $this->emailFixturesHelper->createEmail();
         $this->em->flush();
 
         $formWithEmailSend = $this->createForm('form-with-email-send');
@@ -123,8 +128,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailUsageInPointActions(): void
     {
-        $email = $this->createEmail();
-        $this->em->persist($email);
+        $email = $this->emailFixturesHelper->createEmail();
         $this->em->flush();
 
         $pointActionIsSent = $this->createEmailPointAction($email->getId(), 'email.send');
@@ -140,8 +144,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailUsageInPointTriggers(): void
     {
-        $email = $this->createEmail();
-        $this->em->persist($email);
+        $email = $this->emailFixturesHelper->createEmail();
         $this->em->flush();
 
         $pointActionIsSent = $this->createPointTriggerWithEmailSendEvent($email->getId(), 'email.send');
@@ -156,8 +159,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailUsageInReports(): void
     {
-        $email = $this->createEmail();
-        $this->em->persist($email);
+        $email = $this->emailFixturesHelper->createEmail();
         $this->em->flush();
 
         $emailReport      = $this->createEmailReport($email->getId());
@@ -293,19 +295,6 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         return $action;
     }
 
-    private function createEmail(): Email
-    {
-        $email = new Email();
-        $email->setName('Test email');
-        $email->setSubject('Test email subject');
-        $email->setEmailType('template');
-        $email->setIsPublished(true);
-        $this->em->persist($email);
-        $this->em->flush();
-
-        return $email;
-    }
-
     /**
      * @param array<int, array<string, mixed>> $filters
      */
@@ -320,109 +309,5 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $segment;
-    }
-
-    /**
-     * Creates campaign with email sent action.
-     *
-     * Campaign diagram:
-     * -------------------
-     * -  Start segment  -
-     * -------------------
-     *         |
-     * -------------------
-     * -   Send email    -
-     * -------------------
-     *
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    private function createCampaignWithEmailSent(int $emailId): Campaign
-    {
-        $campaign = new Campaign();
-        $campaign->setName('Test Update contact');
-
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        $event1 = new Event();
-        $event1->setCampaign($campaign);
-        $event1->setName('Send email');
-        $event1->setType('email.send');
-        $event1->setChannel('email');
-        $event1->setChannelId($emailId);
-        $event1->setEventType('action');
-        $event1->setTriggerMode('immediate');
-        $event1->setOrder(1);
-        $event1->setProperties(
-            [
-                'canvasSettings' => [
-                    'droppedX' => '549',
-                    'droppedY' => '155',
-                ],
-                'name'                       => '',
-                'triggerMode'                => 'immediate',
-                'triggerDate'                => null,
-                'triggerInterval'            => '1',
-                'triggerIntervalUnit'        => 'd',
-                'triggerHour'                => '',
-                'triggerRestrictedStartHour' => '',
-                'triggerRestrictedStopHour'  => '',
-                'anchor'                     => 'leadsource',
-                'properties'                 => [
-                    'email'      => $emailId,
-                    'email_type' => 'transactional',
-                    'priority'   => '2',
-                    'attempts'   => '3',
-                ],
-                'type'            => 'email.send',
-                'eventType'       => 'action',
-                'anchorEventType' => 'source',
-                'campaignId'      => 'mautic_ce6c7dddf8444e579d741c0125f18b33a5d49b45',
-                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'         => [
-                    'save' => '',
-                ],
-                'email'      => $emailId,
-                'email_type' => 'transactional',
-                'priority'   => 2,
-                'attempts'   => 3.0,
-            ]
-        );
-
-        $this->em->persist($event1);
-        $this->em->flush();
-
-        $campaign->setCanvasSettings(
-            [
-                'nodes'       => [
-                    [
-                        'id'        => $event1->getId(),
-                        'positionX' => '549',
-                        'positionY' => '155',
-                    ],
-                    [
-                        'id'        => 'lists',
-                        'positionX' => '796',
-                        'positionY' => '50',
-                    ],
-                ],
-                'connections' => [
-                    [
-                        'sourceId' => 'lists',
-                        'targetId' => $event1->getId(),
-                        'anchors'  => [
-                            'source' => 'leadsource',
-                            'target' => 'top',
-                        ],
-                    ],
-                ],
-            ]
-        );
-
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        return $campaign;
     }
 }

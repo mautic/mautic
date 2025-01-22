@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -307,9 +309,10 @@ CONTENT,
                     ['mailer_from_name', null, 'No Body'],
                 ]
             );
-        $mockFactory = $this->createMock(MauticFactory::class); /** @phpstan-ignore-line MauticFactory is deprecated */
-        $mailer      = new Mailer(new BatchTransport());
-        $mailHelper  = new MailHelper(
+        $mockFactory  = $this->createMock(MauticFactory::class); /** @phpstan-ignore-line MauticFactory is deprecated */
+        $mailer       = new Mailer(new BatchTransport());
+        $requestStack = new RequestStack();
+        $mailHelper   = new MailHelper(
             $mockFactory,
             $mailer,
             $fromEmailHelper,
@@ -321,7 +324,9 @@ CONTENT,
             $twig,
             $themeHelper,
             $slotsHelper,
-            $this->createMock(EventDispatcherInterface::class)
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $requestStack
         );
 
         $email = new Email();

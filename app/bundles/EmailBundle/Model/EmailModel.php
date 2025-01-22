@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -22,6 +23,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -73,7 +75,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
@@ -297,7 +299,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return Paginator|array<string, int|object>
      */
     public function getEntities(array $args = [])
     {

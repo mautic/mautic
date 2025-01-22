@@ -147,7 +147,7 @@
       "@generate-assets"
     ],
     "test": "bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-    "e2e-test": "bin/codecept run acceptance",
+    "e2e-test": "APP_ENV=test bin/codecept run acceptance",
     "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=5G bin/phpstan analyse --ansi",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",

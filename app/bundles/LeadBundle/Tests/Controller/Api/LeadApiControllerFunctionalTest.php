@@ -174,6 +174,16 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
         $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
 
+        // Assert date modified
+        $this->assertNotEmpty($response['contacts'][0]['dateModified']);
+        $this->assertNotEmpty($response['contacts'][1]['dateModified']);
+        $this->assertNotEmpty($response['contacts'][2]['dateModified']);
+
+        // Assert date added
+        $this->assertNotEmpty($response['contacts'][0]['dateAdded']);
+        $this->assertNotEmpty($response['contacts'][1]['dateAdded']);
+        $this->assertNotEmpty($response['contacts'][2]['dateAdded']);
+
         // Emulate an unsanitized email to ensure that doesn't cause duplicates
         $payload[0]['email'] = 'batchemail1@email.com,';
 

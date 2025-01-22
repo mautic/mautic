@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -33,7 +34,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Notification>
  */
-class NotificationModel extends FormModel implements AjaxLookupModelInterface
+class NotificationModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     public function __construct(
         protected TrackableModel $pageTrackableModel,

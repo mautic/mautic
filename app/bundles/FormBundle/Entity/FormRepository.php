@@ -3,7 +3,9 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 
 /**
  * @extends CommonRepository<Form>
@@ -12,17 +14,38 @@ class FormRepository extends CommonRepository
 {
     public function getEntities(array $args = [])
     {
+        $q = $this->createQueryBuilder('f');
+        $q->select('f');
+
         // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
         $sq = $this->_em->createQueryBuilder()
             ->select('count(fs.id)')
             ->from(Submission::class, 'fs')
             ->where('fs.form = f');
 
-        $q = $this->createQueryBuilder('f');
-        $q->select('f, ('.$sq->getDql().') as submission_count');
+        $q->addSelect('('.$sq->getDql().') as submission_count');
         $q->leftJoin('f.category', 'c');
 
         $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
+     * @param array<string, string|array<int, array<int|string, int|string|bool|null>>> $filter
+     */
+    public function getEntitiesForGlobalSearch(array $filter): Paginator
+    {
+        $q = $this->createQueryBuilder('f');
+        $q->select('f');
+
+        $args = [
+            'qb'               => $q,
+            'filter'           => $filter,
+            'start'            => 0,
+            'limit'            => GlobalSearchEvent::RESULTS_LIMIT,
+            'ignore_paginator' => false,
+        ];
 
         return parent::getEntities($args);
     }
