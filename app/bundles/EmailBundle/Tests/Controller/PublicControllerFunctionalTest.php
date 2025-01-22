@@ -233,7 +233,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $page;
     }
 
-    public function testUnsubscribeFormActionWithUsingLandingPageWithoutContactLocal(): void
+    public function testUnsubscribeFormActionWithUsingLandingPageWithoutContactLocale(): void
     {
         $lead = $this->createLead();
         $page = $this->createPage();
@@ -246,7 +246,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Save preferences', $crawler->html());
     }
 
-    public function testUnsubscribeFormActionWithUsingLandingPageWithContactLocal(): void
+    public function testUnsubscribeFormActionWithUsingLandingPageWithContactLocale(): void
     {
         $lead = $this->createLead('de');
         $page = $this->createPage();
@@ -306,7 +306,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $form;
     }
 
-    protected function createLead(?string $local = null): Lead
+    protected function createLead(?string $locale = null): Lead
     {
         $lead = new Lead();
         $lead->setEmail('john@doe.email');
