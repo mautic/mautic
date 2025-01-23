@@ -310,7 +310,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     {
         $lead = new Lead();
         $lead->setEmail('john@doe.email');
-        $lead->addUpdatedField('preferred_locale', $local);
+        $lead->addUpdatedField('preferred_locale', $locale);
         $this->em->persist($lead);
 
         return $lead;
