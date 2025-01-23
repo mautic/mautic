@@ -131,7 +131,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -143,6 +143,14 @@ jobs:
 
     - name: Run E2E tests
       run: ddev exec bin/codecept run acceptance
+
+    - name: Upload test artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: e2e-test-screenshots
+        path: tests/_output
+        if-no-files-found: ignore
 
   misc:
     # We don't want the scheduled jobs to run on forks of Mautic

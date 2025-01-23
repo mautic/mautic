@@ -113,6 +113,63 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertDeleteResponse($payload, $id, $alias);
     }
 
+    /**
+     * @param array<string, array<string, string>> $properties
+     *
+     * @dataProvider dataForCreatingNewBooleanFieldApiEndpoint
+     */
+    public function testCreatingNewBooleanFieldApiEndpoint(array $properties, string $expectedMessage): void
+    {
+        $payload = [
+            'label'               => 'Request a meeting',
+            'alias'               => 'meeting',
+            'type'                => 'boolean',
+            'isPubliclyUpdatable' => true,
+            'isUniqueIdentifier'  => false,
+        ];
+
+        $payload += $properties;
+
+        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
+        $clientResponse = $this->client->getResponse();
+        $errorResponse  = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertArrayHasKey('errors', $errorResponse);
+        Assert::assertSame($errorResponse['errors'][0]['code'], $clientResponse->getStatusCode());
+        Assert::assertSame($expectedMessage, $errorResponse['errors'][0]['message']);
+    }
+
+    /**
+     * @return iterable<string, array<int, string|array<string, array<string, string>>>>
+     */
+    public function dataForCreatingNewBooleanFieldApiEndpoint(): iterable
+    {
+        yield 'No properties' => [
+            [
+            ],
+            'A \'positive\' label is required.',
+        ];
+
+        yield 'Only Yes' => [
+            [
+                'properties'=> [
+                    'yes' => 'Yes',
+                ],
+            ],
+            'A \'negative\' label is required.',
+        ];
+
+        yield 'Only No' => [
+            [
+                'properties'=> [
+                    'no' => 'No',
+                ],
+            ],
+            'A \'positive\' label is required.',
+        ];
+    }
+
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int
     {
         // Test creating a new field

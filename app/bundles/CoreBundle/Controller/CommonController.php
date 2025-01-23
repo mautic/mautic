@@ -466,16 +466,22 @@ class CommonController extends AbstractController implements MauticController
     public function notFound($msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
-
-        $page_404 = $this->coreParametersHelper->get('404_page');
-        if (!empty($page_404)) {
+        $page404 = $this->coreParametersHelper->get('404_page');
+        if (!empty($page404)) {
             $pageModel = $this->getModel('page');
             \assert($pageModel instanceof PageModel);
-            $page = $pageModel->getEntity($page_404);
+            $page = $pageModel->getEntity($page404);
             if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
-                $slug = $pageModel->generateSlug($page);
+                $slug     = $pageModel->generateSlug($page);
+                $response = $this->forward(
+                    'Mautic\PageBundle\Controller\PublicController::indexAction',
+                    [
+                        'slug'            => $slug,
+                        'ignore_mismatch' => true,
+                    ]
+                );
 
-                return $this->redirectToRoute('mautic_page_public', ['slug' => $slug]);
+                return new Response($response->getContent(), Response::HTTP_NOT_FOUND, $response->headers->all());
             }
         }
 

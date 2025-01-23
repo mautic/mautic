@@ -46,33 +46,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
      */
     public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
     {
-        // A way to keep the upgrade from failing if the session is lost after
-        // the cache is cleared by upgrade.php
-        if ($request->cookies->has('mautic_update')) {
-            $step = $request->cookies->get('mautic_update');
-            if ('clearCache' === $step) {
-                // Run migrations
-                $request->query->set('finalize', 1);
-
-                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateDatabaseMigrationAction',
-                    [
-                        'request' => $request,
-                    ]
-                );
-            } elseif ('schemaMigration' === $step) {
-                // Done so finalize
-                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction',
-                    [
-                        'request' => $request,
-                    ]
-                );
-            }
-
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->deleteCookie('mautic_update');
-        }
-
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {

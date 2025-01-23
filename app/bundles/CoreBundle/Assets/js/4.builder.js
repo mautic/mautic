@@ -1272,7 +1272,7 @@ Mautic.getSlotDeleteLink = function() {
         Mautic.deleteLink = mQuery('<a><i class="ri-lg ri-close-line"></i></a>')
             .attr('data-slot-action', 'delete')
             .attr('alt', 'delete')
-            .addClass('btn btn-delete btn-default');
+            .addClass('btn btn-delete btn-ghost');
     }
 
     return Mautic.deleteLink;
@@ -1706,27 +1706,6 @@ Mautic.initSlotListeners = function() {
         // Store the slot to a global var
         Mautic.builderSlots.push({slot: slot, type: type});
     });
-
-    Mautic.getPredefinedLinks = function(callback) {
-        var linkList = [];
-        Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
-            if (tokens.length) {
-                mQuery.each(tokens, function(token, label) {
-                    if (token.startsWith('{pagelink=') ||
-                        token.startsWith('{assetlink=') ||
-                        token.startsWith('{webview_url') ||
-                        token.startsWith('{unsubscribe_url')) {
-
-                        linkList.push({
-                            text: label,
-                            href: token
-                        });
-                    }
-                });
-            }
-            return callback(linkList);
-        });
-    };
 
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
@@ -2196,7 +2175,8 @@ Mautic.getPredefinedLinks = function(callback) {
                 if (token.startsWith('{pagelink=') ||
                     token.startsWith('{assetlink=') ||
                     token.startsWith('{webview_url') ||
-                    token.startsWith('{unsubscribe_url')) {
+                    token.startsWith('{unsubscribe_url') ||
+                    token.startsWith('{resubscribe_url')) {
 
                     linkList.push({
                         text: label,

@@ -1,49 +1,68 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 {% block headerTitle %}{{ packageDetail.packageBase.getHumanPackageName()|escape }}{% endblock %}
 
-{% set buttons = {
-    0: {
-        'attr' : {
-            'href' : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
-        },
-        'btnText'   : 'marketplace.package.details.close'|trans,
-        'iconClass' : 'ri-arrow-go-back-line',
-        'primary'   : true,
-}
- } %}
-
 {% set latestVersion = packageDetail.versions.findLatestStableVersionPackage() %}
 
 {% if not latestVersion %}
     {% set latestVersion = packageDetail.versions.findLatestVersionPackage() %}
 {% endif %}
 
-{% if latestVersion and latestVersion.issues %}
-    {% set buttons = buttons|merge({0: {
+{% block indexButton %}
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                label: 'mautic.core.close_back'|trans({'%target%': 'mautic.marketplace.marketplace'|trans}),
+                size: 'xs',
+                variant: 'tertiary',
+                icon: 'ri-arrow-left-line',
+                href: path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
+                attributes: {
+                    'data-toggle': 'ajax',
+                    'class': 'btn-back mb-lg'
+                }
+            }
+        ]
+    } %}
+{% endblock %}
+
+{% block actions %}
+{% set buttons = {
+    0: {
         'attr' : {
-            'href'        : latestVersion.issues,
-            'target'      : '_blank',
-            'rel'         : 'noopener noreferrer',
-            'data-toggle' : '',
+            'href' : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
+            'class' : 'btn btn-tertiary'
         },
-        'btnText'   : 'marketplace.package.issue.tracker'|trans,
-        'iconClass' : 'ri-question-mark',
-        'primary'   : false,
-    }}) %}
+        'btnText'   : 'marketplace.package.details.close'|trans,
+        'iconClass' : 'ri-arrow-go-back-line',
+        'primary'   : true,
+}
+ } %}
+ {% if latestVersion and latestVersion.issues %}
+ {% set buttons = buttons|merge({0: {
+     'attr' : {
+         'href'        : latestVersion.issues,
+         'target'      : '_blank',
+         'rel'         : 'noopener noreferrer',
+         'data-toggle' : '',
+     },
+     'btnText'   : 'marketplace.package.issue.tracker'|trans,
+     'iconClass' : 'ri-question-mark',
+     'primary'   : false,
+ }}) %}
 {% endif %}
 
 {% if latestVersion and latestVersion.wiki %}
-    {% set buttons = buttons|merge({0:{
-        'attr' : {
-            'href'        : latestVersion.wiki,
-            'target'      : '_blank',
-            'rel'         : 'noopener noreferrer',
-            'data-toggle' : '',
-        },
-        'btnText'   : 'marketplace.package.wiki'|trans,
-        'iconClass' : 'ri-book-line',
-        'primary'   : false,
-    }}) %}
+ {% set buttons = buttons|merge({0:{
+     'attr' : {
+         'href'        : latestVersion.wiki,
+         'target'      : '_blank',
+         'rel'         : 'noopener noreferrer',
+         'data-toggle' : '',
+     },
+     'btnText'   : 'marketplace.package.wiki'|trans,
+     'iconClass' : 'ri-book-line',
+     'primary'   : false,
+ }}) %}
 {% endif %}
 
 {% if security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and not isInstalled and isComposerEnabled %}
@@ -82,8 +101,6 @@
         'primary'   : true,
     }}) %}
 {% endif %}
-
-{% block actions %}
     {{- include('@MauticCore/Helper/page_actions.html.twig', {
         'customButtons' : buttons
     }) -}}

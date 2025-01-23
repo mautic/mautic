@@ -5,27 +5,87 @@
 {% set id = searchId|default('list-search') %}
 {% set tmpl = tmpl|default('list') %}
 
-<div class="input-group">
-    {% if searchHelp is defined and searchHelp is not empty %}
-    <div class="input-group-btn">
-        <button class="input-group-addon btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help">
-            <i class="ri-question-line"></i>
-        </button>
+{% include '@MauticCore/Helper/button.html.twig' with {
+    buttons: [
+        {
+            label: 'mautic.core.search.clear',
+            variant: 'ghost',
+            icon: 'ri-search-line ri-fw',
+            icon_only: true,
+            size: 'sm',
+            attributes: {
+                'type': 'button',
+                'id': 'btn-filter',
+                'data-livesearch-parent': id,
+                'class': 'input-group-btn btn-search'
+            }
+        }
+    ]
+} %}
+<div class="input-group d-flex fg-1">
+    <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ searchValue|escape }}" autocomplete="false" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
+</div>
+{% if (filters is defined and filters is not empty) or (quickFilters is defined and quickFilters is not empty) %}
+{% set filtering %}
+<div class="row">
+    <div class="{% if filters is defined and filters is not empty %}col-xs-6 pa-0{% endif %}">
+        {% if quickFilters is defined and quickFilters is not empty %}
+        {{ include('@MauticCore/Helper/list_quickfilters.html.twig', {
+            'quickFilters': quickFilters
+        }) }}
+        {% endif %}
+    </div>
+    {% if filters is defined and filters is not empty %}
+    <div class="col-xs-6 pa-0">
+        <div class="dropdown-header mt-0">{{ 'mautic.core.quick_filters.more'|trans }}</div>
+        <div class="pi-md">
+            {{- include('@MauticCore/Helper/list_filters.html.twig', {
+                filters: filters,
+                target: target|default(null),
+                tmpl: tmpl|default(null)
+            }) -}}
+        </div>
     </div>
     {% endif %}
-
-    <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ searchValue|escape }}" autocomplete="false" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
-    <div class="input-group-btn">
-        <button type="button" class="input-group-addon btn-search btn-nospin" id="btn-filter" data-livesearch-parent="{{ id }}">
-            <i class="ri-search-line ri-fw"></i>
-        </button>
+</div>
+<div class="row">
+    <div class="footer-buttons d-flex fw-nowrap gap-1 mt-lg">
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.reset_filter',
+                    variant: 'secondary',
+                    onclick: 'Mautic.resetFilters()',
+                    size: 'lg'
+                },
+                {
+                    label: 'mautic.core.apply_filter',
+                    variant: 'primary',
+                    onclick: 'Mautic.applyFilters()',
+                    size: 'lg'
+                }
+            ]
+        } %}
     </div>
 </div>
+{% endset %}
 
-{% if searchHelp %}
-{{- include('@MauticCore/Helper/modal.html.twig', {
-    id: (searchId ~ '-search-help'),
-    header: 'mautic.core.search.header'|trans,
-    body: ('mautic.core.search.help'|trans ~ searchHelp|trans)
-}) -}}
+{% include '@MauticCore/Helper/button.html.twig' with {
+    buttons: [
+    {
+        variant: 'ghost',
+        icon_only: true,
+        icon: 'ri-filter-line ri-1x',
+        attributes: {
+            'type': 'button',
+            'data-container': 'body',
+            'data-toggle': 'popover',
+            'data-html': 'true',
+            'data-placement': 'left',
+            'data-content': filtering|raw
+        },
+        label: 'mautic.core.quick_filters'
+    }
+    ]
+} %}
 {% endif %}

@@ -1,0 +1,109 @@
+{
+    "name": "Landing pages",
+    "description": "Start with a dashboard of 11 widgets that provide insights related to landing pages and interactions.",
+    "widgets": [
+        {
+            "name": "Contacts Created",
+            "width": 100,
+            "height": 215,
+            "ordering": 0,
+            "type": "created.leads.in.time",
+            "params": {
+                "lists": "identifiedVsAnonymous"
+            },
+            "template": null
+        },
+        {
+            "name": "Page visits in time",
+            "width": 50,
+            "height": 215,
+            "ordering": 1,
+            "type": "page.hits.in.time",
+            "params": {
+                "flag": ""
+            },
+            "template": null
+        },
+        {
+            "name": "Downloads in time",
+            "width": 50,
+            "height": 215,
+            "ordering": 2,
+            "type": "asset.downloads.in.time",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Unique vs returning visitors",
+            "width": 50,
+            "height": 330,
+            "ordering": 4,
+            "type": "unique.vs.returning.leads",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Upcoming Emails",
+            "width": 50,
+            "height": 330,
+            "ordering": 4,
+            "type": "upcoming.emails",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Dwell times",
+            "width": 50,
+            "height": 330,
+            "ordering": 5,
+            "type": "dwell.times",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Popular landing pages",
+            "width": 25,
+            "height": 330,
+            "ordering": 6,
+            "type": "popular.pages",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Created Landing pages",
+            "width": 25,
+            "height": 330,
+            "ordering": 7,
+            "type": "created.pages",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Device granularity",
+            "width": 25,
+            "height": 330,
+            "ordering": 8,
+            "type": "device.granularity",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Popular assets",
+            "width": 25,
+            "height": 330,
+            "ordering": 9,
+            "type": "popular.assets",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Form Submissions",
+            "width": 50,
+            "height": 330,
+            "ordering": 11,
+            "type": "submissions.in.time",
+            "params": [],
+            "template": null
+        }
+    ]
+}

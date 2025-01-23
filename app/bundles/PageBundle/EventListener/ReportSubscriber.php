@@ -486,7 +486,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ph.page_language')
                         ->andWhere($qb->expr()->isNotNull('ph.page_language'));
-                    $data  = $queryBuilder->execute()->fetchAllAssociative();
+                    $data  = $queryBuilder->executeQuery()->fetchAllAssociative();
                     $chart = new PieChart();
 
                     foreach ($data as $lang) {
@@ -505,7 +505,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ds.device');
-                    $data     = $queryBuilder->execute()->fetchAllAssociative();
+                    $data     = $queryBuilder->executeQuery()->fetchAllAssociative();
                     $chart    = new PieChart();
 
                     foreach ($data as $device) {

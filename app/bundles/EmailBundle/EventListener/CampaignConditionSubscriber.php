@@ -9,6 +9,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
@@ -41,7 +42,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
     {
         try {
             $this->validator->validate($event->getLead()->getEmail(), true);
-        } catch (InvalidEmailException) {
+        } catch (UnexpectedValueException|InvalidEmailException) {
             return $event->setResult(false);
         }
 

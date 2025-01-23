@@ -1,6 +1,27 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 {% block mauticContent %}asset{% endblock %}
-{% block headerTitle %}{{ activeAsset.getTitle() }}{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+        {
+            'item'            : activeAsset,
+            'templateButtons' : {
+                'close' : securityHasEntityAccess(
+                    permissions['asset:assets:viewown'],
+                    permissions['asset:assets:viewother'],
+                    activeAsset.getCreatedBy()
+                ),
+            },
+            'routeBase'  : 'asset',
+            'langVar'    : 'asset.asset',
+            'nameGetter' : 'getTitle',
+            'targetLabel': 'mautic.asset.assets'|trans
+        }
+    ) -}}
+{% endblock %}
+
+{% block headerTitle %} {{ activeAsset.getTitle() }} {% endblock %}
+
 {% block actions %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
         {
@@ -15,11 +36,6 @@
                 'delete' : securityHasEntityAccess(
                     permissions['asset:assets:deleteown'],
                     permissions['asset:assets:deleteother'],
-                    activeAsset.getCreatedBy()
-                ),
-                'close' : securityHasEntityAccess(
-                    permissions['asset:assets:viewown'],
-                    permissions['asset:assets:viewother'],
                     activeAsset.getCreatedBy()
                 ),
             },
@@ -43,13 +59,7 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- asset detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10 va-m">
-                        <div class="text-white dark-sm mb-0">{{ activeAsset.getDescription()|purify }}</div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeAsset.description} %}
             <!--/ asset detail header -->
             <!-- asset detail collapseable -->
             <div class="collapse pr-md pl-md" id="asset-details">
@@ -137,7 +147,7 @@
         <div class="tab-content pa-md preview-detail">
             {{- include('@MauticAsset/Asset/preview.html.twig',
                 {
-                    'activeAsset' : activeAsset, 
+                    'activeAsset' : activeAsset,
                     'assetDownloadUrl' : url(
                     'mautic_asset_action',
                     {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
@@ -150,7 +160,7 @@
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{% trans %}mautic.asset.asset.url{% endtrans %}</div>
             </div>
@@ -159,10 +169,18 @@
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly value="{{ assetDownloadUrl|escape }}"/>
                 <span class="input-group-btn">
-                    <button class="btn btn-default btn-nospin"
-                            onclick="window.open('{{ assetDownloadUrl }}', '_blank');">
-                        <i class="ri-external-link-line"></i>
-                    </button>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                icon: 'ri-external-link-line',
+                                icon_only: true,
+                                tooltip_placement: 'left',
+                                label: 'mautic.core.open_link',
+                                onclick: "window.open('" ~ assetDownloadUrl ~ "', '_blank')",
+                                variant: 'ghost'
+                            }
+                        ]
+                    } %}
                 </span>
                 </div>
             </div>

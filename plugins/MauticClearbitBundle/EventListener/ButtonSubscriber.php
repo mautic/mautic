@@ -40,7 +40,7 @@ class ButtonSubscriber implements EventSubscriberInterface
             $event->addButton(
                 [
                     'attr' => [
-                        'class'       => 'btn btn-default btn-sm btn-nospin',
+                        'class'       => 'btn btn-ghost btn-sm btn-nospin',
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
                         'onclick'     => 'this.href=\''.
@@ -92,7 +92,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                 $event->addButton(
                     [
                         'attr' => [
-                            'class'       => 'btn btn-default btn-sm btn-nospin',
+                            'class'       => 'btn btn-ghost btn-sm btn-nospin',
                             'data-toggle' => 'ajaxmodal',
                             'data-target' => '#MauticSharedModal',
                             'onclick'     => 'this.href=\''.

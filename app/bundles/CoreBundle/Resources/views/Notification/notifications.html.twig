@@ -6,22 +6,40 @@
     </a>
     <div class="dropdown-menu">
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-heading pt-sm">
                 <div class="panel-title notification notification-title">
-                    <h6 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
-                        <a href="javascript:void(0);" class="btn-link btn-xs btn-nospin pull-right" onclick="Mautic.clearNotification(0);">{% trans %}mautic.core.notifications.clearall{% endtrans %}</a>
+                    <h6 class="fw-sb d-flex jc-space-between ai-center">{{ 'mautic.core.notifications'|trans }}
+                        {% if notifications is not empty %}
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.notifications.clearall',
+                                        variant: 'ghost',
+                                        size: 'xs',
+                                        icon_only: true,
+                                        icon: 'ri-delete-bin-2-line',
+                                        attributes: {
+                                            'class': 'pull-right',
+                                        },
+                                        onclick: 'Mautic.clearNotification(0);'
+                                    }
+                                ]
+                            } %}
+                        {% endif %}
                     </h6>
                 </div>
             </div>
             <div class="pt-0 pb-xs pl-0 pr-0">
-                <div class="scroll-content slimscroll" id="notifications">
+                <div class="scroll-content slimscroll d-flex fd-column" id="notifications">
                     {{ include('@MauticCore/Notification/notification_messages.html.twig', {
                         notifications: notifications,
                         updateMessage: updateMessage
                     }) }}
                     {% set class = notifications is not empty ? ' hide' : '' %}
-                    <div class="{{ class }} mautibot-image notification-empty" id="notificationMautibot">
-                        <img class="img img-responsive" src="{{ mautibotGetImage('wave') }}" />
+                    <div class="{{ class }} mautibot-image pa-lg d-flex fd-column ai-center jc-center" id="notificationMautibot">
+                        <div class="fs-30">🦄</div>
+                        <div class="text-muted fw-sb">{{'mautic.core.notifications.empty'|trans}}</div>
+                        <div class="text-muted">{{'mautic.core.notifications.empty_extra'|trans}}</div>
                     </div>
                 </div>
             </div>

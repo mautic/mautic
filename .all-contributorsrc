@@ -1367,6 +1367,80 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Aleks0129",
+      "name": "Aleks0129",
+      "avatar_url": "https://avatars.githubusercontent.com/u/182695073?v=4",
+      "profile": "https://github.com/Aleks0129",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "mchojrin",
+      "name": "Mauro Chojrin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1532615?v=4",
+      "profile": "https://academy.leewayweb.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tomfriedhof",
+      "name": "Tom Friedhof",
+      "avatar_url": "https://avatars.githubusercontent.com/u/810903?v=4",
+      "profile": "http://activelamp.com",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "MojisolaaaO",
+      "name": "Mojisola Otusheso",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173389301?v=4",
+      "profile": "https://github.com/MojisolaaaO",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "nileshlohar",
+      "name": "Nilesh Lohar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18068907?v=4",
+      "profile": "https://github.com/nileshlohar",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "AlbertMN",
+      "name": "Albert Møller Nielsen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11600207?v=4",
+      "profile": "https://simplyprint.io/",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "TheMarvelFan",
+      "name": "Kushagra Nigam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93257324?v=4",
+      "profile": "https://github.com/TheMarvelFan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "laurielim",
+      "name": "Laurie Lim Sam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/62180225?v=4",
+      "profile": "http://laurielim.github.io",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,

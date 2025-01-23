@@ -98,6 +98,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         // these should not allow visual tokens
         $tokens = [
             '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{dnc_url}'         => $this->translator->trans('mautic.email.token.unsubscribe_all_url'),
+            '{resubscribe_url}' => $this->translator->trans('mautic.email.token.resubscribe_url'),
             '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -283,6 +285,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+        $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+        $event->addToken('{resubscribe_url}', $this->emailModel->buildUrl('mautic_email_resubscribe', ['idHash' => $idHash]));
 
         $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {

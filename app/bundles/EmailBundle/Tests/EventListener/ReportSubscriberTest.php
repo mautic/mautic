@@ -232,7 +232,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $resultMock        = $this->createMock(Result::class);
         $translatorMock    = $this->createMock(TranslatorInterface::class);
 
-        $queryBuilderMock->method('execute')->willReturn($resultMock);
+        $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
 
         $eventMock->expects($this->once())
@@ -333,7 +333,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $resultMock        = $this->createMock(Result::class);
         $translatorMock    = $this->createMock(TranslatorInterface::class);
 
-        $queryBuilderMock->method('execute')->willReturn($resultMock);
+        $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
 
         $eventMock->expects($this->once())

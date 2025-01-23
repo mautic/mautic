@@ -582,7 +582,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
                     $this->addDNCTableForEmails($queryBuilder);
 
-                    $data = $queryBuilder->execute()->fetchAllAssociative();
+                    $data = $queryBuilder->executeQuery()->fetchAllAssociative();
 
                     if (is_array($data)) {
                         $names        = array_column($data, 'name');
@@ -621,7 +621,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
-                    $counts = $queryBuilder->execute()->fetchAssociative();
+                    $counts = $queryBuilder->executeQuery()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.stat.read'),
@@ -771,7 +771,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         ->orderBy('tr.hits', 'DESC')
                         ->setMaxResults(10);
 
-                    $items                  = $queryBuilder->execute()->fetchAllAssociative();
+                    $items                  = $queryBuilder->executeQuery()->fetchAllAssociative();
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

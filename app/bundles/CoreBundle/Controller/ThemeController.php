@@ -83,6 +83,8 @@ class ThemeController extends FormController
                             );
                         }
                     }
+                } else {
+                    $form->addError(new FormError($form->getErrors(true)));
                 }
             }
         }

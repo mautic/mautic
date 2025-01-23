@@ -9,9 +9,10 @@
 
 .container {
   padding-right: 15px;
-    padding-left: 15px;
-    margin: 0;
-    display: flex;
+  padding-left: 15px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
 
   @media (min-width: @screen-sm-min) {
     max-width: @container-sm;
@@ -23,7 +24,6 @@
     max-width: @container-lg;
   }
 }
-
 
 // Fluid container
 //
@@ -42,7 +42,6 @@
 .row {
   display: flex;
   flex-wrap: wrap;
-  max-width: 100%;
   .make-row();
 }
 

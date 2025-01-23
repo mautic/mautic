@@ -1,5 +1,5 @@
 <form action="{{ path('mautic_contactnote_index', {'page': page, 'leadId': lead.id, 'tmpl': 'list'}) }}" class="panel" id="note-filters" method="post">
-    <div class="form-control-icon pa-xs">
+    <div class="form-control-icon pa-md">
         <input type="text"
                name="search"
                value="{{ search|e }}"
@@ -9,7 +9,7 @@
                data-toggle="livesearch"
                data-target="#NoteList"
                data-action="{{ path('mautic_contactnote_index', {'leadId': lead.id, 'page': 1}) }}">
-        <span class="the-icon ri-search-line text-muted mt-xs"></span><!-- must below `form-control` -->
+        <span class="the-icon ri-search-line text-muted"></span><!-- must below `form-control` -->
     </div>
     <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}" />
     <div class="panel-footer text-muted">

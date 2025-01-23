@@ -7,7 +7,7 @@
 
 <div class="campaign-event-content d-flex fw-nowrap ai-center gap-sm">
     <div class="campaign-event-icon pa-sm mr-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
-    
+
         <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         <span class="campaign-event-name label label-primary ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span>
         <a class="label label-primary has-click-event highlight-jump-target ml-sm" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="{{ event['properties']['jumpToEvent'] }}">
@@ -18,12 +18,49 @@
 </div>
 {% if update is not defined %}
 <div class="campaign-event-buttons hide">
-    <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-secondary btn-xs btn-edit" title="{{ 'mautic.campaign.event.edit.btn.tooltip'|trans }}">
-        <i class="ri-pencil-line"></i>
-    </a>
-    <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-delete btn-danger btn-xs" title="{{ 'mautic.campaign.event.remove.btn.tooltip'|trans }}">
-        <i class="ri-delete-bin-line"></i>
-    </a>
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                href: path(route, {
+                    'objectAction': 'edit',
+                    'objectId': event['id'],
+                    'campaignId': campaignId
+                }),
+                variant: 'secondary',
+                icon: 'ri-pencil-line',
+                size: 'xs',
+                icon_only: true,
+                label: 'mautic.campaign.event.edit.btn.tooltip'|trans,
+                attributes: {
+                    'data-toggle': 'ajaxmodal',
+                    'data-prevent-dismiss': 'true',
+                    'data-target': '#CampaignEventModal',
+                    'class': 'btn-edit'
+                }
+            },
+            {
+                href: path(route, {
+                    'objectAction': 'delete',
+                    'objectId': event['id'],
+                    'campaignId': campaignId
+                }),
+                variant: 'primary',
+                danger: true,
+                icon: 'ri-delete-bin-line',
+                size: 'xs',
+                icon_only: true,
+                label: 'mautic.campaign.event.remove.btn.tooltip'|trans,
+                attributes: {
+                    'data-toggle': 'ajax',
+                    'data-target': 'CampaignEvent_' ~ event['id'],
+                    'data-ignore-formexit': 'true',
+                    'data-method': 'POST',
+                    'data-hide-loadingbar': 'true',
+                    'class': 'btn-delete'
+                }
+            }
+        ]
+    } %}
 </div>
 
 </div>
