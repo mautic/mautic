@@ -19,10 +19,7 @@ class Stat
 
     public const TABLE_NAME = 'email_stats';
 
-    /**
-     * @var string|null
-     */
-    private $id;
+    private ?string $id = null;
 
     /**
      * @var Email|null
@@ -291,9 +288,9 @@ class Stat
         $this->email = $email;
     }
 
-    public function getId(): int
+    public function getId(): ?string
     {
-        return (int) $this->id;
+        return $this->id;
     }
 
     /**

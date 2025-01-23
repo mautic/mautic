@@ -356,7 +356,7 @@ class HitRepository extends CommonRepository
                 )
             );
 
-        if (isset($options['fromDate']) && null !== $options['fromDate']) {
+        if (isset($options['fromDate'])) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($options['fromDate']);
             $q->andWhere(

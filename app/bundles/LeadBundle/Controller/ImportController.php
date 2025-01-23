@@ -351,25 +351,23 @@ class ImportController extends FormController
 
                                 $this->requestStack->getSession()->set('mautic.'.$object.'.import.config', $config);
 
-                                if (false !== $file) {
-                                    // Get the headers for matching
-                                    $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                // Get the headers for matching
+                                $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
-                                    // Get the number of lines so we can track progress
-                                    $file->seek(PHP_INT_MAX);
-                                    $linecount = $file->key();
+                                // Get the number of lines so we can track progress
+                                $file->seek(PHP_INT_MAX);
+                                $linecount = $file->key();
 
-                                    if (!empty($headers) && is_array($headers)) {
-                                        $headers = CsvHelper::sanitizeHeaders($headers);
+                                if (!empty($headers) && is_array($headers)) {
+                                    $headers = CsvHelper::sanitizeHeaders($headers);
 
-                                        $this->requestStack->getSession()->set('mautic.'.$object.'.import.headers', $headers);
-                                        $this->requestStack->getSession()->set('mautic.'.$object.'.import.step', self::STEP_MATCH_FIELDS);
-                                        $this->requestStack->getSession()->set('mautic.'.$object.'.import.importfields', CsvHelper::convertHeadersIntoFields($headers));
-                                        $this->requestStack->getSession()->set('mautic.'.$object.'.import.progress', [0, $linecount]);
-                                        $this->requestStack->getSession()->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
+                                    $this->requestStack->getSession()->set('mautic.'.$object.'.import.headers', $headers);
+                                    $this->requestStack->getSession()->set('mautic.'.$object.'.import.step', self::STEP_MATCH_FIELDS);
+                                    $this->requestStack->getSession()->set('mautic.'.$object.'.import.importfields', CsvHelper::convertHeadersIntoFields($headers));
+                                    $this->requestStack->getSession()->set('mautic.'.$object.'.import.progress', [0, $linecount]);
+                                    $this->requestStack->getSession()->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
 
-                                        return $this->newAction($request, 0, true);
-                                    }
+                                    return $this->newAction($request, 0, true);
                                 }
                             } catch (FileException $e) {
                                 if (str_contains($e->getMessage(), 'upload_max_filesize')) {
@@ -665,8 +663,7 @@ class ImportController extends FormController
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (!isset($parameters['object'])) {
-            $request = $this->getCurrentRequest();
-            \assert(null !== $request);
+            $request              = $this->getCurrentRequest();
             $parameters['object'] = $request->get('object', 'contacts');
         }
 
@@ -720,8 +717,7 @@ class ImportController extends FormController
     private function dispatchImportOnInit(): ImportInitEvent
     {
         $request = $this->getCurrentRequest();
-        \assert(null !== $request);
-        $event = new ImportInitEvent($request->get('object'));
+        $event   = new ImportInitEvent($request->get('object'));
 
         $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
 

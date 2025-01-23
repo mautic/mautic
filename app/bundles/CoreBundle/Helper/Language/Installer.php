@@ -72,7 +72,6 @@ class Installer
         $bundles = new Finder();
         $bundles->directories()->name('*Bundle')->in($this->sourceDirectory);
 
-        /** @var \SplFileInfo $bundle */
         foreach ($bundles as $bundle) {
             $this->copyBundle($bundle);
         }

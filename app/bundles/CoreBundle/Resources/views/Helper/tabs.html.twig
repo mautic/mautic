@@ -39,7 +39,7 @@
                 {% if tab.published is defined and tab['published'] is not empty %}
                     {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-success'}) %}
                 {% else %}
-                    {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-muted'}) %}
+                    {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-secondary'}) %}
                 {% endif %}
             {% endif %}
             <li data-tab-id="{{ tab['id'] }}" class="{% if tab['active'] is not empty %}active{% endif %}{{ class }}"{{ attr }}>

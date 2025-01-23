@@ -1148,14 +1148,14 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     * @param bool  $persist
-     * @param bool  $skipIfExists
-     *
-     * @throws \Exception
+     * @param array<string>                $fields
+     * @param array<mixed>                 $data
+     * @param int|string|null              $owner
+     * @param LeadList|mixed[]|string|null $list
+     * @param string[]|string|null         $tags
+     * @param ?int                         $importId
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, ?LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false): bool
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1595,9 +1595,11 @@ class LeadModel extends FormModel
     /**
      * Modify tags with support to remove via a prefixed minus sign.
      *
-     * @param bool $persist True if tags modified
+     * @param bool            $persist    True if tags modified
+     * @param string[]|string $tags       can be CSV string
+     * @param string[]        $removeTags
      */
-    public function modifyTags(Lead $lead, $tags, ?array $removeTags = null, $persist = true): bool
+    public function modifyTags(Lead $lead, $tags, ?array $removeTags = null, bool $persist = true): bool
     {
         $tagsModified = false;
         $leadTags     = $lead->getTags();
@@ -1867,11 +1869,9 @@ class LeadModel extends FormModel
         $mapData   = [];
 
         // Convert country names to 2-char code
-        if ($results) {
-            foreach ($results as $leadCountry) {
-                if (isset($countries[$leadCountry['country']])) {
-                    $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
-                }
+        foreach ($results as $leadCountry) {
+            if (isset($countries[$leadCountry['country']])) {
+                $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
             }
         }
 
@@ -1906,10 +1906,8 @@ class LeadModel extends FormModel
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
-     *
-     * @return array
      */
-    public function getTopOwners($limit = 10, $dateFrom = null, $dateTo = null, $filters = [])
+    public function getTopOwners($limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
@@ -1934,10 +1932,8 @@ class LeadModel extends FormModel
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
-     *
-     * @return array
      */
-    public function getTopCreators($limit = 10, $dateFrom = null, $dateTo = null, $filters = [])
+    public function getTopCreators($limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
@@ -1961,10 +1957,8 @@ class LeadModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param array $options
-     *
-     * @return array
      */
-    public function getLeadList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = [])
+    public function getLeadList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
     {
         if (!empty($options['canViewOthers'])) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();
@@ -1985,19 +1979,17 @@ class LeadModel extends FormModel
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        if ($results) {
-            foreach ($results as &$result) {
-                if ($result['firstname'] || $result['lastname']) {
-                    $result['name'] = trim($result['firstname'].' '.$result['lastname']);
-                } elseif ($result['email']) {
-                    $result['name'] = $result['email'];
-                } else {
-                    $result['name'] = 'anonymous';
-                }
-                unset($result['firstname']);
-                unset($result['lastname']);
-                unset($result['email']);
+        foreach ($results as &$result) {
+            if ($result['firstname'] || $result['lastname']) {
+                $result['name'] = trim($result['firstname'].' '.$result['lastname']);
+            } elseif ($result['email']) {
+                $result['name'] = $result['email'];
+            } else {
+                $result['name'] = 'anonymous';
             }
+            unset($result['firstname']);
+            unset($result['lastname']);
+            unset($result['email']);
         }
 
         return $results;

@@ -134,6 +134,34 @@ Mautic.campaignOnLoad = function (container, response) {
             Mautic.processBuilderErrors(response);
         }
 
+        const campaignEmailStats = mQuery(container).find('[data-load="campaign-email-stats"]').first();
+        if(campaignEmailStats.length) {
+            mQuery(campaignEmailStats).on('click', () => {
+                const $campaignWeekdaysContainer = mQuery('[data-campaign-email-stats-weekdays]');
+                const $campaignHoursContainer = mQuery('[data-campaign-email-stats-hours]');
+
+                if ($campaignWeekdaysContainer.find('canvas').length === 0) {
+                    mQuery.ajax({
+                        url: $campaignWeekdaysContainer.data('campaign-email-stats-weekdays'),
+                        success: function (response) {
+                            $campaignWeekdaysContainer.html(response);
+                            Mautic.renderCharts($campaignWeekdaysContainer);
+                        }
+                    });
+                }
+
+                if ($campaignHoursContainer.find('canvas').length === 0) {
+                    mQuery.ajax({
+                        url: $campaignHoursContainer.data('campaign-email-stats-hours'),
+                        success: function (response) {
+                            $campaignHoursContainer.html(response);
+                            Mautic.renderCharts($campaignHoursContainer);
+                        }
+                    });
+                }
+            });
+        }
+
         // update the cloned event info when storage is updated from different tab
         window.addEventListener('storage', function(event) {
             if (event.key === 'mautic_campaign_event_clone') {
@@ -1168,7 +1196,7 @@ Mautic.closeCampaignBuilder = function() {
         spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
-    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="ri-loader-3-line ri-spin ri-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
     mQuery('#builder-errors').hide('fast').text('');
 

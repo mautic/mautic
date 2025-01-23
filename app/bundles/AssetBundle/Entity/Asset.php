@@ -894,8 +894,8 @@ class Asset extends FormEntity
             $ch = curl_init($this->getRemotePath());
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
             curl_exec($ch);
 
@@ -930,8 +930,8 @@ class Asset extends FormEntity
             $ch = curl_init($this->getRemotePath());
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_exec($ch);
 
             return curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -945,7 +945,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Returns Font Awesome icon class based on file type.
+     * Returns icon class based on file type.
      */
     public function getIconClass(): string
     {
@@ -1244,8 +1244,8 @@ class Asset extends FormEntity
                 $ch = curl_init($this->getRemotePath());
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_HEADER, 1);
-                curl_setopt($ch, CURLOPT_NOBODY, 1);
+                curl_setopt($ch, CURLOPT_HEADER, true);
+                curl_setopt($ch, CURLOPT_NOBODY, true);
                 curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
                 curl_exec($ch);

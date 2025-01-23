@@ -22,6 +22,11 @@ final class ButtonHelper
     public const LOCATION_TOOLBAR_ACTIONS = 'toolbar_actions';
 
     /**
+     * Toolbar actions.
+     */
+    public const LOCATION_TOOLBAR_BULK_ACTIONS = 'toolbar_bulk_actions';
+
+    /**
      * Page actions.
      */
     public const LOCATION_PAGE_ACTIONS = 'page_actions';
@@ -494,7 +499,13 @@ final class ButtonHelper
         if (!empty($addTo['btnClass'])) {
             $addTo['attr']['class'] = $addTo['btnClass'];
         } elseif (!isset($button['attr']['class'])) {
-            $addTo['attr']['class'] = 'btn btn-tertiary';
+            // Conditional check for LOCATION_TOOLBAR_BULK_ACTIONS
+            if (self::LOCATION_TOOLBAR_BULK_ACTIONS === $this->location) {
+                $addTo['attr']['class'] = 'btn btn-primary bdr-rds-0';
+                $addTo['attr']['size']  = 'lg';
+            } else {
+                $addTo['attr']['class'] = 'btn btn-tertiary';
+            }
         } elseif (!strstr($addTo['attr']['class'], 'btn-')) {
             $addTo['attr']['class'] .= ' btn btn-ghost';
         }

@@ -18,6 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -331,6 +332,21 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         return $this->getEntityManager()->getRepository($entityClass)->getBaseColumns($entityClass, $returnColumnNames);
+    }
+
+    /**
+     * @param array<string, string|array<int, array<int|string, int|string|bool|null>>> $filter
+     */
+    public function getEntitiesForGlobalSearch(array $filter): Paginator
+    {
+        $args = [
+            'filter'           => $filter,
+            'start'            => 0,
+            'limit'            => GlobalSearchEvent::RESULTS_LIMIT,
+            'ignore_paginator' => false,
+        ];
+
+        return $this->getEntities($args);
     }
 
     /**
@@ -1342,17 +1358,13 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param QueryBuilder|DbalQueryBuilder $query
      * @param array                         $clauses [['col' => 'column_a', 'dir' => 'ASC']]
-     *
-     * @return array
      */
-    protected function buildOrderByClauseFromArray($query, array $clauses)
+    protected function buildOrderByClauseFromArray($query, array $clauses): void
     {
-        if ($clauses && is_array($clauses)) {
-            foreach ($clauses as $clause) {
-                $clause = $this->validateOrderByClause($clause);
-                $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
-                $query->addOrderBy($column, $clause['dir']);
-            }
+        foreach ($clauses as $clause) {
+            $clause = $this->validateOrderByClause($clause);
+            $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+            $query->addOrderBy($column, $clause['dir']);
         }
     }
 

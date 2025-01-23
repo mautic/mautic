@@ -1886,6 +1886,9 @@ Mautic.removeFilterCommands = function (searchValue) {
  */
 Mautic.getActiveFilterCommands = function () {
     const searchInput = document.getElementById('list-search');
+    if (!searchInput) {
+        return []; // Return an empty array if there's no search input
+    }
     const searchValue = searchInput.value || '';
 
     if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {

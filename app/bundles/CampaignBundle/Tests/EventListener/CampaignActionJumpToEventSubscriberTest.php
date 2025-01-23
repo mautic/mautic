@@ -47,7 +47,10 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             ) {
             }
 
-            public function getEntities(array $args = [])
+            /**
+             * @return Event[]
+             */
+            public function getEntities(array $args = []): array
             {
                 Assert::assertSame(
                     [
@@ -162,7 +165,10 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             ) {
             }
 
-            public function getEntities(array $args = [])
+            /**
+             * @return Event[]
+             */
+            public function getEntities(array $args = []): array
             {
                 Assert::assertSame(
                     [

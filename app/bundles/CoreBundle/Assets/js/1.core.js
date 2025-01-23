@@ -68,20 +68,25 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     }
     Mautic.attachDismissHandlers();
 
-    // Initialize Bootstrap Popovers
+    // Initialize popovers with custom configuration
     mQuery('[data-toggle="popover"]').popover({
-        sanitize: false
+        sanitize: false,
+        content: function() {
+            return mQuery(this).data('content');
+        }
     });
 
-    // Handle popover insertion
-    mQuery('[data-toggle="popover"]').on('inserted.bs.popover', function () {
-        // Initialize Chosen on select elements inside popover
+    // Handle popover shown event
+    mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
+        // Initialize code blocks after popover is fully shown
+        Mautic.initializeCodeBlocks();
+
+        // Initialize other elements inside popover
         mQuery('.popover-content select').chosen({
             allow_single_deselect: true,
             disable_search_threshold: 10
         });
 
-        // Initialize tooltips inside popovers
         mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
     });
 });
@@ -93,25 +98,6 @@ mQuery( document ).ajaxStop(function(event) {
     Mautic.stopPageLoadingBar();
     Mautic.initializeCodeBlocks();
 });
-
-/**
- * Applies user interface preferences from localStorage to the HTML element.
- * Runs immediately to set attributes based on 'm-toggle-setting-' prefixed items.
- */
-(function() {
-    // Load user preferences for UI saved previously
-    const prefix = 'm-toggle-setting-';
-    Object.keys(localStorage)
-        .filter(key => key.startsWith(prefix))
-        .forEach(setting => {
-            const attributeName = setting.replace(prefix, '');
-            const value = localStorage.getItem(setting);
-
-            if (value) {
-                document.documentElement.setAttribute(attributeName, value);
-            }
-        });
-})();
 
 mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
@@ -682,7 +668,7 @@ var Mautic = {
                 }
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-muted'];
+                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-secondary'];
                 var appendClasses = "";
 
                 for (var j = 0; j < specialClasses.length; j++) {

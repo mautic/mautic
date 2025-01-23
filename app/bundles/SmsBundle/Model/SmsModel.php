@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -40,7 +41,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Sms>
  */
-class SmsModel extends FormModel implements AjaxLookupModelInterface
+class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     public function __construct(
         protected TrackableModel $pageTrackableModel,
@@ -115,9 +116,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $options
+     * @param mixed[] $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
@@ -198,6 +198,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($fetchContacts) {
+            /** @var Lead[] $foundContacts */
             $foundContacts = $this->leadModel->getEntities(
                 [
                     'ids' => $fetchContacts,

@@ -98,7 +98,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
     {
         $lead  = new Lead();
         $owner = new class extends User {
-            public function getId()
+            public function getId(): int
             {
                 return 10;
             }

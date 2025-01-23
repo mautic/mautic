@@ -86,9 +86,6 @@ class SchemaHelper
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function createDatabase(): bool
     {
         try {

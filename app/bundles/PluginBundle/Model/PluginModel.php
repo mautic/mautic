@@ -95,7 +95,7 @@ class PluginModel extends FormModel
     /**
      * Loads all installed Plugin entities from database.
      *
-     * @return array
+     * @return Plugin[]
      */
     public function getInstalledPlugins()
     {

@@ -82,12 +82,14 @@ class ImportTest extends StandardImportTestHelper
         $import->setUpdatedCount($count);
         $import->setInsertedCount($count);
 
-        $this->assertSame(3 * $count, $import->getProcessedRows());
+        $expectedCount = (3 * $count);
+        $this->assertSame($expectedCount, $import->getProcessedRows());
 
         $import->increaseIgnoredCount();
         $import->increaseIgnoredCount();
 
-        $this->assertSame(3 * $count + 2, $import->getProcessedRows());
+        $expectedCount = (int) (2 + $expectedCount);
+        $this->assertSame($expectedCount, $import->getProcessedRows()); // @phpstan-ignore argument.unresolvableType (I don't see anything wrong)
     }
 
     public function testGetProgressPercentage(): void
@@ -138,7 +140,7 @@ class ImportTest extends StandardImportTestHelper
         $import->start()->end(false);
 
         $this->assertSame(Import::IMPORTED, $import->getStatus());
-        $this->assertTrue($import->getDateEnded() instanceof \DateTime);
+        $this->assertNotNull($import->getDateEnded());
     }
 
     public function testGetRunTime(): void

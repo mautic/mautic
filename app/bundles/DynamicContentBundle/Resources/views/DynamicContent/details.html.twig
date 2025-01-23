@@ -126,7 +126,7 @@
               <!-- page detail collapseable toggler -->
               <div class="hr-expand nm">
                   <span data-toggle="tooltip" title="Detail">
-                      <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#page-details">
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#page-details">
                           <span class="caret"></span>
                           {{ 'mautic.core.details'|trans }}
                       </a>
@@ -154,6 +154,10 @@
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
+                        {% if not entity.isCampaignBased %}
+                            {{ include('@MauticDynamicContent/DynamicContent/StandaloneSlotGenerator/dwc-generator.html.twig') }}
+                            <hr>
+                        {% endif %}
                       </div>
                   </div>
               </div>

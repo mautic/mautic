@@ -230,10 +230,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * Populates custom field values for updating the company.
-     *
-     * @param bool|false $overwriteWithBlank
      */
-    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false): void
+    public function setFieldValues(Company $company, array $data, bool $overwriteWithBlank = false): void
     {
         // save the field values
         $fieldValues = $company->getFields();
@@ -268,7 +266,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen($newValue) > 0 || (0 === strlen($newValue) && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (strlen($newValue) > 0 || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -780,13 +778,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param mixed[] $fields
-     * @param mixed[] $data
-     * @param bool    $skipIfExists
-     *
-     * @throws \Exception
+     * @param array<string>   $fields
+     * @param array<mixed>    $data
+     * @param int|string|null $owner
      */
-    public function import($fields, $data, $owner = null, $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false): bool
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 

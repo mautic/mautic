@@ -20,7 +20,6 @@ label {
 // -------------------------
 .control-label {
   color: var(--text-secondary);
-  white-space: nowrap;
 
   &.text-left {
     text-align: left;
@@ -75,7 +74,6 @@ input[style] {
   +.help-text,
   +p {
     margin-top: 5px;
-    font-size: var(--utility-01);
   }
 
   &.not-chosen {
@@ -469,7 +467,7 @@ input[type="checkbox"] {
   vertical-align: -3px;
   background-color: transparent;
   appearance: none;
-  border: 1px solid var(--interactive);
+  border: 1px solid var(--icon-primary);
   border-radius: 4px;
   margin: 0;
   align-items: center;
@@ -479,24 +477,24 @@ input[type="checkbox"] {
   .outline-noff();
 
   &:after {
+    position: static;
+    block-size: 5px;
     content: "";
-    height: calc(var(--mtc-checkbox-size) - 6px);
-    aspect-ratio: 1/1;
-    border-radius: 3px;
-    -webkit-transform: scale(.5);
-    -ms-transform: scale(.5);
-    -o-transform: scale(.5);
-    transform: scale(.5);
-    .transition(var(--transition-all-productive));
+    inline-size: 9px;
+    margin-block-start: -2px;
+    transform: scale(0.5) rotate(-45deg);
+    transition: var(--transition-all-productive);
+    background: none;
+    border-block-end: 2px solid transparent;
+    border-inline-start: 2px solid transparent;
   }
 
   &:checked {
+    background-color: var(--icon-primary);
+
     &:after {
-      background-color: var(--interactive);
-      -webkit-transform: scale(1);
-      -ms-transform: scale(1);
-      -o-transform: scale(1);
-      transform: scale(1);
+      transform: scale(1) rotate(-45deg);
+      border-color: var(--icon-inverse);
       .transition(var(--transition-all-productive));
     }
   }

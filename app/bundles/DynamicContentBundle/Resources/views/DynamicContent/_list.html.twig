@@ -15,12 +15,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#dwcTable',
-                        'routeBase': 'dynamicContent',
-                        'templateButtons': {
-                            'delete': permissions['dynamiccontent:dynamiccontents:deleteown'] or permissions['dynamiccontent:dynamiccontents:deleteother'],
-                        },
+                    'checkall': 'true',
+                    'target': '#dwcTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {

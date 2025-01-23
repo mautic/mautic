@@ -259,11 +259,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                /**
-                 * @param array<string> $fields
-                 * @param array<string> $data
-                 */
-                public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool
+                public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false): bool
                 {
                     return true;
                 }

@@ -58,11 +58,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         }
     }
 
-    /**
-     * @throws AbortMigration
-     *
-     * @todo remove this method to make it absctract for Mautic 6
-     */
     public function down(Schema $schema): void
     {
         // Not supported

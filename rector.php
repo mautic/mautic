@@ -84,7 +84,6 @@ return static function (RectorConfig $rectorConfig): void {
         ],
 
         // handle later with full PHP 8.0 upgrade
-        Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
         Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
 
         // handle later, case by case as lot of chnaged code

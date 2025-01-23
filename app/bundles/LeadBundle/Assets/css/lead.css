@@ -16,7 +16,7 @@
     width: 125px;
 }
 
-.leadfield-list .fa-asterisk:hover, .leadfield-list .fa-eye:hover, .leadfield-list .fa-lock:hover, .leadfield-list .fa-list:hover {
+.leadfield-list i {
     color: #7D5B71;
 }
 

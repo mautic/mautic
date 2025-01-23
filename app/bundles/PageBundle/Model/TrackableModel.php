@@ -789,7 +789,7 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param array<int, Redirect|Trackable> $trackableTokens
+     * @param array<int|string, Redirect|Trackable> $trackableTokens
      *
      * @return string
      */

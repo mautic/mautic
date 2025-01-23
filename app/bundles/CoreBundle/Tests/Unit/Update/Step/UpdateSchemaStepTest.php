@@ -158,7 +158,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);
-            $this->assertTrue(true);
+            $this->expectNotToPerformAssertions();
         } catch (UpdateFailedException) {
             $this->fail('UpdateFailedException should not have been thrown');
         }

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -49,7 +50,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadList>
  */
-class ListModel extends FormModel
+class ListModel extends FormModel implements GlobalSearchInterface
 {
     use OperatorListTrait;
 
@@ -161,8 +162,6 @@ class ListModel extends FormModel
      * @param array       $options
      *
      * @return FormInterface<LeadList>
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
@@ -810,10 +809,8 @@ class ListModel extends FormModel
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true)
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')

@@ -23,6 +23,12 @@
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue': searchValue,
         'action': currentRoute,
+        'bulk_actions': {
+            'routeBase': 'webhook',
+            'templateButtons': {
+                'delete': (permissions['webhook:webhooks:deleteown'] or permissions['webhook:webhooks:deleteother'])
+            }
+        },
         'quickFilters': [
             {
                 'search': 'mautic.core.searchcommand.ispublished',
@@ -62,11 +68,7 @@
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig', {
                         checkall: 'true',
-                        target: '#webhookTable',
-                        routeBase: 'webhook',
-                        templateButtons: {
-                            delete: (permissions['webhook:webhooks:deleteown'] or permissions['webhook:webhooks:deleteother'])
-                        }
+                        target: '#webhookTable'
                 }) -}}
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig', {
@@ -130,7 +132,7 @@
                                 {{ item.getName() }}
                             </a>
                             {% if item.getDescription() is defined and item.getDescription() is not empty %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.getDescription()|purify }}</small>
                             </div>
                             {% endif %}

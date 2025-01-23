@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ?ValidatorInterface $validator;
+    private ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [

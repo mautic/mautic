@@ -35,7 +35,7 @@ class HttpFactoryTest extends TestCase
         $this->expectException(PluginNotConfiguredException::class);
 
         $credentials = new class implements HeaderCredentialsInterface {
-            public function getApiKey(): ?string
+            public function getApiKey(): string
             {
                 return '';
             }
@@ -52,7 +52,7 @@ class HttpFactoryTest extends TestCase
     public function testInstantiatedClientIsReturned(): void
     {
         $credentials = new class implements HeaderCredentialsInterface {
-            public function getApiKey(): ?string
+            public function getApiKey(): string
             {
                 return 'abc';
             }
@@ -70,7 +70,7 @@ class HttpFactoryTest extends TestCase
         $this->assertTrue($client1 === $client2);
 
         $credential2 = new class implements HeaderCredentialsInterface {
-            public function getApiKey(): ?string
+            public function getApiKey(): string
             {
                 return '123';
             }
@@ -88,7 +88,7 @@ class HttpFactoryTest extends TestCase
     public function testHeaderCredentialsSetsHeader(): void
     {
         $credentials = new class implements HeaderCredentialsInterface {
-            public function getApiKey(): ?string
+            public function getApiKey(): string
             {
                 return '123';
             }
@@ -110,7 +110,7 @@ class HttpFactoryTest extends TestCase
     public function testParameterCredentialsAppendsToken(): void
     {
         $credentials = new class implements ParameterCredentialsInterface {
-            public function getApiKey(): ?string
+            public function getApiKey(): string
             {
                 return '123';
             }

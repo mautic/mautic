@@ -19,12 +19,6 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the transport interface processes the message appropriately
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
     public function testProcessorInterfaceProcessesMessage(): void
     {
@@ -76,12 +70,6 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that the message is processed appropriately
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {

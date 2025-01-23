@@ -1,0 +1,10 @@
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_TOOLBAR_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_GROUP'),
+) }}
+
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+{# Workaround to get variables from action_button_helper here #}
+{{ restore('action_button_helper') }}
+
+{{ buttonsRender() }}

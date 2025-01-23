@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -30,7 +31,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<User>
  */
-class UserModel extends FormModel
+class UserModel extends FormModel implements GlobalSearchInterface
 {
     public function __construct(
         protected MailHelper $mailHelper,
@@ -106,9 +107,6 @@ class UserModel extends FormModel
         return $entity->getPassword();
     }
 
-    /**
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof User) {

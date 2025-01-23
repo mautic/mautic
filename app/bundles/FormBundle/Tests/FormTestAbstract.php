@@ -287,7 +287,7 @@ class FormTestAbstract extends TestCase
     }
 
     /**
-     * @return array<string,array<string,mixed>>
+     * @return array<int|string, array<string, bool|int|list<string>|string>>
      */
     public function getTestFormFields(): array
     {

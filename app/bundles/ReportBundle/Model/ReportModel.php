@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -44,7 +45,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<Report>
  */
-class ReportModel extends FormModel
+class ReportModel extends FormModel implements GlobalSearchInterface
 {
     public const CHANNEL_FEATURE = 'reporting';
 
@@ -309,12 +310,9 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @property filterList
-     * @property definitions
-     *
      * @param string $context
      *
-     * @return \stdClass[filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
+     * return \stdClass{filterList: mixed[], definitions: mixed[], operatorChoices: mixed[], operatorHtml: mixed[], filterListHtml: string}
      */
     public function getFilterList($context = 'all'): \stdClass
     {

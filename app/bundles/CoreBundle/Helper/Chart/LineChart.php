@@ -44,7 +44,7 @@ class LineChart extends AbstractChart implements ChartInterface
         $this->setDateRange($dateFrom, $dateTo);
         $this->amount     = $this->countAmountFromDateRange();
         $this->generateTimeLabels($this->amount);
-        $this->addOneUnitMinusOneSec($this->dateTo);
+        $this->dateTo = $this->addOneUnitMinusOneSec($this->dateTo);
     }
 
     /**

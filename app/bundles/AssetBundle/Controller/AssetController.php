@@ -269,7 +269,7 @@ class AssetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, AssetModel $model, $entity = null)
+    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null)
     {
         if (null == $entity) {
             $entity = $model->getEntity();
@@ -336,7 +336,7 @@ class AssetController extends FormController
 
                     if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $uploaderHelper, $model, $entity->getId(), true);
+                        return $this->editAction($request, $uploaderHelper, $integrationHelper, $model, $entity->getId(), true);
                     }
 
                     $viewParameters = [
@@ -366,9 +366,6 @@ class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        /** @var IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
-
         $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
 
         return $this->delegateView([
@@ -403,7 +400,7 @@ class AssetController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, AssetModel $model, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false)
     {
         $entity = $model->getEntity($objectId);
 
@@ -532,9 +529,6 @@ class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        /** @var IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
-
         $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
 
         return $this->delegateView([
@@ -569,7 +563,7 @@ class AssetController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, AssetModel $model, $objectId)
+    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId)
     {
         $entity = $model->getEntity($objectId);
         $clone  = null;
@@ -590,7 +584,7 @@ class AssetController extends FormController
             $clone->setIsPublished(false);
         }
 
-        return $this->newAction($request, $parametersHelper, $uploaderHelper, $model, $clone);
+        return $this->newAction($request, $parametersHelper, $uploaderHelper, $integrationHelper, $model, $clone);
     }
 
     /**

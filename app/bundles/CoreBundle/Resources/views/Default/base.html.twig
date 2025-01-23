@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html theme="{{ app.getUser().getPreferences().theme | default('light') }}" accent="{{ app.getUser().getPreferences().accent | default('01') }}" reduce-transparency="{{ app.getUser().getPreferences().reduce_transparency | default('false') }}" reduce-motion="{{ app.getUser().getPreferences().reduce_motion | default('false') }}" contrast-borders="{{ app.getUser().getPreferences().contrast_borders | default('false') }}" enable-underlines="{{ app.getUser().getPreferences().enable_underlines | default('false') }}">
     {{ include('@MauticCore/Default/head.html.twig', {
             headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
             pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
@@ -28,8 +28,8 @@
             <footer id="app-footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-xs-6 text-muted">{% trans with {'%date%': 'now' | date('Y') } %}mautic.core.copyright{% endtrans %}</div>
-                        <div class="col-xs-6 text-muted text-right small">v{{ mauticAppVersion() }}</div>
+                        <div class="col-xs-6 text-secondary">{% trans with {'%date%': 'now' | date('Y') } %}mautic.core.copyright{% endtrans %}</div>
+                        <div class="col-xs-6 text-secondary text-right small">v{{ mauticAppVersion() }}</div>
                     </div>
                 </div>
             </footer>
