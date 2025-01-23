@@ -80,7 +80,7 @@ class FetchSegmentCommand extends ModeratedCommand
             ->fetchAllAssociative();
 
         return array_map(static fn ($result) => [
-            'leadlist_id'          => $result['leadlist_id'],
+            'id'                   => $result['leadlist_id'],
             'name'                 => $result['name'],
             'is_published'         => $result['is_published'],
             'category_id'          => $result['category_id'],
