@@ -34,8 +34,8 @@ class ExportCampaignCommand extends ModeratedCommand
             ->addOption(
                 'id',
                 null,
-                InputOption::VALUE_REQUIRED,
-                'The ID of the campaign to export.'
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'The ID(s) of the campaign(s) to export. Use comma-separated values for multiple IDs.'
             )
             ->addOption(
                 'json-only',
@@ -61,106 +61,154 @@ class ExportCampaignCommand extends ModeratedCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $campaignId = $input->getOption('id');
-        $jsonOnly   = $input->getOption('json-only');
-        $jsonFile   = $input->getOption('json-file');
-        $zipFile    = $input->getOption('zip-file');
-
-        if (!$campaignId || !is_numeric($campaignId)) {
-            $output->writeln('<error>You must specify a valid campaign ID using --id.</error>');
+        $campaignIds = $input->getOption('id');
+        if (!$campaignIds || !is_array($campaignIds)) {
+            $output->writeln('<error>You must specify at least one valid campaign ID using --id.</error>');
 
             return self::FAILURE;
         }
 
+        $combinedData = [
+            'campaigns'    => [],
+            'events'       => [],
+            'segments'     => [],
+            'emails'       => [],
+            'forms'        => [],
+            'dependencies' => [],
+            'exportedAt'   => (new \DateTime())->format(DATE_ATOM),
+        ];
+
+        foreach ($campaignIds as $campaignId) {
+            $campaignData = $this->fetchCampaignData($campaignId, $output);
+            if (!$campaignData) {
+                continue;
+            }
+
+            $eventData   = $this->fetchEvents($campaignId, $output);
+            $segmentData = $this->fetchSegments($campaignId, $output);
+            $formData    = $this->fetchForms($campaignId, $output);
+            $emailData   = $this->fetchEmails($campaignId, $output);
+
+            $combinedData['campaigns'][] = array_merge($combinedData['campaigns'], $campaignData);
+            $this->mergeDependencies(
+                $combinedData['dependencies'],
+                $campaignId,
+                $eventData,
+                $segmentData,
+                $formData,
+                $emailData
+            );
+
+            $combinedData['events']   = array_merge($combinedData['events'], $eventData);
+            $combinedData['segments'] = array_merge($combinedData['segments'], $segmentData);
+            $combinedData['forms']    = array_merge($combinedData['forms'], $formData);
+            $combinedData['emails']   = array_merge($combinedData['emails'], $emailData);
+        }
+
+        // Output or save the combined data
+        return $this->outputData($combinedData, $input, $output);
+    }
+
+    private function fetchCampaignData(string $campaignId, OutputInterface $output): ?array
+    {
         $campaignData = $this->callAnotherCommand('mautic:campaign:fetch', [
             '--id'        => $campaignId,
             '--json-only' => true,
         ]);
 
-        if (null === $campaignData) {
-            $output->writeln('<error>Failed to fetch campaign data.</error>');
+        return $campaignData ? json_decode($campaignData, true) : null;
+    }
 
-            return self::FAILURE;
-        }
-
-        $campaignData = json_decode($campaignData, true);
-
+    private function fetchDependencies(string $campaignId, OutputInterface $output): ?array
+    {
         $dependenciesData = $this->callAnotherCommand('mautic:campaign:fetch-dependencies', [
             '--id'        => $campaignId,
             '--json-only' => true,
         ]);
 
-        if (null === $dependenciesData) {
-            $output->writeln('<error>Failed to fetch campaign data.</error>');
+        return $dependenciesData ? json_decode($dependenciesData, true) : null;
+    }
 
-            return self::FAILURE;
-        }
-
-        $dependenciesData = json_decode($dependenciesData, true);
-
+    private function fetchEvents(string $campaignId, OutputInterface $output): array
+    {
         $eventData = $this->callAnotherCommand('mautic:campaign:fetch-events', [
             '--id'        => $campaignId,
             '--json-only' => true,
         ]);
 
-        if (null === $eventData) {
-            $output->writeln('<error>Failed to fetch event data.</error>');
+        return $eventData ? json_decode($eventData, true) : [];
+    }
 
-            return self::FAILURE;
-        }
-        $eventData = json_decode($eventData, true);
-
+    private function fetchEmails(string $campaignId, OutputInterface $output): array
+    {
         $emailData = $this->callAnotherCommand('mautic:campaign:fetch-emails', [
             '--id'        => $campaignId,
             '--json-only' => true,
         ]);
 
-        if (null === $emailData) {
-            $output->writeln('<error>Failed to fetch email data.</error>');
+        return $emailData ? json_decode($emailData, true) : [];
+    }
 
-            return self::FAILURE;
-        }
-
-        $emailData = json_decode($emailData, true);
-
+    private function fetchSegments(string $campaignId, OutputInterface $output): array
+    {
         $segmentData = $this->callAnotherCommand('mautic:campaign:fetch-segments', [
             '--id'        => $campaignId,
             '--json-only' => true,
         ]);
 
-        if (null === $segmentData) {
-            $output->writeln('<error>Failed to fetch segment data.</error>');
+        return $segmentData ? json_decode($segmentData, true) : [];
+    }
 
-            return self::FAILURE;
-        }
-
-        $segmentData = json_decode($segmentData, true);
-
+    private function fetchForms(string $campaignId, OutputInterface $output): array
+    {
         $formData = $this->callAnotherCommand('mautic:campaign:fetch-forms', [
             '--id'        => $campaignId,
             '--json-only' => true,
         ]);
 
-        if (null === $formData) {
-            $output->writeln('<error>Failed to fetch segment data.</error>');
+        return $formData ? json_decode($formData, true) : [];
+    }
 
-            return self::FAILURE;
-        }
-
-        $formData = json_decode($formData, true);
-
-        $combinedData = [
-            'campaign'     => $campaignData,
-            'dependencies' => $dependenciesData,
-            'events'       => $eventData,
-            'emails'       => $emailData,
-            'segments'     => $segmentData,
-            'forms'        => $formData,
-            'exportedAt'   => (new \DateTime())->format(DATE_ATOM),
+    private function mergeDependencies(array &$dependencies, string $campaignId, array $eventData, array $segmentData, array $formData, array $emailData): void
+    {
+        $dependency = [
+            'event'   => [],
+            'segment' => [],
+            'form'    => [],
+            'email'   => [],
         ];
 
-        // Output or save the combined data
-        return $this->outputData($combinedData, $input, $output);
+        foreach ($eventData as $event) {
+            $dependency['event'][] = [
+                'campaignId' => (int) $campaignId,
+                'eventId'    => (int) $event['id'],
+            ];
+        }
+
+        foreach ($segmentData as $segment) {
+            $dependency['segment'][] = [
+                'campaignId' => (int) $campaignId,
+                'segmentId'  => (int) $segment['id'],
+            ];
+        }
+
+        foreach ($formData as $form) {
+            $dependency['form'][] = [
+                'campaignId' => (int) $campaignId,
+                'formId'     => (int) $form['id'],
+            ];
+        }
+
+        foreach ($emailData as $email) {
+            foreach ($eventData as $event) {
+                $dependency['email'][] = [
+                    'eventId' => (int) $event['id'],
+                    'emailId' => (int) $email['id'],
+                ];
+            }
+        }
+
+        $dependencies[] = $dependency;
     }
 
     private function outputData(array $data, InputInterface $input, OutputInterface $output): int
@@ -211,24 +259,15 @@ class ExportCampaignCommand extends ModeratedCommand
 
     private function callAnotherCommand(string $commandName, array $arguments): ?string
     {
-        // Initialize the application
         $application = $this->getApplication();
         $command     = $application->find($commandName);
 
-        // Prepare input arguments
         $input = new \Symfony\Component\Console\Input\ArrayInput($arguments);
 
-        // Capture the output
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
 
-        // Execute the command
-        $returnCode = $command->run($input, $output);
+        $command->run($input, $output);
 
-        // if ($returnCode !== Command::SUCCESS) {
-        //     return null;
-        // }
-
-        // Return the output as a string
         return $output->fetch();
     }
 }
