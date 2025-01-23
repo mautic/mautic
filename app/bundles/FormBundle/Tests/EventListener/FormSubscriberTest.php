@@ -496,7 +496,7 @@ New line',
     private function getFormRepostAction(): Action
     {
         $onSubmitActionConfig = [
-            'post_url'             => 'https://example.com',
+            'post_url'             => 'https://mautic.org',
             'failure_email'        => '',
             'authorization_header' => '',
         ];

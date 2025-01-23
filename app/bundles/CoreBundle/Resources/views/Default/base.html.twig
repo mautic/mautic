@@ -14,6 +14,7 @@
             {{ include('@MauticCore/Modal/tokens_help.html.twig') }}
             {{ include('@MauticCore/Modal/keyboard_shortcuts.html.twig') }}
             {{ include('@MauticCore/Modal/search_commands.html.twig') }}
+            {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
 
             <aside class="app-sidebar sidebar-left">
                 {{ include('@MauticCore/LeftPanel/index.html.twig') }}

@@ -95,7 +95,6 @@
     {% set customButtons = customButtons|merge([heatmapButton]) %}
 {% endif %}
 
-
 {# Only show A/B test button if not already a translation of an a/b test #}
 {% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
 
@@ -105,9 +104,6 @@
         'entity': email,
         'status': email.getPublishUp() is not null ? 'sending' : 'available'
     }) -}}
-
-
-
 
         {% set tags = [
             {

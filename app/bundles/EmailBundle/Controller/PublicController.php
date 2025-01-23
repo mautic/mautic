@@ -486,7 +486,7 @@ class PublicController extends CommonFormController
         // bogus ID
         if ($contactId && (
             !$this->security->isAdmin()
-            || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+            && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
         )
         ) {
             // disallow displaying contact information

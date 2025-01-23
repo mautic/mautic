@@ -432,9 +432,6 @@ class TriggerModel extends CommonFormModel
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
                 $this->getEventRepository()->detachEntities($persist);
-                if (isset($triggerEvent)) {
-                    $this->getEventRepository()->deleteEntity($triggerEvent);
-                }
             }
         }
     }
