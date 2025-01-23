@@ -845,8 +845,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->isSearchable;
     }
 
-    public function setIsSearchable(bool $isSearchable): void
+    public function setIsSearchable(?bool $isSearchable): void
     {
-        $this->isSearchable = $isSearchable;
+        $this->isSearchable = $isSearchable ?? false;
     }
 }
