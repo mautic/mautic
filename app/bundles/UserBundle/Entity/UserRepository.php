@@ -206,6 +206,8 @@ class UserRepository extends CommonRepository
 
     /**
      * Given role id, return an array of users which match the role.
+     *
+     * @return array<int, User>
      */
     public function findByRole(int $id): array
     {
