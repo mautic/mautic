@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\EmailController;
@@ -121,6 +122,7 @@ class EmailControllerTest extends TestCase
         $this->flashBagMock         = $this->createMock(FlashBag::class);
         $this->requestStack         = new RequestStack();
         $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
+        $batchDeleteService         = new BatchDeleteService($this->corePermissionsMock, $this->translatorMock);
 
         $helperUserMock->method('getUser')
             ->willReturn(new User(false));
@@ -136,7 +138,8 @@ class EmailControllerTest extends TestCase
             $this->translatorMock,
             $this->flashBagMock,
             $this->requestStack,
-            $this->corePermissionsMock
+            $this->corePermissionsMock,
+            $batchDeleteService
         );
         $this->controller->setContainer($this->containerMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->createMock(FlashBagInterface::class));

@@ -2,10 +2,12 @@
 
 namespace Mautic\CoreBundle\Service;
 
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\Tag;
 
 final class BatchDeleteService
 {
@@ -20,10 +22,11 @@ final class BatchDeleteService
     /**
      * Perform batch delete on entities.
      *
-     * @param FormModel $model
+     * @param FormModel            $model
+     * @param array<string, mixed> $postActionVars
      *
-     * @return array
-     *               Array of flash messages
+     * @return array<string, mixed>
+     *                              Array of flash messages
      */
     public function batchDelete(
         MauticModelInterface $model,
@@ -96,7 +99,10 @@ final class BatchDeleteService
         return $flashes;
     }
 
-    public function getBatchActionFilter(string $ids, string $searchValue, FormModel $model)
+    /**
+     * @return array<string, array{string?:string, force:array<string, mixed>}>
+     */
+    public function getBatchActionFilter(string $ids, string $searchValue, FormModel $model): array
     {
         $filter = [];
         // When user select 'all'.
@@ -116,7 +122,7 @@ final class BatchDeleteService
         return $filter;
     }
 
-    private function checkPermission(string $permissionBase, $entity): bool
+    private function checkPermission(string $permissionBase, CommonEntity|Tag $entity): bool
     {
         if (method_exists($entity, 'getCreatedBy')) {
             return $this->security->hasEntityAccess(
@@ -130,6 +136,11 @@ final class BatchDeleteService
 
     /**
      * Return flash messages for ids not found.
+     *
+     * @param int[] $givenIds
+     * @param int[] $entityIds
+     *
+     * @return array<string, array{type: string, msg: string, msgVars: array<string, mixed>}>
      */
     private function getIdsNotFound(array $givenIds, array $entityIds, string $modelName): array
     {
@@ -149,7 +160,7 @@ final class BatchDeleteService
     /**
      * Get custom or core translation.
      */
-    private function getTranslationKey($modelName, $action): string
+    private function getTranslationKey(string $modelName, string $action): string
     {
         $customString = 'mautic.'.$modelName.'.'.$action;
 

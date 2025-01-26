@@ -88,6 +88,9 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
         return $entity;
     }
 
+    /**
+     * @return string[]
+     */
     public function isLocked(): array
     {
         return [

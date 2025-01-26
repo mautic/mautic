@@ -1221,7 +1221,7 @@ class ListModel extends FormModel implements GlobalSearchInterface, CannotBeDele
     /**
      * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
      *
-     * @param array $ids
+     * @param int[] $ids
      */
     public function cannotBeDeleted($ids): array
     {

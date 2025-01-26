@@ -747,6 +747,10 @@ class LeadModel extends FormModel
 
     /**
      * Obtains a list of leads based a list of IDs.
+     *
+     * @param int[] $ids
+     *
+     * @return Paginator|array<int,mixed>
      */
     public function getLeadsByIds(array $ids, bool $ignore_paginator = false): Paginator|array
     {

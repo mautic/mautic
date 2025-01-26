@@ -18,11 +18,11 @@ interface CannotBeDeletedInterface
      *    ];
      * </code>.
      *
-     * @param array $ids
+     * @param int[] $ids
      *                   Ids selected for deletion
      *
-     * @return array
-     *               An associative array where each key is an entity ID, and the value is a flash message for why entity cannot be deleted
+     * @return array<string, array{type: string, msg: string, msgVars: array<string, mixed>}>
+     *                                                                                        An associative array where each key is an entity ID, and the value is a flash message for why entity cannot be deleted
      */
     public function cannotBeDeleted(array $ids): array;
 }

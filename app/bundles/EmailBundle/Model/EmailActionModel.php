@@ -51,7 +51,12 @@ class EmailActionModel
         return $affected;
     }
 
-    public function getEmails($filter): array
+    /**
+     * @param array{string: string, force: array<string, mixed>} $filter
+     *
+     * @return array<string, object>
+     */
+    public function getEmails(array $filter): array
     {
         return $this->emailModel->getEntities([
             'filter'           => $filter,
