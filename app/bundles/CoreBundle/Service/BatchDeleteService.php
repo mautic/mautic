@@ -100,7 +100,7 @@ final class BatchDeleteService
     }
 
     /**
-     * @return array<string, array{string?:string, force:array<string, mixed>}>
+     * @return array<string, array{string?:string, force?:array<string, mixed>}>
      */
     public function getBatchActionFilter(string $ids, string $searchValue, FormModel $model): array
     {
