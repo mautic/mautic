@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\Entity\TagRepository;
-use Mautic\LeadBundle\Model\TagModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
+use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -169,6 +169,13 @@ class TagControllerTest extends MauticMysqlTestCase
         $tags   = $this->tagRepository->findAll();
         $tagsId = array_map(fn (Tag $tag) => $tag->getId(), $tags);
         $this->client->request('POST', '/s/tags/batchDelete?ids='.json_encode($tagsId));
+        $this->assertTrue($this->client->getResponse()->isOk(), 'Return code must be 200.');
+        $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
+    }
+
+    public function testBatchDeleteActionWhenSelectAll(): void
+    {
+        $this->client->request('POST', '/s/tags/batchDelete?ids=all');
         $this->assertTrue($this->client->getResponse()->isOk(), 'Return code must be 200.');
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
     }
