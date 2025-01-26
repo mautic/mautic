@@ -51,7 +51,7 @@ final class BatchDeleteService
             // flash which ids were not found.
             if (($ids = json_decode($ids)) && count($entities) !== count($ids)) {
                 $idsNotFound = $this->getIdsNotFound($ids, array_keys($entities), $modelName);
-                $flashes[]   = array_merge($flashes, $idsNotFound);
+                $flashes     = array_merge($flashes, $idsNotFound);
             }
             $permissionBase = $model->getPermissionBase();
             // Do this in chunks so that we don't run out of memory.
@@ -147,11 +147,11 @@ final class BatchDeleteService
         $flashes    = [];
         $missingIds = array_diff($givenIds, $entityIds);
         foreach ($missingIds as $id) {
-            $flashes = array_merge([
+            $flashes[] = [
                 'type'    => 'error',
                 'msg'     => $this->getTranslationKey($modelName, 'error.notfound'),
                 'msgVars' => ['%id%' => $id],
-            ], $flashes);
+            ];
         }
 
         return $flashes;
