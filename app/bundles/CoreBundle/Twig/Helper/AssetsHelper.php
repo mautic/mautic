@@ -449,7 +449,7 @@ final class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getCKEditorScripts());
         }
 
         if (isset($assets['js'])) {
@@ -488,7 +488,7 @@ final class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getCKEditorScripts());
         }
 
         if ($render) {
@@ -516,49 +516,6 @@ final class AssetsHelper
 
         return [
             $base.'ckeditor.js?v'.$this->version,
-        ];
-    }
-
-    /**
-     * Load Froala JS source files.
-     *
-     * @return string[]
-     */
-    public function getFroalaScripts(): array
-    {
-        if (!$this->coreParametersHelper->get('load_froala_assets')) {
-            return [];
-        }
-
-        $base    = 'app/bundles/CoreBundle/Assets/js/libraries/froala/';
-        $plugins = $base.'plugins/';
-
-        return [
-            $base.'froala_editor.js?v'.$this->version,
-            $plugins.'align.js?v'.$this->version,
-            $plugins.'code_beautifier.js?v'.$this->version,
-            $plugins.'code_view.js?v'.$this->version,
-            $plugins.'colors.js?v'.$this->version,
-            // $plugins . 'file.js?v' . $this->version,  // @todo
-            $plugins.'font_family.js?v'.$this->version,
-            $plugins.'font_size.js?v'.$this->version,
-            $plugins.'fullscreen.js?v'.$this->version,
-            $plugins.'image.js?v'.$this->version,
-            // $plugins . 'image_manager.js?v' . $this->version,
-            $plugins.'filemanager.js?v'.$this->version,
-            $plugins.'inline_style.js?v'.$this->version,
-            $plugins.'line_breaker.js?v'.$this->version,
-            $plugins.'link.js?v'.$this->version,
-            $plugins.'lists.js?v'.$this->version,
-            $plugins.'paragraph_format.js?v'.$this->version,
-            $plugins.'paragraph_style.js?v'.$this->version,
-            $plugins.'quick_insert.js?v'.$this->version,
-            $plugins.'quote.js?v'.$this->version,
-            $plugins.'table.js?v'.$this->version,
-            $plugins.'url.js?v'.$this->version,
-            // $plugins . 'video.js?v' . $this->version,
-            $plugins.'token.js?v'.$this->version,
-            $plugins.'dynamic_content.js?v'.$this->version,
         ];
     }
 

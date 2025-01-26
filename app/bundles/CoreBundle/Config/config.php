@@ -1440,7 +1440,6 @@ return [
             ],
         ],
         'composer_updates'                                        => false,
-        'load_froala_assets'                                      => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only'                                      => false,
         Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE  => null,
         'gdpr_user_purge_threshold'                               => 1095, // Minimum no. of days a user has to be inactive to get picked up by `mautic:maintenance:cleanup --gdpr`

@@ -244,20 +244,6 @@ Mautic.isCodeMode = function() {
 window.document.fileManagerInsertImageCallback = function(selector, url) {
     if (Mautic.isCodeMode()) {
         Mautic.insertTextAtCMCursor(url);
-    } else {
-        if (typeof FroalaEditorForFileManager !== 'underfined') {
-            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
-                FroalaEditorForFileManager.image.insert(url, false, {}, FroalaEditorForFileManagerCurrentImage);
-            } else {
-                FroalaEditorForFileManager.image.insert(url);
-            }
-        } else {
-            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
-                mQuery(selector).froalaEditor('image.insert', url, false, {}, FroalaEditorForFileManagerCurrentImage);
-            } else {
-                mQuery(selector).froalaEditor('image.insert', url);
-            }
-        }
     }
 };
 
