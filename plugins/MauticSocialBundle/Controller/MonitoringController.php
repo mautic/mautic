@@ -560,10 +560,8 @@ class MonitoringController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $session   = $request->getSession();
         $page      = $session->get('mautic.social.monitoring.page', 1);
