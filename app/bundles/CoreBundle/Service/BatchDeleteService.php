@@ -44,6 +44,12 @@ final class BatchDeleteService
                 'filter'           => $filter,
                 'ignore_paginator' => true,
             ]);
+            // If there's a mismatch between given ids and found entities,
+            // flash which ids were not found.
+            if (($ids = json_decode($ids)) && count($entities) !== count($ids)) {
+                $idsNotFound = $this->getIdsNotFound($ids, array_keys($entities), $modelName);
+                $flashes[]   = array_merge($flashes, $idsNotFound);
+            }
             $permissionBase = $model->getPermissionBase();
             // Do this in chunks so that we don't run out of memory.
             $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
@@ -80,7 +86,7 @@ final class BatchDeleteService
         if (!empty($deleteIds)) {
             $entities  = $model->deleteEntities($deleteIds);
             $flashes[] = [
-                'msg'     => $this->getBatchDeletedTranslatedString($modelName),
+                'msg'     => $this->getTranslationKey($modelName, 'notice.batch_deleted'),
                 'msgVars' => [
                     '%count%' => count($entities),
                 ],
@@ -123,14 +129,32 @@ final class BatchDeleteService
     }
 
     /**
+     * Return flash messages for ids not found.
+     */
+    private function getIdsNotFound(array $givenIds, array $entityIds, string $modelName): array
+    {
+        $flashes    = [];
+        $missingIds = array_diff($givenIds, $entityIds);
+        foreach ($missingIds as $id) {
+            $flashes = array_merge([
+                'type'    => 'error',
+                'msg'     => $this->getTranslationKey($modelName, 'error.notfound'),
+                'msgVars' => ['%id%' => $id],
+            ], $flashes);
+        }
+
+        return $flashes;
+    }
+
+    /**
      * Get custom or core translation.
      */
-    private function getBatchDeletedTranslatedString($modelName): string
+    private function getTranslationKey($modelName, $action): string
     {
-        $customString = 'mautic.'.$modelName.'.notice.batch_deleted';
+        $customString = 'mautic.'.$modelName.'.'.$action;
 
         return $this->translator->hasId($customString, 'flashes')
             ? $customString
-            : 'mautic.core.notice.batch_deleted';
+            : 'mautic.core.'.$action;
     }
 }
