@@ -17,12 +17,6 @@ class AssetGenerationHelper
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'moment/min/moment.min.js', // Needed for date/time formatting.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
-        'codemirror/lib/codemirror.js', // Needed for the legacy code-mode editor.
-        'codemirror/addon/hint/show-hint.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/xml/xml.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/javascript/javascript.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/htmlmixed/htmlmixed.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/css/css.js', // Needed for the legacy code-mode editor.
         'jquery.cookie/jquery.cookie.js', // A simple, lightweight jQuery plugin for reading, writing and deleting cookies.
         'jsplumb/dist/js/jsplumb.js', // Needed for the campaign builder.
         'typeahead.js/dist/typeahead.bundle.js', // Needed for the Twitter-like mentions (tokens).
