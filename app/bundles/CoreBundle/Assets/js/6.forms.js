@@ -366,6 +366,20 @@ Mautic.switchFormFieldState = function (formName) {
         }
     }
 
+    /**
+     * Switch to first tab disabled/hidden field is a tab.
+     */
+    var clickFirstTab = function (field) {
+        if (field.parent().hasClass('nav-tabs')) {
+            // Get the first tab.
+            firstTab = field.siblings().first();
+            if (!firstTab.hasClass('active')) {
+                console.log('click')
+                firstTab.find('a').click()
+            }
+        }
+    }
+
     // find all fields to show
     processConditions('data-show-on', visibleFields, false);
 
@@ -397,6 +411,7 @@ Mautic.switchFormFieldState = function (formName) {
             fieldContainer.fadeIn();
         } else {
             toggleFieldOff(field);
+            clickFirstTab(field);
             fieldContainer.fadeOut();
         }
     });
@@ -411,6 +426,7 @@ Mautic.switchFormFieldState = function (formName) {
         var field = mQuery('#' + fieldId)
         if (disable) {
             toggleFieldOff(field);
+            clickFirstTab(field);
             field.addClass('disabled', disable);
             field.attr('disabled', 'disabled');
         } else {
