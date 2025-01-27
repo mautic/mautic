@@ -12,12 +12,19 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class BatchDeleteServiceTest extends MauticMysqlTestCase
 {
     private BatchDeleteService $batchDeleteService;
-    private CorePermissions $securityMock;
-    private Translator $translatorMock;
+    /**
+     * @var MockObject&Translator
+     */
+    private MockObject $securityMock;
+    /**
+     * @var MockObject&CorePermissions
+     */
+    private MockObject $translatorMock;
 
     private CompanyModel $model;
 
@@ -74,7 +81,10 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
             [$this, 'isLocked'],
         );
 
+        $this->assertNotEmpty($flashes, 'Flashes array is empty');
+        $this->assertArrayHasKey(0, $flashes, 'Flashes array does not have expected key 0');
         $this->assertEquals('mautic.core.error.accessdenied', $flashes[0]['msg']);
+        $this->assertArrayHasKey(1, $flashes, 'Flashes array does not have expected key 1');
         $this->assertEquals('mautic.core.notice.batch_deleted', $flashes[1]['msg']);
     }
 
