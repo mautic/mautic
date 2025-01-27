@@ -46,7 +46,6 @@ class AssetGenerationHelper
         'jquery-ui/ui/tabbable.js',
         'jquery-ui/ui/unique-id.js',
         'jquery-ui/ui/effect.js',
-        'jquery-ui/ui/safe-blur.js', // needed for the legacy builder
         'jquery-ui/ui/widgets/mouse.js',
         'jquery-ui/ui/widgets/draggable.js',
         'jquery-ui/ui/widgets/droppable.js',
