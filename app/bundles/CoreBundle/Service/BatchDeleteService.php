@@ -25,8 +25,8 @@ final class BatchDeleteService
      * @param FormModel            $model
      * @param array<string, mixed> $postActionVars
      *
-     * @return array<int, array>
-     *                           Array of flash messages
+     * @return list<array{type?: string, msg: string, msgVars?: array<string, mixed>}>
+     *                                                                                 Array of flash messages
      */
     public function batchDelete(
         MauticModelInterface $model,
