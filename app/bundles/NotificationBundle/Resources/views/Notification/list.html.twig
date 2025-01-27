@@ -25,12 +25,18 @@
             'searchValue': searchValue,
             'searchId': 'notification-search',
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': permissions['notification:notifications:create'],
                 },
                 'routeBase': 'notification',
-            }),
+            },
+            'bulk_actions': {
+                'routeBase': 'notification',
+                'templateButtons': {
+                    'delete': permissions['notification:notifications:deleteown'] or permissions['notification:notifications:deleteother'],
+                },
+            },
             'quickFilters': [
                 {
                     'search': 'mautic.core.searchcommand.ispublished',

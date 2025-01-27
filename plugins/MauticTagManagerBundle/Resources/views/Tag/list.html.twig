@@ -17,13 +17,20 @@
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': security.isGranted('tagManager:tagManager:create')
                 },
                 'routeBase': 'tagmanager',
                 'langVar': 'tag.list'
-            })
+            },
+            'bulk_actions': {
+                'langVar': 'tagmanager.tag',
+                'routeBase': 'tagmanager',
+                'templateButtons': {
+                    'delete': permissions['tagManager:tagManager:delete'],
+                },
+            },
         }) -}}
         <div class="page-list">
             {% if items is defined and items is not empty %}
@@ -31,17 +38,10 @@
                     <table class="table table-hover" id="tagsTable">
                         <thead>
                         <tr>
-                            {{ include(
-                                '@MauticCore/Helper/tableheader.html.twig',
-                                {
-                                    'checkall': 'true',
-                                    'target': '#tagsTable',
-                                    'langVar': 'tagmanager.tag',
-                                    'routeBase': 'tagmanager',
-                                    'templateButtons': {
-                                        'delete': permissions['tagManager:tagManager:delete'],
-                                    }
-                                }) }}
+                            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                'checkall': 'true',
+                                'target': '#tagsTable',
+                            }) }}
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {

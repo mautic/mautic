@@ -7,12 +7,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#focusTable',
-                        'routeBase': 'focus',
-                        'templateButtons': {
-                            'delete': permissions['focus:items:delete'],
-                        },
+                    'checkall': 'true',
+                    'target': '#focusTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {

@@ -7,6 +7,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -237,6 +238,7 @@ class MailHelper
         private Environment $twig,
         private ThemeHelper $themeHelper,
         private SlotsHelper $slotsHelper,
+        private PathsHelper $pathsHelper,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
     ) {
@@ -823,7 +825,7 @@ class MailHelper
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
                 if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
                     $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
-                    $path = $this->factory->getSystemPath('root', true).$path;
+                    $path = $this->pathsHelper->getSystemPath('root', true).$path;
                 }
 
                 if ($imageContent = file_get_contents($path)) {

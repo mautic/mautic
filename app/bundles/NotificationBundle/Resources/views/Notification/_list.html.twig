@@ -16,11 +16,7 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'routeBase': 'notification',
-                        'templateButtons': {
-                            'delete': permissions['notification:notifications:deleteown'] or permissions['notification:notifications:deleteother'],
-                        },
+                    'checkall': 'true',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -89,6 +85,7 @@
                                     <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="ri-fw ri-list-check"></i></span>
                                 {% endif %}
                             </a>
+                            {{ customContent('notification.name', _context) }}
                         </div>
                     </td>
                     <td class="visible-md visible-lg">

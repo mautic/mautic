@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -602,7 +603,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getEmailTemplateAction(Request $request, EmailModel $model): JsonResponse
+    public function getEmailTemplateAction(Request $request, EmailModel $model, MailHelper $mailHelper): JsonResponse
     {
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
         $emailId = $request->query->get('template');
@@ -617,11 +618,10 @@ class AjaxController extends CommonAjaxController
                 $email->getCreatedBy()
             )
         ) {
-            $mailer = $this->factory->getMailer();
-            $mailer->setEmail($email, true, [], [], true);
+            $mailHelper->setEmail($email, true, [], [], true);
 
-            $data['body']    = $mailer->getBody();
-            $data['subject'] = $mailer->getSubject();
+            $data['body']    = $mailHelper->getBody();
+            $data['subject'] = $mailHelper->getSubject();
         }
 
         return $this->sendJsonResponse($data);

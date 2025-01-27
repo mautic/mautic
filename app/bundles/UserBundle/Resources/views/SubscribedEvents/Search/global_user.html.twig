@@ -5,25 +5,20 @@
 {% else %}
 <div class="d-flex ai-center">
     <span class="pull-left mr-sm pt-xs" style="width:36px">
-        <span class="img-wrapper img-rounded"><img src="{{ gravatarGetImage(user.getEmail(), '100') }}" /></span>
+        <span class="img-wrapper img-rounded"><img src="{{ gravatarGetImage(item.getEmail(), '100') }}" /></span>
     </span>
     <div class="d-flex fd-column">
         <div>
-            {% if canEdit %}
-                <a class="fw-sb mr-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : user.getId()}) }}" data-toggle="ajax">
-                    {{ user.getName() }}
-                </a>
+            <a class="fw-sb mr-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
+                {{ item.getName() }}
+            </a>
             {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
-                'entity': user,
+                'entity': item,
                 'status': 'active',
                 'simplified': 'true'
             }) -}}
-            {% else %}
-                {{ user.getName() }}
-            {% endif %}
         </div>
-
-        <div class="small text-muted">{{ user.getPosition() }}</div>
+        <div class="small text-muted">{{ item.getPosition() }}</div>
     </div>
     <div class="clearfix"></div>
 </div>

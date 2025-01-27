@@ -3,12 +3,8 @@
     <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
 </a>
 {% else %}
-{% if canEdit %}
-<a href="{{ url('mautic_role_action', {'objectAction' : 'edit', 'objectId' : role.getId()}) }}" data-toggle="ajax">
-    <span class="fw-sb">{{ role.name }}</span>
-    <span class="ml-4 mr-sm">#{{ role.id }}</span>
+<a href="{{ url('mautic_role_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
+    <span class="fw-sb">{{ item.name }}</span>
+    <span class="ml-4 mr-sm">#{{ item.id }}</span>
 </a>
-{% else %}
-<span class="fw-sb">{{ role.name }}</span>
-{% endif %}
 {% endif %}
