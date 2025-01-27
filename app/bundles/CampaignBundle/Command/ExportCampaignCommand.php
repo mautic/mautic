@@ -201,10 +201,12 @@ class ExportCampaignCommand extends ModeratedCommand
 
         foreach ($emailData as $email) {
             foreach ($eventData as $event) {
-                $dependency['email'][] = [
-                    'eventId' => (int) $event['id'],
-                    'emailId' => (int) $email['id'],
-                ];
+                if ('email' === $event['channel']) {
+                    $dependency['email'][] = [
+                        'eventId' => (int) $event['id'],
+                        'emailId' => (int) $email['id'],
+                    ];
+                }
             }
         }
 

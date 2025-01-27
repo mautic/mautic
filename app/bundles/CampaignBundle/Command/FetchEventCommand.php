@@ -52,6 +52,9 @@ class FetchEventCommand extends ModeratedCommand
         $eventData = [];
 
         foreach ($events as $event) {
+            $parent   = $event->getParent();
+            $parentId = $parent ? $parent->getId() : null;
+
             $eventData[] = [
                 'id'                    => $event->getId(),
                 'campaign_id'           => $campaign->getId(),
@@ -67,6 +70,7 @@ class FetchEventCommand extends ModeratedCommand
                 'triggerDate'           => $event->getTriggerDate() ? $event->getTriggerDate()->format(DATE_ATOM) : null,
                 'channel'               => $event->getChannel(),
                 'channel_id'            => $event->getChannelId(),
+                'parent_id'             => $parentId,
             ];
         }
 

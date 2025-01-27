@@ -49,10 +49,11 @@ class FetchCampaignCommand extends ModeratedCommand
         }
 
         $data = [
-            'id'           => $campaign->getId(),
-            'name'         => $campaign->getName(),
-            'description'  => $campaign->getDescription(),
-            'is_published' => $campaign->getIsPublished(),
+            'id'              => $campaign->getId(),
+            'name'            => $campaign->getName(),
+            'description'     => $campaign->getDescription(),
+            'is_published'    => $campaign->getIsPublished(),
+            'canvas_settings' => $campaign->getCanvasSettings(),
         ];
 
         return $this->outputData($data, $input, $output);
