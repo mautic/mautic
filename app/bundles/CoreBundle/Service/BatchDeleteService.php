@@ -25,8 +25,8 @@ final class BatchDeleteService
      * @param FormModel            $model
      * @param array<string, mixed> $postActionVars
      *
-     * @return array<string, mixed>
-     *                              Array of flash messages
+     * @return array<int, array>
+     *                           Array of flash messages
      */
     public function batchDelete(
         MauticModelInterface $model,
@@ -140,7 +140,7 @@ final class BatchDeleteService
      * @param int[] $givenIds
      * @param int[] $entityIds
      *
-     * @return array<string, array{type: string, msg: string, msgVars: array<string, mixed>}>
+     * @return list<array{type: string, msg: string, msgVars: array<string, mixed>}>
      */
     private function getIdsNotFound(array $givenIds, array $entityIds, string $modelName): array
     {

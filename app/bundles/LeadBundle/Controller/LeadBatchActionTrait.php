@@ -16,8 +16,8 @@ trait LeadBatchActionTrait
      * @param string  $ids
      *                         ids is either all or json array of ids
      *
-     * @return array{string?: string, force: array<string, mixed>}
-     *                                                             Filter arguments for the entity query
+     * @return array{}|array{string?: string, force: array<string, mixed>}
+     *                                                                     Filter arguments for the entity query
      */
     protected function getBatchActionFilter(Request $request, string $ids): array
     {
