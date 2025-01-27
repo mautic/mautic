@@ -18,11 +18,11 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
 {
     private BatchDeleteService $batchDeleteService;
     /**
-     * @var MockObject|Translator
+     * @var MockObject|CorePermissions
      */
     private MockObject $securityMock;
     /**
-     * @var MockObject|CorePermissions
+     * @var MockObject|Translator
      */
     private MockObject $translatorMock;
 
