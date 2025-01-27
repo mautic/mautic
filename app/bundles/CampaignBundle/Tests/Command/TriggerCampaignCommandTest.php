@@ -556,7 +556,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     {
         $campaign1 = $this->createCampaign('Campaign 1');
         // create campaign with restart allowed
-        $campaign2 = $this->createCampaign('Campaign 2', true);
+        $campaign2 = $this->createCampaign('Campaign 2');
         $campaign2->setAllowRestart(true);
         $this->em->persist($campaign2);
 
