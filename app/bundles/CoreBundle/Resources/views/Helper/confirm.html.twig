@@ -42,7 +42,7 @@
     {%- set attr = attr|merge({'data-cancel-text': cancelText|escape('js')}) %}
 {%- endif %}
 {%- if confirmText is not empty %}
-    {%- set attr = attr|merge({'data-confirm-text': confirmText|escape('js')}) %}
+    {%- set attr = attr|merge({'data-confirm-text': confirmText}) %}
 {%- endif %}
 {%- if cancelCallback is not empty %}
     {%- set attr = attr|merge({'data-cancel-callback': cancelCallback}) %}
