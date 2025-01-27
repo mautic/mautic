@@ -1,12 +1,3 @@
-Mautic.toggleDwcFilters = function () {
-    mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide");
-    if (mQuery("#dwcFiltersTab").hasClass('hide')) {
-        mQuery('.nav-tabs a[href="#details"]').click();
-    } else {
-        Mautic.dynamicContentOnLoad();
-    }
-};
-
 Mautic.dwcGenerator = (function() {
     // Selectors
     const copyBtnSelector = '#generator-copy-dynamic-content-slot';

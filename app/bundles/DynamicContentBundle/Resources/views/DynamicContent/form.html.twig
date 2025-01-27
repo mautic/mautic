@@ -35,7 +35,7 @@
                             {% endif %}
                         </a>
                     </li>
-                    <li class="{% if form.vars.value.isCampaignBased or form.updateSelect is defined %}hide{% endif %}" id="dwcFiltersTab">
+                    <li data-disable-on='{"dwc_isCampaignBased_1": "checked"}' id="dwcFiltersTab">
                         <a href="#filters" role="tab" data-toggle="tab" class="{% if hasFilterErrors %}text-danger{% endif %}">
                             {{ 'mautic.core.filters'|trans }}
                             {% if hasFilterErrors %}
@@ -130,7 +130,7 @@
             {% if form.updateSelect is not defined %}
                 {{ form_row(form.isCampaignBased) }}
             {% endif %}
-            <div id="slotNameDiv" class="{% if form.vars.value.isCampaignBased %}hide{% endif %}">
+            <div id="slotNameDiv">
                 {{ form_row(form.slotName) }}
             </div>
             <hr/>

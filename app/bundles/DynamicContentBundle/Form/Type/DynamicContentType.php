@@ -129,8 +129,9 @@ class DynamicContentType extends AbstractType
                 'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
+                    'class'           => 'form-control',
+                    'tooltip'         => 'mautic.dynamicContent.send.slot_name.tooltip',
+                    'data-disable-on' => '{"dwc_isCampaignBased_1": "checked"}',
                 ],
             ]
         );
@@ -158,7 +159,6 @@ class DynamicContentType extends AbstractType
                 'data'  => (bool) $options['data']->isCampaignBased(),
                 'attr'  => [
                     'tooltip'  => 'mautic.dwc.form.is_campaign_based.tooltip',
-                    'onchange' => 'Mautic.toggleDwcFilters()',
                 ],
             ]
         );
