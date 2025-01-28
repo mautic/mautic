@@ -202,7 +202,7 @@
                     {
                         label: 'mautic.form.field.asset.use_category'|trans({'%category_name%': categoryName}),
                         icon: 'ri-folder-line',
-                        color: 'gray',
+                        color: 'warm-gray',
                         attributes: {
                             href: path('mautic_asset_index')
                         }
@@ -218,7 +218,7 @@
                         {
                             label: asset.title,
                             icon: 'ri-file-line',
-                            color: 'gray',
+                            color: 'warm-gray',
                             attributes: securityIsGranted('asset:assets:viewother') ? {
                                 href: path('mautic_asset_action', {'objectAction': 'view', 'objectId': asset.id})
                             } : {}
@@ -229,6 +229,21 @@
         {% endif %}
     {% endif %}
 
+    {% if action.properties.integration is defined %}
+        <!-- Push to integration -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: action.properties.integration,
+                    icon: 'ri-plug-line',
+                    color: 'warm-gray',
+                    attributes: securityIsGranted('plugin:plugins:manage') ? {
+                        href: path('mautic_plugin_index')
+                    } : {}
+                }
+            ]
+        } %}
+    {% endif %}
 {% endset %}
 
 {% if footerContent|trim is not empty %}
