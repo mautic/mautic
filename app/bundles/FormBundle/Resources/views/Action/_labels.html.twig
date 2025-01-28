@@ -80,7 +80,8 @@
                     'label': email.name,
                     'icon': 'ri-mail-line',
                     'attributes': {
-                        'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.email })
+                        'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.email }),
+                        'target': '_blank'
                     }
                 }]
             } %}
@@ -97,7 +98,8 @@
                     'label': email.name,
                     'icon': 'ri-mail-line',
                     'attributes': {
-                        'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.useremail.email })
+                        'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.useremail.email }),
+                        'target': '_blank'
                     }
                 }]
             } %}
@@ -115,7 +117,8 @@
                             'label': user.firstName,
                             'icon': 'ri-account-circle-line',
                             'attributes': {
-                                'href': path('mautic_user_action', {'objectAction': 'edit', 'objectId': user.id })
+                                'href': path('mautic_user_action', {'objectAction': 'edit', 'objectId': user.id }),
+                                'target': '_blank'
                             }
                         }]
                     } %}
@@ -141,7 +144,8 @@
                     'color': 'green',
                     'icon': 'ri-pie-chart-line',
                     'attributes': {
-                        'href': path('mautic_segment_action', {'objectAction': 'view', 'objectId': segment.id })
+                        'href': path('mautic_segment_action', {'objectAction': 'view', 'objectId': segment.id }),
+                        'target': '_blank'
                     }
                 }]
             } %}
@@ -158,7 +162,8 @@
                     'color': 'red',
                     'icon': 'ri-pie-chart-line',
                     'attributes': {
-                        'href': path('mautic_segment_action', {'objectAction': 'view', 'objectId': segment.id })
+                        'href': path('mautic_segment_action', {'objectAction': 'view', 'objectId': segment.id }),
+                        'target': '_blank'
                     }
                 }]
             } %}
@@ -204,7 +209,8 @@
                         icon: 'ri-folder-line',
                         color: 'warm-gray',
                         attributes: {
-                            href: path('mautic_asset_index')
+                            href: path('mautic_asset_index'),
+                            'target': '_blank'
                         }
                     }
                 ]
@@ -220,7 +226,8 @@
                             icon: 'ri-file-line',
                             color: 'warm-gray',
                             attributes: securityIsGranted('asset:assets:viewother') ? {
-                                href: path('mautic_asset_action', {'objectAction': 'view', 'objectId': asset.id})
+                                href: path('mautic_asset_action', {'objectAction': 'view', 'objectId': asset.id}),
+                                'target': '_blank'
                             } : {}
                         }
                     ]
@@ -238,7 +245,8 @@
                     icon: 'ri-plug-line',
                     color: 'warm-gray',
                     attributes: securityIsGranted('plugin:plugins:manage') ? {
-                        href: path('mautic_plugin_index')
+                        href: path('mautic_plugin_index'),
+                        'target': '_blank'
                     } : {}
                 }
             ]
