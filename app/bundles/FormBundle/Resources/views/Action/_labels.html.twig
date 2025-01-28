@@ -193,7 +193,7 @@
 
     {% if action.properties.asset is defined %}
         {% if action.properties.asset is null and action.properties.category is defined %}
-            {# Using last asset from category #}
+            <!-- Using last asset from category -->
             {% set category = getEntities('Mautic\\CategoryBundle\\Entity\\Category', [action.properties.category])|first %}
             {% set categoryName = category ? category.title : '' %}
 
@@ -210,7 +210,7 @@
                 ]
             } %}
         {% elseif action.properties.asset is not null %}
-            {# Specific asset selected #}
+            <!-- Specific asset selected -->
             {% set asset = getEntities('Mautic\\AssetBundle\\Entity\\Asset', [action.properties.asset])|first %}
             {% if asset %}
                 {% include '@MauticCore/Helper/_tag.html.twig' with {
