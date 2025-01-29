@@ -2,17 +2,32 @@
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if ('testLabelsForFormAction' === $this->getName(false)) {
+            $this->truncateTables('assets', 'categories', 'emails', 'lead_lists');
+        }
+    }
 
     /**
      * Index should return status code 200.
@@ -193,6 +208,218 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $options = $crawler->filterXPath('//select[@name="formfield[mappedField]"]')->html();
         $this->assertStringContainsString('<option value="email">Email</option>', $options, 'Email option should not be pre-selected.');
+    }
+
+    /**
+     * @param array{
+     *      type: string,
+     *      properties: array<string, mixed>,
+     *      entities?: array<object>
+     *  } $inputValues The input configuration for the form action
+     * @param array<int, array{
+     *      message: string,
+     *      message_arg: array<string, mixed>
+     *  }> $expectedMessages The expected messages with translation arguments
+     *
+     * @dataProvider dataTestLabelsForFormActions
+     */
+    public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
+    {
+        $form = $this->createForm('test', 'test');
+
+        // Persist entities if provided
+        if (!empty($inputValues['entities'])) {
+            // @phpstan-ignore-next-line
+            array_map([$this->em, 'persist'], $inputValues['entities']);
+        }
+
+        // create form action
+        $action = $this->createFormAction($form, $inputValues['type'], $inputValues['properties']);
+        $form->addAction(0, $action);
+        $this->em->persist($form);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+
+        /** @var TranslatorInterface $translator */
+        $translator = $this->getContainer()->get('translator');
+
+        foreach ($expectedMessages as $expectedMessage) {
+            $translatedMessage = $translator->trans($expectedMessage['message'], $expectedMessage['message_arg']);
+            $this->assertStringContainsString($translatedMessage, $crawler->html());
+        }
+    }
+
+    /**
+     * @return iterable<string, array{
+     *      0: array{
+     *          type: string,
+     *          properties: array<string, mixed>,
+     *          entities?: array<object>
+     *      },
+     *      1: array<array{
+     *          message: string,
+     *          message_arg: array<string, mixed>
+     *      }>
+     *  }>
+     */
+    public function dataTestLabelsForFormActions(): iterable
+    {
+        $category = new Category();
+        $category->setTitle('Category');
+        $category->setAlias('category');
+        $category->setBundle('global');
+
+        $asset = new Asset();
+        $asset->setTitle('test');
+        $asset->setAlias('test');
+        $asset->setCategory($category);
+
+        yield 'Action: Download asset using category' => [
+            // input
+            [
+                'type'       => 'asset.download',
+                'properties' => [
+                    'asset'    => null,
+                    'category' => 1,
+                ],
+                'entities' => [
+                    $category,
+                    $asset,
+                ],
+            ],
+            // expected
+            [
+                [
+                    'message'     => 'mautic.form.field.asset.use_category',
+                    'message_arg' => [
+                        '%category_name%' => $category->getTitle(),
+                    ],
+                ],
+            ],
+        ];
+
+        yield 'Action: Add to company points' => [
+            // input
+            [
+                'type'       => 'lead.scorecontactscompanies',
+                'properties' => ['score' => 10],
+            ],
+            // expected
+            [
+                [
+                    'message'     => 'mautic.form.form.change_points_by',
+                    'message_arg' => ['%value%' => 10],
+                ],
+            ],
+        ];
+
+        yield 'Action: Add to contact points' => [
+            // input
+            [
+                'type'       => 'lead.pointschange',
+                'properties' => [
+                    'operator' => 'plus',
+                    'points'   => 10,
+                    'group'    => 0,
+                ],
+            ],
+            // expected
+            [
+                [
+                    'message'     => 'mautic.form.field.points.operation',
+                    'message_arg' => [
+                        '%operator%' => '(+)',
+                        '%points%'   => 10,
+                        '%group%'    => '',
+                    ],
+                ],
+            ],
+        ];
+
+        yield 'Action: Email to send to user' => [
+            // input
+            [
+                'type'       => 'email.send.user',
+                'properties' => [
+                    'useremail' => ['email' => 1],
+                    'user_id'   => [1],
+                ],
+                'entities' => [
+                    (new Email())->setName('Email')
+                        ->setSubject('Test Subject')
+                        ->setIsPublished(true),
+                ],
+            ],
+            // expected
+            [
+                [
+                    'message'     => 'Email',
+                    'message_arg' => [],
+                ],
+                [
+                    'message'     => 'Email',
+                    'message_arg' => [],
+                ],
+            ],
+        ];
+
+        $segmentOne = new LeadList();
+        $segmentOne->setName('list one');
+        $segmentOne->setAlias('list_one');
+        $segmentOne->setPublicName('list_one');
+        $segmentOne->setFilters([]);
+
+        $segmentTwo = new LeadList();
+        $segmentTwo->setName('list two');
+        $segmentTwo->setAlias('list_two');
+        $segmentTwo->setPublicName('list_two');
+        $segmentTwo->setFilters([]);
+
+        yield 'Action: Change segments' => [
+            // input
+            [
+                'type'       => 'lead.changelist',
+                'properties' => [
+                    'addToLists'      => [1],
+                    'removeFromLists' => [2],
+                ],
+                'entities' => [
+                    $segmentOne,
+                    $segmentTwo,
+                ],
+            ],
+            // expected
+            [
+                [
+                    'message'     => $segmentOne->getName(),
+                    'message_arg' => [],
+                ],
+                [
+                    'message'     => $segmentTwo->getName(),
+                    'message_arg' => [],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, int|string|array<mixed>> $properties
+     */
+    private function createFormAction(Form $form, string $type, array $properties = []): Action
+    {
+        $action = new Action();
+
+        $action->setName($type);
+        $action->setType($type);
+        $action->setForm($form);
+        $action->setProperties($properties);
+
+        $this->em->persist($action);
+
+        return $action;
     }
 
     private function createForm(string $name, string $alias): Form
