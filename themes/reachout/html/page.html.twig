@@ -2,8 +2,13 @@
 
 {% block content %}
 <div class="sidebars">
-    <div class="sidebar--left"><img class="logo--small"
-            src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+    <div class="sidebar--left">
+        <div class="company-wrapper">
+            <img class="logo--small" src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+            <div class="company-name">
+                <p>Company name</p>
+            </div>
+        </div>
         <div class="h3">
             <p>Chat with us</p>
         </div>
@@ -134,6 +139,19 @@
         margin: 0;
     }
 
+    .company-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        max-width: fit-content;
+    }
+
+    .company-name {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
     .h3 {
         padding: 0 10px;
         margin-top: 45px;
@@ -200,7 +218,7 @@
 
     .logo--small {
         padding: 0 10px;
-        height: 35px;
+        height: 25px;
     }
 
     .logo--big {
