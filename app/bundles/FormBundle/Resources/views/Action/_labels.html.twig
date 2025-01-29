@@ -15,7 +15,7 @@
         {% set operatorKey = 'mautic.lead.lead.submitaction.operator_' ~ action.properties.operator %}
         {% set operatorLabel = operatorKey|trans %}
 
-        {% set pointGroup = getEntities('Mautic\\PointBundle\\Entity\\Group', [action.properties.group])|first %}
+        {% set pointGroup = getEntity('Mautic\\PointBundle\\Entity\\Group', action.properties.group) %}
         {% set groupName = pointGroup ? pointGroup.name : '' %}
 
         {% set label = 'mautic.form.field.points.operation'|trans({
@@ -70,40 +70,34 @@
         } %}
     {% endif %}
 
-    {% if action.properties.email is defined and securityIsGranted('email:emails:view') %}
+    {% if action.type != 'form.repost' and  action.properties.email is defined and securityIsGranted('email:emails:view') %}
     <!-- Email to send to contact -->
-        {% set emails = getEntities('Mautic\\EmailBundle\\Entity\\Email', [action.properties.email]) %}
-        {% if emails|length > 0 %}
-            {% set email = emails[0] %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
-                'tags': [{
-                    'label': email.name,
-                    'icon': 'ri-mail-line',
-                    'attributes': {
-                        'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.email }),
-                        'target': '_blank'
-                    }
-                }]
-            } %}
-        {% endif %}
+        {% set email = getEntity('Mautic\\EmailBundle\\Entity\\Email', action.properties.email) %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': email.name,
+                'icon': 'ri-mail-line',
+                'attributes': {
+                    'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.email }),
+                    'target': '_blank'
+                }
+            }]
+        } %}
     {% endif %}
 
     {% if action.properties.useremail is defined and action.properties.useremail.email is defined and securityIsGranted('email:emails:view') %}
     <!-- Email to send to user -->
-        {% set emails = getEntities('Mautic\\EmailBundle\\Entity\\Email', [action.properties.useremail.email]) %}
-        {% if emails|length > 0 %}
-            {% set email = emails[0] %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
-                'tags': [{
-                    'label': email.name,
-                    'icon': 'ri-mail-line',
-                    'attributes': {
-                        'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.useremail.email }),
-                        'target': '_blank'
-                    }
-                }]
-            } %}
-        {% endif %}
+        {% set email = getEntity('Mautic\\EmailBundle\\Entity\\Email', action.properties.useremail.email) %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': email.name,
+                'icon': 'ri-mail-line',
+                'attributes': {
+                    'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.useremail.email }),
+                    'target': '_blank'
+                }
+            }]
+        } %}
     {% endif %}
 
     {% if action.properties.user_id is defined and action.properties.user_id is not empty %}
@@ -199,7 +193,7 @@
     {% if action.properties.asset is defined %}
         {% if action.properties.asset is null and action.properties.category is defined %}
             <!-- Using last asset from category -->
-            {% set category = getEntities('Mautic\\CategoryBundle\\Entity\\Category', [action.properties.category])|first %}
+            {% set category = getEntity('Mautic\\CategoryBundle\\Entity\\Category', action.properties.category) %}
             {% set categoryName = category ? category.title : '' %}
 
             {% include '@MauticCore/Helper/_tag.html.twig' with {
@@ -217,7 +211,7 @@
             } %}
         {% elseif action.properties.asset is not null %}
             <!-- Specific asset selected -->
-            {% set asset = getEntities('Mautic\\AssetBundle\\Entity\\Asset', [action.properties.asset])|first %}
+            {% set asset = getEntity('Mautic\\AssetBundle\\Entity\\Asset', action.properties.asset) %}
             {% if asset %}
                 {% include '@MauticCore/Helper/_tag.html.twig' with {
                     tags: [

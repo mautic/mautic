@@ -10,7 +10,7 @@ use Twig\TwigFunction;
 
 class EntityHelper extends AbstractExtension
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
     }
 
@@ -20,31 +20,34 @@ class EntityHelper extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('getEntity', [$this, 'getEntity']),
             new TwigFunction('getEntities', [$this, 'getEntities']),
         ];
     }
 
     /**
-     * Retrieves entities based on the provided class name and ID(s).
+     * Retrieves an entity based on the provided class name and ID.
      *
-     * @param string           $entityName the fully qualified class name of the entity
-     * @param int|string|array $ids        a single ID or an array of IDs to retrieve
+     * @param class-string    $entityName The fully qualified class name of the entity
+     * @param int|string|null $id         The ID of the entity to retrieve
      *
-     * @return array the array of retrieved entities
+     * @return object|null The retrieved entity or null if not found
      */
-    public function getEntities(string $entityName, int|string|array $ids): array
+    public function getEntity(string $entityName, int|string|null $id): ?object
     {
-        // If $ids is not an array, convert it into an array
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
+        return null !== $id ? $this->entityManager->getRepository($entityName)->find($id) : null;
+    }
 
-        // Fetch entities using the repository's findBy method
-        $entities = $this->entityManager
-                         ->getRepository($entityName)
-                         ->findBy(['id' => $ids]);
-
-        // Ensure the result is always an array
-        return is_array($entities) ? $entities : [$entities];
+    /**
+     * Retrieves multiple entities based on the provided class name and an array of IDs.
+     *
+     * @param class-string   $entityName The fully qualified class name of the entity
+     * @param int[]|string[] $ids        An array of IDs to retrieve
+     *
+     * @return object[] The array of retrieved entities
+     */
+    public function getEntities(string $entityName, array $ids): array
+    {
+        return $this->entityManager->getRepository($entityName)->findBy(['id' => $ids]);
     }
 }
