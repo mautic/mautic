@@ -1,6 +1,6 @@
 {
   "name": "mautic/theme-reachout",
-  "description": "Mautic Reachout Theme",
+  "description": "Mautic ReachOut Theme",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
   "minimum-stability": "dev",
