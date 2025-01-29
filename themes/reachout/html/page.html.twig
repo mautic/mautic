@@ -105,21 +105,9 @@
         text-decoration: none;
     }
 
-    .gjs-row {
-        display: block;
-        padding: 10px;
-        width: 100%;
-    }
-
-    .gjs-cell {
-        width: 100%;
-        display: block;
-        height: auto;
-    }
-
     .sidebar--left {
         width: 100%;
-        max-width: 100%;
+        max-width: fit-content;
         height: 100%;
         background-color: #fafafa;
         border-radius: 12px;
@@ -139,6 +127,7 @@
         margin: 0;
         padding: 20px 0;
         padding-left: 10px;
+        min-width: 290px;
     }
 
     .sidebar--right .mauticform_wrapper {
@@ -205,7 +194,7 @@
         align-items: center;
         min-height: 100vh;
         padding: 10px;
-        gap: 30px;
+        gap: 100px;
         flex-wrap: wrap;
     }
 
@@ -215,7 +204,6 @@
     }
 
     .logo--big {
-        padding: 0 10px;
         height: 100px;
     }
 
@@ -223,16 +211,6 @@
 
     /* Tablet and Up */
     @media (min-width: 768px) {
-        .gjs-row {
-            display: table;
-        }
-
-        .gjs-cell {
-            width: 8%;
-            display: table-cell;
-            height: 75px;
-        }
-
         .sidebars {
             flex-direction: row;
             justify-content: center;
@@ -246,7 +224,7 @@
         }
 
         .sidebar--right {
-            width: 50%;
+            width: 30%;
             padding: 50px 0;
         }
 
