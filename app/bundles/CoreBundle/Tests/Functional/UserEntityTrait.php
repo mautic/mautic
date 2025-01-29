@@ -12,11 +12,11 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 trait UserEntityTrait
 {
-    private function loginOtherUser(string $name): void
+    private function loginOtherUser(User $user): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($name);
-        $this->client->setServerParameter('PHP_AUTH_USER', $name);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
     }
 
