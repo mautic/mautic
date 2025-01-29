@@ -20,7 +20,7 @@
     "@ckeditor/ckeditor5-ckfinder": "^43.1.1",
     "@ckeditor/ckeditor5-core": "^43.1.1",
     "@ckeditor/ckeditor5-dev-translations": "^43.0.0",
-    "@ckeditor/ckeditor5-dev-utils": "^43.0.0",
+    "@ckeditor/ckeditor5-dev-utils": "^46.0.1",
     "@ckeditor/ckeditor5-editor-classic": "^43.1.1",
     "@ckeditor/ckeditor5-essentials": "^43.1.1",
     "@ckeditor/ckeditor5-font": "^43.1.1",
@@ -58,7 +58,6 @@
     "js-cookie": "^2.2.1",
     "jsplumb": "^2.15.6",
     "jvectormap-next": "^3.1.1",
-    "modernizr": "^3.12.0",
     "moment": "^2.29.4",
     "mousetrap": "^1.6.5",
     "multiselect": "^0.9.12",
@@ -68,6 +67,6 @@
   },
   "scripts": {
     "build": "webpack --mode production  --config webpack.config.js",
-    "postinstall": "node_modules/modernizr/bin/modernizr -c modernizr-config.json -d node_modules/modernizr/modernizr-mautic-dist.js & npm run build"
+    "postinstall": "npm run build"
   }
 }
