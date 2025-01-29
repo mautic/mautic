@@ -244,6 +244,11 @@
             "name": "theme-creative",
             "directory": "themes/creative",
             "target": "git@github.com:mautic/theme-creative.git"
+        },
+        {
+            "name": "theme-reachout",
+            "directory": "themes/reachout",
+            "target": "git@github.com:mautic/theme-reachout.git"
         }
 
     ]
