@@ -23,7 +23,7 @@ class ContactScheduledExportCommand extends Command
     public function __construct(
         private ContactExportSchedulerModel $contactExportSchedulerModel,
         private EventDispatcherInterface $eventDispatcher,
-        private FormatterHelper $formatterHelper
+        private FormatterHelper $formatterHelper,
     ) {
         parent::__construct();
     }

@@ -44,7 +44,7 @@ class ContactTracker
         private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         private EventDispatcherInterface $dispatcher,
-        FieldModel $leadFieldModel
+        FieldModel $leadFieldModel,
     ) {
         $this->leadFieldModel         = $leadFieldModel;
     }
@@ -248,10 +248,8 @@ class ContactTracker
 
     /**
      * @param bool $persist
-     *
-     * @return Lead
      */
-    private function createNewContact(IpAddress $ip = null, $persist = true)
+    private function createNewContact(IpAddress $ip = null, $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();

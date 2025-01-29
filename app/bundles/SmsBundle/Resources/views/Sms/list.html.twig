@@ -10,12 +10,12 @@
             'searchValue': searchValue,
             'searchId': 'sms-search',
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': permissions['sms:smses:create']
                 },
                 'routeBase': 'sms'
-            }),
+            },
             'quickFilters': [
                 {
                     'search': 'mautic.core.searchcommand.ispublished',

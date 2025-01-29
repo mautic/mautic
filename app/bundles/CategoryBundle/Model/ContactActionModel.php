@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 class ContactActionModel
 {
     public function __construct(
-        private LeadModel $contactModel
+        private LeadModel $contactModel,
     ) {
     }
 

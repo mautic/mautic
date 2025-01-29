@@ -82,12 +82,14 @@ class ImportTest extends StandardImportTestHelper
         $import->setUpdatedCount($count);
         $import->setInsertedCount($count);
 
-        $this->assertSame(3 * $count, $import->getProcessedRows());
+        $expectedCount = (3 * $count);
+        $this->assertSame($expectedCount, $import->getProcessedRows());
 
         $import->increaseIgnoredCount();
         $import->increaseIgnoredCount();
 
-        $this->assertSame(3 * $count + 2, $import->getProcessedRows());
+        $expectedCount = (int) (2 + $expectedCount);
+        $this->assertSame($expectedCount, $import->getProcessedRows()); // @phpstan-ignore argument.unresolvableType (I don't see anything wrong)
     }
 
     public function testGetProgressPercentage(): void
@@ -95,7 +97,7 @@ class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity()
             ->setLineCount(100);
 
-        $this->assertSame(0, $import->getProgressPercentage());
+        $this->assertSame(0.0, $import->getProgressPercentage());
 
         $import->setIgnoredCount(3);
 
@@ -120,7 +122,6 @@ class ImportTest extends StandardImportTestHelper
         $startDate = $import->getDateStarted();
 
         $this->assertSame(Import::IN_PROGRESS, $import->getStatus());
-        $this->assertTrue($startDate instanceof \DateTime);
 
         // But the date started will not change when started for the second time.
         $import->end(false);
@@ -139,7 +140,7 @@ class ImportTest extends StandardImportTestHelper
         $import->start()->end(false);
 
         $this->assertSame(Import::IMPORTED, $import->getStatus());
-        $this->assertTrue($import->getDateEnded() instanceof \DateTime);
+        $this->assertNotNull($import->getDateEnded());
     }
 
     public function testGetRunTime(): void
@@ -173,7 +174,7 @@ class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0, $import->getSpeed());
+        $this->assertSame(0.0, $import->getSpeed());
 
         $import->setInsertedCount(900);
         $import->end(false);
@@ -187,12 +188,12 @@ class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0, $import->getSpeed());
+        $this->assertSame(0.0, $import->getSpeed());
 
         $import->setInsertedCount(3);
         $import->end(false);
 
-        $this->assertSame(3, $import->getSpeed());
+        $this->assertSame(3.0, $import->getSpeed());
     }
 
     /**

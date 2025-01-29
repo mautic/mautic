@@ -28,7 +28,7 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $output;
 
-    private ?ConsoleErrorListener $listener;
+    private ConsoleErrorListener $listener;
 
     protected function setUp(): void
     {

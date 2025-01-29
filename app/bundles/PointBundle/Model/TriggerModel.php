@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -32,7 +33,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Trigger>
  */
-class TriggerModel extends CommonFormModel
+class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 {
     protected $triggers = [];
 
@@ -57,7 +58,7 @@ class TriggerModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -360,10 +361,7 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function invokeCallback($event, Lead $lead, array $settings)
+    private function invokeCallback($event, Lead $lead, array $settings): mixed
     {
         $args = [
             'event'   => $event,
@@ -383,6 +381,10 @@ class TriggerModel extends CommonFormModel
 
         $pass = [];
         foreach ($reflection->getParameters() as $param) {
+            if ('factory' === $param->getName()) {
+                @\trigger_error('Using "factory" parameter is deprecated. Use dependency injection instead. Usage of "factory" parameter will be removed in 6.0.', \E_USER_DEPRECATED);
+            }
+
             if (isset($args[$param->getName()])) {
                 $pass[] = $args[$param->getName()];
             } else {

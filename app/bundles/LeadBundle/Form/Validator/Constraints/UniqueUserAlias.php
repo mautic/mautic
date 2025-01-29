@@ -11,22 +11,22 @@ class UniqueUserAlias extends Constraint
 
     public $field   = '';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'uniqueleadlist';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['field'];
     }
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'field';
     }

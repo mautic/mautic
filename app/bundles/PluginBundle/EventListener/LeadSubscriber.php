@@ -17,7 +17,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private PluginModel $pluginModel,
-        private IntegrationRepository $integrationRepository
+        private IntegrationRepository $integrationRepository,
     ) {
     }
 

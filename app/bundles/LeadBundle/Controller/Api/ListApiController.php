@@ -230,7 +230,7 @@ class ListApiController extends CommonApiController
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         } elseif ('delete' == $action) {
-            return $this->factory->getSecurity()->hasEntityAccess(
+            return $this->security->hasEntityAccess(
                 true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );
         }

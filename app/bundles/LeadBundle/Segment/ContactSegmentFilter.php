@@ -30,7 +30,7 @@ class ContactSegmentFilter implements \Stringable
         private FilterDecoratorInterface $filterDecorator,
         private TableSchemaColumnsCache $schemaCache,
         private FilterQueryBuilderInterface $filterQueryBuilder,
-        private array $batchLimiters = []
+        private array $batchLimiters = [],
     ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
     }

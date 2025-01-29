@@ -11,7 +11,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -19,31 +21,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FieldHelperTest extends TestCase
 {
     /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldModel&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $fieldModel;
 
     /**
-     * @var VariableExpresserHelperInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
-    private \PHPUnit\Framework\MockObject\MockObject $variableExpresserHelper;
+    private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var ChannelListHelper
+     * @var VariableExpresserHelperInterface&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $channelListHelper;
-
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    private MockObject $variableExpresserHelper;
 
     /**
-     * @var MauticSyncFieldsLoadEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @var ChannelListHelper&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mauticSyncFieldsLoadEvent;
+    private MockObject $channelListHelper;
+
+    private MockObject $eventDispatcher;
 
     /**
-     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
+     * @var MauticSyncFieldsLoadEvent&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $mauticSyncFieldsLoadEvent;
+
+    /**
+     * @var ObjectProvider&MockObject
+     */
+    private MockObject $objectProvider;
 
     private FieldHelper $fieldHelper;
 
@@ -61,8 +68,11 @@ class FieldHelperTest extends TestCase
         $this->eventDispatcher->method('dispatch')
             ->willReturn($this->mauticSyncFieldsLoadEvent);
 
+        $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+
         $this->fieldHelper = new FieldHelper(
             $this->fieldModel,
+            $this->fieldsWithUniqueIdentifier,
             $this->variableExpresserHelper,
             $this->channelListHelper,
             $this->createMock(TranslatorInterface::class),
@@ -129,8 +139,8 @@ class FieldHelperTest extends TestCase
             ->method('getFieldList')
             ->willReturn(['some fields']);
 
-        $this->fieldModel->expects($this->once())
-            ->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())
+            ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(['some unique fields']);
 
         $this->assertSame(
@@ -151,8 +161,8 @@ class FieldHelperTest extends TestCase
             ->method('getFieldList')
             ->willReturn(['some fields']);
 
-        $this->fieldModel->expects($this->never())
-            ->method('getUniqueIdentifierFields');
+        $this->fieldsWithUniqueIdentifier->expects($this->never())
+            ->method('getFieldsWithUniqueIdentifier');
 
         $this->assertSame(
             ['some fields'],

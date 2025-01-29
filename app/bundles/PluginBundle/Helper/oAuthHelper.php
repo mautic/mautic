@@ -25,7 +25,7 @@ class oAuthHelper
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private ?Request $request = null,
-        $settings = []
+        $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();

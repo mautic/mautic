@@ -67,7 +67,7 @@ class RequestStateStore extends AbstractRequestStateArrayStore
     /**
      * @param array<mixed> $arr
      */
-    protected function setArray(array $arr): void
+    protected function setArray(array $arr): AbstractRequestStateArrayStore
     {
         throw new \LogicException('Not implemented');
     }

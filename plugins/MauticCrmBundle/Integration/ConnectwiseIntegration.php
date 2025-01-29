@@ -94,10 +94,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return sprintf('%s/v4_6_release/apis/3.0', $this->keys['site']);
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }

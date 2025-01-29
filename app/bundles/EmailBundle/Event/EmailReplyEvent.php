@@ -11,7 +11,7 @@ class EmailReplyEvent extends Event
     private ?Email $email;
 
     public function __construct(
-        private Stat $stat
+        private Stat $stat,
     ) {
         $this->email = $stat->getEmail();
     }

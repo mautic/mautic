@@ -123,7 +123,7 @@
 
 {% if inForm is defined and true == inForm %}
   <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-      <label class="text-muted">{{ field.label|purify }}</label>
+      <label class="text-secondary">{{ field.label|purify }}</label>
   </div>
 {% else %}
   {% set inputAttributes = inputAttributes|merge({
@@ -131,4 +131,3 @@
   }) %}
   <input {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
 {% endif %}
-

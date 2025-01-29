@@ -41,7 +41,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         string $object,
         string $type,
         string $operator,
-        array $additionalValue = []
+        array $additionalValue = [],
     ): void {
         $fieldDetails = [
             'alias'               => 'select_field',
@@ -129,7 +129,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         Event $yesEvent,
         Event $noEvent,
         array $yesEventLeads,
-        array $noEventLeads
+        array $noEventLeads,
     ): void {
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
             ->findBy(['campaign' => $campaign, 'event' => $yesEvent], ['event' => 'ASC']);
@@ -177,7 +177,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         $field->setAlias($fieldDetails['alias']);
         $field->setProperties($fieldDetails['properties']);
 
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
         \assert($fieldModel instanceof FieldModel);
         $fieldModel->saveEntity($field);
     }
@@ -218,7 +218,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
                     ],
                 ],
             ]);
-            $leadModel = self::$container->get('mautic.lead.model.lead');
+            $leadModel = self::getContainer()->get('mautic.lead.model.lead');
             \assert($leadModel instanceof LeadModel);
             $leadModel->setFieldValues($lead, [$customField['alias'] => $customField['value']]);
         }
@@ -265,7 +265,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         string $eventType,
         array $property = null,
         string $decisionPath = '',
-        Event $parentEvent = null
+        Event $parentEvent = null,
     ): Event {
         $event = new Event();
         $event->setName($name);
@@ -300,7 +300,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
                     ],
                 ],
             ]);
-            $companyModel = self::$container->get('mautic.lead.model.company');
+            $companyModel = self::getContainer()->get('mautic.lead.model.company');
             \assert($companyModel instanceof CompanyModel);
             $companyModel->setFieldValues($company, [$customField['alias'] => $customField['value']]);
         }
@@ -328,7 +328,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         string $object,
         array $fieldDetails,
         array $additionalValue,
-        int $index
+        int $index,
     ): Lead {
         $fieldValue      = !empty($fieldDetails) ?
             array_merge($fieldDetails, ['value' => array_merge(['v'.$index], $additionalValue)]) : [];

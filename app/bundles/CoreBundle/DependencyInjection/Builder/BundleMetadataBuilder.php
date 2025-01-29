@@ -16,14 +16,11 @@ class BundleMetadataBuilder
 
     private array $pluginMetadata = [];
 
-    /**
-     * @var array
-     */
-    private $coreMetadata = [];
+    private array $coreMetadata = [];
 
     public function __construct(
         private array $symfonyBundles,
-        private array $paths
+        private array $paths,
     ) {
         $this->buildMetadata();
     }

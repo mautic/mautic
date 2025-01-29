@@ -40,7 +40,7 @@ class WebhookApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
     ) {
         $webhookModel = $modelFactory->getModel('webhook');
         \assert($webhookModel instanceof WebhookModel);

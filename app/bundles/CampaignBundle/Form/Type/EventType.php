@@ -329,7 +329,7 @@ class EventType extends AbstractType
         return new \DateTime($data[$name]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'campaignevent';
     }

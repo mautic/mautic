@@ -25,7 +25,7 @@ class ImportCommand extends Command
         private TranslatorInterface $translator,
         private ImportModel $importModel,
         private ProcessSignalService $processSignalService,
-        private UserTokenSetter $userTokenSetter
+        private UserTokenSetter $userTokenSetter,
     ) {
         parent::__construct();
     }

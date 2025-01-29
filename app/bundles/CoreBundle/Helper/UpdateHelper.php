@@ -32,7 +32,7 @@ class UpdateHelper
         private CoreParametersHelper $coreParametersHelper,
         private Client $client,
         private ReleaseParser $releaseParser,
-        private PreUpdateCheckHelper $preUpdateCheckHelper
+        private PreUpdateCheckHelper $preUpdateCheckHelper,
     ) {
         $this->mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : 'unknown';
         $this->phpVersion    = defined('PHP_VERSION') ? PHP_VERSION : 'unknown';

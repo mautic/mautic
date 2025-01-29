@@ -20,7 +20,7 @@ class Interval implements ScheduleModeInterface
 
     public function __construct(
         private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -190,7 +190,7 @@ class Interval implements ScheduleModeInterface
         \DateTimeInterface $hour = null,
         \DateTimeInterface $startTime = null,
         \DateTimeInterface $endTime = null,
-        array $daysOfWeek = []
+        array $daysOfWeek = [],
     ) {
         $this->logger->debug(
             sprintf('CAMPAIGN: Comparing calculated executed time for event ID %s and contact ID %s with %s', $eventId, $contact->getId(), $compareFromDateTime->format('Y-m-d H:i:s e'))
@@ -273,7 +273,7 @@ class Interval implements ScheduleModeInterface
         \DateTimeInterface $startTime,
         \DateTimeInterface $endTime,
         $eventId,
-        \DateTimeInterface $compareFromDateTime
+        \DateTimeInterface $compareFromDateTime,
     ) {
         /* @var \DateTime $startTime */
         $startTime = clone $startTime;

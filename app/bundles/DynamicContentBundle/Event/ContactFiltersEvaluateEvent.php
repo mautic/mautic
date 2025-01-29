@@ -18,7 +18,7 @@ final class ContactFiltersEvaluateEvent extends Event
      */
     public function __construct(
         private array $filters,
-        private Lead $contact
+        private Lead $contact,
     ) {
     }
 

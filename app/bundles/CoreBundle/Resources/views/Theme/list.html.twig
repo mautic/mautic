@@ -10,11 +10,6 @@
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'checkall': 'true',
                             'target'  : '#themeTable',
-                            'langVar' : 'core.theme',
-                            'routeBase': 'themes',
-                            'templateButtons': {
-                                'delete': permissions['core:themes:delete'],
-                            },
                         })}}
 
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {

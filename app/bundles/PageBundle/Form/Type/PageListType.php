@@ -21,7 +21,7 @@ class PageListType extends AbstractType
 
     public function __construct(
         private PageModel $model,
-        CorePermissions $corePermissions
+        CorePermissions $corePermissions,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
@@ -62,7 +62,7 @@ class PageListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

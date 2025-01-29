@@ -26,7 +26,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         private FieldList $fieldList,
         private CorePermissions $corePermissions,
         private LeadModel $contactModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -98,7 +98,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 true,
                 $event->eventLog,
                 (int) $event->import->getId(),
-                $event->import->getDefault('skip_if_exists')
+                (bool) $event->import->getDefault('skip_if_exists')
             );
             $event->setWasMerged((bool) $merged);
             $event->stopPropagation();

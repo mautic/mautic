@@ -31,7 +31,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return '';
@@ -42,12 +42,12 @@ class HttpFactoryTest extends TestCase
                 return '';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return '';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -60,7 +60,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -71,12 +71,12 @@ class HttpFactoryTest extends TestCase
                 return '';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return '';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -87,7 +87,7 @@ class HttpFactoryTest extends TestCase
 
     public function testBaseURISetOnBaseUriAwareCredentials(): void
     {
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -98,17 +98,17 @@ class HttpFactoryTest extends TestCase
                 return 'http://token.url';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'bar';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'foo';
             }
 
-            public function getCode(): ?string
+            public function getCode(): string
             {
                 return 'auth_code';
             }
@@ -118,12 +118,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://redirect.url';
             }
 
-            public function getScope(): ?string
+            public function getScope(): string
             {
                 return 'scope';
             }
 
-            public function getBaseUri(): ?string
+            public function getBaseUri(): string
             {
                 return 'https://mautic.com';
             }
@@ -142,7 +142,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -153,12 +153,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://token.url';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return '';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -171,7 +171,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -182,12 +182,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://token.url';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -198,7 +198,7 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new class implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -209,12 +209,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://token.url';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
@@ -226,7 +226,7 @@ class HttpFactoryTest extends TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credentials2 = new class() implements CredentialsInterface {
+        $credentials2 = new class implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -237,12 +237,12 @@ class HttpFactoryTest extends TestCase
                 return 'http://token.url';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'bar';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'foo';
             }
@@ -348,7 +348,7 @@ class HttpFactoryTest extends TestCase
      */
     private function getCredentials(): CredentialsInterface
     {
-        return new class() implements CredentialsInterface, CodeInterface, RedirectUriInterface, ScopeInterface {
+        return new class implements CredentialsInterface, CodeInterface, RedirectUriInterface, ScopeInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -359,17 +359,17 @@ class HttpFactoryTest extends TestCase
                 return 'http://token.url';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'bar';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'foo';
             }
 
-            public function getCode(): ?string
+            public function getCode(): string
             {
                 return 'auth_code';
             }
@@ -379,7 +379,7 @@ class HttpFactoryTest extends TestCase
                 return 'http://redirect.url';
             }
 
-            public function getScope(): ?string
+            public function getScope(): string
             {
                 return 'scope';
             }

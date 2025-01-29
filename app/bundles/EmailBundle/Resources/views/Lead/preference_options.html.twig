@@ -62,7 +62,7 @@
                                     <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
                                         {% if showContactFrequency %}
                                             <div class="col-md-6" data-contact-frequency="1">
-                                                <label class="text-muted">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
+                                                <label class="text-secondary">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
                                                 {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value]) }}
                                                 {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
                                                 {{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}
@@ -70,7 +70,7 @@
                                         {% endif %}
                                         {%  if showContactPauseDates %}
                                             <div class="col-md-6" data-contact-pause-dates="1">
-                                                <label class="text-muted">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                                                <label class="text-secondary">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                                                 {{ form_widget(form.lead_channels['contact_pause_start_date_' ~ channel.value]) }}
                                                 {{ form_label(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
                                                 {{ form_widget(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}

@@ -38,12 +38,12 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $listModel;
 
     /**
-     * @var MockObject&campaignModel
+     * @var MockObject&CampaignModel
      */
     private MockObject $campaignModel;
 
     /**
-     * @var MockObject&emailModel
+     * @var MockObject&EmailModel
      */
     private MockObject $emailModel;
 

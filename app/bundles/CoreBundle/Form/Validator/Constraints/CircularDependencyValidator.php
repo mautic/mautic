@@ -16,7 +16,7 @@ class CircularDependencyValidator extends ConstraintValidator
 {
     public function __construct(
         private ListModel $model,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -43,7 +43,7 @@ class CircularDependencyValidator extends ConstraintValidator
     private function getSegmentIdFromRequest(): int
     {
         $request     = $this->requestStack->getCurrentRequest();
-        $routeParams = $request->get('_route_params');
+        $routeParams = $request->request->all()['_route_params'] ?? [];
 
         if (empty($routeParams['objectId'])) {
             throw new \UnexpectedValueException('Segment ID is missing in the request');

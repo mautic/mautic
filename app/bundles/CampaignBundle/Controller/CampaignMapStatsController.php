@@ -81,7 +81,7 @@ class CampaignMapStatsController extends AbstractController
         CorePermissions $security,
         int $objectId,
         string $dateFrom = '',
-        string $dateTo = ''
+        string $dateTo = '',
     ): Response {
         $entity = $this->model->getEntity($objectId);
 

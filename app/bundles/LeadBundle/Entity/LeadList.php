@@ -65,7 +65,7 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
+     * @var ArrayCollection<ListLead>
      */
     private $leads;
 
@@ -274,7 +274,7 @@ class LeadList extends FormEntity
     public function getFilters()
     {
         if (is_array($this->filters)) {
-            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters));
+            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters)); // @phpstan-ignore method.deprecated
         }
 
         return $this->filters;

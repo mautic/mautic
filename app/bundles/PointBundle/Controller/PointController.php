@@ -120,7 +120,7 @@ class PointController extends AbstractFormController
         // set the page we came from
         $page       = $request->getSession()->get('mautic.point.page', 1);
         $method     = $request->getMethod();
-        $point      = $request->request->get('point') ?? [];
+        $point      = $request->request->all()['point'] ?? [];
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
         $actions    = $model->getPointActions();
@@ -253,7 +253,7 @@ class PointController extends AbstractFormController
         }
 
         $method     = $request->getMethod();
-        $point      = $request->request->get('point') ?? [];
+        $point      = $request->request->all()['point'] ?? [];
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : $entity->getType();
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
@@ -420,10 +420,8 @@ class PointController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.point.page', 1);
         $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $page]);

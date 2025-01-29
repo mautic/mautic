@@ -136,7 +136,7 @@
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#lead-details">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#lead-details">
                        <span class="caret"></span>
                        {{ 'mautic.core.details'|trans }}
                     </a>
@@ -208,11 +208,11 @@
             <div class="panel-body pt-sm">
                 {% if company.owner %}
                   <h6 class="fw-sb">{{ 'mautic.lead.company.field.owner'|trans }}</h6>
-                  <p class="text-muted">{{ company.owner.name }}</p>
+                  <p class="text-secondary">{{ company.owner.name }}</p>
                 {% endif %}
 
                 <h6 class="fw-sb">{{ 'mautic.lead.field.address'|trans }}</h6>
-                <address class="text-muted">
+                <address class="text-secondary">
                     {% if company.address1 is not empty %}
                         {{ company.address1 }}<br>
                     {% endif %}
@@ -224,11 +224,11 @@
                 </address>
 
                 <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
-                <p class="text-muted">{{ company.email }}</p>
+                <p class="text-secondary">{{ company.email }}</p>
 
                 {% if company.phone is not empty %}
                   <h6 class="fw-sb">{{ 'mautic.company.phone'|trans }}</h6>
-                  <p class="text-muted">{{ company.phone }}</p>
+                  <p class="text-secondary">{{ company.phone }}</p>
                 {% endif %}
             </div>
         </div>

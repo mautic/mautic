@@ -102,6 +102,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactPreferencesLandingPageTracking(): void
     {
+        $this->logoutUser();
         $lead                 = $this->createLead();
         $preferenceCenterPage = $this->getPreferencesCenterLandingPage();
         $stat                 = $this->getStat(null, $lead, $preferenceCenterPage);
@@ -208,13 +209,14 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void
     {
+        $this->logoutUser();
         $lead              = $this->createLead();
         $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
         $stat              = $this->getStat(null, $lead, $preferencesCenter);
         $this->em->flush();
-        $crawler    = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertResponseIsSuccessful();
         $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertEquals(1, $tokenInput->count(), $this->client->getResponse()->getContent());
     }
 
@@ -321,9 +323,10 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
     }
 
-    public function testPreviewForExpiredEmail(): void
+    public function testPreviewForExpiredEmailForAnonymousUser(): void
     {
-        $emailName    = 'Test preview email';
+        $this->logoutUser();
+        $emailName = 'Test preview email';
 
         $email = new Email();
         $email->setName($emailName);
@@ -359,7 +362,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         string $email,
         string $emailHash,
         string $message,
-        bool $addedRow
+        bool $addedRow,
     ): void {
         $uri = '/email/unsubscribe/'.$statHash.'/'.$email.'/'.$emailHash;
         $this->client->request(Request::METHOD_GET, $uri);
@@ -393,7 +396,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail($rightEmail);
         $this->em->persist($lead);
         // Email hash
-        $coreParametersHelper   = self::$container->get('mautic.helper.core_parameters');
+        $coreParametersHelper   = self::getContainer()->get('mautic.helper.core_parameters');
         $configSecretEmailHash  = $coreParametersHelper->get('secret_key');
         $rightHashForWrongEmail = hash_hmac('sha256', $wrongEmail, $configSecretEmailHash);
         $rightHashForRightEmail = hash_hmac('sha256', $rightEmail, $configSecretEmailHash);
@@ -515,7 +518,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert that the link for unsubscribe all exists
         $unsubscribeAllLink = $crawler->filter('a[href^="/email/dnc/"]')->first();
-        $this->assertNotNull($unsubscribeAllLink, 'Unsubscribe all link not found');
+        $this->assertCount(1, $unsubscribeAllLink, 'Unsubscribe all link not found');
         $href = $unsubscribeAllLink->attr('href');
 
         // Click the link for unsubscribe all

@@ -6,13 +6,16 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\EventListener\SearchSubscriber;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -32,9 +35,12 @@ class SearchSubscriberTest extends TestCase
         $connection        = $this->getMockedConnection();
         $mockPlatform      = $this->createMock(AbstractPlatform::class);
         $leadModel         = $this->createMock(LeadModel::class);
+        $companyModel      = $this->createMock(CompanyModel::class);
+        $listModel         = $this->createMock(ListModel::class);
         $translator        = $this->createMock(TranslatorInterface::class);
         $security          = $this->createMock(CorePermissions::class);
         $twig              = $this->createMock(Environment::class);
+        $globalSearch      = $this->createMock(GlobalSearch::class);
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
@@ -88,10 +94,13 @@ class SearchSubscriberTest extends TestCase
 
         $subscriber = new SearchSubscriber(
             $leadModel,
+            $companyModel,
+            $listModel,
             $emailRepository,
             $translator,
             $security,
-            $twig
+            $twig,
+            $globalSearch
         );
 
         $dispatcher = new EventDispatcher();

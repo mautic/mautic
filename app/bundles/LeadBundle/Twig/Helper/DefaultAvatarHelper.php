@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 final class DefaultAvatarHelper
 {
     public function __construct(
-        private AssetsHelper $assetsHelper
+        private AssetsHelper $assetsHelper,
     ) {
     }
 

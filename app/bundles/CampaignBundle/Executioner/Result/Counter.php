@@ -18,7 +18,7 @@ class Counter
         private $executed = 0,
         private $totalEvaluated = 0,
         private $totalExecuted = 0,
-        private $totalScheduled = 0
+        private $totalScheduled = 0,
     ) {
     }
 

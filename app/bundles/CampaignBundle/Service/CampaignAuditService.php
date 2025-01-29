@@ -15,7 +15,7 @@ class CampaignAuditService
         private FlashBag $flashBag,
         private UrlGeneratorInterface $urlGenerator,
         private CampaignRepository $campaignRepository,
-        private EmailRepository $emailRepository
+        private EmailRepository $emailRepository,
     ) {
     }
 

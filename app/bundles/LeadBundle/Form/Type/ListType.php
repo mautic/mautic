@@ -29,7 +29,7 @@ class ListType extends AbstractType
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private ListModel $listModel
+        private ListModel $listModel,
     ) {
     }
 
@@ -168,10 +168,7 @@ class ListType extends AbstractType
         $view->vars['fields'] = $this->listModel->getChoiceFields();
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadlist';
     }

@@ -48,10 +48,7 @@ class BatchLookupType extends AbstractType
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'fullcontact_batch_lookup';
     }

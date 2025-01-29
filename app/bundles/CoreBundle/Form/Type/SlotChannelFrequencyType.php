@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SlotChannelFrequencyType extends SlotType
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -93,10 +93,7 @@ class SlotChannelFrequencyType extends SlotType
         parent::buildForm($builder, $options);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'slot_channelfrequency';
     }

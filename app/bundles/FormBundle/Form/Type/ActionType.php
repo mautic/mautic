@@ -105,7 +105,7 @@ class ActionType extends AbstractType
         $resolver->setRequired(['settings', 'formId']);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'formaction';
     }

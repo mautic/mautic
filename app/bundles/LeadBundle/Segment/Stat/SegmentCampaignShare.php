@@ -11,7 +11,7 @@ class SegmentCampaignShare
     public function __construct(
         private CampaignModel $campaignModel,
         private CacheStorageHelper $cacheStorageHelper,
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
     ) {
     }
 

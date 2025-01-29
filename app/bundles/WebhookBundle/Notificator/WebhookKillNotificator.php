@@ -20,7 +20,7 @@ class WebhookKillNotificator
         private NotificationModel $notificationModel,
         private EntityManager $entityManager,
         private MailHelper $mailer,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
@@ -71,5 +73,15 @@ class TagRepository extends BaseTagRepository
         }
 
         return ($returnArray) ? $return : $return[$tagIds[0]];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function addCatchAllWhereClause($qb, $filter): array
+    {
+        return $this->addStandardCatchAllWhereClause($qb, $filter, [
+            'lt.tag',
+        ]);
     }
 }

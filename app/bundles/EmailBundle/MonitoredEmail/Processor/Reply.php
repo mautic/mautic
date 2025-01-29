@@ -27,7 +27,7 @@ class Reply implements ProcessorInterface
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private ContactTracker $contactTracker,
-        private EmailAddressHelper $addressHelper
+        private EmailAddressHelper $addressHelper,
     ) {
     }
 

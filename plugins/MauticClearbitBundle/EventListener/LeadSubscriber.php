@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LookupHelper $lookupHelper
+        private LookupHelper $lookupHelper,
     ) {
     }
 

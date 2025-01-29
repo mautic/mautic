@@ -3,7 +3,6 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
 use Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType;
@@ -80,7 +79,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private BuilderTokenHelperFactory $builderTokenHelperFactory,
         private TranslatorInterface $translator,
         private Connection $connection,
-        private Environment $twig
+        private Environment $twig,
     ) {
     }
 
@@ -294,14 +293,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 '@MauticCore/Slots/separator.html.twig',
                 SlotSeparatorType::class,
                 400
-            );
-            $event->addSlotType(
-                'gatedvideo',
-                $this->translator->trans('mautic.core.slot.label.gatedvideo'),
-                'video-camera',
-                '@MauticCore/Slots/gatedvideo.html.twig',
-                GatedVideoType::class,
-                300
             );
             $event->addSlotType(
                 'dwc',

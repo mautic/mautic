@@ -412,8 +412,10 @@ Mautic.switchFormFieldState = function (formName) {
         if (disable) {
             toggleFieldOff(field);
             field.addClass('disabled', disable);
+            field.attr('disabled', 'disabled');
         } else {
             field.removeClass('disabled', disable);
+            field.removeAttr('disabled');
         }
 
     });

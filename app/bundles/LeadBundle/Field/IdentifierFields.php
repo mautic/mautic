@@ -12,7 +12,7 @@ class IdentifierFields
 {
     public function __construct(
         private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private FieldList $fieldList
+        private FieldList $fieldList,
     ) {
     }
 

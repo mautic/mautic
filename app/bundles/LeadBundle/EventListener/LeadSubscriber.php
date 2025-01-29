@@ -41,7 +41,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var string[]
      */
-    private $preventLoop = [];
+    private array $preventLoop = [];
 
     /**
      * @var int|null
@@ -63,7 +63,7 @@ class LeadSubscriber implements EventSubscriberInterface
         ModelFactory $modelFactory,
         private CoreParametersHelper $coreParametersHelper,
         private CompanyLeadRepository $companyLeadRepository,
-        private $isTest = false
+        private $isTest = false,
     ) {
         $this->router              = $router;
 

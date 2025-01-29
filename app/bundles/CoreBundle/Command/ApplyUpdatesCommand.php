@@ -23,7 +23,7 @@ class ApplyUpdatesCommand extends Command
     public function __construct(
         private TranslatorInterface $translator,
         private StepProvider $stepProvider,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }

@@ -87,22 +87,14 @@ class AppKernel extends Kernel
             $this->boot();
         }
 
-        /*
-         * If we've already sent the response headers, and we have a session
-         * set in the request, set that as the session in the container.
-         */
-        if (headers_sent() && $request->hasSession()) {
-            $this->getContainer()->set('session', $request->getSession());
-        }
-
         // Check for an an active db connection and die with error if unable to connect
         if (!defined('MAUTIC_INSTALLER')) {
             $db = $this->getContainer()->get('database_connection');
             try {
                 $db->connect();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 error_log($e);
-                throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', ['%code%' => $e->getCode()]), 0, $e);
+                throw new Mautic\CoreBundle\Exception\DatabaseConnectionException($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', ['%code%' => $e->getCode()]), 0, $e);
             }
         }
 
@@ -164,7 +156,7 @@ class AppKernel extends Kernel
 
         // dynamically register Mautic Plugin Bundles
         $searchPath = $this->getApplicationDir().'/plugins';
-        $finder     = new \Symfony\Component\Finder\Finder();
+        $finder     = new Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
             ->depth('1')
@@ -179,7 +171,7 @@ class AppKernel extends Kernel
             if (class_exists($class)) {
                 $plugin = new $class();
 
-                if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                if ($plugin instanceof Symfony\Component\HttpKernel\Bundle\Bundle) {
                     if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
                         // Check if this version supports the plugin before loading it
                         if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
@@ -195,7 +187,6 @@ class AppKernel extends Kernel
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
-            $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
             $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
 
@@ -214,8 +205,8 @@ class AppKernel extends Kernel
 
     protected function build(ContainerBuilder $container): void
     {
-        $container->registerForAutoconfiguration(\Mautic\CoreBundle\Model\MauticModelInterface::class)
-            ->addTag(\Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass::TAG);
+        $container->registerForAutoconfiguration(Mautic\CoreBundle\Model\MauticModelInterface::class)
+            ->addTag(Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass::TAG);
     }
 
     public function boot(): void
@@ -295,13 +286,13 @@ class AppKernel extends Kernel
         return dirname(__DIR__);
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         if (null === $this->projectDir) {
-            $r = new \ReflectionObject($this);
+            $r = new ReflectionObject($this);
 
             if (!is_file($dir = $r->getFileName())) {
-                throw new \LogicException(sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
+                throw new LogicException(sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
             }
 
             // We need 1 level deeper than the parent method, as the app folder contains a composer.json file

@@ -1,5 +1,5 @@
 {%- if template is defined %}
-{%- set btnClass = btnClass|default('danger') %}
+{%- set btnClass = btnClass|default('btn btn-primary bdr-rds-0') %}
     {%- if template is same as 'batchdelete' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
         {%- set iconClass = iconClass|default('ri-delete-bin-line text-danger') %}
@@ -9,6 +9,7 @@
         {% set wrapClosingTag = wrapClosingTag is defined ? wrapClosingTag : '' %}
         {%- set precheck = precheck|default('batchActionPrecheck') %}
     {%- elseif template is same as 'delete' %}
+        {%- set btnClass = 'danger' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
         {%- set iconClass = iconClass|default('ri-delete-bin-line') %}
         {%- set btnText = btnText|default('mautic.core.form.delete')|trans %}
@@ -77,13 +78,11 @@
     data-message="{{ message|escape }}"
     {% if 'data-confirm-text' not in attr|keys %}data-confirm-text="{{ confirmText|escape }}"{% endif %}
     {{ attr|filter(v => v is not empty)|map((value, key) => key ~ '="' ~ value ~ '"')|join(' ')|raw }}>
-<span{{ tooltipAttr }}>
     {% if iconClass is defined %}
-        <i class="{{ iconClass }}"></i>
+        <i class="{{ iconClass }}{{ tooltipAttr }}"></i>
     {% endif %}
     {% if btnText is defined %}
         <span{{ btnTextAttr }}>{{ btnText }}</span>
     {% endif %}
-</span>
 </{{ tag }}>
 {{ wrapClosingTag }}

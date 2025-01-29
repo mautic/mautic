@@ -87,7 +87,7 @@
         <div>
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#segment-details">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#segment-details">
                         <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                     </a>
                 </span>
@@ -131,7 +131,7 @@
             <!-- search bar-->
             <form method="post" action="{{ path('mautic_segment_contacts', {'objectId': list.id}) }}" class="panel" id="segment-contact-filters">
                 {% if events.types is defined and events.types is iterable %}
-                    <div class="history-search panel-footer text-muted">
+                    <div class="history-search panel-footer text-secondary">
                         <div class="col-sm-5">
                             <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}">
                                 {% for typeKey, typeName in events.types %}

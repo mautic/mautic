@@ -28,7 +28,7 @@ class AbTestPropertiesType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'page_abtest_settings';
     }

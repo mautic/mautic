@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
-use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 
 class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
@@ -65,8 +64,6 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $containers);
         $key = '{mail.test.com:993/imap/ssl}_user';
         $this->assertArrayHasKey($key, $containers);
-
-        $this->assertInstanceOf(MailboxContainer::class, $containers[$key]);
     }
 
     /**
@@ -122,10 +119,6 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         $containers = $organizer->getContainers();
 
         $this->assertCount(3, $containers);
-
-        foreach ($containers as $key => $container) {
-            $this->assertInstanceOf(MailboxContainer::class, $container);
-        }
     }
 
     /**

@@ -23,10 +23,6 @@ Mautic includes works under other copyright notices and distributed
 according to the terms of the GNU General Public License or a compatible
 license, including:
 
-CSS
-
-    Font Awesome - MIT - by Dave Gandy - http://fontawesome.io
-
 Javascript
 
     Bootstrap - MIT - Copyright (c) 2011-2014 Twitter, Inc

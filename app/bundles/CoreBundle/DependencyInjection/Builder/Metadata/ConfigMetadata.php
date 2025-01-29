@@ -10,7 +10,7 @@ class ConfigMetadata
     private array $ipLookupServices = [];
 
     public function __construct(
-        private BundleMetadata $metadata
+        private BundleMetadata $metadata,
     ) {
     }
 

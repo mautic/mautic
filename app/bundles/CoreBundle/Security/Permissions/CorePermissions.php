@@ -8,9 +8,10 @@ use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CorePermissions
+class CorePermissions implements ResetInterface
 {
     private array $permissionClasses = [];
 
@@ -29,9 +30,14 @@ class CorePermissions
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
         private array $bundles,
-        private array $pluginBundles
+        private array $pluginBundles,
     ) {
         $this->registerPermissionClasses();
+    }
+
+    public function reset(): void
+    {
+        $this->permissionObjectsGenerated = false;
     }
 
     public function setPermissionObject(AbstractPermissions $permissionObject): void
@@ -83,7 +89,7 @@ class CorePermissions
             $permissionObject = $this->findPermissionObject($bundle);
         } catch (\UnexpectedValueException $e) {
             try {
-                $permissionObject = $this->instantiatePermissionObject($bundle);
+                $permissionObject = $this->instantiatePermissionObject($bundle); // @phpstan-ignore method.deprecated
                 $this->setPermissionObject($permissionObject);
             } catch (\InvalidArgumentException $e) {
                 if ($throwException) {
@@ -299,10 +305,8 @@ class CorePermissions
      * @param string|bool $ownPermission
      * @param string|bool $otherPermission
      * @param User|int    $ownerId
-     *
-     * @return bool
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0)
+    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0): bool
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {

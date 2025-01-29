@@ -45,7 +45,7 @@ class TriggerEvent
     private $trigger;
 
     /**
-     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadTriggerLog>
+     * @var ArrayCollection<int,LeadTriggerLog>
      */
     private $log;
 

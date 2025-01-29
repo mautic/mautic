@@ -16,7 +16,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         private ConfigChangeLogger $configChangeLogger,
         private IpAddressRepository $ipAddressRepository,
         private CoreParametersHelper $coreParametersHelper,
-        private AuditLogRepository $auditLogRepository
+        private AuditLogRepository $auditLogRepository,
     ) {
     }
 

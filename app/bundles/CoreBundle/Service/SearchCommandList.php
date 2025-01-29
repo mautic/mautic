@@ -16,7 +16,7 @@ final class SearchCommandList implements SearchCommandListInterface
     private array $searchCommands = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

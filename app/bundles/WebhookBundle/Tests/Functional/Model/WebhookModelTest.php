@@ -2,7 +2,7 @@
 
 namespace Mautic\WebhookBundle\Tests\Functional\Model;
 
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
@@ -25,7 +25,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
 
     public function testEventsOrderByDirAsc(): void
     {
-        $webhookModel = $this->getWebhookModel(Criteria::ASC);
+        $webhookModel = $this->getWebhookModel(Order::Ascending->value);
         $webhook      = $this->createWebhookAndQueue();
         $queueArray   = $webhookModel->getWebhookQueues($webhook);
 
@@ -46,7 +46,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
 
     public function testEventsOrderByDirDesc(): void
     {
-        $webhookModel = $this->getWebhookModel(Criteria::DESC);
+        $webhookModel = $this->getWebhookModel(Order::Descending->value);
         $webhook      = $this->createWebhookAndQueue();
         $queueArray   = $webhookModel->getWebhookQueues($webhook);
 

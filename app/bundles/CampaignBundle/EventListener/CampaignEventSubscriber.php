@@ -23,7 +23,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
      *
      * @return array<string,mixed>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_PRE_SAVE => ['onCampaignPreSave', 0],

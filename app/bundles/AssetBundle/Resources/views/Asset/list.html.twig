@@ -15,13 +15,20 @@
 			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'action': currentRoute,
-                'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                'page_actions': {
                     'templateButtons': {
                         'new': permissions['asset:assets:create'],
                     },
                     'routeBase': 'asset',
                     'langVar': 'asset.asset',
-                }),
+                },
+                'bulk_actions': {
+                    'langVar': 'asset.asset',
+                    'routeBase': 'asset',
+                    'templateButtons': {
+                        'delete': permissions['asset:assets:deleteown'] or permissions['asset:assets:deleteother'],
+                    },
+                },
                 'quickFilters': [
                     {
                         'search': 'mautic.core.searchcommand.isuncategorized',
@@ -64,18 +71,10 @@
         <table class="table table-hover asset-list" id="assetTable">
             <thead>
             <tr>
-                {{- include(
-                    '@MauticCore/Helper/tableheader.html.twig',
-                    {
-                        'checkall'        : 'true',
-                        'target'          : '#assetTable',
-                        'langVar'         : 'asset.asset',
-                        'routeBase'       : 'asset',
-                        'templateButtons' : {
-                            'delete' : permissions['asset:assets:deleteown'] or permissions['asset:assets:deleteother'],
-                    },
-                    }
-                ) -}}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#assetTable',
+                }) }}
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig',
                     {
@@ -200,10 +199,11 @@
                                 {{ item.getTitle() }} ({{ item.getAlias() }})
                             </a>
                             <i class="{{ item.getIconClass() }}"></i>
+                            {{ customContent('asset.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ description|purify }}</small>
                             </div>
                         {% endif %}

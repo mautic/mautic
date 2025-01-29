@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private WebhookModel $webhookModel
+        private WebhookModel $webhookModel,
     ) {
     }
 

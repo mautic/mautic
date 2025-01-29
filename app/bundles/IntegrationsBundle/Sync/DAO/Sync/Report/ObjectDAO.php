@@ -20,7 +20,7 @@ class ObjectDAO
     public function __construct(
         private $object,
         private $objectId,
-        private ?\DateTimeInterface $changeDateTime = null
+        private ?\DateTimeInterface $changeDateTime = null,
     ) {
     }
 

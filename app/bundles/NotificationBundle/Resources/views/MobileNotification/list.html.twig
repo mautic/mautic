@@ -25,12 +25,18 @@
         'searchValue': searchValue,
         'searchId': 'mobile-notification-search',
         'action': currentRoute,
-        'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+        'page_actions': {
             'templateButtons': {
                 'new': permissions['notification:mobile_notifications:create'],
             },
             'routeBase': 'mobile_notification',
-        }),
+        },
+        'bulk_actions': {
+          'routeBase': 'mobile_notification',
+          'templateButtons': {
+              'delete': permissions['notification:mobile_notifications:deleteown'] or permissions['notification:mobile_notifications:deleteother'],
+          },
+        },
         'quickFilters': [
             {
                 'search': 'mautic.core.searchcommand.ispublished',

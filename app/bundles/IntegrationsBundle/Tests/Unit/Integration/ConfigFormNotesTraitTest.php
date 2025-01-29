@@ -13,7 +13,7 @@ class ConfigFormNotesTraitTest extends TestCase
 {
     public function testConfigFormNotesTraitFormDefaultValues(): void
     {
-        $configFormNotes = new class() implements ConfigFormNotesInterface {
+        $configFormNotes = new class implements ConfigFormNotesInterface {
             use ConfigFormNotesTrait;
         };
 
@@ -24,20 +24,20 @@ class ConfigFormNotesTraitTest extends TestCase
 
     public function testConfigFormNotesTraitFormForCustomValues(): void
     {
-        $configFormNotes = new class() implements ConfigFormNotesInterface {
+        $configFormNotes = new class implements ConfigFormNotesInterface {
             use ConfigFormNotesTrait;
 
-            public function getAuthorizationNote(): ?Note
+            public function getAuthorizationNote(): Note
             {
                 return new Note('Authorisation', Note::TYPE_WARNING);
             }
 
-            public function getFeaturesNote(): ?Note
+            public function getFeaturesNote(): Note
             {
                 return new Note('Features', Note::TYPE_INFO);
             }
 
-            public function getFieldMappingNote(): ?Note
+            public function getFieldMappingNote(): Note
             {
                 return new Note('Field Mapping', Note::TYPE_WARNING);
             }

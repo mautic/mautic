@@ -42,7 +42,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -675,7 +675,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         ];
 
         foreach ($namespaces as $namespace) {
-            if ($this->get('twig')->getLoader()->exists($namespace.'/'.$file)) {
+            if ($this->container->get('twig')->getLoader()->exists($namespace.'/'.$file)) {
                 return $namespace.'/'.$file;
             }
         }
@@ -766,7 +766,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';
-        $dateRangeValues = $request->$method->get('daterange', $request->getSession()->get($name, []));
+        $dateRangeValues = $request->$method->all()['daterange'] ?? $request->getSession()->get($name, []);
         $request->getSession()->set($name, $dateRangeValues);
 
         $dateRangeForm = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);

@@ -56,7 +56,7 @@ class FormController extends AbstractStandardFormController
         string $translationBase,
         string $templateBase,
         string $activeLink,
-        string $mauticContent
+        string $mauticContent,
     ) {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;

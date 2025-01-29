@@ -24,7 +24,7 @@ class SmsSubscriber implements EventSubscriberInterface
         private PageTokenHelper $pageTokenHelper,
         private AssetTokenHelper $assetTokenHelper,
         private SmsHelper $smsHelper,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

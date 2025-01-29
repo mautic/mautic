@@ -26,7 +26,7 @@ class TwitterCustomType extends TwitterAbstractType
         parent::buildForm($builder, $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'twitter_custom';
     }

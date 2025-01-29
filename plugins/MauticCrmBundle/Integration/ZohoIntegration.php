@@ -595,8 +595,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $url .= '&scope='.urlencode($scope);
             }
 
-            if ($this->session) {
-                $this->session->set($this->getName().'_csrf_token', $state);
+            if ($this->requestStack->getCurrentRequest()->hasSession()) {
+                $this->requestStack->getSession()->set($this->getName().'_csrf_token', $state);
             }
 
             return $url;
@@ -816,6 +816,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, 0, $params['start'], $params['end'], ['Contacts', 'Leads'])
         );
         $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, 0, $params['start'], $params['end']);
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {

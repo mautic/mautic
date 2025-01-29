@@ -17,7 +17,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransformValuesAfterSubmitWithNoFieldsNoMatchesAndNoTokens(): void
     {
-        $router = new class() extends Router {
+        $router = new class extends Router {
             public function __construct()
             {
             }
@@ -36,14 +36,14 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testTransformValuesAfterSubmitWithFileFieldMatchesAndTokens(): void
     {
-        $router                                   = new class() extends Router {
+        $router                                   = new class extends Router {
             public int $generateMethodCallCounter = 0;
 
             public function __construct()
             {
             }
 
-            public function generate(string $name, mixed $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
+            public function generate(string $name, mixed $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
             {
                 Assert::assertSame('mautic_form_file_download', $name);
                 Assert::assertSame([
@@ -57,7 +57,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
             }
         };
         $transformer = new FieldValueTransformer($router);
-        $submission  = new class() extends Submission {
+        $submission  = new class extends Submission {
             public function getId(): int
             {
                 return 456;

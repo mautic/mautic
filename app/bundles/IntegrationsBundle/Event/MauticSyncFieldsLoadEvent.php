@@ -10,7 +10,7 @@ class MauticSyncFieldsLoadEvent extends Event
 {
     public function __construct(
         private string $objectName,
-        private array $fields
+        private array $fields,
     ) {
     }
 

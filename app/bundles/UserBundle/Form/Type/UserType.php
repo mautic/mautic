@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -32,7 +33,7 @@ class UserType extends AbstractType
     public function __construct(
         private TranslatorInterface $translator,
         private UserModel $model,
-        private LanguageHelper $languageHelper
+        private LanguageHelper $languageHelper,
     ) {
     }
 
@@ -175,6 +176,14 @@ class UserType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'preferences',
+            UserPreferencesType::class,
+            [
+                'label'      => false,
+            ]
+        );
+
         $defaultSignature = '';
         if (isset($options['data']) && null === $options['data']->getSignature()) {
             $defaultSignature = $this->translator->trans('mautic.email.default.signature', ['%from_name%' => '|FROM_NAME|']);
@@ -212,7 +221,7 @@ class UserType extends AbstractType
                         'choice_label'  => 'name',
                         'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('r')
                             ->where('r.isPublished = true')
-                            ->orderBy('r.name', \Doctrine\Common\Collections\Criteria::ASC),
+                            ->orderBy('r.name', Order::Ascending->value),
                     ]
                 )
             );

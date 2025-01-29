@@ -247,7 +247,7 @@
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#lead-details">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#lead-details">
                        <span class="caret"></span>
                        {{ 'mautic.core.details'|trans }}
                     </a>
@@ -406,7 +406,7 @@
                 <div class="lead-avatar-panel">
                     <div class="avatar-collapser hr-expand nm">
                         <a href="javascript:void(0)"
-                            class="arrow text-muted text-center {% if 'expanded' != avatarPanelState %}collapsed{% endif %}"
+                            class="arrow text-secondary text-center {% if 'expanded' != avatarPanelState %}collapsed{% endif %}"
                             data-toggle="collapse"
                             data-target="#lead-avatar-block">
                             <span class="caret"></span>
@@ -440,7 +440,7 @@
                             <h6 class="fw-sb col-md-6">
                                 {{ groupScore.group.name }}
                             </h6>
-                            <p class="text-muted col-md-6">
+                            <p class="text-secondary col-md-6">
                                 {{ 'mautic.lead.points.count'|trans({'%count%': groupScore.score}) }}
                             </p>
                         </div>
@@ -462,13 +462,13 @@
             <div class="panel-body pt-sm">
             {% if lead.owner %}
                 <h6 class="fw-sb">{{ 'mautic.lead.lead.field.owner'|trans }}</h6>
-                <p class="text-muted">{{ lead.owner.name|purify }}</p>
+                <p class="text-secondary">{{ lead.owner.name|purify }}</p>
             {% endif %}
 
                 <h6 class="fw-sb">
                     {{ 'mautic.lead.field.address'|trans }}
                 </h6>
-                <address class="text-muted">
+                <address class="text-secondary">
                     {% if fields.core.address1 is defined %}{{ fields.core.address1.value|purify }}<br>{% endif %}
                     {% if fields.core.address2 is defined %}{{ fields.core.address2.value|purify }}<br>{% endif %}
                     {{ lead.location|purify }}
@@ -477,16 +477,16 @@
                 </address>
 
                 <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
-                <p class="text-muted">{{ fields.core.email.value|purify }}</p>
+                <p class="text-secondary">{{ fields.core.email.value|purify }}</p>
 
                 {% if fields.core.phone is defined %}
                     <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.home'|trans }}</h6>
-                    <p class="text-muted">{{ fields.core.phone.value|purify }}</p>
+                    <p class="text-secondary">{{ fields.core.phone.value|purify }}</p>
                 {% endif %}
 
                 {% if fields.core.mobile is defined %}
                     <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.mobile'|trans }}</h6>
-                    <p class="text-muted mb-0">{{ fields.core.mobile.value|purify }}</p>
+                    <p class="text-secondary mb-0">{{ fields.core.mobile.value|purify }}</p>
                 {% endif %}
             </div>
         </div>

@@ -19,7 +19,7 @@ class NotificationHelper
         private NotificationModel $notificationModel,
         private TranslatorInterface $translator,
         private Router $router,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

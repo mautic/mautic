@@ -9,7 +9,7 @@ use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\CacheItem;
 
 class RequestStateStoreTest extends TestCase
 {
@@ -18,10 +18,7 @@ class RequestStateStoreTest extends TestCase
      */
     private MockObject $cacheProvider;
 
-    /**
-     * @var MockObject&CacheItemInterface
-     */
-    private MockObject $cacheItem;
+    private CacheItem $cacheItem;
 
     private RequestStateStore $requestStateStore;
     private string $cachePrefix = 'prefix_suffix';
@@ -31,7 +28,7 @@ class RequestStateStoreTest extends TestCase
     {
         parent::setUp();
 
-        $this->cacheItem = $this->createMock(CacheItemInterface::class);
+        $this->cacheItem = new CacheItem();
 
         $this->cacheProvider = $this->createMock(CacheProviderInterface::class);
         $this->cacheProvider->method('getItem')
@@ -48,39 +45,43 @@ class RequestStateStoreTest extends TestCase
             ->method('getId')
             ->willReturn($this->stateId);
 
-        $this->cacheItem->expects(self::once())
-            ->method('expiresAfter')
-            ->with(2 * 60);
-        $this->cacheItem->expects(self::once())
-            ->method('set')
-            ->with($state);
-
         $this->cacheProvider->expects(self::once())
             ->method('save')
             ->with($this->cacheItem);
 
         $this->requestStateStore->set($state);
+
+        $check = \Closure::bind(
+            static function (CacheItem $actual, TestCase $case) use ($state): void {
+                $case::assertEqualsWithDelta(
+                    (2 * 60) + microtime(true),
+                    $actual->expiry,
+                    1
+                );
+                $case::assertSame($state, $actual->value);
+            },
+            null,
+            CacheItem::class
+        );
+        ($check)($this->cacheItem, $this);
     }
 
     public function testGetNotHit(): void
     {
-        $this->cacheItem->expects(self::once())
-            ->method('isHit')
-            ->willReturn(false);
-        $this->cacheItem->expects(self::never())
-            ->method('get');
-
         self::assertNull($this->requestStateStore->get($this->stateId));
     }
 
     public function testGetIsHitButNotRequestState(): void
     {
-        $this->cacheItem->expects(self::once())
-            ->method('isHit')
-            ->willReturn(true);
-        $this->cacheItem->expects(self::once())
-            ->method('get')
-            ->willReturn('string');
+        $setUp = \Closure::bind(
+            static function (CacheItem $item): void {
+                $item->isHit = true;
+                $item->value = 'string';
+            },
+            null,
+            CacheItem::class
+        );
+        ($setUp)($this->cacheItem);
 
         self::assertNull($this->requestStateStore->get($this->stateId));
     }
@@ -88,12 +89,16 @@ class RequestStateStoreTest extends TestCase
     public function testGetIsHitRequestState(): void
     {
         $state = $this->createMock(RequestState::class);
-        $this->cacheItem->expects(self::once())
-            ->method('isHit')
-            ->willReturn(true);
-        $this->cacheItem->expects(self::once())
-            ->method('get')
-            ->willReturn($state);
+
+        $setUp = \Closure::bind(
+            static function (CacheItem $item, RequestState $state): void {
+                $item->isHit = true;
+                $item->value = $state;
+            },
+            null,
+            CacheItem::class
+        );
+        ($setUp)($this->cacheItem, $state);
 
         self::assertSame($state, $this->requestStateStore->get($this->stateId));
     }

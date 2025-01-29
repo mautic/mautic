@@ -126,7 +126,7 @@ class ObjectChangeGeneratorTest extends TestCase
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
-            new class() extends ValueHelper {
+            new class extends ValueHelper {
             }
         );
 

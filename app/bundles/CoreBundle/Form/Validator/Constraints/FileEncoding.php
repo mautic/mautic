@@ -10,7 +10,7 @@ class FileEncoding extends Constraint
 
     public $encodingFormat        = '[UTF-8]';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return FileEncodingValidator::class;
     }

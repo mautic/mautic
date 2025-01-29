@@ -19,7 +19,7 @@
                                 <div class="list-group-item {{ (dashboard == preview) ? 'active' : '' }}">
                                     <h4 class="list-group-item-heading">{{ config.name|purify }}</h4>
                                     {% if config.description is not empty %}<p class="small">{{ config.description|purify }}</p>{% endif %}
-                                    <p class="list-group-item-text">
+                                    <p class="list-group-item-heading">
                                         <a href="{{ path('mautic_dashboard_action', {'objectAction': 'import', 'preview': dashboard}) }}">
                                             {{ 'mautic.dashboard.preview'|trans }}
                                         </a>&#183;

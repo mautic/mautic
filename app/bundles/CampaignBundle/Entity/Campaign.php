@@ -4,6 +4,7 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -60,17 +61,17 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $events;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Lead>
+     * @var ArrayCollection<int, Lead>
      */
     private $leads;
 
     /**
-     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<int, LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Form>
+     * @var ArrayCollection<int, Form>
      */
     private $forms;
 
@@ -649,10 +650,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     {
         return $this->leads->matching(
             Criteria::create()
-                    ->where(
-                        Criteria::expr()->eq('lead', $contact)
-                    )
-                    ->orderBy(['dateAdded' => Criteria::DESC])
+                ->where(Criteria::expr()->eq('lead', $contact))
+                ->orderBy(['dateAdded' => Order::Descending->value])
         );
     }
 

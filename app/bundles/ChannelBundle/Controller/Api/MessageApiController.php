@@ -43,7 +43,7 @@ class MessageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
     ) {
         $messageModel = $modelFactory->getModel('channel.message');
         \assert($messageModel instanceof MessageModel);

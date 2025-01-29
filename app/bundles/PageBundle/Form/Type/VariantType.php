@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class VariantType extends AbstractType
 {
     public function __construct(
-        private PageModel $pageModel
+        private PageModel $pageModel,
     ) {
     }
 
@@ -86,7 +86,7 @@ class VariantType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pagevariant';
     }

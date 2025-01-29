@@ -14,12 +14,18 @@
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': permissions['focus:items:create'],
                 },
                 'routeBase': 'focus',
-            }),
+            },
+            'bulk_actions': {
+                'routeBase': 'focus',
+                'templateButtons': {
+                    'delete': permissions['focus:items:delete'],
+                },
+            },
             'quickFilters': [
                 {
                     'search': 'mautic.core.searchcommand.ispublished',

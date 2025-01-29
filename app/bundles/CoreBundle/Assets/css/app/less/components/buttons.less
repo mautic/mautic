@@ -6,19 +6,21 @@
 // Base styles
 // ---------------------
 .btn {
+  --btn-height: var(--spacing-08);
+  --btn-line-height: var(--btn-height);
   transition: var(--transition-all-productive);
   border: 1px solid transparent;
-  .outline();
   border-radius: 20px;
   display: inline-flex;
   align-items: center;
-  height: var(--spacing-08);
-  line-height: var(--spacing-08);
+  height: var(--btn-height);
+  line-height: var(--btn-line-height);
   font-size: 14px;
   padding: 0 var(--spacing-05);
   gap: var(--spacing-03);
   justify-content: space-between;
   width: fit-content;
+  .outline();
   &:hover {
     border: 1px solid transparent;
   }
@@ -40,7 +42,7 @@
     > span {margin-right: 8px;}
   }
 
-  // reset font awesome width
+  // reset icon width
   i {
     min-width: 13px;
     order: 2;
@@ -145,12 +147,7 @@
 }
 
 /// Tertiary + automatic error fixes
-.btn-tertiary,
-.btn-tertiary + .dropdown-toggle,
-.btn-primary + .btn-primary:not(.dropdown-toggle),
-.btn-primary + .btn-primary + .btn-primary,
-.btn-primary + .btn-primary + .btn-secondary,
-.open > .btn-tertiary + .dropdown-toggle.btn-primary {
+.btn-tertiary {
   .button-variant(
     @background: transparent,
     @text-color: var(--button-tertiary),
@@ -192,7 +189,7 @@
     justify-content: space-between;
     gap: var(--spacing-07);
     width: 100%;
-    height: 100%;
+    height: var(--btn-line-height);
   }
 }
 
@@ -260,12 +257,12 @@
 }
 
 // Standard sizes
-.btn-xs, .btn[size="xs"] { height: var(--spacing-06); line-height: var(--spacing-06); }
-.btn-sm, .btn[size="sm"] { height: var(--spacing-07); line-height: var(--spacing-07); }
-.btn-md, .btn[size="md"] { height: var(--spacing-08); line-height: var(--spacing-08); }
-.btn-lg, .btn[size="lg"] { height: var(--spacing-09); line-height: var(--spacing-09); }
-.btn-xl, .btn[size="xl"] { height: var(--spacing-10); line-height: var(--spacing-08); align-items: flex-start; }
-.btn-2xl, .btn[size="2xl"] { height: var(--spacing-11); line-height: var(--spacing-08); align-items: flex-start; }
+.btn-xs, .btn[size="xs"] { --btn-height: var(--spacing-06); }
+.btn-sm, .btn[size="sm"] { --btn-height: var(--spacing-07); }
+.btn-md, .btn[size="md"] { --btn-height: var(--spacing-08); }
+.btn-lg, .btn[size="lg"] { --btn-height: var(--spacing-09); }
+.btn-xl, .btn[size="xl"] { --btn-height: var(--spacing-10); --btn-line-height: var(--spacing-08); align-items: flex-start; }
+.btn-2xl, .btn[size="2xl"] { --btn-height: var(--spacing-11); --btn-line-height: var(--spacing-08); align-items: flex-start; }
 
 // Fix for outline
 .dropdown-toggle,

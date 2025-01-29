@@ -26,7 +26,7 @@ class SyncIntegrationsHelper
 
     public function __construct(
         private IntegrationsHelper $integrationsHelper,
-        private ObjectProvider $objectProvider
+        private ObjectProvider $objectProvider,
     ) {
     }
 
@@ -51,8 +51,6 @@ class SyncIntegrationsHelper
 
     /**
      * @return array<int,string>|null
-     *
-     * @throws IntegrationNotFoundException
      */
     public function getEnabledIntegrations()
     {

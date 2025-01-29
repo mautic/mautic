@@ -19,7 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
@@ -50,10 +49,7 @@ trait RequestTrait
                 continue;
             }
 
-            $type = $child->getConfig()->getType();
-            if ($type instanceof ResolvedFormTypeInterface) {
-                $type = $type->getInnerType();
-            }
+            $type = $child->getConfig()->getType()->getInnerType();
             switch ($type::class) {
                 case YesNoButtonGroupType::class:
                 case BooleanType::class:

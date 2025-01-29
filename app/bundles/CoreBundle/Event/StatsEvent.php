@@ -83,7 +83,7 @@ class StatsEvent extends Event
         $limit,
         protected array $order,
         array $where,
-        protected User $user
+        protected User $user,
     ) {
         $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
         $this->start = (int) $start;

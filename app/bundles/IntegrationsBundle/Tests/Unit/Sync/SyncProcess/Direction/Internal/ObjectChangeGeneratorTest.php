@@ -161,18 +161,18 @@ class ObjectChangeGeneratorTest extends TestCase
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
-            new class() implements SyncJudgeInterface {
+            new class implements SyncJudgeInterface {
                 public function adjudicate(
                     $mode,
                     InformationChangeRequestDAO $leftChangeRequest,
-                    InformationChangeRequestDAO $rightChangeRequest
+                    InformationChangeRequestDAO $rightChangeRequest,
                 ) {
                     return $leftChangeRequest;
                 }
             },
-            new class() extends ValueHelper {
+            new class extends ValueHelper {
             },
-            new class() extends FieldHelper {
+            new class extends FieldHelper {
                 public function __construct()
                 {
                 }

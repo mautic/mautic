@@ -16,7 +16,7 @@ trait TranslationModelTrait
      *
      * @param Lead|array|null $lead
      *
-     * @return array[$parentEntity, TranslationEntityInterface $entity]
+     * @return array{object, TranslationEntityInterface}
      */
     public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null): array
     {
