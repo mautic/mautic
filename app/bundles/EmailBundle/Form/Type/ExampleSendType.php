@@ -11,6 +11,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -28,10 +29,13 @@ class ExampleSendType extends AbstractType
             'emails',
             SortableListType::class,
             [
-                'entry_type'       => EmailType::class,
-                'label'            => 'mautic.email.example_recipients',
-                'add_value_button' => 'mautic.email.add_recipient',
-                'option_notblank'  => false,
+                'entry_type'        => EmailType::class,
+                'label'             => 'mautic.email.example_recipients',
+                'add_value_button'  => 'mautic.email.add_recipient',
+                'option_notblank'   => true,
+                'option_constraint' => [
+                    new Email(),
+                ],
             ]
         );
 
@@ -58,6 +62,7 @@ class ExampleSendType extends AbstractType
                             'mautic.core.form.nomatches'
                         ),
                     ],
+                    'required' => false,
                 ]
             );
 

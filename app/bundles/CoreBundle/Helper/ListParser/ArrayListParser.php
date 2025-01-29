@@ -12,11 +12,7 @@ class ArrayListParser implements ListParserInterface
             throw new FormatNotSupportedException();
         }
 
-        if (
-            array_key_exists(0, $list)
-            && !is_array($list[0])
-            && array_keys($list) === range(0, count($list) - 1)
-        ) {
+        if (!array_filter(array_keys($list), 'is_string') && !array_filter($list, 'is_array')) {
             $choices = [];
 
             // Numerical array so set labels as values and return as choices

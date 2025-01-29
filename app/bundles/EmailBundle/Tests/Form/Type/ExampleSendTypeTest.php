@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExampleSendTypeTest extends TestCase
@@ -58,10 +59,13 @@ class ExampleSendTypeTest extends TestCase
                     'emails',
                     SortableListType::class,
                     [
-                        'entry_type'       => EmailType::class,
-                        'label'            => 'mautic.email.example_recipients',
-                        'add_value_button' => 'mautic.email.add_recipient',
-                        'option_notblank'  => false,
+                        'entry_type'        => EmailType::class,
+                        'label'             => 'mautic.email.example_recipients',
+                        'add_value_button'  => 'mautic.email.add_recipient',
+                        'option_notblank'   => true,
+                        'option_constraint' => [
+                            new Email(),
+                        ],
                     ],
                 ],
                 [
@@ -117,10 +121,13 @@ class ExampleSendTypeTest extends TestCase
                     'emails',
                     SortableListType::class,
                     [
-                        'entry_type'       => EmailType::class,
-                        'label'            => 'mautic.email.example_recipients',
-                        'add_value_button' => 'mautic.email.add_recipient',
-                        'option_notblank'  => false,
+                        'entry_type'        => EmailType::class,
+                        'label'             => 'mautic.email.example_recipients',
+                        'add_value_button'  => 'mautic.email.add_recipient',
+                        'option_notblank'   => true,
+                        'option_constraint' => [
+                            new Email(),
+                        ],
                     ],
                 ],
                 [
@@ -136,6 +143,7 @@ class ExampleSendTypeTest extends TestCase
                             'placeholder'            => 'startTyping',
                             'data-no-record-message' => 'nomatches',
                         ],
+                        'required' => false,
                     ],
                 ],
                 [

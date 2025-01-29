@@ -397,7 +397,8 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     {# Work around for Symfony bug not repopulating values only for add action #}
     {% set list = form.parent.children.properties.list %}
 {% endif %}
-{% set feedbackClass = form_errors(list) ? ' has-error' : '' %}
+{% set errors_block = form_errors(list) %}
+{% set feedbackClass = errors_block ? ' has-error' : '' %}
 {% set datePrototype = list.vars.prototype is defined ? ('<div class="sortable">' ~ form_widget(list.vars.prototype|raw) ~ '</div>')|e : '' %}
 <div class="row">
     <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list" style="overflow:auto">
@@ -406,7 +407,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
            class="btn btn-tertiary btn-sm btn-add-item" href="#" id="{{ form.vars.id }}_additem">
             {{ addValueButton|trans }}
         </a>
-        {{ block('sortablelist_errors') }}
+        {{ errors_block|raw }}
         {% if isSortable %}
         <div id="sortable-{{ form.vars.id }}" class="list-sortable" {% for k,v in attr %}
         {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
