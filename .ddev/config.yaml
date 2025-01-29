@@ -19,3 +19,4 @@ use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
 corepack_enable: false
+nodejs_version: lts
