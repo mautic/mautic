@@ -110,9 +110,21 @@
         text-decoration: none;
     }
 
+    .sidebars {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        min-height: 100vh;
+        padding: 10px;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
     .sidebar--left {
         width: 100%;
-        max-width: fit-content;
+        max-width: 100%;
         height: 100%;
         background-color: #fafafa;
         border-radius: 12px;
@@ -124,15 +136,15 @@
     }
 
     .sidebar--right {
-        width: 100%;
-        max-width: 100%;
         display: flex;
         flex-direction: column;
-        height: auto;
-        margin: 0;
-        padding: 20px 0;
-        padding-left: 10px;
+        width: 100%;
         min-width: 290px;
+        max-width: 100%;
+        height: auto;
+        padding: 60px 25px 20px;
+        margin: 0;
+        font-size: 13px;
     }
 
     .sidebar--right .mauticform_wrapper {
@@ -204,18 +216,6 @@
         background-color: #e9e9e9;
     }
 
-    .sidebars {
-        width: 100%;
-        max-width: 100%;
-        display: flex;
-        flex-direction: column-reverse;
-        align-items: center;
-        min-height: 100vh;
-        padding: 10px;
-        gap: 100px;
-        flex-wrap: wrap;
-    }
-
     .logo--small {
         padding: 0 10px;
         height: 25px;
@@ -233,11 +233,13 @@
             flex-direction: row;
             justify-content: center;
             flex-wrap: nowrap;
+            gap: 100px;
         }
 
         .sidebar--left {
             width: 30%;
             min-width: 350px;
+            max-width: fit-content;
             padding: 50px 15px;
         }
 
