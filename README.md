@@ -67,7 +67,7 @@ Using Mautic
 
 ### 🚀 Self-host completely free, forever
 
-Please check the latest supported versions on the [Mautic Releases](https://www.mautic.org/mautic-releases) page.
+Please check the latest supported versions on the [Mautic Releases][mautic-releases] page.
 
 The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download][download-mautic].
 
@@ -352,3 +352,4 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [all-contributors]: <https://github.com/all-contributors/all-contributors>
 [best-pulls]: <https://github.com/mautic/mautic/pulls?q=is%3Aopen+is%3Apr+-label%3Ablocked+-label%3Awip+-is%3Adraft+-label%3Aready-to-commit+-label%3Apending-feedback+label%3Aready-to-test+status%3Asuccess>
 [mautic-trials]: <https://m.mautic.org/mautic-start-your-trial>
+[mautic-releases]: <https://www.mautic.org/mautic-releases>
