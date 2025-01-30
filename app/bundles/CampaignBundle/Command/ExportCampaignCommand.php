@@ -2,24 +2,18 @@
 
 namespace Mautic\CampaignBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
     public function __construct(
-        private CampaignRepository $campaignRepository,
-        private EntityManagerInterface $entityManager,
-        private TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
@@ -79,15 +73,15 @@ class ExportCampaignCommand extends ModeratedCommand
         ];
 
         foreach ($campaignIds as $campaignId) {
-            $campaignData = $this->fetchCampaignData($campaignId, $output);
+            $campaignData = $this->fetchCampaignData($campaignId);
             if (!$campaignData) {
                 continue;
             }
 
-            $eventData   = $this->fetchEvents($campaignId, $output);
-            $segmentData = $this->fetchSegments($campaignId, $output);
-            $formData    = $this->fetchForms($campaignId, $output);
-            $emailData   = $this->fetchEmails($campaignId, $output);
+            $eventData   = $this->fetchEvents($campaignId);
+            $segmentData = $this->fetchSegments($campaignId);
+            $formData    = $this->fetchForms($campaignId);
+            $emailData   = $this->fetchEmails($campaignId);
 
             $combinedData['campaigns'][] = array_merge($combinedData['campaigns'], $campaignData);
             $this->mergeDependencies(
@@ -109,7 +103,10 @@ class ExportCampaignCommand extends ModeratedCommand
         return $this->outputData($combinedData, $input, $output);
     }
 
-    private function fetchCampaignData(string $campaignId, OutputInterface $output): ?array
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function fetchCampaignData(string $campaignId): ?array
     {
         $campaignData = $this->callAnotherCommand('mautic:campaign:fetch', [
             '--id'        => $campaignId,
@@ -119,17 +116,10 @@ class ExportCampaignCommand extends ModeratedCommand
         return $campaignData ? json_decode($campaignData, true) : null;
     }
 
-    private function fetchDependencies(string $campaignId, OutputInterface $output): ?array
-    {
-        $dependenciesData = $this->callAnotherCommand('mautic:campaign:fetch-dependencies', [
-            '--id'        => $campaignId,
-            '--json-only' => true,
-        ]);
-
-        return $dependenciesData ? json_decode($dependenciesData, true) : null;
-    }
-
-    private function fetchEvents(string $campaignId, OutputInterface $output): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchEvents(string $campaignId): array
     {
         $eventData = $this->callAnotherCommand('mautic:campaign:fetch-events', [
             '--id'        => $campaignId,
@@ -139,7 +129,10 @@ class ExportCampaignCommand extends ModeratedCommand
         return $eventData ? json_decode($eventData, true) : [];
     }
 
-    private function fetchEmails(string $campaignId, OutputInterface $output): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchEmails(string $campaignId): array
     {
         $emailData = $this->callAnotherCommand('mautic:campaign:fetch-emails', [
             '--id'        => $campaignId,
@@ -149,7 +142,10 @@ class ExportCampaignCommand extends ModeratedCommand
         return $emailData ? json_decode($emailData, true) : [];
     }
 
-    private function fetchSegments(string $campaignId, OutputInterface $output): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchSegments(string $campaignId): array
     {
         $segmentData = $this->callAnotherCommand('mautic:campaign:fetch-segments', [
             '--id'        => $campaignId,
@@ -159,7 +155,10 @@ class ExportCampaignCommand extends ModeratedCommand
         return $segmentData ? json_decode($segmentData, true) : [];
     }
 
-    private function fetchForms(string $campaignId, OutputInterface $output): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchForms(string $campaignId): array
     {
         $formData = $this->callAnotherCommand('mautic:campaign:fetch-forms', [
             '--id'        => $campaignId,
@@ -169,6 +168,13 @@ class ExportCampaignCommand extends ModeratedCommand
         return $formData ? json_decode($formData, true) : [];
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $dependencies
+     * @param array<int, array<string, mixed>> $eventData
+     * @param array<int, array<string, mixed>> $segmentData
+     * @param array<int, array<string, mixed>> $formData
+     * @param array<int, array<string, mixed>> $emailData
+     */
     private function mergeDependencies(array &$dependencies, string $campaignId, array $eventData, array $segmentData, array $formData, array $emailData): void
     {
         $dependency = [
@@ -213,6 +219,9 @@ class ExportCampaignCommand extends ModeratedCommand
         $dependencies[] = $dependency;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function outputData(array $data, InputInterface $input, OutputInterface $output): int
     {
         $jsonOutput = json_encode($data, JSON_PRETTY_PRINT);
@@ -259,7 +268,10 @@ class ExportCampaignCommand extends ModeratedCommand
         return $zipFilePath;
     }
 
-    private function callAnotherCommand(string $commandName, array $arguments): ?string
+    /**
+     * @param array<string, mixed> $arguments
+     */
+    private function callAnotherCommand(string $commandName, array $arguments): string
     {
         $application = $this->getApplication();
         $command     = $application->find($commandName);

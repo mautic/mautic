@@ -77,6 +77,9 @@ class FetchEventCommand extends ModeratedCommand
         return $this->outputData($eventData, $input, $output);
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $data
+     */
     private function outputData(array $data, InputInterface $input, OutputInterface $output): int
     {
         $jsonOutput = json_encode($data, JSON_PRETTY_PRINT);

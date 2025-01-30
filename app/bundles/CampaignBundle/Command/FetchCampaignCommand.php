@@ -59,6 +59,9 @@ class FetchCampaignCommand extends ModeratedCommand
         return $this->outputData($data, $input, $output);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function outputData(array $data, InputInterface $input, OutputInterface $output): int
     {
         $jsonOutput = json_encode($data, JSON_PRETTY_PRINT);

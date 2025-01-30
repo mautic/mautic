@@ -149,9 +149,9 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Export an entity.
      *
-     * @return JsonResponse|BinaryFileResponse
+     * @return JsonResponse|BinaryFileResponse|Response
      */
-    public function exportAction(ExportHelper $exportHelper, CommandHelper $commandHelper, Request $request, $objectId)
+    public function exportAction(ExportHelper $exportHelper, CommandHelper $commandHelper, Request $request, int $objectId)
     {
         $permissions = $this->security->isGranted(
             [
@@ -181,8 +181,8 @@ class CampaignController extends AbstractStandardFormController
 
         // Run the export command and get the file path
         $response = $commandHelper->runCommand('mautic:campaign:export', [
-            '--id'       => [$objectId],
-            '--zip-file' => true,
+            '--id'       => (int) $objectId,
+            '--zip-file' => 1,
         ]);
 
         if (0 !== $response->getStatusCode()) {
