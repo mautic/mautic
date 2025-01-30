@@ -18,7 +18,9 @@ use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CommandHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -31,6 +33,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -141,6 +144,60 @@ class CampaignController extends AbstractStandardFormController
     public function cloneAction(Request $request, $objectId)
     {
         return $this->cloneStandard($request, $objectId);
+    }
+
+    /**
+     * Export an entity.
+     *
+     * @return JsonResponse|BinaryFileResponse
+     */
+    public function exportAction(ExportHelper $exportHelper, CommandHelper $commandHelper, Request $request, $objectId)
+    {
+        $permissions = $this->security->isGranted(
+            [
+                'campaign:campaigns:viewown',
+                'campaign:campaigns:viewother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['campaign:campaigns:viewown'] && !$permissions['campaign:campaigns:viewother']) {
+            return $this->accessDenied();
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = $this->getModel('campaign');
+        $campaign      = $campaignModel->getEntity($objectId);
+
+        if (empty($campaign)) {
+            return $this->notFound();
+        }
+
+        // Generate the export file name
+        $date           = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
+        $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
+
+        // Run the export command and get the file path
+        $response = $commandHelper->runCommand('mautic:campaign:export', [
+            '--id'       => [$objectId],
+            '--zip-file' => true,
+        ]);
+
+        if (0 !== $response->getStatusCode()) {
+            return new JsonResponse(['error' => 'Failed to export the campaign.'], 500);
+        }
+
+        // Extract the file path from the command response
+        $filePath = trim($response->getMessage());
+
+        if (!file_exists($filePath)) {
+            return new JsonResponse(['error' => 'Export file not found.'], 500);
+        }
+
+        // Return the file for download
+        return $exportHelper->exportAsZip($filePath, $exportFileName);
     }
 
     /**

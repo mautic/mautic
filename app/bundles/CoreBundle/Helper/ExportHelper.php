@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -224,5 +226,20 @@ class ExportHelper
         $leadExport['stage'] = $stage ? $stage->getName() : null;
 
         return $leadExport;
+    }
+
+    public function exportAsZip(string $filePath, string $fileName): BinaryFileResponse
+    {
+        return new BinaryFileResponse(
+            $filePath,
+            Response::HTTP_OK,
+            [
+                'Content-Type'        => 'application/zip',
+                'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+                'Expires'             => 0,
+                'Cache-Control'       => 'must-revalidate',
+                'Pragma'              => 'public',
+            ]
+        );
     }
 }

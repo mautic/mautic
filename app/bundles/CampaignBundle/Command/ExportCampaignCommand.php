@@ -224,7 +224,7 @@ class ExportCampaignCommand extends ModeratedCommand
             $output->writeln('<info>JSON file created at:</info> '.$filePath);
         } elseif ($input->getOption('zip-file')) {
             $zipPath = $this->writeToZipFile($jsonOutput);
-            $output->writeln('<info>ZIP file created at:</info> '.$zipPath);
+            $output->writeln(''.$zipPath);
         } else {
             $output->writeln('<error>You must specify one of --json-only, --json-file, or --zip-file options.</error>');
 
