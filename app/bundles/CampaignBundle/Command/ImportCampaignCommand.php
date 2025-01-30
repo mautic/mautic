@@ -155,7 +155,7 @@ class ImportCampaignCommand extends ModeratedCommand
         }
 
         // Step 2: Update Dependencies with New Campaign IDs
-        $this->updateDependencies($data['dependencies'], $campaignIdMap, 'campaignId', $output);
+        $this->updateDependencies($data['dependencies'], $campaignIdMap, 'campaignId');
 
         // Step 3: Import Other Entities (Segments, Emails, Forms)
         $formIdMap    = $this->importForms($data['forms'] ?? [], $output);
@@ -163,9 +163,9 @@ class ImportCampaignCommand extends ModeratedCommand
         $emailIdMap   = $this->importEmails($data['emails'] ?? [], $output);
 
         // Step 4: Update Dependencies for Segments, Forms and Emails
-        $this->updateDependencies($data['dependencies'], $formIdMap, 'formId', $output);
-        $this->updateDependencies($data['dependencies'], $segmentIdMap, 'segmentId', $output);
-        $this->updateDependencies($data['dependencies'], $emailIdMap, 'emailId', $output);
+        $this->updateDependencies($data['dependencies'], $formIdMap, 'formId');
+        $this->updateDependencies($data['dependencies'], $segmentIdMap, 'segmentId');
+        $this->updateDependencies($data['dependencies'], $emailIdMap, 'emailId');
 
         $this->processDependencies($data['dependencies'], $output);
 
@@ -174,7 +174,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
         $eventIdMap = $this->importCampaignEvents($data['events'], $output);
 
-        $this->updateDependencies($data['dependencies'], $eventIdMap, 'eventId', $output);
+        $this->updateDependencies($data['dependencies'], $eventIdMap, 'eventId');
 
         // Step 6: Update Event ParentId
         foreach ($data['events'] as $eventData) {
@@ -280,7 +280,7 @@ class ImportCampaignCommand extends ModeratedCommand
      * @param array<int, array<string, mixed>>     $dependencies
      * @param array<int, array<string, mixed>|int> $idMap
      */
-    private function updateDependencies(array &$dependencies, array $idMap, string $key, OutputInterface $output): void
+    private function updateDependencies(array &$dependencies, array $idMap, string $key): void
     {
         foreach ($dependencies as &$dependencyGroup) {
             foreach ($dependencyGroup as &$items) {
