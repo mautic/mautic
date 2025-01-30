@@ -51,7 +51,7 @@ Open source means more than open code. Open source provides equality for all and
 
 Get Involved Quickly
 =============
-Calling all devs, testers and writers! Get started quickly and show us what you’re made of. Technical contributions are also welcome.
+Calling all devs, testers and writers! Get started quickly and show us what you’re made of.
 
 - 🐛 [Easy-to-fix bugs][t1-issues]
 - 🧪 [Best pull requests for testing][best-pulls]
