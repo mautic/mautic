@@ -172,7 +172,6 @@ class DynamicContentController extends FormController
 
             $passthrough = [
                 'activeLink'    => '#mautic_dynamicContent_index',
-                'mauticContent' => 'dynamicContent',
             ];
 
             // Check to see if this is a popup
@@ -203,7 +202,8 @@ class DynamicContentController extends FormController
             }
         }
 
-        $passthrough['route'] = $action;
+        $passthrough['mauticContent'] = 'dynamicContent';
+        $passthrough['route']         = $action;
 
         return $this->delegateView(
             [
