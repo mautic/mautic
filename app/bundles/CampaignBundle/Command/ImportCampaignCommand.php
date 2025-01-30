@@ -102,6 +102,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<string, mixed> $data
+     *
      * @return array<string, mixed>
      */
     private function validateCampaignData(array $data): array
@@ -201,8 +202,8 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<string, mixed> $data
-     * @param array<int, int> $eventIdMap
-     * @param array<int, int> $campaignIdMap
+     * @param array<int, int>      $eventIdMap
+     * @param array<int, int>      $campaignIdMap
      */
     private function updateCampaignCanvasSettings(array &$data, array $eventIdMap, array $campaignIdMap, OutputInterface $output): void
     {
@@ -222,7 +223,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<string, mixed> $canvasSettings
-     * @param array<int, int> $eventIdMap
+     * @param array<int, int>      $eventIdMap
      */
     private function updateCanvasNodes(array &$canvasSettings, array $eventIdMap, OutputInterface $output): void
     {
@@ -238,7 +239,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<string, mixed> $canvasSettings
-     * @param array<int, int> $eventIdMap
+     * @param array<int, int>      $eventIdMap
      */
     private function updateCanvasConnections(array &$canvasSettings, array $eventIdMap, OutputInterface $output): void
     {
@@ -257,7 +258,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<string, mixed> $data
-     * @param array<int, int> $campaignIdMap
+     * @param array<int, int>      $campaignIdMap
      */
     private function persistUpdatedCanvasSettings(array &$data, array $campaignIdMap, OutputInterface $output): void
     {
@@ -276,7 +277,7 @@ class ImportCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param array<int, array<string, mixed>> $dependencies
+     * @param array<int, array<string, mixed>>     $dependencies
      * @param array<int, array<string, mixed>|int> $idMap
      */
     private function updateDependencies(array &$dependencies, array $idMap, string $key, OutputInterface $output): void
@@ -295,6 +296,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<int, array<string, mixed>> $forms
+     *
      * @return array<int, int>
      */
     private function importForms(array $forms, OutputInterface $output): array
@@ -331,6 +333,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<int, array<string, mixed>> $segments
+     *
      * @return array<int, int>
      */
     private function importSegments(array $segments, OutputInterface $output): array
@@ -373,6 +376,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<int, array<string, mixed>> $emails
+     *
      * @return array<int, int>
      */
     private function importEmails(array $emails, OutputInterface $output): array
@@ -418,6 +422,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<int, array<string, mixed>> $events
+     *
      * @return array<int, int>
      */
     private function importCampaignEvents(array $events, OutputInterface $output): array
@@ -494,7 +499,7 @@ class ImportCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
      */
     private function updateEvents(array &$data, array $dependencies, OutputInterface $output): void
@@ -521,6 +526,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<int, array<string, mixed>> $dependencies
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getEventDependencies(array $dependencies): array
@@ -535,7 +541,7 @@ class ImportCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param array<string, mixed> $event
+     * @param array<string, mixed>             $event
      * @param array<int, array<string, mixed>> $eventDependencies
      */
     private function updateEventCampaignId(array &$event, array $eventDependencies, OutputInterface $output): void
@@ -550,7 +556,7 @@ class ImportCampaignCommand extends ModeratedCommand
 
     /**
      * @param array<int, array<string, mixed>> $dependencies
-     * @param array<string, mixed> $event
+     * @param array<string, mixed>             $event
      */
     private function updateEventChannelId(array &$event, array $dependencies, OutputInterface $output): void
     {
