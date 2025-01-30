@@ -30,7 +30,7 @@ class AssetType extends AbstractType
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private AssetModel $assetModel
+        private AssetModel $assetModel,
     ) {
     }
 

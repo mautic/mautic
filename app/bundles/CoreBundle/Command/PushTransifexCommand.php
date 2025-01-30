@@ -29,7 +29,7 @@ class PushTransifexCommand extends Command
     public function __construct(
         private TransifexFactory $transifexFactory,
         private TranslatorInterface $translator,
-        private LanguageHelper $languageHelper
+        private LanguageHelper $languageHelper,
     ) {
         parent::__construct();
     }

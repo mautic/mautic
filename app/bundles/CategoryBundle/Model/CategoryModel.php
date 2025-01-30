@@ -40,7 +40,7 @@ class CategoryModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -102,8 +102,6 @@ class CategoryModel extends FormModel
     /**
      * @param string|null $action
      * @param array       $options
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {

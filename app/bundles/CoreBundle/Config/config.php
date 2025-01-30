@@ -121,16 +121,20 @@ return [
             ],
         ],
         'admin' => [
+            'mautic.core.general' => [
+                'id'        => 'mautic_general_root',
+                'priority'  => 15,
+            ],
             'mautic.theme.menu.index' => [
                 'route'     => 'mautic_themes_index',
-                'iconClass' => 'ri-pantone-fill',
+                'iconClass' => 'ri-pantone-line',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
+                'parent'    => 'mautic.core.general',
                 'priority'  => 18,
             ],
             'mautic.core.integrations' => [
                 'id'        => 'mautic_integrations_root',
-                'iconClass' => 'ri-plug-fill',
                 'priority'  => 15,
             ],
         ],
@@ -154,7 +158,6 @@ return [
             'mautic.core.service.flashbag' => [
                 'class'     => Mautic\CoreBundle\Service\FlashBag::class,
                 'arguments' => [
-                    '@session',
                     'translator',
                     'request_stack',
                     'mautic.core.model.notification',
@@ -490,7 +493,7 @@ return [
             'mautic.page.helper.factory' => [
                 'class'     => Mautic\CoreBundle\Factory\PageHelperFactory::class,
                 'arguments' => [
-                    'session',
+                    'request_stack',
                     'mautic.helper.core_parameters',
                 ],
             ],
@@ -584,7 +587,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
                     '%kernel.cache_dir%',
-                    'session',
+                    'request_stack',
                     'mautic.helper.paths',
                     'kernel',
                 ],
@@ -766,7 +769,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.helper.paths',
-                    'session',
+                    'request_stack',
                     'mautic.helper.app_version',
                 ],
                 'tag' => 'mautic.update_step',

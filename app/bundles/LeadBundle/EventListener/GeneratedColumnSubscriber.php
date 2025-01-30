@@ -17,7 +17,7 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ListModel $segmentModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

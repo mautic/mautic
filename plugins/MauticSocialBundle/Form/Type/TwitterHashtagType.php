@@ -39,7 +39,7 @@ class TwitterHashtagType extends TwitterAbstractType
         parent::buildForm($builder, $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'twitter_hashtag';
     }

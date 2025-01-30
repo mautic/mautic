@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ExceptionListener extends ErrorListener
@@ -25,7 +25,7 @@ class ExceptionListener extends ErrorListener
     public function __construct(
         protected Router $router,
         $controller,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
     ) {
         parent::__construct($controller, $logger);
     }
@@ -38,7 +38,7 @@ class ExceptionListener extends ErrorListener
             // Convert the LightSamlException to a AuthenticationException so it can be passed in the session.
             $exception = new AuthenticationException($exception->getMessage());
             // Redirect to login page with message
-            $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+            $event->getRequest()->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
             $event->setResponse(new RedirectResponse($this->router->generate('login')));
 
             return;

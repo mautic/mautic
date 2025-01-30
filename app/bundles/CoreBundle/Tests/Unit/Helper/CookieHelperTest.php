@@ -17,16 +17,21 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class CookieHelperTest extends TestCase
 {
     /**
-     * @var RequestStack|MockObject
+     * @var RequestStack&MockObject
      */
     private MockObject $requestStackMock;
+
+    /**
+     * @var Request&MockObject
+     */
+    private MockObject $requestMock;
 
     protected function setUp(): void
     {
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $requestMock            = $this->createMock(Request::class);
-        $this->requestStackMock->method('getMasterRequest')
-            ->willReturn($requestMock);
+        $this->requestMock      = $this->createMock(Request::class);
+        $this->requestStackMock->method('getMainRequest')
+            ->willReturn($this->requestMock);
     }
 
     /**

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class NotificationSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 
@@ -98,10 +98,7 @@ class NotificationSendType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'notificationsend_list';
     }

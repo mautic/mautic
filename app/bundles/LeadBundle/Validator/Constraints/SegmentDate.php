@@ -10,7 +10,7 @@ class SegmentDate extends Constraint
 {
     public string $message;
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return SegmentDateValidator::class;
     }

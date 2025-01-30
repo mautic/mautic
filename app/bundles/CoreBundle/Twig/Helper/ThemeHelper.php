@@ -28,7 +28,7 @@ final class ThemeHelper
      */
     public function __construct(
         PathsHelper $pathsHelper,
-        private $theme
+        private $theme,
     ) {
         $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
         $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;

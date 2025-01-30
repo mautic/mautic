@@ -23,7 +23,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepo;
 

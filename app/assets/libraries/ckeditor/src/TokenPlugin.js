@@ -20,10 +20,8 @@ export default class TokenPlugin extends Plugin {
             tokens.map((item) => {
                 const itemId = item.id;
                 let tokenName = item.name;
-                let tokenNameArr = tokenName.split(':');
-                if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
-                {
-                    tokenName =  tokenNameArr[1];
+                if (tokenName.startsWith('a:')) {
+                    tokenName = tokenName.substring(2);
                 }
 
                 if (itemId.match(/dwc=/i)){

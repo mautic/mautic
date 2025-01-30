@@ -12,7 +12,7 @@ use Mautic\SmsBundle\Sms\TransportInterface;
 abstract class AbstractSmsApi implements TransportInterface
 {
     public function __construct(
-        protected TrackableModel $pageTrackableModel
+        protected TrackableModel $pageTrackableModel,
     ) {
     }
 

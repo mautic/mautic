@@ -21,7 +21,7 @@ class InactiveHelper
         private LeadEventLogRepository $eventLogRepository,
         private EventRepository $eventRepository,
         private LoggerInterface $logger,
-        private DecisionHelper $decisionHelper
+        private DecisionHelper $decisionHelper,
     ) {
     }
 
@@ -52,7 +52,7 @@ class InactiveHelper
         ArrayCollection $contacts,
         $lastActiveEventId,
         ArrayCollection $negativeChildren,
-        Event $event
+        Event $event,
     ): void {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);

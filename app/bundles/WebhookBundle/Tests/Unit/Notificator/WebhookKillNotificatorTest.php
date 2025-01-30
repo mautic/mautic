@@ -69,7 +69,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private string $createdBy = 'createdBy';
 
-    private ?User $owner;
+    private User $owner;
 
     private string $ownerEmail = 'toEmail';
 

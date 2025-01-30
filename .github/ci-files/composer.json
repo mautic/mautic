@@ -7,7 +7,7 @@
   "homepage": "https://www.mautic.org/mautic-releases",
   "support": {
     "user-docs": "https://docs.mautic.org/en",
-    "developer-docs": "https://developer.mautic.org",
+    "developer-docs": "https://devdocs.mautic.org",
     "chat": "https://www.mautic.org/slack"
   },
   "funding": [

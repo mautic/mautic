@@ -3,13 +3,17 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
+use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -90,7 +94,7 @@ class PublicController extends CommonFormController
         Request $request,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
-        string $idHash
+        string $idHash,
     ): Response {
         try {
             $messageBus->dispatch(new EmailHitNotification($idHash, $request));
@@ -111,15 +115,17 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, $idHash, string $urlEmail = null, string $secretHash = null)
     {
-        $stat                  = $model->getEmailStatus($idHash);
-        $message               = '';
-        $email                 = null;
-        $lead                  = null;
-        $template              = null;
-        $session               = $request->getSession();
-        $isOneClickUnsubscribe = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
+        $stat                   = $model->getEmailStatus($idHash);
+        $message                = '';
+        $email                  = null;
+        $lead                   = null;
+        $template               = null;
+        $session                = $request->getSession();
+        $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
+        $isUnsubscribeAll       = $request->get('unsubscribe_all');
+        $showContactPreferences = $this->coreParametersHelper->get('show_contact_preferences');
 
         if (!empty($stat)) {
             if ($isOneClickUnsubscribe) {
@@ -160,11 +166,11 @@ class PublicController extends CommonFormController
             $template = $formTemplate;
         }
 
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
-        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+        $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
         if (!empty($stat) || $isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
 
@@ -191,7 +197,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            if (!$this->coreParametersHelper->get('show_contact_preferences')) {
+            if (!$showContactPreferences || $isUnsubscribeAll) {
                 if (!empty($stat)) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
                 } elseif ($lead && $lead instanceof Lead) {
@@ -213,6 +219,7 @@ class PublicController extends CommonFormController
                     'showContactPreferredChannels' => $this->coreParametersHelper->get('show_contact_preferred_channels'),
                     'showContactCategories'        => $this->coreParametersHelper->get('show_contact_categories'),
                     'showContactSegments'          => $this->coreParametersHelper->get('show_contact_segments'),
+                    'dncUrl'                       => $this->generateUrl('mautic_email_unsubscribe_all', $params),
                 ];
 
                 if ($session->get($successSessionName)) {
@@ -324,7 +331,7 @@ class PublicController extends CommonFormController
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
-                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+                $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
             } else {
                 $viewParams['content'] = '';
                 $viewParams['message'] = $message.$formContent;
@@ -334,11 +341,23 @@ class PublicController extends CommonFormController
         return $this->render($contentTemplate, $viewParams);
     }
 
+    public function unsubscribeAllAction(Request $request, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
+    {
+        $request->attributes->set('unsubscribe_all', 1);
+
+        return $this->forward(static::class.'::unsubscribeAction', [
+            'request'    => $request,
+            'idHash'     => $idHash,
+            'urlEmail'   => $urlEmail,
+            'secretHash' => $secretHash,
+        ]);
+    }
+
     /**
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, MailHashHelper $mailHash, $idHash): Response
+    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
         $stat = $model->getEmailStatus($idHash);
 
@@ -393,25 +412,25 @@ class PublicController extends CommonFormController
 
         $template = (!empty($email) && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
 
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
 
         // Ensure template still exists
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
         if (empty($theme) || $theme->getTheme() !== $template) {
             $template = $this->coreParametersHelper->get('theme');
         }
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $analytics = $analyticsHelper->getCode();
 
         if (!empty($analytics)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            $assetsHelper->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
 
         return $this->render(
             $logicalName,
@@ -441,19 +460,22 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, Request $request, string $objectId, string $objectType = null)
+    public function previewAction(AnalyticsHelper $analyticsHelper, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
     {
-        $contactId = (int) $request->query->get('contactId');
-        /** @var EmailModel $model */
-        $model       = $this->getModel('email');
+        $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
 
         if (null === $emailEntity) {
             return $this->notFound();
         }
+        $publicPreview = $emailEntity->isPublicPreview();
+        $draftEnabled  = $emailConfig->isDraftEnabled();
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $publicPreview = $emailEntity->getDraft()->isPublicPreview();
+        }
 
         if (
-            ($this->security->isAnonymous() && (!$emailEntity->getIsPublished() || !$emailEntity->isPublicPreview()))
+            ($this->security->isAnonymous() && (!$emailEntity->isPublished() || !$publicPreview))
             || (!$this->security->isAnonymous()
                 && !$this->security->hasEntityAccess(
                     'email:emails:viewown',
@@ -479,17 +501,20 @@ class PublicController extends CommonFormController
 
         $BCcontent = $emailEntity->getContent();
         $content   = $emailEntity->getCustomHtml();
+
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $content = $emailEntity->getDraftContent();
+        }
+
         if (empty($content) && !empty($BCcontent)) {
             $template = $emailEntity->getTemplate();
-            $slots    = $this->factory->getTheme($template)->getSlots('email');
-
-            $assetsHelper = $this->factory->getHelper('template.assets');
+            $slots    = $themeHelper->getTheme($template)->getSlots('email');
 
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
 
-            $this->processSlots($slots, $emailEntity);
+            $this->processSlots($slotsHelper, $slots, $emailEntity);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $response = $this->render(
                 $logicalName,
@@ -515,9 +540,7 @@ class PublicController extends CommonFormController
             // We have one from request parameter
             /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead.lead');
-            /** @var Lead $contact */
-            $contact = $leadModel->getEntity($contactId);
-            $contact = $contact->convertToArray();
+            $contact   = $leadModel->getRepository()->getLead($contactId);
         } else {
             // Generate faked one
             /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
@@ -560,11 +583,8 @@ class PublicController extends CommonFormController
     /**
      * @param Email $entity
      */
-    public function processSlots($slots, $entity): void
+    public function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
         $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {
@@ -705,7 +725,7 @@ class PublicController extends CommonFormController
             $mailer->setFrom($from, '');
 
             // Set Content
-            $body = filter_var($query['body'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+            $body = htmlspecialchars(filter_var($query['body'], FILTER_FLAG_STRIP_HIGH));
             $mailer->setBody($body);
             $mailer->parsePlainText($body);
 
@@ -713,7 +733,7 @@ class PublicController extends CommonFormController
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 
-            $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+            $subject = htmlspecialchars(filter_var($query['subject'], FILTER_FLAG_STRIP_HIGH));
             $mailer->setSubject($subject);
 
             return $mailer->createEmailStat();

@@ -23,7 +23,7 @@ class DateOptionParameters
     public function __construct(
         ContactSegmentFilterCrate $leadSegmentFilterCrate,
         array $relativeDateStrings,
-        TimezoneResolver $timezoneResolver
+        TimezoneResolver $timezoneResolver,
     ) {
         $this->hasTimePart             = $leadSegmentFilterCrate->hasTimeParts();
         $this->timeframe               = $this->parseTimeFrame($leadSegmentFilterCrate, $relativeDateStrings);

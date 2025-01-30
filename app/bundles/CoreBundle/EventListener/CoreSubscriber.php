@@ -39,7 +39,7 @@ class CoreSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
-        private FormRepository $formRepository
+        private FormRepository $formRepository,
     ) {
     }
 
@@ -217,7 +217,7 @@ class CoreSubscriber implements EventSubscriberInterface
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
-                                    'controller' => $controller.':'.$standardDetails['action'].'Action',
+                                    'controller' => $controller.'::'.$standardDetails['action'].'Action',
                                     'method'     => $standardDetails['method'],
                                 ]
                             );

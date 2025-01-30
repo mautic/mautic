@@ -1,0 +1,17 @@
+{# _utm_tags_fields.html.twig #}
+{% set utmTagsContent %}
+    {% for i, utmTag in form.utmTags %}
+        {{ form_row(utmTag) }}
+    {% endfor %}
+{% endset %}
+<div class="row">
+{% include '@MauticCore/Helper/accordion.html.twig' with {
+    'items': [
+        {
+            'id': 'UTM',
+            'title': 'mautic.email.utm_tags',
+            'content': utmTagsContent,
+        }
+    ]
+} %}
+</div>

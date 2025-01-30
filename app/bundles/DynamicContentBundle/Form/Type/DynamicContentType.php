@@ -38,7 +38,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DynamicContentType extends AbstractType
 {
-    private $fieldChoices;
+    /**
+     * @var mixed[]
+     */
+    private array $fieldChoices;
 
     /**
      * @var mixed[]
@@ -81,7 +84,7 @@ class DynamicContentType extends AbstractType
         private EntityManager $em,
         ListModel $listModel,
         private TranslatorInterface $translator,
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -343,10 +346,7 @@ class DynamicContentType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dwc';
     }

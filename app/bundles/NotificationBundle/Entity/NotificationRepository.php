@@ -76,7 +76,7 @@ class NotificationRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );

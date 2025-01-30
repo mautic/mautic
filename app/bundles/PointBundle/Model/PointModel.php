@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -34,7 +35,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Point>
  */
-class PointModel extends CommonFormModel
+class PointModel extends CommonFormModel implements GlobalSearchInterface
 {
     public function __construct(
         protected RequestStack $requestStack,
@@ -53,7 +54,7 @@ class PointModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private PointGroupModel $pointGroupModel
+        private PointGroupModel $pointGroupModel,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -250,6 +251,10 @@ class PointModel extends CommonFormModel
 
                 $pass = [];
                 foreach ($reflection->getParameters() as $param) {
+                    if ('factory' === $param->getName()) {
+                        @\trigger_error('Using "factory" parameter is deprecated. Use dependency injection instead. Usage of "factory" parameter will be removed in 6.0.', \E_USER_DEPRECATED);
+                    }
+
                     if (isset($args[$param->getName()])) {
                         $pass[] = $args[$param->getName()];
                     } else {

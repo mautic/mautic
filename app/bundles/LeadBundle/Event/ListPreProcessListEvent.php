@@ -13,7 +13,7 @@ class ListPreProcessListEvent extends CommonEvent
      */
     public function __construct(
         protected array $list,
-        $isNew = false
+        $isNew = false,
     ) {
         $this->isNew = $isNew;
     }

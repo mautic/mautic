@@ -11,7 +11,7 @@ class WebhookBuilderEvent extends Event
     private array $events = [];
 
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

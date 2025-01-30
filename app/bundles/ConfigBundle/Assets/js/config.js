@@ -79,14 +79,14 @@ Mautic.configDsnTestExecute = function(element, action, key) {
     const $button = mQuery(element),
         $container = $button.closest('.config-dsn-container');
 
-    $container.find('.fa-spinner').removeClass('hide');
+    $container.find('.ri-loader-3-line').removeClass('hide');
 
     Mautic.ajaxActionRequest(action, {key: key}, function(response) {
         const theClass = (response.success) ? 'has-success' : 'has-error',
             theMessage = response.message;
         $container.find('.config-dsn-test-container').removeClass('has-success has-error').addClass(theClass);
         $container.find('.help-block .status-msg').html(theMessage);
-        $container.find('.fa-spinner').addClass('hide');
+        $container.find('.ri-loader-3-line').addClass('hide');
     });
 };
 
@@ -100,13 +100,10 @@ Mautic.configDsnTestDisable = function(element) {
 
 
 Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
-    if (parseInt(anonymize_ip, 10) === 1)
-    {
-        mQuery('.anonymize_ip_address').removeClass('hide');
-    }
-    else
-    {
+    if (mQuery(anonymize_ip).siblings('.toggle__label').attr('aria-checked') === 'true') {
         mQuery('.anonymize_ip_address').addClass('hide');
+    } else {
+        mQuery('.anonymize_ip_address').removeClass('hide');
     }
 };
 

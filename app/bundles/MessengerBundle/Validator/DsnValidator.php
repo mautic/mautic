@@ -17,11 +17,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class DsnValidator extends ConstraintValidator
 {
     public function __construct(
-        private TransportFactory $transportFactory
+        private TransportFactory $transportFactory,
     ) {
     }
 
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');

@@ -39,6 +39,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -58,7 +59,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private DoNotContact $doNotContact,
         private PointGroupModel $groupModel,
-        private FilterOperatorProvider $filterOperatorProvider
+        private FilterOperatorProvider $filterOperatorProvider,
     ) {
     }
 
@@ -505,7 +506,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                         $lead->getId(), $event->getConfig()['field'], $triggerDate);
                 }
             } else {
-                $operators = $this->leadModel->getFilterExpressionFunctions();
+                $operators = OperatorOptions::getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
                 $value     = $event->getConfig()['value'];
                 $fields    = $this->getFields($lead);

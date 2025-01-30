@@ -13,7 +13,7 @@ class RelationDAO
         private string $relFieldName,
         private string $relObjectName,
         private string $objectIntegrationId,
-        private string $relObjectIntegrationId
+        private string $relObjectIntegrationId,
     ) {
     }
 

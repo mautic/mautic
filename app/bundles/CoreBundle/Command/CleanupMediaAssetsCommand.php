@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Finder;
 class CleanupMediaAssetsCommand extends Command
 {
     public function __construct(
-        private PathsHelper $pathsHelper
+        private PathsHelper $pathsHelper,
     ) {
         parent::__construct();
     }

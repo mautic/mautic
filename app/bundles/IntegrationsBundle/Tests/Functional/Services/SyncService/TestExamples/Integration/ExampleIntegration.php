@@ -18,7 +18,7 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
     public const NAME = 'Example';
 
     public function __construct(
-        private ExampleSyncDataExchange $syncDataExchange
+        private ExampleSyncDataExchange $syncDataExchange,
     ) {
     }
 

@@ -21,7 +21,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         private ListModel $listModel,
         private TranslatorInterface $translator,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -78,6 +78,10 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
         $excludeSegments       = $input->getOption('exclude');
+
+        if (is_numeric($max)) {
+            $max = (int) $max;
+        }
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;

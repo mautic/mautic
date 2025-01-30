@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class ChangeOwnerType extends AbstractType
 {
     public function __construct(
-        private UserModel $userModel
+        private UserModel $userModel,
     ) {
     }
 

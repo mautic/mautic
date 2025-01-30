@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class TweetType extends AbstractType
 {
     public function __construct(
-        protected EntityManager $em
+        protected EntityManager $em,
     ) {
     }
 
@@ -171,7 +171,7 @@ class TweetType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'twitter_tweet';
     }

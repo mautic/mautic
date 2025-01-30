@@ -71,7 +71,7 @@ final class LeadEvents
      * The mautic.lead_category_change event is dispatched if a lead's subscribed categories change.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadCategoryEvent instance.
+     * Mautic\LeadBundle\Event\CategoryChangeEvent instance.
      *
      * @var string
      */
@@ -781,6 +781,8 @@ final class LeadEvents
      * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
      */
     public const POST_CONTACT_EXPORT_SCHEDULED = 'mautic.post_contact_export_scheduled';
+
+    public const POST_CONTACT_EXPORT = 'mautic.post_contact_export';
 
     /**
      * The mautic.contact_export_prepare_file event is dispatched when a contact export is being processed.

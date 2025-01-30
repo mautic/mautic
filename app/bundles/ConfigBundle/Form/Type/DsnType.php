@@ -24,12 +24,13 @@ class DsnType extends AbstractType
 {
     public function __construct(
         private DsnTransformerFactory $dsnTransformerFactory,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -124,7 +125,7 @@ class DsnType extends AbstractType
                     'label'    => $options['test_button']['label'],
                     'required' => false,
                     'attr'     => [
-                        'class'   => 'btn btn-info config-dsn-test-button',
+                        'class'   => 'btn btn-tertiary btn-sm config-dsn-test-button',
                         'onclick' => sprintf('Mautic.configDsnTestExecute(this, "%s", "%s")', $options['test_button']['action'], $name),
                     ],
                 ]

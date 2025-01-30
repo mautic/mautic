@@ -10,7 +10,7 @@
     <link rel="icon" sizes="192x192" href="http://mautic.ddev.site/media/images/favicon.ico" />
     <link rel="apple-touch-icon" href="http://mautic.ddev.site/media/images/apple-touch-icon.png" />
 
-    <!-- froala editor 
+    <!-- froala editor
     <link
       rel="stylesheet"
       href="http://mautic.ddev.site/app/bundles/CoreBundle/Assets/css/libraries/builder.css"
@@ -654,10 +654,6 @@
       data-source="mautic"
     ></script>
     <script
-      src="http://mautic.ddev.site/app/bundles/CoreBundle/Assets/js/libraries/froala/plugins/gatedvideo.js?vdd858d2f"
-      data-source="mautic"
-    ></script>
-    <script
       src="http://mautic.ddev.site/app/bundles/CoreBundle/Assets/js/libraries/froala/plugins/token.js?vdd858d2f"
       data-source="mautic"
     ></script>
@@ -704,7 +700,7 @@
                     <div class="btn-group toolbar-standard hidden-xs hidden-sm">
                       <button
                         type="button"
-                        class="btn btn-default btn-dnd btn-nospin text-primary btn-builder btn-copy"
+                        class="btn btn-ghost btn-dnd btn-nospin text-interactive btn-builder btn-copy"
                         id="emailform_buttons_builder_toolbar"
                         onclick="Mautic.launchBuilder('emailform')"
                       >
@@ -712,7 +708,7 @@
                         Builder</button
                       ><button
                         type="button"
-                        class="btn btn-default btn-apply btn-copy"
+                        class="btn btn-ghost btn-apply btn-copy"
                         id="emailform_buttons_apply_toolbar"
                         disabled
                       >
@@ -720,7 +716,7 @@
                         Save</button
                       ><button
                         type="button"
-                        class="btn btn-default btn-save btn-copy"
+                        class="btn btn-ghost btn-save btn-copy"
                         id="emailform_buttons_save_toolbar"
                         disabled
                       >
@@ -728,7 +724,7 @@
                         Save &amp; Close</button
                       ><button
                         type="button"
-                        class="btn btn-default btn-cancel btn-copy"
+                        class="btn btn-ghost btn-cancel btn-copy"
                         id="emailform_buttons_cancel_toolbar"
                         disabled
                       >
@@ -739,7 +735,7 @@
                     <div class="btn-group toolbar-dropdown hidden-md hidden-lg">
                       <button
                         type="button"
-                        class="btn btn-default btn-main"
+                        class="btn btn-ghost btn-main"
                         id="emailform_buttons_cancel_toolbar_mobile"
                       >
                         <i class="ri-close-line text-danger"></i>
@@ -747,7 +743,7 @@
                       </button>
                       <button
                         type="button"
-                        class="btn btn-default btn-nospin dropdown-toggle"
+                        class="btn btn-ghost btn-nospin dropdown-toggle"
                         data-toggle="dropdown"
                         aria-expanded="false"
                       >
@@ -846,7 +842,7 @@
                                 <h3>Code Mode</h3>
                                 <div class="panel-body text-center" style="height: 250px">
                                   <i
-                                    class="ri-code-s-slash-line ri-5x text-muted"
+                                    class="ri-code-s-slash-line ri-5x text-secondary"
                                     aria-hidden="true"
                                     style="padding-top: 75px; color: #e4e4e4"
                                   ></i>
@@ -855,14 +851,14 @@
                                   href="#"
                                   type="button"
                                   data-theme="mautic_code_mode"
-                                  class="select-theme-link btn btn-default"
+                                  class="select-theme-link btn btn-ghost"
                                   onclick="mQuery('#dynamic-content-tab').removeClass('hidden')"
                                 >
                                   Select
                                 </a>
                                 <button
                                   type="button"
-                                  class="select-theme-selected btn btn-default hide"
+                                  class="select-theme-selected btn btn-ghost hide"
                                   disabled="disabled"
                                 >
                                   Selected
@@ -890,14 +886,14 @@
                                   href="#"
                                   type="button"
                                   data-theme="blank"
-                                  class="select-theme-link btn btn-default hide"
+                                  class="select-theme-link btn btn-ghost hide"
                                   onclick="mQuery('#dynamic-content-tab').addClass('hidden')"
                                 >
                                   Select
                                 </a>
                                 <button
                                   type="button"
-                                  class="select-theme-selected btn btn-default"
+                                  class="select-theme-selected btn btn-ghost"
                                   disabled="disabled"
                                 >
                                   Selected
@@ -1590,7 +1586,7 @@
                                                   data-cmd="color"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-tint" aria-hidden="true"></i
+                                                  <i class="ri-drop-fill" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Colors</span></button
                                                 ><button
                                                   id="align-1"
@@ -1824,23 +1820,6 @@
                                                     >Insert Image</span
                                                   ></button
                                                 ><button
-                                                  id="insertGatedVideo-1"
-                                                  type="button"
-                                                  tabindex="-1"
-                                                  role="button"
-                                                  title="Insert Video"
-                                                  class="fr-command fr-btn fr-btn-font_awesome"
-                                                  data-cmd="insertGatedVideo"
-                                                  data-popup="true"
-                                                >
-                                                  <i
-                                                    class="ri-vidicon-2-line"
-                                                    aria-hidden="true"
-                                                  ></i
-                                                  ><span class="fr-sr-only"
-                                                    >Insert Video</span
-                                                  ></button
-                                                ><button
                                                   id="insertTable-1"
                                                   type="button"
                                                   tabindex="-1"
@@ -1876,7 +1855,7 @@
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="fullscreen"
                                                 >
-                                                  <i class="fa fa-expand" aria-hidden="true"></i
+                                                  <i class="ri-expand-diagonal-s-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Fullscreen</span>
                                                 </button>
                                               </div>
@@ -2467,7 +2446,7 @@ Default Dynamic Content</textarea
                                                   data-cmd="color"
                                                   data-popup="true"
                                                 >
-                                                  <i class="fa fa-tint" aria-hidden="true"></i
+                                                  <i class="ri-drop-fill" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Colors</span></button
                                                 ><button
                                                   id="align-2"
@@ -2701,23 +2680,6 @@ Default Dynamic Content</textarea
                                                     >Insert Image</span
                                                   ></button
                                                 ><button
-                                                  id="insertGatedVideo-2"
-                                                  type="button"
-                                                  tabindex="-1"
-                                                  role="button"
-                                                  title="Insert Video"
-                                                  class="fr-command fr-btn fr-btn-font_awesome"
-                                                  data-cmd="insertGatedVideo"
-                                                  data-popup="true"
-                                                >
-                                                  <i
-                                                    class="ri-vidicon-2-line"
-                                                    aria-hidden="true"
-                                                  ></i
-                                                  ><span class="fr-sr-only"
-                                                    >Insert Video</span
-                                                  ></button
-                                                ><button
                                                   id="insertTable-2"
                                                   type="button"
                                                   tabindex="-1"
@@ -2753,7 +2715,7 @@ Default Dynamic Content</textarea
                                                   class="fr-command fr-btn fr-btn-font_awesome"
                                                   data-cmd="fullscreen"
                                                 >
-                                                  <i class="fa fa-expand" aria-hidden="true"></i
+                                                  <i class="ri-expand-diagonal-s-line" aria-hidden="true"></i
                                                   ><span class="fr-sr-only">Fullscreen</span>
                                                 </button>
                                               </div>
@@ -4103,7 +4065,7 @@ Default Dynamic Content</textarea
                       type="button"
                       id="emailform_buttons_builder"
                       name="emailform[buttons][builder]"
-                      class="btn btn-default btn-dnd btn-nospin text-primary btn-builder"
+                      class="btn btn-ghost btn-dnd btn-nospin text-interactive btn-builder"
                       onclick="Mautic.launchBuilder('emailform', 'email');"
                     >
                       <i class="ri-instance-fill"></i>
@@ -4113,7 +4075,7 @@ Default Dynamic Content</textarea
                       type="submit"
                       id="emailform_buttons_apply"
                       name="emailform[buttons][apply]"
-                      class="btn btn-default btn-apply"
+                      class="btn btn-ghost btn-apply"
                     >
                       <i class="ri-check-line text-success"></i>
                       Save
@@ -4122,7 +4084,7 @@ Default Dynamic Content</textarea
                       type="submit"
                       id="emailform_buttons_save"
                       name="emailform[buttons][save]"
-                      class="btn btn-default btn-save"
+                      class="btn btn-ghost btn-save"
                     >
                       <i class="ri-save-line text-success"></i>
                       Save &amp; Close
@@ -4131,7 +4093,7 @@ Default Dynamic Content</textarea
                       type="submit"
                       id="emailform_buttons_cancel"
                       name="emailform[buttons][cancel]"
-                      class="btn btn-default btn-cancel"
+                      class="btn btn-ghost btn-cancel"
                     >
                       <i class="ri-close-line text-danger"></i>
                       Cancel
@@ -4163,7 +4125,7 @@ required="required" class="form-control dynamic-content-token-name" autocomplete
     <div class="col-xs-10">
         <label class="required" for="emailform_dynamicContent___name___content" >Default Content</label>    </div>
     <div class="col-xs-2">
-                    <a class="remove-item btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+                    <a class="remove-item btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
             </div>
 </div>
 <div class="row form-group">
@@ -4180,7 +4142,7 @@ required="required" class="form-control editor editor-dynamic-content" autocompl
         <div class="col-xs-10">
             <label class="required" for="emailform_dynamicContent_0_filters___name___content" >Content</label>        </div>
         <div class="col-xs-2">
-                        <a class="remove-item remove-filter btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+                        <a class="remove-item remove-filter btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
                     </div>
     </div>
     <div class="row form-group">
@@ -4234,22 +4196,22 @@ required="required" class="form-control editor editor-dynamic-content" autocompl
                   <div class="col-xs-6 col-sm-3 field-name">
                       <i class="object-icon ri-user-6-line"></i> <span>__label__</span>
                   </div>
-          
+
                   <div class="col-xs-6 col-sm-3 padding-none">
                       <select
                   id="emailform_dynamicContent_0_filters_0_filters___name___operator" name="emailform[dynamicContent][0][filters][0][filters][__name__][operator]"
           class="form-control not-chosen" onchange="Mautic.convertLeadFilterInput(this)" autocomplete="false"    >
                       </select>        </div>
-          
+
                           <div class="col-xs-10 col-sm-5 padding-none">
                       <input type="text"
                   id="emailform_dynamicContent_0_filters_0_filters___name___filter" name="emailform[dynamicContent][0][filters][0][filters][__name__][filter]"
           required="required" class="form-control" data-toggle="field-lookup" data-target="" data-action="lead:fieldList" placeholder="filter value" autocomplete="false" />                        <input type="hidden"
                   id="emailform_dynamicContent_0_filters_0_filters___name___display" name="emailform[dynamicContent][0][filters][0][filters][__name__][display]"
           autocomplete="false" />                    </div>
-          
+
                   <div class="col-xs-2 col-sm-1">
-                      <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
+                      <a href="javascript: void(0);" class="remove-selected btn btn-ghost text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
                   </div>
                   <input type="hidden"
                   id="emailform_dynamicContent_0_filters_0_filters___name___field" name="emailform[dynamicContent][0][filters][0][filters][__name__][field]"

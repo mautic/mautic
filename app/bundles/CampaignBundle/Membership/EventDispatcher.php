@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class EventDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

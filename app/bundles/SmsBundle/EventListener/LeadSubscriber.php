@@ -14,7 +14,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private EntityManager $em
+        private EntityManager $em,
     ) {
     }
 
@@ -87,7 +87,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'type'   => $state,
                         ],
                         'contentTemplate' => '@MauticSms/SubscribedEvents/Timeline/index.html.twig',
-                        'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',
+                        'icon'            => ('read' == $state) ? 'ri-chat-1-fill' : 'ri-message-2-fill',
                         'contactId'       => $contactId,
                     ]
                 );

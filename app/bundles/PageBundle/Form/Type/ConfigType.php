@@ -32,6 +32,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.page.config.form.google.analytics',
                 'label_attr' => ['class' => 'control-label'],
+                'data'       => htmlspecialchars_decode((string) $options['data']['google_analytics']),
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.config.form.google.analytics.tooltip',
@@ -42,7 +43,7 @@ class ConfigType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pageconfig';
     }

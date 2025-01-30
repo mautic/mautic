@@ -1,6 +1,5 @@
 # ddev redis recipe file
 #
-version: "3.6"
 
 services:
   redis:

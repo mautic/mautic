@@ -20,7 +20,7 @@ class PageSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private BuilderTokenHelperFactory $builderTokenHelperFactory,
         private TranslatorInterface $translator,
-        private CorePermissions $security
+        private CorePermissions $security,
     ) {
     }
 

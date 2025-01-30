@@ -17,7 +17,7 @@ class AggregateStatRequestEvent extends Event
         private $statName,
         private \DateTimeInterface $fromDateTime,
         private \DateTimeInterface $toDateTime,
-        private FetchOptions $options
+        private FetchOptions $options,
     ) {
         $this->statCollection = new StatCollection();
     }

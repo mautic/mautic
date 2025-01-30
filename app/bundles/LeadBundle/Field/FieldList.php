@@ -13,7 +13,7 @@ class FieldList
 {
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

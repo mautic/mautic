@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
@@ -144,7 +145,7 @@ trait CustomFieldRepositoryTrait
                     $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                     $this->buildSelectClause($dq, $args);
 
-                    $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
+                    $q->orderBy('ORD', Order::Ascending->value);
                 }
 
                 // only pull the leads as filtered via DBAL

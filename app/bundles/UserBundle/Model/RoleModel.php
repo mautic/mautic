@@ -3,6 +3,7 @@
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Event\RoleEvent;
@@ -16,7 +17,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Role>
  */
-class RoleModel extends FormModel
+class RoleModel extends FormModel implements GlobalSearchInterface
 {
     public function getRepository(): RoleRepository
     {
@@ -87,9 +88,6 @@ class RoleModel extends FormModel
         parent::deleteEntity($entity);
     }
 
-    /**
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Role) {

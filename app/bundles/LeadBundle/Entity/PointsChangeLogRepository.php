@@ -38,7 +38,7 @@ class PointsChangeLogRepository extends CommonRepository
             ));
         }
 
-        return $this->getTimelineResults($query, $options, 'lp.event_name', 'lp.date_added', [], ['dateAdded']);
+        return $this->getTimelineResults($query, $options, 'lp.event_name', 'lp.date_added', [], ['dateAdded'], null, 'lp.id');
     }
 
     /**

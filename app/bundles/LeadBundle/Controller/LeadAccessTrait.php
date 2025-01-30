@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 
 trait LeadAccessTrait

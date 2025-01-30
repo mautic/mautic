@@ -39,7 +39,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private RealTimeExecutioner $realTimeExecutioner,
         private SendEmailToUser $sendEmailToUser,
         private TranslatorInterface $translator,
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
     ) {
     }
 

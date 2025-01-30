@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class MenuSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Config $config
+        private Config $config,
     ) {
     }
 
@@ -40,6 +40,7 @@ final class MenuSubscriber implements EventSubscriberInterface
                         'route'     => RouteProvider::ROUTE_LIST,
                         'access'    => MarketplacePermissions::CAN_VIEW_PACKAGES,
                         'parent'    => 'mautic.core.integrations',
+                        'iconClass' => 'ri-shopping-bag-2-line',
                         'priority'  => 16,
                     ],
                 ],

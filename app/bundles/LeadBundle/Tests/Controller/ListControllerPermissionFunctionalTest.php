@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
@@ -603,9 +603,11 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($name);
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
+
+        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $name);
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
     }
 
     /**
@@ -628,9 +630,9 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName($userDetails['last-name']);
         $user->setRole($role);
 
-        /** @var PasswordEncoderInterface $encoder */
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);
         $this->em->flush();

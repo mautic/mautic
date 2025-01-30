@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CategoryBundlesType extends AbstractType
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -39,15 +39,12 @@ class CategoryBundlesType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'category_bundles_form';
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

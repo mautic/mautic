@@ -45,7 +45,7 @@
         <div class="row">
             {% if isInline %}
             <div class="mautibot-content col-xs-12">
-                <h3><i class="ri-alert-line fa-fw text-danger"></i><strong>{{ status_code }}</strong> {{ status_text }}{{ exceptionMessage }}</h3>
+                <h3><i class="ri-alert-line ri-fw text-danger"></i><strong>{{ status_code }}</strong> {{ status_text }}{{ exceptionMessage }}</h3>
             </div>
             {% else %}
             <div class="mautibot-image col-xs-4 col-md-3">
@@ -57,7 +57,7 @@
                     <footer class="text-right">Mautibot</footer>
                 </blockquote>
                 <div class="pull-right">
-                    <a class="text-muted" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
+                    <a class="text-secondary" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
                 </div>
             </div>
             {% endif %}
@@ -109,8 +109,8 @@
                 </div>
             {% endif %}
             </div>
-            
-        
+
+
         </div>
     </div>
     <div class="clearfix"></div>

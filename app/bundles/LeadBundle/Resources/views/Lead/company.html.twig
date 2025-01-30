@@ -11,7 +11,7 @@
         {% set switch = companyLead[company.id] is defined ? 'ri-toggle-fill' : 'ri-toggle-line' %}
         {% set bgClass = companyLead[company.id] is defined ? 'text-success' : 'text-danger' %}
         <li class="list-group-item">
-            <i class="fa ri-lg fa-fw {{ switch }} {{ bgClass }}"
+            <i class="ri-lg ri-fw {{ switch }} {{ bgClass }}"
                id="companyLeadsToggle{{ company.id }}"
                onclick="Mautic.toggleCompanyLead('companyLeadsToggle{{ company.id }}', {{ leadId }}, {{ company.id }});"></i>
             <span>{{ company.companyname|purify }}</span>

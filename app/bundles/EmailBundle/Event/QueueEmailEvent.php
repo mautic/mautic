@@ -10,7 +10,7 @@ class QueueEmailEvent extends Event
     private bool $retry = false;
 
     public function __construct(
-        private MauticMessage $message
+        private MauticMessage $message,
     ) {
     }
 

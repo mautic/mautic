@@ -716,7 +716,7 @@ class UpdateHelperTest extends TestCase
             }
         }
 
-        $this->assertSame(2, count($errors));
+        $this->assertCount(2, $errors);
     }
 
     public function testPassingPreUpdateChecks(): void
@@ -741,12 +741,12 @@ class UpdateHelperTest extends TestCase
             }
         }
 
-        $this->assertSame(0, count($errors));
+        $this->assertCount(0, $errors);
     }
 
     private function getFailingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class() extends AbstractPreUpdateCheck {
+        return new class extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('Dummy')]);
@@ -756,7 +756,7 @@ class UpdateHelperTest extends TestCase
 
     private function getPassingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class() extends AbstractPreUpdateCheck {
+        return new class extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(true, null);

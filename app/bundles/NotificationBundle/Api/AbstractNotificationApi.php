@@ -13,7 +13,7 @@ abstract class AbstractNotificationApi
     public function __construct(
         protected Client $http,
         protected TrackableModel $trackableModel,
-        protected IntegrationHelper $integrationHelper
+        protected IntegrationHelper $integrationHelper,
     ) {
     }
 

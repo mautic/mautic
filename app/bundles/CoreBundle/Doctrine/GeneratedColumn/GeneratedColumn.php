@@ -23,7 +23,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
         private string $tableName,
         string $columnName,
         private string $columnType,
-        private string $as
+        private string $as,
     ) {
         $this->indexColumns[] = $columnName;
         $this->tablePrefix    = MAUTIC_TABLE_PREFIX;

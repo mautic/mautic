@@ -11,7 +11,9 @@ class UntrackableUrlsEvent extends Event
      */
     private array $doNotTrack = [
         '{webview_url}',
+        '{resubscribe_url}',
         '{unsubscribe_url}',
+        '{dnc_url}',
         '{trackable=(.*?)}',
     ];
 
@@ -19,7 +21,7 @@ class UntrackableUrlsEvent extends Event
      * @param mixed $content
      */
     public function __construct(
-        private $content
+        private $content,
     ) {
     }
 

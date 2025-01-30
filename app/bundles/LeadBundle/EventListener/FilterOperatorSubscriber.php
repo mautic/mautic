@@ -24,7 +24,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         private LeadFieldRepository $leadFieldRepository,
         private TypeOperatorProviderInterface $typeOperatorProvider,
         private FieldChoicesProviderInterface $fieldChoicesProvider,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

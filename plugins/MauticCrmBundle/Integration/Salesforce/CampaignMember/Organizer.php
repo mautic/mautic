@@ -7,37 +7,49 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class Organizer
 {
+    /**
+     * @var array<string, Lead>
+     */
     private array $leads = [];
 
+    /**
+     * @var array<string, Contact>
+     */
     private array $contacts = [];
 
     public function __construct(
-        private array $records
+        private array $records,
     ) {
         $this->organize();
     }
 
     /**
-     * @return array
+     * @return array<string, Lead>
      */
     public function getLeads()
     {
         return $this->leads;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLeadIds(): array
     {
         return array_keys($this->leads);
     }
 
     /**
-     * @return array
+     * @return array<string, Contact>
      */
     public function getContacts()
     {
         return $this->contacts;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getContactIds(): array
     {
         return array_keys($this->contacts);

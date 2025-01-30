@@ -51,7 +51,7 @@ abstract class AbstractLookup
         protected ?string $cacheDir = null,
         protected ?LoggerInterface $logger = null,
         protected ?Client $client = null,
-        protected ?CoreParametersHelper $coreParametersHelper = null
+        protected ?CoreParametersHelper $coreParametersHelper = null,
     ) {
     }
 

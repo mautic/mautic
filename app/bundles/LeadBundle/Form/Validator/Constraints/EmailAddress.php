@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute]
 class EmailAddress extends Constraint
 {
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return static::class.'Validator';
     }

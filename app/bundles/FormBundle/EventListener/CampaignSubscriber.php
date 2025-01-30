@@ -22,7 +22,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private SubmissionModel $formSubmissionModel,
         private RealTimeExecutioner $realTimeExecutioner,
-        private FormFieldHelper $formFieldHelper
+        private FormFieldHelper $formFieldHelper,
     ) {
     }
 

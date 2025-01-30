@@ -12,6 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -73,9 +74,9 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($role);
 
-        $this->loginUser($user->getUserIdentifier());
+        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         return $user;
     }
@@ -110,8 +111,9 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword('mautic', null));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
 
         $this->em->persist($user);

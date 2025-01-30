@@ -12,7 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class FieldToOrderTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private LeadFieldRepository $leadFieldRepository
+        private LeadFieldRepository $leadFieldRepository,
     ) {
     }
 

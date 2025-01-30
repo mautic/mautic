@@ -16,25 +16,22 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $adapter;
 
-    private string $random;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->random  = sha1((string) time());
         $this->adapter = $this->getMockBuilder(FilesystemTagAwareAdapter::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['clear', 'commit'])
             ->addMethods(['getCacheAdapter']) // because CacheProvider does not have an interface.
             ->getMock();
-        $this->adapter->method('clear')->willReturn($this->random);
-        $this->adapter->method('commit')->willReturn(null);
+        $this->adapter->method('clear')->willReturn(true);
+        $this->adapter->method('commit')->willReturn(true);
         $this->adapter->method('getCacheAdapter')->willReturn('');
     }
 
     public function testClear(): void
     {
-        $this->adapter->expects($this->once())->method('clear')->willReturn($this->random);
+        $this->adapter->expects($this->once())->method('clear')->willReturn(true);
         $subscriber = new CacheClearSubscriber($this->adapter, new Logger('test'));
         $subscriber->clear('aaa');
     }

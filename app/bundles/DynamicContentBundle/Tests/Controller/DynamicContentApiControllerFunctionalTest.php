@@ -28,7 +28,7 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/dwc/slot-a');
 
-        Assert::assertSame(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getContent());
     }
 
     public function testDwcGetEndpointForASlotAndContact(): void
@@ -63,7 +63,7 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/dwc/slot-a?ct={$ct}");
 
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         $responseArray = json_decode($this->client->getResponse()->getContent(), true);
         Assert::assertSame('<some>content</some>', $responseArray['content']);
@@ -77,6 +77,6 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/dynamiccontents/new', $payload);
-        Assert::assertSame(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $this->client->getResponse()->getContent());
     }
 }

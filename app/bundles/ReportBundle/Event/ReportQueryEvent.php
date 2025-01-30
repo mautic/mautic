@@ -13,7 +13,7 @@ class ReportQueryEvent extends AbstractReportEvent
         Report $report,
         private QueryBuilder $query,
         $totalResults,
-        private array $options
+        private array $options,
     ) {
         $this->context      = $report->getSource();
         $this->report       = $report;
@@ -21,7 +21,7 @@ class ReportQueryEvent extends AbstractReportEvent
     }
 
     /**
-     * @return array
+     * @return QueryBuilder
      */
     public function getQuery()
     {

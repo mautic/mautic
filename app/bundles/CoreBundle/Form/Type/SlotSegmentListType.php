@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SlotSegmentListType extends SlotType
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -33,10 +33,7 @@ class SlotSegmentListType extends SlotType
         parent::buildForm($builder, $options);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'slot_segmentlist';
     }

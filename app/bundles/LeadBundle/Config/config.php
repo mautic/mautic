@@ -342,7 +342,7 @@ return [
             'mautic.lead.export_scheduled_logger_subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ContactExportSchedulerLoggerSubscriber::class,
                 'arguments' => [
-                    'logger',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.lead.export_scheduled_notification_subscriber' => [
@@ -448,15 +448,9 @@ return [
                 'class'     => Mautic\LeadBundle\Deduplicate\ContactDeduper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
+                    'mautic.lead.field.fields_with_unique_identifier',
                     'mautic.lead.merger',
                     'mautic.lead.repository.lead',
-                ],
-            ],
-            'mautic.company.deduper' => [
-                'class'     => Mautic\LeadBundle\Deduplicate\CompanyDeduper::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.repository.company',
                 ],
             ],
             'mautic.lead.helper.primary_company' => [

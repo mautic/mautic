@@ -87,31 +87,23 @@ class Import extends FormEntity
 
     /**
      * Tolal line count of the CSV file.
-     *
-     * @var int
      */
-    private $lineCount = 0;
+    private int $lineCount = 0;
 
     /**
      * Count of entities which were newly created.
-     *
-     * @var int
      */
-    private $insertedCount = 0;
+    private int $insertedCount = 0;
 
     /**
      * Count of entities which were updated.
-     *
-     * @var int
      */
-    private $updatedCount = 0;
+    private int $updatedCount = 0;
 
     /**
      * Count of ignored items.
-     *
-     * @var int
      */
-    private $ignoredCount = 0;
+    private int $ignoredCount = 0;
 
     /**
      * @var int
@@ -123,20 +115,11 @@ class Import extends FormEntity
      */
     private $status;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateStarted;
+    private ?\DateTimeInterface $dateStarted = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateEnded;
+    private ?\DateTimeInterface $dateEnded = null;
 
-    /**
-     * @var string
-     */
-    private $object = 'lead';
+    private string $object = 'lead';
 
     /**
      * @var array<mixed>|null
@@ -372,12 +355,7 @@ class Import extends FormEntity
         return $this->getOriginalFile() ?: $this->getId();
     }
 
-    /**
-     * @param int $lineCount
-     *
-     * @return Import
-     */
-    public function setLineCount($lineCount)
+    public function setLineCount(int $lineCount): self
     {
         $this->isChanged('lineCount', $lineCount);
         $this->lineCount = $lineCount;
@@ -385,20 +363,12 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLineCount()
+    public function getLineCount(): int
     {
         return $this->lineCount;
     }
 
-    /**
-     * @param int $insertedCount
-     *
-     * @return Import
-     */
-    public function setInsertedCount($insertedCount)
+    public function setInsertedCount(int $insertedCount): self
     {
         $this->isChanged('insertedCount', $insertedCount);
         $this->insertedCount = $insertedCount;
@@ -406,28 +376,17 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Import
-     */
-    public function increaseInsertedCount()
+    public function increaseInsertedCount(): self
     {
         return $this->setInsertedCount($this->insertedCount + 1);
     }
 
-    /**
-     * @return int
-     */
-    public function getInsertedCount()
+    public function getInsertedCount(): int
     {
         return $this->insertedCount;
     }
 
-    /**
-     * @param int $updatedCount
-     *
-     * @return Import
-     */
-    public function setUpdatedCount($updatedCount)
+    public function setUpdatedCount(int $updatedCount): self
     {
         $this->isChanged('updatedCount', $updatedCount);
         $this->updatedCount = $updatedCount;
@@ -435,28 +394,17 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Import
-     */
-    public function increaseUpdatedCount()
+    public function increaseUpdatedCount(): self
     {
         return $this->setUpdatedCount($this->updatedCount + 1);
     }
 
-    /**
-     * @return int
-     */
-    public function getUpdatedCount()
+    public function getUpdatedCount(): int
     {
         return $this->updatedCount;
     }
 
-    /**
-     * @param int $ignoredCount
-     *
-     * @return Import
-     */
-    public function setIgnoredCount($ignoredCount)
+    public function setIgnoredCount(int $ignoredCount): self
     {
         $this->isChanged('ignoredCount', $ignoredCount);
         $this->ignoredCount = $ignoredCount;
@@ -464,28 +412,20 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Import
-     */
-    public function increaseIgnoredCount()
+    public function increaseIgnoredCount(): self
     {
         return $this->setIgnoredCount($this->ignoredCount + 1);
     }
 
-    /**
-     * @return int
-     */
-    public function getIgnoredCount()
+    public function getIgnoredCount(): int
     {
         return $this->ignoredCount;
     }
 
     /**
      * Counts how many rows have been processed so far.
-     *
-     * @return int
      */
-    public function getProcessedRows()
+    public function getProcessedRows(): int
     {
         return $this->getInsertedCount() + $this->getUpdatedCount() + $this->getIgnoredCount();
     }
@@ -501,7 +441,7 @@ class Import extends FormEntity
             return round(($processed / $total) * 100, 2);
         }
 
-        return 0;
+        return 0.0;
     }
 
     /**
@@ -561,12 +501,7 @@ class Import extends FormEntity
         };
     }
 
-    /**
-     * @param int $dateStarted
-     *
-     * @return Import
-     */
-    public function setDateStarted(\DateTime $dateStarted)
+    public function setDateStarted(?\DateTimeInterface $dateStarted): self
     {
         $this->isChanged('dateStarted', $dateStarted);
         $this->dateStarted = $dateStarted;
@@ -574,20 +509,15 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateStarted()
+    public function getDateStarted(): ?\DateTimeInterface
     {
         return $this->dateStarted;
     }
 
     /**
      * Modify the entity for the start of import.
-     *
-     * @return Import
      */
-    public function start()
+    public function start(): self
     {
         if (empty($this->getDateStarted())) {
             $this->setDateStarted(new \DateTime());
@@ -600,10 +530,8 @@ class Import extends FormEntity
 
     /**
      * Modify the entity for the end of import.
-     *
-     * @return Import
      */
-    public function end($removeFile = true)
+    public function end($removeFile = true): self
     {
         $this->setDateEnded(new \DateTime());
 
@@ -618,12 +546,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @param int $dateEnded
-     *
-     * @return Import
-     */
-    public function setDateEnded(\DateTime $dateEnded)
+    public function setDateEnded(?\DateTimeInterface $dateEnded): self
     {
         $this->isChanged('dateEnded', $dateEnded);
         $this->dateEnded = $dateEnded;
@@ -631,10 +554,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateEnded()
+    public function getDateEnded(): ?\DateTimeInterface
     {
         return $this->dateEnded;
     }
@@ -653,7 +573,7 @@ class Import extends FormEntity
             $endTime = $this->getDateModified();
         }
 
-        if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
+        if ($startTime instanceof \DateTimeInterface && $endTime instanceof \DateTimeInterface) {
             return $endTime->diff($startTime);
         }
 
@@ -683,10 +603,8 @@ class Import extends FormEntity
 
     /**
      * Counts speed in items per second.
-     *
-     * @return float
      */
-    public function getSpeed()
+    public function getSpeed(): float
     {
         $runtime       = $this->getRunTimeSeconds();
         $processedRows = $this->getProcessedRows();
@@ -695,7 +613,7 @@ class Import extends FormEntity
             return round($processedRows / $runtime, 2);
         }
 
-        return $processedRows;
+        return (float) $processedRows;
     }
 
     /**

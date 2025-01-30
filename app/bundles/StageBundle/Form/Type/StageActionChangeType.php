@@ -36,10 +36,7 @@ class StageActionChangeType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'stageaction_change';
     }

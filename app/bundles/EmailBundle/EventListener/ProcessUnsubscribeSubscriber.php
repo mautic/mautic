@@ -27,7 +27,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private Unsubscribe $unsubscriber,
-        private FeedbackLoop $looper
+        private FeedbackLoop $looper,
     ) {
     }
 

@@ -1,0 +1,55 @@
+<h4 class="pa-md mt-lg fw-sb">Email specific</h4>
+<p class="text-secondary pi-md">{{'mautic.placeholder_tokens.email_tokens.explanation'|trans}}</p>
+<ul id="emailTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
+  <!-- Email specific tokens -->
+  <li class="panel">
+    <a role="button" id="headingEmailTokens" class="accordion-heading collapsed" data-toggle="collapse"
+      data-parent="#tokensAccordion" href="#collapseEmailTokens" aria-expanded="false"
+      aria-controls="collapseEmailTokens">
+      <i class="ri-arrow-down-s-line accordion-arrow"></i>
+      <span class="accordion-title">{{ 'mautic.placeholder_tokens.email_tokens'|trans }}</span>
+    </a>
+    <div id="collapseEmailTokens" class="collapse accordion-wrapper" role="tabpanel"
+      aria-labelledby="headingEmailTokens">
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+            <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.email.signature'|trans }}</td>
+            <td><code>{signature}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.email.subject'|trans }}</td>
+            <td><code>{subject}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.email.unsubscribe_text'|trans }}</td>
+            <td><code>{unsubscribe_text}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.email.unsubscribe_url'|trans }}</td>
+            <td><code>{unsubscribe_url}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.email.resubscribe_url'|trans }}</td>
+            <td><code>{resubscribe_url}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.email.webview_text'|trans }}</td>
+            <td><code>{webview_text}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.email.webview_url'|trans }}</td>
+            <td><code>{webview_url}</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </li>
+</ul>

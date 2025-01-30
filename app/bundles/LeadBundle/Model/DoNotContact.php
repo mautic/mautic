@@ -13,7 +13,7 @@ class DoNotContact implements MauticModelInterface
 {
     public function __construct(
         protected LeadModel $leadModel,
-        protected DoNotContactRepository $dncRepo
+        protected DoNotContactRepository $dncRepo,
     ) {
     }
 
@@ -71,7 +71,7 @@ class DoNotContact implements MauticModelInterface
         $comments = '',
         $persist = true,
         $checkCurrentStatus = true,
-        $allowUnsubscribeOverride = false
+        $allowUnsubscribeOverride = false,
     ) {
         $dnc     = null;
         $contact = $this->leadModel->getEntity($contactId);

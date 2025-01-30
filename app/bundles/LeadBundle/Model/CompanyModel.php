@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyMergeEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
@@ -73,7 +74,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        private FieldList $fieldList,
     ) {
         $this->leadFieldModel = $leadFieldModel;
 
@@ -117,7 +119,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->repoSetup = true;
             $repo->setDispatcher($this->dispatcher);
             // set the point trigger model in order to get the color code for the lead
-            $fields = $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+            $fields = $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
 
             $searchFields = [];
             foreach ($fields as $groupFields) {
@@ -228,10 +230,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * Populates custom field values for updating the company.
-     *
-     * @param bool|false $overwriteWithBlank
      */
-    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false): void
+    public function setFieldValues(Company $company, array $data, bool $overwriteWithBlank = false): void
     {
         // save the field values
         $fieldValues = $company->getFields();
@@ -266,7 +266,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen($newValue) > 0 || (0 === strlen($newValue) && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (strlen($newValue) > 0 || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -778,13 +778,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param mixed[] $fields
-     * @param mixed[] $data
-     * @param bool    $skipIfExists
-     *
-     * @throws \Exception
+     * @param array<string>   $fields
+     * @param array<mixed>    $data
+     * @param int|string|null $owner
      */
-    public function import($fields, $data, $owner = null, $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false): bool
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 

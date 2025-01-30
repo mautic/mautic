@@ -32,7 +32,7 @@ class EventLogger
         private ContactTracker $contactTracker,
         private LeadEventLogRepository $leadEventLogRepository,
         private LeadRepository $leadRepository,
-        private SummaryModel $summaryModel
+        private SummaryModel $summaryModel,
     ) {
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();

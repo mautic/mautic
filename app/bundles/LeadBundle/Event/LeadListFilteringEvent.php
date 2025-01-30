@@ -31,7 +31,7 @@ class LeadListFilteringEvent extends CommonEvent
         protected $alias,
         protected $func,
         protected $queryBuilder,
-        EntityManager $entityManager
+        EntityManager $entityManager,
     ) {
         $this->em              = $entityManager;
         $this->isFilteringDone = false;

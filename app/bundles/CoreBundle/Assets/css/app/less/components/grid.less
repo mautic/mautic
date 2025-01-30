@@ -8,19 +8,22 @@
 // Set the container width, and override it for fixed navbars in media queries.
 
 .container {
-  .container-fixed();
+  padding-right: 15px;
+  padding-left: 15px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
 
   @media (min-width: @screen-sm-min) {
-    width: @container-sm;
+    max-width: @container-sm;
   }
   @media (min-width: @screen-md-min) {
-    width: @container-md;
+    max-width: @container-md;
   }
   @media (min-width: @screen-lg-min) {
-    width: @container-lg;
+    max-width: @container-lg;
   }
 }
-
 
 // Fluid container
 //

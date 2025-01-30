@@ -109,37 +109,37 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $expectedColumns = [
             'lead.name' => [
-                'label' => null,
+                'label' => '',
                 'type'  => 'bool',
                 'alias' => 'name',
             ],
             'comp.name' => [
-                'label' => null,
+                'label' => '',
                 'type'  => 'bool',
                 'alias' => 'name',
             ],
             'utm.utm_campaign' => [
-                'label' => null,
+                'label' => '',
                 'type'  => 'text',
                 'alias' => 'utm_campaign',
             ],
             'utm.utm_content' => [
-                'label' => null,
+                'label' => '',
                 'type'  => 'text',
                 'alias' => 'utm_content',
             ],
             'utm.utm_medium' => [
-                'label' => null,
+                'label' => '',
                 'type'  => 'text',
                 'alias' => 'utm_medium',
             ],
             'utm.utm_source' => [
-                'label' => null,
+                'label' => '',
                 'type'  => 'text',
                 'alias' => 'utm_source',
             ],
             'utm.utm_term' => [
-                'label' => null,
+                'label' => '',
                 'type'  => 'text',
                 'alias' => 'utm_term',
             ],
@@ -151,7 +151,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
                 'columns'      => $expectedColumns,
                 'filters'      => array_merge($expectedColumns, [
                     'tag' => [
-                        'label'     => null,
+                        'label'     => '',
                         'type'      => 'multiselect',
                         'list'      => ['A', 'B', 'C'],
                         'operators' => [

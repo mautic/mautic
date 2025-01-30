@@ -16,23 +16,28 @@ use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
 
-class EmailControllerTest extends \PHPUnit\Framework\TestCase
+class EmailControllerTest extends TestCase
 {
     /**
-     * @var MockObject|Translator
+     * @var string
      */
+    public const NEW_CATEGORY_TITLE = 'New category';
     private MockObject $translatorMock;
 
     /**
@@ -137,7 +142,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
-        $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
+        $this->sessionMock->method('getFlashBag')->willReturn($this->createMock(FlashBagInterface::class));
     }
 
     public function testSendActionWhenNoEntityFound(): void
@@ -222,15 +227,10 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ['twig', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->twigMock],
         ];
 
-        $serviceExists = fn ($key) => count(array_filter($services, fn ($service) => $service[0] === $key));
+        $serviceExists = fn ($key) => count(array_filter($services, fn ($service) => $service[0] === $key)) > 0;
 
         $this->containerMock->method('has')->willReturnCallback($serviceExists);
         $this->containerMock->method('get')->willReturnMap($services);
-
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
 
         $this->modelMock->expects($this->once())
             ->method('getEntity')
@@ -272,6 +272,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
 
         $request = new Request();
         $this->requestStack->push($request);
-        $this->controller->sendExampleAction($request, 1);
+        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FieldModel::class));
     }
 }

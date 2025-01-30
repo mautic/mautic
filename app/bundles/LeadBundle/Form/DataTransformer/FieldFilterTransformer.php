@@ -21,7 +21,7 @@ class FieldFilterTransformer implements DataTransformerInterface
 
     public function __construct(
         TranslatorInterface $translator,
-        private array $default = []
+        private array $default = [],
     ) {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
@@ -78,7 +78,7 @@ class FieldFilterTransformer implements DataTransformerInterface
         $rawFilters = array_values($rawFilters);
 
         foreach ($rawFilters as $k => $f) {
-            if ('datetime' == $f['type']) {
+            if ('datetime' === $f['type']) {
                 $bcFilter = $f['filter'] ?? '';
                 $filter   = $f['properties']['filter'] ?? $bcFilter;
                 if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {

@@ -23,7 +23,7 @@ class CampaignEventHelper
         protected TrackableModel $trackableModel,
         protected PageTokenHelper $pageTokenHelper,
         protected AssetTokenHelper $assetTokenHelper,
-        protected TweetModel $tweetModel
+        protected TweetModel $tweetModel,
     ) {
     }
 

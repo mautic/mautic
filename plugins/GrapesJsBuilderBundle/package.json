@@ -51,8 +51,6 @@
     "grapesjs-mjml": "^1.0.5",
     "grapesjs-navbar": "^1.0.2",
     "grapesjs-parser-postcss": "^1.0.3",
-    "grapesjs-plugin-ckeditor": "^1.0.1",
-    "grapesjs-plugin-ckeditor5": "^0.0.33",
     "grapesjs-plugin-export": "^1.0.12",
     "grapesjs-plugin-forms": "^2.0.6",
     "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#5.1",

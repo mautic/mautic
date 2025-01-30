@@ -20,8 +20,6 @@ class EmailGraphStatsController extends AbstractController
      * @param string $dateFrom
      * @param string $dateTo
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
-     *
      * @throws \Exception
      */
     public function viewAction(
@@ -32,7 +30,7 @@ class EmailGraphStatsController extends AbstractController
         $objectId,
         $isVariant,
         $dateFrom = null,
-        $dateTo = null
+        $dateTo = null,
     ): \Symfony\Component\HttpFoundation\Response {
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
@@ -57,7 +55,7 @@ class EmailGraphStatsController extends AbstractController
         [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Prepare stats for bargraph
-        if ($chartStatsSource = $request->query->get('stats', false)) {
+        if ($chartStatsSource = $request->query->get('stats')) {
             $includeVariants = ('all' === $chartStatsSource);
         } else {
             $includeVariants = (($email->isVariant() && $parent === $email) || ($email->isTranslation() && $translationParent === $email));

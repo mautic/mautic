@@ -17,7 +17,7 @@
            style="border-radius: 0;"
             {% if button.attr is not empty %}{{ button.attr }}{% endif %}
         >
-            <i class="fa fa-fw {{ button.icon }}"></i>{{ button.text }}
+            <i class="ri-fw {{ button.icon }}"></i>{{ button.text }}
         </a>
     {% if button.extra is not empty %}{{ button.extra }}{% endif %}
     </div>
@@ -39,14 +39,14 @@
                 {% if tab.published is defined and tab['published'] is not empty %}
                     {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-success'}) %}
                 {% else %}
-                    {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-muted'}) %}
+                    {% set tab = tab|merge({'icon': 'ri-checkbox-circle-line text-secondary'}) %}
                 {% endif %}
             {% endif %}
             <li data-tab-id="{{ tab['id'] }}" class="{% if tab['active'] is not empty %}active{% endif %}{{ class }}"{{ attr }}>
                 <a href="#{{ tab['id'] }}" role="tab" data-toggle="tab" class="{{ class }}">
                     <span>{{ tab['name'] }}</span>
                     {% if tab.icon is not empty %}
-                        <i class="fa fa-fw {{ tab['icon'] }}"></i>
+                        <i class="ri-fw {{ tab['icon'] }}"></i>
                     {% endif %}
                 </a>
             </li>

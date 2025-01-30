@@ -16,7 +16,7 @@ class MessageType extends AbstractFormStandardType
 {
     public function __construct(
         protected MessageModel $model,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         $this->security = $security;
     }

@@ -2,6 +2,10 @@
   <p align="center">
    <img width="150" height="150" src="(.github/readme_logo.png)" alt="Logo">
 
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-154-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
   </p>
 	<h1 align="center"><b>Mautic</b></h1>
 	<p align="center">
@@ -22,7 +26,7 @@
 
 🗒️ About Mautic
 ============
-Mautic is the world’s largest open source marketing automation project. With over 200,000 organisations using Mautic and over 1,000 community volunteers, we empower businesses by making it easy to manage their marketing across a range of channels. 
+Mautic is the world’s largest open source marketing automation project. With over 200,000 organisations using Mautic and over 1,000 community volunteers, we empower businesses by making it easy to manage their marketing across a range of channels.
 
 ### ✨ Benefits over regular marketing automation tools
 
@@ -71,6 +75,13 @@ The GitHub version is recommended for both development and testing. The producti
 > [!WARNING]
 > <sub>*Install from source only if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and keep it working. If the source/database schema gets out of sync with Mautic releases, the release updater may not work and will require manual updates. For production, we recommend the pre-packaged Mautic which is available at [mautic.org/download][download-mautic].*
 *Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*</sub>
+
+### How to install Mautic
+You must already have [Composer][composer] available on your computer because this is a development release and you'll need Composer to download the vendor packages.
+
+Also note that if you have DDEV installed, you can just run 'ddev start' as a DDEV project’s configuration is present in the repo. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
+
+Installing Mautic is a simple three-step process:
 
 1. [Download the repository zip][download-zip] then extract the zip to your web root.
 2. Run the `composer install` command to install the required packages.
@@ -279,7 +290,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ajitdev"><img src="https://avatars.githubusercontent.com/u/3738249?v=4?s=100" width="100px;" alt="Ajit"/><br /><sub><b>Ajit</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ajitdev" title="Code">💻</a> <a href="https://github.com/mautic/mautic/issues?q=author%3Aajitdev" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Esthertests"><img src="https://avatars.githubusercontent.com/u/156212312?v=4?s=100" width="100px;" alt="Esthertests"/><br /><sub><b>Esthertests</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3AEsthertests" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/magdalenaleonow"><img src="https://avatars.githubusercontent.com/u/130159751?v=4?s=100" width="100px;" alt="magdalenaleonow"/><br /><sub><b>magdalenaleonow</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Amagdalenaleonow" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nox1134"><img src="https://avatars.githubusercontent.com/u/95358802?v=4?s=100" width="100px;" alt="Priyanshi Gaur"/><br /><sub><b>Priyanshi Gaur</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nox1134" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nox1134"><img src="https://avatars.githubusercontent.com/u/95358802?v=4?s=100" width="100px;" alt="Priyanshi Gaur"/><br /><sub><b>Priyanshi Gaur</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nox1134" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=nox1134" title="Tests">⚠️</a></td>
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/magician7"><img src="https://avatars.githubusercontent.com/u/2359284?v=4?s=100" width="100px;" alt="Damian"/><br /><sub><b>Damian</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Amagician7" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/mautic/mautic/issues?q=author%3Amagician7" title="Bug reports">🐛</a></td>
@@ -291,7 +302,22 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nishant-s7"><img src="https://avatars.githubusercontent.com/u/97207366?v=4?s=100" width="100px;" alt="nishant-s7"/><br /><sub><b>nishant-s7</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nishant-s7" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://matbcvo.github.io"><img src="https://avatars.githubusercontent.com/u/1006437?v=4?s=100" width="100px;" alt="Martin Vooremäe"/><br /><sub><b>Martin Vooremäe</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Amatbcvo" title="Reviewed Pull Requests">👀</a> <a href="#userTesting-matbcvo" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://matbcvo.github.io"><img src="https://avatars.githubusercontent.com/u/1006437?v=4?s=100" width="100px;" alt="Martin Vooremäe"/><br /><sub><b>Martin Vooremäe</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Amatbcvo" title="Reviewed Pull Requests">👀</a> <a href="#userTesting-matbcvo" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/commits?author=matbcvo" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/vinzent"><img src="https://avatars.githubusercontent.com/u/296297?v=4?s=100" width="100px;" alt="Thomas Mueller"/><br /><sub><b>Thomas Mueller</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=vinzent" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Bastian2718"><img src="https://avatars.githubusercontent.com/u/177823038?v=4?s=100" width="100px;" alt="Bastian2718"/><br /><sub><b>Bastian2718</b></sub></a><br /><a href="#userTesting-Bastian2718" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://javad.sh"><img src="https://avatars.githubusercontent.com/u/22474016?v=4?s=100" width="100px;" alt="Javad Shafique"/><br /><sub><b>Javad Shafique</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=cjavad" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Aleks0129"><img src="https://avatars.githubusercontent.com/u/182695073?v=4?s=100" width="100px;" alt="Aleks0129"/><br /><sub><b>Aleks0129</b></sub></a><br /><a href="#userTesting-Aleks0129" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://academy.leewayweb.com"><img src="https://avatars.githubusercontent.com/u/1532615?v=4?s=100" width="100px;" alt="Mauro Chojrin"/><br /><sub><b>Mauro Chojrin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=mchojrin" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://activelamp.com"><img src="https://avatars.githubusercontent.com/u/810903?v=4?s=100" width="100px;" alt="Tom Friedhof"/><br /><sub><b>Tom Friedhof</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Atomfriedhof" title="Bug reports">🐛</a> <a href="https://github.com/mautic/mautic/commits?author=tomfriedhof" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MojisolaaaO"><img src="https://avatars.githubusercontent.com/u/173389301?v=4?s=100" width="100px;" alt="Mojisola Otusheso"/><br /><sub><b>Mojisola Otusheso</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3AMojisolaaaO" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nileshlohar"><img src="https://avatars.githubusercontent.com/u/18068907?v=4?s=100" width="100px;" alt="Nilesh Lohar"/><br /><sub><b>Nilesh Lohar</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nileshlohar" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://simplyprint.io/"><img src="https://avatars.githubusercontent.com/u/11600207?v=4?s=100" width="100px;" alt="Albert Møller Nielsen"/><br /><sub><b>Albert Møller Nielsen</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3AAlbertMN" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/TheMarvelFan"><img src="https://avatars.githubusercontent.com/u/93257324?v=4?s=100" width="100px;" alt="Kushagra Nigam"/><br /><sub><b>Kushagra Nigam</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TheMarvelFan" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://laurielim.github.io"><img src="https://avatars.githubusercontent.com/u/62180225?v=4?s=100" width="100px;" alt="Laurie Lim Sam"/><br /><sub><b>Laurie Lim Sam</b></sub></a><br /><a href="#userTesting-laurielim" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Alaurielim" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/caiqueportela"><img src="https://avatars.githubusercontent.com/u/44068957?v=4?s=100" width="100px;" alt="Caique Portela"/><br /><sub><b>Caique Portela</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=caiqueportela" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/levente999"><img src="https://avatars.githubusercontent.com/u/168987998?v=4?s=100" width="100px;" alt="levente999"/><br /><sub><b>levente999</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=levente999" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
@@ -322,7 +348,7 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
 [community]: <https://www.mautic.org/community>
 [mautic-docs]: <https://docs.mautic.org>
-[dev-docs]: <https://developer.mautic.org>
+[dev-docs]: <https://devdocs.mautic.org>
 [all-contributors]: <https://github.com/all-contributors/all-contributors>
 [best-pulls]: <https://github.com/mautic/mautic/pulls?q=is%3Aopen+is%3Apr+-label%3Ablocked+-label%3Awip+-is%3Adraft+-label%3Aready-to-commit+-label%3Apending-feedback+label%3Aready-to-test+status%3Asuccess>
 [mautic-trials]: <https://m.mautic.org/mautic-start-your-trial>

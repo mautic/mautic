@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints\Email;
 class ConfigMonitoredMailboxesType extends AbstractType
 {
     public function __construct(
-        private Mailbox $imapHelper
+        private Mailbox $imapHelper,
     ) {
     }
 
@@ -208,7 +208,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'label'    => 'mautic.email.config.monitored_email.test_connection',
                 'required' => false,
                 'attr'     => [
-                    'class'   => 'btn btn-success',
+                    'class'   => 'btn btn-tertiary btn-sm',
                     'onclick' => 'Mautic.testMonitoredEmailServerConnection(\''.$options['mailbox'].'\')',
                 ],
             ]
@@ -225,7 +225,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
         $view->vars['mailbox'] = $options['mailbox'];
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'monitored_mailboxes';
     }

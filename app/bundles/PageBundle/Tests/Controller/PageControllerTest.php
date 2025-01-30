@@ -66,6 +66,7 @@ class PageControllerTest extends MauticMysqlTestCase
 
     public function testLandingPageTracking(): void
     {
+        $this->logoutUser();
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
             'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
@@ -154,10 +155,12 @@ class PageControllerTest extends MauticMysqlTestCase
      */
     public function testLandingPageWithUtmTracking(): void
     {
+        $this->logoutUser();
+
         $timestamp  = \time();
         $page       = $this->createTestPage();
 
-        $this->client->request('GET', "{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
+        $this->client->request('GET', "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 

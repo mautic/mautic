@@ -26,7 +26,6 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
@@ -56,9 +55,9 @@ class FieldModel extends FormModel
                     'Miss',
                 ],
             ],
-            'fixed'      => true,
-            'listable'   => true,
-            'object'     => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'firstname' => [
             'fixed'    => true,
@@ -464,9 +463,9 @@ class FieldModel extends FormModel
                     ],
                 ],
             ],
-            'fixed'      => true,
-            'listable'   => true,
-            'object'     => 'company',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companydescription' => [
             'fixed'    => true,
@@ -482,7 +481,6 @@ class FieldModel extends FormModel
         private CustomFieldColumn $customFieldColumn,
         private FieldSaveDispatcher $fieldSaveDispatcher,
         private LeadFieldRepository $leadFieldRepository,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         private FieldList $fieldList,
         private LeadFieldSaver $leadFieldSaver,
         EntityManagerInterface $em,
@@ -492,7 +490,7 @@ class FieldModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -578,8 +576,8 @@ class FieldModel extends FormModel
      */
     public function getLeadFieldCustomFieldSchemaDetails(): array
     {
-        $fields     = $this->getLeadFieldCustomFields();
-        $columns    = $this->columnSchemaHelper->setName('leads')->getColumns();
+        $fields  = $this->getLeadFieldCustomFields();
+        $columns = $this->columnSchemaHelper->setName('leads')->getColumns();
 
         $schemaDetails = [];
         foreach ($fields as $value) {
@@ -934,11 +932,26 @@ class FieldModel extends FormModel
      */
     public function getFieldListWithProperties($object = 'lead'): array
     {
-        $forceFilters[] = [
-            'column' => 'f.object',
-            'expr'   => 'eq',
-            'value'  => $object,
-        ];
+        return $this->getFieldsProperties(['object' => $object]);
+    }
+
+    /**
+     * @param mixed[] $filters
+     *
+     * @return mixed[]
+     */
+    public function getFieldsProperties(array $filters = []): array
+    {
+        $forceFilters = [];
+
+        foreach ($filters as $col => $val) {
+            $forceFilters[] = [
+                'column' => "f.{$col}",
+                'expr'   => is_array($val) ? 'in' : 'eq',
+                'value'  => $val,
+            ];
+        }
+
         $contactFields = $this->getEntities(
             [
                 'filter' => [
@@ -956,6 +969,7 @@ class FieldModel extends FormModel
                 'alias'        => $contactField['alias'],
                 'type'         => $contactField['type'],
                 'group'        => $contactField['group'],
+                'object'       => $contactField['object'],
                 'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
@@ -1003,32 +1017,6 @@ class FieldModel extends FormModel
         }
 
         return $leadFields;
-    }
-
-    /**
-     * Retrieves a list of published fields that are unique identifers.
-     *
-     * @deprecated to be removed in 3.0
-     *
-     * @return array<mixed>
-     */
-    public function getUniqueIdentiferFields($filters = []): array
-    {
-        return $this->getUniqueIdentifierFields($filters);
-    }
-
-    /**
-     * Retrieves a list of published fields that are unique identifers.
-     *
-     * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
-     *
-     * @param array<mixed> $filters
-     *
-     * @return array<mixed>
-     */
-    public function getUniqueIdentifierFields(array $filters = []): array
-    {
-        return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }
 
     /**

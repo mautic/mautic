@@ -14,7 +14,7 @@ class PageSubscriber implements EventSubscriberInterface
     public function __construct(
         private EmailModel $emailModel,
         private RealTimeExecutioner $realTimeExecutioner,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
