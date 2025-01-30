@@ -28,6 +28,7 @@ class FetchEventCommand extends ModeratedCommand
             ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Campaign ID to fetch events for.')
             ->addOption('json-only', null, InputOption::VALUE_NONE, 'Output only JSON data.')
             ->addOption('json-file', null, InputOption::VALUE_NONE, 'Save JSON data to a file.');
+        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
