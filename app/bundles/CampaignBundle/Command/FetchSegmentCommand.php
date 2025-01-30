@@ -55,7 +55,7 @@ class FetchSegmentCommand extends ModeratedCommand
         if ($jsonOnly) {
             $output->write($jsonOutput);
         } elseif ($jsonFile) {
-            $filePath = $this->writeToFile($jsonOutput, $campaignId);
+            $filePath = $this->writeToFile($jsonOutput, (int) $campaignId);
             $output->writeln('<info>JSON file created at:</info> '.$filePath);
         } else {
             $output->writeln('<error>You must specify one of --json-only or --json-file options.</error>');
@@ -66,6 +66,9 @@ class FetchSegmentCommand extends ModeratedCommand
         return self::SUCCESS;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getSegmentData(int $campaignId): array
     {
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
