@@ -1121,9 +1121,10 @@ EMAIL;
         $this->assertNull($contactB->getStage(), 'ContactB has a stage set and is not null.');
         $this->assertNull($contactC->getStage(), 'ContactC has a stage set and is not null.');
         // Perform batch action - add stage.
+        $stageId  = $stage->getId();
         $payload  = [
             'lead_batch_stage' => [
-                'addstage' => $stage->getId(),
+                'addstage' => $stageId,
                 'ids'      => 'all',
             ],
         ];
@@ -1136,7 +1137,6 @@ EMAIL;
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('3 contacts affected', $response['flashes']);
         // Assert that stage has been assigned to all contacts.
-        $stageId = $stage->getId();
         $this->assertEquals($stageId, $contactA->getStage()->getId());
         $this->assertEquals($stageId, $contactB->getStage()->getId());
         $this->assertEquals($stageId, $contactC->getStage()->getId());
@@ -1152,5 +1152,34 @@ EMAIL;
         $this->em->flush();
 
         return $stage;
+    }
+
+    public function testBatchOwnersActionForAll(): void
+    {
+        $ownerId = 1;
+        // Create contacts.
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        // Assert that contacts do not have stage set at this point.
+        $this->assertNull($contactA->getOwner(), 'ContactA owner is not null.');
+        $this->assertNull($contactB->getOwner(), 'ContactB owner is not null.');
+        // Perform batch action - add stage.
+        $payload  = [
+            'lead_batch_owner' => [
+                'addowner' => $ownerId,
+                'ids'      => 'all',
+            ],
+        ];
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchOwners', $payload);
+        $clientResponse = $this->client->getResponse();
+        // Assert response is correct.
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('2 contacts affected', $response['flashes']);
+        // Assert that owner has been assigned to all contacts.
+        $this->assertEquals($ownerId, $contactA->getOwner()->getId());
+        $this->assertEquals($ownerId, $contactB->getOwner()->getId());
     }
 }
