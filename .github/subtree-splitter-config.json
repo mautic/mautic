@@ -244,7 +244,11 @@
             "name": "theme-creative",
             "directory": "themes/creative",
             "target": "git@github.com:mautic/theme-creative.git"
+        },
+        {
+            "name": "theme-chord",
+            "directory": "themes/chord",
+            "target": "git@github.com:mautic/theme-chord.git"
         }
-
     ]
 }
