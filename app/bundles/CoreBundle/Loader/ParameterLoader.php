@@ -71,13 +71,43 @@ class ParameterLoader
         EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
-        $dotenv = new Dotenv(MAUTIC_ENV);
         foreach ($envVariables->all() as $key => $value) {
             if (null === $value) {
                 $envVariables->set($key, '');
             }
         }
-        $dotenv->populate($envVariables->all());
+        $this->populate($envVariables->all());
+    }
+
+    /**
+     * Load all configuration parameters from local configuration files into the environment
+     * that have not yet been loaded via the system environment or .env files.
+     *
+     * @see Dotenv::populate()
+     *
+     * @param array<string, mixed> $values
+     */
+    private function populate(array $values): void
+    {
+        $updateLoadedVars = false;
+        $loadedVars       = array_flip(explode(',', $_SERVER['MAUTIC_PARAMS'] ?? $_ENV['MAUTIC_PARAMS'] ?? ''));
+
+        foreach ($values as $name => $value) {
+            if (!isset($loadedVars[$name]) && isset($_ENV[$name])) {
+                continue;
+            }
+
+            $_ENV[$name] = $_SERVER[$name] = $value;
+
+            if (!isset($loadedVars[$name])) {
+                $loadedVars[$name] = $updateLoadedVars = true;
+            }
+        }
+
+        if ($updateLoadedVars) {
+            $loadedVars            = implode(',', array_keys($loadedVars));
+            $_ENV['MAUTIC_PARAMS'] = $_SERVER['MAUTIC_PARAMS'] = $loadedVars;
+        }
     }
 
     public static function getLocalConfigFile(string $root, bool $updateDefaultParameters = true): string
