@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
+use Mautic\StageBundle\Entity\Stage;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -1039,7 +1040,7 @@ EMAIL;
         $fetchedContact = $contactRepository->find($contact->getId());
         \assert($fetchedContact instanceof Lead);
 
-        // Ensure the DNC recored was created.
+        // Ensure the DNC record was created.
         Assert::assertSame(DoNotContact::MANUAL, $dnc->getReason());
         Assert::assertSame('Test Reason', $dnc->getComments());
         Assert::assertSame($contact->getId(), $dnc->getLead()->getId());
@@ -1082,5 +1083,50 @@ EMAIL;
             ],
             $auditLog->getDetails()['args']
         );
+    }
+
+    public function testBatchStageActionForAll(): void
+    {
+        // Create contacts and stage.
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
+        $stage    = $this->createStage();
+        // Assert that contacts do not have stage set at this point.
+        $this->assertNull($contactA->getStage(), 'ContactA has a stage set and is not null.');
+        $this->assertNull($contactB->getStage(), 'ContactB has a stage set and is not null.');
+        $this->assertNull($contactC->getStage(), 'ContactC has a stage set and is not null.');
+        // Perform batch action - add stage.
+        $payload  = [
+            'lead_batch_stage' => [
+                'addstage' => $stage->getId(),
+                'ids'      => 'all',
+            ],
+        ];
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
+        $clientResponse = $this->client->getResponse();
+        // Assert response is correct.
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        // Assert that stage has been assigned to all contacts.
+        $stageId = $stage->getId();
+        $this->assertEquals($stageId, $contactA->getStage()->getId());
+        $this->assertEquals($stageId, $contactB->getStage()->getId());
+        $this->assertEquals($stageId, $contactC->getStage()->getId());
+    }
+
+    private function createStage(): Stage
+    {
+        $stage = new Stage();
+
+        $stage->setName('Stage A');
+
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        return $stage;
     }
 }
