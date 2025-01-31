@@ -1137,6 +1137,9 @@ EMAIL;
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('3 contacts affected', $response['flashes']);
         // Assert that stage has been assigned to all contacts.
+        $this->assertNotNull($contactA->getStage());
+        $this->assertNotNull($contactB->getStage());
+        $this->assertNotNull($contactC->getStage());
         $this->assertEquals($stageId, $contactA->getStage()->getId());
         $this->assertEquals($stageId, $contactB->getStage()->getId());
         $this->assertEquals($stageId, $contactC->getStage()->getId());
@@ -1179,6 +1182,8 @@ EMAIL;
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 contacts affected', $response['flashes']);
         // Assert that owner has been assigned to all contacts.
+        $this->assertNotNull($contactA->getOwner());
+        $this->assertNotNull($contactB->getOwner());
         $this->assertEquals($ownerId, $contactA->getOwner()->getId());
         $this->assertEquals($ownerId, $contactB->getOwner()->getId());
     }
