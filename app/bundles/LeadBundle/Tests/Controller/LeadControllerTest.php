@@ -1085,6 +1085,30 @@ EMAIL;
         );
     }
 
+    public function testBatchDeleteAction(): void
+    {
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
+        // Perform batch delete action for contact A.
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDelete?ids=["'.$contactA->getId().'"]');
+        // Assert response is correct.
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        // Check that only contact A has been deleted for now.
+        $contacts = $this->em->getRepository(Lead::class)->findAll();
+        $this->assertCount(2, $contacts);
+        $contact_emails = array_map(function ($contact) {return $contact->getEmail(); }, $contacts);
+        $this->assertNotContains($contactA->getEmail(), $contact_emails);
+        $this->assertContains($contactB->getEmail(), $contact_emails);
+        $this->assertContains($contactC->getEmail(), $contact_emails);
+        // Perform batch delete action for all.
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDelete?ids=all');
+        // Assert that all contacts have been deleted.
+        $contacts = $this->em->getRepository(Lead::class)->findAll();
+        $this->assertCount(0, $contacts);
+    }
+
     public function testBatchStageActionForAll(): void
     {
         // Create contacts and stage.
