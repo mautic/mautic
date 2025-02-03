@@ -642,4 +642,21 @@ SQL;
             $deleteEntries = $conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount();
         }
     }
+
+    /**
+     * Check if last lead/event failed.
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function isLastFailed(int $leadId, int $eventId): bool
+    {
+        /** @var LeadEventLog $log */
+        $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
+
+        if (null !== $log && null !== $log->getFailedLog()) {
+            return true;
+        }
+
+        return false;
+    }
 }
