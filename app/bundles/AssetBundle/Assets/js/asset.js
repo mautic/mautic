@@ -14,7 +14,7 @@ Mautic.assetOnUnload = function(id) {
 Mautic.updateRemoteBrowser = function(provider, path) {
     path = typeof path !== 'undefined' ? path : '';
 
-    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+    var spinner = mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>');
     spinner.appendTo('#tab' + provider + ' a');
 
     mQuery.ajax({

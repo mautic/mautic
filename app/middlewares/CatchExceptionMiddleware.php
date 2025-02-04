@@ -21,7 +21,7 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
         $this->app = $app;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true)
     {
         $content = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator. System administrators, check server logs for errors.';
         try {

@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\Client;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractLookup
@@ -28,7 +29,7 @@ abstract class AbstractLookup
     public $extra        = '';
 
     /**
-     * @var string IP Address
+     * @var string|null IP Address
      */
     protected $ip;
 
@@ -49,7 +50,8 @@ abstract class AbstractLookup
         protected $config = null,
         protected ?string $cacheDir = null,
         protected ?LoggerInterface $logger = null,
-        protected ?Client $client = null
+        protected ?Client $client = null,
+        protected ?CoreParametersHelper $coreParametersHelper = null
     ) {
     }
 
@@ -60,8 +62,10 @@ abstract class AbstractLookup
     {
         $this->ip = $ip;
 
-        // Fetch details from the service
-        $this->lookup();
+        if ($this->shouldPerformLookup()) {
+            // Fetch details from the service
+            $this->lookup();
+        }
 
         return $this;
     }
@@ -85,5 +89,10 @@ abstract class AbstractLookup
             'timezone'     => $this->timezone,
             'extra'        => $this->extra,
         ];
+    }
+
+    protected function shouldPerformLookup(): bool
+    {
+        return true;
     }
 }

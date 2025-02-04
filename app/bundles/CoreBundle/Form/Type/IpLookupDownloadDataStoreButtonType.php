@@ -33,7 +33,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
             [
                 'label' => ($localDataExists) ? 'mautic.core.ip_lookup.update_data' : 'mautic.core.ip_lookup.fetch_data',
                 'attr'  => [
-                    'class'   => 'btn btn-'.($localDataExists ? 'success' : 'danger'),
+                    'class'   => 'btn btn-tertiary btn-sm',
                     'onclick' => 'Mautic.downloadIpLookupDataStore()',
                 ],
             ]

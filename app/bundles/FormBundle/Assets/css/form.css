@@ -1,117 +1,197 @@
 /* FormBundle */
 
+/* Panel Styles */
 .panel2 {
     border: 1px solid #ebedf0;
     -webkit-box-shadow: 0px 1px 1px #f3f3f3;
     box-shadow: 0px 1px 1px #f3f3f3;
-    margin-left:25px;
-    margin-bottom:25px;
-    margin-right:25px;
-    zoom:0.9;
+    margin: 0 25px 25px 25px;
+    zoom: 0.9;
 }
 .panel2 label {
-    font-size:1em;
-}
-.panel:hover, .panel2:hover {
-    border-color:#ccc;
+    font-size: 1em;
 }
 
+/* Form Submit Action Group Header */
 .form-submitaction-group-header {
     font-size: 1.1em;
     font-weight: bold;
 }
 
+/* Form Field Wrapper */
 .form-field-wrapper {
     position: relative;
 }
-
 .form-field-wrapper img {
     max-width: 100%;
 }
 
-#mauticforms_fields .mauticform-row, #mauticforms_actions .mauticform-row {
-    padding: 10px;
-}
-
-#mauticforms_fields .mauticform-row {
-    margin-bottom: 0 !important;
-}
-
+/* Mautic Forms Fields and Actions */
 #mauticforms_actions .mauticform-row .action-label {
     font-size: 1.1em;
     font-weight: bold;
     display: block;
 }
-
 #mauticforms_actions .mauticform-row .action-descr {
     font-size: 0.9em;
     display: block;
 }
-
-#mauticforms_actions .form-buttons {
-    float: right;
-    margin-top: 3px;
-}
-
-#mauticforms_fields .form-buttons {
+@media (min-width: 768px) { .form-buttons { top: 8px; }}
+.form-buttons {
     position: absolute;
     right: 8px;
-    top: 8px;
+    bottom: 10px;
+    z-index: 1;
 }
-
-#mauticforms_fields input, #mauticforms_fields textarea, #mauticforms_fields select {
-    background-color: #fff;
-    box-shadow: 0px 0px 0px #fff inset;
-    padding: 0.5em 0.5em;
-    width: 50%;
-}
-
 #mauticforms_fields .chosen-container-single .chosen-search input[type="text"] {
-    width:100%;
+    width: 100%;
 }
-
-.mauticform-row {
-    min-height: 60px;
-}
-
 #mauticforms_fields .panel-footer {
     padding: 3px 15px;
 }
-
-textarea.form-html {
-    height: 200px;
-}
-
-.col-form-id, .col-formresult-id {
-    width: 75px;
-}
-
-.col-form-submissions {
-    width: 100px;
-}
-
-.formresult-list th .input-group {
-    margin-top: 10px;
-}
-
-.formresult-list th:not(.col-formresult-id):not(.col-actions) {
-    min-width: 125px;
-}
-
-.formresult-list th.col-formresult-id {
-    min-width: 125px;
-}
-
-.inline-spacer {
-    padding-right: 20px;
-}
-
 #mauticforms_fields input[type="date"],
 #mauticforms_fields input[type="time"],
 #mauticforms_fields input[type="datetime-local"],
 #mauticforms_fields input[type="month"] {
     line-height: inherit;
 }
-#mauticforms_fields input.mauticform-radiogrp-radio {
-    width: auto;
+
+/* Textarea Form HTML */
+textarea.form-html {
+    height: 200px;
+}
+
+/* Column Widths */
+.col-form-id, .col-formresult-id {
+    width: 75px;
+}
+.col-form-submissions {
+    width: 100px;
+}
+
+/* Form Result List */
+.formresult-list th .input-group {
+    margin-top: 10px;
+}
+.formresult-list th:not(.col-formresult-id):not(.col-actions) {
+    min-width: 125px;
+}
+.formresult-list th.col-formresult-id {
+    min-width: 125px;
+}
+
+/* Inline Spacer */
+.inline-spacer {
+    padding-right: 20px;
+}
+
+/* Mautic Form Wrapper */
+.mauticform_wrapper {
+    max-width: 600px;
+    margin: 10px auto;
+}
+.mauticform-innerform {}
+.mauticform-post-success {}
+.mauticform-name {
+    font-weight: bold;
+    font-size: 1.5em;
+    margin-bottom: 3px;
+}
+.mauticform-description {
+    margin-top: 2px;
+    margin-bottom: 10px;
+}
+.mauticform-error {
+    margin-bottom: 10px;
+    color: red;
+}
+.mauticform-message {
+    margin-bottom: 10px;
+    color: green;
+}
+.mauticform-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    min-height: 60px;
+    padding: 10px;
+}
+.mauticform-label {
+    font-size: 1.1em;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.mauticform-row.mauticform-required .mauticform-label:after {
+    color: #e32;
+    content: " *";
+    display: inline;
+}
+.mauticform-helpmessage {
+    display: block;
+    font-size: 0.9em;
+    margin-bottom: 3px;
+}
+.mauticform-errormsg {
+    display: block;
+    color: red;
+    margin-top: 2px;
+}
+.mauticform-selectbox,
+.mauticform-input,
+.mauticform-textarea {
+    width: 75%;
+    max-width: 500px;
+    padding: 0.5em 0.5em;
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.mauticform-checkboxgrp-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.mauticform-checkboxgrp-row input[type="radio"],
+.mauticform-checkboxgrp-row input[type="checkbox"] {
+    margin: 0;
+}
+.mauticform-checkboxgrp-label {
+    font-weight: normal;
+    line-height: 1em;
+}
+.mauticform-checkboxgrp-checkbox {}
+.mauticform-radiogrp-row {}
+.mauticform-radiogrp-label {
+    font-weight: normal;
+}
+input[type="radio"].mauticform-radiogrp-radio {
+    width: 16px;
+    height: 16px;
+    vertical-align: -3px;
+    margin-right: 4px;
+}
+
+/* Mautic Form Button Styles */
+.mauticform-button-wrapper .mauticform-button,
+.mauticform-pagebreak-wrapper .mauticform-pagebreak {
+    margin-bottom: 0;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 13px;
+    line-height: 1.3856;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.mauticform-button-wrapper .mauticform-button.btn-ghost[disabled],
+.mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost[disabled] {
+    cursor: not-allowed;
+}
+.mauticform-pagebreak-wrapper .mauticform-button-wrapper {
+    display: inline;
 }

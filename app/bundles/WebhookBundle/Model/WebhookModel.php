@@ -324,7 +324,7 @@ class WebhookModel extends FormModel
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
-                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode);
+                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode.' with payload: '.json_encode($payload));
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();

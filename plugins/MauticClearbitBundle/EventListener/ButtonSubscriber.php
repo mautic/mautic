@@ -40,7 +40,7 @@ class ButtonSubscriber implements EventSubscriberInterface
             $event->addButton(
                 [
                     'attr' => [
-                        'class'       => 'btn btn-default btn-sm btn-nospin',
+                        'class'       => 'btn btn-ghost btn-sm btn-nospin',
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
                         'onclick'     => 'this.href=\''.
@@ -52,7 +52,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         'data-header' => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-                    'iconClass' => 'fa fa-search',
+                    'iconClass' => 'ri-search-line',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );
@@ -72,7 +72,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         ),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-                    'iconClass' => 'fa fa-search',
+                    'iconClass' => 'ri-search-line',
                 ];
 
                 $event->addButton(
@@ -92,7 +92,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                 $event->addButton(
                     [
                         'attr' => [
-                            'class'       => 'btn btn-default btn-sm btn-nospin',
+                            'class'       => 'btn btn-ghost btn-sm btn-nospin',
                             'data-toggle' => 'ajaxmodal',
                             'data-target' => '#MauticSharedModal',
                             'onclick'     => 'this.href=\''.
@@ -106,7 +106,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                             ),
                         ],
                         'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-                        'iconClass' => 'fa fa-search',
+                        'iconClass' => 'ri-search-line',
                     ],
                     ButtonHelper::LOCATION_BULK_ACTIONS
                 );
@@ -126,7 +126,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                             ),
                         ],
                         'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-                        'iconClass' => 'fa fa-search',
+                        'iconClass' => 'ri-search-line',
                     ];
 
                     $event->addButton(

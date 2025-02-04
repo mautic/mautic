@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20231110103625 extends AbstractMauticMigration
 {
-    protected static string $tableName = 'roles';
+    protected const TABLE_NAME = 'roles';
 
     public function up(Schema $schema): void
     {
@@ -53,10 +53,5 @@ final class Version20231110103625 extends AbstractMauticMigration
         }
 
         $this->write(sprintf('<comment>%s record(s) have been updated successfully.</comment>', $updatedRecords));
-    }
-
-    private function getPrefixedTableName(): string
-    {
-        return $this->prefix.self::$tableName;
     }
 }

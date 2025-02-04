@@ -6,18 +6,45 @@
 // Base styles
 // ---------------------
 .btn {
-  transition: var(--all);
+  transition: var(--transition-all-productive);
+  border: 1px solid transparent;
+  .outline();
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  height: var(--spacing-08);
+  line-height: var(--spacing-08);
+  font-size: 14px;
+  padding: 0 var(--spacing-05);
+  gap: var(--spacing-03);
+  justify-content: space-between;
+  width: fit-content;
+  &:hover {
+    border: 1px solid transparent;
+  }
   &,
   &:active,
   &.active {
-    outline: 0;
+    box-shadow: none;
+    color: var(--text-primary);
+    &:focus,
+    &.focus {
+      outline: 2px solid transparent;
+    }
+  }
+
+  span {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    > span {margin-right: 8px;}
   }
 
   // reset font awesome width
-  .fa { min-width: 13px; }
-
-  // remix icon
-  [class^="ri-"], [class*=" ri-"] {
+  i {
+    min-width: 13px;
+    order: 2;
+    line-height: inherit;
     font-size: 12px;
     vertical-align: -.05em;
   }
@@ -61,8 +88,194 @@
     &.btn-danger { color: @brand-danger; }
     &.btn-info { color: @brand-info; }
   }
+
+  &.btn-block {width: 100%;}
 }
 
+.btn ~ .btn,
+.btn ~ .btn-group,
+.btn-group ~ .btn,
+.btn-group ~ .btn-group {
+  margin-left: 5px;
+}
+
+// Hierarchycal buttons
+// ---------------------------------
+
+/// Primary
+.btn-primary, .btn-primary + .dropdown-toggle {
+  .button-variant(
+    @background: var(--button-primary),
+    @text-color: var(--text-on-color),
+    @border-color: var(--button-primary),
+    @hover-background: var(--button-primary-hover),
+    @hover-text-color: var(--text-on-color),
+    @active-background: var(--button-primary-active),
+    @disabled-background: var(--button-disabled),
+    @disabled-text-color: var(--text-on-color-disabled)
+  );
+
+  /// Primary danger
+  &.btn-danger {
+    .button-variant(
+      @background: var(--button-danger-primary),
+      @text-color: var(--text-inverse),
+      @border-color: var(--button-danger-primary),
+      @hover-background: var(--button-danger-hover),
+      @hover-text-color: var(--text-inverse),
+      @active-background: var(--button-danger-active),
+      @disabled-background: var(--button-disabled),
+      @disabled-text-color: var(--text-on-color-disabled)
+    );
+  }
+}
+
+/// Secondary
+.btn-secondary {
+  .button-variant(
+    @background: var(--button-secondary),
+    @text-color: var(--button-secondary-text),
+    @border-color: var(--button-secondary),
+    @hover-background: var(--button-secondary-hover),
+    @hover-text-color: var(--button-secondary-text),
+    @active-background: var(--button-secondary-active),
+    @disabled-background: var(--button-disabled),
+    @disabled-text-color: var(--text-on-color-disabled)
+  );
+}
+
+/// Tertiary + automatic error fixes
+.btn-tertiary,
+.btn-tertiary + .dropdown-toggle,
+.btn-primary + .btn-primary:not(.dropdown-toggle),
+.btn-primary + .btn-primary + .btn-primary,
+.btn-primary + .btn-primary + .btn-secondary,
+.open > .btn-tertiary + .dropdown-toggle.btn-primary {
+  .button-variant(
+    @background: transparent,
+    @text-color: var(--button-tertiary),
+    @border-color: var(--button-tertiary),
+    @hover-background: var(--button-tertiary-hover),
+    @hover-text-color: var(--text-on-color),
+    @active-background: var(--button-tertiary-active),
+    @disabled-background: transparent,
+    @disabled-text-color: var(--text-disabled)
+  );
+
+  /// Tertiary danger
+  &.btn-danger {
+    .button-variant(
+      @background: transparent,
+      @text-color: var(--button-danger-secondary),
+      @border-color: var(--button-danger-secondary),
+      @hover-background: var(--button-danger-hover),
+      @hover-text-color: var(--text-inverse),
+      @active-background: var(--button-danger-active),
+      @disabled-background: var(--button-disabled),
+      @disabled-text-color: var(--text-disabled)
+    );
+  }
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-tertiary {
+  padding-left: var(--spacing-05);
+  padding-right: var(--spacing-10);
+  gap: var(--spacing-07);
+  &:has(i) {padding-right: var(--spacing-05);}
+  &.btn-icon {
+    padding-right: 0;
+    span { width: initial;}
+  }
+  span {
+    justify-content: space-between;
+    gap: var(--spacing-07);
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/// Ghost
+.btn-ghost {
+  .button-variant(
+    @background: transparent,
+    @text-color: var(--link-primary),
+    @border-color: transparent,
+    @hover-background: var(--background-hover),
+    @hover-text-color: var(--link-primary-hover),
+    @active-background: var(--background-active),
+    @disabled-background: transparent,
+    @disabled-text-color: var(--text-disabled)
+  );
+  padding-inline: var(--spacing-05);
+  justify-content: center;
+  span {gap: var(--spacing-03);}
+
+  //// Ghost Danger
+  &.btn-danger,
+  &.btn-danger.btn-icon {
+    .button-variant(
+      @background: transparent,
+      @text-color: var(--button-danger-secondary),
+      @border-color: transparent,
+      @hover-background: var(--button-danger-hover),
+      @hover-text-color: var(--text-inverse),
+      @active-background: var(--button-danger-active),
+      @disabled-background: transparent,
+      @disabled-text-color: var(--text-disabled)
+    );
+  }
+
+  //// Ghost icon only
+  &.btn-icon {
+    .button-variant(
+      @background: transparent,
+      @text-color: var(--icon-primary),
+      @border-color: transparent,
+      @hover-background: var(--background-hover),
+      @hover-text-color: var(--icon-primary),
+      @active-background: var(--background-active),
+      @disabled-background: transparent,
+      @disabled-text-color: var(--icon-disabled)
+    );
+
+    &.btn-toggletip { color: inherit; }
+  }
+}
+
+// Ghost icon only
+.btn-icon {
+  justify-content: center;
+  padding: 0;
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+}
+
+.btn-toggletip {
+  height: auto;
+  line-height: 1em;
+  padding: 2px;
+}
+
+// Standard sizes
+.btn-xs, .btn[size="xs"] { height: var(--spacing-06); line-height: var(--spacing-06); }
+.btn-sm, .btn[size="sm"] { height: var(--spacing-07); line-height: var(--spacing-07); }
+.btn-md, .btn[size="md"] { height: var(--spacing-08); line-height: var(--spacing-08); }
+.btn-lg, .btn[size="lg"] { height: var(--spacing-09); line-height: var(--spacing-09); }
+.btn-xl, .btn[size="xl"] { height: var(--spacing-10); line-height: var(--spacing-08); align-items: flex-start; }
+.btn-2xl, .btn[size="2xl"] { height: var(--spacing-11); line-height: var(--spacing-08); align-items: flex-start; }
+
+// Fix for outline
+.dropdown-toggle,
+.dropdown-menu > .active > a,
+.open > a,
+.btn-group .dropdown-toggle,
+.btn-group.open .dropdown-toggle,
+.navbar-toggle {
+  .outline();
+}
 
 // Link buttons
 // -------------------------
@@ -70,17 +283,66 @@
 // Make a button look and behave like a link
 .btn-link {
   font-weight: @btn-font-weight;
-
+  height: auto;
+  line-height: normal;
+  padding: 0;
   &:hover,
-  &:focus {
-    text-decoration: none;
-  }
+  &:focus { text-decoration: none; }
 }
 
 .btn-info {
   color: @gray-dark;
+  &:hover { color: @gray-dark; }
+}
 
-  &:hover {
-    color: @gray-dark;
+// Back to index button
+.btn-back {
+  gap: var(--spacing-02);
+  font-size: 92%;
+  i { order: unset; }
+}
+
+// Modal footer buttons
+.modal-footer {
+  .modal-form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1px;
+    margin: -15px;
+
+      .btn {
+        align-items: flex-start;
+        height: var(--spacing-10);
+        width: var(--spacing-13);
+        border-radius: 0;
+        &:first-child { border-radius: 0 0 0 calc(var(--border-radius-md) + 3px); }
+        &:last-child { border-radius: 0 0 calc(var(--border-radius-md) + 3px) 0; }
+        &:only-child {
+          border-radius: 0 0 calc(var(--border-radius-md) + 3px) calc(var(--border-radius-md) + 3px);
+          flex-grow: 1;
+        }
+      }
+      .btn + .btn { margin: 0; }
+      &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
+      &:has(.btn:nth-child(3)) .btn { min-width: 25%; }
+   }
+}
+
+// Popover footer
+.footer-buttons {
+  margin-bottom: -15px;
+  .btn {
+    align-items: flex-start;
+    min-width: 0;
+    width: var(--spacing-13);
+    border-radius: 0;
+    &:first-child { border-radius: 0 0 0 var(--border-radius-md); }
+    &:last-child { border-radius: 0 0 var(--border-radius-md) 0; }
+    &:only-child {
+      border-radius: 0 0 calc(var(--border-radius-md) + 3px) calc(var(--border-radius-md) + 3px);
+      flex-grow: 1;
+    }
   }
+  .btn + .btn { margin: 0; }
+  &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
 }

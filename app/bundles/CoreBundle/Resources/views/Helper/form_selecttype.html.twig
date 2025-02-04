@@ -19,15 +19,26 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="panel panel-success">
-                            <div class="panel-heading">
-                                <div class="col-xs-8 col-sm-10 np">
+                            <div class="panel-heading row-no-gutters">
+                                <div class="col-xs-8 col-sm-10 np jc-center">
                                     <h3 class="panel-title">{{ typeOneHeader|trans }}</h3>
                                 </div>
-                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
-                                    <i class="hidden-xs fa {{ typeOneIconClass }} fa-lg"></i>
-                                    <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-primary" onclick="{{ typeOneOnClick }}">
-                                        {{ 'mautic.core.select'|trans }}
-                                    </button>
+                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 ai-end jc-center">
+                                    <i class="hidden-xs {{ typeOneIconClass }} ri-lg"></i>
+                                    {% include '@MauticCore/Helper/button.html.twig' with {
+                                        buttons: [
+                                            {
+                                                label: 'mautic.core.select',
+                                                size: 'sm',
+                                                variant: 'ghost',
+                                                spin: false,
+                                                onclick: typeOneOnClick,
+                                                attributes: {
+                                                    'class': 'visible-xs pull-right text-primary'
+                                                }
+                                            }
+                                        ]
+                                    } %}
                                 </div>
                             </div>
                             <div class="panel-body">
@@ -41,23 +52,45 @@
                                 </ul>
                             </div>
                             <div class="hidden-xs panel-footer text-center">
-                                <button class="btn btn-lg btn-default btn-nospin text-success" onclick="{{ typeOneOnClick }}">
-                                    {{ 'mautic.core.select'|trans }}
-                                </button>
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.select',
+                                            size: 'lg',
+                                            variant: 'ghost',
+                                            spin: false,
+                                            onclick: typeOneOnClick,
+                                            attributes: {
+                                                'class': 'text-success'
+                                            }
+                                        }
+                                    ]
+                                } %}
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <div class="col-xs-8 col-sm-10 np">
+                            <div class="panel-heading row-no-gutters">
+                                <div class="col-xs-8 col-sm-10 np jc-center">
                                     <h3 class="panel-title">{{ typeTwoHeader|trans }}</h3>
                                 </div>
-                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
-                                    <i class="hidden-xs fa {{ typeTwoIconClass }} fa-lg"></i>
-                                    <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-primary" onclick="{{ typeTwoOnClick }}">
-                                        {{ 'mautic.core.select'|trans }}
-                                    </button>
+                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 ai-end jc-center">
+                                    <i class="hidden-xs {{ typeTwoIconClass }} ri-lg"></i>
+                                    {% include '@MauticCore/Helper/button.html.twig' with {
+                                        buttons: [
+                                            {
+                                                label: 'mautic.core.select',
+                                                size: 'sm',
+                                                variant: 'ghost',
+                                                spin: false,
+                                                onclick: typeTwoOnClick,
+                                                attributes: {
+                                                    'class': 'visible-xs pull-right text-primary'
+                                                }
+                                            }
+                                        ]
+                                    } %}
                                 </div>
                             </div>
                             <div class="panel-body">
@@ -71,9 +104,20 @@
                                 </ul>
                             </div>
                             <div class="hidden-xs panel-footer text-center">
-                                <button class="btn btn-lg btn-default btn-nospin text-primary" onclick="{{ typeTwoOnClick }}">
-                                    {{ 'mautic.core.select'|trans }}
-                                </button>
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.select',
+                                            size: 'lg',
+                                            variant: 'ghost',
+                                            spin: false,
+                                            onclick: typeTwoOnClick,
+                                            attributes: {
+                                                'class': 'text-primary'
+                                            }
+                                        }
+                                    ]
+                                } %}
                             </div>
                         </div>
                     </div>

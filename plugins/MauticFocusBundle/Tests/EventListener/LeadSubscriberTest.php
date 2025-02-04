@@ -217,7 +217,7 @@ class LeadSubscriberTest extends CommonMocks
             ],
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,
-            'icon'            => 'fa-search',
+            'icon'            => 'ri-search-line',
             'contactId'       => $lead?->getId(),
         ];
     }

@@ -10,13 +10,13 @@
             {{ outputScripts('bodyOpen') }}
 
             {{ include('@MauticCore/Notification/flashes.html.twig') }}
+            {{ include('@MauticCore/Menu/quick_help.html.twig') }}
+            {{ include('@MauticCore/Modal/tokens_help.html.twig') }}
+            {{ include('@MauticCore/Modal/keyboard_shortcuts.html.twig') }}
+            {{ include('@MauticCore/Modal/search_commands.html.twig') }}
 
             <aside class="app-sidebar sidebar-left">
                 {{ include('@MauticCore/LeftPanel/index.html.twig') }}
-            </aside>
-
-            <aside class="app-sidebar sidebar-right">
-                {{ include('@MauticCore/RightPanel/index.html.twig') }}
             </aside>
 
             <header id="app-header" class="navbar">

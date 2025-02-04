@@ -1,43 +1,47 @@
-<div class="card" style="height: {{ widget.height|default('310') - 10 }}px;">
-    <div class="card-header">
-        <h4>{{ widget.name|purify }}</h4>
+<div class="tile" style="height: {{ widget.height|default('310') - 10 }}px;">
+    <div class="card-header d-flex jc-space-between ai-center">
+        <h4 class="fw-sb">{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                <a class="btn btn-ghost btn-icon btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
                     <i class="ri-more-2-fill"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
+                    <li class="small fw-sb text-muted ma-md ellipsis">
+                        {% if widget.isCached %}
+                            <i class="ri-history-line mr-xs"></i>
+                            {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
+                        {% else %}
+                            <i class="ri-flashlight-line mr-xs"></i>
+                            {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
+                        {% endif %}
+                    </li>
                     <li>
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
                             data-toggle="ajaxmodal"
                             data-target="#MauticSharedModal"
                             data-header="{{ 'mautic.dashboard.widget.header.edit'|trans }}">
-                            <i class="ri-edit-line"></i> Edit
+                            <span>
+                                <i class="ri-edit-line"></i>
+                                {{'mautic.core.form.edit'|trans}}
+                            </span>
                         </a>
                     </li>
-                    <li role="separator" class="divider"></li>
-                    <li  class="dropdown-header">
-                        {{ 'mautic.dashboard.widget.load.time'|trans({'%time%': (widget.loadTime * 1000)|round(1)}) }}
-                    </li>
-                    <li  class="dropdown-header">
-                        {% if widget.isCached %}
-                            {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
-                        {% else %}
-                            {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
-                        {% endif %}
-                    </li>
-                    <li role="separator" class="divider"></li>
                     <li>
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
                             data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
-                            class="remove-widget">
-                            <i class="ri-close-line"></i> Remove
+                            class="remove-widget danger">
+                            <span>
+                                <i class="ri-close-line"></i>
+                                {{'mautic.core.remove'|trans}}
+                            </span>
                         </a>
                     </li>
                 </ul>
             </div>
         {% endif %}
     </div>
+    <hr class="bdr-b">
     <div class="card-body">
         {% if widget.errorMessage %}
             <div class="alert alert-danger" role="alert">
@@ -48,5 +52,8 @@
             {{ include(widget.template, widget.templateData) }}
             <!-- end: {{ widget.template }} -->
         {% endif %}
+    </div>
+    <div class="widget-overlay d-flex ai-center jc-center">
+        <i class="ri-drag-drop-fill ri-4x text-primary"></i>
     </div>
 </div>

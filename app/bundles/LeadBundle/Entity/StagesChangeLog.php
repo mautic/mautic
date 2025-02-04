@@ -43,7 +43,8 @@ class StagesChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_stages_change_log')
-            ->setCustomRepositoryClass(StagesChangeLogRepository::class);
+            ->setCustomRepositoryClass(StagesChangeLogRepository::class)
+            ->addIndex(['date_added'], 'lead_stages_change_log_date_added');
 
         $builder->addId();
 

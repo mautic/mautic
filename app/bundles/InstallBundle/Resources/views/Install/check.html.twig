@@ -52,7 +52,7 @@
 
     {% if not (majors|length) %}
         <div class="alert alert-success">
-            <h4><i class="fa fa-check"></i> {{ 'mautic.install.heading.ready'|trans }}</h4>
+            <h4><i class="ri-check-line"></i> {{ 'mautic.install.heading.ready'|trans }}</h4>
             <p>{{ 'mautic.install.sentence.ready'|trans }}</p>
         </div>
     {% endif %}
@@ -62,7 +62,7 @@
         <div class="panel panel-warning">
             <div class="panel-heading">
                 <h3 class="panel-title" style="font-size: 1em;">
-                    <a data-toggle="collapse" style="display: block; " href="#minorDetails"><i class="fa fa-chevron-down"></i> {{ 'mautic.install.heading.minor.problems'|trans }}</a>
+                    <a data-toggle="collapse" style="display: block; " href="#minorDetails"><i class="ri-arrow-down-s-line"></i> {{ 'mautic.install.heading.minor.problems'|trans }}</a>
                 </h3>
             </div>
             <div id="minorDetails" class="panel-collapse collapse">

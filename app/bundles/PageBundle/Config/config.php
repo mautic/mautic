@@ -115,24 +115,21 @@ return [
             'mautic.page.helper.tracking' => [
                 'class'     => Mautic\PageBundle\Helper\TrackingHelper::class,
                 'arguments' => [
-                    'session',
+                    'mautic.tracker.contact',
+                    'mautic.cache.provider',
                     'mautic.helper.core_parameters',
                     'request_stack',
-                    'mautic.tracker.contact',
                 ],
             ],
         ],
     ],
 
     'parameters' => [
-        'cat_in_page_url'       => false,
-        'google_analytics'      => null,
-        'track_contact_by_ip'   => false,
-        'track_by_tracking_url' => false,
-        'redirect_list_types'   => [
-            '301' => 'mautic.page.form.redirecttype.permanent',
-            '302' => 'mautic.page.form.redirecttype.temporary',
-        ],
+        'cat_in_page_url'                       => false,
+        'google_analytics'                      => null,
+        'track_contact_by_ip'                   => false,
+        'track_by_fingerprint'                  => false,
+        'track_by_tracking_url'                 => false,
         'google_analytics_id'                   => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,

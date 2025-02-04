@@ -21,21 +21,18 @@
     z-index: 1040;
 }
 
-#CampaignCanvas {
-    height: 10000px;
-    width: 10000px;
-}
-
 #CampaignEvent_newsource_hide {
     display: none;
 }
 
 #CampaignEventPanel {
+    display: flex;
+    height: auto;
+    flex-direction: column;
     position: absolute;
     padding: 10px 20px;
-    background-color: #ededed;
-    border: 1px solid #cdcdcd;
-    border-radius: 4px;
+    background-color: var(--background);
+    border-radius: var(--border-radius-lg);
     z-index:1035;
 }
 
@@ -50,8 +47,8 @@
 #CampaignPasteContainer {
     position: relative;
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
-    margin-top: 10px;
 }
 #CampaignPasteContainer::before {
     content: "";
@@ -92,8 +89,6 @@
     border-left: 1px solid #ebedf0;
 }
 
-
-
 .jtk-endpoint {
     z-index: 1005;
 }
@@ -111,6 +106,18 @@
     cursor:pointer;
     z-index: 1004;
     color: #47535f;
+}
+
+.jtk-label--success {
+    border-color: var(--support-success);
+    background-color: var(--support-success);
+    color: var(--text-inverse);
+}
+
+.jtk-label--error {
+    border-color: var(--support-error);
+    background-color: var(--support-error);
+    color: var(--text-inverse);
 }
 
 .jtk-connector {
@@ -145,38 +152,57 @@
 }
 
 .list-campaign-event, .list-campaign-source {
-    width: 200px;
-    height: 45px;
+    min-width: 260px;
     position: absolute;
-    padding: 10px 15px;
     z-index: 1010;
-    background: #FFFFFF;
-    border-radius: 3px;
+    transition: border var(--duration-productive) var(--easing-standard-productive), box-shadow var(--duration-productive) var(--easing-standard-productive);
+}
+.list-campaign-event {
+    background: var(--background);
+    color: var(--text-primary);
+    box-shadow: hsl(0deg 100% 15% / 10%) 0px 0px 10px 0px;
 }
 
-.live .list-campaign-event:hover, .live .list-campaign-source:hover {
-    border:1px solid #123456;
-    /*
-    box-shadow: 2px 2px 19px #444;
-    -o-box-shadow: 2px 2px 19px #444;
-    -webkit-box-shadow: 2px 2px 19px #444;
-    -moz-box-shadow: 2px 2px 19px #fff;
-    opacity:0.9;
-    filter:alpha(opacity=90);
-    */
+.list-campaign-leadsource {
+    background-color: var(--background-inverse);
+    border: solid 1px var(--no-border-color);
+    color: var(--text-inverse);
+    text-align: center;
+    padding: var(--spacing-04);
+    border-radius: 20px;
+    line-height: 1em;
+}
+.list-campaign-leadsource .campaign-event-icon {
+    font-size: 16px;
 }
 
+.campaign-source-title {
+    position: absolute;
+    top: -20px;
+    color: var(--text-primary);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.live .list-campaign-event:hover, .live .list-campaign-source:hover, .live .list-campaign-event:active {
+    box-shadow: rgba(26, 17, 17, 0.05) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+}
+
+/* Buttons */
 .campaign-event-buttons {
     position: absolute;
     top: -10px;
     right: -10px;
 }
 
-.campaign-event-buttons .btn {
-    border-radius: 10px;
-    width: 20px;
-    height: 20px;
-    padding: 0;
+.campaign-event-buttons .btn:hover {
+    transform: scale(1.2);
+}
+
+.campaign-event-icon {
+    color: var(--icon-inverse);
+    font-size: 20px;
+    text-align: center;
 }
 
 .campaign-event-content {
@@ -184,15 +210,21 @@
     position: relative;
 }
 
-.campaign-event-content .highlight-jump-target {
-    position: absolute;
-    bottom: -26px;
-    left: 50%;
+.preview .campaign-event-content {
+    cursor: default;
+}
+
+.list-campaign-event .highlight-jump-target {
+    opacity: 0;
     border-radius: 10px;
-    width: 20px;
     height: 20px;
-    padding: 0;
     margin-left: -10px;
+    transition: var(--transition-all-productive);
+    line-height: 16px;
+}
+
+.list-campaign-event:hover .highlight-jump-target {
+    opacity: 1;
 }
 
 .list-campaign-event .campaign-event-name {
@@ -201,25 +233,57 @@
 }
 
 .list-campaign-decision {
-    /*background-color: #e5ffff;*/
-    border: solid 1px #00b49d;
+    background-color: var(--background);
+    border-style: solid;
+    border-width: 0 0 0 6px;
+    border-color: var(--support-info);
+}
+
+.list-campaign-decision,
+.list-campaign-condition {
+    line-height: 1em;
 }
 
 .list-campaign-condition {
-    /*background-color: #ffe9d1;*/
-    border: solid 1px #ffb79f;
+    background-color: var(--background);
+    border-style: solid;
+    border-width: 0 0 0 6px;
+    border-color: var(--support-warning);
 }
 
-.list-campaign-action {
-    /*background-color: #cdddff;*/
-    border: solid 1px #9babeb;
-    /*color: #fff;*/
-}
+.list-campaign-action { border-radius: clamp(4px, var(--border-radius-md), 8px); }
 
-.list-campaign-leadsource {
-    /*background-color: #ffffe6;*/
-    border: solid 1px #fdb933;
-    /*color: #fff;*/
+.list-campaign-action .campaign-event-content {
+    background-color: var(--background-brand);
+    border: solid 2px var(--background-brand);
+    border-radius: clamp(4px, var(--border-radius-md), 8px);
+    overflow: hidden;
+    padding: 0 var(--spacing-05) 0 0;
+    color: var(--text-on-color);
+}
+.list-campaign-action .campaign-event-icon {
+    background-color: var(--background);
+    color: var(--icon-interactive);
+    aspect-ratio: 1/1;
+    height: 60px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: clamp(0px, var(--border-radius-md), 6px);
+}
+.list-campaign-condition .campaign-event-icon,
+.list-campaign-decision .campaign-event-icon {
+    color: var(--text-inverse);
+    aspect-ratio: 1/1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.list-campaign-condition .campaign-event-icon {
+    color: var(--support-warning);
+}
+.list-campaign-decision .campaign-event-icon {
+    color: var(--support-info);
 }
 
 #CampaignEventSelector_chosen .list-campaign-action,
@@ -260,25 +324,39 @@
     position: relative;
 }
 
+#CampaignCanvas * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.live #CampaignCanvas::after {
+    background-image: url('data:image/svg+xml,<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(%23clip0_258_125)"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.7106 302.711C2.7106 301.214 1.49706 300 7.62939e-05 300C-1.4969 300 -2.71045 301.214 -2.71045 302.711V381H2.7106V302.711ZM18 397.289V402.71H97.2895C98.7865 402.71 100 401.497 100 400C100 398.503 98.7865 397.289 97.2895 397.289H18ZM2.7106 418H-2.71045V497.289C-2.71045 498.786 -1.4969 500 7.62939e-05 500C1.49706 500 2.7106 498.786 2.7106 497.289V418ZM-19 402.71V397.289H-97.2895C-98.7865 397.289 -100 398.503 -100 400C-100 401.497 -98.7865 402.71 -97.2895 402.71H-19Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M402.711 418H397.29V497.29H402.711V418ZM418 402.71V397.289H497.289C498.786 397.289 500 398.503 500 400C500 401.497 498.786 402.71 497.289 402.71H418ZM402.711 381V302.711H397.29V381H402.711ZM381 397.289H302.711C301.214 397.289 300 398.503 300 400C300 401.497 301.214 402.71 302.711 402.71H381V397.289Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M402.711 -97.2895C402.711 -98.7865 401.497 -100 400 -100C398.503 -100 397.29 -98.7865 397.29 -97.2895V-16H402.711V-97.2895ZM418 -2.71045V2.7106H497.289C498.786 2.7106 500 1.49706 500 7.62939e-05C500 -1.4969 498.786 -2.71045 497.289 -2.71045H418ZM402.711 21H397.29V97.2895C397.29 98.7865 398.503 100 400 100C401.497 100 402.711 98.7865 402.711 97.2895V21ZM381 2.7106V-2.71045H302.711C301.214 -2.71045 300 -1.4969 300 7.62939e-05C300 1.49706 301.214 2.7106 302.711 2.7106H381Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M2.7106 -97.2895C2.7106 -98.7865 1.49706 -100 7.62939e-05 -100C-1.4969 -100 -2.71045 -98.7865 -2.71045 -97.2895V-16H2.7106V-97.2895ZM21 -2.71045V2.7106H97.2895C98.7865 2.7106 100 1.49706 100 7.62939e-05C100 -1.4969 98.7865 -2.71045 97.2895 -2.71045H21ZM2.7106 21H-2.71045V97.2895C-2.71045 98.7865 -1.4969 100 7.62939e-05 100C1.49706 100 2.7106 98.7865 2.7106 97.2895V21ZM-16 2.7106V-2.71045H-97.2895C-98.7865 -2.71045 -100 -1.4969 -100 7.62939e-05C-100 1.49706 -98.7865 2.7106 -97.2895 2.7106H-16Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M802.711 -97.2895C802.711 -98.7865 801.497 -100 800 -100C798.503 -100 797.29 -98.7865 797.29 -97.2895V-16H802.711V-97.2895ZM815 -2.71045V2.7106H897.289C898.786 2.7106 900 1.49706 900 7.62939e-05C900 -1.4969 898.786 -2.71045 897.289 -2.71045H815ZM802.711 21H797.29V97.2895C797.29 98.7865 798.503 100 800 100C801.497 100 802.711 98.7865 802.711 97.2895V21ZM778 2.7106V-2.71045H702.711C701.214 -2.71045 700 -1.4969 700 7.62939e-05C700 1.49706 701.214 2.7106 702.711 2.7106H778Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M802.711 302.711C802.711 301.214 801.497 300 800 300C798.503 300 797.29 301.214 797.29 302.711V378H802.711V302.711ZM815 397.289V402.71H897.289C898.786 402.71 900 401.497 900 400C900 398.503 898.786 397.289 897.289 397.289H815ZM802.711 415H797.29V497.289C797.29 498.786 798.503 500 800 500C801.497 500 802.711 498.786 802.711 497.289V415ZM778 402.71V397.289H702.711C701.214 397.289 700 398.503 700 400C700 401.497 701.214 402.71 702.711 402.71H778Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M802.711 702.711C802.711 701.214 801.497 700 800 700C798.503 700 797.29 701.214 797.29 702.711V778H802.711V702.711ZM815 797.289V802.71H897.289C898.786 802.71 900 801.497 900 800C900 798.503 898.786 797.289 897.289 797.289H815ZM802.711 815H797.29V897.289C797.29 898.786 798.503 900 800 900C801.497 900 802.711 898.786 802.711 897.289V815ZM778 802.71V797.289H702.711C701.214 797.289 700 798.503 700 800C700 801.497 701.214 802.71 702.711 802.71H778Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M402.711 702.711C402.711 701.214 401.497 700 400 700C398.503 700 397.29 701.214 397.29 702.711V778H402.711V702.711ZM418 797.289V802.71H497.289C498.786 802.71 500 801.497 500 800C500 798.503 498.786 797.289 497.289 797.289H418ZM402.711 815H397.29V897.289C397.29 898.786 398.503 900 400 900C401.497 900 402.711 898.786 402.711 897.289V815ZM381 802.71V797.289H302.711C301.214 797.289 300 798.503 300 800C300 801.497 301.214 802.71 302.711 802.71H381Z" fill="%23B35D4C" fill-opacity="0.15"/><path fill-rule="evenodd" clip-rule="evenodd" d="M2.7106 702.711C2.7106 701.214 1.49706 700 7.62939e-05 700C-1.4969 700 -2.71045 701.214 -2.71045 702.711V778H2.7106V702.711ZM21 797.289V802.71H97.2895C98.7865 802.71 100 801.497 100 800C100 798.503 98.7865 797.289 97.2895 797.289H21ZM2.7106 815H-2.71045V897.289C-2.71045 898.786 -1.4969 900 7.62939e-05 900C1.49706 900 2.7106 898.786 2.7106 897.289V815ZM-16 802.71V797.289H-97.2895C-98.7865 797.289 -100 798.503 -100 800C-100 801.497 -98.7865 802.71 -97.2895 802.71H-16Z" fill="%23B35D4C" fill-opacity="0.15"/></g><defs><clipPath id="clip0_258_125"><rect width="800" height="800" fill="white"/></clipPath></defs></svg>') !important;
+    background-repeat: repeat;
+    background-size: 130px;
+    content: "";
+    background-color: #9a4f1d14;
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+
 .campaign-event-list .progress-bar {
     position: absolute;
     top: 0;
     height: 3px;
 }
 
-.campaign-event-buttons .btn-edit,
-.campaign-event-buttons .btn-clone {
-    background: #337ab7;
-}
-
 .stat-boxes .pie-legend li {
     display: inline;
 }
 
+.preview {
+    transform: scale(.8);
+}
+
 .preview .builder-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
     overflow: visible;
 }
 
@@ -288,35 +366,13 @@
     position: relative;
 }
 
-.preview .list-campaign-event, .preview  .list-campaign-source {
-    width: auto;
-    height: 45px;
-    position: absolute;
-    padding: 10px 15px;
-    z-index: 1010;
-    background: #FFFFFF;
-    border-radius: 3px;
-}
-
-.preview .list-campaign-event {
-    height: 54px;
-}
-
-.preview .list-campaign-source {
-    height: 45px;
-}
-
-.preview .jtk-endpoint {
+.preview .jtk-endpoint,
+.preview .jtk-label {
     cursor: default;
 }
 
 .preview .jtk-endpoint svg {
     display: none;
-}
-
-.preview .list-campaign-event .campaign-event-name {
-    line-height: 14px;
-    overflow: visible;
 }
 
 #preview-container {
@@ -358,4 +414,8 @@
     text-align: center;
     line-height: 250px;
     font-size: 24px;
+}
+
+.campaign-event-stat-divider {
+    padding: 0 4px;
 }

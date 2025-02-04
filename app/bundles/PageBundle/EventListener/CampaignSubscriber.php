@@ -229,7 +229,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         foreach ($config['services'] as $service) {
             $values[$service][] = ['category' => $config['category'], 'action' => $config['action'], 'label' => $config['label']];
         }
-        $this->trackingHelper->updateSession($values);
+        $this->trackingHelper->updateCacheItem($values);
 
         return $event->setResult(true);
     }

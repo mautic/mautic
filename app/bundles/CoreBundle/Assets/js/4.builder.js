@@ -715,7 +715,7 @@ Mautic.toggleBuilderButton = function (hide) {
                 .addClass('hide btn-standard-toolbar')
                 .appendTo('.toolbar-form-buttons')
 
-            mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().addClass('hide');
+            mQuery('.toolbar-form-buttons .toolbar-dropdown i.ri-instance-fill').parent().addClass('hide');
         } else {
             if (!mQuery('.btn-standard-toolbar.btn-builder').length) {
                 mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder').addClass('btn-standard-toolbar')
@@ -725,7 +725,7 @@ Mautic.toggleBuilderButton = function (hide) {
                     .prependTo('.toolbar-form-buttons .toolbar-standard')
                     .removeClass('hide');
 
-                mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().removeClass('hide');
+                mQuery('.toolbar-form-buttons .toolbar-dropdown i.ri-instance-fill').parent().removeClass('hide');
             }
         }
     }
@@ -753,7 +753,7 @@ Mautic.initSectionListeners = function() {
                 'bottom': {},
                 'left': {},
                 'clone': {
-                    classes: 'fa fa-copy',
+                    classes: 'ri-file-copy-line',
                     onClick: function() {
                         var cloneBtn = mQuery(this);
                         var clonedElem = cloneBtn.closest('[data-section-wrapper]');
@@ -764,10 +764,10 @@ Mautic.initSectionListeners = function() {
                     }
                 },
                 'handle': {
-                    classes: 'fa fa-arrows-v'
+                    classes: 'ri-expand-height-line'
                 },
                 'delete': {
-                    classes: 'fa fa-remove',
+                    classes: 'ri-close-line',
                     onClick: function() {
                         if (confirm(parent.Mautic.translate('mautic.core.builder.section_delete_warning'))) {
                             var deleteBtn = mQuery(this);
@@ -1269,10 +1269,10 @@ Mautic.getSlotToolbar = function(type) {
 
 Mautic.getSlotDeleteLink = function() {
     if (typeof Mautic.deleteLink == 'undefined') {
-        Mautic.deleteLink = mQuery('<a><i class="fa fa-lg fa-times"></i></a>')
+        Mautic.deleteLink = mQuery('<a><i class="ri-lg ri-close-line"></i></a>')
             .attr('data-slot-action', 'delete')
             .attr('alt', 'delete')
-            .addClass('btn btn-delete btn-default');
+            .addClass('btn btn-delete btn-ghost');
     }
 
     return Mautic.deleteLink;
@@ -1280,7 +1280,7 @@ Mautic.getSlotDeleteLink = function() {
 
 Mautic.getSlotCloneLink = function() {
     if (typeof Mautic.cloneLink == 'undefined') {
-        Mautic.cloneLink = mQuery('<a><i class="fa fa-lg fa-copy"></i></a>')
+        Mautic.cloneLink = mQuery('<a><i class="ri-lg ri-file-copy-line"></i></a>')
             .attr('data-slot-action', 'clone')
             .attr('alt', 'clone')
             .addClass('btn btn-clone btn-clone');
@@ -1706,27 +1706,6 @@ Mautic.initSlotListeners = function() {
         // Store the slot to a global var
         Mautic.builderSlots.push({slot: slot, type: type});
     });
-
-    Mautic.getPredefinedLinks = function(callback) {
-        var linkList = [];
-        Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
-            if (tokens.length) {
-                mQuery.each(tokens, function(token, label) {
-                    if (token.startsWith('{pagelink=') ||
-                        token.startsWith('{assetlink=') ||
-                        token.startsWith('{webview_url') ||
-                        token.startsWith('{unsubscribe_url')) {
-
-                        linkList.push({
-                            text: label,
-                            href: token
-                        });
-                    }
-                });
-            }
-            return callback(linkList);
-        });
-    };
 
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
@@ -2196,7 +2175,8 @@ Mautic.getPredefinedLinks = function(callback) {
                 if (token.startsWith('{pagelink=') ||
                     token.startsWith('{assetlink=') ||
                     token.startsWith('{webview_url') ||
-                    token.startsWith('{unsubscribe_url')) {
+                    token.startsWith('{unsubscribe_url') ||
+                    token.startsWith('{resubscribe_url')) {
 
                     linkList.push({
                         text: label,

@@ -78,7 +78,7 @@ class NotificationModel extends FormModel
      * @param string|null    $type                    Optional $type to ID the source of the notification
      * @param bool|true      $isRead                  Add unread indicator
      * @param string|null    $header                  Header for message
-     * @param string|null    $iconClass               Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param string|null    $iconClass               Font Awesome CSS class for the icon (e.g. ri-eye-line)
      * @param \DateTime|null $datetime                Date the item was created
      * @param User|null      $user                    User object; defaults to current user
      * @param string|null    $deduplicateValue        When supplied, notification will not be added if another notification with tha same $deduplicateValue exists within last 24 hours

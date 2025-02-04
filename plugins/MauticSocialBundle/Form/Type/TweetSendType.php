@@ -61,7 +61,7 @@ class TweetSendType extends AbstractType
                         'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
-                        'icon' => 'fa fa-plus',
+                        'icon' => 'ri-add-line',
                     ],
                     'label' => 'mautic.integration.Twitter.new.tweet',
                 ]
@@ -89,7 +89,7 @@ class TweetSendType extends AbstractType
             //             'class'    => 'btn btn-primary btn-nospin',
             //             'onclick'  => 'Mautic.loadNewWindow(Mautic.standardTweetUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
             //             'disabled' => !isset($tweet),
-            //             'icon'     => 'fa fa-edit',
+            //             'icon'     => 'ri-edit-line',
             //         ],
             //         'label' => 'mautic.integration.Twitter.edit.tweet',
             //     ]

@@ -3,11 +3,6 @@
 // --------------------------------------------------
 
 // animate `app-header` on sidebar-left opened
-.csstransforms3d.sidebar-open-ltr {
-  #app-header.navbar {
-    .translate3d(@sidebar-left-width, 0, 0);
-  }
-}
 .no-csstransforms3d.sidebar-open-ltr {
   #app-header.navbar {
     left: @sidebar-left-width;
@@ -28,15 +23,13 @@
 // navbar as header
 #app-header.navbar {
   .transition(all .3s ease);
-
-  background-color: @header-bg;
   float: left;
   z-index: @header-zindex;
   min-height: @header-height;
   border-width: 0;
   border-radius: 0;
   margin-bottom: 0;
-  .box-shadow(0 1px 0 rgba(0,0,0,0.05));
+  .background-blur();
 
   // fixed header
   .header-fixed & {
@@ -44,8 +37,7 @@
     right: 0;
     left: 0;
     top: 0;
-    //box-shadow: 0 2px 2px rgba(0,0,0,0.05), 0 1px 0 rgba(0,0,0,0.05);
-    box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
+    border-bottom: 1px solid var(--border-subtle);
 
     // Add top padding to `app-content` if header is fixed
     ~ #app-content {
@@ -75,7 +67,6 @@
         .icon-bar {
           margin-left: auto;
           margin-right: auto;
-          background-color: fade(contrast(@header-bg), 60%);
           height: 2px;
           width: 18px;
           border-radius: 0;
@@ -92,13 +83,26 @@
       //position: relative;
       float: left;
       margin: 0;
+      display: flex;
+      align-items: center;
+
+      > .mautic-brand > .mautic-logo-text {
+        opacity: 1;
+        margin-left: 3px;
+        position: absolute;
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+      }
+      > .mautic-brand {
+        .transition(padding-left .3s ease);
+      }
 
       > li {
         float: left;
 
         // `navbar-nav` anchor
         > a {
-          color: fade(contrast(@header-bg), 60%);
+          color: var(--text-primary);
           line-height: @header-height;
           padding-top: 0;
           padding-bottom: 0;
@@ -107,55 +111,6 @@
           // lineicon reset
           .sli {
             top: 1px;
-          }
-
-          // avatar
-          // -------------------------
-          > img,
-          > .img-wrapper {
-            --width: 28px;
-            border-radius: 100%;
-            width: var(--width);
-            height: var(--width);
-            display: inline-block;
-            margin-top: -8px;
-            margin-bottom: -8px;
-          }
-
-          &.user {
-              .info {
-                transform: translateY(-6%);
-                position: relative;
-                transition: transform .3s ease;
-
-                > .position {
-                  opacity: 0;
-                }
-              }
-
-            &:hover {
-              .info {
-                transform: translateY(-20%);
-
-                @keyframes slideDown {
-                  from {
-                    transform: translateY(-10px);
-                  }
-                  to {
-                    transform: translateY(-5px);
-                  }
-                }
-                      
-                > .position {
-                  display: flex;
-                  animation: fadeIn 0.5s ease-in-out forwards, slideDown 0.5s ease-in-out forwards;
-                }
-              }
-          }
-
-            > .text {
-              line-height: 14px;
-            }
           }
 
           // badge & label
@@ -202,18 +157,31 @@
           // interaction
           // -------------------------
           &:hover {
-            color: fade(contrast(@header-bg), 70%);
+            color: var(--text-primary);
             background-color: transparent;
           }
           &:active,
           &:focus,
           &.active {
-            color: fade(contrast(@header-bg), 70%);
-            background-color: darken(@header-bg, 4%);
-            outline: 0;
+            color: var(--text-primary);
+            background-color: var(--background-hover);
           }
         }
       }
+
+      // avatar
+          // -------------------------
+          img,
+          .img-wrapper {
+            border-radius: 100%;
+            width: 28px;
+            min-width: 28px;
+            aspect-ratio: 1/1;
+          }
+
+          .dropdown-menu-user {
+            .text { line-height: 14px; }
+          }
 
       // dropdown custom
       // -------------------------
@@ -240,27 +208,29 @@
       .open {
         // reset default bootstrap `navbar-nav` `dropdown-menu`
         .dropdown-menu {
+          background-color: var(--layer);
           position: absolute;
           top: 100%;
           margin-top: 5px;
           left: 15px;
           float: left;
-          background-color: @dropdown-bg;
           border: 1px solid @dropdown-fallback-border; // IE8 fallback
           border: 1px solid @dropdown-border;
+          border-top-left-radius: var(--border-radius-md);
+          border-top-right-radius: var(--border-radius-md);
           .box-shadow(0 3px 6px rgba(0,0,0,.06));
         }
 
         // `navbar-nav` anchor
         > a {
-          color: fade(contrast(@header-bg), 70%);
-          background-color: darken(@header-bg, 4%);
+          color: var(--text-primary);
+          background-color: var(--background-hover);
 
           // interaction
           &:hover,
           &:focus {
-            color: fade(contrast(@header-bg), 70%);
-            background-color: darken(@header-bg, 4%);
+            color: var(--text-primary);
+            background-color: var(--background-hover);
           }
 
           // badge & bullet
@@ -268,7 +238,7 @@
           > .badge,
           > .bullet,
           > .label {
-            .box-shadow(0 0 0 2px darken(@header-bg, 4%));
+            .box-shadow(0 0 0 2px var(--background-hover));
           }
         }
       }
@@ -305,14 +275,14 @@
         margin-bottom: ((@header-height - @input-height-base) / 2);
 
         // reset fontawesome color
-        .fa { color: fade(contrast(@header-bg), 60%); }
+        .fa { color: var(--text-primary); }
       }
 
       // `form-control` reset
       .form-control {
-        background-color: fade(contrast(@header-bg), 8%);
+        background-color: var(--background-hover);
         border-color: transparent;
-        .placeholder(fade(contrast(@header-bg), 50%));
+        .placeholder(var(--text-placeholder));
       }
     }
 
@@ -340,7 +310,7 @@
         bottom: -7px;
         margin-left: -8px;
         border-width: 0 8px 8px;
-        border-color: transparent transparent #fff;
+        border-color: transparent transparent var(--layer);
         position: absolute;
         content: "";
         left: 50%;
@@ -387,11 +357,6 @@
       ~ .app-sidebar {
         padding-top: @header-height;
       }
-    }
-
-    // minimized state
-    .sidebar-minimized & {
-      left: @sidebar-left-collapse-width !important;
     }
 
     .navbar-nocollapse {

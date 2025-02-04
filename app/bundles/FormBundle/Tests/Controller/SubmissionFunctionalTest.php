@@ -8,8 +8,12 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
@@ -17,11 +21,81 @@ use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    public function testRedirectPostAction(): void
+    {
+        $page = new Page();
+        $page->setTitle('Test');
+        $page->setAlias('test-form-redirect-target-page');
+        $page->setCustomHtml('<!DOCTYPE html><html><head></head><body>Test</body></html>');
+        $this->em->persist($page);
+        $this->em->flush();
+        $pageId = $page->getId();
+
+        // Create the test form via API.
+        $payload = [
+            'name'               => 'Redirect post action test form',
+            'description'        => 'Form created via submission test',
+            'formType'           => 'standalone',
+            'isPublished'        => true,
+            'postAction'         => 'redirect',
+            'postActionProperty' => '{pagelink='.$pageId.'}?foo=bar&lead={contactfield=id}&email={formfield=email}',
+
+            'fields'      => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_redirectpostactiontestform]');
+
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+
+        $form->setValues([
+            'mauticform[email]' => 'john@doe.com',
+        ]);
+
+        $this->client->submit($form);
+        $currentUrl = $this->client->getRequest()->getUri();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Check the redirect
+        $currentUrl = $this->client->getRequest()->getUri();
+        $urlParts   = parse_url($currentUrl);
+        parse_str($urlParts['query'], $queryParams);
+
+        $this->assertEquals('/test-form-redirect-target-page', $urlParts['path']);
+        // Test that the redirect didn't remove any additional URL parts
+        $this->assertEquals('john@doe.com', $queryParams['email']);
+        $this->assertGreaterThan(0, (int) $queryParams['lead']);
+        $this->assertEquals('bar', $queryParams['foo']);
+    }
 
     public function testRequiredConditionalFieldIfNotEmpty(): void
     {
@@ -59,18 +133,18 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'        => 'State',
-                    'type'         => 'select',
-                    'alias'        => 'state',
-                    'leadField'    => 'state',
-                    'parent'       => $response['form']['fields'][0]['id'],
-                    'isRequired'   => true,
-                    'conditions'   => [
+                    'label'      => 'State',
+                    'type'       => 'select',
+                    'alias'      => 'state',
+                    'leadField'  => 'state',
+                    'parent'     => $response['form']['fields'][0]['id'],
+                    'isRequired' => true,
+                    'conditions' => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
                     ],
-                    'properties'   => [
+                    'properties' => [
                         'syncList' => 1,
                         'multiple' => 0,
                     ],
@@ -85,7 +159,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $this->assertStringContainsString(' class="foobar"', $crawler->html());
         $form = $formCrawler->form();
         $form->setValues([
@@ -163,18 +237,18 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'        => 'State',
-                    'type'         => 'select',
-                    'alias'        => 'state',
-                    'leadField'    => 'state',
-                    'parent'       => $response['form']['fields'][0]['id'],
-                    'isRequired'   => true,
-                    'conditions'   => [
+                    'label'      => 'State',
+                    'type'       => 'select',
+                    'alias'      => 'state',
+                    'leadField'  => 'state',
+                    'parent'     => $response['form']['fields'][0]['id'],
+                    'isRequired' => true,
+                    'conditions' => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
                     ],
-                    'properties'   => [
+                    'properties' => [
                         'syncList' => 1,
                         'multiple' => 0,
                     ],
@@ -258,18 +332,18 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'        => 'State',
-                    'type'         => 'select',
-                    'alias'        => 'state',
-                    'leadField'    => 'state',
-                    'parent'       => $response['form']['fields'][0]['id'],
-                    'isRequired'   => true,
-                    'conditions'   => [
+                    'label'      => 'State',
+                    'type'       => 'select',
+                    'alias'      => 'state',
+                    'leadField'  => 'state',
+                    'parent'     => $response['form']['fields'][0]['id'],
+                    'isRequired' => true,
+                    'conditions' => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
                     ],
-                    'properties'   => [
+                    'properties' => [
                         'syncList' => 1,
                         'multiple' => 0,
                     ],
@@ -526,15 +600,89 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        /** @var PasswordEncoderInterface $encoder */
-        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword($this->getUserPlainPassword(), $user->getSalt()));
+        /** @var PasswordHasherInterface $encoder */
+        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $user->setPassword($encoder->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);
         $userRepo->saveEntities([$user]);
 
         return $user;
+    }
+
+    public function testCompanyLookupFieldSubmission(): void
+    {
+        $form = new Form();
+        $form->setName('Submission test form');
+        $form->setAlias('submissiontestform');
+        $form->setFormType('standalone');
+        $form->setIsPublished(true);
+
+        $lookup = new Field();
+        $lookup->setLabel('Company');
+        $lookup->setAlias('company');
+        $lookup->setMappedField('companyname');
+        $lookup->setMappedObject('company');
+        $lookup->setType('companyLookup');
+        $lookup->setForm($form);
+
+        $email = new Field();
+        $email->setLabel('Email');
+        $email->setAlias('email');
+        $email->setMappedField('email');
+        $email->setMappedObject('lead');
+        $email->setType('email');
+        $email->setForm($form);
+
+        $form->addField(0, $lookup);
+        $form->addField(1, $email);
+
+        $company = new Company();
+        $company->setName('Acquia');
+
+        $this->em->persist($company);
+        $this->em->persist($form);
+        $this->em->persist($lookup);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$form->getId()}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        $htmlForm = $formCrawler->form();
+        $htmlForm->setValues([
+            'mauticform[company]' => 'Acquia',
+            'mauticform[email]'   => 'leeloo@fifth.element',
+        ]);
+        $this->client->submit($htmlForm);
+
+        // Ensure the submission was created properly.
+        $submissions = $this->em->getRepository(Submission::class)->findAll();
+        Assert::assertCount(1, $submissions);
+
+        /** @var Submission $submission */
+        $submission = $submissions[0];
+        Assert::assertSame([
+            'company' => 'Acquia',
+            'email'   => 'leeloo@fifth.element',
+        ], $submission->getResults());
+
+        // A contact should be created by the submission.
+        $contact = $submission->getLead();
+
+        Assert::assertSame('Acquia', $contact->getCompany());
+        Assert::assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
+
+        // The previous request changes user to anonymous. We have to configure API again.
+        $this->setUpSymfony($this->configParams);
+
+        // Cleanup:
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$form->getId()}/delete");
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
     public function testSendSubmissionWhenFieldHaveMysqlReservedWords(): void
@@ -570,7 +718,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[f_all]' => 'test',

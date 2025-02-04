@@ -84,7 +84,7 @@ class NotifierTest extends MauticMysqlTestCase
         $qb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'notifications')
             ->where(
-                $qb->expr()->eq('icon_class', $qb->expr()->literal('fa-refresh'))
+                $qb->expr()->eq('icon_class', $qb->expr()->literal('ri-refresh-line'))
             );
         $this->assertCount(2, $qb->executeQuery()->fetchAllAssociative());
     }

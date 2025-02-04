@@ -18,6 +18,18 @@
 
 {% block mauticContent %}list{% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': list,
+    'customButtons': customButtons|default([]),
+    'templateButtons': {
+        'close': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], list.createdBy),
+    },
+    'routeBase': 'segment',
+    'targetLabel': 'mautic.lead.lead.lists'|trans
+}) -}}
+{% endblock %}
+
 {% block headerTitle %}{{ list.name }}{% endblock %}
 
 {% block actions %}
@@ -25,9 +37,8 @@
             'item': list,
             'customButtons': customButtons|default([]),
             'templateButtons': {
-                'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\\Security\\\Permissions\\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], list.createdBy),
+                'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], list.createdBy),
                 'delete': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OTHER')], list.createdBy),
-                'close': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], list.createdBy),
                 'clone': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')]
             },
             'routeBase': 'segment',
@@ -43,21 +54,15 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- page detail header -->
             <!-- segment detail collapseable toggler -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10">
-                        <div class="text-white dark-sm mb-0">{{ list.description|purify }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="collapse" id="segment-details">
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': list.description} %}
+            <div class="collapse pr-md pl-md" id="segment-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': list}) }}
                             <tr>
@@ -79,7 +84,7 @@
             </div>
         </div>
         <!--/ segment detail collapseable toggler -->
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#segment-details">
@@ -97,7 +102,7 @@
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-line-chart"></span>
+                                        <span class="ri-line-chart-fill"></span>
                                         {{ 'mautic.segment.stats'|trans }}
                                     </h5>
                                 </div>
@@ -139,7 +144,7 @@
             </form>
 
             <!--/ search bar -->
-            <ul class="nav nav-tabs pr-md pl-md">
+            <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
                     <a href="#contacts-container" role="tab" data-toggle="tab">{{ 'mautic.lead.leads'|trans }}</a>
                 </li>
@@ -160,7 +165,7 @@
             <div class="tab-pane active bdr-w-0 page-list"
                  id="contacts-container"
                  data-target-url="{{ path('mautic_segment_contacts', {'objectId': list.id, 'page': app.session.get('mautic.segment.contact.page', 1)}) }}">
-              <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+              <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
             </div>
 
             {% if hasSegmentMembershipFilter %}
@@ -169,7 +174,7 @@
 
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
                 <div id="campaign-share-container" style="position: relative">
-                    <table id="campaign-share-table" class="table mb-0">
+                    <table id="campaign-share-table" class="table table-hover mb-0">
                         <thead>
                         <tr>
                             <th>{{ 'mautic.campaign.campaign'|trans }}</th>
@@ -200,7 +205,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         {{ include('@MauticCore/Helper/usage.html.twig', {
             'title': 'mautic.lead.segments.usages'|trans,
             'stats': usageStats,

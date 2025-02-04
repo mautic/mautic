@@ -1,0 +1,138 @@
+{
+    "name": "Forms and Assets",
+    "description": "Start with a dashboard of 14 widgets that help you to check form submissions and identified contacts.",
+    "widgets": [
+        {
+            "name": "Contacts Created",
+            "width": 100,
+            "height": 330,
+            "ordering": 0,
+            "type": "created.leads.in.time",
+            "params": {
+                "lists": "identifiedVsAnonymous"
+            },
+            "template": null
+        },
+        {
+            "name": "Created contacts in time",
+            "width": 100,
+            "height": 215,
+            "ordering": 0,
+            "type": "created.leads.in.time",
+            "params": {
+                "flag": "identified"
+            },
+            "template": null
+        },
+        {
+            "name": "Page Visits",
+            "width": 50,
+            "height": 330,
+            "ordering": 1,
+            "type": "page.hits.in.time",
+            "params": {
+                "flag": "unique"
+            },
+            "template": null
+        },
+        {
+            "name": "Top segments",
+            "width": 50,
+            "height": 215,
+            "ordering": 1,
+            "type": "top.lists",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Created contacts",
+            "width": 50,
+            "height": 215,
+            "ordering": 2,
+            "type": "created.leads",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Form Submissions",
+            "width": 50,
+            "height": 330,
+            "ordering": 3,
+            "type": "submissions.in.time",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Recent Activity",
+            "width": 50,
+            "height": 330,
+            "ordering": 3,
+            "type": "recent.activity",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Upcoming Emails",
+            "width": 50,
+            "height": 330,
+            "ordering": 4,
+            "type": "upcoming.emails",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Top submission referrers",
+            "width": 25,
+            "height": 330,
+            "ordering": 4,
+            "type": "top.submission.referrers",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Created forms",
+            "width": 25,
+            "height": 330,
+            "ordering": 5,
+            "type": "created.forms",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Downloads in time",
+            "width": 25,
+            "height": 330,
+            "ordering": 6,
+            "type": "asset.downloads.in.time",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Popular assets",
+            "width": 25,
+            "height": 330,
+            "ordering": 7,
+            "type": "popular.assets",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Unique vs repetitive downloads",
+            "width": 25,
+            "height": 330,
+            "ordering": 8,
+            "type": "unique.vs.repetitive.downloads",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Created assets",
+            "width": 25,
+            "height": 330,
+            "ordering": 9,
+            "type": "created.assets",
+            "params": [],
+            "template": null
+        }
+    ]
+}

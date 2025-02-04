@@ -59,7 +59,7 @@ class ReplySubscriber implements EventSubscriberInterface
             $event,
             'sms_reply',
             'mautic.sms.timeline.reply',
-            'fa-mobile',
+            'ri-smartphone-line',
             'sms',
             'sms',
             'reply',

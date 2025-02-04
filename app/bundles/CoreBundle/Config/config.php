@@ -34,6 +34,10 @@ return [
                 'path'       => '/themes/{objectAction}/{objectId}',
                 'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
             ],
+            'mautic_core_keep_alive' => [
+                'path'       => '/keep-alive',
+                'controller' => 'Mautic\CoreBundle\Controller\KeepAliveController::keepAliveAction',
+            ],
         ],
         'public' => [
             'mautic_js' => [
@@ -107,26 +111,30 @@ return [
         'main' => [
             'mautic.core.components' => [
                 'id'        => 'mautic_components_root',
-                'iconClass' => 'ri-puzzle-fill',
+                'iconClass' => 'ri-archive-2-fill',
                 'priority'  => 60,
             ],
             'mautic.core.channels' => [
                 'id'        => 'mautic_channels_root',
-                'iconClass' => 'ri-rss-fill',
+                'iconClass' => 'ri-remote-control-fill',
                 'priority'  => 40,
             ],
         ],
         'admin' => [
+            'mautic.core.general' => [
+                'id'        => 'mautic_general_root',
+                'priority'  => 15,
+            ],
             'mautic.theme.menu.index' => [
                 'route'     => 'mautic_themes_index',
-                'iconClass' => 'ri-palette-fill',
+                'iconClass' => 'ri-pantone-line',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
+                'parent'    => 'mautic.core.general',
                 'priority'  => 18,
             ],
             'mautic.core.integrations' => [
                 'id'        => 'mautic_integrations_root',
-                'iconClass' => 'ri-plug-fill',
                 'priority'  => 15,
             ],
         ],
@@ -191,6 +199,7 @@ return [
                 'class'     => Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [
@@ -672,6 +681,7 @@ return [
                     'monolog.logger.mautic',
                     'mautic.http.client',
                     '%kernel.cache_dir%',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.ip_lookup' => [
@@ -1434,5 +1444,6 @@ return [
         'load_froala_assets'                                      => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only'                                      => false,
         Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE  => null,
+        'gdpr_user_purge_threshold'                               => 1095, // Minimum no. of days a user has to be inactive to get picked up by `mautic:maintenance:cleanup --gdpr`
     ],
 ];

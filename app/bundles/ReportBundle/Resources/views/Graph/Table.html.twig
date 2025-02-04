@@ -11,7 +11,7 @@
         {% if graph.data|length > 0 %}
             <div class="table-responsive panel-collapse pull out">
                 {# We need to dynamically create the table headers based on the result set #}
-                <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+                <table class="table table-hover report-list" id="reportTable">
                     <thead>
                         <tr>
                             {% for key, value in graph.data[0]|filter((v, k) => 'id' != k) %}

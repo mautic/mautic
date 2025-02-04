@@ -75,7 +75,7 @@ class DateRangeType extends AbstractType
             SubmitType::class,
             [
                 'label' => 'mautic.core.form.apply',
-                'attr'  => ['class' => 'btn btn-default'],
+                'attr'  => ['class' => 'btn btn-ghost btn-sm'],
             ]
         );
 

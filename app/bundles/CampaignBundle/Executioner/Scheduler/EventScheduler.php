@@ -13,8 +13,9 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Exception\IntervalNotConfiguredException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
-use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
-use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime as DateTimeScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval as IntervalScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized as OptimizedScheduler;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
@@ -25,8 +26,9 @@ class EventScheduler
     public function __construct(
         private LoggerInterface $logger,
         private EventLogger $eventLogger,
-        private Interval $intervalScheduler,
-        private DateTime $dateTimeScheduler,
+        private IntervalScheduler $intervalScheduler,
+        private DateTimeScheduler $dateTimeScheduler,
+        private OptimizedScheduler $optimizedScheduler,
         private EventCollector $collector,
         private EventDispatcherInterface $dispatcher,
         private CoreParametersHelper $coreParametersHelper
@@ -153,6 +155,7 @@ class EventScheduler
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
+            case Event::TRIGGER_MODE_OPTIMIZED:
             case null: // decision
                 $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
 
@@ -181,6 +184,7 @@ class EventScheduler
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
+            case Event::TRIGGER_MODE_OPTIMIZED:
             case null: // decision
                 $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
 
@@ -320,8 +324,14 @@ class EventScheduler
             // Create the entry
             $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
 
-            // Schedule it
-            $log->setTriggerDate($executionDate);
+            // Determine the execution date based on the trigger mode
+            if (Event::TRIGGER_MODE_OPTIMIZED === $event->getTriggerMode()) {
+                $optimizedExecutionDate = $this->optimizedScheduler->getExecutionDateTimeForContact($event, $contact);
+                $log->setTriggerDate($optimizedExecutionDate);
+            } else {
+                // For other trigger modes, use the provided execution date
+                $log->setTriggerDate($executionDate);
+            }
 
             // Add it to the queue to persist to the DB
             $this->eventLogger->queueToPersist($log);

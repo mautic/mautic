@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -225,6 +226,12 @@ class FormModel extends AbstractCommonModel
      */
     public function setTimestamps(&$entity, $isNew, $unlock = true): void
     {
+        // unlock the row if applicable
+        if ($unlock && method_exists($entity, 'setCheckedOut')) {
+            $entity->setCheckedOut(null);
+            $entity->setCheckedOutBy(null);
+        }
+
         if ($isNew) {
             if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
                 $entity->setDateAdded(new \DateTime());
@@ -237,38 +244,38 @@ class FormModel extends AbstractCommonModel
                     $entity->setCreatedByUser($this->userHelper->getUser()->getName());
                 }
             }
-        } else {
-            if (method_exists($entity, 'setDateModified')) {
-                $setDateModified = true;
-                if (method_exists($entity, 'getChanges')) {
-                    $changes = $entity->getChanges();
-                    if (empty($changes)) {
-                        $setDateModified = false;
-                    }
-                    if (is_array($changes) && 1 === count($changes) && isset($changes['dateLastActive'])) {
-                        $setDateModified = false;
-                    }
+
+            return;
+        }
+
+        if ($entity instanceof SkipModifiedInterface && $entity->shouldSkipSettingModifiedProperties()) {
+            return;
+        }
+
+        if (method_exists($entity, 'setDateModified')) {
+            $setDateModified = true;
+            if (method_exists($entity, 'getChanges')) {
+                $changes = $entity->getChanges();
+                if (empty($changes)) {
+                    $setDateModified = false;
                 }
-                if ($setDateModified) {
-                    $dateModified = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
-                        : new \DateTime();
-                    $entity->setDateModified($dateModified);
+                if (is_array($changes) && 1 === count($changes) && isset($changes['dateLastActive'])) {
+                    $setDateModified = false;
                 }
             }
-
-            if ($this->userHelper->getUser() instanceof User) {
-                if (method_exists($entity, 'setModifiedBy')) {
-                    $entity->setModifiedBy($this->userHelper->getUser());
-                } elseif (method_exists($entity, 'setModifiedByUser')) {
-                    $entity->setModifiedByUser($this->userHelper->getUser()->getName());
-                }
+            if ($setDateModified) {
+                $dateModified = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+                    : new \DateTime();
+                $entity->setDateModified($dateModified);
             }
         }
 
-        // unlock the row if applicable
-        if ($unlock && method_exists($entity, 'setCheckedOut')) {
-            $entity->setCheckedOut(null);
-            $entity->setCheckedOutBy(null);
+        if ($this->userHelper->getUser() instanceof User) {
+            if (method_exists($entity, 'setModifiedBy')) {
+                $entity->setModifiedBy($this->userHelper->getUser());
+            } elseif (method_exists($entity, 'setModifiedByUser')) {
+                $entity->setModifiedByUser($this->userHelper->getUser()->getName());
+            }
         }
     }
 

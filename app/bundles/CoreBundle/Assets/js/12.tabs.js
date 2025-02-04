@@ -114,7 +114,7 @@ Mautic.activateTabDeleteButtons = function(container) {
  * @param tab
  */
 Mautic.activateTabDeleteButton = function(tab) {
-    var btn = mQuery('<span class="btn btn-danger btn-xs btn-delete pull-right hide"><i class="fa fa-times"></i></span>')
+    var btn = mQuery('<span class="btn btn-danger btn-xs btn-delete pull-right hide"><i class="ri-close-line"></i></span>')
         .on('click',
             function() {
                 return Mautic.deleteTab(btn)
@@ -183,3 +183,91 @@ Mautic.deleteTab = function(deleteBtn) {
 
     return false;
 };
+
+// Initialize the Tabs Scroll functionality
+Mautic.initTabsScroll = function() {
+    mQuery('.nav-tabs').each(function() {
+        var $navTabs = mQuery(this);
+
+        // Avoid initializing the same nav-tabs multiple times
+        if ($navTabs.parent().hasClass('nav-tabs-wrapper')) {
+            return; // Already initialized
+        }
+
+        // Create wrapper
+        var $navTabsWrapper = mQuery('<div class="nav-tabs-wrapper"></div>');
+
+        // Wrap the nav-tabs with the wrapper
+        $navTabs.wrap($navTabsWrapper);
+
+        // After wrapping, update the reference
+        $navTabsWrapper = $navTabs.parent('.nav-tabs-wrapper');
+
+        // Append scroll buttons with type="button" and specified icons
+        var $leftBtn = mQuery('<button type="button" class="scroll-btn left-btn"><i class="ri-arrow-left-wide-line"></i></button>');
+        var $rightBtn = mQuery('<button type="button" class="scroll-btn right-btn"><i class="ri-arrow-right-wide-line"></i></button>');
+
+        $navTabsWrapper.append($leftBtn);
+        $navTabsWrapper.append($rightBtn);
+
+        var scrollAmount = 150;
+
+        // Function to update button states and visibility
+        function updateButtons() {
+            var scrollLeft = $navTabs.scrollLeft();
+            var maxScrollLeft = $navTabs[0].scrollWidth - $navTabs[0].clientWidth;
+
+            if (maxScrollLeft > 0) {
+                // Tabs overflow the container, show buttons
+                $navTabsWrapper.addClass('show-scroll-buttons');
+            } else {
+                // No overflow, hide buttons
+                $navTabsWrapper.removeClass('show-scroll-buttons');
+            }
+
+            // Update button disabled state
+            $leftBtn.prop('disabled', scrollLeft <= 0);
+            $rightBtn.prop('disabled', scrollLeft >= (maxScrollLeft - 1));
+        }
+
+        // Scroll Left
+        $leftBtn.on('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $navTabs.animate({ scrollLeft: $navTabs.scrollLeft() - scrollAmount }, 300, updateButtons);
+        });
+
+        // Scroll Right
+        $rightBtn.on('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $navTabs.animate({ scrollLeft: $navTabs.scrollLeft() + scrollAmount }, 300, updateButtons);
+        });
+
+        // Update buttons on scroll and resize
+        $navTabs.on('scroll', updateButtons);
+        mQuery(window).on('resize', debounce(updateButtons, 100));
+
+        // Initial button state
+        updateButtons();
+    });
+};
+
+// Debounce function to limit how often a function can fire
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(func, wait);
+    };
+}
+
+// Initialize on document ready
+mQuery(document).ready(function() {
+    Mautic.initTabsScroll();
+});
+
+// Re-initialize on every AJAX complete
+mQuery(document).ajaxComplete(function(event, xhr, settings) {
+    Mautic.initTabsScroll();
+});

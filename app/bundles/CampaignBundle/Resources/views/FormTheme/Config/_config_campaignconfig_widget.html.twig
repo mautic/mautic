@@ -4,13 +4,33 @@
         <h3 class="panel-title">{{ 'mautic.config.tab.campaignconfig'|trans }}</h3>
     </div>
     <div class="panel-body">
-        {% for f in form.children %}
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(f) }}
+                    {{ form_row(form.campaign_time_wait_on_event_false) }}
+                    {{ form_row(form.campaign_by_range) }}
+                    {{ form_row(form.campaign_use_summary) }}
                 </div>
             </div>
-        {% endfor %}
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.peak_interaction_timer.title'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.peak_interaction_timer_best_default_hour_start) }}
+                {{ form_row(form.peak_interaction_timer_best_default_hour_end) }}
+                {{ form_row(form.peak_interaction_timer_best_default_days) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.peak_interaction_timer_cache_timeout) }}
+                {{ form_row(form.peak_interaction_timer_fetch_interactions_from) }}
+                {{ form_row(form.peak_interaction_timer_fetch_limit) }}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

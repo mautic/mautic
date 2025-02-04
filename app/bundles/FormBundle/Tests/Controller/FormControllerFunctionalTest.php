@@ -4,6 +4,9 @@ namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -135,5 +138,89 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Ceci est requis.', $crawler->html());
 
         $filesystem->remove($languagePath);
+    }
+
+    public function testMappedFieldIsNotMarkedAsRemappedUponSavingTheForm(): void
+    {
+        $form  = $this->createForm('Test', 'test');
+        $field = $this->createFormField([
+            'label'        => 'Email',
+            'type'         => 'email',
+        ])->setForm($form);
+
+        // @phpstan-ignore-next-line (using the deprecated method on purpose)
+        $field->setLeadField('email');
+        $this->em->persist($field);
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $this->client->submit($formElement);
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+        $this->assertStringNotContainsString('contact: Email', $response->getContent(), 'Email field should not be marked as mapped.');
+    }
+
+    public function testMappedFieldIsNotAutoFilledWhenUpdatingField(): void
+    {
+        $form  = $this->createForm('Test', 'test');
+        $field = $this->createFormField([
+            'label' => 'Email',
+            'type'  => 'email',
+        ])->setForm($form);
+        $field->setMappedObject(null);
+        $field->setMappedField(null);
+        $this->em->persist($field);
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $this->client->submit($formElement);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->client->request('GET', sprintf('/s/forms/field/edit/%d?formId=%d', $field->getId(), $form->getId()), [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+        $this->assertJson($response->getContent());
+
+        $content = json_decode($response->getContent())->newContent;
+        $crawler = new Crawler($content, $this->client->getInternalRequest()->getUri());
+        $options = $crawler->filterXPath('//select[@name="formfield[mappedField]"]')->html();
+        $this->assertStringContainsString('<option value="email">Email</option>', $options, 'Email option should not be pre-selected.');
+    }
+
+    private function createForm(string $name, string $alias): Form
+    {
+        $form = new Form();
+        $form->setName($name);
+        $form->setAlias($alias);
+        $form->setPostActionProperty('Success');
+        $this->em->persist($form);
+
+        return $form;
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     */
+    private function createFormField(array $data = []): Field
+    {
+        $field     = new Field();
+        $aliasSlug = strtolower(str_replace(' ', '_', $data['label'] ?? 'Field 1'));
+        $field->setLabel($data['label'] ?? 'Field 1');
+        $field->setAlias('field_'.$aliasSlug);
+        $field->setType($data['type'] ?? 'text');
+        $field->setMappedObject($data['mappedObject'] ?? '');
+        $field->setMappedField($data['mappedField'] ?? '');
+        $field->setConditions($data['conditions'] ?? []);
+        $this->em->persist($field);
+
+        return $field;
     }
 }

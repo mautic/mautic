@@ -19,7 +19,7 @@
             'mappedFields': mappedFields|default([]),
     })|replace({
             '<input': '<input value="' ~ field.defaultValue ~ '"',
-    }) -}}
+    })|raw -}}
 {% endif %}
 {#
     This field relies on the `group.html.twig` implementation.

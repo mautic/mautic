@@ -21,13 +21,15 @@ return [
                 'routeParameters' => ['objectAction' => 'edit'],
                 'iconClass'       => 'ri-settings-5-line',
                 'id'              => 'mautic_config_index',
+                'parent'          => 'mautic.core.general',
                 'access'          => 'admin',
                 'priority'        => 16,
             ],
             'mautic.sysinfo.menu.index' => [
                 'route'     => 'mautic_sysinfo_index',
-                'iconClass' => 'ri-information-2-fill',
+                'iconClass' => 'ri-information-2-line',
                 'id'        => 'mautic_sysinfo_index',
+                'parent'    => 'mautic.core.general',
                 'access'    => 'admin',
                 'priority'  => 04,
                 'checks'    => [

@@ -50,9 +50,9 @@ class FlashBag
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             $iconClass = match ($level) {
-                self::LEVEL_WARNING => 'text-warning fa-exclamation-triangle',
-                self::LEVEL_ERROR   => 'text-danger fa-exclamation-circle',
-                default             => 'fa-info-circle',
+                self::LEVEL_WARNING => 'text-warning ri-alert-line',
+                self::LEVEL_ERROR   => 'text-danger ri-error-warning-line-circle',
+                default             => 'ri-information-2-line',
             };
 
             // If the user has not interacted with the browser for the last 30 seconds, consider the message unread

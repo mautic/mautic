@@ -133,7 +133,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
+                    'preaddon'     => 'ri-lock-fill',
                     'tooltip'      => 'mautic.email.config.monitored_email_password.tooltip',
                     'autocomplete' => 'off',
                     'data-show-on' => $monitoredShowOn,
@@ -208,7 +208,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'label'    => 'mautic.email.config.monitored_email.test_connection',
                 'required' => false,
                 'attr'     => [
-                    'class'   => 'btn btn-success',
+                    'class'   => 'btn btn-tertiary btn-sm',
                     'onclick' => 'Mautic.testMonitoredEmailServerConnection(\''.$options['mailbox'].'\')',
                 ],
             ]

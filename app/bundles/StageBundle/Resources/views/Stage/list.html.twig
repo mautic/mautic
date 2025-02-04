@@ -7,24 +7,45 @@
 	{% trans %}mautic.stages.menu.root{% endtrans %}
 {% endblock %}
 
-{% block actions %}
-    {{- include('@MauticCore/Helper/page_actions.html.twig', {
-            'templateButtons' : {
-                'new' : permissions['stage:stages:create'],
-            },
-            'routeBase' : 'stage',
-        }) -}}
-{% endblock %}
-
 {% block content %}
 {% if isIndex %}
-<div class="panel panel-default bdr-t-wdh-0 mb-0">
-    {{- include('@MauticCore/Helper/list_toolbar.html.twig',
-        {
-            'searchValue' : searchValue,
-            'searchHelp'  : 'mautic.core.help.searchcommands',
-            'action'      : currentRoute,
-    }) -}}
+<div id="page-list-wrapper" class="panel panel-default">
+    {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'action': currentRoute,
+        'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'templateButtons': {
+                'new': permissions['stage:stages:create'],
+            },
+            'routeBase': 'stage',
+        }),
+        'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ispublished',
+                'label': 'mautic.core.form.active',
+                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                'icon': 'ri-check-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isunpublished',
+                'label': 'mautic.core.form.inactive',
+                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                'icon': 'ri-close-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isuncategorized',
+                'label': 'mautic.core.form.uncategorized',
+                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                'icon': 'ri-folder-unknow-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            }
+        ]
+    }) }}
     <div class="page-list">
         {{ block('listResults') }}
     </div>
@@ -113,11 +134,8 @@
                     <td class="visible-md visible-lg">
                         {% set category = item.getCategory() %}
                         {% set catName = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = category ? '#' ~ category.getColor() : 'inherit' %}
-                        <span style="white-space: nowrap;">
-                        <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> 
-                        <span>{{ catName }}</span>
-                        </span>
+                        {% set color = category ? '#' ~ category.getColor() : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>

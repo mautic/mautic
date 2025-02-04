@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\AssetBundle\Entity\Download;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use Mautic\DynamicContentBundle\Entity\Stat as StatDC;
+use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -892,6 +899,115 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    public function testGetAllActivityDownload(): void
+    {
+        $expectedActivites = 0;
+        for ($i = 0; $i < 10; ++$i) {
+            $contact = new Lead();
+            $contact->setEmail('email'.(string) $i.'@acquia.cz');
+            $this->em->persist($contact);
+            // +30 assets downloads
+            $expectedActivites += 3;
+            for ($iAsset = 0; $iAsset < 3; ++$iAsset) {
+                $ipAddress = new IpAddress();
+                $ipAddress->setIpAddress('13.13.13.13');
+                $this->em->persist($ipAddress);
+                $assetDownload = new Download();
+                $assetDownload->setLead($contact);
+                $assetDownload->setDateDownload(date_create('2013-03-15'));
+                $assetDownload->setCode(13);
+                $assetDownload->setTrackingId(13);
+                $assetDownload->setIpAddress($ipAddress);
+                $this->em->persist($assetDownload);
+            }
+            // +30 lead event logs + 30 events
+            $expectedActivites += 6;
+            for ($iEvent = 0; $iEvent < 3; ++$iEvent) {
+                $campaign = new Campaign();
+                $campaign->setName('Test Campaign');
+                $this->em->persist($campaign);
+                $event = new Event();
+                $event->setName('Test Event');
+                $event->setType('typeTest');
+                $event->setEventType('eventTypeTest');
+                $event->setCampaign($campaign);
+                $this->em->persist($event);
+                $leadEventLog = new LeadEventLog();
+                $leadEventLog->setEvent($event);
+                $leadEventLog->setLead($contact);
+                $this->em->persist($leadEventLog);
+            }
+            // +30 do not contact
+            $expectedActivites += 3;
+            for ($iDoNotContact = 0; $iDoNotContact < 3; ++$iDoNotContact) {
+                $doNotContact = new DoNotContact();
+                $doNotContact->setLead($contact);
+                $doNotContact->setDateAdded(date_create('2013-03-15'));
+                $doNotContact->setChannel('email');
+                $this->em->persist($doNotContact);
+            }
+            // +30 dynamic content stats
+            $expectedActivites += 3;
+            for ($iStat = 0; $iStat < 3; ++$iStat) {
+                $stat = new StatDC();
+                $stat->setLead($contact);
+                $stat->setDateSent(date_create('2013-03-15'));
+                $this->em->persist($stat);
+            }
+            // +30 email stats
+            $expectedActivites += 3;
+            for ($iEmailStat = 0; $iEmailStat < 3; ++$iEmailStat) {
+                $stat = new StatEmail();
+                $stat->setLead($contact);
+                $stat->setEmailAddress('email'.(string) $i.'@acquia.cz');
+                $stat->setDateSent(date_create('2013-03-15'));
+                $this->em->persist($stat);
+            }
+        }
+
+        // Save to DB
+        $this->em->flush();
+
+        // Call endpoint
+        $this->client->request('GET', '/api/contacts/activity');
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $responseJson = json_decode($clientResponse->getContent());
+        $this->assertSame($expectedActivites, $responseJson->total);
+    }
+
+    public function testGetActivityInRightOrder(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('email@acquia.cz');
+        $this->em->persist($contact);
+
+        $dates = ['2013-03-15', '2013-03-10', '2013-03-05', '2013-03-20', '2013-03-25'];
+        foreach ($dates as $date) {
+            $stat = new StatDC();
+            $stat->setLead($contact);
+            $stat->setDateSent(date_create($date));
+            $this->em->persist($stat);
+        }
+
+        // Save to DB
+        $this->em->flush();
+
+        // Expected stat order
+        $expectedDatesOrder = ['2013-03-25', '2013-03-20', '2013-03-15', '2013-03-10', '2013-03-05'];
+
+        // Call endpoint
+        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId().'/activity');
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $responseJson = json_decode($clientResponse->getContent());
+        $resultOrder  = [];
+        foreach ($responseJson->events as $event) {
+            $resultOrder[] = substr($event->timestamp, 0, 10);
+        }
+        $this->assertSame($expectedDatesOrder, $resultOrder);
     }
 
     private function createCompany(string $name): Company

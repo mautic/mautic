@@ -111,7 +111,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
 
         // Theme menu shows 'Unhide' option
         $visibilityMenu = $hiddenThemeRow->filter('ul')->filter('a[href="/s/themes/visibility/aurora"]');
-        Assert::assertStringContainsString('Unhide', $visibilityMenu->html());
+        Assert::assertStringContainsString('Show', $visibilityMenu->html());
 
         // Unhide the 'Aurora' theme
         $this->client->request(Request::METHOD_POST, '/s/themes/visibility/aurora');

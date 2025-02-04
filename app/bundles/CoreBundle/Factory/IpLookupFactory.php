@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Factory;
 
 use GuzzleHttp\Client;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Psr\Log\LoggerInterface;
 
@@ -12,7 +13,8 @@ class IpLookupFactory
         protected array $lookupServices,
         protected ?LoggerInterface $logger = null,
         protected ?Client $client = null,
-        protected ?string $cacheDir = null
+        protected ?string $cacheDir = null,
+        protected ?CoreParametersHelper $coreParametersHelper = null
     ) {
     }
 
@@ -42,7 +44,8 @@ class IpLookupFactory
                 $ipLookupConfig,
                 $this->cacheDir,
                 $this->logger,
-                $this->client
+                $this->client,
+                $this->coreParametersHelper
             );
         }
 

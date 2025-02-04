@@ -12,9 +12,19 @@
     </div>
 </div>
 <div class="row text-center">
-    <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="window.close();">
-        <i class="fa fa-check"></i>
-        {{ 'mautic.integration.closewindow'|trans }}
-    </button>
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                label: 'mautic.integration.closewindow',
+                variant: 'success',
+                icon: 'ri-check-line',
+                attributes: {
+                    'id': 'integration_details_authButton',
+                    'name': 'integration_details[authButton]'
+                },
+                onclick: 'window.close();'
+            }
+        ]
+    } %}
 </div>
 {% endblock %}

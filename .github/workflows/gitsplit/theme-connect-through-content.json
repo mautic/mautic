@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-connect-through-content",
+            "directory": "themes/_connect-through-content",
+            "target": "git@github.com:mautic/theme-connect-through-content.git"
+        }
+    ]
+}

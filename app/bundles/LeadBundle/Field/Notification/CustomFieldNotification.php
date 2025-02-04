@@ -95,7 +95,7 @@ class CustomFieldNotification
             'info',
             false,
             $header,
-            'fa-columns',
+            'ri-layout-column-line',
             null,
             $user
         );

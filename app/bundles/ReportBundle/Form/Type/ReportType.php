@@ -61,7 +61,7 @@ class ReportType extends AbstractType
             );
 
             $builder->add('isPublished', YesNoButtonGroupType::class, [
-                'label' => 'mautic.core.status.available',
+                'label' => 'mautic.core.form.available',
             ]);
 
             $data = $options['data']->getSystem();
@@ -69,11 +69,12 @@ class ReportType extends AbstractType
                 'system',
                 YesNoButtonGroupType::class,
                 [
-                    'label' => 'mautic.report.report.form.issystem',
-                    'data'  => $data,
-                    'attr'  => [
+                    'label'      => 'mautic.report.report.form.issystem',
+                    'data'       => $data,
+                    'attr'       => [
                         'tooltip' => 'mautic.report.report.form.issystem.tooltip',
                     ],
+                    'no_label'   => 'mautic.lead.list.form.isglobal.no',
                 ]
             );
 
@@ -316,7 +317,7 @@ class ReportType extends AbstractType
                     'required'   => false,
                     'attr'       => [
                         'class'    => 'form-control',
-                        'preaddon' => 'fa fa-envelope',
+                        'preaddon' => 'ri-mail-line',
                         'tooltip'  => 'mautic.report.schedule.toAddress.tooltip',
                     ],
                 ]
