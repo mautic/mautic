@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -14,6 +15,14 @@ use Mautic\LeadBundle\Entity\DoNotContact;
  */
 class EmailRepository extends CommonRepository
 {
+    public const EMAILS_PREFIX        = 'e';
+
+    public const DNC_PREFIX           = 'dnc';
+
+    public const TRACKABLE_PREFIX     = 'tr';
+
+    public const REDIRECT_PREFIX      = 'pr';
+
     /**
      * Get an array of do not email.
      *
@@ -418,6 +427,104 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * @return array<string, int>
+     */
+    public function getSentReadNotReadCount(QueryBuilder $queryBuilder): array
+    {
+        $queryBuilder->resetQueryPart('groupBy');
+        $queryBuilder->resetQueryParts(['join']);
+
+        $queryBuilder->select('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count');
+        $results = $queryBuilder->executeQuery()->fetchAssociative();
+
+        if ($results) {
+            $results['sent_count'] = (int) $results['sent_count'];
+            $results['read_count'] = (int) $results['read_count'];
+            $results['not_read']   = $results['sent_count'] - $results['read_count'];
+        } else {
+            $results             = [];
+            $results['not_read'] = $results['sent_count'] = $results['read_count'] = 0;
+        }
+
+        return $results;
+    }
+
+    public function getUnsubscribedCount(QueryBuilder $queryBuilder): int
+    {
+        $queryBuilder->resetQueryParts(['join']);
+        $this->addDNCTableForEmails($queryBuilder);
+        $queryBuilder->select('e.id as email_id, dnc.lead_id');
+        $queryBuilder->andWhere('dnc.reason='.DoNotContact::UNSUBSCRIBED);
+
+        return $queryBuilder->executeQuery()->rowCount();
+    }
+
+    public function getUniqueClicks(QueryBuilder $queryBuilder): int
+    {
+        $this->addTrackableTablesForEmailStats($queryBuilder);
+        $queryBuilder->select('SUM( tr.unique_hits) as `unique_clicks`');
+
+        return (int) $queryBuilder->executeQuery()->fetchOne();
+    }
+
+    private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
+    {
+        $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
+        $prTable = MAUTIC_TABLE_PREFIX.'page_redirects';
+
+        if (!$this->isJoined($qb, $trTable, self::EMAILS_PREFIX, self::TRACKABLE_PREFIX)) {
+            $qb->leftJoin(
+                self::EMAILS_PREFIX,
+                $trTable,
+                self::TRACKABLE_PREFIX,
+                'e.id = tr.channel_id AND tr.channel = \'email\''
+            );
+        }
+        if (!$this->isJoined($qb, $prTable, self::TRACKABLE_PREFIX, self::REDIRECT_PREFIX)) {
+            $qb->leftJoin(
+                self::TRACKABLE_PREFIX,
+                $prTable,
+                self::REDIRECT_PREFIX,
+                'tr.redirect_id = pr.id'
+            );
+        }
+    }
+
+    /**
+     * Add the Do Not Contact table to the query builder.
+     */
+    private function addDNCTableForEmails(QueryBuilder $qb): void
+    {
+        $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
+
+        if (!$this->isJoined($qb, $table, self::EMAILS_PREFIX, self::DNC_PREFIX)) {
+            $qb->leftJoin(
+                self::EMAILS_PREFIX,
+                $table,
+                self::DNC_PREFIX,
+                'e.id = dnc.channel_id AND dnc.channel=\'email\''
+            );
+        }
+    }
+
+    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    {
+        $joins = $query->getQueryParts()['join'][$fromAlias] ?? null;
+
+        if (empty($joins)) {
+            return false;
+        }
+
+        foreach ($joins[$fromAlias] as $join) {
+            if ($join['joinTable'] == $table && $join['joinAlias'] == $alias) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
      */
@@ -565,7 +672,7 @@ class EmailRepository extends CommonRepository
                 $q->executeStatement();
 
                 return;
-            } catch (\Doctrine\DBAL\Exception $e) {
+            } catch (Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;
@@ -601,7 +708,7 @@ class EmailRepository extends CommonRepository
                 $updateQuery->executeStatement();
 
                 return;
-            } catch (\Doctrine\DBAL\Exception $e) {
+            } catch (Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;
@@ -642,7 +749,7 @@ class EmailRepository extends CommonRepository
                 $q->executeStatement();
 
                 return;
-            } catch (\Doctrine\DBAL\Exception $e) {
+            } catch (Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;

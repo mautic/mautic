@@ -68,7 +68,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
             $event,
             'campaign_membership',
             'mautic.lead.timeline.campaign_membership',
-            'fa-clock-o',
+            'ri-time-line',
             'campaign',
             'campaign'
         );

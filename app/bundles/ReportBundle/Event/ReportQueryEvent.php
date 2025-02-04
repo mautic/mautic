@@ -21,7 +21,7 @@ class ReportQueryEvent extends AbstractReportEvent
     }
 
     /**
-     * @return array
+     * @return QueryBuilder
      */
     public function getQuery()
     {

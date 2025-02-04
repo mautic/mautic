@@ -17,7 +17,7 @@ export default class CodeModeButton {
     this.editor.Panels.addButton('options', [
       {
         id: 'code-edit',
-        className: 'fa fa-edit',
+        className: 'ri-edit-line',
         attributes: {
           title: Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
         },

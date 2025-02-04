@@ -230,4 +230,43 @@ final class DateHelper
     {
         return 'date';
     }
+
+    /**
+     * Returns a humanized date string like "X hours ago".
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toHumanized($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        if (empty($datetime)) {
+            return '';
+        }
+
+        $this->helper->setDateTime($datetime, $fromFormat, $timezone);
+        $date = $this->helper->getDateTime();
+
+        // Use default timezone if 'local' is provided
+        $nowTimezone = ('local' === $timezone) ? date_default_timezone_get() : $timezone;
+        $now         = new \DateTime('now', new \DateTimeZone($nowTimezone));
+
+        $diff = $now->diff($date);
+
+        if ($diff->y > 0) {
+            return $this->translator->trans('mautic.core.date.years.ago', ['%count%' => $diff->y]);
+        }
+        if ($diff->m > 0) {
+            return $this->translator->trans('mautic.core.date.months.ago', ['%count%' => $diff->m]);
+        }
+        if ($diff->d > 0) {
+            return $this->translator->trans('mautic.core.date.days.ago', ['%count%' => $diff->d]);
+        }
+        if ($diff->h > 0) {
+            return $this->translator->trans('mautic.core.date.hours.ago', ['%count%' => $diff->h]);
+        }
+        if ($diff->i > 0) {
+            return $this->translator->trans('mautic.core.date.minutes.ago', ['%count%' => $diff->i]);
+        }
+
+        return $this->translator->trans('mautic.core.date.just.now');
+    }
 }

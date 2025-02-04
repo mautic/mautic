@@ -41,7 +41,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
                 [
                     'type'       => 'datetime',
                     'properties' => [
-                        'filter' => '2020-03-17 18:22',
+                        'filter' => '2020-03-17 17:22',
                     ],
                 ],
             ],
@@ -64,7 +64,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
                     'type'       => 'datetime',
                     'filter'     => '2020-03-17 17:22:34',
                     'properties' => [
-                        'filter' => '2020-03-17 18:22',
+                        'filter' => '2020-03-17 17:22',
                     ],
                 ],
             ],

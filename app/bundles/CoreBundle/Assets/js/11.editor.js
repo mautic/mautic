@@ -202,6 +202,8 @@ Mautic.MentionLinks =  function (editor) {
 
 /*
  * Customizes the way the list of user suggestions is displayed.
+ *
+ * @deprecated: will be removed in M6
  */
 Mautic.customItemRenderer = function (item) {
     let tokenId = item.id;
@@ -210,11 +212,9 @@ Mautic.customItemRenderer = function (item) {
     const idElement = document.createElement( 'span' );
     idElement.classList.add( 'custom-item-id' );
     itemElement.classList.add( 'custom-item' );
-    const tokenNameArr = tokenName.split(':');
 
-    if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
-    {
-        tokenId = tokenName =  tokenNameArr[1];
+    if (tokenName.startsWith('a:')) {
+        tokenName = tokenName.substring(2);
     }
 
     if (tokenId.match(/dwc=/i)){
@@ -230,6 +230,9 @@ Mautic.customItemRenderer = function (item) {
     return itemElement;
 }
 
+/*
+ * @deprecated: will be removed in M6
+ */
 Mautic.getFeedItems = function (queryText) {
     return new Promise( resolve => {
         setTimeout( () => {

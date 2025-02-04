@@ -221,6 +221,19 @@ class UserController extends FormController
         $model = $this->getModel('user.user');
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
+        if (null === $user) {
+            return $this->postActionRedirect([
+                'returnUrl'       => $this->generateUrl('mautic_user_index'),
+                'flashes'         => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.user.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        }
+        $oldEmail = $user->getEmail();
 
         /** @var AuditLogModel $auditLogModel */
         $auditLogModel      = $this->getModel('core.auditlog');
@@ -249,19 +262,7 @@ class UserController extends FormController
             ],
         ];
 
-        if (null === $user) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => [
-                        [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.user.user.error.notfound',
-                            'msgVars' => ['%id%' => $objectId],
-                        ],
-                    ],
-                ])
-            );
-        } elseif ($model->isLocked($user)) {
+        if ($model->isLocked($user)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $user, 'user.user');
         }
@@ -278,11 +279,19 @@ class UserController extends FormController
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+                $newEmail          = $formUser['email'] ?? null;
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
                     $user->setPassword($password);
                     $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    if (!empty($submittedPassword)) {
+                        $model->sendChangePasswordInfo($user);
+                    }
+
+                    if ($newEmail !== $oldEmail) {
+                        $model->sendChangeEmailInfo($oldEmail, $user);
+                    }
 
                     // check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $languageHelper->getSupportedLanguages();

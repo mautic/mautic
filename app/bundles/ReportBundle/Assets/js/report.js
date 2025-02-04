@@ -383,3 +383,53 @@ Mautic.getHighestIndex = function (selector) {
 
     return parseInt(highestIndex);
 };
+
+Mautic.cloneReportRow = function (containerId) {
+    // Get the existing filter container
+    const container = mQuery(`#${containerId}`);
+
+    // Extract values from the existing filter
+    const glue = container.find('.filter-glue').val();
+    const column = container.find('.filter-columns').val();
+    const value = container.find('.filter-value:checked, .filter-value').val();
+    const dynamic = container.find('[name*="[dynamic]"]:checked').val();
+
+    // Add a new filter row using the existing add function
+    Mautic.addReportRow('report_filters');
+
+    // Get the new container by finding the last filter container
+    const newContainer = mQuery('#report_filters').find('> .panel.in-group').last();
+
+    // Set the 'glue' and 'column' values
+    newContainer.find('.filter-glue').val(glue);
+    const columnSelect = newContainer.find('.filter-columns').val(column).trigger('change');
+
+    // Initialize Chosen when the select field is ready
+    const initializeChosenWhenReady = (selectElement) => {
+        if (selectElement.find('option').length > 0) {
+            Mautic.destroyChosen(selectElement);
+            Mautic.activateChosenSelect(selectElement);
+        } else {
+            setTimeout(() => initializeChosenWhenReady(selectElement), 200);
+        }
+    };
+    initializeChosenWhenReady(columnSelect);
+
+    // Set the 'value' field
+    const newValueInput = newContainer.find('.filter-value');
+    if (newValueInput.is('select')) {
+        newValueInput.val(value);
+        initializeChosenWhenReady(newValueInput);
+    } else {
+        newValueInput.val(value).prop('checked', true).parent().addClass('active');
+    }
+
+    // Set the dynamic option correctly using the toggle element
+    const dynamicLabel = newContainer.find('.toggle__label');
+    if ((dynamic === '1' && dynamicLabel.attr('aria-checked') !== 'true') || (dynamic === '0' && dynamicLabel.attr('aria-checked') !== 'false')) {
+        dynamicLabel.trigger('click');
+    }
+
+    // Reinitialize tooltips
+    newContainer.find("*[data-toggle='tooltip']").tooltip({ html: true, container: 'body' });
+};

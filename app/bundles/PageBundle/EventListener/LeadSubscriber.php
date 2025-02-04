@@ -60,7 +60,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $eventTypeKey  = 'page.hit';
         $eventTypeName = $this->translator->trans('mautic.page.event.hit');
         $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('pageList');
+        $event->addSerializerGroup(['pageList', 'hitDetails']);
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
@@ -78,7 +78,7 @@ class LeadSubscriber implements EventSubscriberInterface
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
                 $template = '@MauticPage/SubscribedEvents/Timeline/index.html.twig';
-                $icon     = 'fa-link';
+                $icon     = 'ri-link';
 
                 if (!empty($hit['source'])) {
                     if ($channelModel = $this->getChannelModel($hit['source'])) {
@@ -163,7 +163,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $eventTypeKey  = 'page.videohit';
         $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
         $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('pageList');
+        $event->addSerializerGroup(['pageList', 'hitDetails']);
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
@@ -192,7 +192,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'hit' => $hit,
                         ],
                         'contentTemplate' => $template,
-                        'icon'            => 'fa-video-camera',
+                        'icon'            => 'ri-vidicon-2-line',
                     ]
                 );
             }

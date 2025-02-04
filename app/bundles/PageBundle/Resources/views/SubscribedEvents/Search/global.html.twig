@@ -5,7 +5,7 @@
 {% else %}
 <a href="{{ url('mautic_page_action', {'objectAction': 'view', 'objectId': page.id}) }}" data-toggle="ajax">
     {{ page.title|purify }}
-    <span class="label label-default pull-right" data-toggle="tooltip" title="{{ 'mautic.page.hits'|trans }}" data-placement="left">
+    <span size="sm" class="label label-gray pull-right" data-toggle="tooltip" title="{{ 'mautic.page.hits'|trans }}" data-placement="left">
         {{ page.hits }}
     </span>
 </a>

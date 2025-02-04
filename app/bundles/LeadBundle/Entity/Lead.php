@@ -10,6 +10,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -20,7 +21,7 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface
 {
     use CustomFieldEntityTrait;
 
@@ -1011,7 +1012,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
+     * @return ArrayCollection<int,CompanyChangeLog>
      */
     public function getCompanyChangeLog()
     {
@@ -1960,11 +1961,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $rules = [];
         foreach ($frequencyRules as $rule) {
-            $rules[$rule['channel']] =
-                [
-                    'frequency' => $rule,
-                    'dnc'       => DoNotContact::IS_CONTACTABLE,
-                ];
+            $rules[$rule['channel']] = [
+                'frequency' => $rule,
+                'dnc'       => DoNotContact::IS_CONTACTABLE,
+            ];
         }
 
         if (count($dncRules)) {
@@ -2016,5 +2016,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function removeGroupScore(GroupContactScore $groupContactScore): void
     {
         $this->groupScores->removeElement($groupContactScore);
+    }
+
+    /**
+     * Do not update modified_by and date_modified fields if only DNC or manipulator was changed.
+     * Avoid unnecessary update queries.
+     */
+    public function shouldSkipSettingModifiedProperties(): bool
+    {
+        $changes = $this->changes;
+
+        unset($changes['dnc_channel_status']);
+        unset($changes['manipulator']);
+
+        return !(bool) count($changes);
     }
 }

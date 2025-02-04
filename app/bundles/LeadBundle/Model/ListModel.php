@@ -833,7 +833,7 @@ class ListModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1167,6 +1167,40 @@ class ListModel extends FormModel
                 // BC support for old filters where the field existed outside of properties.
                 $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
                 if ($filter && in_array($entityFilter['type'], $emailFilterTypes) && in_array($emailId, $filter)) {
+                    $dependents[] = $entity->getId();
+                    break;
+                }
+            }
+        }
+
+        return array_unique($dependents);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getSegmentIdsWithDependenciesOnTag(int $tagId): array
+    {
+        $entities = $this->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        [
+                            'column' => 'l.filters',
+                            'expr'   => 'LIKE',
+                            'value'  => '%"tags"%',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                // BC support for old filters where the field existed outside of properties.
+                $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
+                if ($filter && 'tags' === $entityFilter['type'] && in_array($tagId, $filter)) {
                     $dependents[] = $entity->getId();
                     break;
                 }

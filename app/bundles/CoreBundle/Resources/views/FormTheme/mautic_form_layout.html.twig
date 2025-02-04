@@ -35,12 +35,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block button_group_widget %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
-<div class="btn-group {{ buttonBlockClass }}" data-toggle="buttons">
+<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons">
     {% for child in form %}
         {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
-        <label class="btn btn-default{{ class }}">
+        <label class="btn {{ class }} btn-block mt-0 list-group-item">
             {{ form_widget(child, {'attr': attr}) }}
-            {{ child.vars.label|trans }}
+            <span class="list-group-item-text btn-block text-left">{{ child.vars.label|trans }}</span>
         </label>
     {% endfor %}
 </div>
@@ -115,6 +115,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
             {% else %}
             {{ form_widget(form) }}
             {% endif %}
+            {{ form_help(form) }}
             {{ form_errors(form) }}
         </div>
     </div>
@@ -139,7 +140,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list">
         {{ form_label(form, label) }}
         <a  data-prototype="{{ datePrototype|raw }}"
-           class="btn btn-warning btn-xs btn-add-item" href="#" id="{{ form.vars.id }}_additem">
+           class="btn btn-tertiary btn-sm btn-warning btn-add-item" href="#" id="{{ form.vars.id }}_additem">
             {{ 'mautic.core.form.list.additem'|trans }}
         </a>
         {% if isSortable %}
@@ -203,7 +204,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 <label {% for k, v in label_attr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
 {% endfor %}{{ tooltip ? 'data-toggle="tooltip" data-container="body" data-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
-{{ label_html ? label|trans({}, translation_domain)|purify : label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="fa fa-question-circle"></i>' : '' }}</label>
+{{ label_html ? label|trans({}, translation_domain)|purify : label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="ri-question-line"></i>' : '' }}</label>
 {% endif %}
 {% endblock form_label %}
 
@@ -299,11 +300,30 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         </span>
         {% endif %}
     </div>
-{% else %}
+    {% else %}
+    {% if id is defined and 'publish' in id %}
+    <div class="d-flex gap-3">
+        <label class="btn btn-tertiary btn-icon btn-nospin btn-datepicker" size="sm" for="{{ id|escape }}">
+            {% if 'publishUp' in id %}
+                <i class="ri-calendar-check-line ri-1x"></i>
+            {% elseif 'publishDown' in id %}
+                <i class="ri-calendar-close-line ri-1x"></i>
+            {% endif %}
+        </label>
+
+        <input type="{{ type is defined ? type|escape : 'text' }}"
+               {{ block('widget_attributes') }}
+               {% if value is not empty or value is numeric %}
+               value="{{ value|escape }}"
+               {% endif %} />
+    </div>
+
+    {% else %}
     <input type="{{ type is defined ? type|escape : 'text' }}"
         {{ block('widget_attributes') }}{% if value is not empty or value is numeric %}
         value="{{ value|escape }}"{% endif %} />
-{% endif %}
+    {% endif %}
+    {% endif %}
 {% endblock form_widget_simple %}
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:sortable_value_label_list_widget.html.php #}
@@ -383,7 +403,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list" style="overflow:auto">
         {{ form_label(form, label) }}
         <a data-prototype="{{ datePrototype|raw }}"
-           class="btn btn-warning btn-xs btn-add-item" href="#" id="{{ form.vars.id }}_additem">
+           class="btn btn-tertiary btn-sm btn-add-item" href="#" id="{{ form.vars.id }}_additem">
             {{ addValueButton|trans }}
         </a>
         {{ block('sortablelist_errors') }}
@@ -466,11 +486,14 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {{ disabled|default(false) ? 'disabled="disabled"' : '' }}
 {{ required|default(false) ? 'required="required"' : '' }}
 
-{% for k,v in attr|filter((v,k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr']) %}
+{# Adjust the filter to exclude specific attributes but allow data-* #}
+{% for k,v in attr|filter((v,k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr', 'help_icon']) %}
     {% if k in ['placeholder', 'title'] %}
         {{ '%s="%s" '|format(k|escape, v|trans({}, translation_domain)|escape)|raw }}
     {% elseif k is same as 'data-order' and v is string %}
         {{ k }}="{{ v|raw }}"
+    {% elseif k starts with 'data-' and (k matches '/data-(none|start|both|end)/') %}
+        {{ '%s="%s"'|format(k|escape, v|escape)|raw }}
     {% elseif v is same as true %}
         {{ '%s="%s" '|format(k|escape, k|escape)|raw }}
     {% elseif v is iterable %}
@@ -480,42 +503,72 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
     {% endif %}
 {% endfor %}
-
-{# Disable by default and use false for chrome support #}
 {{ attr.autocomplete is not defined ? 'autocomplete="false" ' : '' }}
 {% endblock %}
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:yesno_button_group_widget.html.php #}
 {% block yesno_button_group_widget %}
-{# apply attributes to radios #}
-{% set attr = form.vars.attr %}
-{% set onchange = "Mautic.toggleYesNoButtonClass(mQuery(this).attr('id'));" %}
+    {# Merge 'attr' passed from 'form_widget' and 'form.vars.attr' #}
+    {% set attr = attr|default({})|merge(form.vars.attr|default({})) %}
+    {# Update 'onchange' in 'attr' #}
+    {% set attr = attr|merge({
+        'onchange': (attr.onchange|default('') ~ '; Mautic.toggleYesNo(this);')|trim
+    }) %}
+    {% set id = form.vars.id %}
+    {% set name = form.vars.full_name %}
+    {% set value = form.vars.value %}
+    {% set size = form.vars.attr.size|default(null) %}
 
-{% if attr.onchange is defined %}
-    {% if not (attr.onchange ends with ';') %}
-        {% set attr = attr|merge({'onchange': attr.onchange ~ ';'}) %}
-    {% endif %}
-    {% set attr = attr|merge({'onchange': attr.onchange ~ ' ' ~ onchange}) %}
-{% else %}
-    {% set attr = attr|merge({'onchange': onchange}) %}
-{% endif %}
+    {% set yes_choice = form.vars.choices[1] %}
+    {% set no_choice = form.vars.choices[0] %}
 
-{% set attr = attr|merge({'style' : 'width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;'}) %}
-<div class="btn-group btn-block" data-toggle="buttons">
-    {% for child in form %}
-        {% set class =
-            (child.vars.checked is not empty ? ' active' : '') ~
-            (((child.vars.disabled is defined and child.vars.disabled is not empty) or (attr.readonly is defined and attr.readonly is not empty)) ? ' disabled' : '' ) ~
-            (child.vars.name == '0' ? ' btn-no' : (child.vars.name == '1' ? ' btn-yes' : ' btn-extra')) ~
-            ((child.vars.name == '0' and child.vars.checked is not empty) ? ' btn-danger' : '') ~
-            ((child.vars.name == '1' and child.vars.checked is not empty) ? ' btn-success' : '')
-        %}
-        <label class="btn btn-default {{ class }}">
-            {{ form_widget(child, {'attr': attr}) }}
-            <span>{{ child.vars.label|trans }}</span>
+    <div class="toggle"
+         data-yes="{{ yes_choice.label|trans }}"
+         data-no="{{ no_choice.label|trans }}"
+         data-yes-value="{{ yes_choice.value }}"
+         data-no-value="{{ no_choice.value }}"
+         {% if id is defined and 'Publish' in id %}
+            data-none="{{ attr['data-none']|default('mautic.core.form.inactive_regardless_of_scheduling') |trans }}"
+            data-start="{{ attr['data-start']|default('mautic.core.form.active_on_scheduled_date') |trans }}"
+            data-both="{{ attr['data-both']|default('mautic.core.form.active_during_scheduled_period') |trans }}"
+            data-end="{{ attr['data-end']|default('mautic.core.form.active_until_scheduled_end') |trans }}"
+        {% endif %} >
+
+        {# Hidden radio inputs #}
+        {% for choice in [yes_choice, no_choice] %}
+            <input type="radio"
+                   id="{{ id }}_{{ choice.value }}"
+                   name="{{ name }}"
+                   value="{{ choice.value }}"
+                   {% if value == choice.value %}checked{% endif %}
+                   style="display: none;"
+                   aria-checked="{{ value == choice.value ? 'true' : 'false' }}"
+                   {% for attrname, attrvalue in attr %}
+                       {{ attrname }}="{{ attrvalue }}"
+                   {% endfor %}>
+        {% endfor %}
+
+        <label id="{{ id }}_label"
+               class="toggle__label"
+               data-yes-id="{{ id }}_{{ yes_choice.value }}"
+               data-no-id="{{ id }}_{{ no_choice.value }}"
+               onclick="Mautic.toggleYesNo(this);"
+               role="switch"
+               tabindex="0"
+               onkeydown="Mautic.handleKeyDown(event, this)">
+            <div class="toggle__appearance" {% if size %}size="{{ size }}"{% endif %}>
+                <div class="toggle__switch {% if value == yes_choice.value %}toggle__switch--checked{% endif %}">
+                    <svg class="toggle__check" width="6px" height="5px" viewBox="0 0 6 5">
+                        <path d="M2.2 2.7L5 0 6 1 2.2 5 0 2.7 1 1.5z"></path>
+                    </svg>
+                </div>
+                <span class="toggle__text" aria-hidden="true">
+                    {{ value == yes_choice.value ? yes_choice.label|trans : no_choice.label|trans }}
+                </span>
+            </div>
         </label>
-    {% endfor %}
-</div>
+    </div>
+    {{ form_help(form) }}
 {% endblock %}
 
 {% block attributes -%}
@@ -534,14 +587,29 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {%- endblock attributes -%}
 
 {% block form_help -%}
-    {%- if help is not empty -%}
-        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
+    {%- if help is not empty or form.vars.attr.help_icon is defined -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-block')|trim}) -%}
         <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+            {%- if form.vars.attr.help_icon is defined and form.vars.attr.help_icon is not empty -%}
+                <i class="{{ form.vars.attr.help_icon }} ri-lg mr-xs"></i>
+            {%- endif -%}
+            {%- if help is not empty -%}
                 {%- if help_html is same as(false) -%}
                     {{- help|trans(help_translation_parameters, translation_domain) -}}
                 {%- else -%}
                     {{- help|trans(help_translation_parameters, translation_domain)|purify -}}
                 {%- endif -%}
+            {%- endif -%}
         </p>
     {%- endif -%}
 {%- endblock form_help %}
+
+{% block alert_widget %}
+    <div class="row">
+        <div {% with { attr: {class: 'col-sm-12'}|merge(attr) } %} {{ block('attributes') }}{% endwith %}>
+            <div class="alert alert-{{ messageType }}">
+                {{ message }}
+            </div>
+        </div>
+    </div>
+{%- endblock alert_widget %}

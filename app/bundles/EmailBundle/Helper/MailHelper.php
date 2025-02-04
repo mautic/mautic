@@ -50,6 +50,12 @@ class MailHelper
 
     public const EMAIL_TYPE_MARKETING     = 'marketing';
 
+    private const DEFAULT_BODY            = [
+        'content'     => '',
+        'contentType' => 'text/html',
+        'charset'     => null,
+    ];
+
     /**
      * @var TransportInterface
      */
@@ -159,12 +165,14 @@ class MailHelper
     /**
      * @var string
      */
-    protected $subject = '';
+    protected $subject              = '';
+    private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
-    protected $plainText = '';
+    protected $plainText              = '';
+    private ?string $plainTextInitial = null;
 
     /**
      * @var bool
@@ -194,11 +202,12 @@ class MailHelper
     /**
      * @var array
      */
-    protected $body = [
-        'content'     => '',
-        'contentType' => 'text/html',
-        'charset'     => null,
-    ];
+    protected $body = self::DEFAULT_BODY;
+
+    /**
+     * @var array<?string>
+     */
+    private ?array $bodyInitial = null;
 
     /**
      * Cache for lead owners.
@@ -599,13 +608,12 @@ class MailHelper
             $this->copies              = [];
             $this->message             = $this->getMessageInstance();
             $this->subject             = '';
+            $this->subjectInitial      = null;
             $this->plainText           = '';
+            $this->plainTextInitial    = null;
             $this->plainTextSet        = false;
-            $this->body                = [
-                'content'     => '',
-                'contentType' => 'text/html',
-                'charset'     => null,
-            ];
+            $this->body                = self::DEFAULT_BODY;
+            $this->bodyInitial         = null;
         }
     }
 
@@ -1464,13 +1472,27 @@ class MailHelper
             $this->dispatcher = $this->factory->getDispatcher();
         }
 
+        if (null === $this->bodyInitial) {
+            $this->bodyInitial = $this->body;
+        }
+
+        if (null === $this->plainTextInitial) {
+            $this->plainTextInitial = $this->plainText;
+        }
+
+        if (null === $this->subjectInitial) {
+            $this->subjectInitial = $this->subject;
+        }
+
+        // Reset body, text, subject and tokens, so the latter listeners use the same data as the former ones.
+        $this->setBody($this->bodyInitial['content'], $this->bodyInitial['contentType'], $this->bodyInitial['charset'], true);
+        $this->setPlainText($this->plainTextInitial);
+        $this->setSubject($this->subjectInitial);
+        $this->eventTokens = [];
+
         $event = new EmailSendEvent($this);
-
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
-
-        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
-
-        unset($event);
+        $this->eventTokens = $event->getTokens(false);
     }
 
     /**

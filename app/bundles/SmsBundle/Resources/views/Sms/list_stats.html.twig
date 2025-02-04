@@ -2,7 +2,7 @@
 {% set type = item.getSmsType() %}
 <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
     {% if 'list' == type %}
-        <span class="mt-xs label label-default has-click-event clickable-stat{{ item.getPendingCount() > 0 and 'list' == item.getSmsType() ? '' : ' hide' }}"
+        <span size="sm" class="mt-xs label label-gray clickable-stat{{ item.getPendingCount() > 0 and 'list' == item.getSmsType() ? '' : ' hide' }}"
               id="pending-{{ item.getId() }}"
               data-toggle="tooltip"
               title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
@@ -12,7 +12,7 @@
         </span>
     {% endif %}
 
-    <span class="mt-xs label label-warning has-click-event clickable-stat"
+    <span class="mt-xs label label-green"
           id="sent-count-{{ item.getId() }}"
           data-toggle="tooltip"
           title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">

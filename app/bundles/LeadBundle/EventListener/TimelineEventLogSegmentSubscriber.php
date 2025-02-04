@@ -57,7 +57,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
             $event,
             'segment_membership',
             'mautic.lead.timeline.segment_membership',
-            'fa-pie-chart',
+            'ri-pie-chart-line',
             'lead',
             'segment'
         );

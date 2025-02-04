@@ -953,7 +953,7 @@ class Asset extends FormEntity
 
         // return missing file icon if file type is empty
         if (!$fileType) {
-            return 'fa fa-ban';
+            return 'ri-prohibited-line';
         }
 
         $fileTypes = $this->getFileExtensions();
@@ -961,12 +961,12 @@ class Asset extends FormEntity
         // Search for icon name by file extension.
         foreach ($fileTypes as $icon => $extensions) {
             if (in_array($fileType, $extensions)) {
-                return 'fa fa-file-'.$icon.'-o';
+                return 'ri-file-'.$icon.'-fill';
             }
         }
 
         // File extension is unknown, display general file icon.
-        return 'fa fa-file-o';
+        return 'ri-file-line';
     }
 
     /**

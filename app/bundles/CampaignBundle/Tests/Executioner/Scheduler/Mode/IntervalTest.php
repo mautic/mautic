@@ -583,4 +583,34 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
+
+    public function testIsContactSpecificExecutionDateRequiredShouldReturnFalseForNegativePathAction(): void
+    {
+        $parentEvent = $this->createMock(Event::class);
+        $parentEvent->method('getEventType')
+            ->willReturn(Event::TYPE_DECISION);
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('i');
+        $event->method('getTriggerInterval')
+            ->willReturn(5);
+        $event->method('getDecisionPath')
+            ->willReturn(Event::PATH_INACTION);
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_ACTION);
+        $event->method('getTriggerHour')
+            ->willReturn(new \DateTime('now'));
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
+        $event->method('getParent')
+            ->willReturn($parentEvent);
+
+        $interval = $this->getInterval();
+
+        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+    }
 }

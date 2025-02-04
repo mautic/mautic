@@ -88,7 +88,7 @@ class PageSubscriber implements EventSubscriberInterface
         $bodyOpenScripts = ob_get_clean();
 
         if ($bodyOpenScripts) {
-            preg_match('/(<body[a-z=\s\-_:"\']*>)/i', $content, $matches);
+            preg_match('/(<body[^>]*>)/i', $content, $matches);
 
             $content = str_ireplace($matches[0], $matches[0]."\n".$bodyOpenScripts, $content);
         }

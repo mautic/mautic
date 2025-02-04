@@ -83,7 +83,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $results = $qb->select('count(*) as the_count, m.integration_object_name, m.integration')
             ->from($prefix.'sync_object_mapping', 'm')
             ->groupBy('m.integration, m.integration_object_name')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(1, $results);
@@ -95,7 +95,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $results = $qb->select('count(*) as the_count, m.internal_object_name, m.integration')
             ->from($prefix.'sync_object_mapping', 'm')
             ->groupBy('m.integration, m.internal_object_name')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(1, $results);
@@ -106,7 +106,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $qb      = $this->connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count')
             ->from($prefix.'sync_object_mapping', 'm')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
         $this->assertEquals(50, $results[0]['the_count']);
     }

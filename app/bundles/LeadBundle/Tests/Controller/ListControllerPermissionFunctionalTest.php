@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
@@ -628,9 +628,9 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName($userDetails['last-name']);
         $user->setRole($role);
 
-        /** @var PasswordEncoderInterface $encoder */
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
+        /** @var PasswordHasherInterface $encoder */
+        $encoder = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $user->setPassword($encoder->hash('mautic'));
 
         $this->em->persist($user);
         $this->em->flush();

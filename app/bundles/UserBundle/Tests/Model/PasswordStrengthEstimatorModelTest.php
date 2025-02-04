@@ -10,13 +10,13 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
 {
-    private EncoderFactory $passwordEncoder;
+    private PasswordHasherFactoryInterface $passwordEncoder;
 
     private RoleRepository $roleRepository;
 
@@ -25,7 +25,7 @@ final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->passwordEncoder = static::getContainer()->get('security.encoder_factory');
+        $this->passwordEncoder = static::getContainer()->get('security.password_hasher_factory');
         $this->roleRepository  = $this->em->getRepository(Role::class);
         $this->validator       = static::getContainer()->get('validator');
     }
@@ -40,7 +40,7 @@ final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
         $user->setUsername('username');
         $user->setEmail('some@email.domain');
         $user->setPlainPassword($simplePassword);
-        $user->setPassword($this->passwordEncoder->getEncoder($user)->encodePassword($simplePassword, $user->getSalt()));
+        $user->setPassword($this->passwordEncoder->getPasswordHasher($user)->hash($simplePassword));
         $user->setRole($this->roleRepository->findAll()[0]);
         $violations                    = $this->validator->validate($user);
         $hasNotWeakConstraintViolation = false;

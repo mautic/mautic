@@ -1,4 +1,3 @@
-/** DynamicContentBundle **/
 Mautic.toggleDwcFilters = function () {
     mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide");
     if (mQuery("#dwcFiltersTab").hasClass('hide')) {
@@ -172,9 +171,9 @@ Mautic.addDwcFilter = function (elId, elObj) {
     }
 
     if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('fa-user').addClass('fa-building');
+        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
     } else {
-        prototype.find(".object-icon").removeClass('fa-building').addClass('fa-user');
+        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
     }
     prototype.find(".inline-spacer").append(fieldObject);
 
@@ -400,16 +399,3 @@ Mautic.disabledDynamicContentAction = function(opener) {
 
     opener.mQuery('#campaignevent_properties_editDynamicContentButton').prop('disabled', disabled);
 };
-
-if (typeof MauticIsDwcReady === 'undefined') {
-    var MauticIsDwcReady = true;
-
-    if (
-        document.readyState === "complete" ||
-        !(document.readyState === "loading" || document.documentElement.doScroll)
-    ) {
-        Mautic.dynamicContentOnLoad();
-    } else {
-        document.addEventListener("DOMContentLoaded", Mautic.dynamicContentOnLoad);
-    }
-}

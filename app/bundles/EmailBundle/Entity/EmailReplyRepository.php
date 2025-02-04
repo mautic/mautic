@@ -14,7 +14,7 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
     use TimelineTrait;
 
     /**
-     * @param int|Lead $leadId
+     * @param int|Lead|null $leadId
      *
      * @return array
      */
@@ -27,9 +27,12 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
         $qb->from(MAUTIC_TABLE_PREFIX.'email_stat_replies', 'reply')
             ->innerJoin('reply', MAUTIC_TABLE_PREFIX.'email_stats', 'stat', 'reply.stat_id = stat.id')
             ->leftJoin('stat', MAUTIC_TABLE_PREFIX.'emails', 'email', 'stat.email_id = email.id')
-            ->leftJoin('stat', MAUTIC_TABLE_PREFIX.'email_copies', 'email_copy', 'stat.copy_id = email_copy.id')
-            ->andWhere('stat.lead_id = :leadId')
-            ->setParameter('leadId', $leadId);
+            ->leftJoin('stat', MAUTIC_TABLE_PREFIX.'email_copies', 'email_copy', 'stat.copy_id = email_copy.id');
+
+        if (null !== $leadId) {
+            $qb->andWhere('stat.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
+        }
 
         if (!empty($options['fromDate'])) {
             /** @var \DateTime $fromDate */
@@ -55,7 +58,7 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
             $qb,
             $options,
             'storedSubject, email.subject',
-            'reply.date_replied',
+            'reply.id',
             [],
             ['date_replied']
         );

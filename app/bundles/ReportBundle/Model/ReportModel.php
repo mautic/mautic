@@ -595,7 +595,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $data      = $query->execute()->fetchAllAssociative();
+            $data      = $query->executeQuery()->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
@@ -663,7 +663,7 @@ class ReportModel extends FormModel
     {
         $hasOrderBy = false;
         foreach ($orderBys as $key => $orderBy) {
-            if ($this->orderByIsValid($orderBy, $allowedColumns)) {
+            if ($this->orderByIsValid($orderBy, $allowedColumns->choices)) {
                 $hasOrderBy = true;
                 continue;
             }
@@ -678,8 +678,10 @@ class ReportModel extends FormModel
 
     /**
      * Check if order by is valid.
+     *
+     * @param array<string, string> $allowedColumns
      */
-    private function orderByIsValid(string $order, \stdClass $allowedColumns): bool
+    private function orderByIsValid(string $order, array $allowedColumns): bool
     {
         if (empty($order)) {
             return false;
@@ -694,7 +696,7 @@ class ReportModel extends FormModel
             $oderByDirection = $orderTemp[1];
         }
 
-        if (!array_key_exists($orderBy, $allowedColumns->choices) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
+        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
             return false;
         }
 
@@ -804,6 +806,35 @@ class ReportModel extends FormModel
         foreach ($entities as $entity) {
             foreach ($entity->getFilters() as $entityFilter) {
                 if ($entityFilter['column'] == $search && $entityFilter['value'] == $emailId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return array_unique($dependents);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getReportsIdsWithDependenciesOnTag(int $tagId): array
+    {
+        $search = 'tag';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                if ($entityFilter['column'] == $search && in_array($tagId, $entityFilter['value'])) {
                     $dependents[] = $entity->getId();
                 }
             }

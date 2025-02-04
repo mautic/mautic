@@ -493,6 +493,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setName('Test Email C');
         $email->setSubject('Test Email C Subject');
         $email->setEmailType('list');
+        $email->setCustomHtml('This is Email C custom HTML.');
         $email->addList($segment);
 
         $this->em->persist($segment);

@@ -20,7 +20,7 @@
 {% block content %}
   {{ form_start(form) }}
     <div class="box-layout">
-        <div class="col-md-9 height-auto bg-white">
+        <div class="col-md-9 height-auto">
             <div class="row">
                 <div class="col-xs-12">
                     <div class="tab-content pa-md">
@@ -44,16 +44,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 bg-white height-auto bdr-l">
+        <div class="col-md-3 height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
                 {{ form_row(form.category) }}
                 {{ form_row(form.language) }}
                 <hr />
-                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-                <br />
-                {% for utmTag in form.utmTags %}
-                    {{ form_row(utmTag) }}
-                {% endfor %}
+                {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
                 <div class="hide">
                     {{ form_row(form.isPublished) }}
                     {{ form_row(form.publishUp) }}

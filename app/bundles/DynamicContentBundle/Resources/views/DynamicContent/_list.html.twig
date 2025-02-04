@@ -72,13 +72,16 @@
                         {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'dynamicContent'}) }}
                         <a href="{{ url('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                             {{ item.name }}
-                            {% if item.isVariant or item.isTranslation %}
+                            {% if item.isVariant or item.isTranslation or item.isCampaignBased %}
                                 <span>
                                   {% if item.isVariant %}
-                                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="fa fa-fw fa-sitemap"></i></span>
-                                  {% endif %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="ri-fw ri-organization-chart"></i></span>
+                                    {% endif %}
                                   {% if item.isTranslation %}
-                                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="fa fa-fw fa-language"></i></span>
+                                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="ri-fw ri-translate"></i></span>
+                                {% endif %}
+                                    {% if item.isCampaignBased %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.dwc.form.is.campaign.tooltip'|trans }}"><i class="ri-fw ri-megaphone-line"></i></span>
                                   {% endif %}
                                  </span>
                             {% endif %}
@@ -87,11 +90,8 @@
                     <td class="visible-md visible-lg">{{ item.slotName }}</td>
                     <td class="visible-md visible-lg">
                         {% set catName = item.category is not empty ? item.category.title : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = item.category is not empty ? '#' ~ item.category.color : 'inherit' %}
-                        <span style="white-space: nowrap;">
-                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
-                          <span>{{ catName }}</span>
-                        </span>
+                        {% set color = item.category is not empty ? '#' ~ item.category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-md visible-lg">{{ item.id }}</td>
                 </tr>

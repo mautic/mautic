@@ -347,6 +347,12 @@ html {
   color: var(--gjs-main-color);
 }
 
+.gjs-assets-spinner {
+  width: 100%;
+  text-align: center;
+  font-size: 26px;
+}
+
 .anim-spin {
   animation: 0.5s linear 0s normal none infinite running spin; }
 

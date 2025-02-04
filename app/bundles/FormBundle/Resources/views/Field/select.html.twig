@@ -54,7 +54,7 @@
 
 {%- if inForm is defined and (true == inForm or inForm is not empty) -%}
   {%- if field.type in ['button', 'pagebreak'] -%}
-    {%- set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' -%}
+    {%- set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' -%}
   {%- endif -%}
 
   {%- set labelAttributes = labelAttributes|merge({
@@ -225,7 +225,7 @@
 {%- endmacro -%}
 
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  {% if field.showLabel -%}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
+  {% if field.showLabel -%}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>{% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
   <select {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>

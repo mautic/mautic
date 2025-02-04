@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-welcome",
+            "directory": "themes/_welcome",
+            "target": "git@github.com:mautic/theme-welcome.git"
+        }
+    ]
+}

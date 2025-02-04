@@ -16,7 +16,7 @@
         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                 'item': item,
                 'templateButtons': {
-                    'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\\Security\\\Permissions\\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], item.createdBy),
+                    'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], item.createdBy),
                     'clone': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')] and securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], item.createdBy),
                     'delete': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OTHER')], item.createdBy),
                 },
@@ -28,7 +28,7 @@
                             'data-toggle': 'ajax',
                             'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias}),
                         },
-                        'icon': 'fa-users',
+                        'icon': 'ri-team-line',
                         'label': 'mautic.lead.list.view_contacts',
                     },
                 ],
@@ -48,19 +48,19 @@
                 <br/>
                 <span class="small">({{ item.createdByUser }})</span>
             {% endif %}
-            {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans }}" class="fa fa-fw fa-globe"></i>{% endif %}
-            {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans }}" class="fa fa-fw fa-filter"></i>{% endif %}
+            {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans }}" class="ri-group-2-fill fs-14"></i>{% endif %}
+            {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans }}" class="ri-fw ri-filter-2-fill fs-14"></i>{% endif %}
             {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""
                        data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt}) }}">
-                    <i class="fa text-danger fa-exclamation-circle"></i></label>
+                    <i class="text-danger ri-error-warning-line-circle fs-14"></i></label>
             {% endif %}
             {% if item.lastBuiltTime >= segmentBuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""
                        data-original-title="{{ 'mautic.lead.list.form.config.segment_build_time.message'|trans({'%count%': item.lastBuiltTime}) }}">
-                    <i class="fa text-danger fa-clock-o"></i></label>
+                    <i class="text-danger ri-time-line fs-14"></i></label>
             {% endif %}
             {{ customContent('segment.name', mauticTemplateVars) }}
         </div>
@@ -71,7 +71,7 @@
         {% endif %}
     </td>
     <td class="visible-md visible-lg">
-        <a class="label label-primary col-count"
+        <a size="sm" class="label label-gray col-count"
            data-id="{{ item.id }}"
            href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
            data-toggle="ajax">{{ 'mautic.lead.list.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}</a>

@@ -193,11 +193,13 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $response['email']['lists']);
         $this->assertEquals($segmentAId, $response['email']['lists'][0]['id']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
+        $this->assertFalse($response['email']['publicPreview']);
 
         // Edit PATCH:
         $patchPayload = [
-            'name'  => 'API email renamed',
-            'lists' => [$segmentBId],
+            'name'          => 'API email renamed',
+            'lists'         => [$segmentBId],
+            'publicPreview' => true,
         ];
         $this->client->request('PATCH', "/api/emails/{$emailId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
@@ -211,11 +213,13 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($segmentBId, $response['email']['lists'][0]['id']);
         $this->assertEquals($payload['emailType'], $response['email']['emailType']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
+        $this->assertEquals($patchPayload['publicPreview'], $response['email']['publicPreview']);
 
         // Edit PUT:
         $payload['subject'] .= ' renamed';
-        $payload['lists']    = [$segmentAId, $segmentBId];
-        $payload['language'] = 'en'; // Must be present for PUT as all empty values are being cleared.
+        $payload['lists']         = [$segmentAId, $segmentBId];
+        $payload['language']      = 'en'; // Must be present for PUT as all empty values are being cleared.
+        $payload['publicPreview'] = false; // Must be present for PUT as all empty values are being cleared.
         $this->client->request('PUT', "/api/emails/{$emailId}/edit", $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -229,6 +233,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($segmentBId, $response['email']['lists'][0]['id']);
         $this->assertEquals($payload['emailType'], $response['email']['emailType']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
+        $this->assertEquals($payload['publicPreview'], $response['email']['publicPreview']);
 
         // Get:
         $this->client->request('GET', "/api/emails/{$emailId}");
@@ -346,9 +351,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
 
-        $user->setPassword($encoder->encodePassword('password', null));
+        $user->setPassword($encoder->hash('password'));
         $this->em->persist($user);
 
         // Create a contact:

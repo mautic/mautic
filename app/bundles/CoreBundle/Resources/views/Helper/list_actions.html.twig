@@ -19,16 +19,29 @@
         <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb{{ id }}" value="{{ id|escape }}"/>
     </span>
 
-    <div class="input-group-btn">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
-            <i class="ri-arrow-down-s-line"></i>
-        </button>
-        {% if tooltip is defined and tooltip is not empty %}<i class="fa fa-question-circle"></i>{% endif %}
+    <div class="ml-xs">
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.options',
+                    size: 'sm',
+                    variant: 'ghost',
+                    icon: 'ri-more-2-line',
+                    icon_only: true,
+                    spin: false,
+                    attributes: {
+                        'data-toggle': 'dropdown',
+                        'type': 'button'
+                    }
+                }
+            ]
+        } %}
+        {% if tooltip is defined and tooltip is not empty %}<i class="ri-question-line"></i>{% endif %}
         <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
             {% if templateButtons.edit is defined and templateButtons.edit is not empty %}
             {{ buttonAdd({
                 attr: editAttr|merge({
-                    class: 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
                     href: path(
                         actionRoute,
                         query|merge({objectAction: 'edit', objectId: id})
@@ -43,7 +56,7 @@
             {% if templateButtons.clone is defined and templateButtons.clone is not empty %}
             {{ buttonAdd({
                 attr: editAttr|merge({
-                    class: 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    class: 'hidden-xs btn btn-ghost btn-sm btn-nospin',
                     href: path(
                         actionRoute,
                         query|merge({objectAction: 'clone', objectId: id})

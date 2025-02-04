@@ -3,6 +3,8 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -490,7 +492,8 @@ class StatRepository extends CommonRepository
             $timestampColumn,
             ['openDetails'],
             ['dateRead', 'dateSent'],
-            $timeToReadParser
+            $timeToReadParser,
+            's.id'
         );
     }
 
@@ -508,7 +511,7 @@ class StatRepository extends CommonRepository
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
-        $results = $query->execute()->fetchAssociative();
+        $results = $query->executeQuery()->fetchAssociative();
 
         if ($results) {
             $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
@@ -525,18 +528,16 @@ class StatRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmails($query, $limit = 10, $offset = 0)
+    public function getMostEmails($query, $limit = 10, $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -672,6 +673,8 @@ class StatRepository extends CommonRepository
      * @param array<int> $contacts
      *
      * @return array<int, array<string, int|float>>
+     *
+     * @throws Exception
      */
     public function getStatsSummaryForContacts(array $contacts): array
     {
@@ -743,5 +746,83 @@ class StatRepository extends CommonRepository
         }
 
         return $contacts;
+    }
+
+    /**
+     * @param array<int> $emailsIds
+     * @param array<int> $eventsIds
+     *
+     * @return array<int, array<string, int|string>>
+     *
+     * @throws Exception
+     */
+    public function getStatsSummaryByCountry(\DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, array $emailsIds, string $sourceType = 'email', array $eventsIds = []): array
+    {
+        $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $leadAlias     = 'l'; // leads
+        $statsAlias    = 'es'; // email_stats
+        $subQueryAlias = 'sq'; // sub query
+        $cutAlias      = 'cut'; // channel_url_trackables
+        $pageHitsAlias = 'ph'; // page_hits
+
+        // use sub query to get page hits for and unique page hits selected contacts
+        $subQueryBuilder->select(
+            "COUNT({$pageHitsAlias}.id) AS hits",
+            "COUNT(DISTINCT({$pageHitsAlias}.redirect_id)) AS unique_hits",
+            "{$cutAlias}.channel_id",
+            "{$pageHitsAlias}.lead_id"
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
+            ->join(
+                $cutAlias,
+                MAUTIC_TABLE_PREFIX.'page_hits',
+                $pageHitsAlias,
+                "{$cutAlias}.redirect_id = {$pageHitsAlias}.redirect_id AND {$cutAlias}.channel_id = {$pageHitsAlias}.source_id"
+            )
+            ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
+            ->andWhere("{$cutAlias}.channel_id in (:emails)")
+            ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
+
+        // main query
+        $queryBuilder->addSelect(
+            "COUNT({$statsAlias}.id) AS `sent_count`",
+            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
+            "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
+        )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            ->rightJoin(
+                $statsAlias,
+                MAUTIC_TABLE_PREFIX.'leads',
+                $leadAlias,
+                "{$statsAlias}.lead_id=l.id"
+            )->leftJoin(
+                $statsAlias,
+                "({$subQueryBuilder->getSQL()})",
+                $subQueryAlias,
+                "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
+            );
+
+        switch ($sourceType) {
+            case 'campaign':
+                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
+                    ->andWhere("{$statsAlias}.source_id in (:events)")
+                    ->andWhere("{$statsAlias}.source = :source")
+                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER)
+                    ->setParameter('events', $eventsIds, ArrayParameterType::INTEGER)
+                    ->setParameter('source', 'campaign.event');
+                break;
+            case 'email':
+                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
+                    ->andWhere("{$statsAlias}.email_id in (:emails)")
+                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
+        }
+
+        $queryBuilder->groupBy("{$leadAlias}.country");
+        $queryBuilder->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo");
+        $queryBuilder->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB));
+        $queryBuilder->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
     }
 }

@@ -28,5 +28,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.user.repository.user_token', Mautic\UserBundle\Entity\UserTokenRepository::class);
     $services->alias('mautic.user.repository', Mautic\UserBundle\Entity\UserRepository::class);
     $services->alias('mautic.permission.repository', Mautic\UserBundle\Entity\PermissionRepository::class);
+    $services->alias('mautic.user.model.password_strength_estimator', Mautic\UserBundle\Model\PasswordStrengthEstimatorModel::class);
     $services->get(Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class)->tag('validator.constraint_validator');
 };

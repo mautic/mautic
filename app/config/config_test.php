@@ -148,3 +148,8 @@ $container->register(GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
 
 $container->register('http_client', Symfony\Component\HttpClient\MockHttpClient::class)
     ->setPublic(true);
+
+$container->register('test.service_container', Mautic\CoreBundle\Test\Container\TestContainer::class)
+    ->setArgument('$kernel', new Reference('kernel'))
+    ->setArgument('$privateServicesLocatorId', 'test.private_services_locator')
+    ->setPublic(true);

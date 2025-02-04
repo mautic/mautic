@@ -100,7 +100,7 @@ EOT
                 ]
             ).'</info>');
 
-            return Command::SUCCESS;
+            return Command::FAILURE;
         }
 
         // Success

@@ -6,6 +6,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailValidator
@@ -22,10 +23,15 @@ class EmailValidator
      *
      * @param bool $doDnsCheck
      *
+     * @throws UnexpectedValueException
      * @throws InvalidEmailException
      */
     public function validate($address, $doDnsCheck = false): void
     {
+        if (!is_string($address)) {
+            throw new UnexpectedValueException($address, 'string');
+        }
+
         if (!$this->isValidFormat($address)) {
             throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_format', ['%email%' => $address ?: '?']));
         }

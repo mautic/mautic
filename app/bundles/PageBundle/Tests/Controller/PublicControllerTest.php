@@ -557,7 +557,7 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $trackingHelper = $this->createMock(TrackingHelper::class);
         $trackingHelper->expects($this->once())
-            ->method('getSession')
+            ->method('getCacheItem')
             ->willReturn($mtcSessionEventArray);
 
         $contactTracker = $this->createMock(ContactTracker::class);

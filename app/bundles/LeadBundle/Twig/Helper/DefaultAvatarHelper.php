@@ -13,6 +13,6 @@ final class DefaultAvatarHelper
 
     public function getDefaultAvatar(bool $absolute = false): string
     {
-        return $this->assetsHelper->getOverridableUrl('images/avatar.svg', $absolute);
+        return $this->assetsHelper->getOverridableUrl('images/avatar.png', $absolute);
     }
 }

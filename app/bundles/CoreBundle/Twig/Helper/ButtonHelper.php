@@ -270,7 +270,7 @@ final class ButtonHelper
     {
         $buttons = '';
 
-        // Wrap links in a tag
+        // Wrap links in a <li> tag for dropdowns
         if (self::TYPE_DROPDOWN == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
@@ -280,35 +280,55 @@ final class ButtonHelper
             $button['attr'] = [];
         }
 
+        // Add or remove button classes based on group type
         if (self::TYPE_GROUP == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount < $this->listMarker)) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
         }
 
+        // Render confirm dialog if required
         if (isset($button['confirm'])) {
             $button['confirm']['btnTextAttr'] = $this->generateTextAttributes($button);
             $buttons .= $this->wrapOpeningTag.$this->twig->render('@MauticCore/Helper/confirm.html.twig', $button['confirm']).
                 "{$this->wrapClosingTag}\n";
         } else {
-            $attr = $this->menuLink;
-
+            // Default `data-toggle` for buttons
             if (!isset($button['attr']['data-toggle'])) {
                 $button['attr']['data-toggle'] = 'ajax';
             }
 
+            // Generate tooltip and other attributes
             $btnTextAttr = $this->generateTextAttributes($button);
             $tooltip     = $this->generateTooltipAttributes($button);
 
+            // Prepare attributes for the `<a>` tag
+            $attr = $this->menuLink;
             foreach ($button['attr'] as $k => $v) {
                 $attr .= " $k=".'"'.$v.'"';
             }
 
-            $buttonContent = (isset($button['iconClass'])) ? '<i class="'.$button['iconClass'].'"></i> ' : '';
+            // Add aria-label if btnText is set
             if (!empty($button['btnText'])) {
-                $buttonContent .= '<span'.$btnTextAttr.'>'.$this->translator->trans($button['btnText']).'</span>';
+                $attr .= ' aria-label="'.$this->translator->trans($button['btnText']).'"';
             }
-            $buttons .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltip}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
+
+            // Create button content without extra wrapping span
+            $buttonContent = '';
+
+            // Add icon with aria-hidden and focusable attributes
+            if (isset($button['iconClass'])) {
+                $iconTooltip = empty($button['btnText']) ? $tooltip : ''; // Attach tooltip to icon only if btnText is absent
+                $buttonContent .= '<i class="'.$button['iconClass'].'" aria-hidden="true" focusable="false"'.$iconTooltip.'></i> ';
+            }
+
+            // Add btnText if available, with tooltip if no icon exists or if btnText should carry it
+            if (!empty($button['btnText'])) {
+                $buttonContent .= '<span'.$btnTextAttr.$tooltip.'>'.$this->translator->trans($button['btnText']).'</span>';
+            }
+
+            // Build final button structure
+            $buttons .= "{$this->wrapOpeningTag}<a{$attr}>{$buttonContent}</a>{$this->wrapClosingTag}\n";
         }
 
         return $buttons;
@@ -480,9 +500,9 @@ final class ButtonHelper
         if (!empty($addTo['btnClass'])) {
             $addTo['attr']['class'] = $addTo['btnClass'];
         } elseif (!isset($button['attr']['class'])) {
-            $addTo['attr']['class'] = 'btn btn-default';
+            $addTo['attr']['class'] = 'btn btn-tertiary';
         } elseif (!strstr($addTo['attr']['class'], 'btn-')) {
-            $addTo['attr']['class'] .= ' btn btn-default';
+            $addTo['attr']['class'] .= ' btn btn-ghost';
         }
 
         if (self::LOCATION_PAGE_ACTIONS == $this->location) {
@@ -509,7 +529,7 @@ final class ButtonHelper
         }
 
         $search = [
-            'btn-default',
+            'btn-ghost',
             'btn-primary',
             'btn-success',
             'btn-info',
