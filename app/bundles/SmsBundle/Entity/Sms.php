@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -109,7 +110,7 @@ class Sms extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('sms_messages')
-            ->setCustomRepositoryClass(\Mautic\SmsBundle\Entity\SmsRepository::class);
+            ->setCustomRepositoryClass(SmsRepository::class);
 
         $builder->addIdColumns();
 
@@ -133,7 +134,7 @@ class Sms extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('sms_message_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -185,6 +186,8 @@ class Sms extends FormEntity
                 }
             },
         ]));
+
+        $metadata->addConstraint(new EntityEvent());
     }
 
     /**

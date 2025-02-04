@@ -85,7 +85,7 @@ class SortableListType extends AbstractType
                 'option_required'     => true,
                 'option_notblank'     => true,
                 'constraint_callback' => false,
-                'remove_icon'         => 'fa fa-times',
+                'remove_icon'         => 'ri-close-line',
                 'sortable'            => 'ri-draggable handle',
                 'with_labels'         => false,
                 'entry_type'          => TextType::class,

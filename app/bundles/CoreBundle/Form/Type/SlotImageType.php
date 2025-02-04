@@ -24,7 +24,7 @@ class SlotImageType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         parent::buildForm($builder, $options);

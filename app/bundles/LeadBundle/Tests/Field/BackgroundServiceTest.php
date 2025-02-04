@@ -20,32 +20,32 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\LeadBundle\Field\BackgroundService $backgroundService;
+    private BackgroundService $backgroundService;
 
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $fieldModel;
 
     /**
      * @var MockObject|CustomFieldColumn
      */
-    private \PHPUnit\Framework\MockObject\MockObject $customFieldColumn;
+    private MockObject $customFieldColumn;
 
     /**
      * @var MockObject|LeadFieldSaver
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldSaver;
+    private MockObject $leadFieldSaver;
 
     /**
      * @var MockObject|FieldColumnBackgroundJobDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldColumnBackgroundJobDispatcher;
+    private MockObject $fieldColumnBackgroundJobDispatcher;
 
     /**
      * @var MockObject|CustomFieldNotification
      */
-    private \PHPUnit\Framework\MockObject\MockObject $customFieldNotification;
+    private MockObject $customFieldNotification;
 
     public function setUp(): void
     {

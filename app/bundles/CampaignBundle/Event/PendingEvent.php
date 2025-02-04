@@ -12,9 +12,9 @@ class PendingEvent extends AbstractLogCollectionEvent
 {
     use ContextTrait;
 
-    private \Doctrine\Common\Collections\ArrayCollection $failures;
+    private ArrayCollection $failures;
 
-    private \Doctrine\Common\Collections\ArrayCollection $successful;
+    private ArrayCollection $successful;
 
     /**
      * @var string|null

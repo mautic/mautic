@@ -50,9 +50,9 @@ class StageType extends AbstractType
             'label'      => 'mautic.stage.action.weight',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.stage.action.weight.help',
-                ],
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.stage.action.weight.help',
+            ],
             'scale'    => 0,
             'required' => false,
         ]);

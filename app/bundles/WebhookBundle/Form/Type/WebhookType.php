@@ -97,7 +97,7 @@ class WebhookType extends AbstractType
                 'label'      => 'mautic.webhook.form.webhook.events',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => ''],
-                ]
+            ]
         );
 
         $builder->get('events')->addModelTransformer(new EventsToArrayTransformer($options['data']));
@@ -108,7 +108,7 @@ class WebhookType extends AbstractType
             'sendTest',
             ButtonType::class,
             [
-                'attr'  => ['class' => 'btn btn-success', 'onclick' => 'Mautic.sendHookTest(this)'],
+                'attr'  => ['class' => 'btn btn-tertiary', 'onclick' => 'Mautic.sendHookTest(this)'],
                 'label' => 'mautic.webhook.send.test.payload',
             ]
         );

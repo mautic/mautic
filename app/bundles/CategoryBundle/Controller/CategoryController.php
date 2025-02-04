@@ -64,7 +64,7 @@ class CategoryController extends AbstractFormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction(Request $request, $bundle, $page = 1)
     {
@@ -207,7 +207,7 @@ class CategoryController extends AbstractFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, $bundle)
     {
@@ -305,7 +305,7 @@ class CategoryController extends AbstractFormController
     /**
      * Generates edit form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $bundle, $objectId, $ignorePost = false)
     {

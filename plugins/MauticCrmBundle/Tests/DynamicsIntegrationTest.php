@@ -7,7 +7,7 @@ use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
 class DynamicsIntegrationTest extends AbstractIntegrationTestCase
 {
-    private \MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration $integration;
+    private DynamicsIntegration $integration;
 
     protected function setUp(): void
     {

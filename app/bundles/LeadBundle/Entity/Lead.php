@@ -10,6 +10,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -20,7 +21,7 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface
 {
     use CustomFieldEntityTrait;
 
@@ -248,7 +249,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('leads')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadRepository::class)
+            ->setCustomRepositoryClass(LeadRepository::class)
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
@@ -259,7 +260,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
+        $builder->createManyToOne('owner', User::class)
             ->fetchLazy()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -283,7 +284,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('doNotContact', \Mautic\LeadBundle\Entity\DoNotContact::class)
+        $builder->createOneToMany('doNotContact', DoNotContact::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
@@ -292,7 +293,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToMany('ipAddresses', \Mautic\CoreBundle\Entity\IpAddress::class)
+        $builder->createManyToMany('ipAddresses', IpAddress::class)
             ->setJoinTable('lead_ips_xref')
             ->addInverseJoinColumn('ip_id', 'id', true, false, 'CASCADE')
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
@@ -302,7 +303,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->cascadePersist()
             ->build();
 
-        $builder->createOneToMany('pushIds', \Mautic\NotificationBundle\Entity\PushID::class)
+        $builder->createOneToMany('pushIds', PushID::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
@@ -350,7 +351,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->nullable()
             ->build();
 
-        $builder->createManyToMany('tags', \Mautic\LeadBundle\Entity\Tag::class)
+        $builder->createManyToMany('tags', Tag::class)
             ->setJoinTable('lead_tags_xref')
             ->addInverseJoinColumn('tag_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
@@ -362,7 +363,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->cascadeDetach()
             ->build();
 
-        $builder->createManyToOne('stage', \Mautic\StageBundle\Entity\Stage::class)
+        $builder->createManyToOne('stage', Stage::class)
             ->cascadePersist()
             ->cascadeMerge()
             ->cascadeDetach()
@@ -377,14 +378,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('utmtags', \Mautic\LeadBundle\Entity\UtmTag::class)
+        $builder->createOneToMany('utmtags', UtmTag::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('frequencyRules', \Mautic\LeadBundle\Entity\FrequencyRule::class)
+        $builder->createOneToMany('frequencyRules', FrequencyRule::class)
             ->orphanRemoval()
             ->setIndexBy('channel')
             ->setOrderBy(['dateAdded' => 'DESC'])
@@ -657,7 +658,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get ipAddresses.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getIpAddresses()
     {
@@ -971,7 +972,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get pointsChangeLog.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getPointsChangeLog()
     {
@@ -1011,7 +1012,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
+     * @return ArrayCollection<int,CompanyChangeLog>
      */
     public function getCompanyChangeLog()
     {
@@ -1412,7 +1413,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get stage.
      *
-     * @return \Mautic\StageBundle\Entity\Stage|null
+     * @return Stage|null
      */
     public function getStage()
     {
@@ -1428,7 +1429,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function setFrequencyRules($frequencyRules)
     {
-        $this->frequencyRules = new \Doctrine\Common\Collections\ArrayCollection($frequencyRules);
+        $this->frequencyRules = new ArrayCollection($frequencyRules);
 
         return $this;
     }
@@ -1960,11 +1961,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $rules = [];
         foreach ($frequencyRules as $rule) {
-            $rules[$rule['channel']] =
-                [
-                    'frequency' => $rule,
-                    'dnc'       => DoNotContact::IS_CONTACTABLE,
-                ];
+            $rules[$rule['channel']] = [
+                'frequency' => $rule,
+                'dnc'       => DoNotContact::IS_CONTACTABLE,
+            ];
         }
 
         if (count($dncRules)) {
@@ -2016,5 +2016,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function removeGroupScore(GroupContactScore $groupContactScore): void
     {
         $this->groupScores->removeElement($groupContactScore);
+    }
+
+    /**
+     * Do not update modified_by and date_modified fields if only DNC or manipulator was changed.
+     * Avoid unnecessary update queries.
+     */
+    public function shouldSkipSettingModifiedProperties(): bool
+    {
+        $changes = $this->changes;
+
+        unset($changes['dnc_channel_status']);
+        unset($changes['manipulator']);
+
+        return !(bool) count($changes);
     }
 }

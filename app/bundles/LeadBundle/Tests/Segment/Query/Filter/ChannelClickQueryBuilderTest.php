@@ -158,8 +158,8 @@ class ChannelClickQueryBuilderTest extends TestCase
                     'object'     => 'behaviors',
                     'type'       => 'boolean',
                     'properties' => [
-                            'filter' => $parameterValue,
-                        ],
+                        'filter' => $parameterValue,
+                    ],
                 ]
             ),
             new BaseDecorator(new ContactSegmentFilterOperator(

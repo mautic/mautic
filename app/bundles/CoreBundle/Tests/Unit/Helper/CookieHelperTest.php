@@ -19,7 +19,7 @@ class CookieHelperTest extends TestCase
     /**
      * @var RequestStack|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
+    private MockObject $requestStackMock;
 
     protected function setUp(): void
     {

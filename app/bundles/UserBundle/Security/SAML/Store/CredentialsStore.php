@@ -11,7 +11,7 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class CredentialsStore implements CredentialStoreInterface
 {
-    private ?\LightSaml\Credential\X509Credential $credentials = null;
+    private ?X509Credential $credentials = null;
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -66,8 +66,8 @@ class CredentialsStore implements CredentialStoreInterface
 
             // Generate a new private (and public) key pair
             $privkey = openssl_pkey_new([
-              'private_key_bits' => 2048,
-              'private_key_type' => OPENSSL_KEYTYPE_RSA,
+                'private_key_bits' => 2048,
+                'private_key_type' => OPENSSL_KEYTYPE_RSA,
             ]);
 
             // Generate a certificate signing request

@@ -1,5 +1,4 @@
-{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
-{{ customContent('details.top', mauticTemplateVars) }}
+{{ customContent('details.top', _context) }}
 {% if attribute(entity, 'getCategory') is defined and method_exists(entity, 'getCategory') %}
 <tr>
     <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.category{% endtrans %}</span></td>
@@ -48,4 +47,4 @@
         <td>{{ entity.getId() }}</td>
     </tr>
 {% endif %}
-{{ customContent('details.bottom', mauticTemplateVars) }}
+{{ customContent('details.bottom', _context) }}

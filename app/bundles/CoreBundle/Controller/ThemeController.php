@@ -2,10 +2,14 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Exception\BadConfigurationException;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ThemeController extends FormController
 {
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
@@ -79,6 +83,8 @@ class ThemeController extends FormController
                             );
                         }
                     }
+                } else {
+                    $form->addError(new FormError($form->getErrors(true)));
                 }
             }
         }
@@ -272,5 +278,85 @@ class ThemeController extends FormController
                 'mauticContent' => 'theme',
             ],
         ];
+    }
+
+    /**
+     * Change default theme's visibility.
+     */
+    public function visibilityAction(string $objectId, Request $request, CorePermissions $corePermissions, ThemeHelperInterface $themeHelper): Response
+    {
+        if (!$corePermissions->isGranted('core:themes:view')) {
+            return $this->accessDenied();
+        }
+
+        $flashes = [];
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $flashes = $this->visibility($objectId, $themeHelper);
+        }
+
+        return $this->postActionRedirect(
+            array_merge($this->getIndexPostActionVars(), [
+                'flashes' => $flashes,
+            ])
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function visibility(string $themeName, ThemeHelperInterface $themeHelper): array
+    {
+        if (!$themeHelper->exists($themeName)) {
+            return [
+                [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.theme.error.notfound',
+                    'msgVars' => ['%theme%' => $themeName],
+                ],
+            ];
+        }
+
+        if (!in_array($themeName, $themeHelper->getDefaultThemes())) {
+            return [
+                [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.theme.cannot.change.visibility',
+                    'msgVars' => ['%theme%' => $themeName],
+                ],
+            ];
+        }
+
+        $flashes = [];
+
+        try {
+            $theme = $themeHelper->getTheme($themeName);
+            $themeHelper->toggleVisibility($themeName);
+            $flashes[] = [
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.theme.visibility.changed',
+                'msgVars' => ['%theme%' => $theme->getName()],
+            ];
+        } catch (IOException) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.visibility.error',
+                'msgVars' => ['%error%' => 'Failed to change the theme visibility'],
+            ];
+        } catch (BadConfigurationException) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.visibility.error',
+                'msgVars' => ['%error%' => sprintf('Theme %s not configured properly: builder property in the config.json', $themeName)],
+            ];
+        } catch (FileNotFoundException) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.visibility.error',
+                'msgVars' => ['%error%' => sprintf('Theme %s not found', $themeName)],
+            ];
+        }
+
+        return $flashes;
     }
 }

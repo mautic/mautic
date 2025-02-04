@@ -11,40 +11,40 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 {
     protected $mailboxes = [
-       'EmailBundle_bounces' => [
-           'address'           => 'bounces@test.com',
-           'host'              => 'mail.test.com',
-           'port'              => '993',
-           'encryption'        => '/ssl',
-           'user'              => 'user',
-           'password'          => 'password',
-           'override_settings' => 0,
-           'folder'            => 'INBOX',
-           'imap_path'         => '{mail.test.com:993/imap/ssl}',
-       ],
-       'EmailBundle_unsubscribes' => [
-           'address'           => 'unsubscribes@test.com',
-           'host'              => 'mail2.test.com',
-           'port'              => '993',
-           'encryption'        => '/ssl',
-           'user'              => 'user',
-           'password'          => 'password',
-           'override_settings' => 0,
-           'folder'            => 'INBOX',
-           'imap_path'         => '{mail.test.com:993/imap/ssl}',
-       ],
-       'EmailBundle_replies' => [
-           'address'           => 'replies@test.com',
-           'host'              => 'mail3.test.com',
-           'port'              => '993',
-           'encryption'        => '/ssl',
-           'user'              => 'user',
-           'password'          => 'password',
-           'override_settings' => 0,
-           'folder'            => 'INBOX',
-           'imap_path'         => '{mail.test.com:993/imap/ssl}',
-       ],
-   ];
+        'EmailBundle_bounces' => [
+            'address'           => 'bounces@test.com',
+            'host'              => 'mail.test.com',
+            'port'              => '993',
+            'encryption'        => '/ssl',
+            'user'              => 'user',
+            'password'          => 'password',
+            'override_settings' => 0,
+            'folder'            => 'INBOX',
+            'imap_path'         => '{mail.test.com:993/imap/ssl}',
+        ],
+        'EmailBundle_unsubscribes' => [
+            'address'           => 'unsubscribes@test.com',
+            'host'              => 'mail2.test.com',
+            'port'              => '993',
+            'encryption'        => '/ssl',
+            'user'              => 'user',
+            'password'          => 'password',
+            'override_settings' => 0,
+            'folder'            => 'INBOX',
+            'imap_path'         => '{mail.test.com:993/imap/ssl}',
+        ],
+        'EmailBundle_replies' => [
+            'address'           => 'replies@test.com',
+            'host'              => 'mail3.test.com',
+            'port'              => '993',
+            'encryption'        => '/ssl',
+            'user'              => 'user',
+            'password'          => 'password',
+            'override_settings' => 0,
+            'folder'            => 'INBOX',
+            'imap_path'         => '{mail.test.com:993/imap/ssl}',
+        ],
+    ];
 
     /**
      * @testdox Multiple mailboxes with the same imap path should be converted to a single container
@@ -152,12 +152,12 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 Mailbox::CRITERIA_UNSEEN => [
-                        'EmailBundle_bounces',
-                        'EmailBundle_unsubscribes',
-                    ],
+                    'EmailBundle_bounces',
+                    'EmailBundle_unsubscribes',
+                ],
                 Mailbox::CRITERIA_UID.' 1234:*' => [
-                        'EmailBundle_replies',
-                    ],
+                    'EmailBundle_replies',
+                ],
             ],
             $criteria
         );

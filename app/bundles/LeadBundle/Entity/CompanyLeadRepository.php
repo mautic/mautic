@@ -212,14 +212,14 @@ class CompanyLeadRepository extends CommonRepository
         )->executeStatement();
     }
 
-   public function removeAllSecondaryCompanies(): void
-   {
-       $conn = $this->getEntityManager()->getConnection();
-       do {
-           $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
-           $row = $conn->executeQuery($sql)->rowCount();
-       } while ($row);
-   }
+    public function removeAllSecondaryCompanies(): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        do {
+            $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
+            $row = $conn->executeQuery($sql)->rowCount();
+        } while ($row);
+    }
 
     public function removeContactSecondaryCompanies(int $leadId): void
     {

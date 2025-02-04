@@ -150,14 +150,14 @@ class Asset extends FormEntity
     /**
      * @var bool|null
      */
-    private $disallow = false;
+    private $disallow = true;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
+            ->setCustomRepositoryClass(AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -953,7 +953,7 @@ class Asset extends FormEntity
 
         // return missing file icon if file type is empty
         if (!$fileType) {
-            return 'fa fa-ban';
+            return 'ri-prohibited-line';
         }
 
         $fileTypes = $this->getFileExtensions();
@@ -961,12 +961,12 @@ class Asset extends FormEntity
         // Search for icon name by file extension.
         foreach ($fileTypes as $icon => $extensions) {
             if (in_array($fileType, $extensions)) {
-                return 'fa fa-file-'.$icon.'-o';
+                return 'ri-file-'.$icon.'-fill';
             }
         }
 
         // File extension is unknown, display general file icon.
-        return 'fa fa-file-o';
+        return 'ri-file-line';
     }
 
     /**
@@ -1073,7 +1073,7 @@ class Asset extends FormEntity
     /**
      * Load the file object from it's path.
      *
-     * @return \Symfony\Component\HttpFoundation\File\File|null
+     * @return File|null
      */
     public function loadFile($temp = false)
     {

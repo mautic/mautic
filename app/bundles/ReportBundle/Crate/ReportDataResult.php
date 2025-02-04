@@ -52,9 +52,9 @@ class ReportDataResult
         private bool $isLastBatch = true
     ) {
         if (
-            !array_key_exists('data', $data) ||
-            !array_key_exists('dataColumns', $data) ||
-            !array_key_exists('columns', $data)
+            !array_key_exists('data', $data)
+            || !array_key_exists('dataColumns', $data)
+            || !array_key_exists('columns', $data)
         ) {
             throw new \InvalidArgumentException("Keys 'data', 'dataColumns' and 'columns' have to be provided");
         }

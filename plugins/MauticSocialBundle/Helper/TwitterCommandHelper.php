@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterCommandHelper
 {
-    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
+    private ?OutputInterface $output = null;
 
     private int $updatedLeads = 0;
 

@@ -14,24 +14,24 @@ class FinalizeUpdateStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var MockObject|Session
      */
-    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private MockObject $session;
 
     /**
      * @var MockObject|AppVersion
      */
-    private \PHPUnit\Framework\MockObject\MockObject $appVersion;
+    private MockObject $appVersion;
 
-    private \Mautic\CoreBundle\Update\Step\FinalizeUpdateStep $step;
+    private FinalizeUpdateStep $step;
 
     protected function setUp(): void
     {

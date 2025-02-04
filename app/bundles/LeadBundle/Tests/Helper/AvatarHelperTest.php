@@ -22,7 +22,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&PathsHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
+    private MockObject $pathsHelperMock;
 
     private GravatarHelper $gravatarHelperMock;
 
@@ -31,7 +31,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&Lead
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadMock;
+    private MockObject $leadMock;
 
     private AvatarHelper $avatarHelper;
 

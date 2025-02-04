@@ -25,17 +25,17 @@ class ObjectChangeGeneratorTest extends TestCase
     /**
      * @var SyncJudgeInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncJudge;
+    private MockObject $syncJudge;
 
     /**
      * @var ValueHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
+    private MockObject $valueHelper;
 
     /**
      * @var FieldHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    private MockObject $fieldHelper;
 
     protected function setUp(): void
     {

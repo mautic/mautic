@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class TriggerEvent
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
@@ -54,6 +54,11 @@ class TriggerEvent
      */
     private $changes;
 
+    public function __clone(): void
+    {
+        $this->id = null;
+    }
+
     public function __construct()
     {
         $this->log = new ArrayCollection();
@@ -64,7 +69,7 @@ class TriggerEvent
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_trigger_events')
-            ->setCustomRepositoryClass(\Mautic\PointBundle\Entity\TriggerEventRepository::class)
+            ->setCustomRepositoryClass(TriggerEventRepository::class)
             ->addIndex(['type'], 'trigger_type_search');
 
         $builder->addIdColumns();

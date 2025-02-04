@@ -136,7 +136,11 @@ class Interval implements ScheduleModeInterface
      */
     public function isContactSpecificExecutionDateRequired(Event $event): bool
     {
-        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event)) {
+        if ($this->isTriggerModeOptimized($event)) {
+            return true;
+        }
+
+        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event)) {
             return false;
         }
 
@@ -148,17 +152,31 @@ class Interval implements ScheduleModeInterface
         return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
     }
 
+    private function isTriggerModeOptimized(Event $event): bool
+    {
+        return Event::TRIGGER_MODE_OPTIMIZED === $event->getTriggerMode();
+    }
+
     private function isRestrictedToDailyScheduling(Event $event): bool
     {
-        return !in_array($event->getTriggerIntervalUnit(), ['i', 'h', 'd', 'm', 'y']) &&
-            empty($event->getTriggerRestrictedDaysOfWeek());
+        return !in_array($event->getTriggerIntervalUnit(), ['i', 'h', 'd', 'm', 'y'])
+            && empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     private function hasTimeRelatedRestrictions(Event $event): bool
     {
-        return null === $event->getTriggerHour() &&
-            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
-            empty($event->getTriggerRestrictedDaysOfWeek());
+        return null === $event->getTriggerHour()
+            && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
+            && empty($event->getTriggerRestrictedDaysOfWeek());
+    }
+
+    private function isNegativePath(Event $event): bool
+    {
+        if ($event->getParent()) {
+            return Event::TYPE_DECISION === $event->getParent()->getEventType() && Event::TYPE_ACTION === $event->getEventType() && Event::PATH_INACTION === $event->getDecisionPath();
+        }
+
+        return false;
     }
 
     /**

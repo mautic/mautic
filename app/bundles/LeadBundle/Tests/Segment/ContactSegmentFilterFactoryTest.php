@@ -74,8 +74,8 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
                 'operator'     => ContactSegmentFilterFactory::CUSTOM_OPERATOR,
                 'properties'   => [
                     [
-                    'operator' => '=',
-                    'filter'   => 'QLD',
+                        'operator' => '=',
+                        'filter'   => 'QLD',
                     ],
                 ],
                 'merged_property' => [],

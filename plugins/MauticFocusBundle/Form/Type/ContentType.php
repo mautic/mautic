@@ -132,6 +132,7 @@ class ContentType extends AbstractType
                     'class'        => 'form-control',
                     'rows'         => 6,
                     'onchange'     => 'Mautic.focusUpdatePreview()',
+                    'tooltip'      => 'mautic.focus.form.custom.css.help',
                 ],
                 'required' => false,
             ]

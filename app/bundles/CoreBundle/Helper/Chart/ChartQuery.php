@@ -14,7 +14,7 @@ class ChartQuery extends AbstractChart
 {
     private DateTimeHelper $dateTimeHelper;
 
-    private ?\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnProvider = null;
+    private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
     /**
      * Match date/time unit to a SQL datetime format
@@ -200,7 +200,7 @@ class ChartQuery extends AbstractChart
      * @param string $column  name. The column must be type of datetime
      * @param array  $filters will be added to where claues
      *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
+     * @return QueryBuilder
      */
     public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
@@ -537,11 +537,11 @@ class ChartQuery extends AbstractChart
     /**
      * Count how many rows is between a range of date diff in seconds.
      *
-     * @param string $query
+     * @param QueryBuilder $query
      */
     public function fetchCountDateDiff($query): int
     {
-        $data = $query->execute()->fetchAssociative();
+        $data = $query->executeQuery()->fetchAssociative();
 
         return (int) $data['count'];
     }

@@ -22,7 +22,7 @@ class Stat
     private $notification;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
@@ -32,7 +32,7 @@ class Stat
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -101,7 +101,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\NotificationBundle\Entity\StatRepository::class)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
             ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
             ->addIndex(['tracking_hash'], 'stat_notification_hash_search')

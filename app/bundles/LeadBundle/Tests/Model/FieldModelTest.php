@@ -28,6 +28,73 @@ class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    /**
+     * @param array<string, mixed[]> $filters
+     *
+     * @dataProvider dataForGetFieldsProperties
+     */
+    public function testGetFieldsProperties(array $filters, int $expectedCount): void
+    {
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::$container->get('mautic.lead.model.field');
+
+        // Create an unpublished lead field.
+        $field = new LeadField();
+        $field->setName('Test Unpublished Field')
+            ->setAlias('test_unpublished_field')
+            ->setType('string')
+            ->setObject('lead')
+            ->setIsPublished(false);
+
+        $fieldModel->saveEntity($field);
+
+        $fields = $fieldModel->getFieldsProperties($filters);
+
+        $this->assertCount($expectedCount, $fields);
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public function dataForGetFieldsProperties(): iterable
+    {
+        // When mautic is installed the total number of fields are 42.
+        yield 'All fields' => [
+            // Filters
+            [],
+            // Expected count
+            44,
+        ];
+
+        yield 'Contact fields' => [
+            // Filters
+            ['object' => 'lead'],
+            // Expected count
+            29,
+        ];
+
+        yield 'Company fields' => [
+            // Filters
+            ['object' => 'company'],
+            // Expected count
+            15,
+        ];
+
+        yield 'Text fields' => [
+            // Filters
+            ['type' => 'text'],
+            // Expected count
+            20,
+        ];
+
+        yield 'Unpublished fields' => [
+            // Filters
+            ['isPublished' => false],
+            // Expected count
+            1,
+        ];
+    }
+
     public function testSingleContactFieldIsCreatedAndDeleted(): void
     {
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');

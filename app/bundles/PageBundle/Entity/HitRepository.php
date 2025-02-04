@@ -84,7 +84,7 @@ class HitRepository extends CommonRepository
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
         }
 
-        return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft']);
+        return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft'], null, 'h.id');
     }
 
     /**
@@ -495,6 +495,7 @@ class HitRepository extends CommonRepository
         }
 
         $query->select('p.title, p.id, '.$column.$as)
+            ->where('p.id IS NOT NULL')
             ->groupBy('p.id, p.title, '.$column)
             ->orderBy($column, 'DESC')
             ->setMaxResults($limit)

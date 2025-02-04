@@ -20,6 +20,8 @@ class Form extends FormEntity
      */
     private $id;
 
+    private ?string $language = null;
+
     /**
      * @var string
      */
@@ -98,9 +100,9 @@ class Form extends FormEntity
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: \Mautic\FormBundle\Entity\Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
-    private \Doctrine\Common\Collections\Collection $submissions;
+    private Collection $submissions;
 
     /**
      * @var int
@@ -148,11 +150,16 @@ class Form extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('forms')
-            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\FormRepository::class);
+            ->setCustomRepositoryClass(FormRepository::class);
 
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->nullable()
+            ->build();
 
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
@@ -303,6 +310,7 @@ class Form extends FormEntity
                     'postActionProperty',
                     'noIndex',
                     'formAttributes',
+                    'language',
                 ]
             )
             ->build();
@@ -616,7 +624,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return Collection|Submission[]
      */
     public function getSubmissions()
     {
@@ -780,6 +788,19 @@ class Form extends FormEntity
     public function getFormAttributes()
     {
         return $this->formAttributes;
+    }
+
+    public function setLanguage(?string $language): self
+    {
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
     }
 
     public function isStandalone(): bool

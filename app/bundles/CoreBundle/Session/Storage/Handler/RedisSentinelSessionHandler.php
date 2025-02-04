@@ -18,7 +18,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
     /**
      * @var Client Redis client
      */
-    private \Predis\Client $redis;
+    private Client $redis;
 
     public function __construct(
         private array $redisConfiguration,
@@ -56,9 +56,9 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function gc($maxlifetime): bool
+    public function gc($maxlifetime): int|false
     {
-        return true;
+        return 1;
     }
 
     public function updateTimestamp($sessionId, $data): bool

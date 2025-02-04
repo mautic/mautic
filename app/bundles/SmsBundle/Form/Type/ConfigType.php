@@ -38,7 +38,7 @@ class ConfigType extends AbstractType
                 'tooltip' => 'mautic.sms.config.select_default_transport',
             ],
             'choices'           => $choices,
-            ]);
+        ]);
 
         $builder->add(
             self::SMS_DISABLE_TRACKABLE_URLS,

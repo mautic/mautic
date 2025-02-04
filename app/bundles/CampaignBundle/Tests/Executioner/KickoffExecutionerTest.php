@@ -25,22 +25,22 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|KickoffContactFinder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $kickoffContactFinder;
+    private MockObject $kickoffContactFinder;
 
     /**
      * @var MockObject|Translator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|EventExecutioner
      */
-    private \PHPUnit\Framework\MockObject\MockObject $executioner;
+    private MockObject $executioner;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
+    private MockObject $scheduler;
 
     protected function setUp(): void
     {
@@ -127,8 +127,8 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
                 ],
                 [
                     $this->countOf(1),
-                        $this->isInstanceOf(ArrayCollection::class),
-                        $this->isInstanceOf(Counter::class),
+                    $this->isInstanceOf(ArrayCollection::class),
+                    $this->isInstanceOf(Counter::class),
                 ]
             );
 

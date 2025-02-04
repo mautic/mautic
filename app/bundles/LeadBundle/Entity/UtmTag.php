@@ -20,7 +20,7 @@ class UtmTag
     private $dateAdded;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     private $lead;
 
@@ -90,6 +90,7 @@ class UtmTag
         $builder->addNullableField('utmMedium', Types::STRING, 'utm_medium');
         $builder->addNullableField('utmSource', Types::STRING, 'utm_source');
         $builder->addNullableField('utmTerm', Types::STRING, 'utm_term');
+        $builder->addIndex(['date_added'], 'utm_date_added');
     }
 
     /**

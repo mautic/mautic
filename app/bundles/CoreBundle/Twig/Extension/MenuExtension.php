@@ -29,8 +29,8 @@ class MenuExtension extends AbstractExtension
     /**
      * Renders a menu with the specified renderer.
      *
-     * @param \Knp\Menu\ItemInterface|string|array<mixed> $menu
-     * @param array<mixed>                                $options
+     * @param ItemInterface|string|array<mixed> $menu
+     * @param array<mixed>                      $options
      */
     public function menuRender($menu, array $options = [], ?string $renderer = null): string
     {

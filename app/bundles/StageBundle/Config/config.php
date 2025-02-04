@@ -17,7 +17,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'stages',
                 'path'            => '/stages',
-                'controller'      => \Mautic\StageBundle\Controller\Api\StageApiController::class,
+                'controller'      => Mautic\StageBundle\Controller\Api\StageApiController::class,
             ],
             'mautic_api_stageddcontact' => [
                 'path'       => '/stages/{id}/contact/{contactId}/add',
@@ -36,7 +36,7 @@ return [
         'main' => [
             'mautic.stages.menu.index' => [
                 'route'     => 'mautic_stage_index',
-                'iconClass' => 'fa-tachometer',
+                'iconClass' => 'ri-barricade-fill flip-vertically',
                 'access'    => ['stage:stages:view'],
                 'priority'  => 25,
             ],

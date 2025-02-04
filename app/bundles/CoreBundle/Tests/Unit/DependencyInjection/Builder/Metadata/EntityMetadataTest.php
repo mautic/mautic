@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class EntityMetadataTest extends TestCase
 {
-    private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
+    private BundleMetadata $metadata;
 
     protected function setUp(): void
     {

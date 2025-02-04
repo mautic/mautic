@@ -170,7 +170,7 @@ class AssetModel extends FormModel
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
+                    $emailRepo = $this->em->getRepository(Email::class);
                     if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
@@ -197,7 +197,7 @@ class AssetModel extends FormModel
                 $lead = $systemEntry['lead'];
                 if (!$lead instanceof Lead) {
                     $leadId = is_array($lead) ? $lead['id'] : $lead;
-                    $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+                    $lead   = $this->em->getReference(Lead::class, $leadId);
                 }
 
                 $download->setLead($lead);
@@ -212,7 +212,7 @@ class AssetModel extends FormModel
                 $email = $systemEntry['email'];
                 if (!$email instanceof Email) {
                     $emailId = is_array($email) ? $email['id'] : $email;
-                    $email   = $this->em->getReference(\Mautic\EmailBundle\Entity\Email::class, $emailId);
+                    $email   = $this->em->getReference(Email::class, $emailId);
                 }
 
                 $download->setEmail($email);
@@ -300,7 +300,7 @@ class AssetModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Asset::class);
+        return $this->em->getRepository(Asset::class);
     }
 
     /**
@@ -308,7 +308,7 @@ class AssetModel extends FormModel
      */
     public function getDownloadRepository()
     {
-        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Download::class);
+        return $this->em->getRepository(Download::class);
     }
 
     public function getPermissionBase(): string
@@ -352,7 +352,7 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -406,8 +406,8 @@ class AssetModel extends FormModel
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
                 // During the form submit & edit, make sure that the data is checked against available assets
-                if ('mautic_segment_action' === $request->get('_route') &&
-                    (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
+                if ('mautic_segment_action' === $request->get('_route')
+                    && (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
                 ) {
                     $limit = 0;
                 }
@@ -589,7 +589,7 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -617,6 +617,6 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

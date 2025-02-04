@@ -4,15 +4,93 @@ namespace Mautic\ReportBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\Persistence\Mapping\MappingException;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testHitRepositoryMostVisited(): void
+    {
+        $page = $this->createPage('test page 1');
+        $this->createHit($page);
+        $this->createHit(null);
+
+        $query = $this->em->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
+        $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
+
+        $pageModel = self::$container->get('mautic.page.model.page');
+        $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
+
+        foreach ($res as $hit) {
+            Assert::assertNotNull($hit['id']);
+            Assert::assertNotNull($hit['title']);
+            Assert::assertNotNull($hit['hits']);
+        }
+    }
+
+    public function testMostVisitedPagesReport(): void
+    {
+        $page = $this->createPage('test page 1');
+        $this->createHit($page);
+        $this->createHit(null);
+
+        $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
+            'mautic.page.table.most.visited.unique',
+            'mautic.page.table.most.visited',
+        ]);
+
+        // Check the details page
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+    }
+
+    public function testReportTableOrderColumn(): void
+    {
+        $page  = $this->createPage('test page 1', 15);
+        $page2 = $this->createPage('test page 2', 9);
+        $page3 = $this->createPage('test page 3', 30);
+
+        $this->createHit($page);
+        $this->createHit($page2);
+        $this->createHit($page3);
+
+        $report = $this->createReport('Report Most Visited Pages', 'page.hits', []);
+        $report->setColumns(['p.title', 'p.hits']);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId());
+
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+        $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
+
+        $this->assertSame([
+            ['1', 'test page 1', '15'],
+            ['2', 'test page 2', '9'],
+            ['3', 'test page 3', '30'],
+        ], array_slice($crawlerReportTable, 1, 3));
+
+        $crawler            = $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=p.hits');
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+        $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
+
+        $this->assertSame([
+            ['1', 'test page 2', '9'],
+            ['2', 'test page 1', '15'],
+            ['3', 'test page 3', '30'],
+        ], array_slice($crawlerReportTable, 1, 3));
+    }
+
     public function testCreatingNewReportAndClone(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
@@ -38,6 +116,54 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
 
         Assert::assertSame($report->getId() + 1, $reportClone->getId());
+    }
+
+    public function testContactReportSqlInjectionDontWork(): void
+    {
+        $report = new Report();
+        $report->setName('Contact report');
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource('leads');
+        $coulmns = [
+            'l.firstname',
+            'l.lastname',
+            'l.email',
+            'l.date_added',
+        ];
+        $report->setColumns($coulmns);
+
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        // Check sql injection in parameter orderby
+        $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id\'');
+        $this->assertStringNotContainsString(
+            'You have an error in your SQL syntax',
+            $this->client->getResponse()->getContent()
+        );
+
+        // Check sql injection in parameter name
+        $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'\'&orderby=a_id');
+        $this->assertStringNotContainsString(
+            'You have an error in your SQL syntax',
+            $this->client->getResponse()->getContent()
+        );
+
+        // Check sql injection in parameter tmpl
+        $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list\'&name=report.'.$report->getId().'&orderby=a_id');
+        $this->assertStringNotContainsString(
+            'You have an error in your SQL syntax',
+            $this->client->getResponse()->getContent()
+        );
+
+        // Check sql injection in parameter id
+        $this->client->request('GET', '/s/reports/view/'.$report->getId().'\'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
+        $this->assertStringNotContainsString(
+            'You have an error in your SQL syntax',
+            $this->client->getResponse()->getContent()
+        );
+
+        $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
+        Assert::assertTrue($this->client->getResponse()->isOk());
     }
 
     public function testContactReportwithComanyDateAddedColumn(): void
@@ -241,6 +367,31 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(2, count($result));
     }
 
+    public function testUtmTagReportContainsExpression(): void
+    {
+        $report = new Report();
+        $report->setName('UTM tags report');
+        $report->setSource('lead.utmTag');
+        $coulmns = [
+            'utm.utm_campaign',
+        ];
+        $report->setColumns($coulmns);
+        $report->setFilters([
+            [
+                'column'    => 'utm.utm_campaign',
+                'glue'      => 'and',
+                'value'     => 'Test',
+                'condition' => 'contains',
+            ]]
+        );
+
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        // Check the details page
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        Assert::assertTrue($this->client->getResponse()->isOk());
+    }
+
     /**
      * @dataProvider scheduleProvider
      *
@@ -334,5 +485,85 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+    }
+
+    public function testXssUrlFromQuery(): void
+    {
+        $report = new Report();
+        $report->setName('Hits report');
+        $report->setDescription('<b>Text Xss Hits</b>');
+        $report->setSource('page.hits');
+        $coulmns = [
+            'ph.isp',
+            'ph.url',
+            'ph.browser_languages',
+            'ph.referer',
+            'ph.remote_host',
+            'ph.user_agent',
+        ];
+        $report->setColumns($coulmns);
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $xssHeader     = '<script>alert(1)</script>';
+        $this->client->request('GET', '/mtracking.gif?page_url='.$xssHeader);
+        $this->assertResponseStatusCodeSame(200);
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+
+        $this->client->request('GET', '/s/reports/view/'.$report->getId().'/export/html');
+        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return array<int,array<int,mixed>>
+     */
+    private function domTableToArray(Crawler $crawler): array
+    {
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+    }
+
+    /**
+     * @param string[] $graphs
+     */
+    private function createReport(string $name, string $source, array $graphs): Report
+    {
+        $report = new Report();
+        $report->setName($name);
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource($source);
+        $report->setGraphs($graphs);
+
+        $this->em->persist($report);
+        $this->em->flush();
+
+        return $report;
+    }
+
+    private function createPage(string $title, int $hitCount=0): Page
+    {
+        $page = new Page();
+        $page->setTitle($title);
+        $page->setHits($hitCount);
+        $page->setAlias(str_replace(' ', '_', $title));
+
+        $this->em->persist($page);
+        $this->em->flush();
+
+        return $page;
+    }
+
+    private function createHit(?Page $page): Hit
+    {
+        $hit = new Hit();
+        $hit->setDateHit(new \DateTime());
+        $hit->setCode(200);
+        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
+        $hit->setIpAddress(new IpAddress('127.0.0.1'));
+        $hit->setPage($page);
+
+        $this->em->persist($hit);
+        $this->em->flush();
+
+        return $hit;
     }
 }

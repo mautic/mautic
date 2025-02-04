@@ -299,7 +299,7 @@ class SubmissionRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted']);
+        return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted'], null, 'fs.id');
     }
 
     /**
@@ -457,6 +457,10 @@ class SubmissionRepository extends CommonRepository
     {
         // Modify operator
         switch ($operatorExpr) {
+            case 'like':
+            case 'notLike':
+                $value = !str_contains($value, '%') ? '%'.$value.'%' : $value;
+                break;
             case 'startsWith':
                 $operatorExpr    = 'like';
                 $value           = $value.'%';

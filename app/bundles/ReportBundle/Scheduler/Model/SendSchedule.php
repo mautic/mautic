@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendSchedule
 {
-    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
+    private MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,

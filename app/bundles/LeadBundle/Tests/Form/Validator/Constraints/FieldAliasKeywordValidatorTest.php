@@ -35,7 +35,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $unitOfWorkMock;
 
-    private \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator $validator;
+    private FieldAliasKeywordValidator $validator;
 
     protected function setUp(): void
     {

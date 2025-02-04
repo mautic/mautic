@@ -34,10 +34,10 @@ class ExceptionController extends CommonController
             || (!defined('MAUTIC_AJAX_VIEW') && str_contains($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
         ) {
             $allowRealMessage =
-                'dev' === MAUTIC_ENV ||
-                str_contains($class, 'UnexpectedValueException') ||
-                str_contains($class, 'NotFoundHttpException') ||
-                str_contains($class, 'AccessDeniedHttpException');
+                'dev' === MAUTIC_ENV
+                || str_contains($class, 'UnexpectedValueException')
+                || str_contains($class, 'NotFoundHttpException')
+                || str_contains($class, 'AccessDeniedHttpException');
 
             $message   = $allowRealMessage
                 ? $exception->getMessage()

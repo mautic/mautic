@@ -1,5 +1,12 @@
 {% block dsn_row %}
     <div class="config-dsn-container">
+        {% if form.test_button is defined %}
+            <div class="help-block">
+                <span class="ri-loader-3-line ri-spin hide pull-left"></span>
+                <div class="status-msg"></div>
+                <div class="alert alert-warning save-config-msg hide">{{ 'mautic.config.dsn.save_to_test'|trans }}</div>
+            </div>
+        {% endif %}
         <div class="row">
             <div class="col-md-6 col-lg-3">
                 {{ form_row(form.scheme) }}
@@ -38,13 +45,7 @@
                             </div>
                         </div>
                     </div>
-                    {% if form.test_button is defined %}
-                        <div class="help-block">
-                            <span class="fa fa-spinner fa-spin hide pull-left"></span>
-                            <div class="status-msg"></div>
-                            <div class="save-config-msg hide text-danger">{{ 'mautic.config.dsn.save_to_test'|trans }}</div>
-                        </div>
-                    {% endif %}
+                    
                 </div>
             </div>
             <div class="col-md-6">

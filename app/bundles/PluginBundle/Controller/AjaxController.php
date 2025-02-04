@@ -78,10 +78,10 @@ class AjaxController extends CommonAjaxController
                     );
 
                     $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                            'form'      => $form->createView(),
-                            'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
-                            'function'  => 'row',
-                        ]
+                        'form'      => $form->createView(),
+                        'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
+                        'function'  => 'row',
+                    ]
                     )->getContent();
 
                     if (!isset($settings['prefix'])) {
@@ -115,7 +115,7 @@ class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
-            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            /** @var IntegrationHelper $helper */
             $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
             $object = $helper->getIntegrationObject($integration);
@@ -172,7 +172,7 @@ class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
-            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            /** @var IntegrationHelper $helper */
             $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
             $object = $helper->getIntegrationObject($integration);
@@ -226,7 +226,7 @@ class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
 
         if (!empty($integration)) {
-            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            /** @var IntegrationHelper $helper */
             $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
             $object = $helper->getIntegrationObject($integration);

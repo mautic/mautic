@@ -8,10 +8,13 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -53,10 +56,16 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function contactListAction(Request $request, LeadModel $model): JsonResponse
+    public function contactListAction(Request $request, LeadModel $model, CorePermissions $corePermissions): JsonResponse
     {
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $model->getLookupResults('contact', $filter);
+        $filter['string'] = InputHelper::clean($request->query->get('filter'));
+
+        // Do not show other's contacts if do not have permission.
+        if (!$corePermissions->isGranted(['lead:leads:viewother'], 'MATCH_ONE')) {
+            $filter['force'] = ' '.$this->translator->trans('mautic.core.searchcommand.ismine');
+        }
+
+        $results = $model->getLookupResults('contact', $filter);
 
         $results['success'] = 1;
 
@@ -290,7 +299,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
-                /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+                /** @var IntegrationHelper $helper */
                 $helper         = $this->factory->getHelper('integration');
                 $socialProfiles = $helper->clearIntegrationCache($lead, $network);
                 $socialCount    = count($socialProfiles);
@@ -497,13 +506,13 @@ class AjaxController extends CommonAjaxController
         $channel     = $request->request->get('channel', 'email');
 
         if (!empty($dncId)) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
 
             /** @var DoNotContactModel $doNotContact */
             $doNotContact = $this->getModel('lead.dnc');
 
             /** @var DoNotContactModel $dnc */
-            $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->findOneBy(
+            $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->findOneBy(
                 [
                     'id' => $dncId,
                 ]
@@ -554,7 +563,7 @@ class AjaxController extends CommonAjaxController
                 return $this->accessDenied(true);
             }
 
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model   = $this->getModel('lead.lead');
             $session = $request->getSession();
 
@@ -627,7 +636,7 @@ class AjaxController extends CommonAjaxController
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
         $emailId = $request->query->get('template');
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
@@ -652,7 +661,7 @@ class AjaxController extends CommonAjaxController
 
     public function updateLeadTagsAction(Request $request): JsonResponse
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        /** @var LeadModel $leadModel */
         $leadModel   = $this->getModel('lead');
         $post        = $request->request->all()['lead_tags'] ?? [];
         $lead        = $leadModel->getEntity((int) $post['id']);
@@ -773,7 +782,7 @@ class AjaxController extends CommonAjaxController
         $limit     = (int) $request->get('limit');
 
         if (!empty($order)) {
-            /** @var \Mautic\LeadBundle\Model\FieldModel $model */
+            /** @var FieldModel $model */
             $model = $this->getModel('lead.field');
 
             $startAt = ($page > 1) ? ($page * $limit) + 1 : 1;
@@ -968,5 +977,20 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse([]);
+    }
+
+    public function updateLeadFieldOrderChoiceListAction(Request $request): Response
+    {
+        $object = InputHelper::clean($request->request->get('object'));
+        $group  = InputHelper::clean($request->request->get('group'));
+        $field  = new LeadField();
+        $field->setObject($object);
+        $field->setGroup($group);
+        $form = $this->createForm(FieldType::class, $field);
+
+        return $this->render(
+            '@MauticLead/Field/_field_order.html.twig', [
+                'form' => $form->createView(),
+            ]);
     }
 }

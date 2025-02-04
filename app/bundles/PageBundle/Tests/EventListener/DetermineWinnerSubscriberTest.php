@@ -18,14 +18,14 @@ class DetermineWinnerSubscriberTest extends TestCase
     /**
      * @var MockObject|HitRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
+    private MockObject $hitRepository;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
-    private \Mautic\PageBundle\EventListener\DetermineWinnerSubscriber $subscriber;
+    private DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -54,13 +54,13 @@ class DetermineWinnerSubscriberTest extends TestCase
                 'bounces'   => 5,
                 'rate'      => 25,
                 'title'     => 'Page 1.1',
-                ],
+            ],
             2 => [
                 'totalHits' => 10,
                 'bounces'   => 1,
                 'rate'      => 10,
                 'title'     => 'Page 1.2',
-                ],
+            ],
             3 => [
                 'totalHits' => 30,
                 'bounces'   => 15,

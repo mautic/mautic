@@ -65,11 +65,11 @@ class ChannelType extends AbstractType
                         'multiple'    => false,
                         'label'       => 'mautic.channel.message.form.message',
                         'constraints' => ($enabled) ? [
-                             new NotBlank(
-                                 [
+                            new NotBlank(
+                                [
                                     'message' => 'mautic.core.value.required',
-                                 ]
-                             ),
+                                ]
+                            ),
                         ] : [],
                     ]
                 );

@@ -28,17 +28,17 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
+    private MockObject $scheduler;
 
     /**
      * @var MockObject|LegacyEventDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $legacyDispatcher;
+    private MockObject $legacyDispatcher;
 
     protected function setUp(): void
     {

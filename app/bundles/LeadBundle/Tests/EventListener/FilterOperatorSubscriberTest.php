@@ -22,29 +22,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriberTest extends TestCase
 {
-    private \Mautic\LeadBundle\Segment\OperatorOptions $operatorOptions;
+    private OperatorOptions $operatorOptions;
 
     /**
      * @var MockObject|LeadFieldRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldRepository;
+    private MockObject $leadFieldRepository;
 
     /**
      * @var MockObject|TypeOperatorProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $typeOperatorProvider;
+    private MockObject $typeOperatorProvider;
 
     /**
      * @var MockObject|FieldChoicesProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldChoicesProvider;
+    private MockObject $fieldChoicesProvider;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
-    private \Mautic\LeadBundle\EventListener\FilterOperatorSubscriber $subscriber;
+    private FilterOperatorSubscriber $subscriber;
 
     protected function setUp(): void
     {

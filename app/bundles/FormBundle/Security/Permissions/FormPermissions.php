@@ -13,6 +13,7 @@ class FormPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
+        $this->addCustomPermission('export', ['enable' => 1024]);
         $this->addExtendedPermissions('forms');
         $this->addStandardPermissions('categories');
     }
@@ -24,7 +25,15 @@ class FormPermissions extends AbstractPermissions
 
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
-        $this->addStandardFormFields('form', 'categories', $builder, $data);
-        $this->addExtendedFormFields('form', 'forms', $builder, $data);
+        $this->addStandardFormFields($this->getName(), 'categories', $builder, $data);
+        $this->addExtendedFormFields($this->getName(), 'forms', $builder, $data);
+        $this->addCustomFormFields(
+            $this->getName(),
+            'export',
+            $builder,
+            'mautic.core.permissions.export',
+            ['mautic.core.permissions.enable' => 'enable'],
+            $data
+        );
     }
 }

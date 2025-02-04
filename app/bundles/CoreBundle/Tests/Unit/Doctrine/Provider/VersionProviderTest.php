@@ -14,14 +14,14 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var Connection|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
      * @var MockObject&Result
      */
-    private \PHPUnit\Framework\MockObject\MockObject $result;
+    private MockObject $result;
 
-    private \Mautic\CoreBundle\Doctrine\Provider\VersionProvider $provider;
+    private VersionProvider $provider;
 
     protected function setUp(): void
     {

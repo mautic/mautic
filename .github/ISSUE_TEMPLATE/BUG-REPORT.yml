@@ -19,18 +19,27 @@ body:
 #    validations:
 #      required: false
   - type: dropdown
-    id: Mautic_Version
+    id: Mautic_Series
     attributes:
-      label: Mautic Version
-      description: What version of Mautic you are using? Please test to reproduce your bug with the [latest stable version of Mautic](https://www.mautic.org/mautic-releases) which might contain new fixes.  If you are able, please also check the latest development release.
+      label: Mautic Series
+      description: What series of Mautic you are using? Please test to reproduce your bug with the [latest stable version of Mautic](https://www.mautic.org/mautic-releases) which might contain new fixes.  If you are able, please also check the latest development release.
       options:
+        - 5.1.x series
         - 5.0.x series
-        - 4.4.x series
+        - 4.4.x series (not supported)
         - 4.3.x series (not supported)
         - 4.2.x series (not supported)
         - 4.1.x series (not supported)
         - 4.0.x series (not supported)
         - 3.3.x series (not supported)
+    validations:
+      required: true
+  - type: input
+    id: mautic_actual_version
+    attributes:
+      label: Mautic installed version
+      description: What is the specific version of Mautic you're using? You can find this in the bottom right corner of your Mautic instance, or in the file ``app/release_metadata.json``.
+      placeholder: ex. 5.1.0
     validations:
       required: true
   - type: dropdown
@@ -51,7 +60,7 @@ body:
     attributes:
       label: PHP version
       description: What PHP version are you using in your environment?
-      placeholder: ex. 8.0.20
+      placeholder: ex. 8.1.0
     validations:
       required: true
   - type: dropdown
@@ -85,7 +94,7 @@ body:
     id: logs
     attributes:
       label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.  Please check to ensure that you are not sharing any sensitive information in your logs (replace with REDACTED as required)
+      description: Please copy and paste any relevant log output - you will usually find the logs in the var/logs folder of your Mautic instance and the current day's logs are displayed in example.com/s/sysinfo where example.com is your Mautic instance. This will be automatically formatted into code, so no need for backticks.  Please check to ensure that you are not sharing any sensitive information in your logs (replace with REDACTED as required)
       render: shell
   - type: checkboxes
     id: terms

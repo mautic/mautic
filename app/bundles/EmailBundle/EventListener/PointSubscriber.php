@@ -69,12 +69,12 @@ class PointSubscriber implements EventSubscriberInterface
         $event->addEvent('email.send', $sendEvent);
 
         $sendToOwnerEvent = [
-          'group'           => 'mautic.email.point.trigger',
-          'label'           => 'mautic.email.point.trigger.send_email_to_user',
-          'formType'        => EmailToUserType::class,
-          'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
-          'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/email_to_user_row.html.twig',
-          'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
+            'group'           => 'mautic.email.point.trigger',
+            'label'           => 'mautic.email.point.trigger.send_email_to_user',
+            'formType'        => EmailToUserType::class,
+            'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
+            'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/email_to_user_row.html.twig',
+            'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
         ];
 
         $event->addEvent('email.send_to_user', $sendToOwnerEvent);

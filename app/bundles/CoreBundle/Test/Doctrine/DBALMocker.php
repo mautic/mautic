@@ -3,9 +3,9 @@
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -104,7 +104,7 @@ class DBALMocker
                 ->method('getReference')
                 ->willReturnCallback(function () {
                     switch (func_get_arg(0)) {
-                        case \Mautic\LeadBundle\Entity\Lead::class:
+                        case Lead::class:
                             $entity = new Lead();
                             break;
                     }
@@ -172,7 +172,7 @@ class DBALMocker
                         'where',
                         'andWhere',
                         'setParameter',
-                        'execute',
+                        'executeQuery',
                     ]
                 )
                 ->getMock();
@@ -234,7 +234,7 @@ class DBALMocker
                 );
 
             $mock->expects($this->testCase->any())
-                ->method('execute')
+                ->method('executeQuery')
                 ->willReturnCallback([$this, 'getMockResultStatement']);
 
             $this->mockQueryBuilder = $mock;

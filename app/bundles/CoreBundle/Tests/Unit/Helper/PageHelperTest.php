@@ -14,7 +14,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    private \Mautic\CoreBundle\Helper\PageHelper $pageHelper;
+    private PageHelper $pageHelper;
 
     protected function setUp(): void
     {

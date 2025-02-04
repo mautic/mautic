@@ -38,6 +38,9 @@ class LanguageHelper
         $this->cacheFile = $pathsHelper->getSystemPath('cache').'/../languageList.txt';
     }
 
+    /**
+     * @return array<string>
+     */
     public function getSupportedLanguages(): array
     {
         if (!empty($this->supportedLanguages)) {
@@ -210,6 +213,13 @@ class LanguageHelper
             $this->fetchLanguages();
         }
 
+        if (!is_readable($this->cacheFile)) {
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.language.helper.error.fetching.languages',
+            ];
+        }
+
         $cacheData = json_decode(file_get_contents($this->cacheFile), true);
 
         // Make sure the language actually exists
@@ -354,5 +364,26 @@ class LanguageHelper
             $config                            = json_decode(file_get_contents($configFile), true);
             $this->supportedLanguages[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
         }
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getLanguageChoices(): array
+    {
+        // Get the list of available languages
+        $languages   = $this->fetchLanguages(false, false);
+        $choices     = [];
+
+        foreach ($languages as $code => $langData) {
+            $choices[$langData['name']] = $code;
+        }
+
+        $choices = array_merge($choices, array_flip($this->getSupportedLanguages()));
+
+        // Alpha sort the languages by name
+        ksort($choices, SORT_FLAG_CASE | SORT_NATURAL);
+
+        return $choices;
     }
 }

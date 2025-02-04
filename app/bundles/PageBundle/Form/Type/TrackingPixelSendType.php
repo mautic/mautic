@@ -38,7 +38,7 @@ class TrackingPixelSendType extends AbstractType
                     ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
                 ),
             ],
-            ]);
+        ]);
 
         $builder->add(
             'category',

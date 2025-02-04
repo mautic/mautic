@@ -32,7 +32,7 @@
     .mauticform-field-hidden { display:none }
 </style>
 <div id="mauticform_wrapper{{ formName }}" class="mauticform_wrapper">
-    <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes }}>
+    <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes|raw }}>
         {%- if successfulSubmitAction == 'top' -%}
             <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
             <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
@@ -76,6 +76,7 @@
                         'mappedFields': mappedFields,
                         'inBuilder': inBuilder,
                         'fields': fields,
+                        'language': form.getLanguage()
                   }) -}}
               {%- endif -%}
 
@@ -99,10 +100,8 @@
                       {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif -%}
 
-
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {%- if theme is empty -%}
-                  {{- include(theme ~ f.type ~ '.html.twig', {
+                  {{- include([theme ~ f.type ~ '.html.twig', template], {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -110,18 +109,8 @@
                           'mappedFields': mappedFields,
                           'inBuilder': inBuilder,
                           'fields': fields,
+                          'language': form.getLanguage()
                   }) -}}
-                  {%- else -%}
-                  {{- include(template, {
-                          'field': f.convertToArray,
-                          'id': f.alias,
-                          'formName': formName,
-                          'fieldPage': (pageCount - 1),
-                          'mappedFields': mappedFields,
-                          'inBuilder': inBuilder,
-                          'fields': fields,
-                  }) -}}
-                {%- endif -%}
                   <!-- end: "{{ theme }}{{ template }}" -->
                 {%- endif -%}
               {%- endfor -%}

@@ -97,7 +97,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getBuilderTokens($query)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page');
 
         return $model->getBuilderComponents(null, ['tokens'], $query ?? '');

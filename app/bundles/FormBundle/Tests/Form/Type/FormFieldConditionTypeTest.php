@@ -17,19 +17,19 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $fieldModel;
 
     /**
      * @var MockObject|PropertiesAccessor
      */
-    private \PHPUnit\Framework\MockObject\MockObject $propertiesAccessor;
+    private MockObject $propertiesAccessor;
 
     /**
      * @var MockObject&FormBuilderInterface<string|FormBuilderInterface>
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+    private MockObject $formBuilder;
 
-    private \Mautic\FormBundle\Form\Type\FormFieldConditionType $form;
+    private FormFieldConditionType $form;
 
     protected function setUp(): void
     {
@@ -68,7 +68,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         ],
                         'required' => false,
                     ],
-                    ],
+                ],
                 [
                     'any',
                     YesNoButtonGroupType::class,

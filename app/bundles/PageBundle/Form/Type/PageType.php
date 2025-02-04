@@ -101,7 +101,9 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
 
         $builder->add(
             'isPreferenceCenter',
@@ -137,7 +139,7 @@ class PageType extends AbstractType
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class);
+        $transformer = new IdToEntityModelTransformer($this->em, Page::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -320,8 +322,8 @@ class PageType extends AbstractType
                     'name'  => 'builder',
                     'label' => 'mautic.core.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-default btn-dnd btn-nospin btn-builder text-primary',
-                        'icon'    => 'fa fa-cube',
+                        'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-primary',
+                        'icon'    => 'ri-layout-line',
                         'onclick' => "Mautic.launchBuilder('page');",
                     ],
                 ],

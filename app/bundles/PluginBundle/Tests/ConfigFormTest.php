@@ -46,12 +46,12 @@ class ConfigFormTest extends KernelTestCase
         $authType   = 'oauth2';
         $expected   = [
             [
-              'a' => 'testa',
-              'b' => 'testb',
-              ''  => '',
+                'a' => 'testa',
+                'b' => 'testb',
+                ''  => '',
             ], [
-              'oauth-token: ',
-              'Authorization: OAuth ',
+                'oauth-token: ',
+                'Authorization: OAuth ',
             ],
         ];
 

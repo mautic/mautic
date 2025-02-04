@@ -58,13 +58,13 @@ class EmailUtmTagsType extends AbstractType
             'utmContent',
             TextType::class,
             [
-            'label'      => 'mautic.email.campaign_content',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class' => 'form-control',
-            ],
-            'required'          => false,
-            'constraints'       => new Length(['max' => ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH]),
+                'label'      => 'mautic.email.campaign_content',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'required'          => false,
+                'constraints'       => new Length(['max' => ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH]),
             ]
         );
     }

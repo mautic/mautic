@@ -58,7 +58,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function saveEntity($entity, $unlock = true): void
     {
@@ -90,7 +90,7 @@ class UserModel extends FormModel
      * @param string     $submittedPassword
      * @param bool|false $validate
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): string|null
+    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): ?string
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -144,7 +144,7 @@ class UserModel extends FormModel
      */
     public function getSystemAdministrator()
     {
-        $adminRole = $this->em->getRepository(\Mautic\UserBundle\Entity\Role::class)->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->em->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
 
         return $this->getRepository()->findOneBy(
             [
@@ -155,7 +155,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -287,6 +287,44 @@ class UserModel extends FormModel
             $this->translator->trans('mautic.user.user.passwordreset.subject'),
             $html
         );
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function sendChangePasswordInfo(User $user): void
+    {
+        $text = $this->translator->trans(
+            'mautic.user.user.passwordchange.email.body',
+            ['%name%' => $user->getFirstName()]
+        );
+        $text = str_replace('\\n', "\n", $text);
+        $html = nl2br($text);
+
+        $this->emailUser(
+            $user,
+            $this->translator->trans('mautic.user.user.passwordchange.subject'),
+            $html
+        );
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function sendChangeEmailInfo(string $oldEmail, User $user): void
+    {
+        $mailer = $this->mailHelper->getMailer();
+        $text   = $this->translator->trans(
+            'mautic.user.user.emailchange.email.body',
+            ['%name%' => $user->getFirstName()]
+        );
+        $text = str_replace('\\n', "\n", $text);
+        $html = nl2br($text);
+
+        $mailer->setTo([$oldEmail => $user->getName()]);
+        $mailer->setBody($html);
+        $mailer->setSubject($this->translator->trans('mautic.user.user.emailchange.subject'));
+        $mailer->send();
     }
 
     public function emailUser(User $user, string $subject, string $content): void

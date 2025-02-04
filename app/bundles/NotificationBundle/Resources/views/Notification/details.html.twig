@@ -15,16 +15,28 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : notification,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['notification:notifications:viewown'], permissions['notification:notifications:viewother'], notification.createdBy),
+        },
+        'routeBase'       : 'notification',
+        'targetLabel'     : 'mautic.notification.notifications'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item': notification,
             'templateButtons': {
                 'edit': securityHasEntityAccess(permissions['notification:notifications:editown'], permissions['notification:notifications:editother'], notification.createdBy),
                 'delete': permissions['notification:notifications:create'],
-                'close': securityHasEntityAccess(permissions['notification:notifications:viewown'], permissions['notification:notifications:viewother'], notification.createdBy),
             },
             'routeBase': 'notification',
-    }) }}
+    }) -}}
 {% endblock %}
 
 {% block publishStatus %}
@@ -35,13 +47,13 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- notification detail collapseable -->
-            <div class="collapse" id="notification-details">
+            <div class="collapse pr-md pl-md" id="notification-details">
               <div class="pr-md pl-md pb-md">
                 <div class="panel shd-none mb-0">
-                  <table class="table table-bordered table-striped mb-0">
+                  <table class="table table-hover mb-0">
                     <tbody>
                       {{ include('@MauticCore/Helper/details.html.twig', {'entity': notification}) }}
                     </tbody>
@@ -70,7 +82,7 @@
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-line-chart"></span>
+                                        <span class="ri-line-chart-fill"></span>
                                         {{ 'mautic.core.stats'|trans }}
                                     </h5>
                                 </div>
@@ -87,10 +99,10 @@
             </div>
             <!--/ stats -->
 
-            {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+            {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
-            <ul class="nav nav-tabs pr-md pl-md">
+            <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
                     <a href="#clicks-container" role="tab" data-toggle="tab">
                         {{ 'mautic.trackable.click_counts'|trans }}
@@ -123,7 +135,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
     </div>

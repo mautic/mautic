@@ -11,7 +11,7 @@ class Installer
 
     private ?string $installDirectory = null;
 
-    private \Symfony\Component\Filesystem\Filesystem $filesystem;
+    private Filesystem $filesystem;
 
     /**
      * @param string $translationsDirectory

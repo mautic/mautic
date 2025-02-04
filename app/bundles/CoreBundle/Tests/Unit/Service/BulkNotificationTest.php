@@ -12,9 +12,9 @@ use PHPUnit\Framework\TestCase;
 
 class BulkNotificationTest extends TestCase
 {
-    private \Mautic\CoreBundle\Service\BulkNotification $bulkNotification;
+    private BulkNotification $bulkNotification;
 
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModelFake;
+    private NotificationModel $notificationModelFake;
 
     protected function setUp(): void
     {
@@ -24,9 +24,9 @@ class BulkNotificationTest extends TestCase
 
     public function testNotifications(): void
     {
-        $this->bulkNotification->addNotification(...$data1 = ['key 1', 'message 1', 'notice 1', 'header 1', 'fa-note 1', new \DateTime('01:00'), (new User())->setUsername('first')]);
-        $this->bulkNotification->addNotification(...$data2 = ['key 2', 'message 2', 'notice 1', 'header 2', 'fa-note 2', new \DateTime('02:00'), (new User())->setUsername('second')]);
-        $this->bulkNotification->addNotification(...$data3 = ['key 1', 'message 3', 'notice 3', 'header 3', 'fa-note 3', new \DateTime('03:00'), (new User())->setUsername('third')]);
+        $this->bulkNotification->addNotification(...$data1 = ['key 1', 'message 1', 'notice 1', 'header 1', 'ri-sticky-note-line 1', new \DateTime('01:00'), (new User())->setUsername('first')]);
+        $this->bulkNotification->addNotification(...$data2 = ['key 2', 'message 2', 'notice 1', 'header 2', 'ri-sticky-note-line 2', new \DateTime('02:00'), (new User())->setUsername('second')]);
+        $this->bulkNotification->addNotification(...$data3 = ['key 1', 'message 3', 'notice 3', 'header 3', 'ri-sticky-note-line 3', new \DateTime('03:00'), (new User())->setUsername('third')]);
 
         Assert::assertCount(0, $this->notificationModelFake->notifications ?? []);
 
@@ -36,7 +36,7 @@ class BulkNotificationTest extends TestCase
         $this->assertNotification($data1, $this->notificationModelFake->notifications[0] ?? [], $deduplicateDateTimeFrom);
         $this->assertNotification($data2, $this->notificationModelFake->notifications[1] ?? [], $deduplicateDateTimeFrom);
 
-        $this->bulkNotification->addNotification(...$data4 = ['key 4', 'message 4', 'notice 4', 'header 4', 'fa-note 4', new \DateTime('04:00'), (new User())->setUsername('forth')]);
+        $this->bulkNotification->addNotification(...$data4 = ['key 4', 'message 4', 'notice 4', 'header 4', 'ri-sticky-note-line 4', new \DateTime('04:00'), (new User())->setUsername('forth')]);
 
         $this->bulkNotification->flush();
 

@@ -18,17 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MaxMindDoNotSellPurgeCommand extends Command
 {
-    /**
-     * @var LeadRepository
-     */
-    private \Doctrine\ORM\EntityRepository $leadRepository;
-
     public function __construct(
         private EntityManager $em,
+        private LeadRepository $leadRepository,
         private MaxMindDoNotSellList $doNotSellList
     ) {
         parent::__construct();
-        $this->leadRepository = $this->em->getRepository(Lead::class);
     }
 
     protected function configure()
@@ -62,15 +57,15 @@ EOT
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
             $this->doNotSellList->loadList();
-            $doNotSellListIPs = array_map(fn ($item): string|array =>
+            $doNotSellListIPs = array_map(fn ($item): string =>
                 // strip subnet mask characters
-                substr_replace($item['value'], '', strpos($item['value'], '/'), 3), $this->doNotSellList->getList());
+                $this->doNotSellList->stripCIDR($item['value']), $this->doNotSellList->getList());
             $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
 
             if (0 == count($doNotSellContacts)) {
                 $output->writeln('<info>No matches found.</info>');
 
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
+                return Command::SUCCESS;
             }
 
             $output->writeln('Found '.count($doNotSellContacts)." contacts with an IP from the Do Not Sell list.\n");
@@ -78,7 +73,7 @@ EOT
             if ($dryRun) {
                 $output->writeln('<info>Dry run; skipping purge.</info>');
 
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
+                return Command::SUCCESS;
             }
 
             $output->writeln('<info>Step 2: Purging data...</info>');
@@ -92,11 +87,11 @@ EOT
             $purgeProgress->finish();
             $output->writeln("\n<info>Purge complete.</info>\n");
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         } catch (\Exception $e) {
             $output->writeln("\n<error>".$e->getMessage().'</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
     }
 
@@ -124,19 +119,28 @@ EOT
 
         // We only purge data from the contact if it matches the data in the IP details
         if ($ipDetails = $matchedIps[0]->getIpDetails()) {
-            if (($ipDetails['city'] ?? '') == $lead->getCity()) {
-                $lead->setCity(null);
-            }
-            if (($ipDetails['region'] ?? '') == $lead->getState()) {
-                $lead->setState(null);
-            }
-            if (($ipDetails['country'] ?? '') == $lead->getCountry()) {
-                $lead->setCountry(null);
-            }
-            if (($ipDetails['zipcode'] ?? '') == $lead->getZipcode()) {
-                $lead->setZipcode(null);
-            }
+            return false;
+        }
 
+        $changed = false;
+        if (($ipDetails['city'] ?? '') == $lead->getCity()) {
+            $lead->setCity(null);
+            $changed = true;
+        }
+        if (($ipDetails['region'] ?? '') == $lead->getState()) {
+            $lead->setState(null);
+            $changed = true;
+        }
+        if (($ipDetails['country'] ?? '') == $lead->getCountry()) {
+            $lead->setCountry(null);
+            $changed = true;
+        }
+        if (($ipDetails['zipcode'] ?? '') == $lead->getZipcode()) {
+            $lead->setZipcode(null);
+            $changed = true;
+        }
+
+        if ($changed) {
             $this->leadRepository->saveEntity($lead);
 
             return true;

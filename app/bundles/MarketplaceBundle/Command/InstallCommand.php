@@ -71,7 +71,7 @@ class InstallCommand extends Command
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Installs a plugin that is available at Packagist.org';

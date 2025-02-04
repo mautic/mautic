@@ -239,8 +239,8 @@ class EventController extends CommonFormController
             || !$request->isXmlHttpRequest()
             || !$this->security->isGranted(
                 [
-                'campaign:campaigns:edit',
-                'campaign:campaigns:create',
+                    'campaign:campaigns:edit',
+                    'campaign:campaigns:create',
                 ],
                 'MATCH_ONE'
             )
@@ -335,7 +335,7 @@ class EventController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $objectId)
     {
@@ -396,7 +396,7 @@ class EventController extends CommonFormController
     /**
      * Undeletes the entity.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function undeleteAction(Request $request, $objectId)
     {

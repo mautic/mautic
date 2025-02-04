@@ -9,6 +9,8 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 /**
  * @extends AbstractType<array<mixed>>
+ *
+ * @deprecated To be removed in 6.0. No longer necessary as of https://github.com/mautic/mautic/pull/13868
  */
 class GenericPointSettingsType extends AbstractType
 {
@@ -22,9 +24,9 @@ class GenericPointSettingsType extends AbstractType
                 'label'      => 'mautic.point.action.delta',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.point.action.delta.help',
-                    ],
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.action.delta.help',
+                ],
                 'scale'       => 0,
                 'data'        => $default,
                 'constraints' => [

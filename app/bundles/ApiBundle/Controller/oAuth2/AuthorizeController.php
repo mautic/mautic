@@ -50,7 +50,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
     }
 
     /**
-     * @return \FOS\OAuthServerBundle\Controller\Response|\Symfony\Component\HttpFoundation\Response
+     * @return \FOS\OAuthServerBundle\Controller\Response|Response
      *
      * @throws \OAuth2\OAuth2RedirectException
      * @throws AccessDeniedException

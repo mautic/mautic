@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ?\Symfony\Component\Validator\Validator\ValidatorInterface $validator;
+    private ?ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [
@@ -40,10 +40,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 Email::class => ['message' => 'mautic.form.submission.email.invalid'],
             ],
         ],
-        'freetext' => [],
-        'freehtml' => [],
-        'hidden'   => [],
-        'number'   => [
+        'freetext'      => [],
+        'freehtml'      => [],
+        'hidden'        => [],
+        'companyLookup' => [],
+        'number'        => [
             'filter' => 'float',
         ],
         'pagebreak' => [],

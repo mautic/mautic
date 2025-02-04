@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Result
 {
-    private ?\Mautic\EmailBundle\Entity\Stat $stat = null;
+    private ?Stat $stat = null;
 
     /**
      * @var Lead[]

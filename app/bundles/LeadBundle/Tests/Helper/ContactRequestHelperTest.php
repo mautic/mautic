@@ -26,47 +26,47 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|EventDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|RequestStack
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
+    private MockObject $requestStack;
 
     /**
      * @var MockObject|Logger
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
     /**
      * @var MockObject|Lead
      */
-    private \PHPUnit\Framework\MockObject\MockObject $trackedContact;
+    private MockObject $trackedContact;
 
     /**
      * @var MockObject|ContactMerger
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactMerger;
+    private MockObject $contactMerger;
 
     protected function setUp(): void
     {

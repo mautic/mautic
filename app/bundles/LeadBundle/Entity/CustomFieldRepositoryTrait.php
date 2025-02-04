@@ -119,7 +119,7 @@ trait CustomFieldRepositoryTrait
                     $alias = $this->getTableAlias();
                     $q     = $this->getEntityManager()->createQueryBuilder();
                     $q->select($alias)
-                        ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
+                        ->from(Lead::class, $alias, $alias.'.id')
                         ->indexBy($alias, $alias.'.id');
                 } else {
                     // ORM

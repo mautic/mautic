@@ -221,7 +221,7 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param int $name
+     * @param string $name
      *
      * @return $this
      */

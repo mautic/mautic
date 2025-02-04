@@ -56,15 +56,15 @@ class PluginCollector
 
         return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion): bool {
             if (
-                !empty($entry->minimumMauticVersion) &&
-                !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
+                !empty($entry->minimumMauticVersion)
+                && !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
             ) {
                 return false;
             }
 
             if (
-                !empty($entry->maximumMauticVersion) &&
-                !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
+                !empty($entry->maximumMauticVersion)
+                && !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
             ) {
                 return false;
             }

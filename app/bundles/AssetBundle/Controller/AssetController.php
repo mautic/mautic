@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AssetController extends FormController
 {
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1)
     {
@@ -125,7 +125,7 @@ class AssetController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, AssetModel $model, $objectId)
     {
@@ -217,7 +217,7 @@ class AssetController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function previewAction(Request $request, AssetModel $model, $objectId)
     {
@@ -267,7 +267,7 @@ class AssetController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, AssetModel $model, $entity = null)
     {
@@ -366,7 +366,7 @@ class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        /** @var IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
         $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
@@ -401,7 +401,7 @@ class AssetController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, UploaderHelper $uploaderHelper, AssetModel $model, $objectId, $ignorePost = false)
     {
@@ -532,7 +532,7 @@ class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        /** @var IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
         $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
@@ -575,8 +575,8 @@ class AssetController extends FormController
         $clone  = null;
 
         if (null != $entity) {
-            if (!$this->security->isGranted('asset:assets:create') ||
-                !$this->security->hasEntityAccess(
+            if (!$this->security->isGranted('asset:assets:create')
+                || !$this->security->hasEntityAccess(
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
                 )
             ) {
@@ -727,7 +727,7 @@ class AssetController extends FormController
     /**
      * Renders the container for the remote file browser.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {

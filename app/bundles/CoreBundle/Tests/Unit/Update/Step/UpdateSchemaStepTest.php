@@ -20,24 +20,24 @@ class UpdateSchemaStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|KernelInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $kernel;
+    private MockObject $kernel;
 
     /**
      * @var MockObject|MigrateCommand
      */
-    private \PHPUnit\Framework\MockObject\MockObject $migrateCommand;
+    private MockObject $migrateCommand;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    private MockObject $eventDispatcher;
 
-    private \Mautic\CoreBundle\Update\Step\UpdateSchemaStep $step;
+    private UpdateSchemaStep $step;
 
     protected function setUp(): void
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -82,5 +83,31 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(1, $response['success'], $this->client->getResponse()->getContent());
         Assert::assertSame(1, $response['closeModal'], $this->client->getResponse()->getContent());
+    }
+
+    public function testNewCompanyLookupFieldForm(): void
+    {
+        $form = new Form();
+        $form->setName('Test Form')
+            ->setIsPublished(true)
+            ->setAlias('testform');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/forms/field/new?type=companyLookup&tmpl=field&formId='.$form->getId().'&inBuilder=1',
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $content     = $this->client->getResponse()->getContent();
+        $content     = json_decode($content)->newContent;
+        $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
+
+        $this->assertSame('Contact', $crawler->filter('select[id="formfield_mappedObject"]')->filter('option[selected]')->text());
+        $this->assertSame('Primary company', $crawler->filter('select[id="formfield_mappedField"]')->filter('option[selected]')->text());
     }
 }

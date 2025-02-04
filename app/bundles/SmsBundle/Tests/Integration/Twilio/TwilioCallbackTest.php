@@ -35,8 +35,8 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
         $request          = $this->createMock(Request::class);
         $inputBag         = new InputBag([
-          'AccountSid' => '123',
-          'From'       => '',
+            'AccountSid' => '123',
+            'From'       => '',
         ]);
 
         $request->request = $inputBag;
@@ -50,9 +50,9 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
         $request          = $this->createMock(Request::class);
         $inputBag         = new InputBag([
-          'AccountSid' => '123',
-          'From'       => '321',
-          'Body'       => '',
+            'AccountSid' => '123',
+            'From'       => '321',
+            'Body'       => '',
         ]);
 
         $request->request = $inputBag;
@@ -66,7 +66,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
         $request          = $this->createMock(Request::class);
         $inputBag         = new InputBag([
-          'AccountSid' => '321',
+            'AccountSid' => '321',
         ]);
 
         $request->request = $inputBag;
@@ -81,9 +81,9 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
             ->willReturn('Hello');
 
         $inputBag = new InputBag([
-          'AccountSid' => '123',
-          'From'       => '321',
-          'Body'       => 'Hello',
+            'AccountSid' => '123',
+            'From'       => '321',
+            'Body'       => 'Hello',
         ]);
 
         $request->request = $inputBag;

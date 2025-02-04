@@ -4,7 +4,7 @@ return [
     'services' => [
         'helpers' => [
             'mautic.helper.sms' => [
-                'class'     => \Mautic\SmsBundle\Helper\SmsHelper::class,
+                'class'     => Mautic\SmsBundle\Helper\SmsHelper::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
@@ -19,7 +19,7 @@ return [
         ],
         'other' => [
             'mautic.sms.transport_chain' => [
-                'class'     => \Mautic\SmsBundle\Sms\TransportChain::class,
+                'class'     => Mautic\SmsBundle\Sms\TransportChain::class,
                 'arguments' => [
                     '%mautic.sms_transport%',
                     'mautic.helper.integration',
@@ -27,10 +27,10 @@ return [
                 ],
             ],
             'mautic.sms.callback_handler_container' => [
-                'class' => \Mautic\SmsBundle\Callback\HandlerContainer::class,
+                'class' => Mautic\SmsBundle\Callback\HandlerContainer::class,
             ],
             'mautic.sms.helper.contact' => [
-                'class'     => \Mautic\SmsBundle\Helper\ContactHelper::class,
+                'class'     => Mautic\SmsBundle\Helper\ContactHelper::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
                     'doctrine.dbal.default_connection',
@@ -38,7 +38,7 @@ return [
                 ],
             ],
             'mautic.sms.helper.reply' => [
-                'class'     => \Mautic\SmsBundle\Helper\ReplyHelper::class,
+                'class'     => Mautic\SmsBundle\Helper\ReplyHelper::class,
                 'arguments' => [
                     'event_dispatcher',
                     'monolog.logger.mautic',
@@ -46,13 +46,13 @@ return [
                 ],
             ],
             'mautic.sms.twilio.configuration' => [
-                'class'        => \Mautic\SmsBundle\Integration\Twilio\Configuration::class,
+                'class'        => Mautic\SmsBundle\Integration\Twilio\Configuration::class,
                 'arguments'    => [
                     'mautic.helper.integration',
                 ],
             ],
             'mautic.sms.twilio.transport' => [
-                'class'        => \Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
+                'class'        => Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
                 'arguments'    => [
                     'mautic.sms.twilio.configuration',
                     'monolog.logger.mautic',
@@ -67,7 +67,7 @@ return [
                 ],
             ],
             'mautic.sms.twilio.callback' => [
-                'class'     => \Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class,
+                'class'     => Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class,
                 'arguments' => [
                     'mautic.sms.helper.contact',
                     'mautic.sms.twilio.configuration',
@@ -78,14 +78,14 @@ return [
             // @deprecated - this should not be used; use `mautic.sms.twilio.transport` instead.
             // Only kept as BC in case someone is passing the service by name in 3rd party
             'mautic.sms.transport.twilio' => [
-                'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
+                'class'        => Mautic\SmsBundle\Api\TwilioApi::class,
                 'arguments'    => [
                     'mautic.sms.twilio.configuration',
                     'monolog.logger.mautic',
                 ],
             ],
             'mautic.sms.broadcast.executioner' => [
-                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
+                'class'        => Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
                 'arguments'    => [
                     'mautic.sms.model.sms',
                     'mautic.sms.broadcast.query',
@@ -94,7 +94,7 @@ return [
                 ],
             ],
             'mautic.sms.broadcast.query' => [
-                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastQuery::class,
+                'class'        => Mautic\SmsBundle\Broadcast\BroadcastQuery::class,
                 'arguments'    => [
                     'doctrine.orm.entity_manager',
                     'mautic.sms.model.sms',
@@ -103,7 +103,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.twilio' => [
-                'class'     => \Mautic\SmsBundle\Integration\TwilioIntegration::class,
+                'class'     => Mautic\SmsBundle\Integration\TwilioIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -112,7 +112,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -159,7 +159,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'smses',
                 'path'            => '/smses',
-                'controller'      => \Mautic\SmsBundle\Controller\Api\SmsApiController::class,
+                'controller'      => Mautic\SmsBundle\Controller\Api\SmsApiController::class,
             ],
             'mautic_api_smses_send' => [
                 'path'       => '/smses/{id}/contact/{contactId}/send',
@@ -186,6 +186,9 @@ return [
             ],
         ],
     ],
+    'categories' => [
+        'sms' => null,
+    ],
     'parameters' => [
         'sms_enabled'                                                      => false,
         'sms_username'                                                     => null,
@@ -194,6 +197,6 @@ return [
         'sms_frequency_number'                                             => 0,
         'sms_frequency_time'                                               => 'DAY',
         'sms_transport'                                                    => 'mautic.sms.twilio.transport',
-        \Mautic\SmsBundle\Form\Type\ConfigType::SMS_DISABLE_TRACKABLE_URLS => false,
+        Mautic\SmsBundle\Form\Type\ConfigType::SMS_DISABLE_TRACKABLE_URLS  => false,
     ],
 ];

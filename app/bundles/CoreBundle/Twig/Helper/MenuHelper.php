@@ -87,9 +87,9 @@ final class MenuHelper
     /**
      * Retrieves an item following a path in the tree.
      *
-     * @param \Knp\Menu\ItemInterface|string $menu
-     * @param array<int, string>             $path
-     * @param array<string, mixed>           $options
+     * @param ItemInterface|string $menu
+     * @param array<int, string>   $path
+     * @param array<string, mixed> $options
      */
     public function get($menu, array $path = [], array $options = []): ItemInterface
     {
@@ -99,9 +99,9 @@ final class MenuHelper
     /**
      * Renders a menu with the specified renderer.
      *
-     * @param \Knp\Menu\ItemInterface|string|array<ItemInterface|string> $menu
-     * @param array<string, mixed>                                       $options
-     * @param string                                                     $renderer
+     * @param ItemInterface|string|array<ItemInterface|string> $menu
+     * @param array<string, mixed>                             $options
+     * @param string                                           $renderer
      */
     public function render($menu, array $options = [], $renderer = null): string
     {

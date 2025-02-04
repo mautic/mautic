@@ -14,12 +14,12 @@ class TransportChainTest extends MauticMysqlTestCase
     /**
      * @var TransportChain|MockObject
      */
-    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
+    private TransportChain $transportChain;
 
     /**
      * @var TransportInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $twilioTransport;
+    private MockObject $twilioTransport;
 
     /**
      * Call protected/private method of a class.

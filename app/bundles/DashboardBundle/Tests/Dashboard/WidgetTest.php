@@ -23,24 +23,24 @@ class WidgetTest extends TestCase
     /**
      * @var DashboardModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dashboardModel;
+    private MockObject $dashboardModel;
 
     /**
      * @var UserHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
+    private MockObject $userHelper;
 
     /**
      * @var MockObject|Session
      */
-    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private MockObject $session;
 
     /**
      * @var User|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $user;
+    private MockObject $user;
 
-    private \Mautic\DashboardBundle\Dashboard\Widget $widget;
+    private Widget $widget;
 
     protected function setUp(): void
     {

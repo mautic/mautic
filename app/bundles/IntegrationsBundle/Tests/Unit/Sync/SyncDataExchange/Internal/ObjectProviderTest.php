@@ -20,7 +20,7 @@ class ObjectProviderTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
+    private ObjectProvider $objectProvider;
 
     protected function setUp(): void
     {

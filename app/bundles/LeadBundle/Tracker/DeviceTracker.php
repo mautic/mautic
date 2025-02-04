@@ -27,7 +27,7 @@ class DeviceTracker
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
+     * @return LeadDevice|null
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {
@@ -45,11 +45,9 @@ class DeviceTracker
 
         if ( // Do not create a new device if
             // ... the device is new
-            $trackedDevice && $trackedDevice->getId()
-            && // ... the device is the same
-            $trackedDevice->getSignature() === $currentDevice->getSignature()
-            && // ... the contact given is the same as the owner of the device tracked
-            $trackedDevice->getLead()->getId() === $trackedContact->getId()
+            $trackedDevice && $trackedDevice->getId() // ... the device is the same
+            && $trackedDevice->getSignature() === $currentDevice->getSignature() // ... the contact given is the same as the owner of the device tracked
+            && $trackedDevice->getLead()->getId() === $trackedContact->getId()
         ) {
             return $trackedDevice;
         }
@@ -63,7 +61,7 @@ class DeviceTracker
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
+     * @return LeadDevice|null
      */
     public function getTrackedDevice()
     {

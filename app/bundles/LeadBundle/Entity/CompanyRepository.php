@@ -95,13 +95,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param mixed[] $args
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
-            ->from(\Mautic\LeadBundle\Entity\Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         return $q;
     }
@@ -356,14 +356,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies grouped by column.
      *
-     * @param QueryBuilder $query
-     *
-     * @return array
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getCompaniesByGroup($query, $column)
+    public function getCompaniesByGroup($query, $column): array
     {
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)
@@ -374,7 +372,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -417,14 +415,20 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
         }
 
-        $q->select($prefix.$valueColumn.' as value,
-        case
-        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')
-        when (comp.companycountry is not null) then concat(comp.companyname, \' <small>\', comp.companycountry, \'</small>\')
-        when (comp.companycity is not null) then concat(comp.companyname, \' <small>\', comp.companycity, \'</small>\')
-        else comp.companyname
-        end
-        as label')
+        if (!(isset($parameters['onlyNames']) && $parameters['onlyNames'])) {
+            $labelExpression = '
+            case
+            when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')
+            when (comp.companycountry is not null) then concat(comp.companyname, \' <small>\', comp.companycountry, \'</small>\')
+            when (comp.companycity is not null) then concat(comp.companyname, \' <small>\', comp.companycity, \'</small>\')
+            else comp.companyname
+            end
+            as label';
+        } else {
+            $labelExpression = $prefix.' companyname as label';
+        }
+
+        $q->select($prefix.$valueColumn.' as value, '.$labelExpression)
             ->from($tableName, $alias)
             ->orderBy($prefix.$labelColumn);
 
@@ -531,5 +535,23 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $entities;
+    }
+
+    /**
+     * @return array<string[]>
+     */
+    public function getCompanyLookupData(string $filterVal): array
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('id, companyname, companycity, companystate')
+            ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
+            ->where($q->expr()->eq('is_published', true))
+            ->andWhere($q->expr()->like('companyname', ':filterVar'))
+            ->setParameter('filterVar', '%'.$filterVal.'%')
+            ->orderBy('companyname')
+            ->setMaxResults(50);
+
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

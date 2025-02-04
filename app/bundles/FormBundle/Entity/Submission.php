@@ -24,12 +24,12 @@ class Submission
     private $form;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
@@ -49,7 +49,7 @@ class Submission
     private $referer;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page|null
+     * @var Page|null
      */
     private $page;
 
@@ -63,7 +63,7 @@ class Submission
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\SubmissionRepository::class)
+            ->setCustomRepositoryClass(SubmissionRepository::class)
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
 
@@ -89,7 +89,7 @@ class Submission
 
         $builder->addField('referer', 'text');
 
-        $builder->createManyToOne('page', \Mautic\PageBundle\Entity\Page::class)
+        $builder->createManyToOne('page', Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
             ->fetchExtraLazy()
             ->build();
@@ -265,7 +265,7 @@ class Submission
     /**
      * Get page.
      *
-     * @return \Mautic\PageBundle\Entity\Page
+     * @return Page
      */
     public function getPage()
     {

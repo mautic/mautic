@@ -13,9 +13,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
         $records = [
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe2AAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe2AAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYv4EAF',
@@ -23,9 +23,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe7AAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQe7AAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYv9EAF',
@@ -33,9 +33,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeCAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeCAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYvEEAV',
@@ -43,9 +43,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeHAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeHAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYvJEAV',
@@ -53,9 +53,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeMAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeMAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => null,
                 'LeadId'     => '00Qf100000YjYvOEAV',
@@ -63,9 +63,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeRAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeRAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYvTEAV',
                 'LeadId'     => null,
@@ -73,9 +73,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeWAAW',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQeWAAW',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000X1NR5EAN',
                 'LeadId'     => null,
@@ -83,9 +83,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQebAAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQebAAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYvYEAV',
                 'LeadId'     => null,
@@ -93,9 +93,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQegAAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQegAAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYvdEAF',
                 'LeadId'     => null,
@@ -103,9 +103,9 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'attributes' => [
-                        'type' => 'CampaignMember',
-                        'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQelAAG',
-                    ],
+                    'type' => 'CampaignMember',
+                    'url'  => '/services/data/v34.0/sobjects/CampaignMember/00vf100000gFQelAAG',
+                ],
                 'CampaignId' => '701f10000021UnkAAE',
                 'ContactId'  => '00Qf100000YjYviEAF',
                 'LeadId'     => null,

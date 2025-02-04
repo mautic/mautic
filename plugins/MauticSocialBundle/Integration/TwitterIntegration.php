@@ -6,9 +6,11 @@ use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
 class TwitterIntegration extends SocialIntegration
 {
+    public const NAME = 'Twitter';
+
     public function getName(): string
     {
-        return 'Twitter';
+        return self::NAME;
     }
 
     public function getPriority(): int

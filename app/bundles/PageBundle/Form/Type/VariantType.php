@@ -64,7 +64,7 @@ class VariantType extends AbstractType
                             ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
                         ),
                     ],
-                    ]
+                ]
             );
 
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria): void {

@@ -11,9 +11,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastExecutioner
 {
-    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $contactLimiter = null;
+    private ?ContactLimiter $contactLimiter = null;
 
-    private ?\Mautic\SmsBundle\Broadcast\BroadcastResult $result = null;
+    private ?BroadcastResult $result = null;
 
     public function __construct(
         private SmsModel $smsModel,

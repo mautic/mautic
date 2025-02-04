@@ -13,17 +13,17 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|LoggerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    private MockObject $pathsHelper;
 
     protected function setUp(): void
     {

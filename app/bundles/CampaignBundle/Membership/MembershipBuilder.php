@@ -13,13 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MembershipBuilder
 {
-    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
+    private ?Campaign $campaign = null;
 
-    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $contactLimiter = null;
+    private ?ContactLimiter $contactLimiter = null;
 
     private ?int $runLimit = null;
 
-    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
+    private ?OutputInterface $output = null;
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 

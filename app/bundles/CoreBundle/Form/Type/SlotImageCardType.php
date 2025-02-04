@@ -39,7 +39,7 @@ class SlotImageCardType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(
@@ -58,7 +58,7 @@ class SlotImageCardType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(

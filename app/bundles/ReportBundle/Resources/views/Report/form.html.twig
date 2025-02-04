@@ -17,11 +17,11 @@
   {{ form_start(form) }}
   {{ form_errors(form) }}
   <div class="box-layout">
-      <div class="col-md-9 bg-white height-auto">
+      <div class="col-md-9 height-auto">
           <div class="row">
               <div class="col-xs-12">
                   <!-- tabs controls -->
-                  <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                  <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active">
                           <a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a>
                       </li>
@@ -148,7 +148,7 @@
               </div>
           </div>
       </div>
-      <div class="col-md-3 bg-white height-auto bdr-l">
+      <div class="col-md-3 height-auto bdr-l">
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.isPublished) }}
               {{ form_row(form.system) }}

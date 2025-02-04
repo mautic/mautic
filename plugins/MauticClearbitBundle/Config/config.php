@@ -24,7 +24,7 @@ return [
     'services' => [
         'others' => [
             'mautic.plugin.clearbit.lookup_helper' => [
-                'class'     => \MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class,
+                'class'     => MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.helper.user',
@@ -36,7 +36,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.clearbit' => [
-                'class'     => \MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration::class,
+                'class'     => MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -45,7 +45,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',

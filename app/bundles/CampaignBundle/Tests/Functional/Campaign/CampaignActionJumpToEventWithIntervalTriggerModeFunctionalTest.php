@@ -177,7 +177,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         yield 'Points at a relative time: Between future time' => [
             $adjustPointEvent,
             '%h',
-             (int) $adjustPointEvent->getTriggerRestrictedStartHour()->diff(new \DateTime())->format('%h'),
+            (int) $adjustPointEvent->getTriggerRestrictedStartHour()->diff(new \DateTime())->format('%h'),
         ];
 
         $adjustPointEvent = clone $event;

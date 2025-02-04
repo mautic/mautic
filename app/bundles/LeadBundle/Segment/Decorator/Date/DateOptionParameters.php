@@ -18,7 +18,7 @@ class DateOptionParameters
 
     private bool $shouldUseLastDayOfRange;
 
-    private \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
+    private DateTimeHelper $dateTimeHelper;
 
     public function __construct(
         ContactSegmentFilterCrate $leadSegmentFilterCrate,

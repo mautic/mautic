@@ -51,7 +51,7 @@ class WidgetApiController extends CommonApiController
     /**
      * Obtains a list of available widget types.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getTypesAction()
     {
@@ -69,7 +69,7 @@ class WidgetApiController extends CommonApiController
      *
      * @param string $type of the widget
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getDataAction(Request $request, $type)
     {

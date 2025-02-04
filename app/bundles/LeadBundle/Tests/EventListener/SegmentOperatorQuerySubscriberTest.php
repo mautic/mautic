@@ -18,19 +18,19 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     /**
      * @var MockObject|QueryBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
+    private MockObject $queryBuilder;
 
     /**
      * @var MockObject|ExpressionBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $expressionBuilder;
+    private MockObject $expressionBuilder;
 
     /**
      * @var MockObject|ContactSegmentFilter
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactSegmentFilter;
+    private MockObject $contactSegmentFilter;
 
-    private \Mautic\LeadBundle\EventListener\SegmentOperatorQuerySubscriber $subscriber;
+    private SegmentOperatorQuerySubscriber $subscriber;
 
     protected function setUp(): void
     {

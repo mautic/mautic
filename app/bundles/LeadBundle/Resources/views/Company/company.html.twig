@@ -15,13 +15,27 @@
 
 {% block headerTitle %}{{ company.name }}{% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : company,
+        'routeBase'       : 'company',
+        'langVar'         : 'company',
+        'customButtons'   : [],
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser),
+        },
+        'targetLabel'     : 'mautic.lead.lead.companies'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
 {% set canEdit     = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], company.permissionUser) %}
 {% set canMerge    = securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser) %}
 {% set canDownload = securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser) %}
 {% set buttons     = [] %}
 
-{# Merge button #}
 {% if canMerge and canEdit %}
     {% set buttons = buttons|merge([{
         'attr': {
@@ -31,11 +45,10 @@
             'href': path('mautic_company_action', {'objectId': company.id, 'objectAction': 'merge'}),
         },
         'btnText': 'mautic.lead.merge'|trans,
-        'iconClass': 'fa fa-user',
+        'iconClass': 'ri-exchange-2-line',
     }]) %}
 {% endif %}
 
-{# Download button #}
 {% if canDownload %}
     {% set buttons = buttons|merge([{
         'attr': {
@@ -43,11 +56,11 @@
             'href': path('mautic_company_export_action', {'companyId': company.id}),
         },
         'btnText': 'mautic.core.export'|trans,
-        'iconClass': 'fa fa-download',
+        'iconClass': 'ri-export-line',
     }]) %}
 {% endif %}
 
-  {{ include ('@MauticCore/Helper/page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
         'item': company,
         'routeBase': 'company',
         'langVar': 'company',
@@ -55,7 +68,6 @@
         'templateButtons': {
             'edit': canEdit,
             'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser),
-            'close': securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser),
         },
   }) }}
 {% endblock %}
@@ -64,13 +76,13 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!--/ lead detail header -->
 
             <!-- lead detail collapseable -->
-            <div class="collapse" id="lead-details">
-                <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
+            <div class="collapse pr-md pl-md" id="lead-details">
+                <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
                     {% for g in fields|keys %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
@@ -81,12 +93,12 @@
                 </ul>
 
                 <!-- start: tab-content -->
-                <div class="tab-content pa-md bg-white">
+                <div class="tab-content pa-md">
                     {% for group in fields|keys %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">
-                                    <table class="table table-bordered table-striped mb-0">
+                                    <table class="table table-hover mb-0">
                                         <tbody>
                                         {% for field in fields[group] %}
                                             {% if field.value is not empty %}
@@ -120,7 +132,7 @@
             <!--/ lead detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
@@ -144,7 +156,7 @@
                                 </h5>
                             </div>
                             <div class="col-xs-4 va-t text-right">
-                                <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                                <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                             </div>
                         </div>
                         {{ include('@MauticCore/Helper/chart.html.twig', {
@@ -183,9 +195,9 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="mt-sm points-panel text-center">
                 <h1>{{ 'mautic.company.score.count'|trans({'%count%': company.score}) }}</h1>
                 <hr/>

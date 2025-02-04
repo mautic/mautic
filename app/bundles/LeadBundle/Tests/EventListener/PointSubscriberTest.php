@@ -16,12 +16,12 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
-    private \Mautic\LeadBundle\EventListener\PointSubscriber $subscriber;
-    private \PHPUnit\Framework\MockObject\MockObject $triggerExecutedEvent;
+    private PointSubscriber $subscriber;
+    private MockObject $triggerExecutedEvent;
 
-    private \PHPUnit\Framework\MockObject\MockObject $triggerEventEntity;
+    private MockObject $triggerEventEntity;
 
     protected function setUp(): void
     {

@@ -29,32 +29,32 @@ class SmsModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|CacheStorageHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $cacheStorageHelper;
+    private MockObject $cacheStorageHelper;
 
     /**
      * @var MockObject|EntityManager
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManger;
+    private MockObject $entityManger;
 
     /**
      * @var MockObject|LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject|MessageQueueModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $messageQueueModel;
+    private MockObject $messageQueueModel;
 
     /**
      * @var MockObject|TrackableModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pageTrackableModel;
+    private MockObject $pageTrackableModel;
 
     /**
      * @var MockObject|TransportChain
      */
-    private \PHPUnit\Framework\MockObject\MockObject $transport;
+    private MockObject $transport;
 
     /**
      * @var MockObject&CorePermissions

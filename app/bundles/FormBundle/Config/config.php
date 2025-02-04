@@ -53,7 +53,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'forms',
                 'path'            => '/forms',
-                'controller'      => \Mautic\FormBundle\Controller\Api\FormApiController::class,
+                'controller'      => Mautic\FormBundle\Controller\Api\FormApiController::class,
             ],
             'mautic_api_formresults' => [
                 'path'       => '/forms/{formId}/submissions',
@@ -114,6 +114,11 @@ return [
                 'path'       => '/form/submit/ajax',
                 'controller' => 'Mautic\FormBundle\Controller\AjaxController::submitAction',
             ],
+            'mautic_form_company_lookup' => [
+                'path'       => '/form/company-lookup/autocomplete',
+                'controller' => 'Mautic\FormBundle\Controller\PublicController::lookupCompanyAction',
+                'method'     => 'POST',
+            ],
         ],
     ],
 
@@ -170,19 +175,19 @@ return [
         ],
         'other' => [
             'mautic.form.collector.object' => [
-                'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,
+                'class'     => Mautic\FormBundle\Collector\ObjectCollector::class,
                 'arguments' => ['event_dispatcher'],
             ],
             'mautic.form.collector.field' => [
-                'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
+                'class'     => Mautic\FormBundle\Collector\FieldCollector::class,
                 'arguments' => ['event_dispatcher'],
             ],
             'mautic.form.collector.mapped.object' => [
-                'class'     => \Mautic\FormBundle\Collector\MappedObjectCollector::class,
+                'class'     => Mautic\FormBundle\Collector\MappedObjectCollector::class,
                 'arguments' => ['mautic.form.collector.field'],
             ],
             'mautic.form.collector.already.mapped.field' => [
-                'class'     => \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
+                'class'     => Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
                 'arguments' => ['mautic.cache.provider'],
             ],
             'mautic.helper.form.field_helper' => [
@@ -213,7 +218,7 @@ return [
                 ],
             ],
             'mautic.form.helper.properties.accessor' => [
-                'class'     => \Mautic\FormBundle\Helper\PropertiesAccessor::class,
+                'class'     => Mautic\FormBundle\Helper\PropertiesAccessor::class,
                 'arguments' => [
                     'mautic.form.model.form',
                 ],
@@ -239,13 +244,13 @@ return [
         ],
         'fixtures' => [
             'mautic.form.fixture.form' => [
-                'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.form.model.form', 'mautic.form.model.field', 'mautic.form.model.action', 'event_dispatcher'],
             ],
             'mautic.form.fixture.form_result' => [
-                'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.page.model.page', 'mautic.form.model.submission'],
             ],
         ],

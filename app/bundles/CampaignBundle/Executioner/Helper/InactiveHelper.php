@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    private \DateTimeInterface|null $earliestInactiveDate = null;
+    private ?\DateTimeInterface $earliestInactiveDate = null;
 
     public function __construct(
         private EventScheduler $scheduler,

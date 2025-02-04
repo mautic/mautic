@@ -3,34 +3,40 @@
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
+        'lazy'      => true,
         'context'   => 'mautic',
         'security'  => false,
     ],
     'dev' => [
         'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
         'security'  => true,
-        'anonymous' => 'lazy',
+        'anonymous' => true,
+        'lazy'      => true,
     ],
     'login' => [
         'pattern'   => '^/s/login$',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
+        'lazy'      => true,
         'context'   => 'mautic',
     ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
-        'anonymous'          => 'lazy',
+        'anonymous'          => true,
+        'lazy'               => true,
         'mautic_plugin_auth' => true,
         'context'            => 'mautic',
     ],
     'saml_login' => [
         'pattern'   => '^/s/saml/login$',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
+        'lazy'      => true,
         'context'   => 'mautic',
     ],
     'saml_discovery' => [
         'pattern'   => '^/saml/discovery$',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
+        'lazy'      => true,
         'context'   => 'mautic',
     ],
     'oauth2_token' => [
@@ -44,7 +50,8 @@ $firewalls = [
             'check_path' => '/oauth/v2/authorize_login_check',
             'login_path' => '/oauth/v2/authorize_login',
         ],
-        'anonymous' => 'lazy',
+        'anonymous' => true,
+        'lazy'      => true,
     ],
     'api' => [
         'pattern'            => '^/api',
@@ -94,7 +101,8 @@ $firewalls = [
     ],
     'public' => [
         'pattern'   => '^/',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
+        'lazy'      => true,
         'context'   => 'mautic',
     ],
 ];
@@ -112,11 +120,11 @@ $container->loadFromExtension(
             ],
         ],
         'encoders' => [
-            \Symfony\Component\Security\Core\User\User::class => [
+            Symfony\Component\Security\Core\User\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
-            \Mautic\UserBundle\Entity\User::class => [
+            Mautic\UserBundle\Entity\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
@@ -165,7 +173,7 @@ if ('prod' == $container->getParameter('kernel.environment')) {
 }
 
 $container->setParameter('mautic.security.restrictedConfigFields', $restrictedConfigFields);
-$container->setParameter('mautic.security.restrictedConfigFields.displayMode', \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::MODE_REMOVE);
+$container->setParameter('mautic.security.restrictedConfigFields.displayMode', Mautic\ConfigBundle\Form\Helper\RestrictionHelper::MODE_REMOVE);
 
 /*
  * Optional security parameters

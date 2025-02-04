@@ -112,7 +112,7 @@ class DoctrineStepType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-lock',
+                    'preaddon' => 'ri-lock-fill',
                 ],
                 'required' => false,
             ]
@@ -154,7 +154,7 @@ class DoctrineStepType extends AbstractType
                         'type'  => 'submit',
                         'attr'  => [
                             'class'   => 'btn btn-success pull-right btn-next',
-                            'icon'    => 'fa fa-arrow-circle-right',
+                            'icon'    => 'ri-arrow-right-circle-line',
                             'onclick' => 'MauticInstaller.showWaitMessage(event);',
                         ],
                     ],

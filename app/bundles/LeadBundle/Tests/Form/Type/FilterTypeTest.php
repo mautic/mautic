@@ -20,14 +20,14 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormAdjustmentsProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formAdjustmentsProvider;
+    private MockObject $formAdjustmentsProvider;
 
     /**
      * @var MockObject|ListModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $listModel;
+    private MockObject $listModel;
 
-    private \Mautic\LeadBundle\Form\Type\FilterType $form;
+    private FilterType $form;
 
     protected function setUp(): void
     {

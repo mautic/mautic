@@ -17,9 +17,9 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|WebhookModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $webhookModel;
+    private MockObject $webhookModel;
 
-    private \Mautic\SmsBundle\EventListener\WebhookSubscriber $subscriber;
+    private WebhookSubscriber $subscriber;
 
     protected function setUp(): void
     {

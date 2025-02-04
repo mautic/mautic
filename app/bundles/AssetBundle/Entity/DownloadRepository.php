@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -62,7 +63,7 @@ class DownloadRepository extends CommonRepository
             $query->andWhere($query->expr()->like('a.title', $query->expr()->literal('%'.$options['search'].'%')));
         }
 
-        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download']);
+        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download'], null, 'd.id');
     }
 
     /**
@@ -72,12 +73,10 @@ class DownloadRepository extends CommonRepository
      * @param int          $limit
      * @param int          $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostDownloaded($query, $limit = 10, $offset = 0)
+    public function getMostDownloaded($query, $limit = 10, $offset = 0): array
     {
         $query->select('a.title, a.id, count(ad.id) as downloads')
             ->groupBy('a.id, a.title')
@@ -85,7 +84,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -95,12 +94,10 @@ class DownloadRepository extends CommonRepository
      * @param int          $limit
      * @param int          $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, $limit = 10, $offset = 0)
+    public function getTopReferrers($query, $limit = 10, $offset = 0): array
     {
         $query->select('ad.referer, count(ad.referer) as downloads')
             ->groupBy('ad.referer')
@@ -108,7 +105,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -125,7 +122,7 @@ class DownloadRepository extends CommonRepository
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
-        $results = $query->execute()->fetchAllAssociative();
+        $results = $query->executeQuery()->fetchAllAssociative();
 
         $chart   = new PieChart();
 

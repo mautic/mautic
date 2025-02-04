@@ -50,7 +50,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('focus_stats')
-            ->setCustomRepositoryClass(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['type'], 'focus_type')
             ->addIndex(['type', 'type_id'], 'focus_type_id')
             ->addIndex(['date_added'], 'focus_date_added');

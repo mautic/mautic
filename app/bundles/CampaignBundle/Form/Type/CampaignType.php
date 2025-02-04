@@ -75,7 +75,7 @@ class CampaignType extends AbstractType
                 'data-confirm-callback' => 'dismissConfirmation',
                 'data-cancel-text'      => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
                 'data-cancel-callback'  => 'setPublishedButtonToYes',
-                'class'                 => 'btn btn-default',
+                'class'                 => 'btn btn-ghost',
             ];
         } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
             $readonly = true;
@@ -109,12 +109,16 @@ class CampaignType extends AbstractType
                     'name'  => 'builder',
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-default btn-dnd',
-                        'icon'    => 'fa fa-cube',
+                        'class'   => 'btn btn-ghost btn-dnd',
+                        'icon'    => 'ri-organization-chart',
                         'onclick' => 'Mautic.launchCampaignEditor();',
                     ],
                 ],
             ],
+        ]);
+
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
         ]);
     }
 

@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
@@ -37,7 +37,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
+    private ReportHelper $reportHelper;
 
     public function setUp(): void
     {

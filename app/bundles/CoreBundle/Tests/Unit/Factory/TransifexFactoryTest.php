@@ -18,12 +18,12 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ClientInterface&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $client;
+    private MockObject $client;
 
     /**
      * @var CoreParametersHelper&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     private TransifexFactory $transifexFactory;
 

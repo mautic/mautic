@@ -81,7 +81,7 @@ EOT
         if (true === $this->coreParametersHelper->get('composer_updates', false)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         try {
@@ -103,7 +103,7 @@ EOT
             );
         }
 
-        return \Symfony\Component\Console\Command\Command::FAILURE;
+        return Command::FAILURE;
     }
 
     /**

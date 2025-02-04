@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory)
     {
@@ -48,7 +48,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model    = $this->getModel('email');
         $objectId = $request->request->get('id', 0);
         $pending  = $request->request->get('pending', 0);
@@ -93,7 +93,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getBuilderTokens($query)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         return $model->getBuilderComponents(null, ['tokens'], (string) $query);

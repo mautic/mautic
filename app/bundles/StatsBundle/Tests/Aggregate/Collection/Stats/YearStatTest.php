@@ -12,7 +12,7 @@ class YearStatTest extends TestCase
 
     private $month    = 11;
 
-    private \Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat $yearStat;
+    private YearStat $yearStat;
 
     private $monthStat;
 

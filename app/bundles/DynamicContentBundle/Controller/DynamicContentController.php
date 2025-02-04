@@ -330,7 +330,7 @@ class DynamicContentController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {

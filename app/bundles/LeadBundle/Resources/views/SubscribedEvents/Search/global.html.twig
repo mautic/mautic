@@ -9,7 +9,7 @@
     </span>
     <a href="{{ url('mautic_contact_action', {'objectAction': 'view', 'objectId': lead.id}) }}" data-toggle="ajax">
         <span>{{ lead.primaryIdentifier(true) }}</span>
-        <span class="label label-default pull-right" {% if lead.color is not empty %}style="background-color:{{ lead.color }};"{% endif %} data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.lead.pointscount'|trans }}">{{ lead.points }}</span>
+        <span size="sm" class="label label-gray pull-right" {% if lead.color is not empty %}style="background-color:{{ lead.color }};"{% endif %} data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.lead.pointscount'|trans }}">{{ lead.points }}</span>
     </a>
     <div class="clearfix"></div>
 {% endif %}

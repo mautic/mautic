@@ -8,11 +8,14 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 class TagControllerTest extends MauticMysqlTestCase
 {
+    public const USERNAME = 'jhony';
     /**
      * @var TagRepository
      */
@@ -180,5 +183,57 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
+    }
+
+    public function testEditTagWithNoPermission(): void
+    {
+        $this->createAndLoginUser();
+        $tag     = $this->tagRepository->findOneBy([]);
+        $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
+        $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
+    }
+
+    private function createAndLoginUser(): User
+    {
+        // Create non-admin role
+        $role = $this->createRole();
+        // Create non-admin user
+        $user = $this->createUser($role);
+
+        $this->em->flush();
+        $this->em->detach($role);
+
+        $this->loginUser(self::USERNAME);
+        $this->client->setServerParameter('PHP_AUTH_USER', self::USERNAME);
+        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+
+        return $user;
+    }
+
+    private function createRole(bool $isAdmin = false): Role
+    {
+        $role = new Role();
+        $role->setName('Role');
+        $role->setIsAdmin($isAdmin);
+
+        $this->em->persist($role);
+
+        return $role;
+    }
+
+    private function createUser(Role $role): User
+    {
+        $user = new User();
+        $user->setFirstName('Jhon');
+        $user->setLastName('Doe');
+        $user->setUsername(self::USERNAME);
+        $user->setEmail('john.doe@email.com');
+        $encoder = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $user->setPassword($encoder->hash('mautic'));
+        $user->setRole($role);
+
+        $this->em->persist($user);
+
+        return $user;
     }
 }

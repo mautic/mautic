@@ -144,13 +144,13 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
                     'type'       => 'leadlist',
                     'operator'   => $operator,
                     'properties' => [
-                            'filter' => [
-                                    0 => $parameterValue,
-                                ],
-                        ],
-                    'filter' => [
+                        'filter' => [
                             0 => $parameterValue,
                         ],
+                    ],
+                    'filter' => [
+                        0 => $parameterValue,
+                    ],
                     'display' => null,
                 ]
             ),

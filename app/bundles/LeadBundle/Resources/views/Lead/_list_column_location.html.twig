@@ -13,6 +13,7 @@
     {% elseif fields.core.country is defined %}
         {% set location = location|merge([fields.core.country.value]) %}
     {% endif %}
-    {{ location|join(', ')|purify }}
+    {{ location|filter(v => v is not empty)|join(', ')|purify }}
     <div class="clearfix"></div>
 </td>
+

@@ -56,7 +56,7 @@ class PageListType extends AbstractType
                 'required'          => false,
                 'top_level'         => 'variant',
                 'ignore_ids'        => [],
-                ]
+            ]
         );
 
         $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);

@@ -11,7 +11,7 @@ class DateRangeUnitTraitTest extends TestCase
     /**
      * @var MockObject|DateRangeUnitTrait
      */
-    private \PHPUnit\Framework\MockObject\MockObject $trait;
+    private MockObject $trait;
 
     protected function setUp(): void
     {

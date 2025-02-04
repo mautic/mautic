@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Field
 {
+    public const TABLE_NAME = 'form_fields';
+
     /**
      * @var int
      */
@@ -172,7 +174,7 @@ class Field
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('form_fields')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(FieldRepository::class)
             ->addIndex(['type'], 'form_field_type_search');
 
@@ -901,8 +903,8 @@ class Field
     {
         $properties = $this->getProperties();
 
-        return 'checkboxgrp' === $this->getType() ||
-            (key_exists('multiple', $properties) && 1 === $properties['multiple']);
+        return 'checkboxgrp' === $this->getType()
+            || (key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
     /**
@@ -987,6 +989,7 @@ class Field
     public function setMappedObject(?string $mappedObject): void
     {
         $this->mappedObject = $mappedObject;
+        $this->resetLeadFieldIfValueIsEmpty($mappedObject);
     }
 
     public function getMappedField(): ?string
@@ -997,5 +1000,15 @@ class Field
     public function setMappedField(?string $mappedField): void
     {
         $this->mappedField = $mappedField;
+        $this->resetLeadFieldIfValueIsEmpty($mappedField);
+    }
+
+    private function resetLeadFieldIfValueIsEmpty(?string $value): void
+    {
+        if ($value) {
+            return;
+        }
+
+        $this->leadField = null;
     }
 }

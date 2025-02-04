@@ -28,34 +28,34 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Session
      */
-    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
+    private MockObject $sessionMock;
 
     /**
      * @var MockObject|ModelFactory<EmailModel>
      */
-    private \PHPUnit\Framework\MockObject\MockObject $modelFactoryMock;
+    private MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|Container
      */
-    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
+    private MockObject $containerMock;
 
     /**
      * @var MockObject|EmailModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $modelMock;
+    private MockObject $modelMock;
 
     /**
      * @var MockObject|Email
      */
-    private \PHPUnit\Framework\MockObject\MockObject $emailMock;
+    private MockObject $emailMock;
 
-    private \Mautic\EmailBundle\Controller\AjaxController $controller;
+    private AjaxController $controller;
 
     /**
      * @var MockObject&ManagerRegistry
      */
-    private \PHPUnit\Framework\MockObject\MockObject $managerRegistry;
+    private MockObject $managerRegistry;
 
     protected function setUp(): void
     {

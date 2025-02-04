@@ -9,19 +9,35 @@
 
 {% block headerTitle activeMonitoring.title %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : activeMonitoring,
+        'templateButtons' : {
+            'close' : securityIsGranted('mauticSocial:monitoring:view'),
+        },
+        'routeBase'       : 'social',
+        'langVar'         : 'monitoring',
+        'targetLabel'     : 'mautic.social.monitoring'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
-    {# @todo finish ACL here #}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
         'item': activeMonitoring,
         'templateButtons': {
             'edit': securityIsGranted('mauticSocial:monitoring:edit'),
             'delete': securityIsGranted('mauticSocial:monitoring:delete'),
-            'close': securityIsGranted('mauticSocial:monitoring:view'),
         },
         'routeBase': 'social',
         'langVar': 'monitoring',
         'nameGetter': 'getTitle',
-    }) }}
+    }) -}}
+{% endblock %}
+
+{% block publishStatus %}
+{{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activeMonitoring}) }}
 {% endblock %}
 
 {% block content %}
@@ -29,25 +45,16 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 bg-white height-auto">
-          <div class="bg-auto">
+      <div class="col-md-9 height-auto">
+          <div>
               <!-- monitoring detail header -->
-              <div class="pr-md pl-md pt-lg pb-lg">
-                  <div class="box-layout">
-                      <div class="col-xs-10 va-m">
-                          <div class="text-white dark-sm mb-0">{{ activeMonitoring.description|purify }}</div>
-                      </div>
-                      <div class="col-xs-2 text-right">
-                          {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activeMonitoring}) }}
-                      </div>
-                  </div>
-              </div>
+              {% include '@MauticCore/Helper/description.html.twig' with {'description': activeMonitoring.description} %}
               <!--/ monitoring detail header -->
               <!-- monitoring detail collapseable -->
-              <div class="collapse" id="asset-details">
+              <div class="collapse pr-md pl-md" id="asset-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-bordered table-striped mb-0">
+                          <table class="table table-hover mb-0">
                               <tbody>
                                   {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeMonitoring}) }}
                               </tbody>
@@ -58,7 +65,7 @@
               <!--/  monitoring collapseable -->
           </div>
 
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- stats -->
               <div class="pa-md">
                   <div class="row">
@@ -67,7 +74,7 @@
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 va-m">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
-                                          <span class="fa fa-twitter"></span>
+                                          <span class="ri-twitter-x-line"></span>
                                           {{ ('mautic.social.monitoring.' ~ activeMonitoring.networkType ~ '.popularity')|trans }}
                                       </h5>
                                   </div>
@@ -84,10 +91,10 @@
               </div>
               <!--/ stats -->
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+              {{ customContent('details.stats.graph.below', _context) }}
 
               <!-- tabs controls -->
-              <ul class="nav nav-tabs pr-md pl-md">
+              <ul class="nav nav-tabs nav-tabs-contained">
                   <li class="active">
                       <a href="#leads-container" role="tab" data-toggle="tab">
                           {{ 'mautic.lead.leads'|trans }}
@@ -109,7 +116,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bg-white bdr-l height-auto">
+      <div class="col-md-3 bdr-l height-auto">
           <!-- recent activity -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
       </div>

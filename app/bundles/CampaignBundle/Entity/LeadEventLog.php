@@ -104,7 +104,7 @@ class LeadEventLog implements ChannelInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+            ->setCustomRepositoryClass(LeadEventLogRepository::class)
             ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')

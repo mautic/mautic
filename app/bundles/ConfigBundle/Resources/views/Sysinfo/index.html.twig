@@ -8,32 +8,32 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- step container -->
-    <div class="col-md-3 bg-white height-auto">
+    <div class="col-md-3 height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
                 <li role="presentation" class="list-group-item in active">
-                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-toggle="tab">
+                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-text">
                         {{ 'mautic.sysinfo.tab.phpinfo'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab">
+                    <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-text">
                         {{ 'mautic.sysinfo.tab.recommendations'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab">
+                    <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab" class="list-group-item-text">
                         {{ 'mautic.sysinfo.tab.folders'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#log" aria-controls="log" role="tab" data-toggle="tab">
+                    <a href="#log" aria-controls="log" role="tab" data-toggle="tab" class="list-group-item-text">
                         {{ 'mautic.sysinfo.tab.log'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab">
+                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab" class="list-group-item-text">
                         {{ 'mautic.sysinfo.tab.dbinfo'|trans }}
                     </a>
                 </li>
@@ -43,7 +43,7 @@
     </div>
 
     <!-- container -->
-    <div class="col-md-9 bg-auto height-auto bdr-l">
+    <div class="col-md-9 height-auto bdr-l">
 
         <!-- Tab panes -->
         <div class="tab-content">
@@ -74,7 +74,7 @@
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
                 <div class="pt-md pr-md pl-md pb-md">
                     <h2 class="pb-md">{{ 'mautic.sysinfo.folders.title'|trans }}</h2>
-                    <table class="table">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th>{{ 'mautic.sysinfo.folder.path'|trans }}</th>
@@ -111,7 +111,7 @@
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     <h2 class="pb-md">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
-                    <table class="table">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th>{{ 'mautic.sysinfo.dbinfo.property'|trans }}</th>

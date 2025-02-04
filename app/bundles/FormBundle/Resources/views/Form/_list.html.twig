@@ -11,7 +11,7 @@
 #}
 {% if items|length > 0 %}
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered" id="formTable">
+        <table class="table table-hover" id="formTable">
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -27,7 +27,7 @@
                                     'message': 'mautic.form.confirm_batch_rebuild'|trans,
                                     'confirmText': 'mautic.form.rebuild'|trans,
                                     'confirmAction': path('mautic_form_action', {'objectAction': 'batchRebuildHtml'}),
-                                    'iconClass': 'fa fa-fw fa-refresh',
+                                    'iconClass': 'fa ri-fw ri-refresh-line',
                                     'btnText': 'mautic.form.rebuild'|trans,
                                     'precheck': 'batchActionPrecheck',
                                     'confirmCallback': 'executeBatchAction',
@@ -108,7 +108,7 @@
                                             'target': '_blank',
                                             'href': path('mautic_form_action', {'objectAction': 'preview', 'objectId': item.id}),
                                         },
-                                        'iconClass': 'fa fa-camera',
+                                        'iconClass': 'ri-eye-line',
                                         'btnText': 'mautic.form.form.preview',
                                     },
                                     {
@@ -116,7 +116,7 @@
                                             'data-toggle': 'ajax',
                                             'href': path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}),
                                         },
-                                        'iconClass': 'fa fa-database',
+                                        'iconClass': 'ri-list-view',
                                         'btnText': 'mautic.form.form.results',
                                     },
                                 ],
@@ -128,7 +128,7 @@
                             <a href="{{ path('mautic_form_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index">
                                 {{ item.name }}
                                 {% if 'campaign' == item.formType %}
-                                    <span data-toggle="tooltip" title="{{ 'mautic.form.icon_tooltip.campaign_form'|trans }}"><i class="fa fa-fw fa-cube"></i></span>
+                                    <span data-toggle="tooltip" title="{{ 'mautic.form.icon_tooltip.campaign_form'|trans }}"><i class="ri-fw ri-megaphone-fill fs-14"></i></span>
                                 {% endif %}
                             </a>
                         </div>
@@ -141,14 +141,11 @@
                     <td class="visible-md visible-lg">
                         {% set category = item.category %}
                         {% set catName = category ? category.title : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = category ? '#' ~ category.color : 'inherit' %}
-                        <span style="white-space: nowrap;">
-                          <span class="label label-default pa-4" style="border:1px solid #d5d5d5;background:{{ color }};"></span>
-                          <span>{{ catName }}</span>
-                        </span>
+                        {% set color = category ? '#' ~ category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
+                        <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
                            {{- 'mautic.form.form.viewresults'|trans({'%count%': i['submission_count']}) -}}
                         </a>
                     </td>

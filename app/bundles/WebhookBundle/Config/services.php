@@ -20,8 +20,8 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\WebhookBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.webhook.model.webhook', \Mautic\WebhookBundle\Model\WebhookModel::class);
-    $services->alias('mautic.webhook.repository.queue', \Mautic\WebhookBundle\Entity\WebhookQueueRepository::class);
+    $services->alias('mautic.webhook.model.webhook', Mautic\WebhookBundle\Model\WebhookModel::class);
+    $services->alias('mautic.webhook.repository.queue', Mautic\WebhookBundle\Entity\WebhookQueueRepository::class);
 };

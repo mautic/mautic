@@ -57,4 +57,22 @@ final class ApiEvents
      * @var string
      */
     public const API_ON_ENTITY_POST_SAVE = 'mautic.api_on_entity_post_save';
+
+    /**
+     * The mautic.api_pre_serialization_context event is dispatched before the serialization context is created for the view.
+     *
+     * The event listener receives a Mautic\ApiBundle\Event\ApiSerializationContextEvent instance.
+     *
+     * @var string
+     */
+    public const API_PRE_SERIALIZATION_CONTEXT = 'mautic.api_pre_serialization_context';
+
+    /**
+     * The mautic.api_post_serialization_context event is dispatched after the serialization context is created for the view.
+     *
+     * The event listener receives a Mautic\ApiBundle\Event\ApiSerializationContextEvent instance.
+     *
+     * @var string
+     */
+    public const API_POST_SERIALIZATION_CONTEXT = 'mautic.api_post_serialization_context';
 }

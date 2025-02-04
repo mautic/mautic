@@ -36,7 +36,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
 
-    private \Mautic\InstallBundle\Controller\InstallController $controller;
+    private InstallController $controller;
 
     private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 

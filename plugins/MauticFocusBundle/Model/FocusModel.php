@@ -32,6 +32,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
+use Twig\Runtime\EscaperRuntime;
 
 /**
  * @extends FormModel<Focus>
@@ -93,7 +94,7 @@ class FocusModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Focus::class);
+        return $this->em->getRepository(Focus::class);
     }
 
     /**
@@ -101,7 +102,7 @@ class FocusModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
@@ -180,7 +181,7 @@ class FocusModel extends FormModel
             $focusContent .= $cached['form'];
         }
 
-        $focusContent = twig_escape_filter($this->twig, $focusContent, 'js');
+        $focusContent = $this->twig->getRuntime(EscaperRuntime::class)->escape($focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
@@ -321,7 +322,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -363,12 +364,12 @@ class FocusModel extends FormModel
     /**
      * @param bool $canViewOthers
      */
-    public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true): array
+    public function getStats(Focus $focus, $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
 
-        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['focus_id' => $focus->getId()]);
+        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_NOTIFICATION, 'focus_id' => $focus->getId()]);
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }

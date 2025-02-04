@@ -145,7 +145,7 @@ class ComposerHelper
             $input, [
                 '--no-interaction',
                 '--working-dir' => $this->kernel->getProjectDir(),
-        ]));
+            ]));
 
         $application = new Application();
         // We don't want our script to stop after running a Composer command

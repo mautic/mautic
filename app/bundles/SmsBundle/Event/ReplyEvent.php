@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
-    private ?\Symfony\Component\HttpFoundation\Response $response = null;
+    private ?Response $response = null;
 
     private ?LeadEventLog $eventLog = null;
 

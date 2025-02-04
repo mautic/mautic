@@ -64,7 +64,7 @@ class Action
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_actions')
-            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\ActionRepository::class)
+            ->setCustomRepositoryClass(ActionRepository::class)
             ->addIndex(['type'], 'form_action_type_search');
 
         $builder->addIdColumns();

@@ -17,7 +17,7 @@ class ConfigSubscriberTest extends TestCase
     /**
      * @var ConfigBuilderEvent&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $configBuilderEvent;
+    private MockObject $configBuilderEvent;
 
     protected function setUp(): void
     {

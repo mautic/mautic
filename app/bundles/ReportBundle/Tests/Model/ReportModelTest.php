@@ -24,7 +24,7 @@ use Twig\Environment;
 
 class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
+    private ReportModel $reportModel;
 
     protected function setUp(): void
     {

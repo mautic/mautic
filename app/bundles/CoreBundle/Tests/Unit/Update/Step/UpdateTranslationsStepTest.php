@@ -13,19 +13,19 @@ class UpdateTranslationsStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|LanguageHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $languageHelper;
+    private MockObject $languageHelper;
 
     /**
      * @var MockObject|LoggerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
-    private \Mautic\CoreBundle\Update\Step\UpdateTranslationsStep $step;
+    private UpdateTranslationsStep $step;
 
     protected function setUp(): void
     {

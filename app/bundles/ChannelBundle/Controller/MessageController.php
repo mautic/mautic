@@ -87,7 +87,7 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {

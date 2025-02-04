@@ -158,7 +158,7 @@ class DynamicsApi extends CrmApi
             $odata .= 'Content-Type: application/http'.PHP_EOL;
             $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
             $odata .= 'Content-ID: '.$objectId.PHP_EOL.PHP_EOL;
-//            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
+            //            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
             $returnIds[$objectId] = $contentId;
             if (!$isUpdate) {
                 $oid                  = $objectId;

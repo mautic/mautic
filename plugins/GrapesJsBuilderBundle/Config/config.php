@@ -17,9 +17,14 @@ return [
                 'path'       => '/grapesjsbuilder/delete',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
             ],
+            /** @depreacated since Mautic 5.2, to be removed in 6.0. Use grapesjsbuilder_media instead */
             'grapesjsbuilder_assets' => [
                 'path'       => '/grapesjsbuilder/assets',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::assetsAction',
+            ],
+            'grapesjsbuilder_media' => [
+                'path'       => '/grapesjsbuilder/media',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::getMediaAction',
             ],
             'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
@@ -34,7 +39,7 @@ return [
         'other'        => [
             // Provides access to configured API keys, settings, field mapping, etc
             'grapesjsbuilder.config' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
+                'class'     => MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],
@@ -43,7 +48,7 @@ return [
         'sync'         => [],
         'helpers'      => [
             'grapesjsbuilder.helper.filemanager' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
+                'class'     => MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
                 'arguments' => [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',

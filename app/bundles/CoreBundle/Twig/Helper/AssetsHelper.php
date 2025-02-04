@@ -23,7 +23,7 @@ final class AssetsHelper
      */
     public const CONTEXT_BUILDER = 'builder';
 
-    private ?\Mautic\CoreBundle\Helper\AssetGenerationHelper $assetHelper = null;
+    private ?AssetGenerationHelper $assetHelper = null;
 
     private string $context = self::CONTEXT_APP;
 
@@ -41,7 +41,7 @@ final class AssetsHelper
      */
     private $siteUrl;
 
-    private ?\Mautic\CoreBundle\Helper\PathsHelper $pathsHelper = null;
+    private ?PathsHelper $pathsHelper = null;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 
@@ -676,7 +676,7 @@ final class AssetsHelper
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
-        $country  = ucwords(str_replace(' ', '-', $country));
+        $country  = ucwords(iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(' ', '-', $country)));
         $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');
 
         if ($urlOnly) {

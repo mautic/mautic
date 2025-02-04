@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyMergeEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
@@ -73,7 +74,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        private FieldList $fieldList
     ) {
         $this->leadFieldModel = $leadFieldModel;
 
@@ -117,7 +119,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->repoSetup = true;
             $repo->setDispatcher($this->dispatcher);
             // set the point trigger model in order to get the color code for the lead
-            $fields = $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+            $fields = $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
 
             $searchFields = [];
             foreach ($fields as $groupFields) {
@@ -134,7 +136,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function getCompanyLeadRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\CompanyLead::class);
+        return $this->em->getRepository(CompanyLead::class);
     }
 
     public function getPermissionBase(): string
@@ -180,7 +182,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class)->getCompanies($user);
+        return $this->em->getRepository(Company::class)->getCompanies($user);
     }
 
     /**
@@ -295,7 +297,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         }
 
         if ($companies instanceof Company) {
@@ -414,7 +416,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         }
 
         $companyLeadRemove = [];
@@ -517,6 +519,58 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * Get a list of companies with names only.
+     *
+     * @param mixed[]|string $filter
+     *
+     * @return string[]
+     */
+    public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, ?string $exclude = ''): array
+    {
+        $valueColumn = 'id';
+        if (!in_array($type, ['companyfield', 'lead.company'])) {
+            return [];
+        }
+        if ('lead.company' === $type) {
+            $column    = 'companyname';
+            $filterVal = $filter;
+        } else {
+            if (is_array($filter)) {
+                $column    = $filter[0];
+                $filterVal = $filter[1];
+            } else {
+                $column = $filter;
+            }
+        }
+
+        $expr      = new ExpressionBuilder($this->em->getConnection());
+        $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
+
+        // Exclude company if $exclude is provided
+        if ('' !== $exclude) {
+            $composite = $expr->and(
+                $composite,
+                $expr->neq('comp.id', $exclude)
+            );
+        }
+
+        // Validate owner permissions
+        if (!$this->security->isGranted('lead:leads:viewother')) {
+            $composite->with(
+                $expr->or(
+                    $expr->and(
+                        $expr->isNull('comp.owner_id'),
+                        $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                    ),
+                    $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                )
+            );
+        }
+
+        return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%', 'onlyNames' => true], $column, $valueColumn);
+    }
+
+    /**
      * Get list of entities for autopopulate fields.
      *
      * @param string         $type
@@ -567,7 +621,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -905,7 +959,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $lead->addUpdatedField('company', $primaryCompanyName)
             ->setDateModified(new \DateTime());
-        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+        $this->em->getRepository(Lead::class)->saveEntity($lead);
 
         if (null !== $newPrimaryCompany) {
             $this->getCompanyLeadRepository()->detachEntity($newPrimaryCompany);

@@ -60,8 +60,8 @@ class Cache
             [
                 'columnName' => 'item_time',
                 'options'    => [
-                        'unsigned' => true,
-                    ],
+                    'unsigned' => true,
+                ],
             ]
         );
     }

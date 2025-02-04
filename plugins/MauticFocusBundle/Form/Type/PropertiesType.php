@@ -141,7 +141,7 @@ class PropertiesType extends AbstractType
                 ],
                 'label'       => 'mautic.focus.form.frequency',
                 'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
+                'attr'        => ['class' => 'form-control', 'tooltip' => 'mautic.focus.form.frequency.help'],
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,

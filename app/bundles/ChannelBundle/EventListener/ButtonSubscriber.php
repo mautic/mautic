@@ -30,14 +30,14 @@ class ButtonSubscriber implements EventSubscriberInterface
             $event->addButton(
                 [
                     'attr' => [
-                        'class'       => 'btn btn-default btn-sm btn-nospin',
+                        'class'       => 'btn btn-ghost btn-sm btn-nospin',
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
                         'href'        => $this->router->generate('mautic_channel_batch_contact_view'),
                         'data-header' => $this->translator->trans('mautic.lead.batch.channels'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.lead.batch.channels'),
-                    'iconClass' => 'fa fa-rss',
+                    'iconClass' => 'ri-remote-control-line',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );

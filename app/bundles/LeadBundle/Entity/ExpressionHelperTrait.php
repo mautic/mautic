@@ -9,7 +9,7 @@ trait ExpressionHelperTrait
 {
     /**
      * @param QueryBuilder|\Doctrine\ORM\QueryBuilder $q
-     * @param $includeIsNull    true/false or null to auto determine based on operator
+     * @param                                         $includeIsNull true/false or null to auto determine based on operator
      *
      * @return mixed
      */

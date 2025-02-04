@@ -487,10 +487,10 @@ class ListController extends FormController
 
         if (!empty($dependents)) {
             $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.lead.list.error.cannot.delete',
-                    'msgVars' => ['%segments%' => implode(', ', $dependents)],
-                ];
+                'type'    => 'error',
+                'msg'     => 'mautic.lead.list.error.cannot.delete',
+                'msgVars' => ['%segments%' => implode(', ', $dependents)],
+            ];
 
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -717,11 +717,11 @@ class ListController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        /** @var ListModel $model */
         $model    = $this->getModel('lead.list');
         $security = $this->security;
 
@@ -937,7 +937,7 @@ class ListController extends FormController
      * @param int $objectId
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
     {

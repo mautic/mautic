@@ -16,9 +16,9 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
-    private \Doctrine\Common\Collections\ArrayCollection $persistQueue;
+    private ArrayCollection $persistQueue;
 
-    private \Doctrine\Common\Collections\ArrayCollection $logs;
+    private ArrayCollection $logs;
 
     private array $contactRotations = [];
 

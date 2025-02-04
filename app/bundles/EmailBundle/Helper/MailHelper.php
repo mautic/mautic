@@ -50,6 +50,12 @@ class MailHelper
 
     public const EMAIL_TYPE_MARKETING     = 'marketing';
 
+    private const DEFAULT_BODY            = [
+        'content'     => '',
+        'contentType' => 'text/html',
+        'charset'     => null,
+    ];
+
     /**
      * @var TransportInterface
      */
@@ -159,12 +165,14 @@ class MailHelper
     /**
      * @var string
      */
-    protected $subject = '';
+    protected $subject              = '';
+    private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
-    protected $plainText = '';
+    protected $plainText              = '';
+    private ?string $plainTextInitial = null;
 
     /**
      * @var bool
@@ -194,11 +202,12 @@ class MailHelper
     /**
      * @var array
      */
-    protected $body = [
-        'content'     => '',
-        'contentType' => 'text/html',
-        'charset'     => null,
-    ];
+    protected $body = self::DEFAULT_BODY;
+
+    /**
+     * @var array<?string>
+     */
+    private ?array $bodyInitial = null;
 
     /**
      * Cache for lead owners.
@@ -211,6 +220,8 @@ class MailHelper
      * @var bool
      */
     protected $fatal = false;
+
+    protected bool $skip = false;
 
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
@@ -313,6 +324,7 @@ class MailHelper
             $this->message->returnPath($this->returnPath);
         }
 
+        $this->dispatchPreSendEvent();
         if (empty($this->fatal)) {
             if (!$isQueueFlush) {
                 // Search/replace tokens if this is not a queue flush
@@ -361,7 +373,7 @@ class MailHelper
             }
 
             // Attach assets
-            /** @var \Mautic\AssetBundle\Entity\Asset $asset */
+            /** @var Asset $asset */
             foreach ($this->assets as $asset) {
                 if (!in_array($asset->getId(), $this->attachedAssets)) {
                     $this->attachedAssets[] = $asset->getId();
@@ -374,7 +386,10 @@ class MailHelper
             }
 
             try {
-                $this->mailer->send($this->message);
+                if (!$this->skip) {
+                    $this->mailer->send($this->message);
+                }
+                $this->skip = false;
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
@@ -593,13 +608,12 @@ class MailHelper
             $this->copies              = [];
             $this->message             = $this->getMessageInstance();
             $this->subject             = '';
+            $this->subjectInitial      = null;
             $this->plainText           = '';
+            $this->plainTextInitial    = null;
             $this->plainTextSet        = false;
-            $this->body                = [
-                'content'     => '',
-                'contentType' => 'text/html',
-                'charset'     => null,
-            ];
+            $this->body                = self::DEFAULT_BODY;
+            $this->bodyInitial         = null;
         }
     }
 
@@ -1458,13 +1472,27 @@ class MailHelper
             $this->dispatcher = $this->factory->getDispatcher();
         }
 
+        if (null === $this->bodyInitial) {
+            $this->bodyInitial = $this->body;
+        }
+
+        if (null === $this->plainTextInitial) {
+            $this->plainTextInitial = $this->plainText;
+        }
+
+        if (null === $this->subjectInitial) {
+            $this->subjectInitial = $this->subject;
+        }
+
+        // Reset body, text, subject and tokens, so the latter listeners use the same data as the former ones.
+        $this->setBody($this->bodyInitial['content'], $this->bodyInitial['contentType'], $this->bodyInitial['charset'], true);
+        $this->setPlainText($this->plainTextInitial);
+        $this->setSubject($this->subjectInitial);
+        $this->eventTokens = [];
+
         $event = new EmailSendEvent($this);
-
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
-
-        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
-
-        unset($event);
+        $this->eventTokens = $event->getTokens(false);
     }
 
     /**
@@ -2115,5 +2143,32 @@ class MailHelper
         }
 
         return $this->systemFrom;
+    }
+
+    public function dispatchPreSendEvent(): void
+    {
+        if (null === $this->dispatcher) {
+            $this->dispatcher = $this->factory->getDispatcher();
+        }
+
+        if (empty($this->dispatcher)) {
+            return;
+        }
+
+        $event = new EmailSendEvent($this);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
+
+        $this->skip               = $event->isSkip();
+        $this->fatal              = $event->isFatal();
+        $errors                   = $event->getErrors();
+        if (!empty($errors)) {
+            $currentErrors = [];
+            if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
+                $currentErrors = $this->errors['failures'];
+            }
+            $this->errors['failures'] = array_merge($errors, $currentErrors);
+        }
+
+        unset($event);
     }
 }

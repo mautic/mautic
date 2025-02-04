@@ -63,14 +63,14 @@ EOT
             if (!$import) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.core.error.notfound', [], 'flashes').'</error>');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
         } else {
             $import = $this->importModel->getImportToProcess();
 
             // No import waiting in the queue. Finish silently.
             if (null === $import) {
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
+                return Command::SUCCESS;
             }
         }
 
@@ -96,7 +96,7 @@ EOT
 
             $this->logError($import, $e->getFile(), $e->getLine(), $e->getTraceAsString());
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         } catch (ImportDelayedException $e) {
             $output->writeln('<info>'.$this->translator->trans(
                 'mautic.lead.import.delayed',
@@ -107,7 +107,7 @@ EOT
 
             $this->logError($import, $e->getFile(), $e->getLine(), $e->getTraceAsString());
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::FAILURE;
         }
 
         // Success
@@ -122,7 +122,7 @@ EOT
             ]
         ).'</info>');
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Imports data to Mautic';

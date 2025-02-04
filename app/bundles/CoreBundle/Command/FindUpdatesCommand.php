@@ -44,7 +44,7 @@ EOT
             $output->writeln($this->translator->trans('mautic.core.updater.cli.update'));
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Fetches updates for Mautic';

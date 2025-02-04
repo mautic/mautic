@@ -19,7 +19,7 @@ class TriggerEventModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\PointBundle\Entity\TriggerEvent::class);
+        return $this->em->getRepository(TriggerEvent::class);
     }
 
     public function getPermissionBase(): string
@@ -105,6 +105,34 @@ class TriggerEventModel extends CommonFormModel
             }
             if (isset($properties['useremail']['email']) && (int) $properties['useremail']['email'] === $emailId) {
                 $triggerIds[] = $entity->getTrigger()->getId();
+            }
+        }
+
+        return array_unique($triggerIds);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getPointTriggerIdsWithDependenciesOnTag(string $tagName): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'eq', 'value' => 'lead.changetags'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $triggerIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            foreach ($properties as $property) {
+                if (in_array($tagName, $property)) {
+                    $triggerIds[] = $entity->getTrigger()->getId();
+                }
             }
         }
 

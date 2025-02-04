@@ -107,9 +107,48 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $dataHeader = $anchorTag->attr('data-header');
 
         Assert::assertNull($mouseOver);
-        Assert::assertSame(sprintf('Campaigns %s is part of', $firstName), $dataHeader);
+        Assert::assertSame(sprintf('Campaigns for %s', $firstName), $dataHeader);
         $response = $this->client->getResponse();
         // Make sure the data-target-url is not an absolute URL
         Assert::assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), $response->getContent());
+    }
+
+    public function testLeadDetailPageForSocialTabInDetailsCollapsibleForNoData(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('john@doe.corp');
+        $this->em->persist($contact);
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', 's/contacts/view/'.$contact->getId());
+        $data    = $crawler->filterXPath('//div[@id="social"]//td');
+        $this->assertCount(1, $data);
+
+        $translator = static::getContainer()->get('translator');
+        $this->assertStringContainsString($translator->trans('mautic.lead.field.group.no_data'), $data->text());
+    }
+
+    public function testLeadDetailPageForSocialTabInDetailsCollapsible(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+
+        $fbLink  = 'https://fb.com/john_doe_test';
+        $form    = $crawler->selectButton('Save & Close')->form();
+        $form->setValues(
+            [
+                'lead[firstname]' => 'John',
+                'lead[lastname]'  => 'Doe',
+                'lead[email]'     => 'john@doe.corp',
+                'lead[facebook]'  => $fbLink,
+            ]
+        );
+
+        $crawler = $this->client->submit($form);
+
+        $fbProfile = $crawler->filterXPath('//div[@id="social"]//td[2]');
+
+        $this->assertCount(1, $fbProfile);
+        $this->assertStringContainsString($fbLink, $fbProfile->text());
     }
 }

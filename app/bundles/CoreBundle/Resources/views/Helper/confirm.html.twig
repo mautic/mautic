@@ -1,21 +1,21 @@
 {%- if template is defined %}
+{%- set btnClass = btnClass|default('danger') %}
     {%- if template is same as 'batchdelete' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
-        {%- set iconClass = iconClass|default('fa fa-trash-o text-danger') %}
+        {%- set iconClass = iconClass|default('ri-delete-bin-line text-danger') %}
         {%- set btnText = btnText|default('mautic.core.form.delete_selected'|trans) %}
-        {%- set btnClass = btnClass|default('') %}
         {%- set confirmCallback = confirmCallback|default('executeBatchAction') %}
         {% set wrapOpeningTag = wrapOpeningTag is defined ? wrapOpeningTag : '' %}
         {% set wrapClosingTag = wrapClosingTag is defined ? wrapClosingTag : '' %}
         {%- set precheck = precheck|default('batchActionPrecheck') %}
     {%- elseif template is same as 'delete' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
-        {%- set iconClass = iconClass|default('fa fa-fw fa-trash-o text-danger') %}
+        {%- set iconClass = iconClass|default('ri-delete-bin-line') %}
         {%- set btnText = btnText|default('mautic.core.form.delete')|trans %}
     {%- endif %}
 {%- endif %}
 
-{%- set btnClass = btnClass ?? 'btn btn-default' %}
+{%- set btnClass = btnClass ?? 'btn btn-ghost' %}
 
 {%- set btnTextAttr = btnTextAttr|default('') %}
 
@@ -69,6 +69,7 @@
 {%- set precheck = precheck|default('') %}
 {{- wrapOpeningTag }}
 <{{ tag }}{{ buttonType }}
+    id="delete"
     class="{{ btnClass }}"
     href="{{ confirmAction }}"
     data-toggle="confirmation"

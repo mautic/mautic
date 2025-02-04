@@ -9,14 +9,14 @@ class InputHelper
     /**
      * String filter.
      */
-    private static ?\Joomla\Filter\InputFilter $stringFilter = null;
+    private static ?InputFilter $stringFilter = null;
 
     /**
      * HTML filter.
      */
-    private static ?\Joomla\Filter\InputFilter $htmlFilter = null;
+    private static ?InputFilter $htmlFilter = null;
 
-    private static ?\Joomla\Filter\InputFilter $strictHtmlFilter = null;
+    private static ?InputFilter $strictHtmlFilter = null;
 
     /**
      * Adjust the boolean values from text to boolean.
@@ -417,7 +417,11 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
-            $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
+            try {
+                $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
+            } catch (\ErrorException) {
+                $hasUnicode = 'UTF-8"' === mb_detect_encoding($value);
+            }
 
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 

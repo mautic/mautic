@@ -45,7 +45,7 @@ class FieldHelperTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
+    private FieldHelper $fieldHelper;
 
     protected function setUp(): void
     {

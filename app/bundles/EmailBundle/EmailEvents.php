@@ -48,6 +48,16 @@ final class EmailEvents
     public const EMAIL_ON_SEND = 'mautic.email_on_send';
 
     /**
+     * The mautic.email_pre_send event is dispatched when an email is clicked.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailSendEvent instance.
+     *
+     * @var string
+     */
+    public const EMAIL_PRE_SEND = 'mautic.email_pre_send';
+
+    /**
      * The mautic.email_on_display event is dispatched when an email is viewed via a browser.
      *
      * The event listener receives a
@@ -270,4 +280,12 @@ final class EmailEvents
      * Mautic\EmailBundle\Event\EmailStatEvent
      */
     public const ON_EMAIL_STAT_POST_SAVE = 'mautic.email.on_email_stat_post_save';
+
+    /**
+     * The mautic.email.on_edit_submit event is fired after an email edit is successfully submitted.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailEditSubmitEvent
+     */
+    public const ON_EMAIL_EDIT_SUBMIT = 'mautic.email.on_edit_submit';
 }

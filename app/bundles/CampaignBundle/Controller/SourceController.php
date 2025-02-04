@@ -232,7 +232,7 @@ class SourceController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $objectId)
     {

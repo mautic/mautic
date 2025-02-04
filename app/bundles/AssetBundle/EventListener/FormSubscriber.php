@@ -119,7 +119,7 @@ class FormSubscriber implements EventSubscriberInterface
         $url = $this->assetModel->generateUrl($asset, true, [
             'lead'    => $event->getLead() ? $event->getLead()->getId() : null,
             'channel' => ['form' => $form->getId()],
-            ]).'&stream=0';
+        ]).'&stream=0';
 
         if ($messengerMode) {
             $event->setPostSubmitResponse(['download' => $url]);

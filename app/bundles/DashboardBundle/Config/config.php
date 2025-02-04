@@ -34,7 +34,7 @@ return [
             'items'    => [
                 'mautic.dashboard.menu.index' => [
                     'route'     => 'mautic_dashboard_index',
-                    'iconClass' => 'fa-th-large',
+                    'iconClass' => 'ri-funds-fill',
                 ],
             ],
         ],

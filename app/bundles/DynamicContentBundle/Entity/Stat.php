@@ -20,7 +20,7 @@ class Stat
     private $dynamicContent;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
@@ -64,9 +64,10 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content_stats')
-            ->setCustomRepositoryClass(\Mautic\DynamicContentBundle\Entity\StatRepository::class)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
-            ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search');
+            ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search')
+            ->addIndex(['date_sent'], 'stat_dynamic_content_date_sent');
 
         $builder->addBigIntIdField();
 

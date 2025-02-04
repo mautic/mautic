@@ -21,9 +21,9 @@ class ReferenceResolverTest extends TestCase
     /**
      * @var Connection|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolver $referenceResolver;
+    private ReferenceResolver $referenceResolver;
 
     protected function setup(): void
     {

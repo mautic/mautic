@@ -78,7 +78,7 @@ class NotificationModel extends FormModel
      * @param string|null    $type                    Optional $type to ID the source of the notification
      * @param bool|true      $isRead                  Add unread indicator
      * @param string|null    $header                  Header for message
-     * @param string|null    $iconClass               Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param string|null    $iconClass               Font Awesome CSS class for the icon (e.g. ri-eye-line)
      * @param \DateTime|null $datetime                Date the item was created
      * @param User|null      $user                    User object; defaults to current user
      * @param string|null    $deduplicateValue        When supplied, notification will not be added if another notification with tha same $deduplicateValue exists within last 24 hours
@@ -139,8 +139,8 @@ class NotificationModel extends FormModel
     /**
      * Clears a notification for a user.
      *
-     * @param $id       Notification to clear; will clear all if empty
-     * @param $limit    Maximum number of notifications to clear if $id is empty
+     * @param $id    Notification to clear; will clear all if empty
+     * @param $limit Maximum number of notifications to clear if $id is empty
      */
     public function clearNotification($id, $limit = null): void
     {
@@ -150,7 +150,6 @@ class NotificationModel extends FormModel
     /**
      * Get content for notifications.
      *
-
      * @param bool $includeRead
      * @param int  $limit
      */

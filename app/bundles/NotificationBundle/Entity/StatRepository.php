@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -143,7 +144,7 @@ class StatRepository extends CommonRepository
         $query = $this->createQueryBuilder('s');
 
         $query->select('IDENTITY(s.notification) AS notification_id, s.id, s.dateRead, s.dateSent, e.title, s.isRead, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.clickDetails')
-            ->leftJoin(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'WITH', 'e.id = s.notification')
+            ->leftJoin(Notification::class, 'e', 'WITH', 'e.id = s.notification')
             ->leftJoin(\Mautic\LeadBundle\Entity\LeadList::class, 'l', 'WITH', 'l.id = s.list')
             ->where(
                 $query->expr()->andX(
@@ -195,18 +196,16 @@ class StatRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostNotifications($query, $limit = 10, $offset = 0)
+    public function getMostNotifications($query, $limit = 10, $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**

@@ -29,7 +29,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'messages',
                 'path'            => '/messages',
-                'controller'      => \Mautic\ChannelBundle\Controller\Api\MessageApiController::class,
+                'controller'      => Mautic\ChannelBundle\Controller\Api\MessageApiController::class,
             ],
         ],
         'public' => [
@@ -60,7 +60,7 @@ return [
     'services' => [
         'helpers' => [
             'mautic.channel.helper.channel_list' => [
-                'class'     => \Mautic\ChannelBundle\Helper\ChannelListHelper::class,
+                'class'     => Mautic\ChannelBundle\Helper\ChannelListHelper::class,
                 'arguments' => [
                     'event_dispatcher',
                     'translator',

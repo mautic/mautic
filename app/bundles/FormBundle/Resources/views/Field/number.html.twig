@@ -14,4 +14,5 @@
         'id': id,
         'formId': formId|default(0),
         'formName': formName|default(''),
+        'step': field.properties.precision is defined ? 1 / 10 ** field.properties.precision : 0,
 }) -}}

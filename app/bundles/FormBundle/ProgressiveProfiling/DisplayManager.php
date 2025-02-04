@@ -7,7 +7,7 @@ use Mautic\FormBundle\Entity\Form;
 
 class DisplayManager
 {
-    private \Mautic\FormBundle\ProgressiveProfiling\DisplayCounter $displayCounter;
+    private DisplayCounter $displayCounter;
 
     public function __construct(
         private Form $form,

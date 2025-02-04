@@ -20,6 +20,18 @@
     color: #7D5B71;
 }
 
+.segment-filter {
+    position: relative;
+}
+
+.segment-filter .filter-buttons {
+    position: absolute;
+    right: -1px;
+    top: -1px;
+    min-width: 100px;
+    padding-right: 0;
+}
+
 .leadlist-filter a {
     text-decoration: none;
 }
@@ -52,9 +64,12 @@
     margin-left:20px;
 }
 
+.selected-filters .btn-group {
+    margin-top:4px;
+}
 
-.selected-filters .glue-select {
-    margin-top:2px;
+.selected-filters .btn-group .btn {
+    margin-right:4px;
 }
 
 .selected-filters .panel {
@@ -100,12 +115,6 @@
 .panel-instagram .panel-heading {
     background: #517fa4;
     color: #FFFFFF;
-}
-
-.btn-leadnote-add {
-    margin-left: 0 !important;
-    border-bottom-left-radius: 2px !important;
-    border-top-left-radius: 2px !important;
 }
 
 ul.tag-cloud li {
@@ -160,17 +169,17 @@ ul.tag-cloud li {
 
 .history-search{
     overflow: visible!important;
-    min-height: 53px;
+    min-height: 95px;
 }
 
-.timeline-icon {
-    width: 50px;
+.timeline-icon, .table-expand {
+    width: 30px;
     text-align: center;
+    aspect-ratio: 1/1;
 }
 
 .timeline-featured td, .timeline-featured th {
     background: rgba(78, 94, 158, 0.1 );
-    border-right: 1px solid rgba(78, 94, 158, 0.1) !important;
 }
 
 #contact-timeline td {
@@ -182,6 +191,7 @@ ul.tag-cloud li {
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     hyphens: auto;
+    height: 42px;
 }
 
 #contact-timeline .dl-horizontal dt {
@@ -192,10 +202,6 @@ ul.tag-cloud li {
 
 #contact-timeline .dl-horizontal dd {
     margin-left: 0px;
-}
-
-#contact-timeline tr.timeline-row-highlighted {
-    background-color: #fafafa;
 }
 
 #contact-timeline tr.timeline-details img {
@@ -292,19 +298,4 @@ ul.tag-cloud li {
     padding-bottom: 8px;
     border-bottom: 1px solid #eee;
     font-size: 14px;
-}
-
-.lead-stats {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 15px;
-}
-
-.lead-stats .lead-stats-name {
-    display: block;
-    color: #8393a2;
-}
-.lead-stats .lead-stats-val {
-    display: block;
-    font-size: 21px;
 }

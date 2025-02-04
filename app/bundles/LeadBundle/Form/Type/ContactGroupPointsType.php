@@ -41,7 +41,7 @@ class ContactGroupPointsType extends AbstractType
                     'attr'       => [
                         'class'       => 'form-control',
                         'placeholder' => $this->translator->trans('mautic.point.form.score_not_set'),
-                     ],
+                    ],
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                 ]

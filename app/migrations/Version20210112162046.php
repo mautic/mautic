@@ -9,8 +9,8 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20210112162046 extends AbstractMauticMigration
 {
-    private const TABLE_NAME = 'sync_object_mapping';
-    private const INDEX_NAME = 'integration_integration_object_name_last_sync_date';
+    protected const TABLE_NAME = 'sync_object_mapping';
+    private const INDEX_NAME   = 'integration_integration_object_name_last_sync_date';
 
     public function preUp(Schema $schema): void
     {
@@ -24,7 +24,7 @@ final class Version20210112162046 extends AbstractMauticMigration
     {
         $this->addSql(sprintf(
             'ALTER TABLE `%s` ADD INDEX `%s` (`integration`, `internal_object_name`, `last_sync_date`);',
-            $this->getTableName(),
+            $this->getPrefixedTableName(),
             static::INDEX_NAME
         ));
     }
@@ -41,18 +41,13 @@ final class Version20210112162046 extends AbstractMauticMigration
     {
         $this->addSql(sprintf(
             'ALTER TABLE `%s` DROP INDEX `%s`;',
-            $this->getTableName(),
+            $this->getPrefixedTableName(),
             static::INDEX_NAME
         ));
     }
 
-    private function getTableName(): string
-    {
-        return $this->prefix.static::TABLE_NAME;
-    }
-
     private function indexExists(Schema $schema): bool
     {
-        return $schema->getTable($this->getTableName())->hasIndex(static::INDEX_NAME);
+        return $schema->getTable($this->getPrefixedTableName())->hasIndex(static::INDEX_NAME);
     }
 }

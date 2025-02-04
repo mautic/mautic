@@ -57,7 +57,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
             $event,
             'segment_membership',
             'mautic.lead.timeline.segment_membership',
-            'fa-pie-chart',
+            'ri-pie-chart-line',
             'lead',
             'segment'
         );
@@ -86,7 +86,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         foreach ($contacts as $key => $contact) {
             if (!$contact instanceof Lead) {
                 $id                      = is_array($contact) ? $contact['id'] : $contact;
-                $contact                 = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $id);
+                $contact                 = $this->em->getReference(Lead::class, $id);
                 $contacts[$key]          = $contact;
                 $detachContactReferences = true;
             }

@@ -19,9 +19,9 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\StageBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.stage.model.stage', \Mautic\StageBundle\Model\StageModel::class);
-    $services->alias('mautic.stage.repository.lead_stage_log', \Mautic\StageBundle\Entity\LeadStageLogRepository::class);
-    $services->alias('mautic.stage.repository.stage', \Mautic\StageBundle\Entity\StageRepository::class);
+    $services->alias('mautic.stage.model.stage', Mautic\StageBundle\Model\StageModel::class);
+    $services->alias('mautic.stage.repository.lead_stage_log', Mautic\StageBundle\Entity\LeadStageLogRepository::class);
+    $services->alias('mautic.stage.repository.stage', Mautic\StageBundle\Entity\StageRepository::class);
 };

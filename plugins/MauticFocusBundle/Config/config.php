@@ -32,7 +32,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'focus',
                 'path'            => '/focus',
-                'controller'      => \MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::class,
+                'controller'      => MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::class,
             ],
             'mautic_api_focusjs' => [
                 'path'       => '/focus/{id}/js',
@@ -45,7 +45,7 @@ return [
     'services' => [
         'other' => [
             'mautic.focus.helper.token' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,
+                'class'     => MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
@@ -53,7 +53,7 @@ return [
                 ],
             ],
             'mautic.focus.helper.iframe_availability_checker' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker::class,
+                'class'     => MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker::class,
                 'arguments' => [
                     'translator',
                 ],

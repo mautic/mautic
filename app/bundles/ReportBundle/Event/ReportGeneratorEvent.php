@@ -29,7 +29,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     private $contentTemplate;
 
-    private ?\Doctrine\DBAL\Query\Expression\ExpressionBuilder $filterExpression = null;
+    private ?ExpressionBuilder $filterExpression = null;
 
     private ?array $sortedFilters = null;
 
@@ -38,7 +38,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         private array $options, /**
      * QueryBuilder object.
      */
-    private QueryBuilder $queryBuilder,
+        private QueryBuilder $queryBuilder,
         private ChannelListHelper $channelListHelper
     ) {
         $this->report            = $report;

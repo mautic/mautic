@@ -26,7 +26,7 @@ final class ListControllerTest extends MauticMysqlTestCase
     public function testMarketplaceListTableWithNoAllowList(): void
     {
         /** @var MockHandler $handlerStack */
-        $handlerStack = static::getContainer()->get(\GuzzleHttp\Handler\MockHandler::class);
+        $handlerStack = static::getContainer()->get(MockHandler::class);
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))  // Getting the package list from Packagist API.
         );
@@ -59,7 +59,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $mockResults = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
 
         /** @var MockHandler $handlerStack */
-        $handlerStack = static::getContainer()->get(\GuzzleHttp\Handler\MockHandler::class);
+        $handlerStack = static::getContainer()->get(MockHandler::class);
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
             new Response(SymfonyResponse::HTTP_OK, [], json_encode(['results' => [$mockResults[1]]])), // mautic-recaptcha-bundle

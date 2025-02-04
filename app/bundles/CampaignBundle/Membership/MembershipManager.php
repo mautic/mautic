@@ -20,7 +20,7 @@ class MembershipManager
 
     public const ACTION_REMOVED = 'removed';
 
-    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
+    private ?ProgressBar $progressBar = null;
 
     public function __construct(
         private Adder $adder,

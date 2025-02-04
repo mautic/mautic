@@ -64,13 +64,17 @@ class SmsType extends AbstractType
                 'label'      => 'mautic.sms.form.message',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => 6,
+                    'class'                => 'form-control',
+                    'data-token-activator' => '{',
+                    'data-token-visual'    => 'false',
+                    'rows'                 => 6,
                 ],
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
 
         // add lead lists
         $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);

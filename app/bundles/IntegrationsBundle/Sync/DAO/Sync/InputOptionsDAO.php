@@ -23,9 +23,9 @@ class InputOptionsDAO
 
     private bool $disableActivityPush;
 
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $mauticObjectIds;
+    private ?ObjectIdsDAO $mauticObjectIds;
 
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $integrationObjectIds;
+    private ?ObjectIdsDAO $integrationObjectIds;
 
     private ?\DateTimeInterface $startDateTime;
 

@@ -19,27 +19,27 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|CookieHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $cookieHelperMock;
+    private MockObject $cookieHelperMock;
 
     /**
      * @var MockObject|LeadDeviceRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepositoryMock;
+    private MockObject $leadDeviceRepositoryMock;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
+    private MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|RequestStack
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
+    private MockObject $requestStackMock;
 
     /**
      * @var MockObject|MergeRecordRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepository;
+    private MockObject $mergeRecordRepository;
 
     protected function setUp(): void
     {
