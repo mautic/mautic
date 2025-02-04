@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
-use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -23,7 +22,7 @@ final class EntityExportCommand extends ModeratedCommand
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('mautic:entity:export')
@@ -40,10 +39,11 @@ final class EntityExportCommand extends ModeratedCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $entityName = $input->getOption('entity');
-        $entityId = $input->getOption('id');
-        
+        $entityId   = $input->getOption('id');
+
         if (empty($entityId) || empty($entityName)) {
             $output->writeln('<error>You must specify the entity and at least one valid entity ID.</error>');
+
             return self::FAILURE;
         }
 
@@ -55,11 +55,9 @@ final class EntityExportCommand extends ModeratedCommand
     }
 
     /**
-     * Dispatch the EntityExportEvent
+     * Dispatch the EntityExportEvent.
      *
-     * @param string $entityName
      * @param array<int> $entityId
-     * @return EntityExportEvent
      */
     private function dispatchEntityExportEvent(string $entityName, array $entityId): EntityExportEvent
     {

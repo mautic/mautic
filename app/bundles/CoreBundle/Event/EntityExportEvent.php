@@ -6,25 +6,20 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityExportEvent extends Event
 {
-    private string $entityName;
-    private int $entityId;
-    
-    /** 
-     * @var array<string, array<string, mixed>> 
-     * Represents the entities to be exported, where the key is the entity name and the value is an array of entities.
+    /**
+     * @var array<string, array<string, mixed>>
+     *                                          Represents the entities to be exported, where the key is the entity name and the value is an array of entities
      */
     private array $entities = [];
 
-    public const EXPORT_CAMPAIGN = "campaign";
-    public const EXPORT_CAMPAIGN_EVENT = "campaign_event";
-    public const EXPORT_EMAIL = "email";
-    public const EXPORT_CAMPAIGN_SEGMENT = "campaign_segment";
-    public const EXPORT_CAMPAIGN_FORM = "campaign_form";
+    public const EXPORT_CAMPAIGN         = 'campaign';
+    public const EXPORT_CAMPAIGN_EVENT   = 'campaign_event';
+    public const EXPORT_EMAIL            = 'email';
+    public const EXPORT_CAMPAIGN_SEGMENT = 'campaign_segment';
+    public const EXPORT_CAMPAIGN_FORM    = 'campaign_form';
 
-    public function __construct(string $entityName, int $entityId)
+    public function __construct(private string $entityName, private int $entityId)
     {
-        $this->entityName = $entityName;
-        $this->entityId = $entityId;
     }
 
     public function getEntityName(): string
@@ -38,9 +33,8 @@ class EntityExportEvent extends Event
     }
 
     /**
-     * Add a single entity to the collection
-     * 
-     * @param string $entityName
+     * Add a single entity to the collection.
+     *
      * @param array<string, mixed> $entity
      */
     public function addEntity(string $entityName, array $entity): void
@@ -49,8 +43,8 @@ class EntityExportEvent extends Event
     }
 
     /**
-     * Get all entities
-     * 
+     * Get all entities.
+     *
      * @return array<string, array<string, mixed>>
      */
     public function getEntities(): array
@@ -59,8 +53,8 @@ class EntityExportEvent extends Event
     }
 
     /**
-     * Add multiple entities to the collection
-     * 
+     * Add multiple entities to the collection.
+     *
      * @param array<string, array<string, mixed>> $entities
      */
     public function addEntities(array $entities): void
