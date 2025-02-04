@@ -151,7 +151,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @return JsonResponse|BinaryFileResponse|Response
      */
-    public function exportAction(ExportHelper $exportHelper, CommandHelper $commandHelper, Request $request, int $objectId)
+    public function exportAction(ExportHelper $exportHelper, CommandHelper $commandHelper, CampaignModel $campaignModel, Request $request, int $objectId)
     {
         $permissions = $this->security->isGranted(
             [
@@ -167,9 +167,7 @@ class CampaignController extends AbstractStandardFormController
             return $this->accessDenied();
         }
 
-        /** @var CampaignModel $campaignModel */
-        $campaignModel = $this->getModel('campaign');
-        $campaign      = $campaignModel->getEntity($objectId);
+        $campaign = $campaignModel->getEntity($objectId);
 
         if (empty($campaign)) {
             return $this->notFound();
