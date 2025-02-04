@@ -161,7 +161,7 @@
                               <div class="drop-here">
                                 {% for action in formActions %}
                                     {% if action.id not in deletedActions %}
-                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/_generic.html.twig') %}
+                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/base_form_action.html.twig') %}
                                         {% set action = action|merge({
                                               'settings': actionSettings[action.type],
                                         }) %}
