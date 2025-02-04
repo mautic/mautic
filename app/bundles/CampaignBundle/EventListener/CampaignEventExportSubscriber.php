@@ -54,7 +54,12 @@ final class CampaignEventExportSubscriber implements EventSubscriberInterface
                 'channel_id'            => $campaignEvent->getChannelId(),
                 'parent_id'             => $parentId,
             ];
+            $dependency = [
+                'campaignId' => (int) $campaignId,
+                'eventId'    => (int) $campaignEvent->getId(),
+            ];
             $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $eventData);
+            $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $dependency);
         }
     }
 }

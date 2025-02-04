@@ -28,7 +28,7 @@ final class EntityExportCommand extends ModeratedCommand
             ->setName('mautic:entity:export')
             ->setDescription('Export entity data as JSON.')
             ->addOption('entity', null, InputOption::VALUE_REQUIRED, 'The name of the entity to export (e.g., campaign, email)')
-            ->addOption('id', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'IDs of entities to export.')
+            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'ID of entities to export.')
             ->addOption('json-only', null, InputOption::VALUE_NONE, 'Output only JSON data.')
             ->addOption('json-file', null, InputOption::VALUE_NONE, 'Save JSON data to a file.')
             ->addOption('zip-file', null, InputOption::VALUE_NONE, 'Save JSON data to a zip file.');
@@ -39,15 +39,13 @@ final class EntityExportCommand extends ModeratedCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $entityName = $input->getOption('entity');
-        $entityId   = $input->getOption('id');
+        $entityId   = (int) $input->getOption('id');
 
         if (empty($entityId) || empty($entityName)) {
             $output->writeln('<error>You must specify the entity and at least one valid entity ID.</error>');
 
             return self::FAILURE;
         }
-
-        $entityId = array_map('intval', $entityId);
 
         $event = $this->dispatchEntityExportEvent($entityName, $entityId);
 
@@ -56,12 +54,10 @@ final class EntityExportCommand extends ModeratedCommand
 
     /**
      * Dispatch the EntityExportEvent.
-     *
-     * @param array<int> $entityId
      */
-    private function dispatchEntityExportEvent(string $entityName, array $entityId): EntityExportEvent
+    private function dispatchEntityExportEvent(string $entityName, int $entityId): EntityExportEvent
     {
-        $event = new EntityExportEvent($entityName, (int) $entityId);
+        $event = new EntityExportEvent($entityName, $entityId);
 
         return $this->dispatcher->dispatch($event, $entityName);
     }

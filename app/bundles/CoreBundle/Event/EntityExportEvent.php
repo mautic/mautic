@@ -8,15 +8,18 @@ class EntityExportEvent extends Event
 {
     /**
      * @var array<string, array<string, mixed>>
-     *                                          Represents the entities to be exported, where the key is the entity name and the value is an array of entities
      */
-    private array $entities = [];
+    private array $entities     = [];
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private array $dependencies = [];
 
     public const EXPORT_CAMPAIGN         = 'campaign';
     public const EXPORT_CAMPAIGN_EVENT   = 'campaign_event';
-    public const EXPORT_EMAIL            = 'email';
     public const EXPORT_CAMPAIGN_SEGMENT = 'campaign_segment';
     public const EXPORT_CAMPAIGN_FORM    = 'campaign_form';
+    public const EXPORT_CAMPAIGN_EMAIL   = 'campaign_email';
 
     public function __construct(private string $entityName, private int $entityId)
     {
@@ -60,5 +63,35 @@ class EntityExportEvent extends Event
     public function addEntities(array $entities): void
     {
         $this->entities = array_merge($this->entities, $entities);
+    }
+
+    /**
+     * Get dependencies.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function getDependencies(): array
+    {
+        return $this->dependencies;
+    }
+
+    /**
+     * Add a single entity to the dependencies.
+     *
+     * @param array<string, mixed> $entity
+     */
+    public function addDependencyEntity(string $entityName, array $entity): void
+    {
+        $this->dependencies[$entityName][] = $entity;
+    }
+
+    /**
+     * Add multiple entities to the dependencies.
+     *
+     * @param array<string, array<string, mixed>> $entities
+     */
+    public function addDependencies(array $entities): void
+    {
+        $this->dependencies = array_merge($this->dependencies, $entities);
     }
 }

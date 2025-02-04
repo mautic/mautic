@@ -50,8 +50,12 @@ final class CampaignSegmentExportSubscriber implements EventSubscriberInterface
                 'is_global'            => $segmentResult['is_global'],
                 'is_preference_center' => $segmentResult['is_preference_center'],
             ];
-
+            $dependency = [
+                'campaignId' => (int) $campaignId,
+                'segmentId'  => (int) $segmentResult['leadlist_id'],
+            ];
             $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT, $segmentData);
+            $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT, $dependency);
         }
     }
 }

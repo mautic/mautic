@@ -178,7 +178,8 @@ class CampaignController extends AbstractStandardFormController
         $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
 
         // Run the export command and get the file path
-        $response = $commandHelper->runCommand('mautic:campaign:export', [
+        $response = $commandHelper->runCommand('mautic:entity:export', [
+            '--entity'   => 'campaign',
             '--id'       => (int) $objectId,
             '--zip-file' => 1,
         ]);

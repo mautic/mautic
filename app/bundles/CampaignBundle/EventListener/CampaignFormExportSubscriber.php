@@ -56,6 +56,11 @@ final class CampaignFormExportSubscriber implements EventSubscriberInterface
                 'form_attr'            => $result['form_attr'],
             ];
 
+            $dependency = [
+                'campaignId' => (int) $campaignId,
+                'segmentId'  => (int) $result['form_id'],
+            ];
+            $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_FORM, $dependency);
             $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_FORM, $data);
         }
     }

@@ -37,7 +37,6 @@ final class CampaignExportSubscriber implements EventSubscriberInterface
 
         $dependentEntities = [
             EntityExportEvent::EXPORT_CAMPAIGN_EVENT,
-            EntityExportEvent::EXPORT_EMAIL,
             EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT,
             EntityExportEvent::EXPORT_CAMPAIGN_FORM,
         ];
@@ -47,7 +46,11 @@ final class CampaignExportSubscriber implements EventSubscriberInterface
             $subEvent = $this->dispatcher->dispatch($subEvent, $entity);
 
             $event->addEntities($subEvent->getEntities());
+
+            $dependency = $subEvent->getDependencies();
+            $event->addDependencies($dependency);
         }
+        $event->addEntity('dependencies', $event->getDependencies());
     }
 
     /**
