@@ -29,7 +29,6 @@ class EntityExportEventTest extends TestCase
 
         $this->assertArrayHasKey('campaign', $entities);
         $this->assertNotEmpty($entities['campaign']);
-
         $this->assertArrayHasKey(0, $entities['campaign']);
 
         $this->assertSame($entityData, $entities['campaign'][0]);
@@ -47,7 +46,13 @@ class EntityExportEventTest extends TestCase
             ],
         ];
 
-        $this->event->addEntities($entities);
+        // Convert lists into proper `array<string, array<string, mixed>>` structure
+        $castedEntities = [];
+        foreach ($entities as $key => $entityList) {
+            $castedEntities[$key] = array_map(fn ($item) => (array) $item, (array) $entityList);
+        }
+
+        $this->event->addEntities($castedEntities);
 
         $retrievedEntities = $this->event->getEntities();
 
@@ -70,7 +75,6 @@ class EntityExportEventTest extends TestCase
 
         $this->assertArrayHasKey('campaign', $dependencies);
         $this->assertNotEmpty($dependencies['campaign']);
-
         $this->assertArrayHasKey(0, $dependencies['campaign']);
 
         $this->assertSame($dependencyData, $dependencies['campaign'][0]);
@@ -87,7 +91,13 @@ class EntityExportEventTest extends TestCase
             ],
         ];
 
-        $this->event->addDependencies($dependencies);
+        // Convert lists into proper `array<string, array<string, mixed>>` structure
+        $castedDependencies = [];
+        foreach ($dependencies as $key => $dependencyList) {
+            $castedDependencies[$key] = array_map(fn ($item) => (array) $item, (array) $dependencyList);
+        }
+
+        $this->event->addDependencies($castedDependencies);
 
         $retrievedDependencies = $this->event->getDependencies();
 
