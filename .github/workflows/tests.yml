@@ -271,7 +271,7 @@ jobs:
             fi
           fi
         elif [[ "${{ matrix.commands }}" == "composer install" ]]; then
-          cat themes/theme-brienz/composer.json
+          cat ../themes/theme-brienz/composer.json
           # create a temp dir and mimic a composer install via mautic/recommended-project
           mkdir test_composer
           cd test_composer
