@@ -13,6 +13,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -208,6 +209,102 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $options = $crawler->filterXPath('//select[@name="formfield[mappedField]"]')->html();
         $this->assertStringContainsString('<option value="email">Email</option>', $options, 'Email option should not be pre-selected.');
+    }
+
+    public function testCreateNewActionUsingBaseTemplateToDisplay(): void
+    {
+        // Create new form
+        $form = $this->createForm('Test', 'test');
+        $this->em->persist($form);
+
+        // Fetch the form
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/forms/action/new',
+            [
+                'formId' => $form->getId(),
+                'type'   => 'lead.addutmtags',
+            ]
+        );
+        $this->assertResponseIsSuccessful();
+        $content     = $this->client->getResponse()->getContent();
+        $content     = json_decode($content)->newContent;
+        $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
+        $formCrawler = $crawler->filter('form');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+
+        // Save new Send Form Results action
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $content    = $this->client->getResponse()->getContent();
+        $actionHtml = json_decode($content, true)['actionHtml'] ?? null;
+        $this->assertNotNull($actionHtml, $content);
+        $crawler  = new Crawler($actionHtml);
+        $editPage = $crawler->filter('.btn-edit')->attr('href');
+
+        // Check the content was not changed
+        $this->client->xmlHttpRequest(Request::METHOD_GET, $editPage);
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testEditNewActionUsingBaseTemplateToDisplay(): void
+    {
+        // Create new form
+        $form = $this->createForm('Test', 'test');
+
+        // Create action
+        $action = $this->createFormAction($form, 'lead.addutmtags');
+        $form->addAction(0, $action);
+        $this->em->persist($form);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Edit and submit the form to be able to push action into session
+        $crawler     = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $this->client->submit($formElement);
+        $this->assertResponseIsSuccessful();
+
+        // Update the Action
+        $this->setCsrfHeader();
+        $this->client->setServerParameter('HTTP_X-Requested-With', 'XMLHttpRequest');
+        $this->client->xmlHttpRequest(
+            Request::METHOD_POST,
+            sprintf('/s/forms/action/edit/%s?formId=%s', $action->getId(), $form->getId()),
+            ['formId' => $form->getId()], // Query parameters (handled in URL)
+            [], // Files
+            ['CONTENT_TYPE' => 'application/json'], // server
+            json_encode([
+                'formaction' => [
+                    'id'          => $action->getId(),
+                    'name'        => $action->getName(),
+                    'type'        => 'lead.addutmtags',
+                    'order'       => $action->getOrder(),
+                    'properties'  => [],
+                    'formId'      => $form->getId(),
+                ],
+            ])
+        );
+        $this->assertResponseIsSuccessful();
+
+        $content     = $this->client->getResponse()->getContent();
+        $content     = json_decode($content)->newContent;
+        $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
+        $formCrawler = $crawler->filter('form');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $content    = $this->client->getResponse()->getContent();
+        $actionHtml = json_decode($content, true)['actionHtml'] ?? null;
+        $this->assertNotNull($actionHtml, $content);
+        $crawler  = new Crawler($actionHtml);
+        $editPage = $crawler->filter('.btn-edit')->attr('href');
+
+        // Check the content was not changed
+        $this->client->xmlHttpRequest(Request::METHOD_GET, $editPage);
+        $this->assertResponseIsSuccessful();
     }
 
     /**
