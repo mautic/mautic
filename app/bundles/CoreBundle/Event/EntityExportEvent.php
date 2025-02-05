@@ -19,7 +19,6 @@ class EntityExportEvent extends Event
     public const EXPORT_CAMPAIGN_EVENT   = 'campaign_event';
     public const EXPORT_CAMPAIGN_SEGMENT = 'campaign_segment';
     public const EXPORT_CAMPAIGN_FORM    = 'campaign_form';
-    public const EXPORT_CAMPAIGN_EMAIL   = 'campaign_email';
 
     public function __construct(private string $entityName, private int $entityId)
     {
