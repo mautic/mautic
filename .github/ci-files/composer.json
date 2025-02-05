@@ -110,8 +110,11 @@
     },
     {
         "type": "path",
-        "url": "../themes/**",
+        "url": "../themes/*",
         "options": {
+            "versions": {
+                "mautic/theme-brienz": "6.x-dev"
+            },
             "symlink": false
         }
     },
