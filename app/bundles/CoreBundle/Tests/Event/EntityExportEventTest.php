@@ -29,7 +29,7 @@ class EntityExportEventTest extends TestCase
 
         $this->assertArrayHasKey('campaign', $entities);
         $this->assertNotEmpty($entities['campaign']);
-        $this->assertArrayHasKey(0, $entities['campaign']); // Ensure offset exists before accessing
+        $this->assertArrayHasKey(0, $entities['campaign']);
 
         $this->assertSame($entityData, $entities['campaign'][0]);
     }
@@ -37,16 +37,22 @@ class EntityExportEventTest extends TestCase
     public function testAddEntities(): void
     {
         $entities = [
-            'campaign' => array_values([
+            'campaign' => [
                 ['id' => 1, 'name' => 'Test Campaign'],
                 ['id' => 2, 'name' => 'Second Campaign'],
-            ]),
-            'segment' => array_values([
+            ],
+            'segment' => [
                 ['id' => 10, 'name' => 'Test Segment'],
-            ]),
+            ],
         ];
 
-        $this->event->addEntities($entities);
+        // Convert lists into proper `array<string, array<string, mixed>>` structure
+        $castedEntities = [];
+        foreach ($entities as $key => $entityList) {
+            $castedEntities[$key] = array_map(fn ($item) => (array) $item, (array) $entityList);
+        }
+
+        $this->event->addEntities($castedEntities);
 
         $retrievedEntities = $this->event->getEntities();
 
@@ -55,7 +61,6 @@ class EntityExportEventTest extends TestCase
         $this->assertNotEmpty($retrievedEntities['campaign']);
         $this->assertNotEmpty($retrievedEntities['segment']);
 
-        // Ensure offsets exist before accessing
         $this->assertArrayHasKey(0, $retrievedEntities['campaign']);
         $this->assertArrayHasKey(0, $retrievedEntities['segment']);
 
@@ -72,7 +77,7 @@ class EntityExportEventTest extends TestCase
 
         $this->assertArrayHasKey('campaign', $dependencies);
         $this->assertNotEmpty($dependencies['campaign']);
-        $this->assertArrayHasKey(0, $dependencies['campaign']); // Ensure offset exists before accessing
+        $this->assertArrayHasKey(0, $dependencies['campaign']);
 
         $this->assertSame($dependencyData, $dependencies['campaign'][0]);
     }
@@ -80,15 +85,21 @@ class EntityExportEventTest extends TestCase
     public function testAddDependencies(): void
     {
         $dependencies = [
-            'campaign' => array_values([
+            'campaign' => [
                 ['id' => 3, 'name' => 'Dependency Campaign'],
-            ]),
-            'form' => array_values([
+            ],
+            'form' => [
                 ['id' => 7, 'name' => 'Dependency Form'],
-            ]),
+            ],
         ];
 
-        $this->event->addDependencies($dependencies);
+        // Convert lists into proper `array<string, array<string, mixed>>` structure
+        $castedDependencies = [];
+        foreach ($dependencies as $key => $dependencyList) {
+            $castedDependencies[$key] = array_map(fn ($item) => (array) $item, (array) $dependencyList);
+        }
+
+        $this->event->addDependencies($castedDependencies);
 
         $retrievedDependencies = $this->event->getDependencies();
 
@@ -97,7 +108,6 @@ class EntityExportEventTest extends TestCase
         $this->assertNotEmpty($retrievedDependencies['campaign']);
         $this->assertNotEmpty($retrievedDependencies['form']);
 
-        // Ensure offsets exist before accessing
         $this->assertArrayHasKey(0, $retrievedDependencies['campaign']);
         $this->assertArrayHasKey(0, $retrievedDependencies['form']);
 
