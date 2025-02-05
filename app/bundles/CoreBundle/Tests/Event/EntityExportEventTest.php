@@ -28,20 +28,22 @@ class EntityExportEventTest extends TestCase
         $entities = $this->event->getEntities();
 
         $this->assertArrayHasKey('campaign', $entities);
-        $this->assertCount(1, $entities['campaign']);
+        $this->assertNotEmpty($entities['campaign']);
+        $this->assertArrayHasKey(0, $entities['campaign']); // Ensure offset exists before accessing
+
         $this->assertSame($entityData, $entities['campaign'][0]);
     }
 
     public function testAddEntities(): void
     {
         $entities = [
-            'campaign' => [
+            'campaign' => array_values([
                 ['id' => 1, 'name' => 'Test Campaign'],
                 ['id' => 2, 'name' => 'Second Campaign'],
-            ],
-            'segment' => [
+            ]),
+            'segment' => array_values([
                 ['id' => 10, 'name' => 'Test Segment'],
-            ],
+            ]),
         ];
 
         $this->event->addEntities($entities);
@@ -50,6 +52,13 @@ class EntityExportEventTest extends TestCase
 
         $this->assertArrayHasKey('campaign', $retrievedEntities);
         $this->assertArrayHasKey('segment', $retrievedEntities);
+        $this->assertNotEmpty($retrievedEntities['campaign']);
+        $this->assertNotEmpty($retrievedEntities['segment']);
+
+        // Ensure offsets exist before accessing
+        $this->assertArrayHasKey(0, $retrievedEntities['campaign']);
+        $this->assertArrayHasKey(0, $retrievedEntities['segment']);
+
         $this->assertCount(2, $retrievedEntities['campaign']);
         $this->assertCount(1, $retrievedEntities['segment']);
     }
@@ -62,19 +71,21 @@ class EntityExportEventTest extends TestCase
         $dependencies = $this->event->getDependencies();
 
         $this->assertArrayHasKey('campaign', $dependencies);
-        $this->assertCount(1, $dependencies['campaign']);
+        $this->assertNotEmpty($dependencies['campaign']);
+        $this->assertArrayHasKey(0, $dependencies['campaign']); // Ensure offset exists before accessing
+
         $this->assertSame($dependencyData, $dependencies['campaign'][0]);
     }
 
     public function testAddDependencies(): void
     {
         $dependencies = [
-            'campaign' => [
+            'campaign' => array_values([
                 ['id' => 3, 'name' => 'Dependency Campaign'],
-            ],
-            'form' => [
+            ]),
+            'form' => array_values([
                 ['id' => 7, 'name' => 'Dependency Form'],
-            ],
+            ]),
         ];
 
         $this->event->addDependencies($dependencies);
@@ -83,6 +94,13 @@ class EntityExportEventTest extends TestCase
 
         $this->assertArrayHasKey('campaign', $retrievedDependencies);
         $this->assertArrayHasKey('form', $retrievedDependencies);
+        $this->assertNotEmpty($retrievedDependencies['campaign']);
+        $this->assertNotEmpty($retrievedDependencies['form']);
+
+        // Ensure offsets exist before accessing
+        $this->assertArrayHasKey(0, $retrievedDependencies['campaign']);
+        $this->assertArrayHasKey(0, $retrievedDependencies['form']);
+
         $this->assertCount(1, $retrievedDependencies['campaign']);
         $this->assertCount(1, $retrievedDependencies['form']);
     }

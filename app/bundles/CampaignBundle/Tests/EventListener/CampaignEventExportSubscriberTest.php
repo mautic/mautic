@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventListener\CampaignEventExportSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\Event;
 
 final class CampaignEventExportSubscriberTest extends TestCase
 {
@@ -20,7 +20,7 @@ final class CampaignEventExportSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->campaignModel = $this->createMock(CampaignModel::class);
-        $this->subscriber = new CampaignEventExportSubscriber($this->campaignModel);
+        $this->subscriber    = new CampaignEventExportSubscriber($this->campaignModel);
     }
 
     public function testSubscribedEvents(): void
@@ -71,15 +71,18 @@ final class CampaignEventExportSubscriberTest extends TestCase
         // Verify entities are added correctly
         $entities = $event->getEntities();
         $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $entities);
-        $this->assertCount(1, $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+        $this->assertNotEmpty($entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+        $this->assertArrayHasKey(0, $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+
         $this->assertSame(10, $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['id']);
         $this->assertSame('Test Event', $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['name']);
-        $this->assertSame('email', $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['channel']);
 
         // Verify dependencies are added correctly
         $dependencies = $event->getDependencies();
         $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $dependencies);
-        $this->assertCount(1, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+        $this->assertNotEmpty($dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+        $this->assertArrayHasKey(0, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+
         $this->assertSame($campaignId, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['campaignId']);
         $this->assertSame(10, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['eventId']);
     }

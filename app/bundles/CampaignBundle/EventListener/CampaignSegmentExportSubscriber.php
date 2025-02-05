@@ -30,8 +30,8 @@ final class CampaignSegmentExportSubscriber implements EventSubscriberInterface
 
         $segmentResults = $queryBuilder
             ->select('cl.leadlist_id, ll.name, ll.category_id, ll.is_published, ll.description, ll.alias, ll.public_name, ll.filters, ll.is_global, ll.is_preference_center')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
-            ->innerJoin('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = cl.leadlist_id AND ll.is_published = 1')
+            ->from('campaign_leadlist_xref', 'cl')
+            ->innerJoin('cl', 'lead_lists', 'll', 'll.id = cl.leadlist_id AND ll.is_published = 1')
             ->where('cl.campaign_id = :campaignId')
             ->setParameter('campaignId', $campaignId, \Doctrine\DBAL\ParameterType::INTEGER)
             ->executeQuery()

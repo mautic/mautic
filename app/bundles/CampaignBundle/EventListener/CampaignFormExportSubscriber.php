@@ -30,8 +30,8 @@ final class CampaignFormExportSubscriber implements EventSubscriberInterface
 
         $formResults = $queryBuilder
             ->select('fl.form_id, ff.name, ff.category_id, ff.is_published, ff.description, ff.alias, ff.lang, ff.cached_html, ff.post_action, ff.template, ff.form_type, ff.render_style, ff.post_action_property, ff.form_attr')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_form_xref', 'fl')
-            ->innerJoin('fl', MAUTIC_TABLE_PREFIX.'forms', 'ff', 'ff.id = fl.form_id AND ff.is_published = 1')
+            ->from('campaign_form_xref', 'fl')
+            ->innerJoin('fl', 'forms', 'ff', 'ff.id = fl.form_id AND ff.is_published = 1')
             ->where('fl.campaign_id = :campaignId')
             ->setParameter('campaignId', $campaignId, \Doctrine\DBAL\ParameterType::INTEGER)
             ->executeQuery()

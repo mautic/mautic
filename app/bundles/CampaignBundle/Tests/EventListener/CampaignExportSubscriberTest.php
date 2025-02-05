@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\EventListener\CampaignExportSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\CampaignBundle\Entity\Campaign;
 
 final class CampaignExportSubscriberTest extends TestCase
 {
@@ -21,7 +21,7 @@ final class CampaignExportSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->campaignModel = $this->createMock(CampaignModel::class);
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->dispatcher    = $this->createMock(EventDispatcherInterface::class);
 
         $this->subscriber = new CampaignExportSubscriber($this->campaignModel, $this->dispatcher);
     }
@@ -36,7 +36,7 @@ final class CampaignExportSubscriberTest extends TestCase
 
     public function testOnCampaignExport(): void
     {
-        $campaignId = 123;
+        $campaignId   = 123;
         $campaignData = [
             'id'              => $campaignId,
             'name'            => 'Test Campaign',

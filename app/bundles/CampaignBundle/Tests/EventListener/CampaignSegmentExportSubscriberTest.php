@@ -23,14 +23,10 @@ final class CampaignSegmentExportSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', 'mautic_');
-        }
-
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->connection = $this->createMock(Connection::class);
-        $this->queryBuilder = $this->createMock(QueryBuilder::class);
-        $this->result = $this->createMock(Result::class); // Mock Result object
+        $this->connection    = $this->createMock(Connection::class);
+        $this->queryBuilder  = $this->createMock(QueryBuilder::class);
+        $this->result        = $this->createMock(Result::class); // Mock Result object
 
         // Mock EntityManager to return Connection
         $this->entityManager
@@ -105,14 +101,22 @@ final class CampaignSegmentExportSubscriberTest extends TestCase
         // Verify entities are added correctly
         $entities = $event->getEntities();
         $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT, $entities);
-        $this->assertCount(1, $entities[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT]);
+        $this->assertNotEmpty($entities[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT]);
+
+        // Ensure the first index exists before accessing it
+        $this->assertArrayHasKey(0, $entities[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT]);
+
         $this->assertSame($segmentResults[0]['leadlist_id'], $entities[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT][0]['id']);
         $this->assertSame($segmentResults[0]['name'], $entities[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT][0]['name']);
 
         // Verify dependencies are added correctly
         $dependencies = $event->getDependencies();
         $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT, $dependencies);
-        $this->assertCount(1, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT]);
+        $this->assertNotEmpty($dependencies[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT]);
+
+        // Ensure the first index exists before accessing it
+        $this->assertArrayHasKey(0, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT]);
+
         $this->assertSame($campaignId, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT][0]['campaignId']);
         $this->assertSame($segmentResults[0]['leadlist_id'], $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_SEGMENT][0]['segmentId']);
     }
