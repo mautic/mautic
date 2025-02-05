@@ -326,8 +326,9 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         // Persist entities if provided
         if (!empty($inputValues['entities'])) {
-            // @phpstan-ignore-next-line
-            array_map([$this->em, 'persist'], $inputValues['entities']);
+            foreach ($inputValues['entities'] as $entity) {
+                $this->em->persist($entity);
+            }
         }
 
         // create form action
@@ -339,9 +340,10 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
 
-        /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
+        \assert($translator instanceof TranslatorInterface);
 
         foreach ($expectedMessages as $expectedMessage) {
             $translatedMessage = $translator->trans($expectedMessage['message'], $expectedMessage['message_arg']);
