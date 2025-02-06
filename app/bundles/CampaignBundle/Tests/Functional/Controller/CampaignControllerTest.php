@@ -37,7 +37,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
     {
         $nonAdminUser = $this->setupCampaignData(38);
 
-        $this->loginOtherUser($nonAdminUser->getUserIdentifier());
+        $this->loginOtherUser($nonAdminUser);
 
         $this->client->request(Request::METHOD_GET, '/s/campaigns/view/'.$this->campaign->getId().'/contact/1');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -58,7 +58,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
     {
         $nonAdminUser = $this->setupCampaignData();
 
-        $this->loginOtherUser($nonAdminUser->getUserIdentifier());
+        $this->loginOtherUser($nonAdminUser);
 
         $this->client->request(Request::METHOD_GET, '/s/campaigns/view/'.$this->campaign->getId().'/contact/1');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
