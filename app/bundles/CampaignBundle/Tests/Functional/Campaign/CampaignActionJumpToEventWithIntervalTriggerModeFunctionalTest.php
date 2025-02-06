@@ -141,7 +141,11 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:00:00'));
+        if ((new \DateTime())->format('G') < 2) {
+            $adjustPointEvent->setTriggerHour((new \DateTime())->modify('midnight')->format('H:00:00'));
+        } else {
+            $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:00:00'));
+        }
 
         yield 'Points at a relative time: Scheduled at - before one hour. Should trigger now.' => [
             $adjustPointEvent,
@@ -181,8 +185,13 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hour'));
+        if ((new \DateTime())->format('G') < 2) {
+            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('midnight')->modify('-4 hours'));
+            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('midnight')->modify('-3 hours'));
+        } else {
+            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hours'));
+            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hours'));
+        }
 
         yield 'Points at a relative time: Between passed time' => [
             $adjustPointEvent,
@@ -206,8 +215,13 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-1 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+1 hour'));
+        if ((new \DateTime())->format('G') < 2) {
+            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('midnight'));
+            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('midnight')->modify('+2 hours'));
+        } else {
+            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-1 hour'));
+            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+1 hour'));
+        }
 
         yield 'Points at a relative time: Between future time today will execute immediatelly as the window is open right now' => [
             $adjustPointEvent,
@@ -247,6 +261,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $adjustPointEvent->setTriggerHour($triggerHourDate->format('H:00:00'));
         $adjustPointEvent->setTriggerIntervalUnit('d');
+        // This must conform the format of the date in the \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::getGroupExecutionDateTime
         $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('N')]);
 
         yield 'Schedule the event when Send From is in the future on the selected day when the day is today' => [
