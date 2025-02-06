@@ -73,6 +73,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     final protected function tearDown(): void
     {
+        date_default_timezone_set('UTC');
         $this->restoreLocalConfig();
         $customFieldsReset = $this->resetCustomFields();
         $this->beforeTearDown();

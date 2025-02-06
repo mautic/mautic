@@ -8359,18 +8359,6 @@ parameters:
 			path: app/bundles/CoreBundle/Factory/IpLookupFactory.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Factory\\MauticFactory\:\:getHelper\(\) has parameter \$helper with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Factory/MauticFactory.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Factory\\MauticFactory\:\:getInstalledThemes\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Factory/MauticFactory.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Factory\\MauticFactory\:\:getModel\(\) has parameter \$modelNameKey with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -15170,18 +15158,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getEntities\(\) has parameter \$args with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getEntities\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getEntities\(\) return type has no value type specified in iterable type array\|Doctrine\\ORM\\Tools\\Pagination\\Paginator\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
@@ -25174,6 +25150,34 @@ parameters:
 			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
 
 		-
+			message: '''
+				#^Fetching deprecated class constant ON_CAMPAIGN_TRIGGER_ACTION of class Mautic\\LeadBundle\\LeadEvents\:
+				Listen to ON_CAMPAIGN_BATCH_ACTION instead\.
+
+				The mautic\.lead\.on_campaign_trigger_action event is fired when the campaign action triggers\.
+
+				The event listener receives a
+				Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent$#
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/CampaignActionDeleteContactSubscriber.php
+
+		-
+			message: '''
+				#^Fetching deprecated class constant ON_CAMPAIGN_TRIGGER_ACTION of class Mautic\\LeadBundle\\LeadEvents\:
+				Listen to ON_CAMPAIGN_BATCH_ACTION instead\.
+
+				The mautic\.lead\.on_campaign_trigger_action event is fired when the campaign action triggers\.
+
+				The event listener receives a
+				Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent$#
+			'''
+			identifier: classConstant.deprecated
+			count: 8
+			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
+
+		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:getFields\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -25205,12 +25209,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerActionUpdateCompany\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerActionUpdateLead\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
@@ -25299,15 +25297,6 @@ parameters:
 		-
 			message: '''
 				#^Parameter \$event of method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerActionUpdateCompany\(\) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
-
-		-
-			message: '''
-				#^Parameter \$event of method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerActionUpdateLead\(\) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
 				2\.13\.0; to be removed in 3\.0$#
 			'''
 			identifier: parameter.deprecatedClass
@@ -31114,12 +31103,6 @@ parameters:
 			path: app/bundles/PageBundle/Helper/TrackingHelper.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Helper\\TrackingHelper\:\:getSession\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Helper/TrackingHelper.php
-
-		-
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Entity\\VariantEntityInterface\:\:getChanges\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -31247,18 +31230,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:getLookupResults\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:getNewVsReturningPieChartData\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:getNewVsReturningPieChartData\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PageBundle/Model/PageModel.php
@@ -32742,15 +32713,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\EventHelper\:\:pushToIntegration\(\) has parameter \$errors with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Helper/EventHelper.php
-
-		-
-			message: '''
-				#^Parameter \$factory of method Mautic\\PluginBundle\\Helper\\EventHelper\:\:pushLead\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory\:
-				2\.0 to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/PluginBundle/Helper/EventHelper.php
 

@@ -2,7 +2,12 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -17,6 +22,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -118,23 +124,64 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'accumulative_time' => '',
     ];
 
-    public function testOnCampaignTriggerActiononUpdateCompany(): void
-    {
-        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
-        $mockLeadModel      = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel = $this->createMock(FieldModel::class);
-        $mockListModel      = $this->createMock(ListModel::class);
-        $mockCompanyModel   = $this->createMock(CompanyModel::class);
-        $mockCampaignModel  = $this->createMock(CampaignModel::class);
-        $mockGroupModel     = $this->createMock(PointGroupModel::class);
-        $companyEntityFrom  = $this->createMock(Company::class);
-        $doNotContact       = $this->createMock(DoNotContact::class);
+    /**
+     * @var LeadModel|MockObject
+     */
+    private $mockLeadModel;
 
-        $filterOperatorProvider = new FilterOperatorProvider(
+    /**
+     * @var CompanyModel|MockObject
+     */
+    private $mockCompanyModel;
+
+    /**
+     * @var CampaignSubscriber
+     */
+    private $subscriber;
+
+    private FilterOperatorProvider $filterOperatorProvider;
+
+    /**
+     * @var DoNotContact|MockObject
+     */
+    private $doNotContact;
+
+    protected function setUp(): void
+    {
+        $mockIpLookupHelper           = $this->createMock(IpLookupHelper::class);
+        $this->mockLeadModel          = $this->createMock(LeadModel::class);
+        $mockLeadFieldModel           = $this->createMock(FieldModel::class);
+        $mockListModel                = $this->createMock(ListModel::class);
+        $this->mockCompanyModel       = $this->createMock(CompanyModel::class);
+        $mockCampaignModel            = $this->createMock(CampaignModel::class);
+        $this->doNotContact           = $this->createMock(DoNotContact::class);
+        $mockGroupModel               = $this->createMock(PointGroupModel::class);
+        $this->filterOperatorProvider = new FilterOperatorProvider(
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(TranslatorInterface::class)
         );
+        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $mockCoreParametersHelper->method('get')
+            ->with('default_timezone')
+            ->willReturn('UTC');
 
+        $this->subscriber = new CampaignSubscriber(
+            $mockIpLookupHelper,
+            $this->mockLeadModel,
+            $mockLeadFieldModel,
+            $mockListModel,
+            $this->mockCompanyModel,
+            $mockCampaignModel,
+            $mockCoreParametersHelper,
+            $this->doNotContact,
+            $mockGroupModel,
+            $this->filterOperatorProvider
+        );
+    }
+
+    public function testOnCampaignTriggerActiononUpdateCompany(): void
+    {
+        $companyEntityFrom   = $this->createMock(Company::class);
         $companyEntityFrom->method('getId')
             ->willReturn($this->configFrom['id']);
         $companyEntityFrom->method('getName')
@@ -148,20 +195,20 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $companyEntityTo->method('getProfileFields')
             ->willReturn($this->configTo);
 
-        $mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
+        $this->mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
 
         $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
         $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn([]);
 
-        $mockCompanyModel->expects($this->atLeastOnce())
+        $this->mockCompanyModel->expects($this->atLeastOnce())
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
 
-        $mockCompanyModel->expects($this->once())
+        $this->mockCompanyModel->expects($this->once())
             ->method('checkForDuplicateCompanies')
             ->willReturn([$companyEntityTo]);
 
-        $mockCompanyModel->expects($this->any())
+        $this->mockCompanyModel->expects($this->any())
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
@@ -170,24 +217,11 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('default_timezone')
             ->willReturn('UTC');
 
-        $subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
-            $mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
-            $mockCompanyModel,
-            $mockCampaignModel,
-            $mockCoreParametersHelper,
-            $doNotContact,
-            $mockGroupModel,
-            $filterOperatorProvider
-        );
-
         $lead = new Lead();
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
 
-        $mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
+        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
             function () use ($lead): void {
                 $lead->setPrimaryCompany($this->configTo);
             }
@@ -205,7 +239,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $event = new CampaignExecutionEvent($args, true);
-        $subscriber->onCampaignTriggerActionUpdateCompany($event);
+        $this->subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
 
         $primaryCompany = $lead->getPrimaryCompany();
@@ -219,39 +253,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
-        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
-        $mockLeadModel      = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel = $this->createMock(FieldModel::class);
-        $mockListModel      = $this->createMock(ListModel::class);
-        $mockCompanyModel   = $this->createMock(CompanyModel::class);
-        $mockCampaignModel  = $this->createMock(CampaignModel::class);
-        $doNotContact       = $this->createMock(DoNotContact::class);
-        $mockGroupModel     = $this->createMock(PointGroupModel::class);
-
-        $filterOperatorProvider = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
-        );
-
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
             ->with('default_timezone')
             ->willReturn('UTC');
 
-        $doNotContact->expects($this->once())->method('isContactable')->willReturn($dncLead);
-
-        $subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
-            $mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
-            $mockCompanyModel,
-            $mockCampaignModel,
-            $mockCoreParametersHelper,
-            $doNotContact,
-            $mockGroupModel,
-            $filterOperatorProvider
-        );
+        $this->doNotContact->expects($this->once())->method('isContactable')->willReturn($dncLead);
 
         $lead = new Lead();
         $lead->setId(99);
@@ -270,44 +277,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $event = new CampaignExecutionEvent($args, true);
-        $subscriber->onCampaignTriggerCondition($event);
+        $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertSame($expected, $event->getResult());
     }
 
     public function testOnCampaignTriggerConditionLeadLandingPageHit(): void
     {
-        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
-        $mockLeadModel      = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel = $this->createMock(FieldModel::class);
-        $mockListModel      = $this->createMock(ListModel::class);
-        $mockCompanyModel   = $this->createMock(CompanyModel::class);
-        $mockCampaignModel  = $this->createMock(CampaignModel::class);
-        $mockDoNotContact   = $this->createMock(DoNotContact::class);
-        $mockGroupModel     = $this->createMock(PointGroupModel::class);
-
-        $filterOperatorProvider = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
-        );
-
-        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('get')
-            ->with('default_timezone')
-            ->willReturn('UTC');
-
-        $subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
-            $mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
-            $mockCompanyModel,
-            $mockCampaignModel,
-            $mockCoreParametersHelper,
-            $mockDoNotContact,
-            $mockGroupModel,
-            $filterOperatorProvider
-        );
-
         $lead = new Lead();
         $lead->setId(99);
         $leadTimeline = [
@@ -331,7 +306,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
             ], ];
 
-        $mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
+        $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
 
         $args = [
             'lead'  => $lead,
@@ -345,44 +320,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $event = new CampaignExecutionEvent($args, true);
-        $subscriber->onCampaignTriggerCondition($event);
+        $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
     }
 
     public function testOnCampaignTriggerConditionLeadPageUrlHit(): void
     {
-        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
-        $mockLeadModel      = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel = $this->createMock(FieldModel::class);
-        $mockListModel      = $this->createMock(ListModel::class);
-        $mockCompanyModel   = $this->createMock(CompanyModel::class);
-        $mockCampaignModel  = $this->createMock(CampaignModel::class);
-        $mockDoNotContact   = $this->createMock(DoNotContact::class);
-        $mockGroupModel     = $this->createMock(PointGroupModel::class);
-
-        $filterOperatorProvider = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
-        );
-
-        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('get')
-            ->with('default_timezone')
-            ->willReturn('UTC');
-
-        $subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
-            $mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
-            $mockCompanyModel,
-            $mockCampaignModel,
-            $mockCoreParametersHelper,
-            $mockDoNotContact,
-            $mockGroupModel,
-            $filterOperatorProvider
-        );
-
         $lead = new Lead();
         $lead->setId(99);
         $leadTimeline = [
@@ -407,7 +350,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
             ], ];
 
-        $mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
+        $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
 
         $args = [
             'lead'  => $lead,
@@ -421,44 +364,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $event = new CampaignExecutionEvent($args, true);
-        $subscriber->onCampaignTriggerCondition($event);
+        $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
     }
 
     public function testOnCampaignTriggerConditionLeadPageUrlHitWithoutSpentTime(): void
     {
-        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
-        $mockLeadModel      = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel = $this->createMock(FieldModel::class);
-        $mockListModel      = $this->createMock(ListModel::class);
-        $mockCompanyModel   = $this->createMock(CompanyModel::class);
-        $mockCampaignModel  = $this->createMock(CampaignModel::class);
-        $mockDoNotContact   = $this->createMock(DoNotContact::class);
-        $mockGroupModel     = $this->createMock(PointGroupModel::class);
-
-        $filterOperatorProvider = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
-        );
-
-        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('get')
-            ->with('default_timezone')
-            ->willReturn('UTC');
-
-        $subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
-            $mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
-            $mockCompanyModel,
-            $mockCampaignModel,
-            $mockCoreParametersHelper,
-            $mockDoNotContact,
-            $mockGroupModel,
-            $filterOperatorProvider
-        );
-
         $lead = new Lead();
         $lead->setId(99);
         $leadTimeline = [
@@ -483,7 +394,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
             ], ];
 
-        $mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
+        $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
 
         $args = [
             'lead'  => $lead,
@@ -497,7 +408,46 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $event = new CampaignExecutionEvent($args, true);
-        $subscriber->onCampaignTriggerCondition($event);
+        $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
+    }
+
+    public function testOnCampaignTriggerActionUpdateLead(): void
+    {
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $properties    = [
+            'points' => 10,
+        ];
+        $event         = (new Event())->setProperties($properties);
+        $event->setType('lead.updatelead');
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
+
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(6);
+        $leadEventLog
+            ->method('setIsScheduled')
+            ->with(false)
+            ->willReturn($leadEventLog);
+
+        $logs = new ArrayCollection([$leadEventLog]);
+
+        $this->mockLeadModel->expects($this->once())
+            ->method('setFieldValues')
+            ->with($lead, $properties, false);
+
+        $this->mockLeadModel->expects($this->once())
+            ->method('saveEntity')
+            ->with($lead);
+
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionUpdateLead($pendingEvent);
+
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
     }
 }

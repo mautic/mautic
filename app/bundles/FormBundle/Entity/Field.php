@@ -124,6 +124,8 @@ class Field
      */
     private $isAutoFill = false;
 
+    private bool $isReadOnly = false;
+
     /**
      * @var array
      */
@@ -207,6 +209,12 @@ class Field
         $builder->addNullableField('leadField', Types::STRING, 'lead_field');
         $builder->addNullableField('saveResult', Types::BOOLEAN, 'save_result');
         $builder->addNullableField('isAutoFill', Types::BOOLEAN, 'is_auto_fill');
+
+        $builder->createField('isReadOnly', Types::BOOLEAN)
+            ->columnName('is_read_only')
+            ->option('default', false)
+            ->build();
+
         $builder->addNullableField('showWhenValueExists', Types::BOOLEAN, 'show_when_value_exists');
         $builder->addNullableField('showAfterXSubmissions', Types::INTEGER, 'show_after_x_submissions');
         $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
@@ -242,6 +250,7 @@ class Field
                     'leadField', // @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
                     'saveResult',
                     'isAutoFill',
+                    'isReadOnly',
                     'mappedObject',
                     'mappedField',
                 ]
@@ -1010,5 +1019,15 @@ class Field
         }
 
         $this->leadField = null;
+    }
+
+    public function isAutoFillReadOnly(): bool
+    {
+        return $this->isAutoFill && $this->isReadOnly;
+    }
+
+    public function setIsReadOnly(?bool $isReadOnly): void
+    {
+        $this->isReadOnly = $isReadOnly ?? false;
     }
 }
