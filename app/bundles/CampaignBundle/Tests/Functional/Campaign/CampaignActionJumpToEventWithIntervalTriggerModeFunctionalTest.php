@@ -14,13 +14,33 @@ use PHPUnit\Framework\Assert;
 
 class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
+    private string $originalTimezone;
+
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
 
+        $timezone = 'UTC';
+        $nowUTC   = new \DateTime('now', new \DateTimeZone($timezone));
+        if ($nowUTC->format('G') < 4) {
+            $timezone = 'Asia/Bangkok'; // +07:00
+        } elseif ($nowUTC->format('G') > 20) {
+            $timezone = 'America/Phoenix'; // -07:00
+        }
+
+        $this->originalTimezone = date_default_timezone_get();
+
         $this->configParams += [
-            'default_timezone' => 'UTC',
+            'default_timezone' => $timezone,
         ];
+    }
+
+    protected function setUp(): void
+    {
+        // Tear down of the base class will restore timezone to UTC.
+        date_default_timezone_set($this->configParams['default_timezone']);
+
+        parent::setUp();
     }
 
     /**
@@ -113,6 +133,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
      */
     public function dataForCampaignWithJumpToEventWithIntervalTriggerMode(): iterable
     {
+        date_default_timezone_set($this->configParams['default_timezone']);
         // Event times starts when the PHPUNIT suite starts. The closures can run minutes later
         // which breaks the test in the CI. Use this time in the closures to avoid flaky tests.
         $testNow = new \DateTime();
@@ -141,11 +162,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        if ((new \DateTime())->format('G') < 2) {
-            $adjustPointEvent->setTriggerHour((new \DateTime())->modify('midnight')->format('H:00:00'));
-        } else {
-            $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:00:00'));
-        }
+        $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:00:00'));
 
         yield 'Points at a relative time: Scheduled at - before one hour. Should trigger now.' => [
             $adjustPointEvent,
@@ -185,13 +202,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        if ((new \DateTime())->format('G') < 2) {
-            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('midnight')->modify('-4 hours'));
-            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('midnight')->modify('-3 hours'));
-        } else {
-            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hours'));
-            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hours'));
-        }
+        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hours'));
+        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hours'));
 
         yield 'Points at a relative time: Between passed time' => [
             $adjustPointEvent,
@@ -215,13 +227,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        if ((new \DateTime())->format('G') < 2) {
-            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('midnight'));
-            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('midnight')->modify('+2 hours'));
-        } else {
-            $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-1 hour'));
-            $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+1 hour'));
-        }
+        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-1 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+1 hour'));
 
         yield 'Points at a relative time: Between future time today will execute immediatelly as the window is open right now' => [
             $adjustPointEvent,
@@ -303,6 +310,9 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
                 $this->assertPlusMinusOneMinuteOf($testNow->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
             },
         ];
+
+        // Need to reset timezone for next date providers call
+        date_default_timezone_set($this->originalTimezone);
     }
 
     /**
