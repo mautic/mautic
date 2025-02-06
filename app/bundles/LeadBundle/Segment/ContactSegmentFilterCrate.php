@@ -100,11 +100,23 @@ class ContactSegmentFilterCrate
      */
     public function getFilter()
     {
-        return match ($this->getType()) {
-            'number'  => (float) $this->filter,
-            'boolean' => (bool) $this->filter,
-            default   => $this->filter,
-        };
+        $excludeTypecastOperators = [
+            OperatorOptions::IN,
+            OperatorOptions::NOT_IN,
+            OperatorOptions::REGEXP,
+            OperatorOptions::NOT_REGEXP,
+        ];
+
+        if (!in_array($this->operator, $excludeTypecastOperators)) {
+            switch ($this->getType()) {
+                case 'number':
+                    return (float) $this->filter;
+                case 'boolean':
+                    return (bool) $this->filter;
+            }
+        }
+
+        return $this->filter;
     }
 
     /**
