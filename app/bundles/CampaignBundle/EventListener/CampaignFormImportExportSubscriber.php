@@ -6,9 +6,11 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportEvent;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignFormExportSubscriber implements EventSubscriberInterface
+final class CampaignFormImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -19,13 +21,13 @@ final class CampaignFormExportSubscriber implements EventSubscriberInterface
     {
         return [
             EntityExportEvent::EXPORT_CAMPAIGN_FORM => ['onCampaignFormExport', 0],
+            EntityImportEvent::IMPORT_CAMPAIGN_FORM => ['onCampaignFormImport', 0],
         ];
     }
 
     public function onCampaignFormExport(EntityExportEvent $event): void
     {
         $campaignId = $event->getEntityId();
-
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
         $formResults = $queryBuilder
@@ -49,19 +51,54 @@ final class CampaignFormExportSubscriber implements EventSubscriberInterface
                 'cached_html'  => $result['cached_html'],
                 'post_action'  => $result['post_action'],
                 'template'     => $result['template'],
-
-                'form_type'            => $result['form_type'],
-                'render_style'         => $result['render_style'],
+                'form_type'    => $result['form_type'],
+                'render_style' => $result['render_style'],
                 'post_action_property' => $result['post_action_property'],
-                'form_attr'            => $result['form_attr'],
+                'form_attr'    => $result['form_attr'],
             ];
 
             $dependency = [
                 'campaignId' => (int) $campaignId,
                 'segmentId'  => (int) $result['form_id'],
             ];
+
             $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_FORM, $dependency);
             $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_FORM, $data);
+        }
+    }
+
+    public function onCampaignFormImport(EntityImportEvent $event): void
+    {
+        $output = new ConsoleOutput();
+        $forms = $event->getEntityData();
+
+        if (!$forms) {
+            return;
+        }
+
+        foreach ($forms as $formData) {
+            $form = new \Mautic\FormBundle\Entity\Form();
+            $form->setName($formData['name']);
+            $form->setIsPublished((bool) $formData['is_published']);
+            $form->setDescription($formData['description'] ?? '');
+            $form->setAlias($formData['alias'] ?? '');
+            $form->setLanguage($formData['lang'] ?? null);
+            $form->setCachedHtml($formData['cached_html'] ?? '');
+            $form->setPostAction($formData['post_action'] ?? '');
+            $form->setPostActionProperty($formData['post_action_property'] ?? '');
+            $form->setTemplate($formData['template'] ?? '');
+            $form->setFormType($formData['form_type'] ?? '');
+            $form->setRenderStyle($formData['render_style'] ?? '');
+            $form->setFormAttributes($formData['form_attr'] ?? '');
+            $form->setDateAdded(new \DateTime());
+            $form->setDateModified(new \DateTime());
+
+            $this->entityManager->persist($form);
+            $this->entityManager->flush();
+
+            $event->addEntityIdMap((int) $formData['id'], (int) $form->getId());
+
+            $output->writeln('<info>Imported form: '.$form->getName().' with ID: '.$form->getId().'</info>');
         }
     }
 }
