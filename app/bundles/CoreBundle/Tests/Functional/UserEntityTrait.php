@@ -17,7 +17,7 @@ trait UserEntityTrait
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
     }
 
     /**
@@ -64,7 +64,7 @@ trait UserEntityTrait
 
         /** @var PasswordHasherInterface $encoder */
         $encoder = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        $user->setPassword($encoder->hash('mautic'));
+        $user->setPassword($encoder->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);
 
