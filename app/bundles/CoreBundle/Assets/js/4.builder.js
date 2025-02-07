@@ -1,5 +1,5 @@
 Mautic.launchBuilder = function () {
-    alert('Please enable the GrapesJS builder plugin to use this feature. Or other builder plugin.');
+    alert('Please enable the GrapesJS builder plugin (or another builder plugin) to use this feature.');
 };
 
 /**

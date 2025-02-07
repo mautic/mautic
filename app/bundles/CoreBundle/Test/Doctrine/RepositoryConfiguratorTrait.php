@@ -48,10 +48,10 @@ trait RepositoryConfiguratorTrait
     /**
      * @return object the repository for the entity
      */
-    private function configureRepository(string $entityClass)
+    private function configureRepository(string $entityClass, MockObject|EntityManagerInterface $entityManager = null)
     {
         $this->classMetadata   = $this->createMock(ClassMetadata::class);
-        $this->entityManager   = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager   = $entityManager ?? $this->createMock(EntityManagerInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->connection      = $this->getMockedConnection();
         $this->result          = $this->createMock(Result::class);
