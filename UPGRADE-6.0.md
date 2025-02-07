@@ -63,6 +63,8 @@
 - `getNewVsReturningPieChartData` was removed from `Mautic\PageBundle\Model\PageModel`. Use `getUniqueVsReturningPieChartData()` instead.
 
 
+- API change in CommonApiController: In the CommonApiController, the newEntityAction now uses a dynamic HTTP method. It returns PATCH if the entity has an ID, or POST otherwise. This change ensures partial updates are properly handled.
+
 ## Most notable changes required by Symfony 6
 
 ### Getting a value from request must be scalar
