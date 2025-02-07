@@ -11,7 +11,7 @@ class LeadChangeEvent extends Event
         private Lead $oldLead,
         private $oldTrackingId,
         private Lead $newLead,
-        private $newTrackingId
+        private $newTrackingId,
     ) {
     }
 

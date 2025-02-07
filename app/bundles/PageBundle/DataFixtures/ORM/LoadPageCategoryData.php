@@ -11,7 +11,7 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private CategoryModel $categoryModel
+        private CategoryModel $categoryModel,
     ) {
     }
 

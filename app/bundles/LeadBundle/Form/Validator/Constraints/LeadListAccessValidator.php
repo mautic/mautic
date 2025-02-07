@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class LeadListAccessValidator extends ConstraintValidator
 {
     public function __construct(
-        private ListModel $segmentModel
+        private ListModel $segmentModel,
     ) {
     }
 

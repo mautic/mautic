@@ -12,7 +12,7 @@ class UserNotificationHelper
 {
     public function __construct(
         private Writer $writer,
-        private UserNotificationBuilder $userNotificationBuilder
+        private UserNotificationBuilder $userNotificationBuilder,
     ) {
     }
 
@@ -28,7 +28,7 @@ class UserNotificationHelper
         int $id,
         string $linkText,
         string $deduplicateValue = null,
-        \DateTime $deduplicateDateTimeFrom = null
+        \DateTime $deduplicateDateTimeFrom = null,
     ): void {
         $link    = $this->userNotificationBuilder->buildLink($mauticObject, $id, $linkText);
         $userIds = $this->userNotificationBuilder->getUserIds($mauticObject, $id);

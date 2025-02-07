@@ -10,7 +10,7 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 {
     public function __construct(
-        private EntityManager $em
+        private EntityManager $em,
     ) {
     }
 

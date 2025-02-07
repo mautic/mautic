@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class EmailSendType extends AbstractType
 {
     public function __construct(
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
@@ -186,10 +186,7 @@ class EmailSendType extends AbstractType
         $resolver->setDefined(['update_select', 'with_email_types']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'emailsend_list';
     }

@@ -79,7 +79,7 @@ class WidgetApiController extends CommonApiController
         $to         = InputHelper::clean($request->get('dateTo', null));
         $dataFormat = InputHelper::clean($request->get('dataFormat', null));
         $unit       = InputHelper::clean($request->get('timeUnit', 'Y'));
-        $dataset    = InputHelper::clean($request->get('dataset', []));
+        $dataset    = InputHelper::clean($request->query->all()['dataset'] ?? $request->request->all()['dataset'] ?? []);
         $response   = ['success' => 0];
 
         try {
@@ -102,7 +102,7 @@ class WidgetApiController extends CommonApiController
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
             'limit'      => (int) $request->get('limit', null),
-            'filter'     => InputHelper::clean($request->get('filter', [])),
+            'filter'     => InputHelper::clean($request->query->all()['filter'] ?? $request->request->all()['filter'] ?? []),
             'dataset'    => $dataset,
         ];
 

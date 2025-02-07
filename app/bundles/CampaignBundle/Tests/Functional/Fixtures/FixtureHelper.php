@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Functional\Fixtures;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
@@ -123,5 +125,108 @@ final class FixtureHelper
         );
 
         return $event;
+    }
+
+    /**
+     * Creates campaign with email sent action.
+     *
+     * Campaign diagram:
+     * -------------------
+     * -  Start segment  -
+     * -------------------
+     *         |
+     * -------------------
+     * -   Send email    -
+     * -------------------
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function createCampaignWithEmailSent(int $emailId): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test send email');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $event1 = new Event();
+        $event1->setCampaign($campaign);
+        $event1->setName('Send email');
+        $event1->setType('email.send');
+        $event1->setChannel('email');
+        $event1->setChannelId($emailId);
+        $event1->setEventType('action');
+        $event1->setTriggerMode('immediate');
+        $event1->setOrder(1);
+        $event1->setProperties(
+            [
+                'canvasSettings' => [
+                    'droppedX' => '549',
+                    'droppedY' => '155',
+                ],
+                'name'                       => '',
+                'triggerMode'                => 'immediate',
+                'triggerDate'                => null,
+                'triggerInterval'            => '1',
+                'triggerIntervalUnit'        => 'd',
+                'triggerHour'                => '',
+                'triggerRestrictedStartHour' => '',
+                'triggerRestrictedStopHour'  => '',
+                'anchor'                     => 'leadsource',
+                'properties'                 => [
+                    'email'      => $emailId,
+                    'email_type' => 'transactional',
+                    'priority'   => '2',
+                    'attempts'   => '3',
+                ],
+                'type'            => 'email.send',
+                'eventType'       => 'action',
+                'anchorEventType' => 'source',
+                'campaignId'      => 'mautic_ce6c7dddf8444e579d741c0125f18b33a5d49b45',
+                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'         => [
+                    'save' => '',
+                ],
+                'email'      => $emailId,
+                'email_type' => 'transactional',
+                'priority'   => 2,
+                'attempts'   => 3.0,
+            ]
+        );
+        $this->em->persist($event1);
+        $this->em->flush();
+
+        $campaign->setCanvasSettings(
+            [
+                'nodes'       => [
+                    [
+                        'id'        => $event1->getId(),
+                        'positionX' => '549',
+                        'positionY' => '155',
+                    ],
+                    [
+                        'id'        => 'lists',
+                        'positionX' => '796',
+                        'positionY' => '50',
+                    ],
+                ],
+                'connections' => [
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => $event1->getId(),
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $campaign->addEvent($event1->getId(), $event1);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
     }
 }

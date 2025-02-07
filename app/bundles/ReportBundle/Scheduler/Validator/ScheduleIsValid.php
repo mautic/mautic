@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 
 class ScheduleIsValid extends Constraint
 {
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }

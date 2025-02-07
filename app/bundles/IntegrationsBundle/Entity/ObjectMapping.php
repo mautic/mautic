@@ -122,9 +122,6 @@ class ObjectMapping
             ->build();
     }
 
-    /**
-     * @throws \Exception
-     */
     public function __construct(?\DateTime $dateCreated = null)
     {
         if (null === $dateCreated) {
@@ -272,8 +269,6 @@ class ObjectMapping
      * @param \DateTimeInterface|null $lastSyncDate
      *
      * @return ObjectMapping
-     *
-     * @throws \Exception
      */
     public function setLastSyncDate($lastSyncDate)
     {

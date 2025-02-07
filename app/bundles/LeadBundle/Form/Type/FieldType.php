@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -466,7 +467,7 @@ class FieldType extends AbstractType
             // There's no need to filter list during FormEvents::PRE_SUBMIT.
             if ($object && $group) {
                 $options['query_builder'] = fn (EntityRepository $er) => $er->createQueryBuilder('f')
-                    ->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC)
+                    ->orderBy('f.order', Order::Ascending->value)
                     ->where('f.object = :object')
                     ->setParameter('object', $object)
                     ->andWhere('f.group = :group')
@@ -686,10 +687,7 @@ class FieldType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadfield';
     }

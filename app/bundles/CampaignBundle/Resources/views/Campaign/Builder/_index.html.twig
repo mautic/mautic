@@ -8,7 +8,7 @@
     <div id="CampaignEventPanelGroups">
         <div class="row">
             <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-4" id="DecisionGroupSelector">
-                <div class="panel panel-success mb-0">
+                <div class="panel panel-info mb-0">
                     <div class="panel-heading">
                         <div class="col-xs-8 col-sm-10 np">
                             <h3 class="panel-title">{{ 'mautic.campaign.event.decision.header'|trans }}</h3>
@@ -95,7 +95,7 @@
                 </div>
             </div>
             <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-4" id="ConditionGroupSelector">
-                <div class="panel panel-danger mb-0">
+                <div class="panel panel-warning mb-0">
                     <div class="panel-heading">
                         <div class="col-xs-8 col-sm-10 np">
                             <h3 class="panel-title">{{ 'mautic.campaign.event.condition.header'|trans }}</h3>
@@ -139,11 +139,11 @@
         </div>
         <div class="row">
             <div class="mr-0 ml-0 pl-xs pr-xs mt-xs campaign-group-container col-md-12">
-                <div id="CampaignPasteContainer mt-10" class="panel mb-0">
+                <div id="CampaignPasteContainer" class="panel mb-0">
                     <div id="CampaignPasteDescription" class="panel-body">
                         <div><b>{{ 'mautic.campaign.event.clone.header'|trans }}</b></div>
-                        <div><span class="text-muted">{{ 'mautic.campaign.event.clone.name'|trans }}: </span><span data-campaign-event-clone="sourceEventName"></span></div>
-                        <div><span class="text-muted">{{ 'mautic.campaign.event.clone.from'|trans }}: </span><span data-campaign-event-clone="sourceCampaignName"></span></div>
+                        <div><span class="text-secondary">{{ 'mautic.campaign.event.clone.name'|trans }}: </span><span data-campaign-event-clone="sourceEventName"></span></div>
+                        <div><span class="text-secondary">{{ 'mautic.campaign.event.clone.from'|trans }}: </span><span data-campaign-event-clone="sourceCampaignName"></span></div>
 
                     </div>
                     <div class="panel-footer">

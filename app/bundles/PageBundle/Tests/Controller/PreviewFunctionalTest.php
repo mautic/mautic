@@ -23,12 +23,6 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $url = "/page/preview/{$page->getId()}";
 
-        // Anonymous visitor is not allowed to access preview
-        $this->client->request(Request::METHOD_GET, $url);
-        self::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-
-        $this->loginUser('admin');
-
         // Admin user is allowed to access preview
         $this->assertPageContent($url, $defaultContent);
 
@@ -37,6 +31,12 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Check there is no DWC replacement for a non-existent lead
         $this->assertPageContent("{$url}?contactId=987", $defaultContent);
+
+        $this->logoutUser();
+
+        // Anonymous visitor is not allowed to access preview
+        $this->client->request(Request::METHOD_GET, $url);
+        self::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
     private function assertPageContent(string $url, string $expectedContent): void

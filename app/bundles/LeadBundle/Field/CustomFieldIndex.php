@@ -16,7 +16,7 @@ class CustomFieldIndex
     public function __construct(
         private IndexSchemaHelper $indexSchemaHelper,
         private LoggerInterface $logger,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 

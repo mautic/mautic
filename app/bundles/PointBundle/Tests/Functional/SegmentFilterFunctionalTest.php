@@ -77,7 +77,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createContact(
-        string $email
+        string $email,
     ): Lead {
         $lead = new Lead();
         $lead->setEmail($email);
@@ -87,7 +87,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     }
 
     private function createGroup(
-        string $name
+        string $name,
     ): Group {
         $group = new Group();
         $group->setName($name);
@@ -99,7 +99,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     private function addGroupContactScore(
         Lead $lead,
         Group $group,
-        int $score
+        int $score,
     ): void {
         $groupContactScore = new GroupContactScore();
         $groupContactScore->setContact($lead);

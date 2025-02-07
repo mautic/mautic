@@ -46,7 +46,7 @@ class IntegrationHelper
         protected BundleHelper $bundleHelper,
         protected CoreParametersHelper $coreParametersHelper,
         protected Environment $twig,
-        protected PluginModel $pluginModel
+        protected PluginModel $pluginModel,
     ) {
     }
 

@@ -15,7 +15,7 @@ class ScheduledBatchEvent extends AbstractLogCollectionEvent
         AbstractEventAccessor $config,
         Event $event,
         ArrayCollection $logs,
-        private $isReschedule = false
+        private $isReschedule = false,
     ) {
         parent::__construct($config, $event, $logs);
     }

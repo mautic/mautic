@@ -35,6 +35,7 @@ class BulkNotificationTest extends MauticMysqlTestCase
 
         $this->bulkNotification->flush();
 
+        /** @var Notification[] $notifications */
         $notifications = $notificationRepository->findAll();
         Assert::assertCount(2, $notifications);
         $this->assertNotification($notifications[0], 'message 1', 'link 1');

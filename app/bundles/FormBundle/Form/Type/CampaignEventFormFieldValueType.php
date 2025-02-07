@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class CampaignEventFormFieldValueType extends AbstractType
 {
     public function __construct(
-        private FormModel $model
+        private FormModel $model,
     ) {
     }
 
@@ -173,7 +173,7 @@ class CampaignEventFormFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'campaignevent_form_field_value';
     }

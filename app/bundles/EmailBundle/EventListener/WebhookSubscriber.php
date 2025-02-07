@@ -15,7 +15,7 @@ class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private WebhookModel $webhookModel,
-        private bool $includeDetails
+        private bool $includeDetails,
     ) {
     }
 

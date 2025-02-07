@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Controller;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
@@ -84,7 +85,9 @@ class TagController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
-            ]);
+            ]
+        );
+        \assert($items instanceof Paginator);
 
         $count = count($items);
 
@@ -115,7 +118,7 @@ class TagController extends FormController
         // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.tagmanager.page', $page);
 
-        $tagIds    = array_keys(iterator_to_array($items->getIterator(), true));
+        $tagIds    = array_map(fn (Tag $tag) => $tag->getId(), iterator_to_array($items->getIterator()));
         $tagsCount = (!empty($tagIds)) ? $model->getRepository()->countByLeads($tagIds) : [];
 
         $parameters = [
@@ -556,10 +559,8 @@ class TagController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request, TagModel $model): Response
     {
         $page      = $request->getSession()->get('mautic.tagmanager.page', 1);
         $returnUrl = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
@@ -576,8 +577,6 @@ class TagController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model           = $this->getModel('lead.tag');
             $ids             = json_decode($request->query->get('ids', '{}'));
             $deleteIds       = [];
 

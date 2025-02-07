@@ -72,7 +72,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private CompanyModel $companyModel,
         private CompanyReportData $companyReportData,
         private FieldsBuilder $fieldsBuilder,
-        private Translator $translator
+        private Translator $translator,
     ) {
     }
 
@@ -629,7 +629,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select('comp.companycity as title, count(comp.companycity) as quantity')
                         ->groupBy('comp.companycity')
                         ->andWhere(
-                            $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->and(
                                 $queryBuilder->expr()->isNotNull('comp.companycity'),
                                 $queryBuilder->expr()->neq('comp.companycity', $queryBuilder->expr()->literal(''))
                             )

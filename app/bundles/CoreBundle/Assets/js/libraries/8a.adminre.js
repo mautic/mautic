@@ -348,13 +348,10 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 });
             })();
 
-            // @PLUGIN: SelectRow
-            // Self invoking
-            // ================================
             (function () {
                 var contextual,
-                    toggler     = "[data-toggle~=selectrow]",
-                    target      = $(toggler).data("target");
+                    toggler = "[data-toggle~=selectrow]",
+                    target = $(toggler).data("target");
 
                 // check on DOM ready
                 $(toggler).each(function () {
@@ -362,6 +359,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         selectrow(this, "checked");
                     }
                 });
+                updateToolbarState();
 
                 // clicker
                 $(document).on("change", toggler, function () {
@@ -372,6 +370,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     } else {
                         selectrow(this, "unchecked");
                     }
+                    updateToolbarState();
                 });
 
                 // Core SelectRow function
@@ -394,6 +393,28 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         $(element).trigger(settings.eventPrefix+".selectrow.unselected", { "element": $($this).parentsUntil(target) });
                     }
                 }
+
+                // Check if any checkbox is selected and update toolbar state
+                function updateToolbarState() {
+                    var checkedBoxes = $(toggler + ":checked").length;
+                    $(".toolbar--batch-actions").toggleClass("toolbar--batch-actions--active", checkedBoxes > 0);
+
+                    var $summaryCount = $(".toolbar--batch-summary__count");
+                    var singularText = $summaryCount.data('singular');
+                    var pluralText = $summaryCount.data('plural');
+
+                    var itemText = checkedBoxes === 1 ? singularText : pluralText;
+                    $summaryCount.text(checkedBoxes + " " + itemText);
+                }
+
+                $(document).on("click", ".pagination a[data-toggle='ajax']", function() {
+                    // Reset toolbar state
+                    $(".toolbar--batch-actions").removeClass("toolbar--batch-actions--active");
+                    $(".toolbar--batch-summary__count").text("0");
+
+                    // Uncheck main toggle checkbox if it exists
+                    $("[data-toggle=checkall]").prop("checked", false);
+                });
 
                 // Event console
                 MAIN.prototype.HELPER.Console(settings.eventPrefix+".selectrow.selected");
@@ -424,6 +445,19 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     } else {
                         unchecked(target);
                     }
+                });
+
+                // Add this new handler right here
+                $(document).on("click", "[data-toggle=cancel-checkall]", function() {
+                    // Uncheck the main toggle checkbox
+                    $(toggler).prop("checked", false);
+
+                    // Uncheck all row checkboxes
+                    $("input[data-toggle=selectrow]").each(function() {
+                        $(this)
+                            .prop("checked", false)
+                            .trigger("change");
+                    });
                 });
 
                 // Core CheckAll function

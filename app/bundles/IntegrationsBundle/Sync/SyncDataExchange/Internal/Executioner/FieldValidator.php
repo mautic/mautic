@@ -20,7 +20,7 @@ final class FieldValidator implements FieldValidatorInterface
 
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,
-        private BulkNotification $bulkNotification
+        private BulkNotification $bulkNotification,
     ) {
     }
 

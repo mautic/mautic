@@ -200,7 +200,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-09-01 09:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertEquals('2018-08-31 17:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
@@ -255,7 +255,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-09-01 11:00:00', $executionDate->format('Y-m-d H:i:s'));
+        // It is OK to set the execution date 15 seconds in the past. It means execute right now.
+        $this->assertEquals('2018-08-31 13:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 

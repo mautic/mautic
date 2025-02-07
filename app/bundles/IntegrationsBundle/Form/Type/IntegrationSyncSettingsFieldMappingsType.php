@@ -23,7 +23,7 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 {
     public function __construct(
         private LoggerInterface $logger,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -17,7 +17,7 @@ class ContactManagementCest
 
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -43,7 +43,7 @@ class ContactManagementCest
 
     public function createContactFromForm(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -72,7 +72,7 @@ class ContactManagementCest
 
     public function accessEditContactFormFromList(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -92,7 +92,7 @@ class ContactManagementCest
 
     public function editContactFromProfile(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -128,7 +128,7 @@ class ContactManagementCest
 
     public function deleteContactFromList(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -149,7 +149,7 @@ class ContactManagementCest
 
     public function deleteContactFromProfile(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -162,6 +162,15 @@ class ContactManagementCest
         // Wait for the contact details page to load and confirm we're on the correct page
         $I->waitForText($contactName, 30);
         $I->see($contactName);
+
+        // Ensure the dropdown button is visible on the page
+        $I->waitForElementVisible(ContactPage::$dropDown, 10);
+
+        // Scroll to the dropdown button to bring it into view
+        $I->scrollTo(ContactPage::$dropDown, 0, -100);
+
+        // Wait until the dropdown button is clickable
+        $I->waitForElementClickable(ContactPage::$dropDown, 10);
 
         // Click the dropdown caret to show the delete option
         $I->click(ContactPage::$dropDown);
@@ -180,7 +189,7 @@ class ContactManagementCest
 
     public function batchDeleteContacts(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -192,8 +201,8 @@ class ContactManagementCest
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
-        // Select delete option from dropdown for multiple selections
-        $contact->selectOptionFromDropDownForMultipleSelections(11);
+        // Click on the delete button.
+        $I->click('//*[@id="delete"]');
 
         // Wait for the modal to become visible and click on the button to confirm delete
         $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
@@ -210,7 +219,7 @@ class ContactManagementCest
     public function batchAddToCampaign(
         AcceptanceTester $I,
         ContactStep $contact,
-        CampaignStep $campaign
+        CampaignStep $campaign,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -254,7 +263,7 @@ class ContactManagementCest
     public function batchRemoveFromCampaign(
         AcceptanceTester $I,
         ContactStep $contact,
-        CampaignStep $campaign
+        CampaignStep $campaign,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -369,6 +378,15 @@ class ContactManagementCest
         $I->pressKey(ContactPage::$addToTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
 
+        // Clear all selection
+        $I->click(ContactPage::$clearAllContactsSelection);
+
+        // Scroll to the search Bar to bring it into view
+        $I->scrollTo(ContactPage::$searchBar, 0, -100);
+
+        // Wait until the search Bar is clickable
+        $I->waitForElementClickable(ContactPage::$searchBar, 10);
+
         // Search again for contacts in the "Segment Test 3" segment
         $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
         $I->wait(1);
@@ -402,6 +420,15 @@ class ContactManagementCest
         $I->pressKey(ContactPage::$removeFromTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
 
+        // Clear all selection
+        $I->click(ContactPage::$clearAllContactsSelection);
+
+        // Scroll to the search Bar to bring it into view
+        $I->scrollTo(ContactPage::$searchBar, 0, -100);
+
+        // Wait until the search Bar is clickable
+        $I->waitForElementClickable(ContactPage::$searchBar, 10);
+
         // Search for contacts in the "Segment Test 3" segment
         $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
         $I->wait(1);
@@ -429,7 +456,7 @@ class ContactManagementCest
         $contact->selectContactFromList(2);
 
         // Select change segment option from dropdown for multiple selections
-        $contact->selectOptionFromDropDownForMultipleSelections(10);
+        $contact->selectOptionFromDropDownForMultipleSelections(9);
 
         $I->waitForElementClickable(ContactPage::$doNotContactSaveButton, 10);
         $I->click(ContactPage::$doNotContactSaveButton);
@@ -447,7 +474,7 @@ class ContactManagementCest
 
     public function importCSV(
         AcceptanceTester $I,
-        ContactStep $contact
+        ContactStep $contact,
     ): void {
         $I->amOnPage(ContactPage::$URL);
 

@@ -34,4 +34,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.plugin.integrations.repository.integration', Mautic\PluginBundle\Entity\IntegrationRepository::class);
     $services->alias('mautic.integrations.helper.contact_object', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class);
     $services->alias('mautic.integrations.helper.company_object', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class);
+    $services->alias('mautic.integrations.sync.data_exchange.mautic.field_helper', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper::class);
+    $services->alias('mautic.integrations.helper.sync_mapping', Mautic\IntegrationsBundle\Sync\Helper\MappingHelper::class);
 };

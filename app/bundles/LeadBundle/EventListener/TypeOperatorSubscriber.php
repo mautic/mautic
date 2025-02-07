@@ -45,7 +45,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private StageModel $stageModel,
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
     ) {
         $this->translator    = $translator;
     }
@@ -368,7 +368,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
      */
     private function getCategoryChoices(): array
     {
-        return $this->makeChoices($this->categoryModel->getLookupResults('global'), 'title', 'id');
+        return $this->makeChoices($this->categoryModel->getLookupResults('global', '', 300), 'title', 'id');
     }
 
     /**

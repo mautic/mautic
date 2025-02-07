@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class CommonEntity implements \Stringable
 {
     /**
-     * @var array
+     * @var mixed[]
      */
     protected $changes = [];
 

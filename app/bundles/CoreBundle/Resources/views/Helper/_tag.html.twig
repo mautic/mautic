@@ -4,6 +4,7 @@
     {% set icon = tag.icon|default('') %}
     {% set attributes = tag.attributes|default({}) %}
     {% set icon_only = tag.icon_only|default(false) %}
+    {% set size = tag.size|default('md') %}
 
     {# ID generation #}
     {% if attributes.id is defined %}
@@ -22,6 +23,10 @@
     {% set translated_label = tag.label|trans %}
     {% set classes = ['label', 'label-' ~ color] %}
 
+    {% if icon_only %}
+        {% set classes = classes|merge(['label-icon']) %}
+    {% endif %}
+
     {# Merge additional classes #}
     {% if attributes.class is defined %}
         {% set classes = attributes.class is iterable ? classes|merge(attributes.class) : classes|merge([attributes.class]) %}
@@ -37,7 +42,7 @@
 
     {# Wrapper element switching logic #}
     {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}
-    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ translated_label }}"
+    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ translated_label }}" size="{{ size }}"
         {% if wrapper_tag == 'a' %} href="{{ attributes.href }}" {% endif %}
         {% for attr_key, attr_value in other_attributes %}
             {{ attr_key }}="{{ attr_value }}"

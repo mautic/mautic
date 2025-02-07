@@ -43,7 +43,7 @@ class FocusController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -208,7 +208,7 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getPostActionRedirectArguments(array $args, $action): array
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);
@@ -239,7 +239,7 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getEntityFormOptions()
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);

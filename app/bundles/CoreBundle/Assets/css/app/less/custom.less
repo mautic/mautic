@@ -14,6 +14,12 @@
   }
 }
 
+// Fit the right menu to the screen no matter the viewport size
+.dropdown-menu-right {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
 // Contact image
 form[name="lead"] {
   .media-body, .contact-avatar {
@@ -75,12 +81,15 @@ form[name="lead"] {
 
 .content-overlay {
   position: absolute;
-  background: #fbfbfb;
+  background: var(--background);
   z-index: 50;
   width: 100%;
   height: 100%;
-  padding-left: 15px;
-  font-weight: bold;
+  padding: 15px;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
 }
 
 .stat-boxes {
@@ -248,19 +257,6 @@ ul.media-list.media-list-feed div.media-body
   width:auto;
 }
 
-.ico-email:before {
-  font-family: "FontAwesome";
-  content: "\f1fa";
-}
-.ico-sms:before {
-  font-family: "FontAwesome";
-  content: "\f27b";
-}
-
-#globalSearchDropdown .list-group-item>a{
-  padding-top: 10px;
-}
-
 .characters-count {
   z-index: 100;
   float: right;
@@ -287,9 +283,8 @@ ul.media-list.media-list-feed div.media-body
 }
 
 .disabled-row {
-  opacity: 0.6;
   pointer-events: none;
-  background-color: #f2f2f2;
+  color: var(--text-disabled);
 }
 
 .publishstatus_pulse {
@@ -397,28 +392,8 @@ code:hover > .copy-icon {
   }
 }
 
-.list-toolbar {
-  .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
-  .form-control.search,
-  .input-group .input-group-btn button,
-  .btn,
-  div {
-    height: 48px;
-    border-radius: unset;
-    margin: 0;
-  }
-  .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
-  .form-control.search,
-  .input-group .input-group-btn button,
-  .btn-ghost {
-    &:hover {background-color: var(--field-hover);}
-  }
 
-  > .btn {
-    &:last-child, &:only-of-type + .input-group > input { border-radius: 0 var(--border-radius-lg) 0 0; }
-    &:first-child { border-radius: var(--border-radius-lg) 0 0 0; }
-  }
-}
+
 .well { box-shadow: none; }
 
 .collapsed .arrow { transform: scaleY(-1); }

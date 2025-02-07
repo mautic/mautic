@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
 class ModelFactory
 {
     public function __construct(
-        private ContainerInterface $container
+        private ContainerInterface $container,
     ) {
     }
 
@@ -51,7 +51,7 @@ class ModelFactory
     /**
      * Check if a model exists.
      */
-    public function hasModel($modelNameKey)
+    public function hasModel($modelNameKey): bool
     {
         try {
             $this->getModel($modelNameKey);

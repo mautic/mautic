@@ -59,7 +59,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return bool
+     * @return bool|array<mixed>|string
      */
     public function isAuthorized()
     {
@@ -106,10 +106,7 @@ class VtigerIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }

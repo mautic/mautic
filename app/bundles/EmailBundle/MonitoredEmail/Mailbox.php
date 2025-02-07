@@ -195,8 +195,6 @@ class Mailbox
 
     /**
      * Returns if a mailbox is configured.
-     *
-     * @throws MailboxException
      */
     public function isConfigured($bundleKey = null, $folderKey = null): bool
     {

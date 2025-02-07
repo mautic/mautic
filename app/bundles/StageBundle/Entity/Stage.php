@@ -43,7 +43,7 @@ class Stage extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection<int,\Mautic\StageBundle\Entity\LeadStageLog>
+     * @var ArrayCollection<int,LeadStageLog>
      */
     private $log;
 

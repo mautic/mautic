@@ -11,30 +11,22 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
-/**
- * Report generator.
- */
 class ReportGenerator
 {
     private string $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
 
-    /**
-     * @var string
-     */
-    private $contentTemplate;
+    private ?string $contentTemplate = null;
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private Connection $db,
         private Report $entity,
         private ChannelListHelper $channelListHelper,
-        private ?FormFactoryInterface $formFactory = null
+        private ?FormFactoryInterface $formFactory = null,
     ) {
     }
 
     /**
-     * Gets query.
-     *
      * @param array $options Optional options array for the query
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
@@ -51,24 +43,19 @@ class ReportGenerator
     }
 
     /**
-     * Gets form.
-     *
-     * @param Report $entity  Report Entity
-     * @param array  $options Parameters set by the caller
+     * @param array $options Parameters set by the caller
      *
      * @return \Symfony\Component\Form\FormInterface<Report>
      */
-    public function getForm(Report $entity, $options)
+    public function getForm(Report $entity, $options): \Symfony\Component\Form\FormInterface
     {
         return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }
 
     /**
      * Gets the getContentTemplate path.
-     *
-     * @return string
      */
-    public function getContentTemplate()
+    public function getContentTemplate(): ?string
     {
         return $this->contentTemplate;
     }

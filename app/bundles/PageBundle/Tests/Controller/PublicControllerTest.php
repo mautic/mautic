@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -17,6 +18,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -37,7 +39,6 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -266,8 +267,10 @@ class PublicControllerTest extends MauticMysqlTestCase
             );
 
         $container = $this->createMock(Container::class);
-        $container->method('has')
-            ->will($this->returnValue(true));
+        $container->expects(self::never())
+            ->method('has');
+        $container->expects(self::never())
+            ->method('get');
 
         $this->request->attributes->set('ignore_mismatch', true);
 
@@ -278,6 +281,10 @@ class PublicControllerTest extends MauticMysqlTestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $translator           = $this->createMock(Translator::class);
         $flashBag             = $this->createMock(FlashBag::class);
+        $slotsHelper          = new SlotsHelper();
+        $themeHelper          = $this->createMock(ThemeHelper::class);
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
         $requestStack         = new RequestStack();
 
         $controller = new PublicController(
@@ -300,6 +307,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             $cookieHelper,
             $analyticsHelper,
             $assetHelper,
+            $themeHelper,
+            $slotsHelper,
             $this->createMock(Tracking404Model::class),
             $router,
             '/page/a',
@@ -399,7 +408,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->logger,
             $redirectId
         );
-        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame('https://someurl.test/?ct=someClickTroughValue', $response->getTargetUrl());
     }
 
     /**
@@ -498,7 +507,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->logger,
             $redirectId
         );
-        self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame($targetUrl, $response->getTargetUrl());
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }

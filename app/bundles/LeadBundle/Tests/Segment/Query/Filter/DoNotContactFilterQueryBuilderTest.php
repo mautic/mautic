@@ -72,7 +72,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
                 /**
                  * @var array<string, mixed>
                  */
-                private array $batchLimiters
+                private array $batchLimiters,
             ) {
             }
 
@@ -81,17 +81,17 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
                 return new DoNotContactParts('dnc_unsubscribed');
             }
 
-            public function getOperator()
+            public function getOperator(): string
             {
                 return $this->operator;
             }
 
-            public function getParameterValue()
+            public function getParameterValue(): string
             {
                 return $this->parameterValue;
             }
 
-            public function getGlue()
+            public function getGlue(): string
             {
                 return 'and';
             }

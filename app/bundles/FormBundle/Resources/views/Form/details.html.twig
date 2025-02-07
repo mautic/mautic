@@ -122,7 +122,7 @@
             <div class="hr-expand nm">
                 <span data-toggle="tooltip"
                       title="{{ 'mautic.form.details.detail'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
                        data-target="#form-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                 </span>
             </div>
@@ -193,7 +193,7 @@
                                             </div>
                                         {% endif %}
                                         <div class="col-md-7 va-m">
-                                            <h5 class="fw-sb text-primary mb-xs">{{ action.name }}</h5>
+                                            <h5 class="fw-sb text-interactive mb-xs">{{ action.name }}</h5>
                                             <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
                                         </div>
                                         <div class="col-md-4 va-m text-right">
@@ -211,11 +211,11 @@
             <!-- #fields-container -->
             <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
                 <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
-                <ul class="list-group bdr-w-0 mb-xs">
+                <ul class="list-group mb-xs">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
                     {% for field in activeFormFields %}
                       {% if not field.parent %}
-                      <li class="list-group-item mt-10">
+                      <li class="list-group-item">
                           {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': field}) }}
                       </li>
                       {% endif %}

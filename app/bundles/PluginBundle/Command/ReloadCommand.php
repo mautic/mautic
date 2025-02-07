@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ReloadCommand extends Command
 {
     public function __construct(
-        private ReloadFacade $reloadFacade
+        private ReloadFacade $reloadFacade,
     ) {
         parent::__construct();
     }

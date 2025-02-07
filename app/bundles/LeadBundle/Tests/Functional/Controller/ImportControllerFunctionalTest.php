@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -45,7 +46,8 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testScheduleImport(): void
     {
-        $this->loginUser('admin');
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
         $tagName = 'tag1';
         $tag     = $this->createTag($tagName);
         // Show mapping page.
@@ -83,7 +85,8 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCSVWithFileAsHeaderName(): void
     {
-        $this->loginUser('admin');
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->client->loginUser($user, 'mautic');
         // Create 'file' field.
         $this->createField('text', 'file');
         // Create contact import.
@@ -120,7 +123,8 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportWithSpecialCharacterTag(): void
     {
-        $this->loginUser('admin');
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->client->loginUser($user, 'mautic');
 
         // Count tags before import
         $tagRepository  = $this->em->getRepository(Tag::class);

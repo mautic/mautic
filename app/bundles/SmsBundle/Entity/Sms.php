@@ -63,12 +63,12 @@ class Sms extends FormEntity
     private $category;
 
     /**
-     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<int, LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection<int, \Mautic\SmsBundle\Entity\Stat>
+     * @var ArrayCollection<int, Stat>
      */
     private $stats;
 

@@ -22,7 +22,7 @@ class CampaignHelper
     public function __construct(
         protected Client $client,
         protected CompanyModel $companyModel,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

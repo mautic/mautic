@@ -16,7 +16,7 @@ class EmailEditSubmitEvent extends CommonEvent
         private bool $apply,
         private bool $saveAsDraft,
         private bool $applyDraft,
-        private bool $discardDraft
+        private bool $discardDraft,
     ) {
     }
 

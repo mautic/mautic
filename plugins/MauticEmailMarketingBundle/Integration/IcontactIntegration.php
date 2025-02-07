@@ -49,9 +49,6 @@ class IcontactIntegration extends EmailAbstractIntegration
 
     /**
      * Get account ID and client folder ID.
-     *
-     * @param array $settings
-     * @param array $parameters
      */
     public function authCallback($settings = [], $parameters = [])
     {
@@ -79,9 +76,11 @@ class IcontactIntegration extends EmailAbstractIntegration
             if (!empty($response['clientfolders'])) {
                 $keys['clientFolderId'] = $response['clientfolders'][0]['clientFolderId'];
 
-                $this->extractAuthKeys($keys, 'clientFolderId');
+                return $this->extractAuthKeys($keys, 'clientFolderId');
             }
         }
+
+        return false;
     }
 
     /**

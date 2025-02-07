@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 class EncryptionService
 {
     public function __construct(
-        private EncryptionHelper $encryptionHelper
+        private EncryptionHelper $encryptionHelper,
     ) {
     }
 

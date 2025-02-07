@@ -62,7 +62,7 @@
                                     <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
                                         {% if showContactFrequency %}
                                             <div class="col-md-6" data-contact-frequency="1">
-                                                <label class="text-muted">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
+                                                <label class="text-secondary">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
                                                 {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value]) }}
                                                 {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
                                                 {{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}
@@ -70,7 +70,7 @@
                                         {% endif %}
                                         {%  if showContactPauseDates %}
                                             <div class="col-md-6" data-contact-pause-dates="1">
-                                                <label class="text-muted">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                                                <label class="text-secondary">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                                                 {{ form_widget(form.lead_channels['contact_pause_start_date_' ~ channel.value]) }}
                                                 {{ form_label(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
                                                 {{ form_widget(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
@@ -102,11 +102,13 @@
                 {% set categoryCount = form.global_categories is defined ? form.global_categories.vars.choices|length : 0 %}
                 {% if showContactCategories and categoryCount > 0 %}
                     <hr />
-                    <div id="global-categories" class="text-left">
-                        <div>{{ form_label(form.global_categories) }}</div>
-                        {% for category in form.global_categories %}
-                            {{ form_widget(category) }}
-                            {{ form_label(category) }}
+                    <div id="global-categories">
+                        <div class="text-left">{{ form_label(form.global_categories) }}</div>
+                        {% for key, category in form.global_categories %}
+                            <div id="category-{{ key }}" class="text-left">
+                                {{ form_widget(category) }}
+                                {{ form_label(category) }}
+                            </div>
                         {% endfor %}
                     </div>
                 {% endif %}

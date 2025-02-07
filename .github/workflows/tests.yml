@@ -42,6 +42,14 @@ jobs:
           --health-interval=10s 
           --health-timeout=5s 
           --health-retries=3
+      saml:
+        image: kenchan0130/simplesamlphp
+        env:
+          SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
+          SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+        ports:
+          - 8086:8080
 
     steps:
     - uses: actions/checkout@v4
@@ -65,7 +73,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
         coverage: pcov
-        ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~"
+        ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
 
     - name: add MySQL config file
       run: |
@@ -87,11 +95,12 @@ jobs:
       run: |
         rm -rf var/cache
         export DB_PORT="${{ job.services.database.ports[3306] }}"
+        export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          php -d zend.assertions=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
     - name: Upload coverage report
@@ -142,7 +151,7 @@ jobs:
       run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
 
     - name: Run E2E tests
-      run: ddev exec bin/codecept run acceptance
+      run: ddev composer e2e-test
 
     - name: Upload test artifacts
       if: failure()

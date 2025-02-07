@@ -17,7 +17,7 @@ class AssetListType extends AbstractType
     public function __construct(
         private CorePermissions $corePermissions,
         private AssetModel $assetModel,
-        private UserHelper $userHelper
+        private UserHelper $userHelper,
     ) {
     }
 
@@ -32,7 +32,7 @@ class AssetListType extends AbstractType
         ]);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

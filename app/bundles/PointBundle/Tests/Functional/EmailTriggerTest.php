@@ -75,7 +75,7 @@ class EmailTriggerTest extends MauticMysqlTestCase
         self::assertTrue($this->client->getResponse()->isSuccessful());
 
         $uri = sprintf('/s/points/triggers/events/edit/%s?triggerId=%s', $triggerEvent->getId(), $trigger->getId());
-        $this->client->request(Request::METHOD_GET, $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, $uri);
         self::assertTrue($this->client->getResponse()->isSuccessful());
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);

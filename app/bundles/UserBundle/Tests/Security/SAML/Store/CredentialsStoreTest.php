@@ -81,7 +81,6 @@ class CredentialsStoreTest extends TestCase
         $credentials = $store->getByEntityId('foobar');
         $this->assertCount(1, $credentials);
 
-        /** @var X509Credential $cert */
         $cert = $credentials[0];
         $this->assertInstanceOf(X509Credential::class, $cert);
 

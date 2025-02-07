@@ -87,12 +87,12 @@ class Notification extends FormEntity
     private $category;
 
     /**
-     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<int, LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection<int, \Mautic\NotificationBundle\Entity\Stat>
+     * @var ArrayCollection<int, Stat>
      */
     private $stats;
 

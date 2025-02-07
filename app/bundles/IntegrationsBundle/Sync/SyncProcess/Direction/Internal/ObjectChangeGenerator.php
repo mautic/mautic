@@ -34,7 +34,7 @@ class ObjectChangeGenerator
     public function __construct(
         private SyncJudgeInterface $syncJudge,
         private ValueHelper $valueHelper,
-        private FieldHelper $fieldHelper
+        private FieldHelper $fieldHelper,
     ) {
     }
 
@@ -48,7 +48,7 @@ class ObjectChangeGenerator
         MappingManualDAO $mappingManual,
         ObjectMappingDAO $objectMapping,
         ReportObjectDAO $internalObject,
-        ReportObjectDAO $integrationObject
+        ReportObjectDAO $integrationObject,
     ) {
         $objectChange = new ObjectChangeDAO(
             $mappingManual->getIntegration(),
@@ -103,7 +103,7 @@ class ObjectChangeGenerator
         MappingManualDAO $mappingManual,
         ReportObjectDAO $internalObject,
         ReportObjectDAO $integrationObject,
-        ObjectChangeDAO $objectChange
+        ObjectChangeDAO $objectChange,
     ): void {
         // Skip adding fields for the pull process that should sync to integration only.
         if (ObjectMappingDAO::SYNC_TO_INTEGRATION === $fieldMappingDAO->getSyncDirection()) {
@@ -179,7 +179,7 @@ class ObjectChangeGenerator
         FieldMappingDAO $fieldMappingDAO,
         InformationChangeRequestDAO $integrationInformationChangeRequest,
         ObjectChangeDAO $objectChange,
-        string $fieldState
+        string $fieldState,
     ): void {
         try {
             $internalField = $internalObject->getField($fieldMappingDAO->getInternalField());
@@ -273,7 +273,7 @@ class ObjectChangeGenerator
         ObjectChangeDAO $objectChange,
         InformationChangeRequestDAO $integrationInformationChangeRequest,
         InformationChangeRequestDAO $internalInformationChangeRequest,
-        string $fieldState
+        string $fieldState,
     ): void {
         $winningChangeRequest = $this->syncJudge->adjudicate(
             $judgeMode,

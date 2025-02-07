@@ -4,12 +4,13 @@ namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\WebhookBundle\Http\Client;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    public function sendHookTestAction(Request $request, Client $client): \Symfony\Component\HttpFoundation\JsonResponse
+    public function sendHookTestAction(Request $request, Client $client, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $url = InputHelper::url($request->request->get('url'));
 
@@ -27,15 +28,14 @@ class AjaxController extends CommonAjaxController
         }
 
         // get the selected types
-        $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
-        $payloadPaths  = $this->getPayloadPaths($selectedTypes);
+        $selectedTypes = InputHelper::cleanArray($request->request->all()['types']) ?? [];
+        $payloadPaths  = $this->getPayloadPaths($selectedTypes, $pathsHelper);
         $payloads      = $this->loadPayloads($payloadPaths);
         $now           = new \DateTime();
 
         $payloads['timestamp'] = $now->format('c');
 
         // set the response
-        /** @var Psr\Http\Message\ResponseInterface $response */
         $response = $client->post($url, $payloads, InputHelper::string($request->request->get('secret')));
 
         // default to an error message
@@ -47,7 +47,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         // if we get a 2xx response convert to success message
-        if (2 == substr($response->getStatusCode(), 0, 1)) {
+        if (2 == substr((string) $response->getStatusCode(), 0, 1)) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')
@@ -66,7 +66,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return non-falsy-string[]
      */
-    public function getPayloadPaths($types): array
+    public function getPayloadPaths($types, PathsHelper $pathsHelper): array
     {
         $payloadPaths = [];
 
@@ -85,12 +85,12 @@ class AjaxController extends CommonAjaxController
             $eventName = implode('_', $typePath);
 
             // default the path to core
-            $payloadPath = $this->factory->getSystemPath('bundles', true);
+            $payloadPath = $pathsHelper->getSystemPath('bundles', true);
 
             // if plugin is in first part of the string this is an addon
             // input is plugin.bundlename or mautic.bundlename
             if (strpos('plugin.', $prefix)) {
-                $payloadPath = $this->factory->getSystemPath('plugins', true);
+                $payloadPath = $pathsHelper->getSystemPath('plugins', true);
             }
 
             $prefixParts = explode('.', $prefix);

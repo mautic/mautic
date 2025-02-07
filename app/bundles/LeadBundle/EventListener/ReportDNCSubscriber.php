@@ -22,7 +22,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         private CompanyReportData $companyReportData,
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private ChannelListHelper $channelListHelper
+        private ChannelListHelper $channelListHelper,
     ) {
     }
 

@@ -35,10 +35,7 @@ class CompanyChangeScoreActionType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'scorecontactscompanies_action';
     }

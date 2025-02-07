@@ -17,7 +17,7 @@ class MenuEvent extends Event
      */
     public function __construct(
         protected MenuHelper $helper,
-        protected $type = 'main'
+        protected $type = 'main',
     ) {
     }
 

@@ -19,7 +19,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         private LeadDeviceRepository $leadDeviceRepository,
         private LeadRepository $leadRepository,
         private MergeRecordRepository $mergeRecordRepository,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 

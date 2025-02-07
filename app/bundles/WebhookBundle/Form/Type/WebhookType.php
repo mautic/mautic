@@ -2,7 +2,7 @@
 
 namespace Mautic\WebhookBundle\Form\Type;
 
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -128,8 +128,8 @@ class WebhookType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
-                    'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
+                    'mautic.webhook.config.event.orderby.chronological'         => Order::Ascending->value,
+                    'mautic.webhook.config.event.orderby.reverse.chronological' => Order::Descending->value,
                 ],
                 'label' => 'mautic.webhook.config.event.orderby',
                 'attr'  => [

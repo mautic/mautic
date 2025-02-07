@@ -17,7 +17,7 @@ class ExportSchedulerCommand extends Command
     public function __construct(
         private ReportExporter $reportExporter,
         private ReportCleanup $reportCleanup,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
         parent::__construct();
     }
@@ -33,8 +33,14 @@ class ExportSchedulerCommand extends Command
     {
         $report = $input->getOption('report');
 
+        if (!is_null($report) && !is_numeric($report)) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
+
+            return Command::INVALID;
+        }
+
         try {
-            $exportOption = new ExportOption($report);
+            $exportOption = new ExportOption((int) $report);
         } catch (\InvalidArgumentException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 

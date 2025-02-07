@@ -15,7 +15,7 @@ class Engine
         private EntityManager $entityManager,
         private string $tablePrefix,
         string $pluginPath,
-        private string $bundleName
+        private string $bundleName,
     ) {
         $this->migrationsPath = $pluginPath.'/Migrations/';
     }
@@ -47,7 +47,12 @@ class Engine
                 }
             }
 
-            $this->entityManager->commit();
+            // PHP 8+ and pdo_mysql might autocommit a transaction and can throw "No active transaction"
+            // So check directly if the transaction is still active before committing
+            $connection = $this->entityManager->getConnection()->getNativeConnection();
+            if (!$connection instanceof \PDO || $connection->inTransaction()) {
+                $this->entityManager->commit();
+            }
         } catch (\Doctrine\DBAL\Exception $e) {
             $this->entityManager->rollback();
 

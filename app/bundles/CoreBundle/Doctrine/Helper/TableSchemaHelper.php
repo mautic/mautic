@@ -37,7 +37,7 @@ class TableSchemaHelper
     public function __construct(
         protected Connection $db,
         protected $prefix,
-        protected ColumnSchemaHelper $columnHelper
+        protected ColumnSchemaHelper $columnHelper,
     ) {
         $this->sm = $db->createSchemaManager();
     }

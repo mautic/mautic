@@ -1,0 +1,29 @@
+{% set troubleshootingContent %}
+<div class='dwc--generator-troubleshooting'>
+    <i class='ri-close-circle-line ri-xl mb-sm mt-lg d-inline-flex'></i>
+    <h5 class='fw-sb mb-xs'>{{ 'mautic.dynamiccontent.generator.troubleshooting.content_not_displaying'|trans }}</h5>
+    <p>{{ 'mautic.dynamiccontent.generator.troubleshooting.content_not_displaying_text'|trans }}</p>
+
+    <i class='ri-javascript-line ri-xl mb-sm mt-lg d-inline-flex'></i>
+    <h5 class='fw-sb mb-xs'>{{ 'mautic.dynamiccontent.generator.troubleshooting.javascript'|trans }}</h5>
+    <p>{{ 'mautic.dynamiccontent.generator.troubleshooting.javascript_text'|trans }}</p>
+
+    <i class='ri-input-field ri-xl mb-sm mt-lg d-inline-flex'></i>
+    <h5 class='fw-sb mb-xs'>{{ 'mautic.dynamiccontent.generator.troubleshooting.default_content'|trans }}</h5>
+    <p>{{ 'mautic.dynamiccontent.generator.troubleshooting.default_content_text'|trans }}</p>
+
+    <i class='ri-server-line ri-xl mb-sm mt-lg d-inline-flex'></i>
+    <h5 class='fw-sb mb-xs'>{{ 'mautic.dynamiccontent.generator.troubleshooting.cache'|trans }}</h5>
+    <p>{{ 'mautic.dynamiccontent.generator.troubleshooting.cache_text'|trans }}</p>
+</div>
+{% endset %}
+<div>
+    {% include '@MauticCore/Helper/toggletip.html.twig' with {
+        label: 'mautic.core.troubleshooting',
+        size: 'xs',
+        icon: 'ri-question-answer-line',
+        content: troubleshootingContent,
+        html: true,
+        trigger: 'click'
+    } %}
+</div>

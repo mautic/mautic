@@ -17,7 +17,7 @@ class Optimized implements ScheduleModeInterface
     public const AVAILABLE_FOR_EVENTS = ['email.send', 'message.send', 'plugin.leadpush', 'campaign.sendwebhook'];
 
     public function __construct(
-        private PeakInteractionTimer $peakInteractionTimer
+        private PeakInteractionTimer $peakInteractionTimer,
     ) {
     }
 

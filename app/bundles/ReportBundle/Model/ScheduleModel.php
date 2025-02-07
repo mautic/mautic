@@ -18,7 +18,7 @@ class ScheduleModel
 
     public function __construct(
         private EntityManager $entityManager,
-        private SchedulerPlanner $schedulerPlanner
+        private SchedulerPlanner $schedulerPlanner,
     ) {
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }

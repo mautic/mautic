@@ -13,7 +13,7 @@ class UserMapper implements UsernameMapperInterface
      * @param array<string, mixed> $attributes
      */
     public function __construct(
-        private array $attributes
+        private array $attributes,
     ) {
     }
 

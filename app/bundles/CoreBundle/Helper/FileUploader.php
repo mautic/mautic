@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FileUploader
 {
     public function __construct(
-        private FilePathResolver $filePathResolver
+        private FilePathResolver $filePathResolver,
     ) {
     }
 

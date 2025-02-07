@@ -39,7 +39,7 @@ class ObjectChangeDAO
         private $objectId,
         private $mappedObject,
         private $mappedId,
-        private ?\DateTimeInterface $changeDateTime = null
+        private ?\DateTimeInterface $changeDateTime = null,
     ) {
     }
 

@@ -72,15 +72,13 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-     * @throws \Exception
-     *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
     public static function onPluginUpdate(
         Plugin $plugin,
         MauticFactory $factory,
         $metadata = null,
-        Schema $installedSchema = null
+        Schema $installedSchema = null,
     ): void {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         // self::updatePluginSchema($metadata, $installedSchema, $factory);

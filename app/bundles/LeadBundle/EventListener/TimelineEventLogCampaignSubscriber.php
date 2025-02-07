@@ -21,7 +21,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         private UserHelper $userHelper,
-        Translator $translator
+        Translator $translator,
     ) {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
@@ -85,7 +85,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         foreach ($contacts as $contact) {
             $log = new LeadEventLog();
             $log->setUserId($user->getId())
-                ->setUserName($user->getUsername() ?: $this->translator->trans('mautic.core.system'))
+                ->setUserName($user->getUserIdentifier() ?: $this->translator->trans('mautic.core.system'))
                 ->setLead($contact)
                 ->setBundle('campaign')
                 ->setAction($action)

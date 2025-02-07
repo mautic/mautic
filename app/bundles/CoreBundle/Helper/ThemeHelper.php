@@ -100,7 +100,7 @@ class ThemeHelper implements ThemeHelperInterface
         private CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper
+        private BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;
@@ -143,7 +143,7 @@ class ThemeHelper implements ThemeHelperInterface
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }
 
-    public function exists($theme)
+    public function exists($theme): bool
     {
         $root    = $this->pathsHelper->getSystemPath('themes', true).'/';
         $dirName = $this->getDirectoryName($theme);
@@ -310,7 +310,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->themeHelpers[$theme];
     }
 
-    public function install($zipFile)
+    public function install($zipFile): bool
     {
         if (false === $this->filesystem->exists($zipFile)) {
             throw new FileNotFoundException();

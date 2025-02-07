@@ -20,7 +20,7 @@ class Notifier
         private HandlerContainer $handlerContainer,
         private SyncIntegrationsHelper $syncIntegrationsHelper,
         private ConfigIntegrationsHelper $configIntegrationsHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
