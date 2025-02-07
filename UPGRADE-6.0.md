@@ -61,9 +61,7 @@
 - `getSession` was removed from `Mautic\PageBundle\Helper\TrackingHelper` No session for anonymous users. Use `getCacheItem`.
 - `updateSession` was removed from `Mautic\PageBundle\Helper\TrackingHelper` No session for anonymous users. Use `updateCacheItem`.
 - `getNewVsReturningPieChartData` was removed from `Mautic\PageBundle\Model\PageModel`. Use `getUniqueVsReturningPieChartData()` instead.
-
-
-- API change in CommonApiController: In the CommonApiController, the newEntityAction now uses a dynamic HTTP method. It returns PATCH if the entity has an ID, or POST otherwise. This change ensures partial updates are properly handled.
+- API change in `CommonApiController`: The `newEntityAction` now uses `PATCH` if the entity has an ID (EDIT), similar to how it is done in `newEntitiesAction`.
 
 ## Most notable changes required by Symfony 6
 
