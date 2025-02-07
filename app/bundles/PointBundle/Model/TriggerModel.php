@@ -434,9 +434,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
                 $this->getEventRepository()->detachEntities($persist);
-                if (isset($triggerEvent)) {
-                    $this->getEventRepository()->deleteEntity($triggerEvent);
-                }
             }
         }
     }

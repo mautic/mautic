@@ -253,7 +253,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function getWhereFromRequest(Request $request)
     {
-        $where = InputHelper::cleanArray($request->query->all()['where'] ?? []);
+        $where = $request->query->all()['where'] ?? [];
 
         $this->sanitizeWhereClauseArrayFromRequest($where);
 

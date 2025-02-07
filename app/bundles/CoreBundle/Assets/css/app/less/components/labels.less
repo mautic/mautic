@@ -111,6 +111,11 @@
 }
 
 .label-primary {
+  background-color: var(--label-background-primary);
+  color: var(--label-color-primary);
+}
+
+.label-brand {
   background-color: var(--label-background-brand);
   color: var(--label-color-brand);
 }
@@ -189,6 +194,11 @@
     &:hover { background-color: var(--label-background-hover-green); }
   }
   &.label-primary {
+    border: 1px solid var(--label-border-primary);
+    color: var(--label-color-primary);
+    &:hover { background-color: var(--label-background-hover-primary); }
+  }
+  &.label-brand {
     border: 1px solid var(--label-border-brand);
     color: var(--label-color-brand);
     &:hover { background-color: var(--label-background-hover-brand); }
