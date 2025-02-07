@@ -514,10 +514,6 @@ class FieldType extends AbstractType
                     $data['charLengthLimit'] = null;
                 }
 
-                if (!isset($data['isSearchable'])) {
-                    $data['isSearchable'] = false;
-                }
-
                 $event->setData($data);
                 $setupOrderField($event->getForm());
             }
@@ -639,18 +635,6 @@ class FieldType extends AbstractType
                 'label' => 'mautic.lead.field.form.ispubliclyupdatable',
                 'attr'  => [
                     'tooltip' => 'mautic.lead.field.form.ispubliclyupdatable.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add(
-            'isSearchable',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.lead.field.form.isSearchable',
-                'attr'  => [
-                    'tooltip'        => 'mautic.lead.field.form.isSearchable.tooltip',
-                    'data-enable-on' => '{"leadfield_isIndex_1":"checked"}',
                 ],
             ]
         );

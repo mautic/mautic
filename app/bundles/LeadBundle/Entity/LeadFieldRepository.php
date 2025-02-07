@@ -95,13 +95,15 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * Retrieves the aliases of searchable fields that are indexed and published.
+     *
      * @return string[]
      */
     public function getSearchableFieldAliases(string $object = null): array
     {
         $fq = $this->createQueryBuilder($this->getTableAlias());
         $fq->select($this->getTableAlias().'.alias')
-            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isSearchable', true))
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isIndex', true))
             ->andWhere($fq->expr()->eq($this->getTableAlias().'.isPublished', true));
 
         if (!empty($object)) {

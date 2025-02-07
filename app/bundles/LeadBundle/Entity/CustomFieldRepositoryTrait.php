@@ -362,6 +362,8 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
+     * Retrieves the aliases of searchable fields that are indexed and published.
+     *
      * @return array<int, string>
      */
     public function getSearchableFieldAliases(LeadFieldRepository $leadFieldRepository, string $object): array

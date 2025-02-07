@@ -20,11 +20,8 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @dataProvider dataTestCreatingCustomFieldIndexableAndSearchable
-     *
-     * @param array<string, string> $formValues
-     * @param array<string, string> $expectedValues
      */
-    public function testCreatingCustomFieldIndexableAndSearchable(array $formValues, array $expectedValues): void
+    public function testCreatingCustomFieldIndexableAndSearchable(int $isIndex, string $expectedValue): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
         $this->assertResponseIsSuccessful('Failed to load the form: '.$this->client->getResponse()->getContent());
@@ -32,65 +29,30 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('Save')->form();
 
         $defaultValues = [
-            'leadfield[label]'  => 'Custom field',
-            'leadfield[alias]'  => 'custom_field',
-            'leadfield[object]' => 'lead',
-            'leadfield[type]'   => 'text',
-            'leadfield[group]'  => 'core',
+            'leadfield[label]'   => 'Custom field',
+            'leadfield[alias]'   => 'custom_field',
+            'leadfield[object]'  => 'lead',
+            'leadfield[type]'    => 'text',
+            'leadfield[group]'   => 'core',
+            'leadfield[isIndex]' => $isIndex,
         ];
 
-        $form->setValues(array_merge($defaultValues, $formValues));
+        $form->setValues($defaultValues);
 
         $this->client->submit($form);
         $formValuesUpdated = $form->getValues();
 
-        foreach ($expectedValues as $alias => $expectedValue) {
-            $this->assertSame($expectedValue, $formValuesUpdated[$alias], "Mismatch for field {$alias}");
-        }
+        $this->assertSame($expectedValue, $formValuesUpdated['leadfield[isIndex]'], 'Mismatch for field isIndex');
     }
 
     /**
-     * @return iterable<string, array{0: array<string, string>, 1: array<string, string>}>
+     * @return iterable<string, array{0: int, 1: string}>
      */
     public function dataTestCreatingCustomFieldIndexableAndSearchable(): iterable
     {
-        yield 'Only Indexable enabled' => [
-            // input
-            [
-                'leadfield[isIndex]' => '1',
-            ],
-            // expected
-            [
-                'leadfield[isIndex]'      => '1',
-                'leadfield[isSearchable]' => '0',
-            ],
-        ];
+        yield 'When "Add to Search Index" is enabled' => [1, '1'];
 
-        yield 'Indexable enabled and no searchable' => [
-            // input
-            [
-                'leadfield[isIndex]'      => '1',
-                'leadfield[isSearchable]' => '0',
-            ],
-            // expected
-            [
-                'leadfield[isIndex]'      => '1',
-                'leadfield[isSearchable]' => '0',
-            ],
-        ];
-
-        yield 'Indexable and searchable enabled' => [
-            // input
-            [
-                'leadfield[isIndex]'      => '1',
-                'leadfield[isSearchable]' => '1',
-            ],
-            // expected
-            [
-                'leadfield[isIndex]'      => '1',
-                'leadfield[isSearchable]' => '1',
-            ],
-        ];
+        yield 'When "Add to Search Index" is disabled' => [0, '0'];
     }
 
     public function testGlobalSearchForContactsUsingCustomFieldsData(): void
@@ -190,7 +152,7 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
         $field->setDateAdded(new \DateTime());
         $field->setDateAdded(new \DateTime());
         $field->setDateModified(new \DateTime());
-        $field->setIsSearchable(true);
+        $field->setIsIndex(true);
         $field->setType('text');
 
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
