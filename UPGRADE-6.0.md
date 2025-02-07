@@ -43,6 +43,8 @@ As the legacy builder was removed these JS libraries were removed as well:
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getSecurityContext` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getDispatcher` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getMailer` use dependency injection instead with \Mautic\EmailBundle\Helper\MailHelper.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getIpAddressFromRequest` use dependency injection with \Mautic\CoreBundle\Helper\IpLookupHelper instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getDate` use \Mautic\CoreBundle\Helper\DateTimeHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getLogger` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTwig` use DI with the `\Twig\Environment` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTheme` use DI with the `\Mautic\CoreBundle\Helper\ThemeHelper` instead.

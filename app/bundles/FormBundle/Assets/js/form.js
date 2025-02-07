@@ -16,7 +16,7 @@ Mautic.formOnLoad = function (container) {
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
-            items: '.panel',
+            items: '.form-field-wrapper',
             cancel: '',
             helper: function(e, ui) {
                 ui.children().each(function() {

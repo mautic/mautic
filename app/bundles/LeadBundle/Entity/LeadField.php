@@ -280,6 +280,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
                     'isUniqueIdentifier',
                     'isPubliclyUpdatable',
                     'properties',
+                    'isIndex',
+                    'charLengthLimit',
                 ]
             )
             ->build();
