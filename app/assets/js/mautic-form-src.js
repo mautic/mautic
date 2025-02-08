@@ -181,7 +181,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
         };
 
         Form.createIframe = function(options, embed) {
-            var embed = (typeof(embed) == 'undefined') ? false : true ;
+            var embed = (typeof (embed) != 'undefined') ;
             var iframe = document.createElement('iframe');
             //iframe config properties
             iframe.frameBorder = typeof(options.data['border']) != 'undefined' ? parseInt(options.data['border']) : '0' ;
@@ -329,7 +329,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     
                     var el = document.getElementById(key2);
                     if (selectedValue) {
-                        if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
+                        if (el.getAttribute('data-mautic-form-expr') === 'notIn') {
                             if (!(parents[key][key2]).includes(selectedValue)) {
                                 Form.showField(el, selectedValue);
                             }
@@ -606,7 +606,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     if (valid === null) {
                         var name = 'mauticform[' + field.name + ']';
 
-                        if (field.multiple == 'true' || field.type == 'checkboxgrp') {
+                        if (field.multiple === 'true' || field.type === 'checkboxgrp') {
                             name = name + '[]';
                         }
 
@@ -628,7 +628,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                                     break;
 
                                 default:
-                                    valid = (theForm.elements[name].value != '')
+                                    valid = (theForm.elements[name].value !== '')
                                     break;
                             }
                         }
@@ -1022,11 +1022,11 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
         };
 
         Core.debug = function() {
-            return (typeof(config.debug) != 'undefined' && parseInt(config.debug) != 'Nan' && config.debug == 1) ? true : false ;
+            return (typeof (config.debug) != 'undefined' && parseInt(config.debug) != 'Nan' && config.debug === 1) ;
         };
 
         Core.devMode = function() {
-            return (typeof(config.devmode) != 'undefined' && parseInt(config.devmode) != 'Nan' && config.devmode == 1) ? true : false ;
+            return (typeof (config.devmode) != 'undefined' && parseInt(config.devmode) != 'Nan' && config.devmode == 1) ;
         };
 
         Core.setMauticBaseUrl = function(base_url) {
@@ -1084,7 +1084,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
     if (typeof(MauticSDK) === 'undefined') {
         window.MauticSDK = define_library();
-        var sjs = document.getElementsByTagName('script'), tjs = sjs.length;
+        var sjs = document.getElementsByTagName('script');
         for (var i = 0; i < sjs.length; i++) {
             if (!sjs[i].hasAttribute('src') || sjs[i].getAttribute("src").indexOf('mautic-form-src.js') == -1) continue;
             var sParts = sjs[i].getAttribute("src").split("?");

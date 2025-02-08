@@ -6,7 +6,7 @@ Mautic.clientOnLoad = function (container) {
 };
 
 Mautic.refreshApiClientForm = function(url, modeEl) {
-    var mode = mQuery(modeEl).val();
+    let mode = mQuery(modeEl).val();
 
     if (mQuery('#client_redirectUris').length) {
         mQuery('#client_redirectUris').prop('disabled', true);
