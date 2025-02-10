@@ -58,7 +58,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                 text[1].trim().split(/\s+/).forEach(function (strAttribute){
                     var tmpAtr = strAttribute.split('=');
                     replaceArgs.data[tmpAtr[0]] = tmpAtr[1];
-                    if (tmpAtr[0] != 'id')
+                    if (tmpAtr[0] !== 'id')
                         tmpParams.push(tmpAtr[0]+'='+encodeURIComponent(tmpAtr[1]));
                 });
                 tmpParams.push('html=1');
@@ -628,7 +628,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                                     break;
 
                                 default:
-                                    valid = (theForm.elements[name].value !== '')
+                                    valid = (theForm.elements[name].value != '')
                                     break;
                             }
                         }
