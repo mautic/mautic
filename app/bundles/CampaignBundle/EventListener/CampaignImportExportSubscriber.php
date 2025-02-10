@@ -22,7 +22,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         private EntityManagerInterface $entityManager,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -35,11 +36,12 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public function onCampaignExport(EntityExportEvent $event): void
     {
         try {
-            $campaignId = $event->getEntityId();
+            $campaignId   = $event->getEntityId();
             $campaignData = $this->fetchCampaignData($campaignId);
 
             if (!$campaignData) {
-                $this->logger->warning('Campaign data not found for ID: ' . $campaignId);
+                $this->logger->warning('Campaign data not found for ID: '.$campaignId);
+
                 return;
             }
 
@@ -55,7 +57,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $this->exportRelatedEntities($event, $campaignId);
             $event->addEntity('dependencies', $event->getDependencies());
         } catch (\Exception $e) {
-            $this->logger->error('Error during campaign export: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error during campaign export: '.$e->getMessage(), ['exception' => $e]);
             throw $e; // Re-throw to ensure the error is not silently ignored
         }
     }
@@ -64,22 +66,23 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         try {
             $userId = $event->getUserId();
-            $user = $userId ? $this->userModel->getEntity($userId) : null;
+            $user   = $userId ? $this->userModel->getEntity($userId) : null;
 
             if ($userId && !$user) {
-                $this->logger->warning('User ID ' . $userId . ' not found. Campaigns will not have a created_by_user field set.');
+                $this->logger->warning('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
             }
 
             $entityData = $event->getEntityData();
             if (!$entityData) {
                 $this->logger->warning('No entity data provided for import.');
+
                 return;
             }
 
             $this->importCampaigns($event, $entityData, $user);
             $this->importDependentEntities($event, $entityData, $userId);
         } catch (\Exception $e) {
-            $this->logger->error('Error during campaign import: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error during campaign import: '.$e->getMessage(), ['exception' => $e]);
             throw $e; // Re-throw to ensure the error is not silently ignored
         }
     }
@@ -89,7 +92,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         try {
             $campaign = $this->campaignModel->getEntity($campaignId);
             if (!$campaign) {
-                $this->logger->warning('Campaign not found for ID: ' . $campaignId);
+                $this->logger->warning('Campaign not found for ID: '.$campaignId);
+
                 return [];
             }
 
@@ -97,11 +101,11 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 'id'              => $campaign->getId(),
                 'name'            => $campaign->getName(),
                 'description'     => $campaign->getDescription(),
-                'is_published'   => $campaign->getIsPublished(),
+                'is_published'    => $campaign->getIsPublished(),
                 'canvas_settings' => $campaign->getCanvasSettings(),
             ];
         } catch (\Exception $e) {
-            $this->logger->error('Error fetching campaign data: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error fetching campaign data: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }
@@ -113,7 +117,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $this->exportForms($event, $queryBuilder, $campaignId);
             $this->exportSegments($event, $queryBuilder, $campaignId);
         } catch (\Exception $e) {
-            $this->logger->error('Error exporting related entities: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error exporting related entities: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }
@@ -137,7 +141,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 ]);
             }
         } catch (\Exception $e) {
-            $this->logger->error('Error exporting forms: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error exporting forms: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }
@@ -161,7 +165,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 ]);
             }
         } catch (\Exception $e) {
-            $this->logger->error('Error exporting segments: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error exporting segments: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }
@@ -175,7 +179,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $event->addEntities($entityEvent->getEntities());
             $event->addDependencyEntity($type, $dependency);
         } catch (\Exception $e) {
-            $this->logger->error('Error dispatching and adding entity: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error dispatching and adding entity: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }
@@ -193,17 +197,17 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 $campaign->setDateModified(new \DateTime());
 
                 if ($user) {
-                    $campaign->setCreatedByUser($user->getFirstName() . ' ' . $user->getLastName());
+                    $campaign->setCreatedByUser($user->getFirstName().' '.$user->getLastName());
                 }
 
                 $this->entityManager->persist($campaign);
                 $this->entityManager->flush();
 
                 $event->addEntityIdMap($campaignData['id'], $campaign->getId());
-                $this->logger->info('Imported campaign: ' . $campaign->getName() . ' with ID: ' . $campaign->getId());
+                $this->logger->info('Imported campaign: '.$campaign->getName().' with ID: '.$campaign->getId());
             }
         } catch (\Exception $e) {
-            $this->logger->error('Error importing campaigns: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error importing campaigns: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }
@@ -215,13 +219,13 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             foreach ($dependentEntities as $entity) {
                 $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
-                $subEvent = $this->dispatcher->dispatch($subEvent, 'import_' . $entity);
-                $this->logger->info('Imported dependent entity: ' . $entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
+                $subEvent = $this->dispatcher->dispatch($subEvent, 'import_'.$entity);
+                $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
             }
 
             $this->logger->info('Final entity ID map after import: ', ['entityIdMap' => $event->getEntityIdMap()]);
         } catch (\Exception $e) {
-            $this->logger->error('Error importing dependent entities: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error importing dependent entities: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }
