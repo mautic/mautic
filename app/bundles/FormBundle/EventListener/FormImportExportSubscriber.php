@@ -2,40 +2,41 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CampaignBundle\EventListener;
+namespace Mautic\FormBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignFormImportExportSubscriber implements EventSubscriberInterface
+final class FormImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private FormModel $formModel,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::EXPORT_CAMPAIGN_FORM => ['onCampaignFormExport', 0],
-            EntityImportEvent::IMPORT_CAMPAIGN_FORM => ['onCampaignFormImport', 0],
+            EntityExportEvent::EXPORT_FORM          => ['onFormExport', 0],
+            EntityImportEvent::IMPORT_CAMPAIGN_FORM => ['onFormImport', 0],
         ];
     }
 
-    public function onCampaignFormExport(EntityExportEvent $event): void
+    public function onFormExport(EntityExportEvent $event): void
     {
         $campaignId = $event->getEntityId();
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
-        $formResults = $queryBuilder
-            ->select('fl.form_id, ff.name, ff.category_id, ff.is_published, ff.description, ff.alias, ff.lang, ff.cached_html, ff.post_action, ff.template, ff.form_type, ff.render_style, ff.post_action_property, ff.form_attr')
-            ->from('campaign_form_xref', 'fl')
-            ->innerJoin('fl', 'forms', 'ff', 'ff.id = fl.form_id AND ff.is_published = 1')
-            ->where('fl.campaign_id = :campaignId')
-            ->setParameter('campaignId', $campaignId, \Doctrine\DBAL\ParameterType::INTEGER)
+        $formActions = $queryBuilder
+            ->select('action.name, action.description, action.type, action.action_order, action.properties')
+            ->from('form_actions', 'action')
+            ->where('action.form_id = :formId')
+            ->setParameter('formId', $formId, \Doctrine\DBAL\ParameterType::INTEGER)
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -67,7 +68,7 @@ final class CampaignFormImportExportSubscriber implements EventSubscriberInterfa
         }
     }
 
-    public function onCampaignFormImport(EntityImportEvent $event): void
+    public function onFormImport(EntityImportEvent $event): void
     {
         $output = new ConsoleOutput();
         $forms = $event->getEntityData();

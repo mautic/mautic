@@ -28,6 +28,7 @@ class EntityImportEvent extends Event
     {
         return $this->entityName;
     }
+
     public function getEntityData(): array
     {
         return $this->data;
@@ -40,8 +41,6 @@ class EntityImportEvent extends Event
 
     /**
      * Add a single entityIdMap.
-     *
-     * @param array<int, int> $entity
      */
     public function addEntityIdMap(int $originalId, int $newId): void
     {
@@ -60,8 +59,6 @@ class EntityImportEvent extends Event
 
     /**
      * Add multiple entities to the collection.
-     *
-     * @param array<string, array<string, mixed>> $entities
      */
     // public function addEntities(array $entities): void
     // {

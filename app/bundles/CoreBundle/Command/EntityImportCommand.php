@@ -73,7 +73,7 @@ final class EntityImportCommand extends ModeratedCommand
 
         $event = new EntityImportEvent($entityName, $fileData, $userId);
 
-        $this->dispatcher->dispatch($event, 'import_' . $entityName);
+        $this->dispatcher->dispatch($event, 'import_'.$entityName);
 
         $output->writeln('<info>Campaign data imported successfully.</info>');
 
