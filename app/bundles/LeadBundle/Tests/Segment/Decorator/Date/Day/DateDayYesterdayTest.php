@@ -80,26 +80,44 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday::getParameterValue
+     *
+     * @dataProvider dataProviderForOperatorAndType
      */
-    public function testGetParameterValueSingle(): void
+    public function testGetParameterValueSingle(string $operator, string $type, string $expectedDateValue): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('2018-03-02 08:00:09', null, 'local');
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
         $filter        = [
-            'operator' => 'lt',
+            'operator' => $operator,
+            'type'     => $type,
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
         $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateDayYesterday($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('2018-03-01', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals($expectedDateValue, $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function dataProviderForOperatorAndType(): iterable
+    {
+        yield ['lt', 'date', '2018-03-01'];
+        yield ['lte', 'date', '2018-03-01'];
+        yield ['gt', 'date', '2018-03-01'];
+        yield ['gte', 'date', '2018-03-01'];
+        yield ['lt', 'datetime', '2018-03-01 00:00:00'];
+        yield ['lte', 'datetime', '2018-03-01 23:59:59'];
+        yield ['gt', 'datetime', '2018-03-01 23:59:59'];
+        yield ['gte', 'datetime', '2018-03-01 00:00:00'];
     }
 }
