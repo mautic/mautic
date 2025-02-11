@@ -1,3 +1,5 @@
+{% set system_user = 'mautic.core.system'|trans %}
+
 {% if logs is defined and logs is iterable %}
     <div class="pt-md pr-md pb-md pl-md">
         <ul class="media-list media-list-feed">
@@ -9,25 +11,22 @@
                         </span>
                     </div>
                     <div class="media-body">
-                        {% if log.userId is defined and log.userId is not empty %}
+                        {% if log.userId is not defined or log.userId == 0 %}
+                            {{ system_user }}
+                        {% else %}
                             <a href="{{ path('mautic_user_action', {'objectAction': 'edit', 'objectId': log.userId}) }}" data-toggle="ajax">
                                 {{ log.userName }}
                             </a>
-                        {% elseif log.userName %}
-                            {{ log.userName }}
-                        {% else %}
-                            {{ 'mautic.core.system'|trans }}
                         {% endif %}
                         {{ ('mautic.dashboard.'~log.action~'.past.tense')|trans }}
 
-                        {% if log.route is defined %}
+                        {% if log.route is defined and log.route is not empty and log.userId != 0 %}
                             <a href="{{ log.route }}" data-toggle="ajax">
                                 {{ log.objectName }}
                             </a>
                         {% elseif log.objectName is defined %}
                             {{ log.objectName }}
                         {% endif %}
-                        {{ log.object }}
                         <p class="fs-12 dark-sm"><small> {{ dateToFull(log.dateAdded) }}</small></p>
                     </div>
                 </li>

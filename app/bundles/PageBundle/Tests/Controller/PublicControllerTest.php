@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -281,7 +280,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $translator           = $this->createMock(Translator::class);
         $flashBag             = $this->createMock(FlashBag::class);
-        $slotsHelper          = new SlotsHelper();
         $themeHelper          = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
@@ -308,7 +306,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             $analyticsHelper,
             $assetHelper,
             $themeHelper,
-            $slotsHelper,
             $this->createMock(Tracking404Model::class),
             $router,
             '/page/a',

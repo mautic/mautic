@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
@@ -53,9 +52,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $twig = $this->createMock(Environment::class);
 
         $requestStack = new RequestStack();
-
-        $slotsHelper = new SlotsHelper();
-        $themeHelper = $this->createMock(ThemeHelper::class);
+        $themeHelper  = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
@@ -82,7 +79,6 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $router,
             $twig,
             $themeHelper,
-            $slotsHelper,
             $this->createMock(PathsHelper::class),
             $this->createMock(EventDispatcherInterface::class),
             $requestStack,

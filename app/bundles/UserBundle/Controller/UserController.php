@@ -6,6 +6,7 @@ use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
@@ -433,7 +434,7 @@ class UserController extends FormController
      *
      * @param int $objectId
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -500,7 +501,7 @@ class UserController extends FormController
                         'objectId'  => $entityId,
                         'action'    => 'communication',
                         'details'   => $details,
-                        'ipAddress' => $this->factory->getIpAddressFromRequest(),
+                        'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $auditLogModel = $this->getModel('core.auditlog');
                     \assert($auditLogModel instanceof AuditLogModel);
