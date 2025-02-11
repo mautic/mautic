@@ -29,8 +29,13 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function onFormExport(EntityExportEvent $event): void
     {
-        $campaignId = $event->getEntityId();
+        $formId       = $event->getEntityId();
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+
+        $form = $this->formModel->getEntity($formId);
+        if (!$form) {
+            return;
+        }
 
         $formActions = $queryBuilder
             ->select('action.name, action.description, action.type, action.action_order, action.properties')
@@ -40,38 +45,41 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             ->executeQuery()
             ->fetchAllAssociative();
 
-        foreach ($formResults as $result) {
-            $data = [
-                'id'           => $result['form_id'],
-                'name'         => $result['name'],
-                'is_published' => $result['is_published'],
-                'category_id'  => $result['category_id'],
-                'description'  => $result['description'],
-                'alias'        => $result['alias'],
-                'lang'         => $result['lang'],
-                'cached_html'  => $result['cached_html'],
-                'post_action'  => $result['post_action'],
-                'template'     => $result['template'],
-                'form_type'    => $result['form_type'],
-                'render_style' => $result['render_style'],
-                'post_action_property' => $result['post_action_property'],
-                'form_attr'    => $result['form_attr'],
-            ];
+        $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
-            $dependency = [
-                'campaignId' => (int) $campaignId,
-                'segmentId'  => (int) $result['form_id'],
-            ];
+        $formFields = $queryBuilder
+            ->select('field.label, field.alias, field.type, field.is_required, field.properties')
+            ->from('form_fields', 'field')
+            ->where('field.form_id = :formId')
+            ->setParameter('formId', $formId, \Doctrine\DBAL\ParameterType::INTEGER)
+            ->executeQuery()
+            ->fetchAllAssociative();
 
-            $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_FORM, $dependency);
-            $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_FORM, $data);
-        }
+        $data = [
+            'id'                   => $formId,
+            'name'                 => $form->getName(),
+            'is_published'         => $form->isPublished(),
+            'description'          => $form->getDescription(),
+            'alias'                => $form->getAlias(),
+            'lang'                 => $form->getLanguage(),
+            'cached_html'          => $form->getCachedHtml(),
+            'post_action'          => $form->getPostAction(),
+            'template'             => $form->getTemplate(),
+            'form_type'            => $form->getFormType(),
+            'render_style'         => $form->getRenderStyle(),
+            'post_action_property' => $form->getPostActionProperty(),
+            'form_attr'            => $form->getFormAttributes(),
+            'form_actions'         => $formActions,
+            'form_fields'          => $formFields,
+        ];
+
+        $event->addEntity(EntityExportEvent::EXPORT_FORM, $data);
     }
 
     public function onFormImport(EntityImportEvent $event): void
     {
         $output = new ConsoleOutput();
-        $forms = $event->getEntityData();
+        $forms  = $event->getEntityData();
 
         if (!$forms) {
             return;
@@ -97,8 +105,39 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->persist($form);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $formData['id'], (int) $form->getId());
+            // Import form actions
+            if (!empty($formData['form_actions'])) {
+                foreach ($formData['form_actions'] as $actionData) {
+                    $action = new \Mautic\FormBundle\Entity\Action();
+                    $action->setForm($form);
+                    $action->setName($actionData['name']);
+                    $action->setDescription($actionData['description'] ?? '');
+                    $action->setType($actionData['type']);
+                    $action->setOrder($actionData['action_order'] ?? 0);
+                    $action->setProperties($actionData['properties'] ?? []);
 
+                    $this->entityManager->persist($action);
+                }
+            }
+
+            // Import form fields
+            if (!empty($formData['form_fields'])) {
+                foreach ($formData['form_fields'] as $fieldData) {
+                    $field = new \Mautic\FormBundle\Entity\Field();
+                    $field->setForm($form);
+                    $field->setLabel($fieldData['label']);
+                    $field->setAlias($fieldData['alias']);
+                    $field->setType($fieldData['type']);
+                    $field->setIsRequired((bool) $fieldData['is_required']);
+                    $field->setProperties($fieldData['properties'] ?? []);
+
+                    $this->entityManager->persist($field);
+                }
+            }
+
+            $this->entityManager->flush();
+
+            $event->addEntityIdMap((int) $formData['id'], (int) $form->getId());
             $output->writeln('<info>Imported form: '.$form->getName().' with ID: '.$form->getId().'</info>');
         }
     }
