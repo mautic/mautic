@@ -229,6 +229,11 @@
             "name": "theme-creative",
             "directory": "themes/creative",
             "target": "git@github.com:mautic/theme-creative.git"
+        },
+        {
+            "name": "theme-eclipse",
+            "directory": "themes/eclipse",
+            "target": "git@github.com:mautic/theme-eclipse.git"
         }
 
     ]
