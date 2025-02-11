@@ -1127,19 +1127,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function &getEmailSettings(Email $email, $includeVariants = true)
     {
         if (empty($this->emailSettings[$email->getId()])) {
-            // used to house slots so they don't have to be fetched over and over for same template
-            // BC for Mautic v1 templates
-            $slots = [];
-            if ($template = $email->getTemplate()) {
-                $slots[$template] = $this->themeHelper->getTheme($template)->getSlots('email');
-            }
-
             // store the settings of all the variants in order to properly disperse the emails
             // set the parent's settings
             $emailSettings = [
                 $email->getId() => [
                     'template'     => $email->getTemplate(),
-                    'slots'        => $slots,
                     'sentCount'    => $email->getSentCount(),
                     'variantCount' => $email->getVariantSentCount(),
                     'isVariant'    => null !== $email->getVariantStartDate(),
@@ -1180,19 +1172,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
                     foreach ($childrenVariant as $child) {
                         if ($child->isPublished()) {
-                            $useSlots = [];
-                            if ($template = $child->getTemplate()) {
-                                if (isset($slots[$template])) {
-                                    $useSlots = $slots[$template];
-                                } else {
-                                    $slots[$template] = $this->themeHelper->getTheme($template)->getSlots('email');
-                                    $useSlots         = $slots[$template];
-                                }
-                            }
                             $variantSettings                = $child->getVariantSettings();
                             $emailSettings[$child->getId()] = [
                                 'template'     => $child->getTemplate(),
-                                'slots'        => $useSlots,
                                 'sentCount'    => $child->getSentCount(),
                                 'variantCount' => $child->getVariantSentCount(),
                                 'isVariant'    => null !== $email->getVariantStartDate(),
@@ -1546,7 +1528,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
+        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
         $mailer->setCc($cc);
         $mailer->setBcc($bcc);
 
@@ -2202,7 +2184,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $mailer = $this->mailHelper->getSampleMailer();
         $mailer->setLead($leadFields, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
+        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
 
         $errors = [];
         foreach ($users as $user) {

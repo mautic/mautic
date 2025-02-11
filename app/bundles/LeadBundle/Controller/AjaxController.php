@@ -618,7 +618,7 @@ class AjaxController extends CommonAjaxController
                 $email->getCreatedBy()
             )
         ) {
-            $mailHelper->setEmail($email, true, [], [], true);
+            $mailHelper->setEmail($email, true, [], true);
 
             $data['body']    = $mailHelper->getBody();
             $data['subject'] = $mailHelper->getSubject();
@@ -876,16 +876,20 @@ class AjaxController extends CommonAjaxController
     {
         $id = (int) InputHelper::clean($request->get('id'));
 
-        $leadListExists = $model->leadListExists($id);
-
-        if (!$leadListExists) {
-            return new JsonResponse($this->prepareJsonResponse(0), Response::HTTP_NOT_FOUND);
+        $leadList = $model->getEntity($id);
+        if (!$leadList) {
+            return new JsonResponse($this->prepareJsonResponse(0, false), Response::HTTP_NOT_FOUND);
         }
 
         $leadCounts = $model->getSegmentContactCount([$id]);
         $leadCount  = $leadCounts[$id];
 
-        return new JsonResponse($this->prepareJsonResponse($leadCount));
+        return new JsonResponse(
+            $this->prepareJsonResponse(
+                $leadCount,
+                $leadList->needsRebuild(),
+            )
+        );
     }
 
     public function getSegmentDependencyTreeAction(Request $request, SegmentDependencyTreeFactory $segmentDependencyTreeFactory, ListModel $model): JsonResponse
@@ -906,13 +910,14 @@ class AjaxController extends CommonAjaxController
     /**
      * @return array<string, mixed>
      */
-    private function prepareJsonResponse(int $leadCount): array
+    private function prepareJsonResponse(int $leadCount, bool $needsRebuild): array
     {
         return [
-            'html' => $this->translator->trans(
-                'mautic.lead.list.viewleads_count',
+            'html'      => $this->translator->trans(
+                $needsRebuild ? 'mautic.lead.list.building' : 'mautic.lead.list.viewleads_count',
                 ['%count%' => $leadCount]
             ),
+            'className' => sprintf('label %s col-count', $needsRebuild ? 'label-info' : 'label-gray'),
             'leadCount' => $leadCount,
         ];
     }

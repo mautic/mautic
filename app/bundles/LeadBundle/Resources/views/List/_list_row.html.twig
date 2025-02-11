@@ -71,10 +71,10 @@
         {% endif %}
     </td>
     <td class="visible-md visible-lg">
-        <a size="sm" class="label label-gray col-count"
-           data-id="{{ item.id }}"
-           href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
-           data-toggle="ajax">{{ 'mautic.lead.list.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}</a>
+        <span size="sm" class="label {{ item.needsRebuild() ? 'label-info' : 'label-gray' }} col-count" data-id="{{ item.id }}">
+            <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
+                data-toggle="ajax">{{ (item.needsRebuild() ? 'mautic.lead.list.building' : 'mautic.lead.list.viewleads_count')|trans({'%count%': leadCounts[item.id]}) }}</a>
+        </span>
     </td>
     <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
         {% if item.getDateAdded %}{{ dateToDate(item.dateAdded) }}{% endif %}

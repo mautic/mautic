@@ -102,11 +102,13 @@
                 {% set categoryCount = form.global_categories is defined ? form.global_categories.vars.choices|length : 0 %}
                 {% if showContactCategories and categoryCount > 0 %}
                     <hr />
-                    <div id="global-categories" class="text-left">
-                        <div>{{ form_label(form.global_categories) }}</div>
-                        {% for category in form.global_categories %}
-                            {{ form_widget(category) }}
-                            {{ form_label(category) }}
+                    <div id="global-categories">
+                        <div class="text-left">{{ form_label(form.global_categories) }}</div>
+                        {% for key, category in form.global_categories %}
+                            <div id="category-{{ key }}" class="text-left">
+                                {{ form_widget(category) }}
+                                {{ form_label(category) }}
+                            </div>
                         {% endfor %}
                     </div>
                 {% endif %}

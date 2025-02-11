@@ -6,42 +6,31 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CustomTemplateEvent extends AbstractCustomRequestEvent
 {
-    /**
-     * @var string|null
-     */
-    protected $template;
+    protected string $template;
 
     /**
-     * @param string|null $template
+     * @param array<string, string> $vars
      */
     public function __construct(
         Request $request = null,
-        $template = null,
+        string $template = '',
         protected array $vars = [],
     ) {
         parent::__construct($request);
 
-        if (empty($template)) {
+        if ('' === $template) {
             throw new \InvalidArgumentException('$template is required');
         }
 
         $this->template = $template;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return $this->template;
     }
 
-    /**
-     * @param string|null $template
-     *
-     * @return CustomTemplateEvent
-     */
-    public function setTemplate($template)
+    public function setTemplate(string $template): self
     {
         $this->template = $template;
 
@@ -51,19 +40,17 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getVars()
+    public function getVars(): array
     {
         return $this->vars;
     }
 
     /**
-     * @param array<string, mixed> $vars
-     *
-     * @return CustomTemplateEvent
+     * @param array<string, string> $vars
      */
-    public function setVars($vars)
+    public function setVars(array $vars): self
     {
         $this->vars = $vars;
 
