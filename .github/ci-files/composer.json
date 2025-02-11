@@ -47,15 +47,12 @@
     "mautic/theme-blank": "*",
     "mautic/theme-brienz": "*",
     "mautic/theme-cards": "*",
-    "mautic/theme-coffee": "*",
     "mautic/theme-confirmme": "*",
     "mautic/theme-fresh-center": "*",
     "mautic/theme-fresh-fixed": "*",
     "mautic/theme-fresh-left": "*",
     "mautic/theme-fresh-wide": "*",
     "mautic/theme-goldstar": "*",
-    "mautic/theme-mauve": "*",
-    "mautic/theme-nature": "*",
     "mautic/theme-neopolitan": "*",
     "mautic/theme-oxygen": "*",
     "mautic/theme-paprika": "*",
@@ -63,7 +60,22 @@
     "mautic/theme-sparse": "*",
     "mautic/theme-sunday": "*",
     "mautic/theme-vibrant": "*",
-    "mautic/theme-trulypersonal": "*"
+    "mautic/theme-trulypersonal": "*",
+    "mautic/theme-1-2-1-2-column": "*",
+    "mautic/theme-1-2-1-column": "*",
+    "mautic/theme-1-2-column": "*",
+    "mautic/theme-1-3-1-3-column": "*",
+    "mautic/theme-1-3-column": "*",
+    "mautic/theme-attract": "*",
+    "mautic/theme-connect-through-content": "*",
+    "mautic/theme-creative": "*",
+    "mautic/theme-educate": "*",
+    "mautic/theme-gallery": "*",
+    "mautic/theme-make-announcement": "*",
+    "mautic/theme-showcase": "*",
+    "mautic/theme-simple-text": "*",
+    "mautic/theme-survey": "*",
+    "mautic/theme-welcome": "*"
   },
   "scripts": {
     "post-install-cmd": [
@@ -84,14 +96,6 @@
   "repositories": [
     {
       "type": "git",
-      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/SpBundle.git"
-    },
-    {
-      "type": "git",
       "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
     },
     {
@@ -99,7 +103,7 @@
         "url": "../app",
         "options": {
             "versions": {
-                "mautic/core-lib": "5.x-dev"
+                "mautic/core-lib": "6.x-dev"
             },
             "symlink": false
         }

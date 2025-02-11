@@ -89,7 +89,6 @@
     "knplabs/knp-menu-bundle": "^3.0",
     "guzzlehttp/oauth-subscriber": "^0.6.0",
     "helios-ag/fm-elfinder-bundle": "^12.3",
-    "tightenco/collect": "^8.16.0",
     "kamermans/guzzle-oauth2-subscriber": "^1.0",
     "barryvdh/elfinder-flysystem-driver": "^0.4.3",
     "bandwidth-throttle/token-bucket": "^2.0",
@@ -110,7 +109,8 @@
     "symfony/mime": "~6.4",
     "wikimedia/less.php": "^4.1",
     "matthiasmullie/minify": "^1.3",
-    "bjeavons/zxcvbn-php": "^1.3"
+    "bjeavons/zxcvbn-php": "^1.3",
+    "illuminate/collections": "^10.48"
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0"

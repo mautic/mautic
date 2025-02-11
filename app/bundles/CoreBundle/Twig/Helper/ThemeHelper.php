@@ -81,18 +81,6 @@ final class ThemeHelper
     }
 
     /**
-     * Get the theme's slots.
-     *
-     * @param string $type
-     *
-     * @return array<string, mixed>
-     */
-    public function getSlots($type)
-    {
-        return $this->config['slots'][$type] ?? [];
-    }
-
-    /**
      * Returns path to this theme.
      *
      * @param bool $relative
