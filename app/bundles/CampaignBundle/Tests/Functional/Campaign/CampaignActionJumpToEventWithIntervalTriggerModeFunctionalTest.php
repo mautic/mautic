@@ -14,13 +14,33 @@ use PHPUnit\Framework\Assert;
 
 class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
+    private string $originalTimezone;
+
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
 
+        $timezone = 'UTC';
+        $nowUTC   = new \DateTime('now', new \DateTimeZone($timezone));
+        if ($nowUTC->format('G') < 4) {
+            $timezone = 'Asia/Bangkok'; // +07:00
+        } elseif ($nowUTC->format('G') > 20) {
+            $timezone = 'America/Phoenix'; // -07:00
+        }
+
+        $this->originalTimezone = date_default_timezone_get();
+
         $this->configParams += [
-            'default_timezone' => 'UTC',
+            'default_timezone' => $timezone,
         ];
+    }
+
+    protected function setUp(): void
+    {
+        // Tear down of the base class will restore timezone to UTC.
+        date_default_timezone_set($this->configParams['default_timezone']);
+
+        parent::setUp();
     }
 
     /**
@@ -113,6 +133,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
      */
     public function dataForCampaignWithJumpToEventWithIntervalTriggerMode(): iterable
     {
+        date_default_timezone_set($this->configParams['default_timezone']);
         // Event times starts when the PHPUNIT suite starts. The closures can run minutes later
         // which breaks the test in the CI. Use this time in the closures to avoid flaky tests.
         $testNow = new \DateTime();
@@ -181,8 +202,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hour'));
+        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hours'));
+        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hours'));
 
         yield 'Points at a relative time: Between passed time' => [
             $adjustPointEvent,
@@ -247,6 +268,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $adjustPointEvent->setTriggerHour($triggerHourDate->format('H:00:00'));
         $adjustPointEvent->setTriggerIntervalUnit('d');
+        // This must conform the format of the date in the \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::getGroupExecutionDateTime
         $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('N')]);
 
         yield 'Schedule the event when Send From is in the future on the selected day when the day is today' => [
@@ -288,6 +310,9 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
                 $this->assertPlusMinusOneMinuteOf($testNow->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
             },
         ];
+
+        // Need to reset timezone for next date providers call
+        date_default_timezone_set($this->originalTimezone);
     }
 
     /**

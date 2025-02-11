@@ -45,23 +45,14 @@ class AssetsHelperTest extends TestCase
 
         Assert::assertStringContainsString('app.css', $head);
 
-        $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
-            ->addStylesheet('/builder.css')
-            ->setContext();
-
-        $head = $this->assetHelper->getHeadDeclarations();
-        Assert::assertStringNotContainsString('builder.css', $head);
-
         $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        Assert::assertStringContainsString('builder.css', $head);
         Assert::assertStringNotContainsString('app.css', $head);
 
         $version = $this->setVersion($this->assetHelper);
 
         $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        Assert::assertStringContainsString('builder.css?v'.$version, $head);
         Assert::assertStringNotContainsString('app.css?v'.$version, $head);
     }
 

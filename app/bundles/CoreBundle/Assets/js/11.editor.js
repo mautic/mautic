@@ -358,7 +358,9 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
                         rel: 'noopener noreferrer'
                     }
                 }
-            }
+            },
+            // You can use `s?` suffix like below to allow both `http` and `https` protocols at the same time.
+            allowedProtocols: [ 'https?', 'tel', 'sms', 'sftp', 'smb', 'slack' ]
         },
         htmlSupport: {
             allow: [
