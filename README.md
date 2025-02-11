@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-154-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-155-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -263,6 +263,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://laurielim.github.io"><img src="https://avatars.githubusercontent.com/u/62180225?v=4?s=100" width="100px;" alt="Laurie Lim Sam"/><br /><sub><b>Laurie Lim Sam</b></sub></a><br /><a href="#userTesting-laurielim" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Alaurielim" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/caiqueportela"><img src="https://avatars.githubusercontent.com/u/44068957?v=4?s=100" width="100px;" alt="Caique Portela"/><br /><sub><b>Caique Portela</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=caiqueportela" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/levente999"><img src="https://avatars.githubusercontent.com/u/168987998?v=4?s=100" width="100px;" alt="levente999"/><br /><sub><b>levente999</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=levente999" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rishithreddy89"><img src="https://avatars.githubusercontent.com/u/178993450?v=4?s=100" width="100px;" alt="rishithreddy89"/><br /><sub><b>rishithreddy89</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rishithreddy89" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

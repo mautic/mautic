@@ -135,7 +135,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         // exclude the segment
         $segmentTest3Ref = $this->getReference('segment-test-3');
         $lastRebuiltDate = $segmentTest3Ref->getLastBuiltDate();
-        self::assertNotNull($lastRebuiltDate);
+        self::assertNull($lastRebuiltDate);
 
         $this->testSymfonyCommand(
             UpdateLeadListsCommand::NAME,

@@ -5,23 +5,15 @@
 {% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent %}
-    {% if not slot('mauticContent') %}
-        {% if mauticContent is defined %}
-            {{ mauticContent }}
-        {% endif %}
-    {% else %}
-        {{ slot('mauticContent') }}
+    {% if mauticContent is defined %}
+        {{ mauticContent }}
     {% endif %}
 {% endblock %}
 
-{% if not slot('headerTitle') %}
-    {% if headerTitle is not defined %}
-        {% set headerTitle = 'Mautic' %}
-    {% endif %}
-    {% set headerTitle = headerTitle|trans %}
-{% else %}
-    {% set headerTitle = slot('headerTitle') %}
+{% if headerTitle is not defined %}
+    {% set headerTitle = 'Mautic' %}
 {% endif %}
+{% set headerTitle = headerTitle|trans %}
 
 {% block headerTitle %}{{ headerTitle }}{% endblock %}
 

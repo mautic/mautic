@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Functional\EventListener;
 
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -20,14 +20,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @preserveGlobalState disabled
  */
-class BuilderSubscriberTest extends AbstractMauticTestCase
+class BuilderSubscriberTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     // Custom preference center page
-    public const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist';
-    public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist';
-    public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel';
-    public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency';
-    public const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs';
+    public const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist input';
+    public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist input';
+    public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel select';
+    public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency div[data-contact-frequency="1"]';
+    public const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs a.btn-save';
 
     // Default preference center page
     public const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
@@ -41,6 +43,15 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
     public const TOKEN_SELECTOR = '#lead_contact_frequency_rules__token';
     public const FORM_SELECTOR  = 'form[name="lead_contact_frequency_rules"]';
 
+    protected function setUp(): void
+    {
+        $this->configParams['show_contact_preferences'] = 1;
+        $data                                           = $this->getProvidedData();
+        $this->configParams                             = array_merge($data[0], $this->configParams);
+
+        parent::setUp();
+    }
+
     /**
      * Tests both the default and custom preference center pages.
      *
@@ -51,8 +62,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
      */
     public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter): void
     {
-        $this->setUpSymfony(array_merge(['show_contact_preferences' => 1], $configParams, $this->configParams));
-
         $emailStat = $this->createStat(
             $this->createEmail($hasPreferenceCenter),
             $lead = $this->createLead()
@@ -106,8 +115,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
 
     public function frequencyFormRenderingDataProvider(): \Generator
     {
-        // Custom Preference Center: All preferences enabled
-        yield [
+        yield 'Custom Preference Center: All preferences enabled' => [
             [
                 'show_contact_segments'           => 1,
                 'show_contact_categories'         => 1,
@@ -124,8 +132,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             true,
         ];
 
-        // Custom Preference Center: Segments & Categories disabled
-        yield [
+        yield 'Custom Preference Center: Segments & Categories disabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -142,8 +149,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             true,
         ];
 
-        // Custom Preference Center: Preferred Channels & Frequency disabled
-        yield [
+        yield 'Custom Preference Center: Preferred Channels & Frequency disabled' => [
             [
                 'show_contact_segments'           => 1,
                 'show_contact_categories'         => 1,
@@ -160,8 +166,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             true,
         ];
 
-        // Custom Preference Center: Frequency enabled & Pause Dates disabled
-        yield [
+        yield 'Custom Preference Center: Frequency enabled & Pause Dates disabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -178,8 +183,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             true,
         ];
 
-        // Custom Preference Center: Frequency disabled & Pause Dates enabled
-        yield [
+        yield 'Custom Preference Center: Frequency disabled & Pause Dates enabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -191,13 +195,13 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
                 static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
                 static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
                 static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency
+                static::DEFAULT_PAUSE_DATES_SELECTOR      => 1, // determined by show_contact_pause_dates
             ],
             true,
         ];
 
-        // Custom Preference Center: All preferences disabled
-        yield [
+        yield 'Custom Preference Center: All preferences disabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -214,8 +218,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             true,
         ];
 
-        // Default Preference Center: All preferences enabled
-        yield [
+        yield 'Default Preference Center: All preferences enabled' => [
             [
                 'show_contact_segments'           => 1,
                 'show_contact_categories'         => 1,
@@ -233,8 +236,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             false,
         ];
 
-        // Default Preference Center: Segments & Categories disabled
-        yield [
+        yield 'Default Preference Center: Segments & Categories disabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -252,8 +254,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             false,
         ];
 
-        // Default Preference Center: Preferred Channels & Frequency disabled
-        yield [
+        yield 'Default Preference Center: Preferred Channels & Frequency disabled' => [
             [
                 'show_contact_segments'           => 1,
                 'show_contact_categories'         => 1,
@@ -271,8 +272,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             false,
         ];
 
-        // Default Preference Center: Frequency enabled & Pause Dates disabled
-        yield [
+        yield 'Default Preference Center: Frequency enabled & Pause Dates disabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -290,8 +290,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             false,
         ];
 
-        // Default Preference Center: Frequency disabled & Pause Dates enabled
-        yield [
+        yield 'Default Preference Center: Frequency disabled & Pause Dates enabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -309,8 +308,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             false,
         ];
 
-        // Default Preference Center: All preferences disabled
-        yield [
+        yield 'Default Preference Center: All preferences disabled' => [
             [
                 'show_contact_segments'           => 0,
                 'show_contact_categories'         => 0,
@@ -419,19 +417,19 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
     <div>
         {successmessage}
         <div>
-            <div data-slot="segmentlist"></div>
+            {segmentlist}
         </div>
         <div>
-            <div data-slot="categorylist"></div>
+            {categorylist}
         </div>
         <div>
-            <div data-slot="preferredchannel"></div>
+            {preferredchannel}
         </div>
         <div>
-            <div data-slot="channelfrequency"></div>
+            {channelfrequency}
         </div>
         <div>
-            <div data-slot="saveprefsbutton"></div>
+            {saveprefsbutton}
         </div>
     </div>
 </body>

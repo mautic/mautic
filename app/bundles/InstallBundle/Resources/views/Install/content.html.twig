@@ -5,7 +5,7 @@
     @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 #}
 
-{% if not app.getRequest().isXmlHttpRequest() and (false == slot('contentOnly', false)) %}
+{% if not app.getRequest().isXmlHttpRequest() and false == contentOnly|default(false) %}
     {% extends '@MauticInstall/Install/base.html.twig' %}
 {% endif %}
 

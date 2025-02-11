@@ -90,7 +90,6 @@ class LeadList extends FormEntity
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist')
             ->addIndex(['alias'], 'lead_list_alias');
 
         $builder->addIdColumns();
@@ -280,6 +279,24 @@ class LeadList extends FormEntity
         return $this->filters;
     }
 
+    public function needsRebuild(): bool
+    {
+        // Manual segments never require rebuild
+        if (empty($this->getFilters())) {
+            return false;
+        }
+
+        // A segment with filters requires rebuild if it was changed since the last build date, or was never built
+        if (null === $this->getLastBuiltDate()) {
+            return true;
+        }
+        if (null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function hasFilterTypeOf(string $type): bool
     {
         foreach ($this->getFilters() as $filter) {
@@ -426,13 +443,11 @@ class LeadList extends FormEntity
         $this->setLastBuiltDate($now);
     }
 
+    /**
+     * @deprecated Initialisation is no longer necessary and lastBuiltDate is allowed to be null
+     */
     public function initializeLastBuiltDate(): void
     {
-        if ($this->getLastBuiltDate() instanceof \DateTime) {
-            return;
-        }
-
-        $this->setLastBuiltDateToCurrentDatetime();
     }
 
     public function getLastBuiltTime(): ?float

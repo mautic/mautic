@@ -853,6 +853,13 @@ class CommonRepository extends ServiceEntityRepository
             if ($metadata->isIdentifier($fieldName)) {
                 if ($value) {
                     $hasId = true;
+                } elseif ($fieldName === $identifier) {
+                    // https://bugs.php.net/bug.php?id=76896
+                    // mysql_last_insert_id might return 0 if our insert updates a row
+                    // Call LAST_INSERT_ID() for the column to ensure the correct value
+                    $column   = $metadata->getColumnName($fieldName);
+                    $update[] = "{$column} = LAST_INSERT_ID({$column})";
+                    continue;
                 } else {
                     continue;
                 }

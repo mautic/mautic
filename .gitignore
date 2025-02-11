@@ -128,15 +128,12 @@ tests/**/*.sql
 !/themes/aurora
 !/themes/blank
 !/themes/cards
-!/themes/coffee
 !/themes/confirmme
 !/themes/fresh-center
 !/themes/fresh-fixed
 !/themes/fresh-left
 !/themes/fresh-wide
 !/themes/goldstar
-!/themes/Mauve
-!/themes/nature
 !/themes/neopolitan
 !/themes/oxygen
 !/themes/skyline
