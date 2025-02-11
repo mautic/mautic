@@ -277,7 +277,7 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
-    const segmentCountElem = mQuery('a.col-count');
+    const segmentCountElem = mQuery('span.col-count');
 
     if (segmentCountElem.length) {
         segmentCountElem.each(function() {
@@ -288,7 +288,8 @@ Mautic.leadlistOnLoad = function(container, response) {
                 'lead:getLeadCount',
                 {id: id},
                 function (response) {
-                    elem.html(response.html);
+                    elem.className = response.className;
+                    elem.children('a').html(response.html);
                 },
                 false,
                 true,
@@ -731,6 +732,8 @@ Mautic.segmentFilter = function() {
                     {'opacity': 0},
                     'fast',
                     function () {
+                        // Remove existing tooltip
+                        mQuery('*[role="tooltip"]').tooltip('destroy');
                         mQuery(this).remove();
                         Mautic.reorderSegmentFilters();
                     }

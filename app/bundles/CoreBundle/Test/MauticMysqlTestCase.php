@@ -89,6 +89,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->connection->rollback();
         }
 
+        $this->afterRollback();
+
         if (!$this->useCleanupRollback || !$isTransactionActive || $customFieldsReset || !$this->wasRollbackSuccessful()) {
             $this->resetDatabase();
         }
@@ -110,6 +112,13 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * Override this method to execute some logic right before the tearDown() is invoked.
      */
     protected function beforeTearDown(): void
+    {
+    }
+
+    /**
+     * Override this method to execute some logic right after the transaction ends.
+     */
+    protected function afterRollback(): void
     {
     }
 

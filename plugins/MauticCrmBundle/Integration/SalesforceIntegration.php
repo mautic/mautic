@@ -1842,13 +1842,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     protected function prepareFieldsForPush($config): array
     {
-        $leadFields = array_unique(array_values($config['leadFields']));
+        $leadFields = array_unique(array_values($config['leadFields'] ?? []));
         $leadFields = array_combine($leadFields, $leadFields);
         unset($leadFields['mauticContactTimelineLink']);
         unset($leadFields['mauticContactIsContactableByEmail']);
 
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
-        $fieldKeys          = array_keys($config['leadFields']);
+        $fieldKeys          = array_keys($config['leadFields'] ?? []);
         $supportedObjects   = [];
         $objectFields       = [];
 
@@ -2365,7 +2365,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // Pass in the whole config
             $fields = $fieldsToUpdate;
         } else {
-            $fields = array_flip($fieldsToUpdate);
+            $fields = array_flip($fieldsToUpdate ?? []);
         }
 
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
