@@ -3,8 +3,5 @@
   "description": "Chord",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
-  "minimum-stability": "dev",
-  "require": {
-    "mautic/core-lib": "^5.0"
-  }
+  "minimum-stability": "dev"
 }
