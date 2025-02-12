@@ -141,8 +141,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             foreach ($formIds as $formId) {
                 $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_FORM_EVENT, (int) $formId, [
-                    'campaignId' => $campaignId,
-                    'formId'     => (int) $formId,
+                    EntityExportEvent::EXPORT_CAMPAIGN       => $campaignId,
+                    EntityExportEvent::EXPORT_FORM_EVENT     => (int) $formId,
                 ]);
             }
         } catch (\Exception $e) {
@@ -165,8 +165,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             foreach ($segmentIds as $segmentId) {
                 $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_SEGMENT_EVENT, (int) $segmentId, [
-                    'campaignId' => $campaignId,
-                    'segmentId'  => (int) $segmentId,
+                    EntityExportEvent::EXPORT_CAMPAIGN       => $campaignId,
+                    EntityExportEvent::EXPORT_SEGMENT_EVENT  => (int) $segmentId,
                 ]);
             }
         } catch (\Exception $e) {
