@@ -27,8 +27,8 @@ final class CampaignEventExportSubscriberTest extends TestCase
     {
         $events = CampaignEventExportSubscriber::getSubscribedEvents();
 
-        $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $events);
-        $this->assertSame(['onCampaignEventExport', 0], $events[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+        $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $events);
+        $this->assertSame(['onCampaignEventExport', 0], $events[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT]);
     }
 
     public function testOnCampaignEventExport(): void
@@ -63,27 +63,27 @@ final class CampaignEventExportSubscriberTest extends TestCase
             ->with($campaignId)
             ->willReturn($campaign);
 
-        $event = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $campaignId);
+        $event = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
 
         // Execute the event listener
         $this->subscriber->onCampaignEventExport($event);
 
         // Verify entities are added correctly
         $entities = $event->getEntities();
-        $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $entities);
-        $this->assertNotEmpty($entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
-        $this->assertArrayHasKey(0, $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+        $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $entities);
+        $this->assertNotEmpty($entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT]);
+        $this->assertArrayHasKey(0, $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT]);
 
-        $this->assertSame(10, $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['id']);
-        $this->assertSame('Test Event', $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['name']);
+        $this->assertSame(10, $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT][0]['id']);
+        $this->assertSame('Test Event', $entities[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT][0]['name']);
 
         // Verify dependencies are added correctly
         $dependencies = $event->getDependencies();
-        $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $dependencies);
-        $this->assertNotEmpty($dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
-        $this->assertArrayHasKey(0, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT]);
+        $this->assertArrayHasKey(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $dependencies);
+        $this->assertNotEmpty($dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT]);
+        $this->assertArrayHasKey(0, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT]);
 
-        $this->assertSame($campaignId, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['campaignId']);
-        $this->assertSame(10, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENT][0]['eventId']);
+        $this->assertSame($campaignId, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT][0]['campaignId']);
+        $this->assertSame(10, $dependencies[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT][0]['eventId']);
     }
 }

@@ -45,8 +45,8 @@ final class CampaignFormExportSubscriberTest extends TestCase
     {
         $events = CampaignFormExportSubscriber::getSubscribedEvents();
 
-        $this->assertArrayHasKey(EntityExportEvent::EXPORT_FORM, $events);
-        $this->assertSame(['onCampaignFormExport', 0], $events[EntityExportEvent::EXPORT_FORM]);
+        $this->assertArrayHasKey(EntityExportEvent::EXPORT_FORM_EVENT, $events);
+        $this->assertSame(['onCampaignFormExport', 0], $events[EntityExportEvent::EXPORT_FORM_EVENT]);
     }
 
     public function testOnCampaignFormExport(): void
@@ -97,31 +97,31 @@ final class CampaignFormExportSubscriberTest extends TestCase
             ->method('fetchAllAssociative')
             ->willReturn($formResults);
 
-        $event = new EntityExportEvent(EntityExportEvent::EXPORT_FORM, $campaignId);
+        $event = new EntityExportEvent(EntityExportEvent::EXPORT_FORM_EVENT, $campaignId);
 
         // Execute the event listener
         $this->subscriber->onCampaignFormExport($event);
 
         // Verify entities are added correctly
         $entities = $event->getEntities();
-        $this->assertArrayHasKey(EntityExportEvent::EXPORT_FORM, $entities);
-        $this->assertNotEmpty($entities[EntityExportEvent::EXPORT_FORM]);
+        $this->assertArrayHasKey(EntityExportEvent::EXPORT_FORM_EVENT, $entities);
+        $this->assertNotEmpty($entities[EntityExportEvent::EXPORT_FORM_EVENT]);
 
         // Ensure the first index exists before accessing it
-        $this->assertArrayHasKey(0, $entities[EntityExportEvent::EXPORT_FORM]);
+        $this->assertArrayHasKey(0, $entities[EntityExportEvent::EXPORT_FORM_EVENT]);
 
-        $this->assertSame($formResults[0]['form_id'], $entities[EntityExportEvent::EXPORT_FORM][0]['id']);
-        $this->assertSame($formResults[0]['name'], $entities[EntityExportEvent::EXPORT_FORM][0]['name']);
+        $this->assertSame($formResults[0]['form_id'], $entities[EntityExportEvent::EXPORT_FORM_EVENT][0]['id']);
+        $this->assertSame($formResults[0]['name'], $entities[EntityExportEvent::EXPORT_FORM_EVENT][0]['name']);
 
         // Verify dependencies are added correctly
         $dependencies = $event->getDependencies();
-        $this->assertArrayHasKey(EntityExportEvent::EXPORT_FORM, $dependencies);
-        $this->assertNotEmpty($dependencies[EntityExportEvent::EXPORT_FORM]);
+        $this->assertArrayHasKey(EntityExportEvent::EXPORT_FORM_EVENT, $dependencies);
+        $this->assertNotEmpty($dependencies[EntityExportEvent::EXPORT_FORM_EVENT]);
 
         // Ensure the first index exists before accessing it
-        $this->assertArrayHasKey(0, $dependencies[EntityExportEvent::EXPORT_FORM]);
+        $this->assertArrayHasKey(0, $dependencies[EntityExportEvent::EXPORT_FORM_EVENT]);
 
-        $this->assertSame($campaignId, $dependencies[EntityExportEvent::EXPORT_FORM][0]['campaignId']);
-        $this->assertSame($formResults[0]['form_id'], $dependencies[EntityExportEvent::EXPORT_FORM][0]['segmentId']);
+        $this->assertSame($campaignId, $dependencies[EntityExportEvent::EXPORT_FORM_EVENT][0]['campaignId']);
+        $this->assertSame($formResults[0]['form_id'], $dependencies[EntityExportEvent::EXPORT_FORM_EVENT][0]['segmentId']);
     }
 }

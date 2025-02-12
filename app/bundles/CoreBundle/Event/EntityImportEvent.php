@@ -17,8 +17,10 @@ class EntityImportEvent extends Event
 
     public const IMPORT_CAMPAIGN         = 'import_campaign';
     public const IMPORT_CAMPAIGN_EVENT   = 'import_campaign_event';
-    public const IMPORT_CAMPAIGN_SEGMENT = 'import_campaign_segment';
-    public const IMPORT_CAMPAIGN_FORM    = 'import_campaign_form';
+    public const IMPORT_SEGMENT_EVENT    = 'import_segment';
+    public const IMPORT_FORM_EVENT       = 'import_form';
+    public const IMPORT_ASSET_EVENT      = 'import_asset';
+    public const IMPORT_PAGE_EVENT       = 'import_page';
 
     public function __construct(private string $entityName, private array $data, private int $userId)
     {

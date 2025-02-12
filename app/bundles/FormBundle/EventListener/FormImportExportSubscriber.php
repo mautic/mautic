@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -16,14 +17,15 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private FormModel $formModel,
+        private UserModel $userModel,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::EXPORT_FORM          => ['onFormExport', 0],
-            EntityImportEvent::IMPORT_CAMPAIGN_FORM => ['onFormImport', 0],
+            EntityExportEvent::EXPORT_FORM_EVENT  => ['onFormExport', 0],
+            EntityImportEvent::IMPORT_FORM_EVENT  => ['onFormImport', 0],
         ];
     }
 
@@ -73,13 +75,24 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             'form_fields'          => $formFields,
         ];
 
-        $event->addEntity(EntityExportEvent::EXPORT_FORM, $data);
+        $event->addEntity(EntityExportEvent::EXPORT_FORM_EVENT, $data);
     }
 
     public function onFormImport(EntityImportEvent $event): void
     {
-        $output = new ConsoleOutput();
-        $forms  = $event->getEntityData();
+        $output   = new ConsoleOutput();
+        $forms    = $event->getEntityData();
+        $userId   = $event->getUserId();
+        $userName = '';
+
+        if ($userId) {
+            $user   = $this->userModel->getEntity($userId);
+            if ($user) {
+                $userName = $user->getFirstName().' '.$user->getLastName();
+            } else {
+                $output->writeln('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
+            }
+        }
 
         if (!$forms) {
             return;
@@ -101,6 +114,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $form->setFormAttributes($formData['form_attr'] ?? '');
             $form->setDateAdded(new \DateTime());
             $form->setDateModified(new \DateTime());
+            $form->setCreatedByUser($userName);
 
             $this->entityManager->persist($form);
             $this->entityManager->flush();

@@ -20,7 +20,7 @@ final class CampaignEventExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::EXPORT_CAMPAIGN_EVENT => ['onCampaignEventExport', 0],
+            EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT => ['onCampaignEventExport', 0],
         ];
     }
 
@@ -67,34 +67,34 @@ final class CampaignEventExportSubscriber implements EventSubscriberInterface
                 $channel     => $channelId,
             ];
 
-            if (EntityExportEvent::EXPORT_ASSET === $channel && 0 !== (int) $channelId) {
-                $assetEvent = new EntityExportEvent(EntityExportEvent::EXPORT_ASSET, $channelId);
-                $this->dispatcher->dispatch($assetEvent, EntityExportEvent::EXPORT_ASSET);
+            if (EntityExportEvent::EXPORT_ASSET_EVENT === $channel && 0 !== (int) $channelId) {
+                $assetEvent = new EntityExportEvent(EntityExportEvent::EXPORT_ASSET_EVENT, $channelId);
+                $this->dispatcher->dispatch($assetEvent, EntityExportEvent::EXPORT_ASSET_EVENT);
 
-                foreach ($assetEvent->getEntities()[EntityExportEvent::EXPORT_ASSET] ?? [] as $asset) {
+                foreach ($assetEvent->getEntities()[EntityExportEvent::EXPORT_ASSET_EVENT] ?? [] as $asset) {
                     $assets[$asset['id']] = $asset;
                 }
             }
 
-            if (EntityExportEvent::EXPORT_PAGE === $channel && 0 !== (int) $channelId) {
-                $pageEvent = new EntityExportEvent(EntityExportEvent::EXPORT_PAGE, $channelId);
-                $this->dispatcher->dispatch($pageEvent, EntityExportEvent::EXPORT_PAGE);
+            if (EntityExportEvent::EXPORT_PAGE_EVENT === $channel && 0 !== (int) $channelId) {
+                $pageEvent = new EntityExportEvent(EntityExportEvent::EXPORT_PAGE_EVENT, $channelId);
+                $this->dispatcher->dispatch($pageEvent, EntityExportEvent::EXPORT_PAGE_EVENT);
 
-                foreach ($pageEvent->getEntities()[EntityExportEvent::EXPORT_PAGE] ?? [] as $page) {
+                foreach ($pageEvent->getEntities()[EntityExportEvent::EXPORT_PAGE_EVENT] ?? [] as $page) {
                     $pages[$page['id']] = $page;
                 }
             }
 
-            $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $eventData);
-            $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $dependency);
+            $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $eventData);
+            $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $dependency);
         }
 
         if (!empty($assets)) {
-            $event->addEntities([EntityExportEvent::EXPORT_ASSET => array_values($assets)]); // Convert unique assets to list
+            $event->addEntities([EntityExportEvent::EXPORT_ASSET_EVENT => array_values($assets)]); // Convert unique assets to list
         }
 
         if (!empty($pages)) {
-            $event->addEntities([EntityExportEvent::EXPORT_PAGE => array_values($pages)]); // Convert unique pages to list
+            $event->addEntities([EntityExportEvent::EXPORT_PAGE_EVENT => array_values($pages)]); // Convert unique pages to list
         }
     }
 }

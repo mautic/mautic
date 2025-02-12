@@ -48,8 +48,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN, $campaignData);
 
             // Export campaign events
-            $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENT, $campaignId);
-            $campaignEvent = $this->dispatcher->dispatch($campaignEvent, EntityExportEvent::EXPORT_CAMPAIGN_EVENT);
+            $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
+            $campaignEvent = $this->dispatcher->dispatch($campaignEvent, EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT);
             $event->addEntities($campaignEvent->getEntities());
             $event->addDependencies($campaignEvent->getDependencies());
 
@@ -65,11 +65,16 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public function onCampaignImport(EntityImportEvent $event): void
     {
         try {
-            $userId = $event->getUserId();
-            $user   = $userId ? $this->userModel->getEntity($userId) : null;
+            $userId   = $event->getUserId();
+            $userName = '';
 
-            if ($userId && !$user) {
-                $this->logger->warning('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
+            if ($userId) {
+                $user   = $this->userModel->getEntity($userId);
+                if ($user) {
+                    $userName = $user->getFirstName().' '.$user->getLastName();
+                } else {
+                    $this->logger->warning('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
+                }
             }
 
             $entityData = $event->getEntityData();
@@ -79,7 +84,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $this->importCampaigns($event, $entityData, $user);
+            $this->importCampaigns($event, $entityData, $userName);
             $this->importDependentEntities($event, $entityData, $userId);
         } catch (\Exception $e) {
             $this->logger->error('Error during campaign import: '.$e->getMessage(), ['exception' => $e]);
@@ -135,7 +140,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 ->fetchFirstColumn();
 
             foreach ($formIds as $formId) {
-                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_FORM, (int) $formId, [
+                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_FORM_EVENT, (int) $formId, [
                     'campaignId' => $campaignId,
                     'formId'     => (int) $formId,
                 ]);
@@ -159,7 +164,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 ->fetchFirstColumn();
 
             foreach ($segmentIds as $segmentId) {
-                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_SEGMENT, (int) $segmentId, [
+                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_SEGMENT_EVENT, (int) $segmentId, [
                     'campaignId' => $campaignId,
                     'segmentId'  => (int) $segmentId,
                 ]);
@@ -184,7 +189,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function importCampaigns(EntityImportEvent $event, array $entityData, ?object $user): void
+    private function importCampaigns(EntityImportEvent $event, array $entityData, string $user): void
     {
         try {
             foreach ($entityData[EntityExportEvent::EXPORT_CAMPAIGN] as $campaignData) {
@@ -195,10 +200,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 $campaign->setCanvasSettings($campaignData['canvas_settings'] ?? '');
                 $campaign->setDateAdded(new \DateTime());
                 $campaign->setDateModified(new \DateTime());
-
-                if ($user) {
-                    $campaign->setCreatedByUser($user->getFirstName().' '.$user->getLastName());
-                }
+                $campaign->setCreatedByUser($user);
 
                 $this->entityManager->persist($campaign);
                 $this->entityManager->flush();
@@ -215,7 +217,12 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     private function importDependentEntities(EntityImportEvent $event, array $entityData, ?int $userId): void
     {
         try {
-            $dependentEntities = [EntityExportEvent::EXPORT_FORM, EntityExportEvent::EXPORT_CAMPAIGN_EVENT];
+            $dependentEntities = [
+                EntityExportEvent::EXPORT_FORM_EVENT,
+                EntityExportEvent::EXPORT_SEGMENT_EVENT,
+                EntityExportEvent::EXPORT_ASSET_EVENT,
+                EntityExportEvent::EXPORT_PAGE_EVENT,
+            ];
 
             foreach ($dependentEntities as $entity) {
                 $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
