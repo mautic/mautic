@@ -761,4 +761,174 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     {
         return 'test-pass!23';
     }
+
+    /**
+     * @dataProvider formSubmissionDataProvider
+     */
+    public function testFormFieldValues(array $submissionData): void
+    {
+        $payload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'leadField'    => 'email',
+                    'mappedField'  => 'email',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Firstname',
+                    'type'         => 'text',
+                    'alias'        => 'firstname',
+                    'leadField'    => 'firstname',
+                    'mappedField'  => 'firstname',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Lastname',
+                    'type'         => 'text',
+                    'alias'        => 'lastname',
+                    'leadField'    => 'lastname',
+                    'mappedField'  => 'lastname',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Country',
+                    'type'         => 'country',
+                    'alias'        => 'country',
+                    'leadField'    => 'country',
+                    'mappedField'  => 'country',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Company name',
+                    'type'         => 'text',
+                    'alias'        => 'company_name',
+                    'leadField'    => 'company',
+                    'mappedField'  => 'company',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label'        => 'Company country',
+                    'type'         => 'text',
+                    'alias'        => 'company_country',
+                    'leadField'    => 'companycountry',
+                    'mappedField'  => 'companycountry',
+                    'mappedObject' => 'company',
+                ],
+                [
+                    'label'        => 'Company city',
+                    'type'         => 'text',
+                    'alias'        => 'company_city',
+                    'leadField'    => 'companycity',
+                    'mappedField'  => 'companycity',
+                    'mappedObject' => 'company',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        // Create the form
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Submit the form
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+
+        $formData = [];
+        foreach ($submissionData as $key => $value) {
+            $formData["mauticform[{$key}]"] = $value;
+        }
+        $form->setValues($formData);
+
+        $this->client->submit($form);
+
+        // Get form submissions via API
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('total', $submissionsData);
+        $this->assertArrayHasKey('submissions', $submissionsData);
+        $this->assertGreaterThan(0, count($submissionsData['submissions']));
+
+        $latestSubmission = $submissionsData['submissions'][0];
+
+        // Check if the submission data matches
+        $this->assertArrayHasKey('results', $latestSubmission);
+        foreach ($submissionData as $key => $value) {
+            $this->assertArrayHasKey($key, $latestSubmission['results']);
+            $this->assertEquals($value, $latestSubmission['results'][$key]);
+        }
+
+        // Check form details
+        $this->assertArrayHasKey('form', $latestSubmission);
+        $this->assertEquals($formId, $latestSubmission['form']['id']);
+        $this->assertEquals('Submission test form', $latestSubmission['form']['name']);
+        $this->assertEquals('submission', $latestSubmission['form']['alias']);
+
+        // Check contact details
+        $this->assertArrayHasKey('lead', $latestSubmission);
+        $contact = $latestSubmission['lead'];
+        $this->assertEquals($submissionData['email'], $contact['email']);
+        $this->assertEquals($submissionData['firstname'], $contact['firstname']);
+        $this->assertEquals($submissionData['lastname'], $contact['lastname']);
+        $this->assertEquals($submissionData['country'], $contact['country']);
+        $this->assertEquals($submissionData['company_name'], $contact['company']);
+
+        // Check submission metadata
+        $this->assertArrayHasKey('ipAddress', $latestSubmission);
+        $this->assertArrayHasKey('dateSubmitted', $latestSubmission);
+        $this->assertArrayHasKey('referer', $latestSubmission);
+
+        // Cleanup
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    public function formSubmissionDataProvider(): array
+    {
+        return [
+            'submission1' => [
+                [
+                    'email'           => 'john@example.com',
+                    'firstname'       => 'John',
+                    'lastname'        => 'Doe',
+                    'country'         => 'United States',
+                    'company_name'    => 'Acme Inc',
+                    'company_country' => 'United States',
+                    'company_city'    => 'New York',
+                ],
+            ],
+            'submission2' => [
+                [
+                    'email'           => 'jane@example.com',
+                    'firstname'       => 'Jane',
+                    'lastname'        => 'Smith',
+                    'country'         => 'Canada',
+                    'company_name'    => 'Tech Co',
+                    'company_country' => 'Canada',
+                    'company_city'    => 'Toronto',
+                ],
+            ],
+        ];
+    }
 }
