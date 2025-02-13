@@ -15,10 +15,6 @@ return [
                 'path'       => '/campaigns/{page}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
             ],
-            'mautic_campaign_import_index' => [
-                'path'       => '/campaigns/{page}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
-            ],
             'mautic_campaign_action'       => [
                 'path'       => '/campaigns/{objectAction}/{objectId}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::executeAction',
@@ -113,20 +109,11 @@ return [
 
     'menu' => [
         'main' => [
-            'mautic.campaign.menu.root' => [
+            'mautic.campaign.menu.index' => [
                 'iconClass' => 'ri-megaphone-fill',
+                'route'     => 'mautic_campaign_index',
                 'access'    => 'campaign:campaigns:view',
                 'priority'  => 50,
-                'children'  => [
-                    'mautic.campaign.menu.index' => [
-                        'route'  => 'mautic_campaign_index',
-                        'access' => 'campaign:campaigns:view',
-                    ],
-                    'mautic.campaign.menu.import' => [
-                        'route'  => 'mautic_campaign_import_index',
-                        'access' => 'campaign:campaigns:view',
-                    ],
-                ],
             ],
         ],
     ],
