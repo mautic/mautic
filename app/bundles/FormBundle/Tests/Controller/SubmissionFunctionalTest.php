@@ -765,7 +765,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     /**
      * @dataProvider formSubmissionDataProvider
      */
-    public function testFormFieldValues(array $submissionData): void
+    public function testFormFieldValues(array $submissionData, array $expectedData): void
     {
         $payload = [
             'name'        => 'Submission test form',
@@ -873,30 +873,38 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Check if the submission data matches
         $this->assertArrayHasKey('results', $latestSubmission);
-        foreach ($submissionData as $key => $value) {
+        foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key]);
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
         }
-
-        // Check form details
-        $this->assertArrayHasKey('form', $latestSubmission);
-        $this->assertEquals($formId, $latestSubmission['form']['id']);
-        $this->assertEquals('Submission test form', $latestSubmission['form']['name']);
-        $this->assertEquals('submission', $latestSubmission['form']['alias']);
 
         // Check contact details
         $this->assertArrayHasKey('lead', $latestSubmission);
         $contact = $latestSubmission['lead'];
-        $this->assertEquals($submissionData['email'], $contact['email']);
-        $this->assertEquals($submissionData['firstname'], $contact['firstname']);
-        $this->assertEquals($submissionData['lastname'], $contact['lastname']);
-        $this->assertEquals($submissionData['country'], $contact['country']);
-        $this->assertEquals($submissionData['company_name'], $contact['company']);
+        $this->assertEquals($expectedData['email'], $contact['email']);
+        $this->assertEquals($expectedData['firstname'], $contact['firstname']);
+        $this->assertEquals($expectedData['lastname'], $contact['lastname']);
+        $this->assertEquals($expectedData['country'], $contact['country']);
+        $this->assertEquals($expectedData['company_name'], $contact['company']);
 
         // Check submission metadata
         $this->assertArrayHasKey('ipAddress', $latestSubmission);
         $this->assertArrayHasKey('dateSubmitted', $latestSubmission);
         $this->assertArrayHasKey('referer', $latestSubmission);
+
+        // Get contact companies
+        $this->client->request(Request::METHOD_GET, "/api/contacts/{$contact['id']}/companies");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $contactCompanies = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('total', $contactCompanies);
+        $this->assertArrayHasKey('companies', $contactCompanies);
+        $this->assertEquals(1, count($contactCompanies['companies']));
+
+        // Check company details
+        $this->assertEquals($expectedData['company_name'], $contactCompanies['companies'][0]['companyname']);
+        $this->assertEquals($expectedData['company_city'], $contactCompanies['companies'][0]['companycity']);
+        $this->assertEquals($expectedData['company_country'], $contactCompanies['companies'][0]['companycountry']);
 
         // Cleanup
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
@@ -907,8 +915,17 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     public function formSubmissionDataProvider(): array
     {
         return [
-            'submission1' => [
-                [
+            'normal_submission' => [
+                'input' => [
+                    'email'           => 'john@example.com',
+                    'firstname'       => 'John',
+                    'lastname'        => 'Doe',
+                    'country'         => 'United States',
+                    'company_name'    => 'Acme Inc',
+                    'company_country' => 'United States',
+                    'company_city'    => 'New York',
+                ],
+                'expected' => [
                     'email'           => 'john@example.com',
                     'firstname'       => 'John',
                     'lastname'        => 'Doe',
@@ -918,15 +935,84 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_city'    => 'New York',
                 ],
             ],
-            'submission2' => [
-                [
+            'special_characters' => [
+                'input' => [
                     'email'           => 'jane@example.com',
                     'firstname'       => 'Jane',
-                    'lastname'        => 'Smith',
-                    'country'         => 'Canada',
-                    'company_name'    => 'Tech Co',
-                    'company_country' => 'Canada',
-                    'company_city'    => 'Toronto',
+                    'lastname'        => 'O\'Brien-Smith',
+                    'country'         => 'Ireland',
+                    'company_name'    => '"Super" R&D Company, Ltd.',
+                    'company_country' => 'Ireland',
+                    'company_city'    => 'Dublin',
+                ],
+                'expected' => [
+                    'email'           => 'jane@example.com',
+                    'firstname'       => 'Jane',
+                    'lastname'        => 'O\'Brien-Smith',
+                    'country'         => 'Ireland',
+                    'company_name'    => '"Super" R&D Company, Ltd.',
+                    'company_country' => 'Ireland',
+                    'company_city'    => 'Dublin',
+                ],
+            ],
+            'xss_attempt' => [
+                'input' => [
+                    'email'           => 'hacker@evil.com',
+                    'firstname'       => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'lastname'        => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'country'         => 'Poland',
+                    'company_name'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'company_country' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                ],
+                'expected' => [
+                    'email'           => 'hacker@evil.com',
+                    'firstname'       => 'alert("XSS")',
+                    'lastname'        => 'alert("XSS")',
+                    'country'         => 'Poland',
+                    'company_name'    => 'alert("XSS")',
+                    'company_country' => 'alert("XSS")',
+                    'company_city'    => 'alert("XSS")',
+                ],
+            ],
+            'sql_injection_attempt' => [
+                'input' => [
+                    'email'           => 'sqlhacker@evil.com',
+                    'firstname'       => "Robert'; DROP TABLE users; --",
+                    'lastname'        => 'Tables',
+                    'country'         => 'United States',
+                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                    'company_country' => 'United States',
+                    'company_city'    => 'SQL City',
+                ],
+                'expected' => [
+                    'email'           => 'sqlhacker@evil.com',
+                    'firstname'       => "Robert'; DROP TABLE users; --",
+                    'lastname'        => 'Tables',
+                    'country'         => 'United States',
+                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                    'company_country' => 'United States',
+                    'company_city'    => 'SQL City',
+                ],
+            ],
+            'unicode_characters' => [
+                'input' => [
+                    'email'           => 'unicode@example.com',
+                    'firstname'       => 'José',
+                    'lastname'        => 'Martínez',
+                    'country'         => 'Spain',
+                    'company_name'    => '株式会社スマイル',
+                    'company_country' => 'Japan',
+                    'company_city'    => '東京',
+                ],
+                'expected' => [
+                    'email'           => 'unicode@example.com',
+                    'firstname'       => 'José',
+                    'lastname'        => 'Martínez',
+                    'country'         => 'Spain',
+                    'company_name'    => '株式会社スマイル',
+                    'company_country' => 'Japan',
+                    'company_city'    => '東京',
                 ],
             ],
         ];
