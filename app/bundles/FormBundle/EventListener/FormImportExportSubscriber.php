@@ -24,13 +24,17 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::EXPORT_FORM_EVENT  => ['onFormExport', 0],
+            EntityExportEvent::class              => ['onFormExport', 0],
             EntityImportEvent::IMPORT_FORM_EVENT  => ['onFormImport', 0],
         ];
     }
 
     public function onFormExport(EntityExportEvent $event): void
     {
+        if (EntityExportEvent::EXPORT_FORM_EVENT !== $event->getEntityName()) {
+            return;
+        }
+
         $formId       = $event->getEntityId();
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 

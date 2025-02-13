@@ -28,7 +28,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::EXPORT_CAMPAIGN => ['onCampaignExport', 0],
+            EntityExportEvent::class           => ['onCampaignExport', 0],
             EntityImportEvent::IMPORT_CAMPAIGN => ['onCampaignImport', 0],
         ];
     }
@@ -36,6 +36,10 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public function onCampaignExport(EntityExportEvent $event): void
     {
         try {
+            if (EntityExportEvent::EXPORT_CAMPAIGN !== $event->getEntityName()) {
+                return;
+            }
+
             $campaignId   = $event->getEntityId();
             $campaignData = $this->fetchCampaignData($campaignId);
 
@@ -48,7 +52,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN, $campaignData);
 
             $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
-            $campaignEvent = $this->dispatcher->dispatch($campaignEvent, EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT);
+            $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
             $event->addEntities($campaignEvent->getEntities());
             $event->addDependencies($campaignEvent->getDependencies());
 
@@ -168,7 +172,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         try {
             $entityEvent = new EntityExportEvent($type, $entityId);
-            $entityEvent = $this->dispatcher->dispatch($entityEvent, $type);
+            $entityEvent = $this->dispatcher->dispatch($entityEvent);
 
             $event->addEntities($entityEvent->getEntities());
             $event->addDependencyEntity($type, $dependency);
@@ -217,7 +221,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             foreach ($dependentEntities as $entity) {
                 $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
-                $subEvent = $this->dispatcher->dispatch($subEvent, 'import_'.$entity);
+                $subEvent = $this->dispatcher->dispatch($subEvent);
                 $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
 
                 $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
@@ -227,7 +231,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $this->updateEvents($entityData, $entityData['dependencies']);
 
             $campaignEvent = new EntityImportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $entityData[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT], $userId);
-            $campaignEvent = $this->dispatcher->dispatch($campaignEvent, 'import_'.EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT);
+            $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
 
             $this->updateCampaignCanvasSettings($entityData, $campaignEvent->getEntityIdMap(), $event->getEntityIdMap());
 

@@ -21,6 +21,7 @@ class EntityExportEvent extends Event
     public const EXPORT_FORM_EVENT              = 'form';
     public const EXPORT_ASSET_EVENT             = 'asset';
     public const EXPORT_PAGE_EVENT              = 'page';
+    public const EXPORT_EMAIL_EVENT             = 'email';
 
     public function __construct(private string $entityName, private int $entityId)
     {

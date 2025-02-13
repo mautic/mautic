@@ -24,13 +24,17 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::EXPORT_PAGE_EVENT => ['onPageExport', 0],
+            EntityExportEvent::class             => ['onPageExport', 0],
             EntityImportEvent::IMPORT_PAGE_EVENT => ['onPageImport', 0],
         ];
     }
 
     public function onPageExport(EntityExportEvent $event): void
     {
+        if (EntityExportEvent::EXPORT_PAGE_EVENT !== $event->getEntityName()) {
+            return;
+        }
+
         $pageId = $event->getEntityId();
         $page   = $this->pageModel->getEntity($pageId);
         if (!$page) {

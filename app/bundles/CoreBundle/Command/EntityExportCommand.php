@@ -59,7 +59,7 @@ final class EntityExportCommand extends ModeratedCommand
     {
         $event = new EntityExportEvent($entityName, $entityId);
 
-        return $this->dispatcher->dispatch($event, $entityName);
+        return $this->dispatcher->dispatch($event);
     }
 
     /**

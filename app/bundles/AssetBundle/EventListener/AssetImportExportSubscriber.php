@@ -24,13 +24,17 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::EXPORT_ASSET_EVENT => ['onAssetExport', 0],
+            EntityExportEvent::class              => ['onAssetExport', 0],
             EntityImportEvent::IMPORT_ASSET_EVENT => ['onAssetImport', 0],
         ];
     }
 
     public function onAssetExport(EntityExportEvent $event): void
     {
+        if (EntityExportEvent::EXPORT_ASSET_EVENT !== $event->getEntityName()) {
+            return;
+        }
+
         $assetId = $event->getEntityId();
         $asset   = $this->assetModel->getEntity($assetId);
         if (!$asset) {
