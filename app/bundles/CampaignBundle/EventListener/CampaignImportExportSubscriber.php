@@ -40,25 +40,23 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $campaignData = $this->fetchCampaignData($campaignId);
 
             if (!$campaignData) {
-                $this->logger->warning('Campaign data not found for ID: '.$campaignId);
+                $this->logger->warning("Campaign data not found for ID: $campaignId");
 
                 return;
             }
 
             $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN, $campaignData);
 
-            // Export campaign events
             $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
             $campaignEvent = $this->dispatcher->dispatch($campaignEvent, EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT);
             $event->addEntities($campaignEvent->getEntities());
             $event->addDependencies($campaignEvent->getDependencies());
 
-            // Export related entities (forms and segments)
             $this->exportRelatedEntities($event, $campaignId);
             $event->addEntity('dependencies', $event->getDependencies());
         } catch (\Exception $e) {
             $this->logger->error('Error during campaign export: '.$e->getMessage(), ['exception' => $e]);
-            throw $e; // Re-throw to ensure the error is not silently ignored
+            throw $e;
         }
     }
 
@@ -66,16 +64,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         try {
             $userId   = $event->getUserId();
-            $userName = '';
-
-            if ($userId) {
-                $user   = $this->userModel->getEntity($userId);
-                if ($user) {
-                    $userName = $user->getFirstName().' '.$user->getLastName();
-                } else {
-                    $this->logger->warning('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
-                }
-            }
+            $userName = $this->getUserName($userId);
 
             $entityData = $event->getEntityData();
             if (!$entityData) {
@@ -88,7 +77,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $this->importDependentEntities($event, $entityData, $userId);
         } catch (\Exception $e) {
             $this->logger->error('Error during campaign import: '.$e->getMessage(), ['exception' => $e]);
-            throw $e; // Re-throw to ensure the error is not silently ignored
+            throw $e;
         }
     }
 
@@ -97,7 +86,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         try {
             $campaign = $this->campaignModel->getEntity($campaignId);
             if (!$campaign) {
-                $this->logger->warning('Campaign not found for ID: '.$campaignId);
+                $this->logger->warning("Campaign not found for ID: $campaignId");
 
                 return [];
             }
@@ -141,8 +130,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             foreach ($formIds as $formId) {
                 $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_FORM_EVENT, (int) $formId, [
-                    EntityExportEvent::EXPORT_CAMPAIGN       => $campaignId,
-                    EntityExportEvent::EXPORT_FORM_EVENT     => (int) $formId,
+                    EntityExportEvent::EXPORT_CAMPAIGN   => $campaignId,
+                    EntityExportEvent::EXPORT_FORM_EVENT => (int) $formId,
                 ]);
             }
         } catch (\Exception $e) {
@@ -165,8 +154,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             foreach ($segmentIds as $segmentId) {
                 $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_SEGMENT_EVENT, (int) $segmentId, [
-                    EntityExportEvent::EXPORT_CAMPAIGN       => $campaignId,
-                    EntityExportEvent::EXPORT_SEGMENT_EVENT  => (int) $segmentId,
+                    EntityExportEvent::EXPORT_CAMPAIGN      => $campaignId,
+                    EntityExportEvent::EXPORT_SEGMENT_EVENT => (int) $segmentId,
                 ]);
             }
         } catch (\Exception $e) {
@@ -217,45 +206,124 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     private function importDependentEntities(EntityImportEvent $event, array $entityData, ?int $userId): void
     {
         try {
-            $this->updateDependencies($entityData['dependencies'], $event->getEntityIdMap(), 'campaignId');
-            print_r($event->getEntityIdMap());
+            $this->updateDependencies($entityData['dependencies'], $event->getEntityIdMap(), EntityExportEvent::EXPORT_CAMPAIGN);
 
-            $subEvent = new EntityImportEvent(EntityExportEvent::EXPORT_FORM_EVENT, $entityData[EntityExportEvent::EXPORT_FORM_EVENT], $userId);
-            $subEvent = $this->dispatcher->dispatch($subEvent, 'import_'.EntityExportEvent::EXPORT_FORM_EVENT);
-            print_r($subEvent->getEntityIdMap());
+            $dependentEntities = [
+                EntityExportEvent::EXPORT_FORM_EVENT,
+                EntityExportEvent::EXPORT_SEGMENT_EVENT,
+                EntityExportEvent::EXPORT_ASSET_EVENT,
+                EntityExportEvent::EXPORT_PAGE_EVENT,
+            ];
 
-            $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), 'formId');
+            foreach ($dependentEntities as $entity) {
+                $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
+                $subEvent = $this->dispatcher->dispatch($subEvent, 'import_'.$entity);
+                $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
 
-            $subEvent = new EntityImportEvent(EntityExportEvent::EXPORT_SEGMENT_EVENT, $entityData[EntityExportEvent::EXPORT_SEGMENT_EVENT], $userId);
-            $subEvent = $this->dispatcher->dispatch($subEvent, 'import_'.EntityExportEvent::EXPORT_SEGMENT_EVENT);
-            print_r($subEvent->getEntityIdMap());
-            $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), 'segmentId');
-
-            print_r($entityData['dependencies']);
+                $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
+            }
 
             $this->processDependencies($entityData['dependencies']);
+            $this->updateEvents($entityData, $entityData['dependencies']);
 
-            // $dependentEntities = [
-            //     EntityExportEvent::EXPORT_FORM_EVENT,
-            //     EntityExportEvent::EXPORT_SEGMENT_EVENT,
-            // ];
+            $campaignEvent = new EntityImportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $entityData[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT], $userId);
+            $campaignEvent = $this->dispatcher->dispatch($campaignEvent, 'import_'.EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT);
 
-            // $eventeDependentEntities = [
-            //     EntityExportEvent::EXPORT_ASSET_EVENT,
-            //     EntityExportEvent::EXPORT_PAGE_EVENT,
-            // ];
-
-            // foreach ($dependentEntities as $entity) {
-            //     $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
-            //     $subEvent = $this->dispatcher->dispatch($subEvent, 'import_'.$entity);
-            //     $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
-            //     print_r($subEvent->getEntityIdMap());
-            // }
+            $this->updateCampaignCanvasSettings($entityData, $campaignEvent->getEntityIdMap(), $event->getEntityIdMap());
 
             $this->logger->info('Final entity ID map after import: ', ['entityIdMap' => $event->getEntityIdMap()]);
         } catch (\Exception $e) {
             $this->logger->error('Error importing dependent entities: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
+        }
+    }
+
+    private function getUserName(?int $userId): string
+    {
+        if (!$userId) {
+            return '';
+        }
+
+        $user = $this->userModel->getEntity($userId);
+        if (!$user) {
+            $this->logger->warning("User ID $userId not found. Campaigns will not have a created_by_user field set.");
+
+            return '';
+        }
+
+        return $user->getFirstName().' '.$user->getLastName();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, int>      $eventIdMap
+     * @param array<int, int>      $campaignIdMap
+     */
+    private function updateCampaignCanvasSettings(array &$data, array $eventIdMap, array $campaignIdMap): void
+    {
+        foreach ($data[EntityExportEvent::EXPORT_CAMPAIGN] as &$campaignData) {
+            if (!empty($campaignData['canvas_settings'])) {
+                $canvasSettings = &$campaignData['canvas_settings'];
+
+                $this->updateCanvasNodes($canvasSettings, $eventIdMap);
+                $this->updateCanvasConnections($canvasSettings, $eventIdMap);
+            }
+        }
+
+        $this->persistUpdatedCanvasSettings($data, $campaignIdMap);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, int>      $campaignIdMap
+     */
+    private function persistUpdatedCanvasSettings(array &$data, array $campaignIdMap): void
+    {
+        foreach ($data[EntityExportEvent::EXPORT_CAMPAIGN] as $campaignData) {
+            $campaign = $this->entityManager->getRepository(Campaign::class)->find($campaignIdMap[$campaignData['id']] ?? null);
+
+            if ($campaign) {
+                $campaign->setCanvasSettings($campaignData['canvas_settings'] ?? '');
+                $this->entityManager->persist($campaign);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $canvasSettings
+     * @param array<int, int>      $eventIdMap
+     */
+    private function updateCanvasNodes(array &$canvasSettings, array $eventIdMap): void
+    {
+        if (!isset($canvasSettings['nodes'])) {
+            return;
+        }
+
+        foreach ($canvasSettings['nodes'] as &$node) {
+            if (isset($node['id']) && isset($eventIdMap[$node['id']])) {
+                $node['id'] = $eventIdMap[$node['id']];
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $canvasSettings
+     * @param array<int, int>      $eventIdMap
+     */
+    private function updateCanvasConnections(array &$canvasSettings, array $eventIdMap): void
+    {
+        if (!isset($canvasSettings['connections'])) {
+            return;
+        }
+
+        foreach ($canvasSettings['connections'] as &$connection) {
+            if (isset($connection['sourceId']) && isset($eventIdMap[$connection['sourceId']])) {
+                $connection['sourceId'] = $eventIdMap[$connection['sourceId']];
+            }
+            if (isset($connection['targetId']) && isset($eventIdMap[$connection['targetId']])) {
+                $connection['targetId'] = $eventIdMap[$connection['targetId']];
+            }
         }
     }
 
@@ -269,8 +337,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             foreach ($dependencyGroup as &$items) {
                 foreach ($items as &$dependency) {
                     if (isset($dependency[$key]) && isset($idMap[$dependency[$key]])) {
-                        $originalId       = $dependency[$key];
-                        $dependency[$key] = $idMap[$originalId];
+                        $dependency[$key] = $idMap[$dependency[$key]];
                     }
                 }
             }
@@ -284,22 +351,14 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         foreach ($dependencies as &$dependencyGroup) {
             foreach ($dependencyGroup as $key => $items) {
-                // Process form dependencies for campaign_form_xref
-                if ('form' === $key) {
+                if (EntityExportEvent::EXPORT_FORM_EVENT === $key) {
                     foreach ($items as &$dependency) {
-                        $campaignId = $dependency['campaignId'];
-                        $formId     = $dependency['formId'];
-
-                        $this->insertCampaignFormXref($campaignId, $formId);
+                        $this->insertCampaignFormXref($dependency[EntityExportEvent::EXPORT_CAMPAIGN], $dependency[EntityExportEvent::EXPORT_FORM_EVENT]);
                     }
                 }
-                // Process segment dependencies for campaign_leadlist_xref
-                if ('segment' === $key) {
+                if (EntityExportEvent::EXPORT_SEGMENT_EVENT === $key) {
                     foreach ($items as &$dependency) {
-                        $campaignId = $dependency['campaignId'];
-                        $segmentId  = $dependency['segmentId'];
-
-                        $this->insertCampaignSegmentXref($campaignId, $segmentId);
+                        $this->insertCampaignSegmentXref($dependency[EntityExportEvent::EXPORT_CAMPAIGN], $dependency[EntityExportEvent::EXPORT_SEGMENT_EVENT]);
                     }
                 }
             }
@@ -309,30 +368,78 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     private function insertCampaignFormXref(int $campaignId, int $formId): void
     {
         try {
-            $connection = $this->entityManager->getConnection();
-            $connection->insert('campaign_form_xref', [
+            $this->entityManager->getConnection()->insert('campaign_form_xref', [
                 'campaign_id' => $campaignId,
                 'form_id'     => $formId,
             ]);
 
-            $this->logger->info("<info>Inserted campaign_form_xref: campaign_id={$campaignId}, form_id={$formId}</info>");
+            $this->logger->info("Inserted campaign_form_xref: campaign_id={$campaignId}, form_id={$formId}");
         } catch (\Exception $e) {
-            $this->logger->info('<error>Failed to insert into campaign_form_xref: '.$e->getMessage().'</error>');
+            $this->logger->error('Failed to insert into campaign_form_xref: '.$e->getMessage());
         }
     }
 
     private function insertCampaignSegmentXref(int $campaignId, int $segmentId): void
     {
         try {
-            $connection = $this->entityManager->getConnection();
-            $connection->insert('campaign_leadlist_xref', [
+            $this->entityManager->getConnection()->insert('campaign_leadlist_xref', [
                 'campaign_id' => $campaignId,
                 'leadlist_id' => $segmentId,
             ]);
 
-            $this->logger->info("<info>Inserted campaign_leadlist_xref: campaign_id={$campaignId}, leadlist_id={$segmentId}</info>");
+            $this->logger->info("Inserted campaign_leadlist_xref: campaign_id={$campaignId}, leadlist_id={$segmentId}");
         } catch (\Exception $e) {
-            $this->logger->info('<error>Failed to insert into campaign_leadlist_xref: '.$e->getMessage().'</error>');
+            $this->logger->error('Failed to insert into campaign_leadlist_xref: '.$e->getMessage());
         }
+    }
+
+    /**
+     * @param array<string, mixed>             $data
+     * @param array<int, array<string, mixed>> $dependencies
+     */
+    private function updateEvents(array &$data, array $dependencies): void
+    {
+        if (empty($data[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT])) {
+            return;
+        }
+
+        $eventDependencies = $this->getEventDependencies($dependencies);
+        if (empty($eventDependencies)) {
+            return;
+        }
+
+        foreach ($data[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT] as &$event) {
+            foreach ($eventDependencies as $eventDependency) {
+                if (isset($event['id']) && $event['id'] === $eventDependency[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT]) {
+                    $event['campaign_id'] = $eventDependency[EntityExportEvent::EXPORT_CAMPAIGN];
+                    $this->updateEventChannel($event, $eventDependency);
+                }
+            }
+        }
+    }
+
+    private function updateEventChannel(array &$event, array $eventDependency): void
+    {
+        if (isset($event['channel']) && isset($eventDependency[$event['channel']])) {
+            $event['channel_id']                                      = $eventDependency[$event['channel']];
+            $event['properties'][$event['channel'].'s']               = [$eventDependency[$event['channel']]];
+            $event['properties']['properties'][$event['channel'].'s'] = [$eventDependency[$event['channel']]];
+        }
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $dependencies
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getEventDependencies(array $dependencies): array
+    {
+        foreach ($dependencies as $dependencyGroup) {
+            if (isset($dependencyGroup[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT])) {
+                return $dependencyGroup[EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT];
+            }
+        }
+
+        return [];
     }
 }
