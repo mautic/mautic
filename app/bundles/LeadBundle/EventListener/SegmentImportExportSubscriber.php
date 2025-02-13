@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -31,17 +32,13 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 
     public function onSegmentExport(EntityExportEvent $event): void
     {
-        if (EntityExportEvent::EXPORT_SEGMENT_EVENT !== $event->getEntityName()) {
+        $leadList = $event->getEntity();
+        if (!$leadList instanceof LeadList) {
             return;
         }
 
-        $leadListId = $event->getEntityId();
-        $leadList   = $this->leadListModel->getEntity($leadListId);
-        if (!$leadList) {
-            return;
-        }
         $segmentData = [
-            'id'                   => $leadListId,
+            'id'                   => $leadList->getId(),
             'name'                 => $leadList->getName(),
             'is_published'         => $leadList->getIsPublished(),
             'description'          => $leadList->getDescription(),
@@ -51,7 +48,8 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             'is_global'            => $leadList->getIsGlobal(),
             'is_preference_center' => $leadList->getIsPreferenceCenter(),
         ];
-        $event->addEntity(EntityExportEvent::EXPORT_SEGMENT_EVENT, $segmentData);
+
+        $event->addEntity($leadList->getExportKey(), $segmentData);
     }
 
     public function onSegmentImport(EntityImportEvent $event): void
@@ -75,7 +73,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($elements as $element) {
-            $object = new \Mautic\LeadBundle\Entity\LeadList();
+            $object = new LeadList();
             $object->setName($element['name']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setDescription($element['description'] ?? '');

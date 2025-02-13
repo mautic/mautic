@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Entity\ExportableInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -16,6 +18,7 @@ final class EntityExportCommand extends ModeratedCommand
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
+        private EntityManagerInterface $entityManager,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
@@ -47,17 +50,44 @@ final class EntityExportCommand extends ModeratedCommand
             return self::FAILURE;
         }
 
-        $event = $this->dispatchEntityExportEvent($entityName, $entityId);
+        $entity = $this->getEntityByNameAndId($entityName, $entityId);
+        if (!$entity instanceof ExportableInterface) {
+            $output->writeln('<error>Invalid entity type or ID.</error>');
+
+            return self::FAILURE;
+        }
+
+        $event = $this->dispatchEntityExportEvent($entity);
 
         return $this->outputData($event->getEntities(), $input, $output);
     }
 
-    /**
-     * Dispatch the EntityExportEvent.
-     */
-    private function dispatchEntityExportEvent(string $entityName, int $entityId): EntityExportEvent
+    private function getEntityByNameAndId(string $entityName, int $entityId): ?ExportableInterface
     {
-        $event = new EntityExportEvent($entityName, $entityId);
+        $entityClass = $this->getEntityClass($entityName);
+        if (!$entityClass) {
+            return null;
+        }
+
+        $repository = $this->entityManager->getRepository($entityClass);
+        $entity     = $repository->find($entityId);
+
+        return $entity instanceof ExportableInterface ? $entity : null;
+    }
+
+    private function getEntityClass(string $entityName): ?string
+    {
+        $entityClasses = [
+            'campaign' => \Mautic\CampaignBundle\Entity\Campaign::class,
+            'form'     => \Mautic\FormBundle\Entity\Form::class,
+        ];
+
+        return $entityClasses[$entityName] ?? null;
+    }
+
+    private function dispatchEntityExportEvent(ExportableInterface $entity): EntityExportEvent
+    {
+        $event = new EntityExportEvent($entity);
 
         return $this->dispatcher->dispatch($event);
     }
@@ -76,7 +106,7 @@ final class EntityExportCommand extends ModeratedCommand
             $output->writeln('<info>JSON file created at:</info> '.$filePath);
         } elseif ($input->getOption('zip-file')) {
             $zipPath = $this->writeToZipFile($jsonOutput);
-            $output->writeln(''.$zipPath);
+            $output->writeln($zipPath);
         } else {
             $output->writeln('<error>You must specify one of --json-only, --json-file, or --zip-file options.</error>');
 

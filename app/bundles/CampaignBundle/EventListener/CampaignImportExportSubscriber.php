@@ -7,8 +7,11 @@ namespace Mautic\CampaignBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Entity\ExportableInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -36,28 +39,27 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public function onCampaignExport(EntityExportEvent $event): void
     {
         try {
-            if (EntityExportEvent::EXPORT_CAMPAIGN !== $event->getEntityName()) {
+            $campaign = $event->getEntity();
+            if (!$campaign instanceof Campaign) {
                 return;
             }
-
-            $campaignId   = $event->getEntityId();
-            $campaignData = $this->fetchCampaignData($campaignId);
+            $campaignData = $this->fetchCampaignData($campaign->getId());
 
             if (!$campaignData) {
-                $this->logger->warning("Campaign data not found for ID: $campaignId");
+                $this->logger->warning("Campaign data not found for ID: {$campaign->getId()}");
 
                 return;
             }
 
-            $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN, $campaignData);
+            $event->addEntity($campaign->getExportKey(), $campaignData);
 
-            $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
-            $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
-            $event->addEntities($campaignEvent->getEntities());
-            $event->addDependencies($campaignEvent->getDependencies());
-
-            $this->exportRelatedEntities($event, $campaignId);
+            $this->exportRelatedEntities($event, $campaign->getId());
             $event->addEntity('dependencies', $event->getDependencies());
+
+            // $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
+            // $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
+            // $event->addEntities($campaignEvent->getEntities());
+            // $event->addDependencies($campaignEvent->getDependencies());
         } catch (\Exception $e) {
             $this->logger->error('Error during campaign export: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
@@ -133,10 +135,13 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 ->fetchFirstColumn();
 
             foreach ($formIds as $formId) {
-                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_FORM_EVENT, (int) $formId, [
-                    EntityExportEvent::EXPORT_CAMPAIGN   => $campaignId,
-                    EntityExportEvent::EXPORT_FORM_EVENT => (int) $formId,
-                ]);
+                $form = $this->getEntityById(Form::class, (int) $formId);
+                if ($form) {
+                    $this->dispatchAndAddEntity($event, $form, [
+                        $event->getEntity()->getExportKey() => $campaignId,
+                        $form->getExportKey()               => $formId,
+                    ]);
+                }
             }
         } catch (\Exception $e) {
             $this->logger->error('Error exporting forms: '.$e->getMessage(), ['exception' => $e]);
@@ -157,10 +162,13 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 ->fetchFirstColumn();
 
             foreach ($segmentIds as $segmentId) {
-                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_SEGMENT_EVENT, (int) $segmentId, [
-                    EntityExportEvent::EXPORT_CAMPAIGN      => $campaignId,
-                    EntityExportEvent::EXPORT_SEGMENT_EVENT => (int) $segmentId,
-                ]);
+                $segment = $this->getEntityById(LeadList::class, (int) $segmentId);
+                if ($segment) {
+                    $this->dispatchAndAddEntity($event, $segment, [
+                        $event->getEntity()->getExportKey() => $campaignId,
+                        $segment->getExportKey()            => $segmentId,
+                    ]);
+                }
             }
         } catch (\Exception $e) {
             $this->logger->error('Error exporting segments: '.$e->getMessage(), ['exception' => $e]);
@@ -168,14 +176,21 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function dispatchAndAddEntity(EntityExportEvent $event, string $type, int $entityId, array $dependency): void
+    private function getEntityById(string $entityClass, int $entityId): ?ExportableInterface
+    {
+        $entity = $this->entityManager->getRepository($entityClass)->find($entityId);
+
+        return $entity instanceof ExportableInterface ? $entity : null;
+    }
+
+    private function dispatchAndAddEntity(EntityExportEvent $event, ExportableInterface $entity, array $dependency): void
     {
         try {
-            $entityEvent = new EntityExportEvent($type, $entityId);
+            $entityEvent = new EntityExportEvent($entity);
             $entityEvent = $this->dispatcher->dispatch($entityEvent);
 
             $event->addEntities($entityEvent->getEntities());
-            $event->addDependencyEntity($type, $dependency);
+            $event->addDependencyEntity($entity->getExportKey(), $dependency);
         } catch (\Exception $e) {
             $this->logger->error('Error dispatching and adding entity: '.$e->getMessage(), ['exception' => $e]);
             throw $e;

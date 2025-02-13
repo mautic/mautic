@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Entity\ExportableInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityExportEvent extends Event
@@ -15,26 +16,13 @@ class EntityExportEvent extends Event
      */
     private array $dependencies = [];
 
-    public const EXPORT_CAMPAIGN                = 'campaign';
-    public const EXPORT_CAMPAIGN_EVENTS_EVENT   = 'campaign_event';
-    public const EXPORT_SEGMENT_EVENT           = 'segment';
-    public const EXPORT_FORM_EVENT              = 'form';
-    public const EXPORT_ASSET_EVENT             = 'asset';
-    public const EXPORT_PAGE_EVENT              = 'page';
-    public const EXPORT_EMAIL_EVENT             = 'email';
-
-    public function __construct(private string $entityName, private int $entityId)
+    public function __construct(private ExportableInterface $entity)
     {
     }
 
-    public function getEntityName(): string
+    public function getEntity(): ExportableInterface
     {
-        return $this->entityName;
-    }
-
-    public function getEntityId(): int
-    {
-        return $this->entityId;
+        return $this->entity;
     }
 
     /**
