@@ -25,8 +25,8 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class              => ['onFormExport', 0],
-            EntityImportEvent::IMPORT_FORM_EVENT  => ['onFormImport', 0],
+            EntityExportEvent::class  => ['onFormExport', 0],
+            EntityImportEvent::class  => ['onFormImport', 0],
         ];
     }
 
@@ -85,6 +85,10 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function onFormImport(EntityImportEvent $event): void
     {
+        if (Form::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
+
         $output   = new ConsoleOutput();
         $forms    = $event->getEntityData();
         $userId   = $event->getUserId();

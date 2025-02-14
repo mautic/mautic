@@ -77,6 +77,10 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
     public function onEmailImport(EntityImportEvent $event): void
     {
+        if (Email::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
+
         $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
         $userId   = $event->getUserId();

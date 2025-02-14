@@ -25,8 +25,8 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class                => ['onSegmentExport', 0],
-            EntityImportEvent::IMPORT_SEGMENT_EVENT => ['onSegmentImport', 0],
+            EntityExportEvent::class => ['onSegmentExport', 0],
+            EntityImportEvent::class => ['onSegmentImport', 0],
         ];
     }
 
@@ -57,6 +57,9 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 
     public function onSegmentImport(EntityImportEvent $event): void
     {
+        if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
         $output    = new ConsoleOutput();
         $elements  = $event->getEntityData();
         $userId    = $event->getUserId();

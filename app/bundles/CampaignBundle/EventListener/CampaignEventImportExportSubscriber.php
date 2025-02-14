@@ -26,8 +26,8 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class                 => ['onExport', 0],
-            EntityImportEvent::IMPORT_CAMPAIGN_EVENT => ['onCampaignEventImport', 0],
+            EntityExportEvent::class => ['onExport', 0],
+            EntityImportEvent::class => ['onImport', 0],
         ];
     }
 
@@ -113,8 +113,11 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         }
     }
 
-    private function onCampaignEventImport(EntityImportEvent $event): void
+    private function onImport(EntityImportEvent $event): void
     {
+        if (Event::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
         $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
 
