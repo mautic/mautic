@@ -88,75 +88,59 @@ class LeadSubscriber implements EventSubscriberInterface
 
         if (!$event->isEngagementCount()) {
             foreach ($logs['results'] as $log) {
-                $this->processLog($event, $log, $eventTypeKey, $eventTypeName, $eventSettings);
+                $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
+                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : '@MauticCampaign/SubscribedEvents/Timeline/index.html.twig';
+
+                $label = $log['event_name'].' / '.$log['campaign_name'];
+
+                if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
+                    // Note as cancelled
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
+                        .'" class="ri-calendar-close-fill text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
+                }
+
+                if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed']) || !empty($log['fail_reason'])) {
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error')
+                        .'" class="ri-alert-line text-danger"></i>';
+                }
+
+                $extra = [
+                    'log' => $log,
+                ];
+
+                if (!empty($log['parent_id'])) {
+                    $parentEvent = $this->getParentEvent($log['parent_id']);
+                    if ($parentEvent) {
+                        $extra['parentDetails'] = $this->getParentDetails($parentEvent, $log);
+                        $pathIcon               = 'yes' === $log['decision_path'] ? 'ri-corner-down-right-fill' : 'ri-corner-down-left-fill';
+                    }
+                }
+
+                if ($event->isForTimeline()) {
+                    $extra['campaignEventSettings'] = $eventSettings;
+                }
+
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$log['log_id'],
+                        'eventLabel' => [
+                            'label' => $label,
+                            'href'  => $this->router->generate(
+                                'mautic_campaign_action',
+                                ['objectAction' => 'view', 'objectId' => $log['campaign_id']]
+                            ),
+                        ],
+                        'eventType'       => $eventTypeName,
+                        'timestamp'       => $log['dateTriggered'],
+                        'extra'           => $extra,
+                        'contentTemplate' => $template,
+                        'icon'            => 'ri-time-line',
+                        'contactId'       => $log['lead_id'],
+                    ]
+                );
             }
         }
-    }
-
-    /**
-     * Process individual log event.
-     *
-     * @param array<string, mixed> $log
-     * @param array<string, mixed> $eventSettings
-     */
-    private function processLog(LeadTimelineEvent $event, array $log, string $eventTypeKey, string $eventTypeName, array $eventSettings): void
-    {
-        $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
-            ? $eventSettings['action'][$log['type']]['timelineTemplate'] : '@MauticCampaign/SubscribedEvents/Timeline/index.html.twig';
-
-        $label  = $log['event_name'].' / '.$log['campaign_name'];
-        $label .= $this->getLogIcons($log);
-
-        $pathIcon = '';
-        $extra    = ['log' => $log];
-
-        if (!empty($log['parent_id'])) {
-            $parentEvent = $this->getParentEvent($log['parent_id']);
-            if ($parentEvent) {
-                $extra['parentDetails'] = $this->getParentDetails($parentEvent, $log);
-                $pathIcon               = 'yes' === $log['decision_path'] ? 'ri-corner-down-right-fill' : 'ri-corner-down-left-fill';
-            }
-        }
-
-        if ($event->isForTimeline()) {
-            $extra['campaignEventSettings'] = $eventSettings;
-        }
-
-        $event->addEvent([
-            'event'      => $eventTypeKey,
-            'eventId'    => $eventTypeKey.$log['log_id'],
-            'eventLabel' => [
-                'label' => $label,
-                'href'  => $this->router->generate('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $log['campaign_id']]),
-            ],
-            'eventType'       => $eventTypeName,
-            'timestamp'       => $log['dateTriggered'],
-            'extra'           => $extra,
-            'contentTemplate' => $template,
-            'icon'            => 'ri-time-line',
-            'pathIcon'        => $pathIcon,
-            'contactId'       => $log['lead_id'],
-        ]);
-    }
-
-    /**
-     * Get icons for log entries.
-     *
-     * @param array<string, mixed> $log
-     */
-    private function getLogIcons(array $log): string
-    {
-        $icons = '';
-
-        if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
-            $icons .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled').'" class="ri-calendar-close-fill text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
-        }
-
-        if (!empty($log['metadata']['errors']) || !empty($log['metadata']['failed']) || !empty($log['fail_reason'])) {
-            $icons .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error').'" class="ri-alert-line text-danger"></i>';
-        }
-
-        return $icons;
     }
 
     /**
