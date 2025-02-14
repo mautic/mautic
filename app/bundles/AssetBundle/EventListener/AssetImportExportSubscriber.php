@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
@@ -31,7 +32,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
 
     public function onAssetExport(EntityExportEvent $event): void
     {
-        if (EntityExportEvent::EXPORT_ASSET_EVENT !== $event->getEntityName()) {
+        if (Asset::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
 
@@ -61,7 +62,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             'disallow'               => $asset->getDisallow(),
         ];
 
-        $event->addEntity(EntityExportEvent::EXPORT_ASSET_EVENT, $assetData);
+        $event->addEntity(Asset::ENTITY_NAME, $assetData);
     }
 
     public function onAssetImport(EntityImportEvent $event): void
@@ -85,7 +86,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($elements as $element) {
-            $object = new \Mautic\AssetBundle\Entity\Asset();
+            $object = new Asset();
             $object->setTitle($element['title']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setDescription($element['description'] ?? '');

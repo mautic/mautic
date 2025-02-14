@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -14,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormImportExportSubscriber implements EventSubscriberInterface
 {
-    private const ENTITY_NAME = 'forms';
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private FormModel $formModel,
@@ -33,7 +32,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function onFormExport(EntityExportEvent $event): void
     {
-        if (self::ENTITY_NAME !== $event->getEntityName()) {
+        if (Form::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
 
@@ -81,7 +80,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             'form_fields'          => $formFields,
         ];
 
-        $event->addEntity(self::ENTITY_NAME, $data);
+        $event->addEntity(Form::ENTITY_NAME, $data);
     }
 
     public function onFormImport(EntityImportEvent $event): void
@@ -105,7 +104,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($forms as $formData) {
-            $form = new \Mautic\FormBundle\Entity\Form();
+            $form = new Form();
             $form->setName($formData['name']);
             $form->setIsPublished((bool) $formData['is_published']);
             $form->setDescription($formData['description'] ?? '');

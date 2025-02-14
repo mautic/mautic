@@ -16,8 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CampaignImportExportSubscriber implements EventSubscriberInterface
 {
-    private const ENTITY_NAME = 'campaign';
-
     public function __construct(
         private CampaignModel $campaignModel,
         private UserModel $userModel,
@@ -38,7 +36,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public function onCampaignExport(EntityExportEvent $event): void
     {
         try {
-            if (self::ENTITY_NAME !== $event->getEntityName()) {
+            if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
                 return;
             }
 
@@ -51,15 +49,15 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $event->addEntity(self::ENTITY_NAME, $campaignData);
+            $event->addEntity(Campaign::ENTITY_NAME, $campaignData);
 
-            // $rawEvents = $this->campaignModel->getEventRepository()->getCampaignEvents($campaign->getId());
+            // $rawEvents = $this->campaignModel->getEventRepository()->getCampaignEvents($campaignId);
             // print_r($rawEvents);
 
-            // $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
-            // $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
-            // $event->addEntities($campaignEvent->getEntities());
-            // $event->addDependencies($campaignEvent->getDependencies());
+            $campaignEvent = new EntityExportEvent('campaign_event', $campaignId);
+            $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
+            $event->addEntities($campaignEvent->getEntities());
+            $event->addDependencies($campaignEvent->getDependencies());
 
             $this->exportRelatedEntities($event, $campaignId);
             $event->addEntity('dependencies', $event->getDependencies());
@@ -121,8 +119,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             foreach ($campaignSources as $entityName => $entities) {
                 foreach ($entities as $entityId => $entityLabel) {
                     $this->dispatchAndAddEntity($event, $entityName, (int) $entityId, [
-                        self::ENTITY_NAME => $campaignId,
-                        $entityName       => (int) $entityId,
+                        Campaign::ENTITY_NAME => $campaignId,
+                        $entityName           => (int) $entityId,
                     ]);
                 }
             }

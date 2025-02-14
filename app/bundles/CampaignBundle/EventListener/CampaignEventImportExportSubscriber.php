@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
@@ -31,7 +33,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
     public function onExport(EntityExportEvent $event): void
     {
-        if (EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT !== $event->getEntityName()) {
+        if (Event::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
 
@@ -42,21 +44,23 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         }
 
         $campaignEvents = $campaign->getEvents();
-        $assets         = [];
-        $pages          = [];
-        $emails         = [];
+        $data           = [];
 
         foreach ($campaignEvents as $campaignEvent) {
             $eventData  = $this->createEventData($campaign, $campaignEvent);
             $dependency = $this->createDependency($campaignId, $campaignEvent);
 
-            $this->handleChannelExport($campaignEvent, $assets, $pages, $emails);
+            $this->handleChannelExport($campaignEvent, $data);
 
-            $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $eventData);
-            $event->addDependencyEntity(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $dependency);
+            $event->addEntity(Event::ENTITY_NAME, $eventData);
+            $event->addDependencyEntity(Event::ENTITY_NAME, $dependency);
         }
 
-        $this->addEntitiesToEvent($event, $assets, $pages, $emails);
+        if (!empty($data)) {
+            foreach ($data as $entityName => $entities) {
+                $event->addEntities([$entityName => array_values($entities)]);
+            }
+        }
     }
 
     private function createEventData($campaign, $campaignEvent): array
@@ -84,17 +88,17 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
     private function createDependency($campaignId, $campaignEvent): array
     {
-        $channel   = $campaignEvent->getChannel() ?: 'channel';
+        $channel   = $campaignEvent->getChannel() ?: '';
         $channelId = $campaignEvent->getChannelId() ?: 0;
 
         return [
-            EntityExportEvent::EXPORT_CAMPAIGN              => (int) $campaignId,
-            EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT => (int) $campaignEvent->getId(),
-            $channel                                        => (int) $channelId,
+            Campaign::ENTITY_NAME    => (int) $campaignId,
+            Event::ENTITY_NAME       => (int) $campaignEvent->getId(),
+            $channel                 => (int) $channelId,
         ];
     }
 
-    private function handleChannelExport($campaignEvent, &$assets, &$pages, &$emails): void
+    private function handleChannelExport($campaignEvent, &$data): void
     {
         $channel   = $campaignEvent->getChannel();
         $channelId = $campaignEvent->getChannelId();
@@ -103,35 +107,13 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $event = new EntityExportEvent($channel, $channelId);
             $this->dispatcher->dispatch($event);
 
-            $this->collectEntities($event, EntityExportEvent::EXPORT_ASSET_EVENT, $assets);
-            $this->collectEntities($event, EntityExportEvent::EXPORT_PAGE_EVENT, $pages);
-            $this->collectEntities($event, EntityExportEvent::EXPORT_EMAIL_EVENT, $emails);
+            foreach ($event->getEntities()[$channel] ?? [] as $entity) {
+                $data[$channel][$entity['id']] = $entity;
+            }
         }
     }
 
-    private function collectEntities(EntityExportEvent $event, string $entityType, array &$collection): void
-    {
-        foreach ($event->getEntities()[$entityType] ?? [] as $entity) {
-            $collection[$entity['id']] = $entity;
-        }
-    }
-
-    private function addEntitiesToEvent(EntityExportEvent $event, array $assets, array $pages, array $emails): void
-    {
-        if (!empty($assets)) {
-            $event->addEntities([EntityExportEvent::EXPORT_ASSET_EVENT => array_values($assets)]);
-        }
-
-        if (!empty($pages)) {
-            $event->addEntities([EntityExportEvent::EXPORT_PAGE_EVENT => array_values($pages)]);
-        }
-
-        if (!empty($emails)) {
-            $event->addEntities([EntityExportEvent::EXPORT_EMAIL_EVENT => array_values($emails)]);
-        }
-    }
-
-    public function onCampaignEventImport(EntityImportEvent $event): void
+    private function onCampaignEventImport(EntityImportEvent $event): void
     {
         $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
@@ -152,9 +134,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $this->updateParentEvents($event);
     }
 
-    private function createCampaignEvent(array $element): \Mautic\CampaignBundle\Entity\Event
+    private function createCampaignEvent(array $element): Event
     {
-        $campaignEvent = new \Mautic\CampaignBundle\Entity\Event();
+        $campaignEvent = new Event();
         $campaignEvent->setName($element['name'] ?? '');
         $campaignEvent->setDescription($element['description'] ?? '');
         $campaignEvent->setType($element['type'] ?? '');
@@ -184,8 +166,8 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
                 if ($newParentId) {
                     $campaignEventId = $idMap[(int) $element['id']];
-                    $campaignEvent   = $this->entityManager->getRepository(\Mautic\CampaignBundle\Entity\Event::class)->find($campaignEventId);
-                    $parentEvent     = $this->entityManager->getRepository(\Mautic\CampaignBundle\Entity\Event::class)->find($newParentId);
+                    $campaignEvent   = $this->entityManager->getRepository(Event::class)->find($campaignEventId);
+                    $parentEvent     = $this->entityManager->getRepository(Event::class)->find($newParentId);
 
                     if ($campaignEvent && $parentEvent) {
                         $campaignEvent->setParent($parentEvent);

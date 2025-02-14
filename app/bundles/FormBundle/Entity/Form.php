@@ -37,6 +37,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Form extends FormEntity implements UuidInterface
 {
+    public const ENTITY_NAME = 'forms';
+
     /**
      * @var int
      */

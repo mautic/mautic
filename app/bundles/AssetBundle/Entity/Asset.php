@@ -44,6 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    public const ENTITY_NAME = 'asset';
 
     /**
      * @var int|null

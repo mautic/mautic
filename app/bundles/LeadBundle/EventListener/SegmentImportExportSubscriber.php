@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -14,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentImportExportSubscriber implements EventSubscriberInterface
 {
-    private const ENTITY_NAME = 'lists';
-
     public function __construct(
         private ListModel $leadListModel,
         private UserModel $userModel,
@@ -33,7 +32,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 
     public function onSegmentExport(EntityExportEvent $event): void
     {
-        if (self::ENTITY_NAME !== $event->getEntityName()) {
+        if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
 
@@ -53,7 +52,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             'is_global'            => $leadList->getIsGlobal(),
             'is_preference_center' => $leadList->getIsPreferenceCenter(),
         ];
-        $event->addEntity(self::ENTITY_NAME, $segmentData);
+        $event->addEntity(LeadList::ENTITY_NAME, $segmentData);
     }
 
     public function onSegmentImport(EntityImportEvent $event): void
@@ -77,7 +76,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($elements as $element) {
-            $object = new \Mautic\LeadBundle\Entity\LeadList();
+            $object = new LeadList();
             $object->setName($element['name']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setDescription($element['description'] ?? '');

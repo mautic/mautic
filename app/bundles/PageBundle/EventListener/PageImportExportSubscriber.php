@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -31,7 +32,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
 
     public function onPageExport(EntityExportEvent $event): void
     {
-        if (EntityExportEvent::EXPORT_PAGE_EVENT !== $event->getEntityName()) {
+        if (Page::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
 
@@ -67,7 +68,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             'variant_settings'     => $page->getVariantSettings(),
         ];
 
-        $event->addEntity(EntityExportEvent::EXPORT_PAGE_EVENT, $pageData);
+        $event->addEntity(Page::ENTITY_NAME, $pageData);
     }
 
     public function onPageImport(EntityImportEvent $event): void
@@ -91,7 +92,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($elements as $element) {
-            $object = new \Mautic\PageBundle\Entity\Page();
+            $object = new Page();
             $object->setTitle($element['title']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setAlias($element['alias'] ?? '');

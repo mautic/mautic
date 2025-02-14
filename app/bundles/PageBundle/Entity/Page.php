@@ -48,6 +48,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use UuidTrait;
+    public const ENTITY_NAME = 'page';
 
     public const TABLE_NAME = 'pages';
 
