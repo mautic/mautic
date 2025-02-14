@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -105,6 +106,18 @@ final class EntityExportCommand extends ModeratedCommand
         $zip = new \ZipArchive();
         if (true === $zip->open($zipFilePath, \ZipArchive::CREATE)) {
             $zip->addFile($jsonFilePath, 'campaign_data.json');
+
+            $data = json_decode($jsonOutput, true);
+            if (isset($data[Asset::ENTITY_NAME])) {
+                foreach ($data[Asset::ENTITY_NAME] as $asset) {
+                    if ('local' === $asset['storage_location'] && !empty($asset['path'])) {
+                        $assetPath = $this->pathsHelper->getSystemPath('media').'/files/'.$asset['path'];
+                        if (file_exists($assetPath)) {
+                            $zip->addFile($assetPath, 'assets/'.basename($assetPath));
+                        }
+                    }
+                }
+            }
             $zip->close();
         }
 
