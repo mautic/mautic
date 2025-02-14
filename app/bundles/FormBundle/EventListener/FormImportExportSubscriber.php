@@ -14,6 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormImportExportSubscriber implements EventSubscriberInterface
 {
+    private const ENTITY_NAME = 'forms';
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private FormModel $formModel,
@@ -31,7 +33,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function onFormExport(EntityExportEvent $event): void
     {
-        if (EntityExportEvent::EXPORT_FORM_EVENT !== $event->getEntityName()) {
+        if (self::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
 
@@ -79,7 +81,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             'form_fields'          => $formFields,
         ];
 
-        $event->addEntity(EntityExportEvent::EXPORT_FORM_EVENT, $data);
+        $event->addEntity(self::ENTITY_NAME, $data);
     }
 
     public function onFormImport(EntityImportEvent $event): void

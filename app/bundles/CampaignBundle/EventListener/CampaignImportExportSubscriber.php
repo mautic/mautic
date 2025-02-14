@@ -16,6 +16,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CampaignImportExportSubscriber implements EventSubscriberInterface
 {
+    private const ENTITY_NAME = 'campaign';
+
     public function __construct(
         private CampaignModel $campaignModel,
         private UserModel $userModel,
@@ -36,7 +38,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public function onCampaignExport(EntityExportEvent $event): void
     {
         try {
-            if (EntityExportEvent::EXPORT_CAMPAIGN !== $event->getEntityName()) {
+            if (self::ENTITY_NAME !== $event->getEntityName()) {
                 return;
             }
 
@@ -49,12 +51,15 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $event->addEntity(EntityExportEvent::EXPORT_CAMPAIGN, $campaignData);
+            $event->addEntity(self::ENTITY_NAME, $campaignData);
 
-            $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
-            $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
-            $event->addEntities($campaignEvent->getEntities());
-            $event->addDependencies($campaignEvent->getDependencies());
+            // $rawEvents = $this->campaignModel->getEventRepository()->getCampaignEvents($campaign->getId());
+            // print_r($rawEvents);
+
+            // $campaignEvent = new EntityExportEvent(EntityExportEvent::EXPORT_CAMPAIGN_EVENTS_EVENT, $campaignId);
+            // $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
+            // $event->addEntities($campaignEvent->getEntities());
+            // $event->addDependencies($campaignEvent->getDependencies());
 
             $this->exportRelatedEntities($event, $campaignId);
             $event->addEntity('dependencies', $event->getDependencies());
@@ -111,59 +116,18 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     private function exportRelatedEntities(EntityExportEvent $event, int $campaignId): void
     {
         try {
-            $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
-            $this->exportForms($event, $queryBuilder, $campaignId);
-            $this->exportSegments($event, $queryBuilder, $campaignId);
+            $campaignSources = $this->campaignModel->getLeadSources($campaignId);
+
+            foreach ($campaignSources as $entityName => $entities) {
+                foreach ($entities as $entityId => $entityLabel) {
+                    $this->dispatchAndAddEntity($event, $entityName, (int) $entityId, [
+                        self::ENTITY_NAME => $campaignId,
+                        $entityName       => (int) $entityId,
+                    ]);
+                }
+            }
         } catch (\Exception $e) {
             $this->logger->error('Error exporting related entities: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
-        }
-    }
-
-    private function exportForms(EntityExportEvent $event, $queryBuilder, int $campaignId): void
-    {
-        try {
-            $formIds = $queryBuilder
-                ->select('fl.form_id')
-                ->from('campaign_form_xref', 'fl')
-                ->innerJoin('fl', 'forms', 'ff', 'ff.id = fl.form_id AND ff.is_published = 1')
-                ->where('fl.campaign_id = :campaignId')
-                ->setParameter('campaignId', $campaignId, \Doctrine\DBAL\ParameterType::INTEGER)
-                ->executeQuery()
-                ->fetchFirstColumn();
-
-            foreach ($formIds as $formId) {
-                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_FORM_EVENT, (int) $formId, [
-                    EntityExportEvent::EXPORT_CAMPAIGN   => $campaignId,
-                    EntityExportEvent::EXPORT_FORM_EVENT => (int) $formId,
-                ]);
-            }
-        } catch (\Exception $e) {
-            $this->logger->error('Error exporting forms: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
-        }
-    }
-
-    private function exportSegments(EntityExportEvent $event, $queryBuilder, int $campaignId): void
-    {
-        try {
-            $segmentIds = $queryBuilder
-                ->select('cl.leadlist_id')
-                ->from('campaign_leadlist_xref', 'cl')
-                ->innerJoin('cl', 'lead_lists', 'll', 'll.id = cl.leadlist_id AND ll.is_published = 1')
-                ->where('cl.campaign_id = :campaignId')
-                ->setParameter('campaignId', $campaignId, \Doctrine\DBAL\ParameterType::INTEGER)
-                ->executeQuery()
-                ->fetchFirstColumn();
-
-            foreach ($segmentIds as $segmentId) {
-                $this->dispatchAndAddEntity($event, EntityExportEvent::EXPORT_SEGMENT_EVENT, (int) $segmentId, [
-                    EntityExportEvent::EXPORT_CAMPAIGN      => $campaignId,
-                    EntityExportEvent::EXPORT_SEGMENT_EVENT => (int) $segmentId,
-                ]);
-            }
-        } catch (\Exception $e) {
-            $this->logger->error('Error exporting segments: '.$e->getMessage(), ['exception' => $e]);
             throw $e;
         }
     }

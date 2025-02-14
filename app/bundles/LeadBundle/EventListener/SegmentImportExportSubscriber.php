@@ -14,6 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentImportExportSubscriber implements EventSubscriberInterface
 {
+    private const ENTITY_NAME = 'lists';
+
     public function __construct(
         private ListModel $leadListModel,
         private UserModel $userModel,
@@ -31,7 +33,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 
     public function onSegmentExport(EntityExportEvent $event): void
     {
-        if (EntityExportEvent::EXPORT_SEGMENT_EVENT !== $event->getEntityName()) {
+        if (self::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
 
@@ -51,7 +53,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             'is_global'            => $leadList->getIsGlobal(),
             'is_preference_center' => $leadList->getIsPreferenceCenter(),
         ];
-        $event->addEntity(EntityExportEvent::EXPORT_SEGMENT_EVENT, $segmentData);
+        $event->addEntity(self::ENTITY_NAME, $segmentData);
     }
 
     public function onSegmentImport(EntityImportEvent $event): void
