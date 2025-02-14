@@ -1208,4 +1208,97 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider htmlFieldSubmissionDataProvider
+     */
+    public function testHtmlReadOnlyFieldSubmission(string $submittedHtml, string $submittedEmail): void
+    {
+        // Create form with freehtml and email fields
+        // this field is read-only so we want to assure that no data is stored from this field
+        $formPayload = [
+            'name'        => 'Submission test form',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'        => 'Your story',
+                    'type'         => 'freehtml',
+                    'alias'        => 'your_story',
+                    'properties'   => ['text' => ''],
+                ],
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'leadField'    => 'email',
+                    'mappedField'  => 'email',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        // Create the form
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+        $formId         = json_decode($clientResponse->getContent(), true)['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+
+        // Submit the form directly via POST
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'your_story' => $submittedHtml,
+                    'email'      => $submittedEmail,
+                    'formId'     => $formId,
+                ],
+            ]
+        );
+
+        // Verify submission
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $clientResponse  = $this->client->getResponse();
+        $submissionsData = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertArrayHasKey('submissions', $submissionsData);
+        $this->assertCount(1, $submissionsData['submissions']);
+
+        // Verify submission results
+        $submission = $submissionsData['submissions'][0];
+        $this->assertArrayHasKey('results', $submission);
+
+        // Verify that your_story is always false
+        $this->assertArrayNotHasKey('your_story', $submission['results']);
+
+        // Verify that email is stored correctly
+        $this->assertArrayHasKey('email', $submission['results']);
+        $this->assertSame($submittedEmail, $submission['results']['email']);
+
+        // Cleanup
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function htmlFieldSubmissionDataProvider(): array
+    {
+        return [
+            'any_text' => [
+                '<div></div>',
+                'test1@test.com',
+            ],
+            'with_content' => [
+                '<div>Some content</div>',
+                'test2@test.com',
+            ],
+        ];
+    }
 }
