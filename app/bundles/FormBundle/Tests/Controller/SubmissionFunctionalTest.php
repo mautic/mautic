@@ -763,11 +763,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider formSubmissionDataProvider
+     * @dataProvider formFieldValuesMappingDataProvider
      */
-    public function testFormFieldValues(array $submissionData, array $expectedData): void
+    public function testFormFieldValuesMapping(array $submissionData, array $expectedData): void
     {
-        $payload = [
+        $formPayload = [
             'name'        => 'Submission test form',
             'description' => 'Form created via submission test',
             'formType'    => 'standalone',
@@ -838,7 +838,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create the form
-        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
@@ -912,7 +912,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    public function formSubmissionDataProvider(): array
+    public function formFieldValuesMappingDataProvider(): array
     {
         return [
             'normal_submission' => [
@@ -1013,6 +1013,197 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => '株式会社スマイル',
                     'company_country' => 'Japan',
                     'company_city'    => '東京',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider formCustomFieldsMappingDataProvider
+     */
+    public function testFormCustomFieldsMapping(array $submissionData, array $expectedData): void
+    {
+        // Create new contact custom field
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', [
+            'label' => 'Animal',
+            'alias' => 'animal',
+            'type'  => 'text',
+        ]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('field', $response);
+        $contactCustomField = $response['field'];
+
+        // Create form
+        $formPayload = [
+            'name'        => 'Submission test form',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'        => 'What kind of animal are you?',
+                    'type'         => 'text',
+                    'alias'        => 'animal',
+                    'leadField'    => 'animal',
+                    'mappedField'  => 'animal',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        // Create the form
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Submit the form
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+
+        $formData = [];
+        foreach ($submissionData as $key => $value) {
+            $formData["mauticform[{$key}]"] = $value;
+        }
+        $form->setValues($formData);
+
+        $this->client->submit($form);
+
+        // Get form submissions via API
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('total', $submissionsData);
+        $this->assertArrayHasKey('submissions', $submissionsData);
+        $this->assertGreaterThan(0, count($submissionsData['submissions']));
+
+        $latestSubmission = $submissionsData['submissions'][0];
+
+        // Check if the submission data matches
+        $this->assertArrayHasKey('results', $latestSubmission);
+        foreach ($expectedData as $key => $value) {
+            $this->assertArrayHasKey($key, $latestSubmission['results']);
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+        }
+
+        // Check contact details
+        $this->assertArrayHasKey('lead', $latestSubmission);
+        $submissionContact = $latestSubmission['lead'];
+
+        // Get contact
+        $this->client->request(Request::METHOD_GET, "/api/contacts/{$submissionContact['id']}");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $contactResponse = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('contact', $contactResponse);
+        $contact = $contactResponse['contact'];
+
+        $this->assertArrayHasKey('animal', $contact['fields']['core']);
+        $animalField = $contact['fields']['core']['animal'];
+        $this->assertEquals($expectedData['animal'], $animalField['value']);
+
+        // Cleanup
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $this->client->request(Request::METHOD_DELETE, "/api/fields/contact/{$contactCustomField['id']}/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    public function formCustomFieldsMappingDataProvider(): array
+    {
+        return [
+            'simple_value' => [
+                'input' => [
+                    'animal' => 'Dog',
+                ],
+                'expected' => [
+                    'animal' => 'Dog',
+                ],
+            ],
+            'special_characters' => [
+                'input' => [
+                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
+                ],
+                'expected' => [
+                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
+                ],
+            ],
+            'xss_attempt' => [
+                'input' => [
+                    'animal' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                ],
+                'expected' => [
+                    'animal' => 'alert("XSS")',
+                ],
+            ],
+            'sql_injection' => [
+                'input' => [
+                    'animal' => "Cat'; DROP TABLE animals; --",
+                ],
+                'expected' => [
+                    'animal' => "Cat'; DROP TABLE animals; --",
+                ],
+            ],
+            'unicode_and_emoji' => [
+                'input' => [
+                    'animal' => '🐕 犬 🐈 猫',  // Dog and Cat in Japanese with emojis
+                ],
+                'expected' => [
+                    'animal' => '🐕 犬 🐈 猫',
+                ],
+            ],
+            'nested_tags' => [
+                'input' => [
+                    'animal' => '<div><span>Text</span></div>',
+                ],
+                'expected' => [
+                    'animal' => 'Text',
+                ],
+            ],
+            'incomplete_tags' => [
+                'input' => [
+                    'animal' => '<div><span>Text',
+                ],
+                'expected' => [
+                    'animal' => 'Text',
+                ],
+            ],
+            'null_byte' => [
+                'input' => [
+                    'animal' => "Dog\x00Cat",
+                ],
+                'expected' => [
+                    'animal' => 'DogCat',
+                ],
+            ],
+            'javascript_protocol' => [
+                'input' => [
+                    'animal' => '<a href="javascript:alert(\'XSS\')">Click me</a>',
+                ],
+                'expected' => [
+                    'animal' => 'Click me',
+                ],
+            ],
+            'css_expression' => [
+                'input' => [
+                    'animal' => '<div style="width: expression(alert(\'XSS\'));">Test</div>',
+                ],
+                'expected' => [
+                    'animal' => 'Test',
                 ],
             ],
         ];
