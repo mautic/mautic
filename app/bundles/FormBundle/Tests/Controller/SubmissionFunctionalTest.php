@@ -764,6 +764,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @dataProvider formFieldValuesMappingDataProvider
+     *
+     * @param array<string, string> $submissionData
+     * @param array<string, string> $expectedData
      */
     public function testFormFieldValuesMapping(array $submissionData, array $expectedData): void
     {
@@ -912,6 +915,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
+    /**
+     * @return array<string, array{input: array<string, string>, expected: array<string, string>}>
+     */
     public function formFieldValuesMappingDataProvider(): array
     {
         return [
@@ -1020,6 +1026,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @dataProvider formCustomFieldsMappingDataProvider
+     *
+     * @param array<string, string> $submissionData
+     * @param array<string, string> $expectedData
      */
     public function testFormCustomFieldsMapping(array $submissionData, array $expectedData): void
     {
@@ -1123,6 +1132,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
+    /**
+     * @return array<string, array{input: array<string, string>, expected: array<string, string>}>
+     */
     public function formCustomFieldsMappingDataProvider(): array
     {
         return [
@@ -1288,6 +1300,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
     public function htmlFieldSubmissionDataProvider(): array
     {
         return [
