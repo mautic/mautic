@@ -57,6 +57,7 @@
 :root,
 :root[theme="light"] {
   --background: #ffffff;
+  --modal-background: #fff;
   --background-hover: #f1f1f1;
   --background-active: #8d8d8d80;
   --background-selected: #8d8d8d33;
@@ -215,6 +216,7 @@
 }
 :root[theme="solarized-light"] {
   --background: #fdf6e3;
+  --modal-background: #eee8d5;
   --background-hover: #eee8d533;
   --background-active: #eee8d580;
   --background-selected: #eee8d566;
@@ -368,6 +370,7 @@
 }
 :root[theme="dark"] {
   --background: #161616;
+  --modal-background: #262626;
   --background-hover: #292929;
   --background-active: #8d8d8d66;
   --background-selected: #8d8d8d3d;
@@ -517,6 +520,7 @@
 }
 :root[theme="solarized-dark"] {
   --background: #002b36;
+  --modal-background: #002b36;
   --background-hover: #073642;
   --background-active: #586e75;
   --background-selected: #073642;
@@ -666,6 +670,7 @@
 }
 :root[theme="freire"] {
   --background: #1C1C2E;
+  --modal-background: #24243A;
   --background-hover: #232336;
   --background-active: #2A2A40;
   --background-selected: #2A2A40;
@@ -6066,9 +6071,6 @@ input[style]:hover {
   padding: var(--spacing-04) var(--spacing-05);
   color: var(--text-primary);
 }
-.form-control.form-control-widget {
-  padding: 0 var(--spacing-05);
-}
 .form-control + .help-text,
 .form-control + p {
   margin-top: 5px;
@@ -9585,7 +9587,7 @@ form[name="lead"] .contact-avatar {
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--modal-background);
   text-align: center;
 }
 .content-overlay {
