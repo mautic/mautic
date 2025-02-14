@@ -108,6 +108,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     'log' => $log,
                 ];
 
+                $pathIcon = '';
                 if (!empty($log['parent_id'])) {
                     $parentEvent = $this->getParentEvent($log['parent_id']);
                     if ($parentEvent) {
@@ -136,6 +137,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'extra'           => $extra,
                         'contentTemplate' => $template,
                         'icon'            => 'ri-time-line',
+                        'pathIcon'        => $pathIcon,
                         'contactId'       => $log['lead_id'],
                     ]
                 );
