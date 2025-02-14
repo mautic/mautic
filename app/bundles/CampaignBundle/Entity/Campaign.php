@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Entity\ExportableInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -46,7 +45,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     use UuidTrait;
 
     use OptimisticLockTrait;
-    use UuidTrait;
 
     public const TABLE_NAME = 'campaigns';
     /**
@@ -125,11 +123,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $this->id     = null;
 
         parent::__clone();
-    }
-
-    public function getExportKey(): string
-    {
-        return 'campaign';
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

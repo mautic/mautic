@@ -7,7 +7,6 @@ namespace Mautic\FormBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -32,18 +31,23 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function onFormExport(EntityExportEvent $event): void
     {
-        $form = $event->getEntity();
-        if (!$form instanceof Form) {
+        if (EntityExportEvent::EXPORT_FORM_EVENT !== $event->getEntityName()) {
             return;
         }
 
+        $formId       = $event->getEntityId();
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+
+        $form = $this->formModel->getEntity($formId);
+        if (!$form) {
+            return;
+        }
 
         $formActions = $queryBuilder
             ->select('action.name, action.description, action.type, action.action_order, action.properties')
             ->from('form_actions', 'action')
             ->where('action.form_id = :formId')
-            ->setParameter('formId', $form->getId(), \Doctrine\DBAL\ParameterType::INTEGER)
+            ->setParameter('formId', $formId, \Doctrine\DBAL\ParameterType::INTEGER)
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -53,12 +57,12 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             ->select('field.label, field.alias, field.type, field.is_required, field.properties')
             ->from('form_fields', 'field')
             ->where('field.form_id = :formId')
-            ->setParameter('formId', $form->getId(), \Doctrine\DBAL\ParameterType::INTEGER)
+            ->setParameter('formId', $formId, \Doctrine\DBAL\ParameterType::INTEGER)
             ->executeQuery()
             ->fetchAllAssociative();
 
         $data = [
-            'id'                   => $form->getId(),
+            'id'                   => $formId,
             'name'                 => $form->getName(),
             'is_published'         => $form->isPublished(),
             'description'          => $form->getDescription(),
@@ -75,7 +79,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             'form_fields'          => $formFields,
         ];
 
-        $event->addEntity($form->getExportKey(), $data);
+        $event->addEntity(EntityExportEvent::EXPORT_FORM_EVENT, $data);
     }
 
     public function onFormImport(EntityImportEvent $event): void
@@ -99,7 +103,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($forms as $formData) {
-            $form = new Form();
+            $form = new \Mautic\FormBundle\Entity\Form();
             $form->setName($formData['name']);
             $form->setIsPublished((bool) $formData['is_published']);
             $form->setDescription($formData['description'] ?? '');
