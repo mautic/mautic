@@ -62,6 +62,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use DynamicContentEntityTrait;
     use UuidTrait;
 
+    public const ENTITY_NAME = 'email';
+
     /**
      * @var int
      *
