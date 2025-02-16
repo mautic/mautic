@@ -56,6 +56,27 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
     }
 
+    public function testBatchDeleteAction(): void
+    {
+        $role = $this->createRole('Test Role');
+        $user = $this->userSetter($role);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $userRepository = $this->em->getRepository(User::class);
+        // Assert that user has been properly created.
+        $this->assertSame($userRepository->find($user->getId()), $user);
+        $this->client->request('POST', '/s/users/batchDelete?ids=all');
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+        // Asser that user has been deleted
+        $this->assertNull($user->getId());
+        // User with role admin cannot be deleted.
+        $users = $this->em->getRepository(User::class)->findAll();
+        $this->assertEquals(1, count($users));
+        $this->assertEquals('Administrator', $users[0]->getRole()->getName());
+    }
+
     /**
      * @param array<string, string> $data
      */
@@ -198,5 +219,17 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastLogin('2024-02-22 10:30:00');
 
         return $user;
+    }
+
+    private function createRole(string $title): Role
+    {
+        $role = new Role();
+        $role->setName($title);
+        $role->setDescription('The Description');
+
+        $this->em->persist($role);
+        $this->em->flush();
+
+        return $role;
     }
 }
