@@ -550,6 +550,29 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    public function testBatchDeleteAction(): void
+    {
+        $formA  = $this->createForm('Form A', 'form_a');
+        $formB  = $this->createForm('Form B', 'form_b');
+        $formC  = $this->createForm('Form C', 'form_c');
+        // Perform batch delete action for contact A.
+        $this->client->request('POST', sprintf('/s/forms/batchDelete?ids=["%s"]', $formA->getId()));
+        // Assert response is correct.
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $forms = $this->em->getRepository(Form::class)->findAll();
+        $this->assertCount(2, $forms);
+        $formAliases = array_map(function ($form) {return $form->getAlias(); }, $forms);
+        $this->assertNotContains($formA->getAlias(), $formAliases);
+        $this->assertContains($formB->getAlias(), $formAliases);
+        $this->assertContains($formC->getAlias(), $formAliases);
+        // Perform batch delete action for all.
+        $this->client->request('POST', '/s/forms/batchDelete?ids=all');
+        // Assert that all contacts have been deleted.
+        $forms = $this->em->getRepository(Form::class)->findAll();
+        $this->assertCount(0, $forms);
+    }
+
     /**
      * @param array<string, int|string|array<mixed>> $properties
      */
@@ -688,6 +711,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form->setAlias($alias);
         $form->setPostActionProperty('Success');
         $this->em->persist($form);
+        $this->em->flush();
 
         return $form;
     }
