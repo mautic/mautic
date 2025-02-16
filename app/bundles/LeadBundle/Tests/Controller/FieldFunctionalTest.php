@@ -131,6 +131,32 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringNotContainsString($expectedMessage, $text);
     }
 
+    public function testBatchDeleteFields(): void
+    {
+        // Create fields.
+        $fieldA = $this->createField('a');
+        $fieldB = $this->createField('b');
+        $this->em->persist($fieldA);
+        $this->em->persist($fieldB);
+        $this->em->flush();
+        // Assert that the fields have been created.
+        $fieldRepository = $this->em->getRepository(LeadField::class);
+        $this->assertSame($fieldA, $fieldRepository->find($fieldA->getId()));
+        $this->assertSame($fieldB, $fieldRepository->find($fieldB->getId()));
+        // Batch delete all fields.
+        $this->client->request(Request::METHOD_POST, '/s/contacts/fields/batchDelete?ids=all');
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+        $content = $response->getContent();
+        // Assert that certain fields cannot be deleted.
+        $this->assertStringContainsString("Field 'Title' is used internally and cannot be deleted.", $content);
+        $this->assertStringContainsString("Field 'Email' is used internally and cannot be deleted.", $content);
+        // Assert that the created fields were deleted.
+        $this->assertStringContainsString(' fields have been deleted!', $content);
+        $this->assertNull($fieldA->getId());
+        $this->assertNull($fieldB->getId());
+    }
+
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */
