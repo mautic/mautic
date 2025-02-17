@@ -472,7 +472,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->security->isAnonymous() && (!$emailEntity->isPublished() || !$publicPreview))
+            ($this->security->isAnonymous() && !$publicPreview)
             || (!$this->security->isAnonymous()
                 && !$this->security->hasEntityAccess(
                     'email:emails:viewown',
@@ -486,7 +486,7 @@ class PublicController extends CommonFormController
         // bogus ID
         if ($contactId && (
             !$this->security->isAdmin()
-            || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+            && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
         )
         ) {
             // disallow displaying contact information

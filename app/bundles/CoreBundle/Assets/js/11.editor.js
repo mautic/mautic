@@ -284,8 +284,8 @@ Mautic.getCKEditorFonts = function(fonts) {
     const CKEditorFonts = [];
 
     for (let i = 0; i < fonts.length; i++) {
-        if ('undefined' != typeof fonts[i].name) {
-            CKEditorFonts.push(fonts[i].name);
+        if ('undefined' != typeof fonts[i].font) {
+            CKEditorFonts.push(fonts[i].font);
         }
     }
 
@@ -361,7 +361,9 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
                         rel: 'noopener noreferrer'
                     }
                 }
-            }
+            },
+            // You can use `s?` suffix like below to allow both `http` and `https` protocols at the same time.
+            allowedProtocols: [ 'https?', 'tel', 'sms', 'sftp', 'smb', 'slack' ]
         },
         htmlSupport: {
             allow: [

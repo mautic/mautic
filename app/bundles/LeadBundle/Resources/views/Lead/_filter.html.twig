@@ -16,7 +16,7 @@
     {% if 'list' == indexMode %}
         {% set toolbarButtons = toolbarButtons|merge([{
             'attr': {
-                'class': 'hidden-xs btn btn-ghost btn-icon btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ''),
+                'class': 'hidden-xs btn btn-icon btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ' btn-ghost'),
                 'href': 'javascript: void(0)',
                 'onclick': 'Mautic.toggleAnonymousLeads();',
                 'id': 'anonymousLeadButton',

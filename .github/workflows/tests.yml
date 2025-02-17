@@ -151,7 +151,7 @@ jobs:
       run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
 
     - name: Run E2E tests
-      run: ddev exec bin/codecept run acceptance
+      run: ddev composer e2e-test
 
     - name: Upload test artifacts
       if: failure()
