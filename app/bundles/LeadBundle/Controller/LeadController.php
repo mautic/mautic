@@ -1477,8 +1477,18 @@ class LeadController extends FormController
                             $mailer->setEmail($emailEntity);
                         }
 
+                        // Initialize mailer attributes.
+                        $mailFromName = $this->coreParametersHelper->get('mailer_from_name');
+                        $mailFrom     = $this->coreParametersHelper->get('mailer_from_email');
+                        $mailReplyTo  = $this->coreParametersHelper->get('mailer_reply_to_email', $mailFrom);
+
+                        $mailFromName = !empty($email['fromname']) ? $email['fromname'] : $mailFromName;
+                        $mailFrom     = !empty($email['from']) ? $email['from'] : $mailFrom;
+                        $mailReplyTo  = !empty($email['replyToAddress']) ? $email['replyToAddress'] : $mailReplyTo;
+
                         // Set Content
-                        $mailer->setReplyTo($email['from']);
+                        $mailer->setFrom($mailFrom, $mailFromName);
+                        $mailer->setReplyTo($mailReplyTo);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
                         $mailer->setLead($leadFields);
