@@ -21,7 +21,7 @@
   {% if isPrototype or fields[object][filterType].label is defined %}
     <div class="segment-filter panel {% if inGroup %}in-group{% endif %}" id="{{ id }}">
         <div class="panel-heading pl-0 pr-0">
-            <div class="panel-glue col-sm-2 pl-0{% if '0' == form.vars.name %} hide{% endif %}">
+            <div class="panel-glue col-sm-3 pl-0{% if '0' == form.vars.name %} hide{% endif %}">
                 {{ form_widget(form.glue) }}
             </div>
             <div class="col-sm-2 pr-0 pull-right">
@@ -57,7 +57,7 @@
             </div>
         </div>
         <div class="panel-body">
-            <div class="col-xs-6 col-sm-2 field-name">
+            <div class="col-xs-6 col-sm-3 field-name">
                 {% set objectLable = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans  %}
                 <span><i class="filter-type-icon {{ filterTypeIconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %} {{ 'mautic.lead_list.filter.field.label'|trans({'%object%': objectLable, '%field%': fields[object][filterType]['label'] })|raw}}{% endif %}</span>
             </div>
@@ -67,7 +67,7 @@
             </div>
 
             {% set hasErrors = (form.properties.vars.errors|length > 0) %}
-            <div class="col-xs-12 col-sm-6 padding-none {% if hasErrors %}has-error{% endif %}">
+            <div class="col-xs-12 col-sm-5 padding-none {% if hasErrors %}has-error{% endif %}">
                 <div class="properties-form">
                     {{ form_widget(form.properties) }}
                 </div>
