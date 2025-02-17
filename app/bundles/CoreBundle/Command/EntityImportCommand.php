@@ -73,7 +73,7 @@ final class EntityImportCommand extends ModeratedCommand
 
         $event = new EntityImportEvent($entityName, $fileData, $userId);
 
-        $this->dispatcher->dispatch($event, 'import_'.$entityName);
+        $this->dispatcher->dispatch($event);
 
         $output->writeln('<info>Campaign data imported successfully.</info>');
 
@@ -87,10 +87,34 @@ final class EntityImportCommand extends ModeratedCommand
             $zip     = new \ZipArchive();
 
             if (true === $zip->open($filePath)) {
-                $jsonFilePath = $zip->getNameIndex(0);
                 $zip->extractTo($tempDir);
+                $jsonFilePath = null;
+                $mediaPath    = $this->pathsHelper->getSystemPath('media').'/files/';
+
+                for ($i = 0; $i < $zip->numFiles; ++$i) {
+                    $filename = $zip->getNameIndex($i);
+
+                    if (str_starts_with($filename, 'assets/')) {
+                        $sourcePath      = $tempDir.'/'.$filename;
+                        $destinationPath = $mediaPath.substr($filename, strlen('assets/'));
+
+                        if (is_dir($sourcePath)) {
+                            @mkdir($destinationPath, 0755, true);
+                        } else {
+                            @mkdir(dirname($destinationPath), 0755, true);
+                            copy($sourcePath, $destinationPath);
+                        }
+                    } elseif ('json' === pathinfo($filename, PATHINFO_EXTENSION)) {
+                        $jsonFilePath = $tempDir.'/'.$filename;
+                    }
+                }
+
                 $zip->close();
-                $filePath = $tempDir.'/'.$jsonFilePath;
+                if ($jsonFilePath) {
+                    $filePath = $jsonFilePath;
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }

@@ -113,7 +113,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         }
     }
 
-    private function onImport(EntityImportEvent $event): void
+    public function onImport(EntityImportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
             return;

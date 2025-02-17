@@ -15,13 +15,6 @@ class EntityImportEvent extends Event
      */
     private array $dependencies = [];
 
-    public const IMPORT_CAMPAIGN         = 'import_campaign';
-    public const IMPORT_CAMPAIGN_EVENT   = 'import_campaign_event';
-    public const IMPORT_SEGMENT_EVENT    = 'import_segment';
-    public const IMPORT_FORM_EVENT       = 'import_form';
-    public const IMPORT_ASSET_EVENT      = 'import_asset';
-    public const IMPORT_PAGE_EVENT       = 'import_page';
-
     public function __construct(private string $entityName, private array $data, private int $userId)
     {
     }
@@ -58,14 +51,6 @@ class EntityImportEvent extends Event
     {
         return $this->idMap;
     }
-
-    /**
-     * Add multiple entities to the collection.
-     */
-    // public function addEntities(array $entities): void
-    // {
-    //     $this->entities = array_merge($this->entities, $entities);
-    // }
 
     /**
      * Get dependencies.
