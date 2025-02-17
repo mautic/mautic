@@ -472,7 +472,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->security->isAnonymous() && (!$emailEntity->isPublished() || !$publicPreview))
+            ($this->security->isAnonymous() && !$publicPreview)
             || (!$this->security->isAnonymous()
                 && !$this->security->hasEntityAccess(
                     'email:emails:viewown',

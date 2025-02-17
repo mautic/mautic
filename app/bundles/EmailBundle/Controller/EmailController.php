@@ -935,7 +935,7 @@ class EmailController extends FormController
             || !$this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
-                $entity->getCreatedBy()
+                $emailEntity->getCreatedBy()
             )
         ) {
             return $this->accessDenied();
@@ -1674,12 +1674,19 @@ class EmailController extends FormController
         $objectId,
         $page = 1
     ) {
+        $permissions = [
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            'email:emails:viewown',
+            'email:emails:viewother',
+        ];
+
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,
             $objectId,
             $page,
-            ['email:emails:viewown', 'email:emails:viewother'],
+            $permissions,
             'email',
             'email_stats',
             'email',

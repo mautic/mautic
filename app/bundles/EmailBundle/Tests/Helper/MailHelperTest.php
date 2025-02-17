@@ -46,6 +46,7 @@ class MailHelperTest extends TestCase
     private $defaultParams = [
         ['mailer_from_email', null, 'nobody@nowhere.com'],
         ['mailer_from_name', null, 'No Body'],
+        ['mailer_address_length_limit', null, 320],
     ];
 
     private FromEmailHelper $fromEmailHelper;
@@ -140,6 +141,7 @@ class MailHelperTest extends TestCase
                     [
                         ['mailer_return_path', false, null],
                         ['mailer_spool_type', false, 'memory'],
+                        ['mailer_address_length_limit', false, 320],
                     ]
                 )
             );
@@ -1137,5 +1139,57 @@ class MailHelperTest extends TestCase
         $body = $transport->getMessage()->getHtmlBody();
 
         $this->assertSame('<img src="cid:abcdefg"><img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
+    }
+
+    public function testAddToWithLongAddress(): void
+    {
+        $params = [
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, 30], // Set a small address length limit for testing
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $longName = 'This is a very long name that exceeds the length limit';
+        $email    = 'test@example.com';
+
+        $result = $mailer->addTo($email, $longName);
+
+        $this->assertTrue($result);
+
+        $to = $mailer->message->getTo();
+        $this->assertCount(1, $to);
+        $this->assertEquals($email, $to[0]->getAddress());
+        $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
+
+        // Test with a short name
+        $shortName = 'Short Name';
+        $mailer->reset();
+        $result = $mailer->addTo($email, $shortName);
+
+        $this->assertTrue($result);
+
+        $to = $mailer->message->getTo();
+        $this->assertCount(1, $to);
+        $this->assertEquals($email, $to[0]->getAddress());
+        $this->assertEquals($shortName, $to[0]->getName()); // Short name should be used
+
+        // Test with long encoded name
+        $longName = 'อดุลย์ ';
+        $mailer->reset();
+        $email = 'test@example.com';
+
+        $result = $mailer->addTo($email, $longName);
+
+        $this->assertTrue($result);
+
+        $to = $mailer->message->getTo();
+        $this->assertCount(1, $to);
+        $this->assertEquals($email, $to[0]->getAddress());
+        $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
     }
 }
