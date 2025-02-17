@@ -261,19 +261,6 @@ class MailHelper
         $this->message = $this->getMessageInstance();
     }
 
-    public function generateUuidV4()
-    {
-        $data = random_bytes(16);
-
-        // Set the version to 0100 (UUID v4)
-        $data[6] = chr(ord($data[6]) & 0x0F | 0x40);
-
-        // Set the variant to 10xx
-        $data[8] = chr(ord($data[8]) & 0x3F | 0x80);
-
-        return vsprintf('%08s-%04s-%04s-%04s-%12s', str_split(bin2hex($data), 4));
-    }
-
     /**
      * Mirrors previous MauticFactory functionality.
      *
@@ -1153,8 +1140,7 @@ class MailHelper
     public function setIdHash($idHash = null, $statToBeGenerated = true): void
     {
         if (null === $idHash) {
-            // $idHash = str_replace('.', '', uniqid('', true));
-            $idHash = $this->generateUuidV4();
+            $idHash = str_replace('.', '', uniqid('', true));
         }
 
         $this->idHash      = $idHash;
