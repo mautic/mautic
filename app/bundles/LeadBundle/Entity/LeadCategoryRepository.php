@@ -99,7 +99,7 @@ class LeadCategoryRepository extends CommonRepository
         $parentQ->setParameter('bundles', $types, ArrayParameterType::STRING);
 
         // Get the category ids for particular lead
-        $subQ = $this->getEntityManager()->getRepository(LeadCategory::class)->createQueryBuilder('lc');
+        $subQ = $this->createQueryBuilder('lc');
         $subQ->select('IDENTITY(lc.category)');
         $subQ->where($subQ->expr()->eq('lc.lead', ':leadId'));
         $subQ->setParameter('leadId', $lead->getId());
