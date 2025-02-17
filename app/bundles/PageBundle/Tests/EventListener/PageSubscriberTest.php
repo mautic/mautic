@@ -84,13 +84,13 @@ EOF
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $assetsHelperMock   = new AssetsHelper($packagesMock, $coreParametersHelper);
-        $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
-        $auditLogModelMock  = $this->createMock(AuditLogModel::class);
-        $hitRepository      = $this->createMock(HitRepository::class);
-        $contactRepository  = $this->createMock(LeadRepository::class);
-        $hitMock            = $this->createMock(Hit::class);
-        $leadMock           = $this->createMock(Lead::class);
+        $assetsHelperMock     = new AssetsHelper($packagesMock, $coreParametersHelper);
+        $ipLookupHelperMock   = $this->createMock(IpLookupHelper::class);
+        $auditLogModelMock    = $this->createMock(AuditLogModel::class);
+        $hitRepository        = $this->createMock(HitRepository::class);
+        $contactRepository    = $this->createMock(LeadRepository::class);
+        $hitMock              = $this->createMock(Hit::class);
+        $leadMock             = $this->createMock(Lead::class);
         $languageHelper       = $this->createMock(LanguageHelper::class);
 
         $assetsHelperMock->addScriptDeclaration("const foo='bar';", 'onPageDisplay_bodyOpen');
