@@ -54,6 +54,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     use FiltersEntityTrait;
     use UuidTrait;
 
+    public const ENTITY_NAME = 'dynamicContent';
+
     /**
      * @var int
      */
