@@ -388,6 +388,22 @@ class FieldType extends AbstractType
                     ],
                 ]
             );
+
+            $isReadOnlyValue = (bool) ($options['data']['isReadOnly'] ?? false);
+            $builder->add(
+                'isReadOnly',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.form.field.form.read_only',
+                    'data'  => $isReadOnlyValue,
+                    'attr'  => [
+                        'class'           => 'read-only-data',
+                        'tooltip'         => 'mautic.form.field.help.auto_fill',
+                        'data-disable-on' => '{"formfield_isAutoFill_0": "checked"}',
+                        'data-enable-on'  => '{"formfield_isAutoFill_1": "checked"}',
+                    ],
+                ]
+            );
         }
 
         if ($addMappedFieldList) {

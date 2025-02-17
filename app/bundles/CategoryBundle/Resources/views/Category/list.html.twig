@@ -160,6 +160,7 @@
                                     {% if permissions[permissionBase ~ ':edit'] %}
                                         </a>
                                     {% endif %}
+                                    {{ customContent('category.name', _context) }}
                                 </div>
                                 {% set description = item.getDescription() %}
                                 {% if description %}

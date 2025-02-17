@@ -126,6 +126,7 @@
                             {% else %}
                                 {{ item.getName() }}
                             {% endif %}
+                            {{ customContent('stage.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}

@@ -8,5 +8,6 @@ class DateDayToday extends DateDayAbstract
 {
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
+        $dateTimeHelper->modify('midnight today');
     }
 }

@@ -318,7 +318,9 @@ return [
         ],
     ],
     'categories' => [
-        'segment' => null,
+        'segment' => [
+            'class' => Mautic\LeadBundle\Entity\LeadList::class,
+        ],
     ],
     'services' => [
         'events' => [

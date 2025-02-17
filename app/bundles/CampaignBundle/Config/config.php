@@ -111,7 +111,9 @@ return [
     ],
 
     'categories' => [
-        'campaign' => null,
+        'campaign' => [
+            'class' => Mautic\CampaignBundle\Entity\Campaign::class,
+        ],
     ],
 
     'services' => [

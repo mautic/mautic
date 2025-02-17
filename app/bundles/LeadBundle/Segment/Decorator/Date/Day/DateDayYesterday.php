@@ -8,6 +8,6 @@ class DateDayYesterday extends DateDayAbstract
 {
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->modify('-1 day');
+        $dateTimeHelper->modify('midnight yesterday');
     }
 }

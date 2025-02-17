@@ -3,24 +3,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Form\Type\SlotButtonType;
-use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
-use Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType;
-use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
-use Mautic\CoreBundle\Form\Type\SlotDwcType;
-use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
-use Mautic\CoreBundle\Form\Type\SlotImageCardType;
-use Mautic\CoreBundle\Form\Type\SlotImageType;
-use Mautic\CoreBundle\Form\Type\SlotPreferredChannelType;
-use Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType;
-use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
-use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
-use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
-use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
-use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
-use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -72,7 +55,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
     private array $renderedContentCache = [];
 
     public function __construct(
-        private CorePermissions $security,
         private TokenHelper $tokenHelper,
         private IntegrationHelper $integrationHelper,
         private PageModel $pageModel,
@@ -169,167 +151,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 )
             );
         }
-
-        if ($event->slotTypesRequested()) {
-            $event->addSlotType(
-                'text',
-                $this->translator->trans('mautic.core.slot.label.text'),
-                'font',
-                '@MauticCore/Slots/text.html.twig',
-                SlotTextType::class,
-                1000
-            );
-            $event->addSlotType(
-                'image',
-                $this->translator->trans('mautic.core.slot.label.image'),
-                'image',
-                '@MauticCore/Slots/image.html.twig',
-                SlotImageType::class,
-                900
-            );
-            $event->addSlotType(
-                'imagecard',
-                $this->translator->trans('mautic.core.slot.label.imagecard'),
-                'id-card-o',
-                '@MauticCore/Slots/imagecard.html.twig',
-                SlotImageCardType::class,
-                870
-            );
-            $event->addSlotType(
-                'imagecaption',
-                $this->translator->trans('mautic.core.slot.label.imagecaption'),
-                'image',
-                '@MauticCore/Slots/imagecaption.html.twig',
-                SlotImageCaptionType::class,
-                850
-            );
-            $event->addSlotType(
-                'button',
-                $this->translator->trans('mautic.core.slot.label.button'),
-                'external-link',
-                '@MauticCore/Slots/button.html.twig',
-                SlotButtonType::class,
-                800
-            );
-            $event->addSlotType(
-                'socialshare',
-                $this->translator->trans('mautic.core.slot.label.socialshare'),
-                'share-alt',
-                '@MauticCore/Slots/socialshare.html.twig',
-                SlotSocialShareType::class,
-                700
-            );
-            $event->addSlotType(
-                'socialfollow',
-                $this->translator->trans('mautic.core.slot.label.socialfollow'),
-                'twitter',
-                '@MauticCore/Slots/socialfollow.html.twig',
-                SlotSocialFollowType::class,
-                600
-            );
-            if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
-                $event->addSlotType(
-                    'segmentlist',
-                    $this->translator->trans('mautic.core.slot.label.segmentlist'),
-                    'list-alt',
-                    '@MauticCore/Slots/segmentlist.html.twig',
-                    SlotSegmentListType::class,
-                    590
-                );
-                $event->addSlotType(
-                    'categorylist',
-                    $this->translator->trans('mautic.core.slot.label.categorylist'),
-                    'bookmark-o',
-                    '@MauticCore/Slots/categorylist.html.twig',
-                    SlotCategoryListType::class,
-                    580
-                );
-                $event->addSlotType(
-                    'preferredchannel',
-                    $this->translator->trans('mautic.core.slot.label.preferredchannel'),
-                    'envelope-o',
-                    '@MauticCore/Slots/preferredchannel.html.twig',
-                    SlotPreferredChannelType::class,
-                    570
-                );
-                $event->addSlotType(
-                    'channelfrequency',
-                    $this->translator->trans('mautic.core.slot.label.channelfrequency'),
-                    'calendar',
-                    '@MauticCore/Slots/channelfrequency.html.twig',
-                    SlotChannelFrequencyType::class,
-                    560
-                );
-                $event->addSlotType(
-                    'saveprefsbutton',
-                    $this->translator->trans('mautic.core.slot.label.saveprefsbutton'),
-                    'floppy-o',
-                    '@MauticCore/Slots/saveprefsbutton.html.twig',
-                    SlotSavePrefsButtonType::class,
-                    540
-                );
-
-                $event->addSlotType(
-                    'successmessage',
-                    $this->translator->trans('mautic.core.slot.label.successmessage'),
-                    'check',
-                    '@MauticCore/Slots/successmessage.html.twig',
-                    SlotSuccessMessageType::class,
-                    540
-                );
-            }
-            $event->addSlotType(
-                'codemode',
-                $this->translator->trans('mautic.core.slot.label.codemode'),
-                'code',
-                '@MauticCore/Slots/codemode.html.twig',
-                SlotCodeModeType::class,
-                500
-            );
-            $event->addSlotType(
-                'separator',
-                $this->translator->trans('mautic.core.slot.label.separator'),
-                'minus',
-                '@MauticCore/Slots/separator.html.twig',
-                SlotSeparatorType::class,
-                400
-            );
-            $event->addSlotType(
-                'dwc',
-                $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
-                'sticky-note-o',
-                '@MauticCore/Slots/dwc.html.twig',
-                SlotDwcType::class,
-                200
-            );
-        }
-
-        if ($event->sectionsRequested()) {
-            $event->addSection(
-                'one-column',
-                $this->translator->trans('mautic.core.slot.label.onecolumn'),
-                'file-text-o',
-                '@MauticCore/Sections/one-column.html.twig',
-                null,
-                1000
-            );
-            $event->addSection(
-                'two-column',
-                $this->translator->trans('mautic.core.slot.label.twocolumns'),
-                'columns',
-                '@MauticCore/Sections/two-column.html.twig',
-                null,
-                900
-            );
-            $event->addSection(
-                'three-column',
-                $this->translator->trans('mautic.core.slot.label.threecolumns'),
-                'th',
-                '@MauticCore/Sections/three-column.html.twig',
-                null,
-                800
-            );
-        }
     }
 
     public function onPageDisplay(Events\PageDisplayEvent $event): void
@@ -386,25 +207,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
     private function handlePreferenceCenterReplacements(string $content, array $params): string
     {
         $xpath = $this->createDOMXPathForContent($content);
-
-        if ($saveButton = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0)) {
-            $params['saveprefsbutton'] = [
-                'style'      => $saveButton->getAttribute('style'),
-                'background' => $saveButton->getAttribute('background'),
-            ];
-        }
-
-        $slotNamesAndConfig = [
-            'segmentlist'      => [static::segmentListRegex, (bool) ($params['showContactSegments'] ?? false)],
-            'categorylist'     => [static::categoryListRegex, (bool) ($params['showContactCategories'] ?? false)],
-            'preferredchannel' => [static::preferredchannel, (bool) ($params['showContactPreferredChannels'] ?? false)],
-            'channelfrequency' => [static::channelfrequency, (bool) (($params['showContactFrequency'] ?? false) || ($params['showContactPauseDates'] ?? false))],
-            'saveprefsbutton'  => [static::saveprefsRegex, true],
-        ];
-
-        foreach ($slotNamesAndConfig as $slotName => list($tokenValue, $shouldShow)) {
-            $this->setSlotContentToTokenForReplacement($xpath, $slotName, $tokenValue, $shouldShow);
-        }
 
         $content = $this->replacePreferenceCenterTokens($xpath->document->saveHTML(), $params);
 
@@ -587,21 +389,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    private function setSlotContentToTokenForReplacement(\DOMXPath $xpath, string $slotName, string $tokenValue, bool $shouldShow): void
-    {
-        $nodeList = $xpath->query(sprintf('//*[@data-slot="%s"]', $slotName));
-
-        /** @var \DOMElement $node */
-        foreach ($nodeList as $node) {
-            if ($shouldShow) {
-                $node->nodeValue = $tokenValue;
-                $node->setAttribute('data-prefs-center', '1');
-            } else {
-                $node->parentNode->removeChild($node);
-            }
-        }
-    }
-
     private function createDOMXPathForContent(string $content): \DOMXPath
     {
         $domDocument = new \DOMDocument('1.0', 'utf-8');
@@ -620,7 +407,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         $xpath = $this->createDOMXPathForContent($content);
-        $node  = $this->getFirstNodeThatContainsAPreferenceCenterSlot($xpath);
+        $node  = $this->getFirstNodeThatContainsAPreferenceCenterToken($xpath);
 
         if (null === $node) {
             return $content;
@@ -634,15 +421,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         return str_replace(['<startform></startform>', '<endform></endform>'], [$params['startform'], '</form>'], $xpath->document->saveHTML());
     }
 
-    private function getFirstNodeThatContainsAPreferenceCenterSlot(\DOMXPath $xpath): ?\DOMNode
+    private function getFirstNodeThatContainsAPreferenceCenterToken(\DOMXPath $xpath): ?\DOMNode
     {
-        // Query if we're using slots.
-        $nodeList = $xpath->query('//*[@data-prefs-center="1"]');
-
-        if (!$nodeList->length) {
-            // If slots aren't found, query for tokens
-            $nodeList = $xpath->query('//*[@data-prefs-center-first="1"]');
-        }
+        $nodeList = $xpath->query('//*[@data-prefs-center-first="1"]');
 
         if (false !== $nodeList) {
             return $nodeList->item(0);
