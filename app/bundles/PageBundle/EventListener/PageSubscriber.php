@@ -47,7 +47,7 @@ class PageSubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
         if (!array_key_exists($page->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
-          $this->languageHelper->extractLanguagePackage($page->getLanguage());
+            $this->languageHelper->extractLanguagePackage($page->getLanguage());
         }
     }
 
