@@ -91,7 +91,7 @@ class GeneratedColumnSubscriberTest extends TestCase
                     'mautic.core.operator.contains'             => 'contains',
                 ],
                 'object'    => 'lead',
-                'iconClass' => 'ri-list-check-2'
+                'iconClass' => 'ri-list-check-2',
             ],
             $event->getChoices()['lead']['generated_email_domain']
         );
