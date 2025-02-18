@@ -221,7 +221,7 @@ class Interval implements ScheduleModeInterface
             $groupDateTime = clone $compareFromDateTime;
         }
 
-        if ($daysOfWeek) {
+        if ([] !== $daysOfWeek) {
             $this->logger->debug(
                 sprintf(
                     'CAMPAIGN: Scheduling event ID %s for contact ID %s based on DOW restrictions of %s',
@@ -230,6 +230,10 @@ class Interval implements ScheduleModeInterface
                     implode(',', $daysOfWeek)
                 )
             );
+
+            if (in_array(7, $daysOfWeek, true) || in_array('7', $daysOfWeek, true)) {
+                throw new \LogicException('The Mautic accepts only 0-6 as day of week (0 is Sunday).');
+            }
 
             // Schedule for the next day of the week if applicable
             while (!in_array((int) $groupDateTime->format('w'), $daysOfWeek)) {
