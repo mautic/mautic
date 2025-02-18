@@ -164,12 +164,18 @@ class CampaignController extends AbstractStandardFormController
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
+        $permissions = [
+            'campaign:campaigns:view',
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+        ];
+
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,
             $objectId,
             $page,
-            'campaign:campaigns:view',
+            $permissions,
             'campaign',
             'campaign_leads',
             null,
@@ -929,6 +935,9 @@ class CampaignController extends AbstractStandardFormController
                 $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
                 $this->prepareCampaignEventsForEdit($entity, $objectId, true);
 
+                $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);
+                $showEmailStats      = $isEmailStatsEnabled && $entity->isEmailCampaign();
+
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
@@ -940,6 +949,7 @@ class CampaignController extends AbstractStandardFormController
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
                         'campaignEvents'  => $events,
+                        'showEmailStats'  => $showEmailStats,
                     ]
                 );
                 break;

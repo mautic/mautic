@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
@@ -20,7 +21,7 @@ class ThemeController extends FormController
     /**
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper)
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -34,7 +35,7 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
-        $dir    = $this->factory->getSystemPath('themes', true);
+        $dir    = $pathsHelper->getSystemPath('themes', true);
         $action = $this->generateUrl('mautic_themes_index');
         $form   = $this->formFactory->create(ThemeUploadType::class, [], ['action' => $action]);
 

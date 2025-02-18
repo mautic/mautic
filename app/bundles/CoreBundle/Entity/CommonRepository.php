@@ -18,6 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -331,6 +332,21 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         return $this->getEntityManager()->getRepository($entityClass)->getBaseColumns($entityClass, $returnColumnNames);
+    }
+
+    /**
+     * @param array<string, string|array<int, array<int|string, int|string|bool|null>>> $filter
+     */
+    public function getEntitiesForGlobalSearch(array $filter): Paginator
+    {
+        $args = [
+            'filter'           => $filter,
+            'start'            => 0,
+            'limit'            => GlobalSearchEvent::RESULTS_LIMIT,
+            'ignore_paginator' => false,
+        ];
+
+        return $this->getEntities($args);
     }
 
     /**
@@ -837,6 +853,13 @@ class CommonRepository extends ServiceEntityRepository
             if ($metadata->isIdentifier($fieldName)) {
                 if ($value) {
                     $hasId = true;
+                } elseif ($fieldName === $identifier) {
+                    // https://bugs.php.net/bug.php?id=76896
+                    // mysql_last_insert_id might return 0 if our insert updates a row
+                    // Call LAST_INSERT_ID() for the column to ensure the correct value
+                    $column   = $metadata->getColumnName($fieldName);
+                    $update[] = "{$column} = LAST_INSERT_ID({$column})";
+                    continue;
                 } else {
                     continue;
                 }

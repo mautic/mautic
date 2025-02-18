@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
@@ -40,7 +41,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Asset>
  */
-class AssetModel extends FormModel
+class AssetModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var int

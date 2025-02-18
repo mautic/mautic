@@ -4,8 +4,8 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -50,8 +51,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&Environment $twig */
         $twig = $this->createMock(Environment::class);
 
-        $slotsHelper = new SlotsHelper();
-        $themeHelper = $this->createMock(ThemeHelper::class);
+        $requestStack = new RequestStack();
+        $themeHelper  = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
@@ -78,8 +79,9 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $router,
             $twig,
             $themeHelper,
-            $slotsHelper,
-            $this->createMock(EventDispatcherInterface::class)
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $requestStack,
         );
         $mailHelper->setTokens($tokens);
 

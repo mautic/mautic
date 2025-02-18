@@ -1,20 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private StageModel $stageModel,
         private CorePermissions $security,
-        private Environment $twig,
+        private GlobalSearch $globalSearch,
     ) {
     }
 
@@ -28,43 +31,15 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
-        if ($this->security->isGranted('stage:stages:view')) {
-            $str = $event->getSearchString();
-            if (empty($str)) {
-                return;
-            }
+        $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
+        $results   = $this->globalSearch->performSearch(
+            $filterDTO,
+            $this->stageModel,
+            '@MauticStage/SubscribedEvents/Search/global.html.twig'
+        );
 
-            $items = $this->stageModel->getEntities(
-                [
-                    'limit'  => 5,
-                    'filter' => $str,
-                ]);
-            $stageCount = count($items);
-            if ($stageCount > 0) {
-                $stagesResults = [];
-                $canEdit       = $this->security->isGranted('stage:stages:edit');
-                foreach ($items as $item) {
-                    $stagesResults[] = $this->twig->render(
-                        '@MauticStage/SubscribedEvents/Search/global.html.twig',
-                        [
-                            'item'    => $item,
-                            'canEdit' => $canEdit,
-                        ]
-                    );
-                }
-                if ($stageCount > 5) {
-                    $stagesResults[] = $this->twig->render(
-                        '@MauticStage/SubscribedEvents/Search/global.html.twig',
-                        [
-                            'showMore'     => true,
-                            'searchString' => $str,
-                            'remaining'    => ($stageCount - 5),
-                        ]
-                    );
-                }
-                $stagesResults['count'] = $stageCount;
-                $event->addResults('mautic.stage.actions.header.index', $stagesResults);
-            }
+        if (!empty($results)) {
+            $event->addResults('mautic.stage.actions.header.index', $results);
         }
     }
 

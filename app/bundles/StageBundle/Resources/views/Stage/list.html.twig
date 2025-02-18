@@ -13,12 +13,18 @@
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue': searchValue,
         'action': currentRoute,
-        'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+        'page_actions': {
             'templateButtons': {
                 'new': permissions['stage:stages:create'],
             },
             'routeBase': 'stage',
-        }),
+        },
+        'bulk_actions': {
+            'routeBase': 'stage',
+            'templateButtons': {
+                'delete': permissions['stage:stages:delete']
+            }
+        },
         'quickFilters': [
             {
                 'search': 'mautic.core.searchcommand.ispublished',
@@ -46,6 +52,7 @@
             }
         ]
     }) }}
+
     <div class="page-list">
         {{ block('listResults') }}
     </div>
@@ -64,11 +71,7 @@
                 {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'        : 'true',
-                        'target'          : '#stageTable',
-                        'routeBase'       : 'stage',
-                        'templateButtons' : {
-                            'delete' : permissions['stage:stages:delete'],
-                        },
+                        'target'          : '#stageTable'
                     }) -}}
                     {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
@@ -123,10 +126,11 @@
                             {% else %}
                                 {{ item.getName() }}
                             {% endif %}
+                            {{ customContent('stage.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ description|purify }}</small>
                             </div>
                         {% endif %}

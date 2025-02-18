@@ -668,7 +668,7 @@ var Mautic = {
                 }
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-muted'];
+                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-secondary'];
                 var appendClasses = "";
 
                 for (var j = 0; j < specialClasses.length; j++) {

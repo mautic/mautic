@@ -174,6 +174,16 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
         $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
 
+        // Assert date modified
+        $this->assertNotEmpty($response['contacts'][0]['dateModified']);
+        $this->assertNotEmpty($response['contacts'][1]['dateModified']);
+        $this->assertNotEmpty($response['contacts'][2]['dateModified']);
+
+        // Assert date added
+        $this->assertNotEmpty($response['contacts'][0]['dateAdded']);
+        $this->assertNotEmpty($response['contacts'][1]['dateAdded']);
+        $this->assertNotEmpty($response['contacts'][2]['dateAdded']);
+
         // Emulate an unsanitized email to ensure that doesn't cause duplicates
         $payload[0]['email'] = 'batchemail1@email.com,';
 
@@ -328,6 +338,37 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
         $this->assertGreaterThanOrEqual(1, $response['contacts'][0]['id']);
         $this->assertEquals('batchemail1@email.com', $response['contacts'][0]['fields']['all']['email']);
+    }
+
+    public function testSearchContactsWithSpecialCharacters(): void
+    {
+        $contact = new Lead();
+        $contact->setFirstname('O\'neal');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        // Test with an apostropy with URL encoding.
+        $this->client->request(
+            'GET',
+            '/api/contacts',
+            [
+                'where' => [
+                    [
+                        'val'  => 'O\'neal',
+                        'col'  => 'firstname',
+                        'expr' => 'eq',
+                    ],
+                ],
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        Assert::assertTrue($this->client->getResponse()->isOk(), $clientResponse->getContent());
+        $payload = json_decode($clientResponse->getContent(), true);
+        Assert::assertEquals(1, $payload['total']);
+        $contactFromApi = $payload['contacts'][$contact->getId()];
+        Assert::assertEquals($contact->getId(), $contactFromApi['id']);
+        Assert::assertEquals($contact->getFirstname(), $contactFromApi['fields']['all']['firstname']);
     }
 
     public function testSingleNewEndpointCreateAndUpdate(): void

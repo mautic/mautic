@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
@@ -28,7 +29,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Message>
  */
-class MessageModel extends FormModel implements AjaxLookupModelInterface
+class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     public const CHANNEL_FEATURE = 'marketing_messages';
 

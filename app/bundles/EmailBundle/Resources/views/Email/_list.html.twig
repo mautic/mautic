@@ -4,25 +4,7 @@
             <thead>
             <tr>
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
-                    'checkall'        : 'true',
-                    'routeBase'       : 'email',
-                    'templateButtons' : {
-                        'delete' : permissions['email:emails:deleteown'] or permissions['email:emails:deleteother'],
-                    },
-                    'customButtons': [
-                        {
-                            'attr': {
-                                'class': 'btn btn-default btn-sm btn-nospin',
-                                'data-toggle': 'ajaxmodal',
-                                'data-target': '#MauticSharedModal',
-                                'href': path('mautic_email_batch_categories_view'),
-                                'data-header': 'mautic.email.batch.categories'|trans,
-                            },
-                            'btnText': 'mautic.email.batch.categories'|trans,
-                            'iconClass': 'ri-folder-line',
-                        },
-                    ],
-                    'tooltip': 'mautic.lead.list.checkall.help'|trans,
+                    'checkall'        : 'true'
                 }) -}}
 
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
@@ -153,7 +135,7 @@
                             </a>
                         </div>
                         {% if item.getDescription() is not empty %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.getDescription()|purify }}</small>
                             </div>
                         {% endif %}

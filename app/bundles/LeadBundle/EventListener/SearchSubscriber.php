@@ -5,13 +5,18 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
+use Mautic\CoreBundle\Event\CommandListEvent;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
@@ -22,10 +27,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private LeadModel $leadModel,
+        private CompanyModel $companyModel,
+        private ListModel $listModel,
         private EmailRepository $emailRepository,
         private TranslatorInterface $translator,
         private CorePermissions $security,
         private Environment $twig,
+        private GlobalSearch $globalSearch,
     ) {
         $this->leadRepo        = $leadModel->getRepository();
     }
@@ -33,13 +41,17 @@ class SearchSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::GLOBAL_SEARCH              => ['onGlobalSearch', 0],
+            CoreEvents::GLOBAL_SEARCH  => [
+                ['onGlobalSearchForContacts', 0],
+                ['onGlobalSearchForCompanies', 0],
+                ['onGlobalSearchForSegments', 0],
+            ],
             CoreEvents::BUILD_COMMAND_LIST         => ['onBuildCommandList', 0],
             LeadEvents::LEAD_BUILD_SEARCH_COMMANDS => ['onBuildSearchCommands', 0],
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
+    public function onGlobalSearchForContacts(GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
         if (empty($str)) {
@@ -68,41 +80,67 @@ class SearchSubscriber implements EventSubscriberInterface
 
             $results = $this->leadModel->getEntities(
                 [
-                    'limit'          => 5,
+                    'limit'          => GlobalSearchEvent::RESULTS_LIMIT,
                     'filter'         => $filter,
                     'withTotalCount' => true,
                 ]);
 
-            $count = $results['count'];
-
-            if ($count > 0) {
-                $leads       = $results['results'];
-                $leadResults = [];
-
-                foreach ($leads as $lead) {
-                    $leadResults[] = $this->twig->render(
-                        '@MauticLead/SubscribedEvents/Search/global.html.twig',
-                        ['lead' => $lead]
-                    );
-                }
-
-                if ($results['count'] > 5) {
-                    $leadResults[] = $this->twig->render(
-                        '@MauticLead/SubscribedEvents/Search/global.html.twig',
-                        [
-                            'showMore'     => true,
-                            'searchString' => $str,
-                            'remaining'    => ($results['count'] - 5),
-                        ]
-                    );
-                }
-                $leadResults['count'] = $results['count'];
-                $event->addResults('mautic.lead.leads', $leadResults);
-            }
+            $this->addGlobalSearchResults(
+                $this->twig,
+                $event,
+                $results,
+                'mautic.lead.leads',
+                '@MauticLead/SubscribedEvents/Search/global.html.twig'
+            );
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
+    public function onGlobalSearchForSegments(GlobalSearchEvent $event): void
+    {
+        $results = $this->globalSearch->performSearch(
+            new GlobalSearchFilterDTO($event->getSearchString()),
+            $this->listModel,
+            '@MauticLead/SubscribedEvents/Search/global_segment.html.twig'
+        );
+
+        if (!empty($results)) {
+            $event->addResults('mautic.segment.segment', $results);
+        }
+    }
+
+    public function onGlobalSearchForCompanies(GlobalSearchEvent $event): void
+    {
+        $str = $event->getSearchString();
+        if (empty($str)) {
+            return;
+        }
+
+        $filter = ['string' => $str, 'force' => ''];
+
+        $permissions = $this->security->isGranted(
+            ['lead:leads:viewown', 'lead:leads:viewother'],
+            'RETURN_ARRAY'
+        );
+
+        if ($permissions['lead:leads:viewown'] || $permissions['lead:leads:viewother']) {
+            $results = $this->companyModel->getEntities(
+                [
+                    'limit'          => GlobalSearchEvent::RESULTS_LIMIT,
+                    'filter'         => $filter,
+                    'withTotalCount' => true,
+                ]);
+
+            $this->addGlobalSearchResults(
+                $this->twig,
+                $event,
+                $results,
+                'mautic.company.company',
+                '@MauticLead/SubscribedEvents/Search/global_company.html.twig'
+            );
+        }
+    }
+
+    public function onBuildCommandList(CommandListEvent $event): void
     {
         if ($this->security->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'MATCH_ONE')) {
             $event->addCommands(
@@ -463,5 +501,40 @@ class SearchSubscriber implements EventSubscriberInterface
         $event->setReturnParameters(true); // replace search string
         $event->setStrict(true);           // don't use like
         $event->setSearchStatus(true);     // finish searching
+    }
+
+    /**
+     * @param array<string, mixed> $results
+     * @param array<string, mixed> $templateParameters
+     */
+    private function addGlobalSearchResults(
+        Environment $twig,
+        GlobalSearchEvent $event,
+        array $results,
+        string $resultKey,
+        string $template,
+        array $templateParameters = [],
+    ): void {
+        $count = $results['count'] ? (int) $results['count'] : 0;
+
+        if (0 === $count) {
+            return;
+        }
+
+        $renderedResults = array_map(
+            fn ($item) => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
+            $results['results']
+        );
+
+        if ($count > GlobalSearchEvent::RESULTS_LIMIT) {
+            $renderedResults[] = $twig->render($template, [
+                'showMore'     => true,
+                'searchString' => $event->getSearchString(),
+                'remaining'    => $count - GlobalSearchEvent::RESULTS_LIMIT,
+            ]);
+        }
+
+        $renderedResults['count'] = $count;
+        $event->addResults($resultKey, $renderedResults);
     }
 }

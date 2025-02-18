@@ -3,13 +3,16 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
+use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
@@ -41,7 +44,7 @@ use Twig\Environment;
 /**
  * @extends CommonFormModel<Form>
  */
-class FormModel extends CommonFormModel
+class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
     public function __construct(
         protected RequestStack $requestStack,
@@ -1063,5 +1066,20 @@ class FormModel extends CommonFormModel
                 );
             }
         }
+    }
+
+    public function getEntitiesForGlobalSearch(GlobalSearchFilterDTO $filterDTO): ?Paginator
+    {
+        $filter = $filterDTO->getFilters();
+
+        if (!$this->canViewOthersEntity()) {
+            $filter['force'][] = [
+                'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->userHelper->getUser()->getId(),
+            ];
+        }
+
+        return $this->getRepository()->getEntitiesForGlobalSearch($filter);
     }
 }

@@ -25,8 +25,11 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
+    private string $previousTimeZone;
+
     protected function setUp(): void
     {
+        $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->dateHelper           = new DateHelper(
@@ -38,6 +41,11 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
             $this->coreParametersHelper
         );
         $this->formatterHelper               = new FormatterHelper($this->dateHelper, $this->translator);
+    }
+
+    protected function tearDown(): void
+    {
+        date_default_timezone_set($this->previousTimeZone);
     }
 
     public function testStrictHtmlFormatIsRemovingScriptTags(): void

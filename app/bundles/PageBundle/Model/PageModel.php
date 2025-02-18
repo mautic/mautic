@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -52,7 +53,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Page>
  */
-class PageModel extends FormModel
+class PageModel extends FormModel implements GlobalSearchInterface
 {
     use TranslationModelTrait;
     use VariantModelTrait;

@@ -27,6 +27,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -496,6 +497,7 @@ class AjaxController extends CommonController
         LanguageHelper $languageHelper,
         CookieHelper $cookieHelper,
         LoggerInterface $mauticLogger,
+        KernelInterface $kernel,
     ): JsonResponse {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -566,7 +568,7 @@ class AjaxController extends CommonController
             }
 
             $input       = new ArgvInput($args);
-            $application = new Application($this->container->get('kernel'));
+            $application = new Application($kernel);
             $application->setAutoExit(false);
             $output = new BufferedOutput();
 
@@ -610,7 +612,7 @@ class AjaxController extends CommonController
             } else {
                 // Upgrading from 1.0.5
 
-                return $this->updateFinalizationAction($request, $cookieHelper);
+                return $this->updateFinalizationAction($request, $cookieHelper, $kernel);
             }
         }
 
@@ -620,14 +622,15 @@ class AjaxController extends CommonController
     /**
      * Finalize update.
      */
-    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper): JsonResponse
+    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper, KernelInterface $kernel): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
 
+        \assert($kernel instanceof \AppKernel);
         // Here as a just in case it's needed for a future upgrade
         $dataArray['success'] = 1;
-        $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', ['%version%' => $this->factory->getVersion()]);
+        $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', ['%version%' => $kernel->getVersion()]);
 
         // Check for a post install message
         if ($postMessage = $request->getSession()->get('post_upgrade_message', false)) {

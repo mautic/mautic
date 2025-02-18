@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -22,6 +23,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -73,7 +75,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
@@ -297,7 +299,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return Paginator|array<string, int|object>
      */
     public function getEntities(array $args = [])
     {
@@ -1125,19 +1127,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function &getEmailSettings(Email $email, $includeVariants = true)
     {
         if (empty($this->emailSettings[$email->getId()])) {
-            // used to house slots so they don't have to be fetched over and over for same template
-            // BC for Mautic v1 templates
-            $slots = [];
-            if ($template = $email->getTemplate()) {
-                $slots[$template] = $this->themeHelper->getTheme($template)->getSlots('email');
-            }
-
             // store the settings of all the variants in order to properly disperse the emails
             // set the parent's settings
             $emailSettings = [
                 $email->getId() => [
                     'template'     => $email->getTemplate(),
-                    'slots'        => $slots,
                     'sentCount'    => $email->getSentCount(),
                     'variantCount' => $email->getVariantSentCount(),
                     'isVariant'    => null !== $email->getVariantStartDate(),
@@ -1178,19 +1172,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                     foreach ($childrenVariant as $child) {
                         if ($child->isPublished()) {
-                            $useSlots = [];
-                            if ($template = $child->getTemplate()) {
-                                if (isset($slots[$template])) {
-                                    $useSlots = $slots[$template];
-                                } else {
-                                    $slots[$template] = $this->themeHelper->getTheme($template)->getSlots('email');
-                                    $useSlots         = $slots[$template];
-                                }
-                            }
                             $variantSettings                = $child->getVariantSettings();
                             $emailSettings[$child->getId()] = [
                                 'template'     => $child->getTemplate(),
-                                'slots'        => $useSlots,
                                 'sentCount'    => $child->getSentCount(),
                                 'variantCount' => $child->getVariantSentCount(),
                                 'isVariant'    => null !== $email->getVariantStartDate(),
@@ -1544,7 +1528,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
+        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
         $mailer->setCc($cc);
         $mailer->setBcc($bcc);
 
@@ -2200,7 +2184,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $mailer = $this->mailHelper->getSampleMailer();
         $mailer->setLead($leadFields, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
+        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
 
         $errors = [];
         foreach ($users as $user) {

@@ -766,7 +766,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';
-        $dateRangeValues = $request->$method->get('daterange', $request->getSession()->get($name, []));
+        $dateRangeValues = $request->$method->all()['daterange'] ?? $request->getSession()->get($name, []);
         $request->getSession()->set($name, $dateRangeValues);
 
         $dateRangeForm = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);
