@@ -153,7 +153,7 @@ class MailHelperTest extends TestCase
     {
         $this->expectException(BatchQueueMaxException::class);
 
-        $this->mockFactory->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
@@ -172,7 +172,7 @@ class MailHelperTest extends TestCase
 
     public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit(): void
     {
-        $this->mockFactory->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
@@ -915,7 +915,9 @@ class MailHelperTest extends TestCase
             $parameterMap
         );
 
-        $mockFactory->method('getParameter')->willReturnMap($parameterMap);
+        $coreParametersHelper = $this->coreParametersHelper;
+
+        $coreParametersHelper->method('get')->willReturnMap($parameterMap);
         $mockFactory->method('getModel')->willReturnMap([['lead', $mockLeadModel]]);
 
         $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
@@ -929,8 +931,8 @@ class MailHelperTest extends TestCase
 
     public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
-        $mockFactory = $this->mockFactory;
-        $mockFactory->method('getParameter')
+        $coreParametersHelper = $this->coreParametersHelper;
+        $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],

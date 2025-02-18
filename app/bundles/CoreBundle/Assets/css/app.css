@@ -6066,6 +6066,9 @@ input[style]:hover {
   padding: var(--spacing-04) var(--spacing-05);
   color: var(--text-primary);
 }
+.form-control.form-control-widget {
+  padding: 0 var(--spacing-05);
+}
 .form-control + .help-text,
 .form-control + p {
   margin-top: 5px;

@@ -239,22 +239,22 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $transport = new BatchTransport(false, 1);
         $mailer    = new Mailer($transport);
 
-        // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
+        // Mock factory to remove when factory is completely gone.
         $factoryMock = $this->createMock(MauticFactory::class);
-        $factoryMock->method('getParameter')
-            ->willReturnCallback(
-                fn ($param) => match ($param) {
-                    default => '',
-                }
-            );
-        $routerMock = $this->createMock(Router::class);
+        $routerMock  = $this->createMock(Router::class);
 
         $requestStack = new RequestStack();
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
-        $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
+        $this->coreParametersHelper->method('get')->willReturnCallback(
+            fn ($param) => match ($param) {
+                'mailer_from_email' => 'nobody@nowhere.com',
+                'secret_key'        => 'secret',
+                default             => '',
+            }
+        );
 
         $themeHelper = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())
@@ -332,9 +332,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $transport = new BatchTransport(false, 1);
         $mailer    = new Mailer($transport);
 
-        // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
+        // Mock factory to remove when factory is completely gone.
         $factoryMock = $this->createMock(MauticFactory::class);
-        $factoryMock->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn ($param) => match ($param) {
                     default => '',
@@ -433,9 +433,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $transport = new BatchTransport(false, 1);
         $mailer    = new Mailer($transport);
 
-        // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
+        // Mock factory to remove when factory is completely gone.
         $factoryMock = $this->createMock(MauticFactory::class);
-        $factoryMock->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn ($param) => match ($param) {
                     default => '',
@@ -535,9 +535,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $transport = new BatchTransport(true, 1);
         $mailer    = new Mailer($transport);
 
-        // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
+        // Mock factory to remove when factory is completely gone.
         $factoryMock = $this->createMock(MauticFactory::class);
-        $factoryMock->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn ($param) => match ($param) {
                     default => '',
@@ -616,14 +616,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         /** @var MockObject&MauticFactory $mockFactory */
         $mockFactory = $this->createMock(MauticFactory::class);
-        $mockFactory->method('getParameter')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['mailer_return_path', false, null],
-                    ]
-                )
-            );
 
         /** @var MockObject&FromEmailHelper $fromEmailHelper */
         $fromEmailHelper = $this->createMock(FromEmailHelper::class);
@@ -652,6 +644,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],
                     ['mailer_from_name', null, 'No Body'],
+                    ['mailer_return_path', false, null],
                 ]
             );
 

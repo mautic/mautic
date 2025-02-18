@@ -23,10 +23,19 @@ As the legacy builder was removed these JS libraries were removed as well:
 - Deprecated `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentiferFields` and `Mautic\LeadBundle\Model\FieldModel::getUniqueIdentifierFields` were removed. Use `Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier` instead.
 - The signature for the `Mautic\PluginBundle\Integration\AbstractIntegration::__construct()` had to be changed as the `SessionInterface` service no longer exists in Symfony 6. So it was removed from the constructor and session is being fetched from the `RequestStack` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getRequest` use dependency injection with RequestStack instead.
+- Removed PluginBundleBase::onPluginInstall, listen to the PluginEvents::ON_PLUGIN_INSTALL instead.
+- Removed PluginBundleBase::onPluginUpdate, listen to the PluginEvents::ON_PLUGIN_UPDATE instead.
+- Moved PluginBundleBase::installPluginSchema to \Mautic\PluginBundle\Bundle\PluginDatabase::installPluginSchema. MauticFactory is removed as parameter.
+- Removed PluginBundleBase::updatePluginSchema, as method was not recommended, and produced bad results.
+- Removed PluginBundleBase::onPluginUninstall, as method was empty.
+- Moved PluginBundleBase::dropPluginSchema to \Mautic\PluginBundle\Bundle\PluginDatabase::dropPluginSchema. Removed MauticFactory as parameter.
+- Removed AbstractPluginBundle::onPluginUpdate, now listening to the PluginEvents::ON_PLUGIN_UPDATE.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getDatabase` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getHelper` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getDebugMode` use dependency injection instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getMauticBundles` use BundleHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getKernel` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getParameter` use DI with the `\Mautic\CoreBundle\Helper\CoreParametersHelper` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getVersion` use dependency injection with KernelInterface, which will retrieve \AppKernel, then invoke getVersion() method.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getPluginBundles` use BundleHelper instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getBundleConfig` use BundleHelper instead.
@@ -72,7 +81,7 @@ As the legacy builder was removed these JS libraries were removed as well:
 - `getSession` was removed from `Mautic\PageBundle\Helper\TrackingHelper` No session for anonymous users. Use `getCacheItem`.
 - `updateSession` was removed from `Mautic\PageBundle\Helper\TrackingHelper` No session for anonymous users. Use `updateCacheItem`.
 - `getNewVsReturningPieChartData` was removed from `Mautic\PageBundle\Model\PageModel`. Use `getUniqueVsReturningPieChartData()` instead.
-
+- Replaced the `tightenco/collect:^8.16.0` package with `illuminate/collections:^10.48`.
 
 ## Most notable changes required by Symfony 6
 
