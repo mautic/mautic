@@ -4,7 +4,6 @@ namespace Mautic\PluginBundle\Tests\Helper;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
 use Mautic\PluginBundle\Event\PluginUpdateEvent;
@@ -15,8 +14,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private MockObject $factoryMock;
-
     private ReloadHelper $helper;
 
     private array $sampleAllPlugins = [];
@@ -35,11 +32,12 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->factoryMock     = $this->createMock(MauticFactory::class);
-        $this->helper          = new ReloadHelper($this->eventDispatcher, $this->factoryMock);
+        $this->helper          = new ReloadHelper($this->eventDispatcher);
 
         $this->sampleMetaData = [
-            'MauticPlugin\MauticZapierBundle' => [$this->createMock(ClassMetadata::class)],
+            'MauticPlugin\MauticZapierBundle' => [
+                'MauticPlugin\MauticZapierBundle\Entity\SomeTest' => $this->createMock(ClassMetadata::class),
+            ],
         ];
 
         $sampleSchema = $this->createMock(Schema::class);
@@ -111,7 +109,12 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $plugin = $this->createSampleZapierPlugin();
         $plugin->setVersion('1.0.1');
         $plugin->setDescription('Updated description');
-        $event = new PluginUpdateEvent($plugin, '1.0');
+        $event = new PluginUpdateEvent(
+            $plugin,
+            '1.0',
+            $this->sampleMetaData['MauticPlugin\MauticZapierBundle'],
+            $this->sampleSchemas['MauticPlugin\MauticZapierBundle']
+        );
         $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_UPDATE);
         $updatedPlugins = $this->helper->updatePlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
@@ -126,7 +129,11 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $sampleInstalledPlugins = [
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),
         ];
-        $event = new PluginInstallEvent($this->createSampleZapierPlugin());
+        $event = new PluginInstallEvent(
+            $this->createSampleZapierPlugin(),
+            $this->sampleMetaData['MauticPlugin\MauticZapierBundle'],
+            null
+        );
         $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_INSTALL);
 
         $installedPlugins = $this->helper->installPlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);

@@ -3,13 +3,10 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CampaignBundle\Entity\Lead;
-use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,7 +16,6 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
@@ -32,7 +28,6 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +36,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class EmailController extends FormController
 {
-    use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
 
@@ -588,9 +582,6 @@ class EmailController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
         $routeParams = [
             'objectAction' => 'new',
         ];
@@ -614,11 +605,7 @@ class EmailController extends FormController
                     'form'          => $form->createView(),
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
-                    'slots'         => $this->buildSlotForms($slotTypes),
-                    'sections'      => $this->buildSlotForms($sections),
                     'themes'        => $themeHelper->getInstalledThemes('email', true),
-                    'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                    'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
                     'permissions'   => $permissions,
                 ],
@@ -825,9 +812,6 @@ class EmailController extends FormController
         \assert($assetModel instanceof AssetModel);
         $attachmentSize = $assetModel->getTotalFilesize($assets);
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
         $routeParams = [
             'objectAction' => 'edit',
             'objectId'     => $entity->getId(),
@@ -860,14 +844,10 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'form'               => $form->createView(),
                     'isVariant'          => $entity->isVariant(true),
-                    'slots'              => $this->buildSlotForms($slotTypes),
-                    'sections'           => $this->buildSlotForms($sections),
                     'themes'             => $themeHelper->getInstalledThemes('email', true),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
-                    'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                    'sectionForm'        => $sectionForm->createView(),
                     'permissions'        => $permissions,
                     'draftPreviewUrl'    => $draftPreviewUrl,
                     'previewUrl'         => $this->generateUrl(
@@ -1014,10 +994,6 @@ class EmailController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
-
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -1033,11 +1009,7 @@ class EmailController extends FormController
                     'form'          => $form->createView(),
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
-                    'slots'         => $this->buildSlotForms($slotTypes),
-                    'sections'      => $this->buildSlotForms($sections),
                     'themes'        => $themeHelper->getInstalledThemes('email', true),
-                    'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                    'sectionForm'   => $sectionForm->createView(),
                     'permissions'   => $permissions,
                 ],
                 'contentTemplate' => '@MauticEmail/Email/form.html.twig',
@@ -1124,7 +1096,7 @@ class EmailController extends FormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, ThemeHelper $themeHelper, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId)
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');
@@ -1152,7 +1124,6 @@ class EmailController extends FormController
         }
 
         $template = InputHelper::clean($request->query->get('template'));
-        $slots    = $themeHelper->getTheme($template)->getSlots('email');
 
         // merge any existing changes
         $newContent = $request->getSession()->get('mautic.emailbuilder.'.$objectId.'.content', []);
@@ -1164,15 +1135,12 @@ class EmailController extends FormController
             $entity->setContent($content);
         }
 
-        $this->processSlots($slotsHelper, $slots, $entity);
-
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
         return $this->render(
             $logicalName,
             [
                 'isNew'    => $isNew,
-                'slots'    => $slots,
                 'content'  => $content,
                 'email'    => $entity,
                 'template' => $template,
@@ -1629,35 +1597,6 @@ class EmailController extends FormController
                 'contentTemplate' => '@MauticEmail/Email/recipients.html.twig',
             ]
         );
-    }
-
-    /**
-     * PreProcess page slots for public view.
-     *
-     * @param array $slots
-     * @param Email $entity
-     */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
-    {
-        $content     = $entity->getContent();
-
-        // Set the slots
-        foreach ($slots as $slot => $slotConfig) {
-            // support previous format where email slots are not defined with config array
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            $value = $content[$slot] ?? '';
-            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
-        }
-
-        // add builder toolbar
-        $slotsHelper->start('builder'); ?>
-        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
-        <?php
-        $slotsHelper->stop();
     }
 
     /**

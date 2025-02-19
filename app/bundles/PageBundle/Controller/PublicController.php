@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -50,7 +49,6 @@ class PublicController extends AbstractFormController
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         ThemeHelper $themeHelper,
-        SlotsHelper $slotsHelper,
         Tracking404Model $tracking404Model,
         RouterInterface $router,
         $slug)
@@ -249,10 +247,7 @@ class PublicController extends AbstractFormController
                  */
                 $template = $entity->getTemplate();
                 // all the checks pass so display the content
-                $slots   = $themeHelper->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
-
-                $this->processSlots($assetsHelper, $slotsHelper, $slots, $entity);
 
                 // Add the GA code to the template assets
                 if (!empty($analytics)) {
@@ -264,7 +259,6 @@ class PublicController extends AbstractFormController
                 $response = $this->render(
                     $logicalName,
                     [
-                        'slots'    => $slots,
                         'content'  => $content,
                         'page'     => $entity,
                         'template' => $template,
@@ -311,7 +305,7 @@ class PublicController extends AbstractFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, SlotsHelper $slotsHelper, int $id)
+    public function previewAction(Request $request, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id)
     {
         $contactId = (int) $request->query->get('contactId');
 
@@ -359,10 +353,7 @@ class PublicController extends AbstractFormController
         if (empty($content) && !empty($BCcontent)) {
             $template = $page->getTemplate();
             // all the checks pass so display the content
-            $slots   = $themeHelper->getTheme($template)->getSlots('page');
             $content = $page->getContent();
-
-            $this->processSlots($assetsHelper, $slotsHelper, $slots, $page);
 
             // Add the GA code to the template assets
             if (!empty($analytics)) {
@@ -374,7 +365,6 @@ class PublicController extends AbstractFormController
             $response = $this->render(
                 $logicalName,
                 [
-                    'slots'    => $slots,
                     'content'  => $content,
                     'page'     => $page,
                     'template' => $template,
@@ -550,81 +540,6 @@ class PublicController extends AbstractFormController
         }
 
         return $this->redirect($url);
-    }
-
-    /**
-     * PreProcess page slots for public view.
-     *
-     * @deprecated - to be removed in 3.0
-     *
-     * @param array $slots
-     * @param Page  $entity
-     */
-    private function processSlots(AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, $slots, $entity): void
-    {
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            // backward compatibility - if slotConfig array does not exist
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            if (isset($slotConfig['type']) && 'slideshow' == $slotConfig['type']) {
-                if (isset($content[$slot])) {
-                    $options = json_decode($content[$slot], true);
-                } else {
-                    $options = [
-                        'width'            => '100%',
-                        'height'           => '250px',
-                        'background_color' => 'transparent',
-                        'arrow_navigation' => false,
-                        'dot_navigation'   => true,
-                        'interval'         => 5000,
-                        'pause'            => 'hover',
-                        'wrap'             => true,
-                        'keyboard'         => true,
-                    ];
-                }
-
-                // Create sample slides for first time or if all slides were deleted
-                if (empty($options['slides'])) {
-                    $options['slides'] = [
-                        [
-                            'order'            => 0,
-                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
-                            'captionheader'    => 'Caption 1',
-                        ],
-                        [
-                            'order'            => 1,
-                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
-                            'captionheader'    => 'Caption 2',
-                        ],
-                    ];
-                }
-
-                // Order slides
-                usort(
-                    $options['slides'],
-                    fn ($a, $b): int => strcmp($a['order'], $b['order'])
-                );
-
-                $options['slot']   = $slot;
-                $options['public'] = true;
-            } elseif (isset($slotConfig['type']) && 'textarea' == $slotConfig['type']) {
-                $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
-                $slotsHelper->set($slot, $value);
-            } else {
-                // Fallback for other types like html, text, textarea and all unknown
-                $value = $content[$slot] ?? '';
-                $slotsHelper->set($slot, $value);
-            }
-        }
-
-        $parentVariant = $entity->getVariantParent();
-        $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
-        $slotsHelper->set('pageTitle', $title);
     }
 
     /**

@@ -157,10 +157,24 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
         $segmentId = $segment->getId();
 
-        // Check segment count UI for no contacts.
+        // Save manual segment without filters.
+        $manualSegment   = $this->saveSegment('Lead List 2', 'lead-list-2');
+        $manualSegmentId = $manualSegment->getId();
+
+        // Verify last built date is not set.
+        self::assertNull($segment->getLastBuiltDate());
+
+        // Check segment count UI for no contacts for manual segment.
+        // And check the filtered segment is Building
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $segmentId);
+        self::assertSame('Building', $html);
+        self::assertSame('label label-info col-count', $spClass);
+        $html    = $this->getSegmentCountHtml($crawler, $manualSegmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $manualSegmentId);
         self::assertSame('No Contacts', $html);
+        self::assertSame('label label-gray col-count', $spClass);
 
         // Add 4 contacts.
         $contacts   = $this->saveContacts();
@@ -169,10 +183,22 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Rebuild segment - set current count to the cache.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
 
+        // Verify last built date is set.
+        $this->em->detach($segment);
+        $segment = $this->listRepo->find($segmentId);
+        self::assertNotNull($segment->getLastBuiltDate());
+
+        // Set last built date in the future to allow testing without waiting.
+        // (Same second built date as the modified date is shown as "Building" still in the UI).
+        $segment->setLastBuiltDate(new \DateTime('+5 seconds'));
+        $this->listModel->saveEntity($segment);
+
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $segmentId);
         self::assertSame('View 4 Contacts', $html);
+        self::assertSame('label label-gray col-count', $spClass);
 
         // Remove 1 contact from segment.
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
@@ -182,7 +208,9 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Check segment count UI for 3 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $segmentId);
         self::assertSame('View 3 Contacts', $html);
+        self::assertSame('label label-gray col-count', $spClass);
 
         // Add 1 contact back to segment.
         $parameters = ['ids' => [$contact1Id]];
@@ -193,12 +221,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $segmentId);
         self::assertSame('View 4 Contacts', $html);
+        self::assertSame('label label-gray col-count', $spClass);
 
         // Check segment count AJAX for 4 contacts.
         $parameter = ['id' => $segmentId];
         $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('View 4 Contacts', $response['content']['html']);
+        self::assertSame('label label-gray col-count', $response['content']['className']);
         self::assertSame(4, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
 
@@ -211,6 +242,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $parameter = ['id' => $segmentId];
         $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('View 3 Contacts', $response['content']['html']);
+        self::assertSame('label label-gray col-count', $response['content']['className']);
         self::assertSame(3, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
 
@@ -224,6 +256,30 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $parameter = ['id' => $segmentId];
         $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('View 4 Contacts', $response['content']['html']);
+        self::assertSame('label label-gray col-count', $response['content']['className']);
+        self::assertSame(4, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
+
+        // Save filtered segment again to trigger rebuild label, setting last built date in the past.
+        $this->em->detach($segment);
+        $segment = $this->listRepo->find($segmentId);
+        $segment->setLastBuiltDate(new \DateTime('-1 year'));
+        // Date modified only updates on specific changes, so change name.
+        $segment->setName('Lead List 1 Updated');
+        $this->listModel->saveEntity($segment);
+
+        // Check segment count UI for bulding with 4 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $segmentId);
+        self::assertSame('Building (4 Contacts)', $html);
+        self::assertSame('label label-info col-count', $spClass);
+
+        // Check segment count AJAX for building 4 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('Building (4 Contacts)', $response['content']['html']);
+        self::assertSame('label label-info col-count', $response['content']['className']);
         self::assertSame(4, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
     }
@@ -259,9 +315,16 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getSegmentCountHtml(Crawler $crawler, int $id): string
     {
-        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
+        $content = $crawler->filter('span.col-count[data-id="'.$id.'"] a')->html();
 
         return trim($content);
+    }
+
+    private function getSegmentCountClass(Crawler $crawler, int $id): string
+    {
+        $class = $crawler->filter('span.col-count[data-id="'.$id.'"]')->attr('class');
+
+        return trim($class);
     }
 
     /**

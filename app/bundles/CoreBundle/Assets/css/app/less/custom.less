@@ -420,3 +420,67 @@ code:hover > .copy-icon {
     border: 1px solid var(--border-subtle);
     box-shadow: rgba(0, 0, 0, 0.07) 0px -1px 1px, rgba(0, 0, 0, 0.07) 0px 2px 2px, rgba(0, 0, 0, 0.07) 0px 4px 4px, rgba(0, 0, 0, 0.07) 0px 8px 8px, rgba(0, 0, 0, 0.07) 0px 16px 16px;
 }
+
+.builder-active {
+  background-color: var(--background);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1030;
+}
+
+.builder .builder-panel-top {
+  margin-bottom: 10px;
+}
+
+.builder-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 30%;
+  height: 100%;
+  padding: 15px;
+  background-color: var(--layer, #d5d4d4);
+  overflow-y: auto;
+}
+
+.builder-content {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 70%;
+  height: 100%;
+}
+
+.builder-panel .panel a.btn {
+  white-space: normal;
+}
+
+@media (max-width: 767px) {
+  .builder .builder-panel {
+    width: 100%;
+    bottom: 0;
+    top: auto;
+    height: 35%;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+    border-top: 1px solid #757575;
+    position: fixed;
+  }
+  .builder .builder-content {
+    right: 0;
+    width: 100%;
+  }
+  .builder .builder-panel-top {
+    position: relative;
+    width: 100%;
+  }
+  .builder .builder-tokens {
+    margin-top: 10px;
+  }
+}

@@ -5,6 +5,6 @@
   "keywords": ["mautic","theme"],
   "minimum-stability": "dev",
   "require": {
-    "mautic/core-lib": "^5.2"
+    "mautic/core-lib": "^6.0"
   }
 }
