@@ -8,10 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class BuilderEvent extends Event
 {
-    protected $slotTypes            = [];
-
-    protected $sections             = [];
-
     protected $tokens               = [];
 
     protected $abTestWinnerCriteria = [];
@@ -32,74 +28,6 @@ class BuilderEvent extends Event
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
-    }
-
-    /**
-     * @param int $priority
-     */
-    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = []): void
-    {
-        $this->slotTypes[$key] = [
-            'header'   => $this->translator->trans($header),
-            'icon'     => $icon,
-            'content'  => $content,
-            'params'   => $params,
-            'form'     => $form,
-            'priority' => $priority,
-        ];
-    }
-
-    /**
-     * Get slot types.
-     *
-     * @return array
-     */
-    public function getSlotTypes()
-    {
-        $sort = ['priority' => [], 'header' => []];
-        foreach ($this->slotTypes as $k => $v) {
-            $sort['priority'][$k] = $v['priority'];
-            $sort['header'][$k]   = $v['header'];
-        }
-
-        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->slotTypes);
-
-        foreach ($this->slotTypes as $i => $slot) {
-            $slot['header'] = str_replace(' ', '<br />', $slot['header']);
-
-            $this->slotTypes[$i] = $slot;
-        }
-
-        return $this->slotTypes;
-    }
-
-    public function addSection($key, $header, $icon, $content, $form, $priority = 0): void
-    {
-        $this->sections[$key] = [
-            'header'   => $this->translator->trans($header),
-            'icon'     => $icon,
-            'content'  => $content,
-            'form'     => $form,
-            'priority' => $priority,
-        ];
-    }
-
-    /**
-     * Get slot types.
-     *
-     * @return array
-     */
-    public function getSections()
-    {
-        $sort = ['priority' => [], 'header' => []];
-        foreach ($this->sections as $k => $v) {
-            $sort['priority'][$k] = $v['priority'];
-            $sort['header'][$k]   = $v['header'];
-        }
-
-        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->sections);
-
-        return $this->sections;
     }
 
     /**
@@ -330,22 +258,6 @@ class BuilderEvent extends Event
     public function abTestWinnerCriteriaRequested(): bool
     {
         return $this->getRequested('abTestWinnerCriteria');
-    }
-
-    /**
-     * Check if Slot types has been requested.
-     */
-    public function slotTypesRequested(): bool
-    {
-        return $this->getRequested('slotTypes');
-    }
-
-    /**
-     * Check if Sections has been requested.
-     */
-    public function sectionsRequested(): bool
-    {
-        return $this->getRequested('sections');
     }
 
     protected function getRequested($type): bool

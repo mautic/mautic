@@ -7,6 +7,7 @@ use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -491,16 +492,24 @@ class CategoryController extends AbstractFormController
                 return $this->isLocked($postActionVars, $entity, 'category.category');
             }
 
-            $model->deleteEntity($entity);
+            try {
+                $model->deleteEntity($entity);
 
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => [
-                    '%name%' => $entity->getTitle(),
-                    '%id%'   => $objectId,
-                ],
-            ];
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.core.notice.deleted',
+                    'msgVars' => [
+                        '%name%' => $entity->getTitle(),
+                        '%id%'   => $objectId,
+                    ],
+                ];
+            } catch (RecordCanNotBeDeletedException $exception) {
+                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
+                $flashes[]                      = [
+                    'type' => 'notice',
+                    'msg'  => $exception->getMessage(),
+                ];
+            }
         } // else don't do anything
 
         return $this->postActionRedirect(
@@ -542,7 +551,8 @@ class CategoryController extends AbstractFormController
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
-            // Loop over the IDs to perform access checks pre-delete
+            // Loop over the IDs to perform access checks and delete
+            $deletedExceptions = [];
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
@@ -557,20 +567,30 @@ class CategoryController extends AbstractFormController
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);
                 } else {
-                    $deleteIds[] = $objectId;
+                    try {
+                        // Delete everything we are able to
+                        $model->deleteEntity($entity);
+                        $deleteIds[] = $objectId;
+                    } catch (RecordCanNotBeDeletedException $exception) {
+                        $deletedExceptions[] = $exception;
+                    }
                 }
             }
 
-            // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.category.notice.batch_deleted',
                     'msgVars' => [
-                        '%count%' => count($entities),
+                        '%count%' => count($deleteIds),
                     ],
+                ];
+            }
+
+            foreach ($deletedExceptions as $deletedException) {
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => $deletedException->getMessage(),
                 ];
             }
         } // else don't do anything
