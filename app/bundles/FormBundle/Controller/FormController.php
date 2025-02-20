@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
 use Mautic\FormBundle\Entity\Field;
@@ -49,7 +48,7 @@ class FormController extends CommonFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -221,7 +220,7 @@ class FormController extends CommonFormController
         $logs = $auditLogModel->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -307,7 +306,7 @@ class FormController extends CommonFormController
 
         // set the page we came from
         $page       = $request->getSession()->get('mautic.form.page', 1);
-        $mauticform = $request->request->get('mauticform') ?? [];
+        $mauticform = $request->request->all()['mauticform'] ?? [];
         $sessionId  = $mauticform['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
 
         // set added/updated fields
@@ -502,7 +501,7 @@ class FormController extends CommonFormController
     {
         /** @var FormModel $model */
         $model            = $this->getModel('form');
-        $formData         = $request->request->get('mauticform');
+        $formData         = $request->request->all()['mauticform'] ?? [];
         $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
         $modifiedFields   = [];
@@ -921,7 +920,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      */
-    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, AnalyticsHelper $analyticsHelper): Response
+    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper): Response
     {
         /** @var FormModel $model */
         $model = $this->getModel('form.form');
@@ -974,8 +973,6 @@ class FormController extends CommonFormController
 
         if (!empty($template)) {
             $logicalName     = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
-
-            $slotsHelper->set('pageTitle', $form->getName());
 
             $analytics = $analyticsHelper->getCode();
 
@@ -1062,10 +1059,8 @@ class FormController extends CommonFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
@@ -1150,7 +1145,7 @@ class FormController extends CommonFormController
         $this->alreadyMappedFieldCollector->removeAllForForm((string) $sessionId);
     }
 
-    public function batchRebuildHtmlAction(Request $request)
+    public function batchRebuildHtmlAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);

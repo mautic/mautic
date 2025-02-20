@@ -21,7 +21,7 @@ class MaxMindDoNotSellPurgeCommand extends Command
     public function __construct(
         private EntityManager $em,
         private LeadRepository $leadRepository,
-        private MaxMindDoNotSellList $doNotSellList
+        private MaxMindDoNotSellList $doNotSellList,
     ) {
         parent::__construct();
     }

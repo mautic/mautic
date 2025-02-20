@@ -58,7 +58,7 @@ class EmailRepository extends CommonRepository
      *
      * @param string $email
      *
-     * @return bool
+     * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
     public function checkDoNotEmail($email)
     {
@@ -170,7 +170,7 @@ class EmailRepository extends CommonRepository
         $countWithMaxMin = false,
         $maxDate = null,
         int $maxThreads = null,
-        int $threadId = null
+        int $threadId = null,
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -319,7 +319,7 @@ class EmailRepository extends CommonRepository
         $maxContactId = null,
         $countWithMaxMin = false,
         int $maxThreads = null,
-        int $threadId = null
+        int $threadId = null,
     ) {
         $q = $this->getEmailPendingQuery(
             $emailId,
@@ -559,7 +559,7 @@ class EmailRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
@@ -717,7 +717,7 @@ class EmailRepository extends CommonRepository
         }
     }
 
-    public function incrementRead(int $emailId, int $statId, bool $isVariant = false): void
+    public function incrementRead(int $emailId, string $statId, bool $isVariant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

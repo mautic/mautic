@@ -208,6 +208,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
+    private ?EmailDraft $draft = null;
+
     private bool $isCloned = false;
 
     /**
@@ -236,6 +238,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
+        $this->setDraft(null);
 
         parent::__clone();
     }
@@ -333,6 +336,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('headers', Types::JSON);
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
+
+        $builder->createOneToOne('draft', EmailDraft::class)
+            ->mappedBy('email')
+            ->fetchExtraLazy()
+            ->cascadeAll()
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -896,7 +905,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return ArrayCollection<int, LeadList>
      */
     public function getLists()
     {
@@ -938,7 +947,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return Collection<int, \Mautic\LeadBundle\Entity\LeadList>
+     * @return Collection<int, LeadList>
      */
     public function getExcludedLists(): Collection
     {
@@ -1153,10 +1162,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Calculate Read Percentage for each Email.
-     *
-     * @return int
      */
-    public function getReadPercentage($includevariants = false)
+    public function getReadPercentage($includevariants = false): float|int
     {
         if ($this->getSentCount($includevariants) > 0) {
             return round($this->getReadCount($includevariants) / $this->getSentCount($includevariants) * 100, 2);
@@ -1254,6 +1261,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $this->initListChanges($property);
         $this->changes[$property][1] = array_diff($this->changes[$property][1], [$id]);
+    }
+
+    public function getDraft(): ?EmailDraft
+    {
+        return $this->draft;
+    }
+
+    public function setDraft(?EmailDraft $draft): void
+    {
+        $this->draft = $draft;
+    }
+
+    public function hasDraft(): bool
+    {
+        return null !== $this->getDraft();
+    }
+
+    public function getDraftContent(): ?string
+    {
+        return $this->getDraft()?->getHtml();
     }
 
     /**

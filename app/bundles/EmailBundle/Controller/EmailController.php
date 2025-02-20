@@ -3,32 +3,31 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CampaignBundle\Entity\Lead;
-use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +36,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class EmailController extends FormController
 {
-    use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
 
@@ -48,10 +46,9 @@ class EmailController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1)
     {
-        $model = $this->getModel('email');
-
+        $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -118,7 +115,7 @@ class EmailController extends FormController
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $this->factory->getInstalledThemes('email'),
+            'options' => $themeHelper->getInstalledThemes('email'),
             'prefix'  => 'theme',
         ];
 
@@ -135,9 +132,9 @@ class EmailController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$column, $filter] = explode(':', $updatedFilter);
 
-                    $newFilters[$clmn][] = $fltr;
+                    $newFilters[$column][] = $filter;
                 }
 
                 $currentFilters = $newFilters;
@@ -236,15 +233,16 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'filters'     => $listFilters,
-                    'items'       => $emails,
-                    'totalItems'  => $count,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'tmpl'        => $request->get('tmpl', 'index'),
-                    'permissions' => $permissions,
-                    'model'       => $model,
+                    'searchValue'    => $search,
+                    'filters'        => $listFilters,
+                    'items'          => $emails,
+                    'totalItems'     => $count,
+                    'page'           => $page,
+                    'limit'          => $limit,
+                    'tmpl'           => $request->get('tmpl', 'index'),
+                    'permissions'    => $permissions,
+                    'model'          => $model,
+                    'isDraftEnabled' => $isDraftEnabled,
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [
@@ -261,10 +259,8 @@ class EmailController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, $objectId)
     {
-        /** @var EmailModel $model */
-        $model    = $this->getModel('email');
         $security = $this->security;
 
         /** @var Email $email */
@@ -273,7 +269,7 @@ class EmailController extends FormController
         $page = $request->getSession()->get('mautic.email.page', 1);
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -374,7 +370,17 @@ class EmailController extends FormController
         $logs = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         // Get click through stats
-        $trackableLinks = $model->getEmailClickStats($email->getId());
+        $trackableLinks  = $model->getEmailClickStats($email->getId());
+        $draftPreviewUrl = null;
+        if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
+            $draftPreviewUrl = $this->generateUrl(
+                'mautic_email_preview',
+                [
+                    'objectId'   => $email->getId(),
+                    'objectType' => 'draft',
+                ]
+            );
+        }
 
         $variants = [
             'parent'             => $parent,
@@ -423,9 +429,10 @@ class EmailController extends FormController
                         ],
                         'RETURN_ARRAY'
                     ),
-                    'abTestResults' => $abTestResults,
-                    'security'      => $security,
-                    'previewUrl'    => $this->generateUrl(
+                    'abTestResults'   => $abTestResults,
+                    'security'        => $security,
+                    'draftPreviewUrl' => $draftPreviewUrl,
+                    'previewUrl'      => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $email->getId()],
                         UrlGeneratorInterface::ABSOLUTE_URL
@@ -466,13 +473,9 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
+    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, $entity = null)
     {
-        $model = $this->getModel('email');
-        \assert($model instanceof EmailModel);
-
         if (!($entity instanceof Email)) {
-            /** @var Email $entity */
             $entity = $model->getEntity();
         }
 
@@ -486,7 +489,7 @@ class EmailController extends FormController
         // set the page we came from
         $page         = $session->get('mautic.email.page', 1);
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
-        $emailForm    = $request->request->get('emailform') ?? [];
+        $emailForm    = $request->request->all()['emailform'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailForm['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -537,7 +540,7 @@ class EmailController extends FormController
                         $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity->getId(), true);
+                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $model, $themeHelper, $entity->getId(), true);
                     }
                 }
             } else {
@@ -579,9 +582,6 @@ class EmailController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
         $routeParams = [
             'objectAction' => 'new',
         ];
@@ -605,11 +605,7 @@ class EmailController extends FormController
                     'form'          => $form->createView(),
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
-                    'slots'         => $this->buildSlotForms($slotTypes),
-                    'sections'      => $this->buildSlotForms($sections),
-                    'themes'        => $this->factory->getInstalledThemes('email', true),
-                    'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                    'sectionForm'   => $sectionForm->createView(),
+                    'themes'        => $themeHelper->getInstalledThemes('email', true),
                     'updateSelect'  => $updateSelect,
                     'permissions'   => $permissions,
                 ],
@@ -637,14 +633,14 @@ class EmailController extends FormController
         Translator $translator,
         RouterInterface $routerHelper,
         CoreParametersHelper $coreParametersHelper,
+        EmailConfig $emailConfig,
+        EmailModel $model,
+        ThemeHelper $themeHelper,
         $objectId,
         $ignorePost = false,
-        $forceTypeSelection = false
+        $forceTypeSelection = false,
     ) {
-        /** @var EmailModel $model */
-        $model  = $this->getModel('email');
-        $method = $request->getMethod();
-
+        $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $request->getSession();
         $page    = $request->getSession()->get('mautic.email.page', 1);
@@ -692,7 +688,7 @@ class EmailController extends FormController
 
         // Create the form
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $emailform    = $request->request->get('emailform') ?? [];
+        $emailform    = $request->request->all()['emailform'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailform['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -701,19 +697,32 @@ class EmailController extends FormController
             // Force type to template
             $entity->setEmailType('template');
         }
-        /** @var Form $form */
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
+                $existingEmail = clone $entity;
+                $this->restoreNullifiedFieldsDuringClone($existingEmail, $entity);
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
                     // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+
+                    if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
+                        $this->dispatcher->dispatch(new EmailEditSubmitEvent(
+                            $existingEmail,
+                            $entity,
+                            $this->getFormButton($form, ['buttons', 'save'])->isClicked(),
+                            $this->getFormButton($form, ['buttons', 'apply'])->isClicked(),
+                            $form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked(),
+                            $form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked(),
+                            $form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked()
+                        ), EmailEvents::ON_EMAIL_EDIT_SUBMIT);
+                    }
 
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
@@ -757,7 +766,12 @@ class EmailController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
+            if ($cancelled
+                || ($valid && ($this->getFormButton($form, ['buttons', 'save'])->isClicked()
+                    || ($form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked())
+                    || ($form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked())
+                    || ($form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked())))
+            ) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -798,9 +812,6 @@ class EmailController extends FormController
         \assert($assetModel instanceof AssetModel);
         $attachmentSize = $assetModel->getTotalFilesize($assets);
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
         $routeParams = [
             'objectAction' => 'edit',
             'objectId'     => $entity->getId(),
@@ -818,21 +829,27 @@ class EmailController extends FormController
             ],
             'RETURN_ARRAY'
         );
+        $draftPreviewUrl = '';
+        if (true === $emailConfig->isDraftEnabled() && $entity->hasDraft()) {
+            $draftPreviewUrl = $this->generateUrl(
+                'mautic_email_preview',
+                ['objectId'       => $entity->getId(),
+                    'objectType'  => 'draft',
+                ]
+            );
+        }
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'form'               => $form->createView(),
                     'isVariant'          => $entity->isVariant(true),
-                    'slots'              => $this->buildSlotForms($slotTypes),
-                    'sections'           => $this->buildSlotForms($sections),
-                    'themes'             => $this->factory->getInstalledThemes('email', true),
+                    'themes'             => $themeHelper->getInstalledThemes('email', true),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
-                    'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                    'sectionForm'        => $sectionForm->createView(),
                     'permissions'        => $permissions,
+                    'draftPreviewUrl'    => $draftPreviewUrl,
                     'previewUrl'         => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $entity->getId()],
@@ -856,7 +873,7 @@ class EmailController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, EmailModel $model, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, EmailModel $model, ThemeHelper $themeHelper, $objectId)
     {
         $emailEntity  = $model->getEntity($objectId);
         $entity       = null;
@@ -910,14 +927,12 @@ class EmailController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
-        /** @var Form $form */
-        $form = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                $formData = $request->request->get('emailform');
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
@@ -948,12 +963,10 @@ class EmailController extends FormController
                         $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                         $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
-                        return $this->redirect($this->generateUrl('mautic_email_action',
-                            [
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
-                            ]
-                        ));
+                        return $this->redirectToRoute('mautic_email_action', [
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId(),
+                        ]);
                     }
                 }
             } else {
@@ -981,10 +994,6 @@ class EmailController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
-
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -1000,11 +1009,7 @@ class EmailController extends FormController
                     'form'          => $form->createView(),
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
-                    'slots'         => $this->buildSlotForms($slotTypes),
-                    'sections'      => $this->buildSlotForms($sections),
-                    'themes'        => $this->factory->getInstalledThemes('email', true),
-                    'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                    'sectionForm'   => $sectionForm->createView(),
+                    'themes'        => $themeHelper->getInstalledThemes('email', true),
                     'permissions'   => $permissions,
                 ],
                 'contentTemplate' => '@MauticEmail/Email/form.html.twig',
@@ -1091,7 +1096,7 @@ class EmailController extends FormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId)
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');
@@ -1119,7 +1124,6 @@ class EmailController extends FormController
         }
 
         $template = InputHelper::clean($request->query->get('template'));
-        $slots    = $this->factory->getTheme($template)->getSlots('email');
 
         // merge any existing changes
         $newContent = $request->getSession()->get('mautic.emailbuilder.'.$objectId.'.content', []);
@@ -1131,15 +1135,12 @@ class EmailController extends FormController
             $entity->setContent($content);
         }
 
-        $this->processSlots($slotsHelper, $slots, $entity);
-
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
         return $this->render(
             $logicalName,
             [
                 'isNew'    => $isNew,
-                'slots'    => $slots,
                 'content'  => $content,
                 'email'    => $entity,
                 'template' => $template,
@@ -1153,9 +1154,8 @@ class EmailController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, $objectId)
     {
-        $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
@@ -1181,7 +1181,7 @@ class EmailController extends FormController
             $clone->setVariantParent($entity);
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $model, $themeHelper, $clone);
     }
 
     /**
@@ -1479,7 +1479,7 @@ class EmailController extends FormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FieldModel $fieldModel)
+    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FieldModel $fieldModel): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -1600,35 +1600,6 @@ class EmailController extends FormController
     }
 
     /**
-     * PreProcess page slots for public view.
-     *
-     * @param array $slots
-     * @param Email $entity
-     */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
-    {
-        $content     = $entity->getContent();
-
-        // Set the slots
-        foreach ($slots as $slot => $slotConfig) {
-            // support previous format where email slots are not defined with config array
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            $value = $content[$slot] ?? '';
-            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
-        }
-
-        // add builder toolbar
-        $slotsHelper->start('builder'); ?>
-        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
-        <?php
-        $slotsHelper->stop();
-    }
-
-    /**
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
@@ -1637,14 +1608,21 @@ class EmailController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
+        $permissions = [
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            'email:emails:viewown',
+            'email:emails:viewother',
+        ];
+
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,
             $objectId,
             $page,
-            ['email:emails:viewown', 'email:emails:viewother'],
+            $permissions,
             'email',
             'email_stats',
             'email',
@@ -1660,5 +1638,25 @@ class EmailController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    private function restoreNullifiedFieldsDuringClone(Email $clonedEmail, Email $cloningEmail): void
+    {
+        $clonedEmail->setTranslationParent($cloningEmail->getTranslationParent());
+        foreach ($cloningEmail->getTranslationChildren() as $translationChild) {
+            $clonedEmail->addTranslationChild($translationChild);
+        }
+        $clonedEmail->setVariantParent($cloningEmail->getVariantParent());
+        foreach ($cloningEmail->getVariantChildren() as $variantChild) {
+            $clonedEmail->addVariantChild($variantChild);
+        }
+        $clonedEmail->setSentCount($cloningEmail->getSentCount());
+        $clonedEmail->setReadCount($cloningEmail->getReadCount());
+        $clonedEmail->setRevision($cloningEmail->getRevision());
+        $clonedEmail->setVariantSentCount($cloningEmail->getVariantSentCount());
+        $clonedEmail->setVariantReadCount($cloningEmail->getVariantReadCount());
+        $clonedEmail->setVariantStartDate($cloningEmail->getVariantStartDate());
+        $clonedEmail->setEmailType($cloningEmail->getEmailType());
+        $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 }

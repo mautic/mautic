@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -47,6 +48,7 @@ class PublicController extends AbstractFormController
         CookieHelper $cookieHelper,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
+        ThemeHelper $themeHelper,
         Tracking404Model $tracking404Model,
         RouterInterface $router,
         $slug)
@@ -152,7 +154,7 @@ class PublicController extends AbstractFormController
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
                                 // if not the parent, show the specific variant already displayed to the visitor
-                                if ($variantCookie !== $entity->getId()) {
+                                if ((string) $variantCookie !== (string) $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
                                 } // otherwise proceed with displaying parent
                             }
@@ -220,6 +222,7 @@ class PublicController extends AbstractFormController
                         $lead,
                         $request
                     );
+                    \assert($translatedEntity instanceof Page);
 
                     if ($translationParent && $translatedEntity !== $entity) {
                         if (!$request->get('ntrd', 0)) {
@@ -244,22 +247,18 @@ class PublicController extends AbstractFormController
                  */
                 $template = $entity->getTemplate();
                 // all the checks pass so display the content
-                $slots   = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
-
-                $this->processSlots($slots, $entity);
 
                 // Add the GA code to the template assets
                 if (!empty($analytics)) {
-                    $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+                    $assetsHelper->addCustomDeclaration($analytics);
                 }
 
-                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+                $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
                 $response = $this->render(
                     $logicalName,
                     [
-                        'slots'    => $slots,
                         'content'  => $content,
                         'page'     => $entity,
                         'template' => $template,
@@ -277,7 +276,8 @@ class PublicController extends AbstractFormController
                 }
             }
 
-            $assetsHelper->addScript($router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $assetsHelper->addScript(
+                $router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'
@@ -305,7 +305,7 @@ class PublicController extends AbstractFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, CorePermissions $security, int $id)
+    public function previewAction(Request $request, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id)
     {
         $contactId = (int) $request->query->get('contactId');
 
@@ -325,7 +325,7 @@ class PublicController extends AbstractFormController
             return $this->notFound();
         }
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $analytics = $analyticsHelper->getCode();
 
         $BCcontent = $page->getContent();
         $content   = $page->getCustomHtml();
@@ -353,22 +353,18 @@ class PublicController extends AbstractFormController
         if (empty($content) && !empty($BCcontent)) {
             $template = $page->getTemplate();
             // all the checks pass so display the content
-            $slots   = $this->factory->getTheme($template)->getSlots('page');
             $content = $page->getContent();
-
-            $this->processSlots($slots, $page);
 
             // Add the GA code to the template assets
             if (!empty($analytics)) {
-                $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+                $assetsHelper->addCustomDeclaration($analytics);
             }
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
             $response = $this->render(
                 $logicalName,
                 [
-                    'slots'    => $slots,
                     'content'  => $content,
                     'page'     => $page,
                     'template' => $template,
@@ -378,7 +374,7 @@ class PublicController extends AbstractFormController
 
             $content = $response->getContent();
         } else {
-            $content = str_replace('</head>', $analytics.$this->renderView('@MauticPage/Page/preview_header.html.twig')."\n</head>", $content);
+            $content = str_replace('</head>', $analytics."\n</head>", $content);
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
@@ -416,7 +412,7 @@ class PublicController extends AbstractFormController
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
         TrackingHelper $trackingHelper,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
     ) {
         $notSuccessResponse = new JsonResponse(
             [
@@ -466,7 +462,7 @@ class PublicController extends AbstractFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
-        $redirectId
+        $redirectId,
     ): \Symfony\Component\HttpFoundation\RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
@@ -547,89 +543,9 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * PreProcess page slots for public view.
-     *
-     * @deprecated - to be removed in 3.0
-     *
-     * @param array $slots
-     * @param Page  $entity
-     */
-    private function processSlots($slots, $entity): void
-    {
-        /** @var AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            // backward compatibility - if slotConfig array does not exist
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            if (isset($slotConfig['type']) && 'slideshow' == $slotConfig['type']) {
-                if (isset($content[$slot])) {
-                    $options = json_decode($content[$slot], true);
-                } else {
-                    $options = [
-                        'width'            => '100%',
-                        'height'           => '250px',
-                        'background_color' => 'transparent',
-                        'arrow_navigation' => false,
-                        'dot_navigation'   => true,
-                        'interval'         => 5000,
-                        'pause'            => 'hover',
-                        'wrap'             => true,
-                        'keyboard'         => true,
-                    ];
-                }
-
-                // Create sample slides for first time or if all slides were deleted
-                if (empty($options['slides'])) {
-                    $options['slides'] = [
-                        [
-                            'order'            => 0,
-                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
-                            'captionheader'    => 'Caption 1',
-                        ],
-                        [
-                            'order'            => 1,
-                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
-                            'captionheader'    => 'Caption 2',
-                        ],
-                    ];
-                }
-
-                // Order slides
-                usort(
-                    $options['slides'],
-                    fn ($a, $b): int => strcmp($a['order'], $b['order'])
-                );
-
-                $options['slot']   = $slot;
-                $options['public'] = true;
-            } elseif (isset($slotConfig['type']) && 'textarea' == $slotConfig['type']) {
-                $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
-                $slotsHelper->set($slot, $value);
-            } else {
-                // Fallback for other types like html, text, textarea and all unknown
-                $value = $content[$slot] ?? '';
-                $slotsHelper->set($slot, $value);
-            }
-        }
-
-        $parentVariant = $entity->getVariantParent();
-        $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
-        $slotsHelper->set('pageTitle', $title);
-    }
-
-    /**
      * Track video views.
      */
-    public function hitVideoAction(Request $request)
+    public function hitVideoAction(Request $request): JsonResponse|Response
     {
         // Only track XMLHttpRequests, because the hit should only come from there
         if ($request->isXmlHttpRequest()) {

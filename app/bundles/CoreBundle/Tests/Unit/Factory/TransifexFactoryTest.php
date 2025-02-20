@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\Transifex\Connector\Resources;
 use Mautic\Transifex\Exception\MissingCredentialsException;
-use Mautic\Transifex\TransifexInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
@@ -48,8 +47,6 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn('the_api_key');
 
         $transifex = $this->transifexFactory->getTransifex();
-
-        Assert::assertTrue($transifex instanceof TransifexInterface);
 
         // Getting a connector validates the config, so this should throw an exception.
         Assert::assertTrue($transifex->getConnector(Resources::class) instanceof Resources);

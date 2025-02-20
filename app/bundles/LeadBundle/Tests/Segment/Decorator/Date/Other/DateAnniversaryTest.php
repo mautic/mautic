@@ -39,8 +39,6 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
     {
         /**
          * Today in '%-m-d%' format. This matches date and datetime fields.
-         *
-         * @var string
          */
         $expectedResult = '%'.(new \DateTime('now', new \DateTimeZone('UTC')))->format('-m-d').'%';
 

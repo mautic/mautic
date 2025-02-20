@@ -11,12 +11,12 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
+        $this->configParams['disable_trackable_urls'] = false;
         if (str_contains($this->getDataSetAsString(false), 'Invalid unsubscribe_text configured')) {
             $this->configParams['unsubscribe_text']  = '<a href="|some|">Unsubscribe</a> with invalid token within the href attribute.';
         }
@@ -77,7 +77,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, LEAD>
+     * @return array<string, Lead>
      */
     private function createContacts(int $count, LeadList $segment): array
     {
@@ -118,16 +118,15 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 
     private function sendMessages(Email $email, int $pending): void
     {
-        $this->client->request(
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(
             Request::METHOD_POST,
             '/s/ajax?action=email:sendBatch',
             ['id' => $email->getId(), 'pending' => $pending],
-            [],
-            $this->createAjaxHeaders()
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
         Assert::assertSame(
             '{"success":1,"percent":100,"progress":['.$pending.','.$pending.'],"stats":{"sent":'.$pending.',"failed":0,"failedRecipients":[]}}',
             $response->getContent()

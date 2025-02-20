@@ -94,7 +94,7 @@ class FieldBuilderTest extends TestCase
 
         $this->assertEquals('mautic_internal_contact_timeline', $field->getName());
         $this->assertEquals(FieldDAO::FIELD_CHANGED, $field->getState());
-        $this->assertEquals(0, $field->getValue()->getNormalizedValue());
+        $this->assertEquals('', $field->getValue()->getNormalizedValue());
     }
 
     public function testCustomFieldsAreAdded(): void

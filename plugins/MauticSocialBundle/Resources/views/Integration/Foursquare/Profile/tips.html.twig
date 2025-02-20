@@ -8,7 +8,7 @@
                   {{ l }}<br />
                 {% endfor %}
             </p>
-            <p class="text-muted"><i class="ri-time-line"></i> {{ dateToFull(item.createdAt, 'UTC', 'U') }}</p>
+            <p class="text-secondary"><i class="ri-time-line"></i> {{ dateToFull(item.createdAt, 'UTC', 'U') }}</p>
             {% if not loop.first %}<hr />{% endif %}
         </li>
     {% endfor %}

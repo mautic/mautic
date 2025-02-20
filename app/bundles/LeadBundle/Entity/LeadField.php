@@ -66,7 +66,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
     /**
      * @var bool
      */
-    private $isShortVisible = true;
+    private $isShortVisible = false;
 
     /**
      * @var bool
@@ -180,6 +180,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
         $builder->createField('isShortVisible', 'boolean')
             ->columnName('is_short_visible')
+            ->nullable(false)
+            ->option('default', false)
             ->build();
 
         $builder->createField('isListable', 'boolean')
@@ -280,6 +282,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
                     'isUniqueIdentifier',
                     'isPubliclyUpdatable',
                     'properties',
+                    'isIndex',
+                    'charLengthLimit',
                 ]
             )
             ->build();
@@ -597,15 +601,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->getIsVisible();
     }
 
-    /**
-     * Set isShortVisible.
-     *
-     * @param bool $isShortVisible
-     *
-     * @return LeadField
-     */
-    public function setIsShortVisible($isShortVisible)
+    public function setIsShortVisible(?bool $isShortVisible): self
     {
+        $isShortVisible = $isShortVisible ?? false;
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
 

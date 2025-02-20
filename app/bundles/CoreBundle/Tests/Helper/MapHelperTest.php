@@ -64,8 +64,8 @@ class MapHelperTest extends MauticMysqlTestCase
     public function testGetOptionLegendText(): void
     {
         $legendValues = [
-            '%total'       => 4,
-            '%withCountry' => 2,
+            '%total'       => '4',
+            '%withCountry' => '2',
         ];
 
         $this->assertEquals(

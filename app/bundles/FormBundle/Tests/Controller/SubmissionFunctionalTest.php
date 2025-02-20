@@ -25,7 +25,8 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected $useCleanupRollback   = false;
+    protected bool $authenticateApi = true;
 
     public function testRedirectPostAction(): void
     {
@@ -72,7 +73,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_redirectpostactiontestform]');
 
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
 
         $form = $formCrawler->form();
 
@@ -263,7 +264,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => '',
@@ -284,8 +285,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // A contact should be created by the submission.
         $contact = $submission->getLead();
 
-        Assert::assertSame(null, $contact->getCountry());
-        Assert::assertSame(null, $contact->getState());
+        Assert::assertNull($contact->getCountry());
+        Assert::assertNull($contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -358,7 +359,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => 'Australia',
@@ -433,9 +434,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         // show just one text field
-        $this->assertSame(1, $formCrawler->filter('.mauticform-text')->count());
+        $this->assertCount(1, $formCrawler->filter('.mauticform-text'));
     }
 
     public function testAddContactToCampaignByForm(): void
@@ -490,7 +491,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[email]' => 'xx@xx.com',
@@ -543,7 +544,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => 'Australia',
@@ -560,6 +561,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // fetch form submissions as Admin User
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
+        $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $submission     = $response['submissions'][0];
@@ -600,9 +602,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        /** @var PasswordHasherInterface $encoder */
-        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        $user->setPassword($encoder->hash($this->getUserPlainPassword()));
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);
@@ -650,7 +652,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$form->getId()}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $htmlForm = $formCrawler->form();
         $htmlForm->setValues([
             'mauticform[company]' => 'Acquia',
@@ -718,7 +720,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler, $crawler->html());
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[f_all]' => 'test',
@@ -757,6 +759,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
     private function getUserPlainPassword(): string
     {
-        return 'test-pass';
+        return 'test-pass!23';
     }
 }

@@ -1,16 +1,17 @@
 {% block _config_themeconfig_widget %}
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ 'mautic.config.tab.themeconfig'|trans }}</h3>
-    </div>
-    <div class="panel-body">
-        {% for f in form.children %}
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.themeconfig'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.themeconfig.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
             <div class="row">
-                <div class="col-md-6">
+                {% for f in form.children %}
+                <div class="col-xs-12">
                     {{ form_row(f) }}
                 </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}

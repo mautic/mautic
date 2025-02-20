@@ -15,7 +15,7 @@ class CompletedSyncIterationEvent extends Event
         private OrderResultsDAO $orderResultsDAO,
         private int $iteration,
         private InputOptionsDAO $inputOptionsDAO,
-        private MappingManualDAO $mappingManualDAO
+        private MappingManualDAO $mappingManualDAO,
     ) {
     }
 

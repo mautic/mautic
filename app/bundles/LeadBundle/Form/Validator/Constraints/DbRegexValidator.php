@@ -16,7 +16,7 @@ final class DbRegexValidator extends ConstraintValidator
     {
     }
 
-    public function validate($regex, Constraint $constraint): void
+    public function validate(mixed $regex, Constraint $constraint): void
     {
         if (!$constraint instanceof DbRegex) {
             throw new UnexpectedTypeException($constraint, DbRegex::class);

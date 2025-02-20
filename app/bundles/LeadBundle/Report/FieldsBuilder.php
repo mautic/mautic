@@ -14,7 +14,7 @@ class FieldsBuilder
         private FieldModel $fieldModel,
         private ListModel $listModel,
         private UserModel $userModel,
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
     ) {
     }
 

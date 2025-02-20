@@ -26,7 +26,7 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     public function __construct(
         protected AbstractEventAccessor $config,
         protected Event $event,
-        ArrayCollection $logs
+        ArrayCollection $logs,
     ) {
         $this->logs     = $logs;
         $this->contacts = new ArrayCollection();

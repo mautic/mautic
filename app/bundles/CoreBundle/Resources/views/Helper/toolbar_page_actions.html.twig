@@ -1,0 +1,43 @@
+{% set item = item is defined ? item : null %}
+{% set tooltip = tooltip is defined ? tooltip : null %}
+
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_PAGE_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_BUTTON_DROPDOWN'),
+    item) }}
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+{{ restore('action_button_helper') }}
+
+{% if templateButtons is not empty %}
+    {{ buttonsAddFromTemplate(templateButtons, query, actionRoute, indexRoute, langVar, nameGetter, editAttr, routeVars, item, tooltip) }}
+{% endif %}
+
+{% set buttons = buttonsRender()|raw|split('</a>')|slice(0, -1) %}
+{% set standardButtons = buttons|filter(button => 'btn' in button)|map(button => button ~ '</a>')|join %}
+{% set dropdownItems = buttons|filter(button => 'btn' not in button)|map(button => button ~ '</a>')|join %}
+
+<div class="dropdown">
+    {% if dropdownItems %}
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                variant: 'ghost',
+                label: 'mautic.core.options',
+                icon_only: true,
+                icon: 'ri-settings-5-line ri-1x',
+                attributes: {
+                    'class': 'dropdown-toggle',
+                    'data-toggle': 'dropdown',
+                    'aria-expanded': 'false',
+                    'type': 'button',
+                    'id': 'page-list-actions'
+                }
+            }
+        ]
+    } %}
+
+        <ul class="dropdown-menu" role="menu">{{ dropdownItems|raw }}</ul>
+    {% endif %}
+</div>
+{{ standardButtons|raw }}
+{{ extraHtml|raw }}

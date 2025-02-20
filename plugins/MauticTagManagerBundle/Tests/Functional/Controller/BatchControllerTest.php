@@ -90,7 +90,7 @@ class BatchControllerTest extends MauticMysqlTestCase
     /**
      * @param array<string> $tags
      *
-     * @return array<int, \Mautic\LeadBundle\Entity\Tag>
+     * @return array<int, Tag>
      */
     public function addTags(array $tags): array
     {
@@ -104,7 +104,7 @@ class BatchControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, \Mautic\LeadBundle\Entity\Lead>
+     * @return array<int, Lead>
      */
     public function addLeads(): array
     {

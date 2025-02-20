@@ -195,7 +195,7 @@ class NotificationController extends AbstractFormController
         $logs = $auditLog->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
@@ -273,7 +273,7 @@ class NotificationController extends AbstractFormController
         // set the page we came from
         $page         = $session->get('mautic.notification.page', 1);
         $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
-        $notification = $request->request->get('notification') ?? [];
+        $notification = $request->request->all()['notification'] ?? [];
         $updateSelect = ('POST' == $method)
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -439,7 +439,7 @@ class NotificationController extends AbstractFormController
 
         // Create the form
         $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $notification = $request->request->get('notification') ?? [];
+        $notification = $request->request->all()['notification'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -643,10 +643,8 @@ class NotificationController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.notification.page', 1);
         $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
@@ -742,7 +740,7 @@ class NotificationController extends AbstractFormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,

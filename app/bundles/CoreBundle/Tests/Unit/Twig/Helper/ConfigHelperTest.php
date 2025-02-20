@@ -10,7 +10,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet(): void
     {
-        $coreParametersHelper = new class() extends CoreParametersHelper {
+        $coreParametersHelper = new class extends CoreParametersHelper {
             public function __construct()
             {
             }
@@ -30,7 +30,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName(): void
     {
-        $coreParametersHelper = new class() extends CoreParametersHelper {
+        $coreParametersHelper = new class extends CoreParametersHelper {
             public function __construct()
             {
             }

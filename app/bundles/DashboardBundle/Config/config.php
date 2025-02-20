@@ -46,7 +46,7 @@ return [
                 'arguments' => [
                     'mautic.dashboard.model.dashboard',
                     'mautic.helper.user',
-                    'session',
+                    'request_stack',
                 ],
             ],
         ],

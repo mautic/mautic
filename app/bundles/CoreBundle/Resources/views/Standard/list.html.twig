@@ -5,54 +5,40 @@
 {% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent %}
-    {% if not slot('mauticContent') %}
-        {% if mauticContent is defined %}
-            {{ mauticContent }}
-        {% endif %}
-    {% else %}
-        {{ slot('mauticContent') }}
+    {% if mauticContent is defined %}
+        {{ mauticContent }}
     {% endif %}
 {% endblock %}
 
-{% if not slot('headerTitle') %}
-    {% if headerTitle is not defined %}
-        {% set headerTitle = 'Mautic' %}
-    {% endif %}
-    {% set headerTitle = headerTitle|trans %}
-{% else %}
-    {% set headerTitle = slot('headerTitle') %}
+{% if headerTitle is not defined %}
+    {% set headerTitle = 'Mautic' %}
 {% endif %}
+{% set headerTitle = headerTitle|trans %}
 
 {% block headerTitle %}{{ headerTitle }}{% endblock %}
 
-{% block actions %}
-    {{- include('@MauticCore/Helper/page_actions.html.twig',
-    {
-        'templateButtons' : {
-            'new' : permissions[permissionBase ~ ':create'],
-        },
-        'actionRoute'     : actionRoute,
-        'indexRoute'      : indexRoute,
-        'translationBase' : translationBase,
-    }) -}}
-{% endblock %}
-
 {% block content %}
     {% if isIndex %}
-        <div id="page-list-wrapper">
-            {{- include('@MauticCore/Helper/list_toolbar.html.twig',
-                {
-                    'searchValue'      : searchValue,
-                    'searchHelp'       : searchHelp is defined ? searchHelp : '',
-                    'action'           : currentRoute,
-                    'actionRoute'      : actionRoute,
-                    'indexRoute'       : indexRoute,
-                    'translationBase'  : translationBase,
-                    'preCustomButtons' : toolBarButtons is defined ? toolBarButtons : null,
-                    'templateButtons'  : {
-                        'delete' : permissions[permissionBase ~ ':delete'],
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'actionRoute': actionRoute,
+                'indexRoute': indexRoute,
+                'translationBase': translationBase,
+                'preCustomButtons': toolBarButtons is defined ? toolBarButtons : null,
+                'templateButtons': {
+                    'delete': permissions[permissionBase ~ ':delete'],
+                },
+                'filters': filters is defined ? filters : [],
+                'page_actions': {
+                    'templateButtons': {
+                        'new': permissions[permissionBase ~ ':create'],
                     },
-                    'filters' : filters is defined ? filters : [],
+                    'actionRoute': actionRoute,
+                    'indexRoute': indexRoute,
+                    'translationBase': translationBase,
+                }
             }) -}}
 
             <div class="page-list">
@@ -196,7 +182,7 @@
                                     </a>
                                 </div>
                                 {% if attribute(item, 'getDescription') is defined and item.getDescription() %}
-                                    <div class="text-muted mt-4">
+                                    <div class="text-secondary mt-4">
                                         <small>{{ item.getDescription()|purify }}</small>
                                     </div>
                                 {% endif %}

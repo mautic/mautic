@@ -39,7 +39,7 @@ class CoreSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
-        private FormRepository $formRepository
+        private FormRepository $formRepository,
     ) {
     }
 

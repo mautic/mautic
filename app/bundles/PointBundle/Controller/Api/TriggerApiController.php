@@ -43,7 +43,7 @@ class TriggerApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
     ) {
         $triggerModel = $modelFactory->getModel('point.trigger');
         \assert($triggerModel instanceof TriggerModel);

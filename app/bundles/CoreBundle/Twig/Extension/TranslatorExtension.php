@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 class TranslatorExtension extends AbstractExtension
 {
     public function __construct(
-        private Translator $translator
+        private Translator $translator,
     ) {
     }
 

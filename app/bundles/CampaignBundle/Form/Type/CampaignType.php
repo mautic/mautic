@@ -26,7 +26,7 @@ class CampaignType extends AbstractType
 {
     public function __construct(
         private CorePermissions $security,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class CommandHelper
 {
     public function __construct(
-        private KernelInterface $kernel
+        private KernelInterface $kernel,
     ) {
     }
 

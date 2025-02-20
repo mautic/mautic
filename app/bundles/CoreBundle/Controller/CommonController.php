@@ -50,9 +50,9 @@ class CommonController extends AbstractController implements MauticController
         protected Translator $translator,
         private FlashBag $flashBag,
         private ?RequestStack $requestStack,
-        protected ?CorePermissions $security
+        protected ?CorePermissions $security,
     ) {
-        $this->user                 = $userHelper->getUser();
+        $this->user = $userHelper->getUser();
     }
 
     protected function getCurrentRequest(): Request
@@ -90,7 +90,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return AbstractCommonModel<object>
      */
-    protected function getModel($modelNameKey)
+    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -111,6 +111,26 @@ class CommonController extends AbstractController implements MauticController
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+    }
+
+    /**
+     * eventAwareRenderView.
+     *
+     * @param array<string, string> $parameters
+     */
+    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, Request $request = null): string
+    {
+        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
+            $event = $this->dispatcher->dispatch(
+                new CustomTemplateEvent($request, $contentTemplate, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
+            );
+
+            $contentTemplate   = $event->getTemplate();
+            $parameters        = $event->getVars();
+        }
+
+        return $this->renderView($contentTemplate, $parameters);
     }
 
     /**
@@ -199,10 +219,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
-     *
-     * @return RedirectResponse
      */
-    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper)
+    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): RedirectResponse
     {
         return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
     }
@@ -210,7 +228,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects /s and /s/ to /s/dashboard.
      */
-    public function redirectSecureRootAction()
+    public function redirectSecureRootAction(): RedirectResponse
     {
         return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
@@ -219,10 +237,8 @@ class CommonController extends AbstractController implements MauticController
      * Redirects controller if not ajax or retrieves html output for ajax request.
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
-     *
-     * @return Response
      */
-    public function postActionRedirect(array $args = [])
+    public function postActionRedirect(array $args = []): RedirectResponse|Response
     {
         $request = $this->getCurrentRequest();
 
@@ -291,7 +307,7 @@ class CommonController extends AbstractController implements MauticController
             $ajaxRouteName = false;
 
             try {
-                $routeParams   = $this->get('router')->match($routePath);
+                $routeParams   = $this->container->get('router')->match($routePath);
                 $ajaxRouteName = $routeParams['_route'];
 
                 $request->attributes->set('ajaxRoute',
@@ -321,8 +337,9 @@ class CommonController extends AbstractController implements MauticController
             if ($forward) {
                 // the content is from another controller action so we must retrieve the response from it instead of
                 // directly parsing the template
-                $query              = ['ignoreAjax' => true, 'request' => $request, 'subrequest' => true];
-                $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
+                $query                 = ['ignoreAjax' => true, 'subrequest' => true];
+                $parameters['request'] = $request;
+                $newContentResponse    = $this->forward($contentTemplate, $parameters, $query);
                 if ($newContentResponse instanceof RedirectResponse) {
                     $passthrough['redirect'] = $newContentResponse->getTargetUrl();
                     $passthrough['route']    = false;
@@ -330,8 +347,11 @@ class CommonController extends AbstractController implements MauticController
                     $newContent = $newContentResponse->getContent();
                 }
             } else {
+                $parameters['mauticTemplate']     = $contentTemplate;
+                $parameters['mauticTemplateVars'] = $parameters;
+
                 $GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'] = 1; // for error handling
-                $newContent                           = $this->renderView($contentTemplate, $parameters);
+                $newContent                           = $this->eventAwareRenderView($contentTemplate, $parameters, $request);
 
                 unset($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER']);
             }
@@ -466,16 +486,22 @@ class CommonController extends AbstractController implements MauticController
     public function notFound($msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
-
-        $page_404 = $this->coreParametersHelper->get('404_page');
-        if (!empty($page_404)) {
+        $page404 = $this->coreParametersHelper->get('404_page');
+        if (!empty($page404)) {
             $pageModel = $this->getModel('page');
             \assert($pageModel instanceof PageModel);
-            $page = $pageModel->getEntity($page_404);
+            $page = $pageModel->getEntity($page404);
             if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
-                $slug = $pageModel->generateSlug($page);
+                $slug     = $pageModel->generateSlug($page);
+                $response = $this->forward(
+                    'Mautic\PageBundle\Controller\PublicController::indexAction',
+                    [
+                        'slug'            => $slug,
+                        'ignore_mismatch' => true,
+                    ]
+                );
 
-                return $this->redirectToRoute('mautic_page_public', ['slug' => $slug]);
+                return new Response($response->getContent(), Response::HTTP_NOT_FOUND, $response->headers->all());
             }
         }
 
@@ -559,10 +585,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders flashes' HTML.
-     *
-     * @return string
      */
-    protected function getFlashContent()
+    protected function getFlashContent(): string
     {
         return $this->renderView('@MauticCore/Notification/flash_messages.html.twig');
     }
@@ -622,10 +646,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * @param array|\Iterator $toExport
-     *
-     * @return StreamedResponse
      */
-    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper)
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));

@@ -7,7 +7,7 @@ namespace Mautic\MessengerBundle\Message;
 class TestHit
 {
     public function __construct(
-        public int $userId
+        public int $userId,
     ) {
     }
 }

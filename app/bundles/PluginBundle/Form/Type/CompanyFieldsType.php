@@ -25,10 +25,7 @@ class CompanyFieldsType extends AbstractType
         $this->configureFieldOptions($resolver, 'company');
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'integration_company_fields';
     }

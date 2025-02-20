@@ -4,27 +4,7 @@
             <thead>
             <tr>
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
-                    'checkall'        : 'true',
-                    'routeBase'       : 'email',
-                    'templateButtons' : {
-                        'delete' : permissions['email:emails:deleteown'] or permissions['email:emails:deleteother'],
-                    },
-                    'customButtons': [
-                        {
-                            'attr': {
-                                'class': 'btn btn-default btn-sm btn-nospin',
-                                'data-toggle': 'ajaxmodal',
-                                'data-target': '#MauticSharedModal',
-                                'href': path('mautic_email_batch_categories_view'),
-                                'data-header': 'mautic.email.batch.categories'|trans,
-                            },
-                            'btnText': 'mautic.email.batch.categories'|trans,
-                            'iconClass': 'ri-folder-line',
-                        },
-                    ],
-                    'langVar': 'lead.lead',
-                    'routeBase': 'contact',
-                    'tooltip': 'mautic.lead.list.checkall.help'|trans,
+                    'checkall'        : 'true'
                 }) -}}
 
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
@@ -79,6 +59,7 @@
                 {% set hasVariants  = item.isVariant() %}
                 {% set hasTranslations  = item.isTranslation() %}
                 {% set type = item.getEmailType() %}
+                {% set hasDraft  = item.hasDraft() %}
                 {% set mauticTemplateVars = _context|merge({'item' : item}) %}
                 <tr id="row_email_{{ item.id }}">
                     <td>
@@ -145,11 +126,16 @@
                                 {% if 'list' == type %}
                                   <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="ri-pie-chart-line fs-14"></i></span>
                                 {% endif %}
+                                {% if isDraftEnabled and hasDraft %}
+                                <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                    <i class="fa fa-fw fa-file"></i>
+                                </span>
+                                {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>
                         </div>
                         {% if item.getDescription() is not empty %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.getDescription()|purify }}</small>
                             </div>
                         {% endif %}
@@ -162,11 +148,11 @@
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}
-                        <span class="mt-xs label label-red{{ (item.getPendingCount() > 0 and 'list' == item.getEmailType()) ? '' : ' hide' }}"
+                        <span class="mt-xs label label-warm-gray{{ (item.getPendingCount() > 0 and 'list' == item.getEmailType()) ? '' : ' hide' }}"
                               id="pending-{{ item.getId() }}"
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.leadcount.tooltip'|trans }}">
-                          <i class="ri-mail-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
+                          <i class="ri-more-fill"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
                               {{ 'mautic.email.stat.leadcount'|trans ({'%count%' : item.getPendingCount()}) }}
                           </a>
                         </span>
@@ -191,7 +177,7 @@
                                 ({{ item.getReadPercentage(true) }}%)
                             </span>
                         </span>
-                        
+
                         {{ customContent('email.stats', mauticTemplateVars) }}
                         {{ customContent('email.stats.below', mauticTemplateVars) }}
                     </td>

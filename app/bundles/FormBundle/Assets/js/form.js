@@ -16,7 +16,7 @@ Mautic.formOnLoad = function (container) {
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
-            items: '.panel',
+            items: '.form-field-wrapper',
             cancel: '',
             helper: function(e, ui) {
                 ui.children().each(function() {
@@ -307,7 +307,7 @@ Mautic.formActionOnLoad = function (container, response) {
             var newField = false;
         } else {
             //append content
-            mQuery(newHtml).appendTo('#mauticforms_actions');
+            mQuery(newHtml).appendTo('#mauticforms_actions .drop-here');
             var newField = true;
         }
         //activate new stuff

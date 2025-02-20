@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-creative",
+            "directory": "themes/creative",
+            "target": "git@github.com:mautic/theme-creative.git"
+        }
+    ]
+}

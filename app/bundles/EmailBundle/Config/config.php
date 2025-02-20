@@ -111,7 +111,9 @@ return [
         ],
     ],
     'categories' => [
-        'email' => null,
+        'email' => [
+            'class' => Mautic\EmailBundle\Entity\Email::class,
+        ],
     ],
     'services' => [
         'other' => [
@@ -321,6 +323,7 @@ return [
         'show_contact_categories'                                           => false,
         'show_contact_segments'                                             => false,
         'disable_trackable_urls'                                            => false,
+        'email_draft_enabled'                                               => false,
         'theme_email_default'                                               => 'blank',
         'mailer_memory_msg_limit'                                           => 100,
         Mautic\EmailBundle\Form\Type\ConfigType::MINIFY_EMAIL_HTML          => false,

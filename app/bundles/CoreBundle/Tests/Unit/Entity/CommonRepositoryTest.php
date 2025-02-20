@@ -83,10 +83,6 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Check that array of ORDER statements is correct
-     *
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
-     * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClauseFromArray
      */
     public function testBuildingQueryWithOrderArray(): void
     {

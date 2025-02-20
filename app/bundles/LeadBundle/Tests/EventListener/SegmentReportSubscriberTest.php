@@ -84,64 +84,64 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'display_name' => 'mautic.lead.report.segment.membership',
                 'columns'      => [
                     'xx.yyy' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'yyy',
                     ],
                     'lll.manually_removed' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'manually_removed',
                     ],
                     'lll.manually_added' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'manually_added',
                     ],
                     's.id' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'int',
                         'alias' => 's_id',
                     ],
                     's.name' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_name',
                     ],
                     's.created_by_user' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_created_by_user',
                     ],
                     's.date_added' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'datetime',
                         'alias' => 's_date_added',
                     ],
                     's.modified_by_user' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_modified_by_user',
                     ],
                     's.date_modified' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'datetime',
                         'alias' => 's_date_modified',
                     ],
                     's.description' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_description',
                     ],
                     's.is_published' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 's_is_published',
                     ],
                 ],
                 'filters' => [
                     'filter' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'text',
                         'alias' => 'filter',
                     ],

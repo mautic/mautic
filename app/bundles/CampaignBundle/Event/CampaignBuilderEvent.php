@@ -23,7 +23,7 @@ class CampaignBuilderEvent extends Event
     private array $sortCache = [];
 
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

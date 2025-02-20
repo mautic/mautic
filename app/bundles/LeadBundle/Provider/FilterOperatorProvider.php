@@ -18,7 +18,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

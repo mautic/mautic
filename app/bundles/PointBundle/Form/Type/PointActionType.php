@@ -12,6 +12,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PointActionType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks           = [];
@@ -21,7 +25,10 @@ class PointActionType extends AbstractType
         if (!empty($options['formTypeOptions'])) {
             $formTypeOptions = array_merge($formTypeOptions, $options['formTypeOptions']);
         }
-        $builder->add('properties', $options['formType'], $formTypeOptions);
+
+        if (isset($options['formType'])) {
+            $builder->add('properties', $options['formType'], $formTypeOptions);
+        }
 
         if (isset($options['settings']['formTypeCleanMasks'])) {
             $masks['properties'] = $options['settings']['formTypeCleanMasks'];
@@ -33,12 +40,12 @@ class PointActionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'formType'        => GenericPointSettingsType::class,
+            'formType'        => null,
             'formTypeOptions' => [],
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pointaction';
     }

@@ -46,6 +46,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias(GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
+    $services->alias(Symfony\Component\DependencyInjection\ContainerInterface::class, 'service_container');
     $services->alias('mautic.factory', Mautic\CoreBundle\Factory\MauticFactory::class);
     $services->alias(Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class, 'argument_resolver');
 
@@ -56,7 +57,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.language', Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', Mautic\CoreBundle\Helper\EmailAddressHelper::class);
     $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
-    $services->alias('twig.helper.slots', Mautic\CoreBundle\Twig\Helper\SlotsHelper::class);
 
     $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 

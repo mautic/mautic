@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class FormLoadEvent extends Event
 {
     public function __construct(
-        private Integration $integrationConfiguration
+        private Integration $integrationConfiguration,
     ) {
     }
 

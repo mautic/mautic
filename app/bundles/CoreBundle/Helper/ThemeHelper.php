@@ -52,19 +52,31 @@ class ThemeHelper implements ThemeHelperInterface
      * @var string[]
      */
     protected $defaultThemes = [
-        'Mauve',
+        '_1-2-1-2-column',
+        '_1-2-1-column',
+        '_1-2-column',
+        '_1-3-1-3-column',
+        '_1-3-column',
+        '_connect-through-content',
+        '_educate',
+        '_gallery',
+        '_make-announcement',
+        '_showcase',
+        '_simple-text',
+        '_survey',
+        '_welcome',
+        'attract',
         'aurora',
         'blank',
         'brienz',
         'cards',
-        'coffee',
         'confirmme',
+        'creative',
         'fresh-center',
         'fresh-fixed',
         'fresh-left',
         'fresh-wide',
         'goldstar',
-        'nature',
         'neopolitan',
         'oxygen',
         'paprika',
@@ -88,7 +100,7 @@ class ThemeHelper implements ThemeHelperInterface
         private CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper
+        private BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;
@@ -131,7 +143,7 @@ class ThemeHelper implements ThemeHelperInterface
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }
 
-    public function exists($theme)
+    public function exists($theme): bool
     {
         $root    = $this->pathsHelper->getSystemPath('themes', true).'/';
         $dirName = $this->getDirectoryName($theme);
@@ -298,7 +310,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->themeHelpers[$theme];
     }
 
-    public function install($zipFile)
+    public function install($zipFile): bool
     {
         if (false === $this->filesystem->exists($zipFile)) {
             throw new FileNotFoundException();

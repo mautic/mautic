@@ -30,7 +30,7 @@ class CustomFormEvent extends Event
     public function __construct(
         protected $formName,
         protected $formType,
-        private FormBuilderInterface $formBuilder
+        private FormBuilderInterface $formBuilder,
     ) {
     }
 

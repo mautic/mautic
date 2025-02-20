@@ -15,7 +15,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SmsModel $smsModel,
-        private TransportChain $transportChain
+        private TransportChain $transportChain,
     ) {
     }
 

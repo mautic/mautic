@@ -12,7 +12,7 @@ use Mautic\MessengerBundle\Message\TestHit;
 class TestMessageFactory
 {
     public function __construct(
-        private UserHelper $userHelper
+        private UserHelper $userHelper,
     ) {
     }
 

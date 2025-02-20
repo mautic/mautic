@@ -27,7 +27,7 @@ class MembershipManager
         private Remover $remover,
         private EventDispatcher $eventDispatcher,
         private LeadRepository $leadRepository,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -132,7 +132,7 @@ class MembershipManager
         }
 
         // Clear entities from RAM
-        $this->leadRepository->detachEntities($contacts->toArray());
+        $this->leadRepository->detachEntities($campaignMembers);
     }
 
     /**

@@ -23,7 +23,7 @@ class InformationChangeRequestDAO
         private $objectName,
         private $objectId,
         private $field,
-        private NormalizedValueDAO $newValue
+        private NormalizedValueDAO $newValue,
     ) {
     }
 

@@ -49,11 +49,7 @@
                 {{ form_row(form.category) }}
                 {{ form_row(form.language) }}
                 <hr />
-                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
-                <br />
-                {% for utmTag in form.utmTags %}
-                    {{ form_row(utmTag) }}
-                {% endfor %}
+                {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}
                 <div class="hide">
                     {{ form_row(form.isPublished) }}
                     {{ form_row(form.publishUp) }}

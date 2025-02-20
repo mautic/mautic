@@ -38,12 +38,12 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $listModel;
 
     /**
-     * @var MockObject&campaignModel
+     * @var MockObject&CampaignModel
      */
     private MockObject $campaignModel;
 
     /**
-     * @var MockObject&emailModel
+     * @var MockObject&EmailModel
      */
     private MockObject $emailModel;
 
@@ -154,7 +154,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->categoryModel->expects($this->once())
             ->method('getLookupResults')
-            ->with('global')
+            ->with('global', '', 300)
             ->willReturn([['title' => 'Category E', 'id' => 66]]);
 
         $this->emailModel->expects($this->once())

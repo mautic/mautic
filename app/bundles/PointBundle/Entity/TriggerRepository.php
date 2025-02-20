@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -35,8 +36,7 @@ class TriggerRepository extends CommonRepository
             ->from(Trigger::class, 't', 't.id');
 
         $q->where($this->getPublishedByDateExpression($q));
-
-        $q->orderBy('t.points', \Doctrine\Common\Collections\Criteria::ASC);
+        $q->orderBy('t.points', Order::Ascending->value);
 
         return $q->getQuery()->getArrayResult();
     }

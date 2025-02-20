@@ -55,7 +55,7 @@ class CampaignApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory,
         private ValidatorInterface $validator,
-        private EventModel $eventModel
+        private EventModel $eventModel,
     ) {
         $campaignModel = $modelFactory->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);

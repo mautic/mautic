@@ -66,6 +66,7 @@ class ObjectMapping
         $builder
             ->setTable('sync_object_mapping')
             ->setCustomRepositoryClass(ObjectMappingRepository::class)
+            ->addIndex(['internal_object_id'], 'internal_object_id_idx')
             ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')
             ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'integration_reference')
             ->addIndex(['integration', 'internal_object_name', 'last_sync_date'], 'integration_integration_object_name_last_sync_date')
@@ -122,9 +123,6 @@ class ObjectMapping
             ->build();
     }
 
-    /**
-     * @throws \Exception
-     */
     public function __construct(?\DateTime $dateCreated = null)
     {
         if (null === $dateCreated) {
@@ -272,8 +270,6 @@ class ObjectMapping
      * @param \DateTimeInterface|null $lastSyncDate
      *
      * @return ObjectMapping
-     *
-     * @throws \Exception
      */
     public function setLastSyncDate($lastSyncDate)
     {

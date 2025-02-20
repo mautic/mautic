@@ -17,7 +17,7 @@ class FieldColumnDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private BackgroundSettings $backgroundSettings
+        private BackgroundSettings $backgroundSettings,
     ) {
     }
 

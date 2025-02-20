@@ -26,7 +26,7 @@ class IntegrationsHelper
     public function __construct(
         private IntegrationRepository $integrationRepository,
         private EncryptionService $encryptionService,
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

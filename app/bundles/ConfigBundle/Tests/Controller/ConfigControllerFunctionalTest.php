@@ -8,15 +8,13 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL = 'subdomain_url.com';
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
     protected $useCleanupRollback = false;
 
@@ -36,28 +34,27 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testValuesAreEscapedProperly(): void
     {
-        $url                         = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
-        $trackIps                    = "%ip1%\n%ip2%\n%kernel.project_dir%";
-        $googleAnalytics             = 'reveal pass: %mautic.db_password%';
+        $trackIps        = "%ip1%\n%ip2%\n%kernel.project_dir%";
+        $googleAnalytics = 'reveal pass: %mautic.db_password%';
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         // Find save & close button
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
-                'config[coreconfig][site_url]'                    => 'https://mautic-community.local', // required
-                'config[coreconfig][do_not_track_ips]'            => $trackIps,
-                'config[pageconfig][google_analytics]'            => $googleAnalytics,
-                'config[leadconfig][contact_columns]'             => ['name', 'email', 'id'],
+                'config[coreconfig][site_url]'         => 'https://mautic-community.local', // required
+                'config[coreconfig][do_not_track_ips]' => $trackIps,
+                'config[pageconfig][google_analytics]' => $googleAnalytics,
+                'config[leadconfig][contact_columns]'  => ['name', 'email', 'id'],
             ]
         );
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         // Check for a flash error
         $response = $this->client->getResponse()->getContent();
@@ -83,7 +80,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($this->escape($googleAnalytics), $configParameters['google_analytics']);
         // Check values are unescaped properly in the edit form
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
@@ -182,9 +179,11 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
-        $crawler       = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
         Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
@@ -192,7 +191,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         // Request not found url page3 page content should be rendered
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/editnotfoundurlblablabla');
+        $crawler = $this->client->request(Request::METHOD_GET, '/notfoundurlblablabla');
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertStringContainsString('Page3 Test Html', $crawler->text());
     }
 
@@ -219,10 +219,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
@@ -236,7 +236,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     public function testUserAndSystemLocale(): void
     {
         // 1. Change user locale in account - should change _locale session
-        $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
+        $accountCrawler = $this->client->request(Request::METHOD_GET, '/s/account');
+        $this->assertResponseIsSuccessful();
         $accountSaveButton = $accountCrawler->selectButton('user[buttons][save]');
         $accountForm       = $accountSaveButton->form();
         $accountForm->setValues(
@@ -245,8 +246,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $this->client->submit($accountForm);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
 
         // 2. Change system locale in configuration - should not change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -259,8 +260,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $this->client->submit($configForm);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
 
         // 3. Change user locale to system default in account - should change _locale session to system default
         $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
@@ -272,8 +273,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $this->client->submit($accountForm);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
 
         // 2. Change system locale in configuration to en_US - should change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -286,8 +287,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $this->client->submit($configForm);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
     }
 
     public function testSSOSettingEntityId(): void
@@ -307,7 +308,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $this->client->submit($configForm);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         Assert::assertEquals($availableOptions[1], $configForm['config[userconfig][saml_idp_entity_id]']->getValue());
     }
 }

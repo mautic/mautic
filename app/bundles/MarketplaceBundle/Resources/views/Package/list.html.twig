@@ -34,7 +34,7 @@
                 {% trans %}marketplace.composer.required{% endtrans %}
             </div>
         {% endif %}
-        <div id="page-list-wrapper">
+        <div id="page-list-wrapper" class="panel panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'action'      : currentRoute,
@@ -58,7 +58,7 @@
                     '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'  : 'true',
-                        'target'    : '#packages-table',
+                        'target'    : '#marketplace-packages-table',
                         'langVar'   : 'marketplace.package',
                         'routeBase' : 'marketplace',
                     }
@@ -115,7 +115,7 @@
                             </a>
                         </div>
                         {% if item.description %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.description|purify }}</small>
                             </div>
                         {% endif %}

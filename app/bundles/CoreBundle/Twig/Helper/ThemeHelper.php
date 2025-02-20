@@ -28,7 +28,7 @@ final class ThemeHelper
      */
     public function __construct(
         PathsHelper $pathsHelper,
-        private $theme
+        private $theme,
     ) {
         $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
         $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;
@@ -78,18 +78,6 @@ final class ThemeHelper
     public function getConfig()
     {
         return $this->config;
-    }
-
-    /**
-     * Get the theme's slots.
-     *
-     * @param string $type
-     *
-     * @return array<string, mixed>
-     */
-    public function getSlots($type)
-    {
-        return $this->config['slots'][$type] ?? [];
     }
 
     /**

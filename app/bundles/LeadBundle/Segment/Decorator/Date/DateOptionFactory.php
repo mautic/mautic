@@ -27,21 +27,16 @@ class DateOptionFactory
     public function __construct(
         private DateDecorator $dateDecorator,
         private RelativeDate $relativeDate,
-        private TimezoneResolver $timezoneResolver
+        private TimezoneResolver $timezoneResolver,
     ) {
     }
 
-    /**
-     * @return FilterDecoratorInterface
-     */
-    public function getDateOption(ContactSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getDateOption(ContactSegmentFilterCrate $leadSegmentFilterCrate): FilterDecoratorInterface
     {
         $originalValue        = $leadSegmentFilterCrate->getFilter();
         $relativeDateStrings  = $this->relativeDate->getRelativeDateStrings();
-
         $dateOptionParameters = new DateOptionParameters($leadSegmentFilterCrate, $relativeDateStrings, $this->timezoneResolver);
-
-        $timeframe = $dateOptionParameters->getTimeframe();
+        $timeframe            = $dateOptionParameters->getTimeframe();
 
         if (!$timeframe) {
             return new DateDefault($this->dateDecorator, $originalValue);

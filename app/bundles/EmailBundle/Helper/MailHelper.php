@@ -7,6 +7,8 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
@@ -22,7 +24,7 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -32,6 +34,7 @@ use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 class MailHelper
@@ -60,13 +63,6 @@ class MailHelper
      * @var TransportInterface
      */
     protected $transport;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    protected ?EventDispatcherInterface $dispatcher = null;
 
     /**
      * @var bool|MauticMessage
@@ -101,10 +97,7 @@ class MailHelper
      */
     protected $internalSend = false;
 
-    /**
-     * @var null
-     */
-    protected $idHash;
+    protected ?string $idHash = null;
 
     /**
      * @var bool
@@ -240,7 +233,12 @@ class MailHelper
         private Mailbox $mailbox,
         private LoggerInterface $logger,
         private MailHashHelper $mailHashHelper,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private Environment $twig,
+        private ThemeHelper $themeHelper,
+        private PathsHelper $pathsHelper,
+        private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -703,7 +701,7 @@ class MailHelper
         }
 
         if ($asset->isPublished()) {
-            $asset->setUploadDir($this->factory->getParameter('upload_dir'));
+            $asset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
             $this->assets[$asset->getId()] = $asset;
         }
     }
@@ -719,10 +717,6 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->twig) {
-            $this->twig = $this->factory->getTwig();
-        }
-
         $content = $this->twig->render($template, $vars);
 
         unset($vars);
@@ -829,7 +823,7 @@ class MailHelper
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
                 if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
                     $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
-                    $path = $this->factory->getSystemPath('root', true).$path;
+                    $path = $this->pathsHelper->getSystemPath('root', true).$path;
                 }
 
                 if ($imageContent = file_get_contents($path)) {
@@ -865,10 +859,8 @@ class MailHelper
 
     /**
      * Set to address(es).
-     *
-     * @return bool
      */
-    public function setTo($addresses, $name = null)
+    public function setTo($addresses, $name = null): bool
     {
         $name = $this->cleanName($name);
 
@@ -905,10 +897,8 @@ class MailHelper
      *
      * @param string      $address
      * @param string|null $name
-     *
-     * @return bool
      */
-    public function addTo($address, $name = null)
+    public function addTo($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients();
 
@@ -931,10 +921,8 @@ class MailHelper
      * @param ?string               $name
      *
      * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
-     *
-     * @return bool
      */
-    public function setCc($addresses, $name = null)
+    public function setCc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
@@ -960,10 +948,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addCc($address, $name = null)
+    public function addCc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'cc');
 
@@ -985,10 +971,8 @@ class MailHelper
      * @param ?string               $name
      *
      * //TODO: same bug for the name as the one we have in setCc
-     *
-     * @return bool
      */
-    public function setBcc($addresses, $name = null)
+    public function setBcc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
@@ -1015,10 +999,8 @@ class MailHelper
      *
      * @param string  $address
      * @param ?string $name
-     *
-     * @return bool
      */
-    public function addBcc($address, $name = null)
+    public function addBcc($address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'bcc');
 
@@ -1216,13 +1198,12 @@ class MailHelper
 
     /**
      * @param bool  $allowBcc            Honor BCC if set in email
-     * @param array $slots               Slots configured in theme
      * @param array $assetAttachments    Assets to send
      * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, $allowBcc = true, $assetAttachments = [], $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1253,20 +1234,9 @@ class MailHelper
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
         if (empty($customHtml) && $template) {
-            if (empty($slots)) {
-                $slots    = $this->factory->getTheme($template)->getSlots('email');
-            }
-
-            if (isset($slots[$template])) {
-                $slots = $slots[$template];
-            }
-
-            $this->processSlots($slots, $email);
-
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+            $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
-                'slots'    => $slots,
                 'content'  => $email->getContent(),
                 'email'    => $email,
                 'template' => $template,
@@ -1443,9 +1413,15 @@ class MailHelper
             }
         }
 
-        $request = $this->factory->getRequest();
+        $request = $this->requestStack->getMainRequest();
+        if (null !== $request) {
+            $baseUrl = $request->getSchemeAndHttpHost().$request->getBasePath();
+        } else {
+            $baseUrl = $this->coreParametersHelper->get('site_url');
+        }
+
         $parser  = new PlainTextHelper([
-            'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
+            'base_url' => $baseUrl,
         ]);
 
         $this->plainText = $parser->setHtml($content)->getText();
@@ -1468,10 +1444,6 @@ class MailHelper
      */
     public function dispatchSendEvent(): void
     {
-        if (null == $this->dispatcher) {
-            $this->dispatcher = $this->factory->getDispatcher();
-        }
-
         if (null === $this->bodyInitial) {
             $this->bodyInitial = $this->body;
         }
@@ -1833,27 +1805,6 @@ class MailHelper
     }
 
     /**
-     * @param Email $entity
-     */
-    public function processSlots($slots, $entity): void
-    {
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            $value = $content[$slot] ?? '';
-            $slotsHelper->set($slot, $value);
-        }
-    }
-
-    /**
      * Clean the name - if empty, set as null to ensure pretty headers.
      *
      * @return string|null
@@ -2147,14 +2098,6 @@ class MailHelper
 
     public function dispatchPreSendEvent(): void
     {
-        if (null === $this->dispatcher) {
-            $this->dispatcher = $this->factory->getDispatcher();
-        }
-
-        if (empty($this->dispatcher)) {
-            return;
-        }
-
         $event = new EmailSendEvent($this);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
 

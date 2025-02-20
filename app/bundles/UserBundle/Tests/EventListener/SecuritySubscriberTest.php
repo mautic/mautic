@@ -52,7 +52,7 @@ class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn($userId);
         $user->expects($this->once())
-            ->method('getUserName')
+            ->method('getUserIdentifier')
             ->willReturn($userName);
         $event = $this->createMock(LoginEvent::class);
         $event->expects($this->exactly(2))

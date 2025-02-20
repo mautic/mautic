@@ -13,7 +13,7 @@ use Symfony\Component\Mailer\Transport\Transports;
 class TransportFactory
 {
     public function __construct(
-        private SymfonyTransportFactory $transportFactory
+        private SymfonyTransportFactory $transportFactory,
     ) {
     }
 

@@ -29,7 +29,7 @@ class UserCreator implements UserCreatorInterface
         private UserMapper $userMapper,
         private UserModel $userModel,
         private UserPasswordHasher $hasher,
-        $defaultRole
+        $defaultRole,
     ) {
         $this->defaultRole   = (int) $defaultRole;
     }

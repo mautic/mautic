@@ -21,7 +21,7 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CompanyObjectHelper $companyObjectHelper,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

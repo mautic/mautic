@@ -1,0 +1,10 @@
+{
+  "name": "mautic/theme-simple-text",
+  "description": "Simple text",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^6.0"
+  }
+}

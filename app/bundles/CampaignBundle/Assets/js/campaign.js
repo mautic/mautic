@@ -134,6 +134,34 @@ Mautic.campaignOnLoad = function (container, response) {
             Mautic.processBuilderErrors(response);
         }
 
+        const campaignEmailStats = mQuery(container).find('[data-load="campaign-email-stats"]').first();
+        if(campaignEmailStats.length) {
+            mQuery(campaignEmailStats).on('click', () => {
+                const $campaignWeekdaysContainer = mQuery('[data-campaign-email-stats-weekdays]');
+                const $campaignHoursContainer = mQuery('[data-campaign-email-stats-hours]');
+
+                if ($campaignWeekdaysContainer.find('canvas').length === 0) {
+                    mQuery.ajax({
+                        url: $campaignWeekdaysContainer.data('campaign-email-stats-weekdays'),
+                        success: function (response) {
+                            $campaignWeekdaysContainer.html(response);
+                            Mautic.renderCharts($campaignWeekdaysContainer);
+                        }
+                    });
+                }
+
+                if ($campaignHoursContainer.find('canvas').length === 0) {
+                    mQuery.ajax({
+                        url: $campaignHoursContainer.data('campaign-email-stats-hours'),
+                        success: function (response) {
+                            $campaignHoursContainer.html(response);
+                            Mautic.renderCharts($campaignHoursContainer);
+                        }
+                    });
+                }
+            });
+        }
+
         // update the cloned event info when storage is updated from different tab
         window.addEventListener('storage', function(event) {
             if (event.key === 'mautic_campaign_event_clone') {
@@ -1129,27 +1157,23 @@ Mautic.campaignHoverCallback = function(sourceEndpoint, endpoint, event) {
  * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
  */
 Mautic.campaignToggleTimeframes = function() {
-    if (mQuery('#campaignevent_triggerMode_2').length) {
-        var immediateChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
-        var intervalChecked = mQuery('#campaignevent_triggerMode_1').prop('checked');
-        var dateChecked = mQuery('#campaignevent_triggerMode_2').prop('checked');
-    } else {
-        var immediateChecked = false;
-        var intervalChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
-        var dateChecked = mQuery('#campaignevent_triggerMode_1').prop('checked');
+    const triggerModes = {
+        immediate: mQuery('#campaignevent_triggerMode_0').prop('checked'),
+        interval: mQuery('#campaignevent_triggerMode_1').prop('checked'),
+        date: mQuery('#campaignevent_triggerMode_2').prop('checked'),
+        optimal: mQuery('#campaignevent_triggerMode_3').prop('checked')
+    };
+
+    if (!mQuery('#campaignevent_triggerMode_2').length) {
+        triggerModes.date = triggerModes.interval;
+        triggerModes.interval = triggerModes.immediate;
+        triggerModes.immediate = false;
     }
 
     if (mQuery('#campaignevent_triggerInterval').length) {
-        if (immediateChecked) {
-            mQuery('#triggerInterval').addClass('hide');
-            mQuery('#triggerDate').addClass('hide');
-        } else if (intervalChecked) {
-            mQuery('#triggerInterval').removeClass('hide');
-            mQuery('#triggerDate').addClass('hide');
-        } else if (dateChecked) {
-            mQuery('#triggerInterval').addClass('hide');
-            mQuery('#triggerDate').removeClass('hide');
-        }
+        mQuery('#triggerInterval').toggleClass('hide', !triggerModes.interval);
+        mQuery('#triggerDate').toggleClass('hide', !triggerModes.date);
+        mQuery('#triggerOptimized').toggleClass('hide', !triggerModes.optimal);
     }
 };
 
@@ -1172,7 +1196,7 @@ Mautic.closeCampaignBuilder = function() {
         spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
-    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="ri-loader-3-line ri-spin ri-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
     mQuery('#builder-errors').hide('fast').text('');
 
@@ -1827,7 +1851,7 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
                 left: (leftPos >=0 ) ? leftPos : 10,
                 top: topPos,
                 width: newWidth,
-                height: Mautic.campaignBuilderIsEventCloneAllowed ? 372 : 280
+
             });
 
         mQuery('#CampaignEventPanel').removeClass('hide');
@@ -1847,7 +1871,6 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
             left: (leftPos >= 0) ? leftPos : 10,
             top: topPos,
             width: 300,
-            height: 80,
         });
 
         mQuery('#CampaignEventPanelGroups').addClass('hide');

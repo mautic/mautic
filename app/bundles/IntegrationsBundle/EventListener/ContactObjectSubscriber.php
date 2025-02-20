@@ -22,7 +22,7 @@ class ContactObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ContactObjectHelper $contactObjectHelper,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

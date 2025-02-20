@@ -13,7 +13,7 @@ class ContactFinder
     public function __construct(
         private StatRepository $statRepository,
         private LeadRepository $leadRepository,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

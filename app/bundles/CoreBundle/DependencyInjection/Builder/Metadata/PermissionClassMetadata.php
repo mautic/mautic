@@ -13,7 +13,7 @@ use Symfony\Component\Finder\Finder;
 class PermissionClassMetadata
 {
     public function __construct(
-        private BundleMetadata $metadata
+        private BundleMetadata $metadata,
     ) {
     }
 
@@ -28,7 +28,6 @@ class PermissionClassMetadata
             ->name('*Permissions.php')
             ->in($directory.'/Security/Permissions');
 
-        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $className       = basename($file->getFilename(), '.php');
             $permissionClass = sprintf('%s\\Security\\Permissions\\%s', $this->metadata->getNamespace(), $className);

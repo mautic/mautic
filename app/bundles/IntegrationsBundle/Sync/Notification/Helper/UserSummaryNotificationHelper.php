@@ -10,15 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserSummaryNotificationHelper
 {
-    /**
-     * @var array
-     */
-    private $userNotifications = [];
+    private array $userNotifications = [];
 
-    /**
-     * @var string
-     */
-    private $integrationDisplayName;
+    private ?string $integrationDisplayName = null;
 
     /**
      * @var string
@@ -34,7 +28,7 @@ class UserSummaryNotificationHelper
         private UserHelper $userHelper,
         private OwnerProvider $ownerProvider,
         private RouteHelper $routeHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

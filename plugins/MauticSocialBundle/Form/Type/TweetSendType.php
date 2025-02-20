@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class TweetSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 
@@ -102,10 +102,7 @@ class TweetSendType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'tweetsend_list';
     }

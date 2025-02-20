@@ -246,7 +246,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     {
         $field   = new Field();
         $form    = new Form();
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getFieldValue($field, $group = null)
             {
                 Assert::assertSame('field_a', $field);
@@ -266,7 +266,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     {
         $field   = new Field();
         $form    = new Form();
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getFieldValue($field, $group = null)
             {
                 Assert::assertSame('field_a', $field);
@@ -286,7 +286,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     {
         $field   = new Field();
         $form    = new Form();
-        $contact = new class() extends Lead {
+        $contact = new class extends Lead {
             public function getFieldValue($field, $group = null)
             {
                 Assert::assertSame('field_a', $field);

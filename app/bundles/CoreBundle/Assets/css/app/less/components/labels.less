@@ -19,7 +19,8 @@
   .text-overflow();
 
   // Exception for category color labels
-  &.label-category {
+  &.label-category,
+  &.label-icon {
     min-width: auto;
     aspect-ratio: 1/1;
   }
@@ -110,19 +111,26 @@
 }
 
 .label-primary {
-  background-color: var(--label-background-brand-primary);
-  color: var(--label-color-brand-primary);
+  background-color: var(--label-background-primary);
+  color: var(--label-color-primary);
 }
 
-.label-secondary {
-  background-color: var(--label-background-brand-secondary);
-  color: var(--label-color-brand-secondary);
+.label-brand {
+  background-color: var(--label-background-brand);
+  color: var(--label-color-brand);
 }
 
-.label-outline {
+.label-outline,
+.label-selectable {
   background-color: transparent;
   color: var(--text-primary);
-  &, &:hover {outline: 1px solid var(--background-inverse);}
+  &, &:hover {border: 1px solid var(--background-inverse);}
+}
+
+.label-selectable.active {
+  background-color: var(--layer-selected-inverse);
+  color: var(--text-inverse);
+  border-color: var(--layer-selected-inverse);
 }
 
 .label-high-contrast {
@@ -186,14 +194,14 @@
     &:hover { background-color: var(--label-background-hover-green); }
   }
   &.label-primary {
-    border: 1px solid var(--label-border-brand-primary);
-    color: var(--label-color-brand-primary);
-    &:hover { background-color: var(--label-background-hover-brand-primary); }
+    border: 1px solid var(--label-border-primary);
+    color: var(--label-color-primary);
+    &:hover { background-color: var(--label-background-hover-primary); }
   }
-  &.label-secondary {
-    border: 1px solid var(--label-border-brand-secondary);
-    color: var(--label-color-brand-secondary);
-    &:hover { background-color: var(--label-background-hover-brand-secondary); }
+  &.label-brand {
+    border: 1px solid var(--label-border-brand);
+    color: var(--label-color-brand);
+    &:hover { background-color: var(--label-background-hover-brand); }
   }
 }
 

@@ -12,7 +12,7 @@ use Twig\TwigFunction;
 class FormatterExtension extends AbstractExtension
 {
     public function __construct(
-        protected FormatterHelper $formatterHelper
+        protected FormatterHelper $formatterHelper,
     ) {
     }
 

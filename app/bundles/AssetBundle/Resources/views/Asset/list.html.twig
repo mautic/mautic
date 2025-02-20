@@ -7,25 +7,55 @@
 {% block headerTitle %}
 	{% trans %}mautic.asset.assets{% endtrans %}
 {% endblock %}
-{% block actions %}
-	{{- include('@MauticCore/Helper/page_actions.html.twig', {
-         'templateButtons' : {
-                'new' : permissions['asset:assets:create'],
-         },
-            'routeBase' : 'asset',
-            'langVar'   : 'asset.asset',
-    }) -}}
-{% endblock %}
 
 {% block content %}
 	{% if isIndex %}
-		<div id="page-list-wrapper">
+		<div id="page-list-wrapper" class="panel panel-default">
 
 			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-        'searchValue' : searchValue,
-        'action'      : currentRoute,
-        'searchHelp'  : 'mautic.asset.asset.help.searchcommands',
-    }) -}}
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'page_actions': {
+                    'templateButtons': {
+                        'new': permissions['asset:assets:create'],
+                    },
+                    'routeBase': 'asset',
+                    'langVar': 'asset.asset',
+                },
+                'bulk_actions': {
+                    'langVar': 'asset.asset',
+                    'routeBase': 'asset',
+                    'templateButtons': {
+                        'delete': permissions['asset:assets:deleteown'] or permissions['asset:assets:deleteother'],
+                    },
+                },
+                'quickFilters': [
+                    {
+                        'search': 'mautic.core.searchcommand.isuncategorized',
+                        'label': 'mautic.core.form.uncategorized',
+                        'tooltip': 'mautic.core.search.quickfilter.is_uncategorized',
+                        'icon': 'ri-folder-unknow-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.available',
+                        'tooltip': 'mautic.core.search.quickfilter.is_published',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.unavailable',
+                        'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+                        'icon': 'ri-close-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
+            }) -}}
 			<div class="page-list">
 				{{ block('listResults') }}
 			</div>
@@ -41,18 +71,10 @@
         <table class="table table-hover asset-list" id="assetTable">
             <thead>
             <tr>
-                {{- include(
-                    '@MauticCore/Helper/tableheader.html.twig',
-                    {
-                        'checkall'        : 'true',
-                        'target'          : '#assetTable',
-                        'langVar'         : 'asset.asset',
-                        'routeBase'       : 'asset',
-                        'templateButtons' : {
-                            'delete' : permissions['asset:assets:deleteown'] or permissions['asset:assets:deleteother'],
-                    },
-                    }
-                ) -}}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#assetTable',
+                }) }}
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig',
                     {
@@ -177,10 +199,11 @@
                                 {{ item.getTitle() }} ({{ item.getAlias() }})
                             </a>
                             <i class="{{ item.getIconClass() }}"></i>
+                            {{ customContent('asset.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ description|purify }}</small>
                             </div>
                         {% endif %}
@@ -223,4 +246,8 @@
         'id'     : 'AssetPreviewModal',
         'header' : false,
 }) -}}
+
+{{ include('@MauticCore/Helper/protip.html.twig', {
+    tip: random(['mautic.protip.assets.gating', 'mautic.protip.assets.naming', 'mautic.protip.assets.repurpose', 'mautic.protip.assets.track'])
+}) }}
 {% endblock %}

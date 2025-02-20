@@ -23,7 +23,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
     public function __construct(
         protected Translator $translator,
         protected LeadModel $leadModel,
-        protected FieldModel $fieldModel
+        protected FieldModel $fieldModel,
     ) {
     }
 
@@ -209,7 +209,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'campaignevent_lead_field_value';
     }

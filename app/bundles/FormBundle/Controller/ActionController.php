@@ -39,7 +39,6 @@ class ActionController extends CommonFormController
 
         // ajax only for form fields
         if (!$actionType
-            || !$request->isXmlHttpRequest()
             || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->modalAccessDenied();
@@ -147,7 +146,7 @@ class ActionController extends CommonFormController
     {
         $session    = $request->getSession();
         $method     = $request->getMethod();
-        $formaction = $request->request->get('formaction') ?? [];
+        $formaction = $request->request->all()['formaction'] ?? [];
         $formId     = 'POST' === $method ? ($formaction['formId'] ?? '') : $request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;

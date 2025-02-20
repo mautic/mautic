@@ -8,7 +8,7 @@ final class CommandResponse
 {
     public function __construct(
         private int $statusCode,
-        private string $message
+        private string $message,
     ) {
     }
 

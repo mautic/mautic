@@ -44,7 +44,7 @@ class ContactLimiter
         private array $contactIdList = [],
         $threadId = null,
         $maxThreads = null,
-        $campaignLimit = null
+        $campaignLimit = null,
     ) {
         $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
         $this->contactId     = ($contactId) ? (int) $contactId : null;

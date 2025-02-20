@@ -1,0 +1,22 @@
+{# description.html.twig #}
+{% if description is defined and description is not empty %}
+    {% set isCollapsed = description|striptags|length > 70 %}
+
+    <div class="row-no-gutters ml-md">
+        <div class="well description pa-0">
+            <a href="javascript:void(0)" class="d-flex jc-space-between gap-sm pa-sm text-secondary pr-xs {{ isCollapsed ? 'collapsed' }}" data-toggle="collapse" data-target="#description">
+                <div class="small fw-b text-secondary">{{ 'mautic.core.description'|trans }}</div>
+                <i class="arrow ri-arrow-up-wide-line ri-sm text-secondary"></i>
+            </a>
+            <div id="description" class="collapse {{ not isCollapsed ? 'in' }}">
+                <div class="well layer-two description-content mb-sm ml-sm mr-sm mt-0 pa-sm">
+                    {{ description|purify|raw }}
+                    {% if extra_content is defined and extra_content is not empty %}
+                        <hr class="mt-xs mb-xs">
+                        {{ extra_content|raw }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

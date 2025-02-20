@@ -36,7 +36,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
     private $isAdmin = false;
 
     /**
-     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\Permission>
+     * @var ArrayCollection<int, Permission>
      */
     private $permissions;
 
@@ -46,7 +46,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
     private $rawPermissions;
 
     /**
-     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
+     * @var ArrayCollection<int, User>
      */
     private $users;
 

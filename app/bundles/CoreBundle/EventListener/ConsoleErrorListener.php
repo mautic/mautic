@@ -10,7 +10,7 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 class ConsoleErrorListener
 {
     public function __construct(
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

@@ -1338,7 +1338,8 @@
       "profile": "https://matbcvo.github.io",
       "contributions": [
         "review",
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -1394,6 +1395,97 @@
       "contributions": [
         "bug",
         "code"
+      ]
+    },
+    {
+      "login": "MojisolaaaO",
+      "name": "Mojisola Otusheso",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173389301?v=4",
+      "profile": "https://github.com/MojisolaaaO",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "nileshlohar",
+      "name": "Nilesh Lohar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18068907?v=4",
+      "profile": "https://github.com/nileshlohar",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "AlbertMN",
+      "name": "Albert Møller Nielsen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11600207?v=4",
+      "profile": "https://simplyprint.io/",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "TheMarvelFan",
+      "name": "Kushagra Nigam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93257324?v=4",
+      "profile": "https://github.com/TheMarvelFan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "laurielim",
+      "name": "Laurie Lim Sam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/62180225?v=4",
+      "profile": "http://laurielim.github.io",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
+    },
+    {
+      "login": "caiqueportela",
+      "name": "Caique Portela",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44068957?v=4",
+      "profile": "https://github.com/caiqueportela",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "levente999",
+      "name": "levente999",
+      "avatar_url": "https://avatars.githubusercontent.com/u/168987998?v=4",
+      "profile": "https://github.com/levente999",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rishithreddy89",
+      "name": "rishithreddy89",
+      "avatar_url": "https://avatars.githubusercontent.com/u/178993450?v=4",
+      "profile": "https://github.com/rishithreddy89",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Jaishree2310",
+      "name": "Jaishree Singh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73012522?v=4",
+      "profile": "https://linktr.ee/Jaishree2310",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "kingsedem",
+      "name": "Kingsley_E_",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47061881?v=4",
+      "profile": "https://github.com/kingsedem",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],

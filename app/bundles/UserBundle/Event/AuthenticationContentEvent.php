@@ -18,7 +18,7 @@ class AuthenticationContentEvent extends Event
     protected $postLogout = false;
 
     public function __construct(
-        protected Request $request
+        protected Request $request,
     ) {
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }

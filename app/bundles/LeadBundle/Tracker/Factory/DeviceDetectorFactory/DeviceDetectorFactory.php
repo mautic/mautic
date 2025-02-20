@@ -9,7 +9,7 @@ use Mautic\CacheBundle\Cache\CacheProvider;
 final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
 {
     public function __construct(
-        private CacheProvider $cacheProvider
+        private CacheProvider $cacheProvider,
     ) {
     }
 

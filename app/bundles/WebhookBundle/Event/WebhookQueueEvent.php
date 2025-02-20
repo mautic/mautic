@@ -14,7 +14,7 @@ class WebhookQueueEvent extends CommonEvent
     public function __construct(
         WebhookQueue $webhookQueue,
         protected Webhook $webhook,
-        $isNew = false
+        $isNew = false,
     ) {
         $this->entity  = $webhookQueue;
         $this->isNew   = $isNew;

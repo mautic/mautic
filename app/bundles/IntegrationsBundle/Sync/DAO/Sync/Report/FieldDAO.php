@@ -19,7 +19,7 @@ class FieldDAO
     public function __construct(
         private string $name,
         private NormalizedValueDAO $value,
-        private string $state = self::FIELD_CHANGED
+        private string $state = self::FIELD_CHANGED,
     ) {
     }
 

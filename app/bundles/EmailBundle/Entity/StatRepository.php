@@ -77,7 +77,7 @@ class StatRepository extends CommonRepository
         $createdByUserId = null,
         $companyId = null,
         $campaignId = null,
-        $segmentId = null
+        $segmentId = null,
     ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')

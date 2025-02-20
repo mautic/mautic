@@ -17,7 +17,7 @@ class InternalObjectCreateEvent extends Event
 
     public function __construct(
         private ObjectInterface $object,
-        private array $createObjects
+        private array $createObjects,
     ) {
     }
 

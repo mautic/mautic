@@ -20,7 +20,7 @@ class ReplyHelper
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
         private LoggerInterface $logger,
-        private ContactTracker $contactTracker
+        private ContactTracker $contactTracker,
     ) {
     }
 

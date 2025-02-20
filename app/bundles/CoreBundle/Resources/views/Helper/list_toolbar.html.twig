@@ -1,19 +1,34 @@
 {% set wrap = true %}
 
-{{ buttonReset(
-    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_TOOLBAR_ACTIONS'),
-    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_GROUP'),
-) }}
+<div class="panel-heading pa-0 toolbar--table-toolbar">
 
-{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
-{# Workaround to get variables from action_button_helper here #}
-{{ restore('action_button_helper') }}
+    <div class="toolbar--batch-actions d-flex jc-space-between bg-primary fd-column fd-row-sm">
+        <div class="toolbar--batch-summary d-flex">
+            <span class="toolbar--batch-summary__count" data-singular="{{ 'mautic.core.item_selected'|trans|lower }}"
+            data-plural="{{ 'mautic.core.items_selected'|trans|lower }}">0 {{ 'mautic.core.items_selected'|trans|lower }}</span>
+        </div>
+        <div class="toolbar--action-list d-flex fw-wrap fw-nowrap-sm">
+            {{ include('@MauticCore/Helper/toolbar_bulk_actions.html.twig', bulk_actions|default({})) }}
+            <span class="toolbar--batch-summary__divider">|</span>
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.core.form.cancel',
+                        variant: 'primary',
+                        size: 'lg',
+                        attributes: {
+                            'type': 'button',
+                            'class': 'bdr-rds-0',
+                            'data-toggle': 'cancel-checkall'
+                        }
+                    }
+                ]
+            } %}
+        </div>
+    </div>
 
-<div class="panel-body">
-    <div class="box-layout">
-        <div class="col-xs-6 col-lg-8 va-m form-inline">
-            <div class="d-flex gap-sm ai-center">
-                {% if searchValue is defined %}
+    <div class="d-flex ai-center list-toolbar toolbar--toolbar-content h-48">
+        {% if searchValue is defined %}
             {{- include('@MauticCore/Helper/search.html.twig', {
                 searchId: searchId|default(null),
                 searchValue: searchValue,
@@ -23,31 +38,10 @@
                 tmpl: tmpl|default(null),
                 overlayDisabled: overlayDisabled is defined ? overlayDisabled : null
             }) -}}
-            {% endif %}
-            {% if quickFilters is defined and quickFilters is not empty %}
-            {{ include('@MauticCore/Helper/list_quickfilters.html.twig', {
-                'quickFilters': quickFilters
-            }) }}
-            {% endif %}
-            {% if filters is defined and filters is not empty %}
-            {{- include('@MauticCore/Helper/list_filters.html.twig', {
-                filters: filters,
-                target: target|default(null),
-                tmpl: tmpl|default(null)
-            }) -}}
-            {% endif %}
-            </div>
-        </div>
+        {% endif %}
 
-        <div class="col-xs-12 col-lg-4 va-m text-right">
-            {% if buttonHelp is defined and buttonHelp is not empty %}
-                <div class="input-group-btn">
-                    <button class="btn btn-ghost btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help">
-                        <i class="ri-question-line"></i>
-                    </button>
-                </div>
-            {% endif %}
-            {{ buttonsRender() }}
-        </div>
+        {% include '@MauticCore/Helper/toolbar_actions.html.twig' %}
+        {{ include('@MauticCore/Helper/toolbar_page_actions.html.twig', page_actions|default({})) }}
     </div>
+
 </div>

@@ -1,0 +1,22 @@
+{% if showMore is defined %}
+    <a href="{{ url('mautic_sms_index', {'search': searchString}) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+    </a>
+    </div>
+{% else %}
+    <a href="{{ url('mautic_sms_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+        <span class="fw-sb">{{ item.name }}</span>
+        <span class="ml-4 mr-sm">#{{ item.id }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': item,
+            'status': 'active',
+            'simplified': 'true'
+        }) -}}
+    </a>
+    <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.sms.stat.sentcount.label'|trans }}"
+          data-placement="left">
+        <i class="ri-send-plane-line"></i>
+        {{ item.sentCount }}
+    </span>
+    <div class="clearfix"></div>
+{% endif %}

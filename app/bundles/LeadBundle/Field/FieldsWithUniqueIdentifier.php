@@ -12,7 +12,7 @@ class FieldsWithUniqueIdentifier
     private array $uniqueIdentifierFields = [];
 
     public function __construct(
-        private FieldList $fieldList
+        private FieldList $fieldList,
     ) {
     }
 

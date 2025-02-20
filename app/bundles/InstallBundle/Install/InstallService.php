@@ -50,7 +50,7 @@ class InstallService
         private KernelInterface $kernel,
         private ValidatorInterface $validator,
         private UserPasswordHasher $hasher,
-        private FixturesLoaderInterface $fixturesLoader
+        private FixturesLoaderInterface $fixturesLoader,
     ) {
     }
 

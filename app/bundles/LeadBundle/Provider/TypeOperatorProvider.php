@@ -26,7 +26,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private FilterOperatorProviderInterface $filterOperatorProvider
+        private FilterOperatorProviderInterface $filterOperatorProvider,
     ) {
     }
 

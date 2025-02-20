@@ -17,7 +17,7 @@ class ExecuteEventCommand extends Command
     public function __construct(
         private ScheduledExecutioner $scheduledExecutioner,
         private TranslatorInterface $translator,
-        private FormatterHelper $formatterHelper
+        private FormatterHelper $formatterHelper,
     ) {
         parent::__construct();
     }

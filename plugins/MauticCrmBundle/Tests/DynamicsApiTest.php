@@ -20,7 +20,6 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->dispatcher,
             $this->cache,
             $this->em,
-            $this->session,
             $this->request,
             $this->router,
             $this->translator,
@@ -32,10 +31,11 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->notificationModel,
             $this->fieldModel,
             $this->integrationEntityModel,
-            $this->doNotContact
+            $this->doNotContact,
+            $this->fieldsWithUniqueIdentifier
         );
 
-        $this->api         = new DynamicsApi($this->integration);
+        $this->api = new DynamicsApi($this->integration);
     }
 
     public function testIntegration(): void

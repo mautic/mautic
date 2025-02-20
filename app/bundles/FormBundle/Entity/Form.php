@@ -73,12 +73,12 @@ class Form extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
+     * @var ArrayCollection<int, Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
+     * @var ArrayCollection<string, Action>
      */
     private $actions;
 
@@ -100,8 +100,6 @@ class Form extends FormEntity
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
     private Collection $submissions;
 
     /**
@@ -527,7 +525,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
+     * @return ArrayCollection<int, Field>
      */
     public function getFields()
     {
@@ -660,7 +658,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
+     * @return ArrayCollection<string, Action>
      */
     public function getActions()
     {

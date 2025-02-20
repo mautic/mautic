@@ -15,7 +15,7 @@ class BundleHelper
      */
     public function __construct(
         private array $coreBundles,
-        private array $pluginBundles
+        private array $pluginBundles,
     ) {
         $this->allBundles    = array_merge($coreBundles, $pluginBundles);
     }

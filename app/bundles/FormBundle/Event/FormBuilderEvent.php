@@ -20,7 +20,7 @@ class FormBuilderEvent extends Event
     private array $validators = [];
 
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

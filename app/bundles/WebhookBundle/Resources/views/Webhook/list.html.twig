@@ -19,13 +19,37 @@
 
 {% block content %}
 {% if isIndex %}
-<div id="page-list-wrapper">
-    {{- include(
-        '@MauticCore/Helper/list_toolbar.html.twig', {
-            searchValue: searchValue,
-            searchHelp: 'mautic.page.help.searchcommands',
-            action: currentRoute
-    }) -}}
+<div id="page-list-wrapper" class="panel panel-default">
+    {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'action': currentRoute,
+        'bulk_actions': {
+            'routeBase': 'webhook',
+            'templateButtons': {
+                'delete': (permissions['webhook:webhooks:deleteown'] or permissions['webhook:webhooks:deleteother'])
+            }
+        },
+        'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ispublished',
+                'label': 'mautic.core.form.active',
+                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                'icon': 'ri-check-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isunpublished',
+                'label': 'mautic.core.form.inactive',
+                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                'icon': 'ri-close-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            }
+        ]
+    }) }}
     <div class="page-list">
         {{ block('listResults') }}
     </div>
@@ -44,11 +68,7 @@
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig', {
                         checkall: 'true',
-                        target: '#webhookTable',
-                        routeBase: 'webhook',
-                        templateButtons: {
-                            delete: (permissions['webhook:webhooks:deleteown'] or permissions['webhook:webhooks:deleteother'])
-                        }
+                        target: '#webhookTable'
                 }) -}}
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig', {
@@ -112,7 +132,7 @@
                                 {{ item.getName() }}
                             </a>
                             {% if item.getDescription() is defined and item.getDescription() is not empty %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.getDescription()|purify }}</small>
                             </div>
                             {% endif %}

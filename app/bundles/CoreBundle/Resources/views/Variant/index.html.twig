@@ -25,9 +25,19 @@
         </div>
         <!-- button -->
         <div class="col-xs-2 va-m text-right">
-            <a href="#" data-toggle="modal" data-target="#abStatsModal" class="btn btn-primary">
-                {{ abStatsHeader }}
-            </a>
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: abStatsHeader,
+                        variant: 'primary',
+                        href: '#',
+                        attributes: {
+                            'data-toggle': 'modal',
+                            'data-target': '#abStatsModal'
+                        }
+                    }
+                ]
+            } %}
         </div>
     </div>
   {% endif %}
