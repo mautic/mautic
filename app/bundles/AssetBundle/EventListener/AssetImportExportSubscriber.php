@@ -114,7 +114,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            $output->writeln('<info>Imported asset: '.$object->getName().' with ID: '.$object->getId().'</info>');
+            $output->writeln('<info>Imported asset: '.$object->getTitle().' with ID: '.$object->getId().'</info>');
         }
     }
 }

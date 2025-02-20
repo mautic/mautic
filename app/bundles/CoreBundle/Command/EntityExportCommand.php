@@ -49,8 +49,15 @@ final class EntityExportCommand extends ModeratedCommand
         }
 
         $event = $this->dispatchEntityExportEvent($entityName, $entityId);
+        $data  = $event->getEntities();
 
-        return $this->outputData($event->getEntities(), $input, $output);
+        if (empty($data)) {
+            $output->writeln('<error>No data found for export.</error>');
+
+            return self::FAILURE;
+        }
+
+        return $this->outputData($data, $input, $output);
     }
 
     /**

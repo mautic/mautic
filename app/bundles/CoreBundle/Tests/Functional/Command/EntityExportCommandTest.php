@@ -2,45 +2,42 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Command;
+namespace Mautic\CoreBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Command\EntityExportCommand;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class EntityExportCommandTest extends TestCase
+final class EntityExportCommandTest extends KernelTestCase
 {
-    /** @var MockObject&EventDispatcherInterface */
-    private MockObject $dispatcher;
-    private PathsHelper $pathsHelper;
-    private CoreParametersHelper $coreParametersHelper;
-    private EntityExportCommand $command;
     private CommandTester $commandTester;
+    private MockObject&EventDispatcherInterface $dispatcher;
 
     protected function setUp(): void
     {
-        /** @var MockObject&EventDispatcherInterface $mockDispatcher */
-        $mockDispatcher   = $this->createMock(EventDispatcherInterface::class);
-        $this->dispatcher = $mockDispatcher;
+        self::bootKernel();
+        $container = self::getContainer();
 
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $pathsHelper          = $container->get(PathsHelper::class);
+        $coreParametersHelper = $container->get(CoreParametersHelper::class);
 
-        $this->command = new EntityExportCommand(
-            $this->dispatcher,
-            $this->pathsHelper,
-            $this->coreParametersHelper
-        );
+        $command = new EntityExportCommand($this->dispatcher, $pathsHelper, $coreParametersHelper);
 
-        $application = new Application();
-        $application->add($this->command);
-        $this->commandTester = new CommandTester($this->command);
+        $this->commandTester = new CommandTester($command);
+    }
+
+    private function createMockEvent(string $entityName, int $entityId): EntityExportEvent
+    {
+        $mockEvent = new EntityExportEvent($entityName, $entityId);
+        $mockEvent->addEntity($entityName, ['id' => $entityId, 'name' => 'Test Campaign']);
+
+        return $mockEvent;
     }
 
     public function testExecuteFailsWithoutEntityOrId(): void
@@ -59,13 +56,10 @@ final class EntityExportCommandTest extends TestCase
     {
         $entityName = 'campaign';
         $entityId   = 123;
-        $mockEvent  = $this->createMock(EntityExportEvent::class);
-        $mockEvent->method('getEntities')->willReturn(['id' => $entityId, 'name' => 'Test Campaign']);
 
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(EntityExportEvent::class), $entityName)
-            ->willReturn($mockEvent);
+        $this->dispatcher->method('dispatch')->willReturnCallback(
+            fn ($event) => $this->createMockEvent($entityName, $entityId)
+        );
 
         $this->commandTester->execute([
             '--entity'    => $entityName,
@@ -83,10 +77,9 @@ final class EntityExportCommandTest extends TestCase
         $entityName = 'campaign';
         $entityId   = 123;
 
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(EntityExportEvent::class), $entityName)
-            ->willReturn(new EntityExportEvent($entityName, $entityId));
+        $this->dispatcher->method('dispatch')->willReturnCallback(
+            fn ($event) => $this->createMockEvent($entityName, $entityId)
+        );
 
         $this->commandTester->execute([
             '--entity' => $entityName,
@@ -102,13 +95,10 @@ final class EntityExportCommandTest extends TestCase
     {
         $entityName = 'campaign';
         $entityId   = 123;
-        $mockEvent  = $this->createMock(EntityExportEvent::class);
-        $mockEvent->method('getEntities')->willReturn(['id' => $entityId, 'name' => 'Test Campaign']);
 
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(EntityExportEvent::class), $entityName)
-            ->willReturn($mockEvent);
+        $this->dispatcher->method('dispatch')->willReturnCallback(
+            fn ($event) => $this->createMockEvent($entityName, $entityId)
+        );
 
         $this->commandTester->execute([
             '--entity'    => $entityName,
@@ -125,13 +115,10 @@ final class EntityExportCommandTest extends TestCase
     {
         $entityName = 'campaign';
         $entityId   = 123;
-        $mockEvent  = $this->createMock(EntityExportEvent::class);
-        $mockEvent->method('getEntities')->willReturn(['id' => $entityId, 'name' => 'Test Campaign']);
 
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(EntityExportEvent::class), $entityName)
-            ->willReturn($mockEvent);
+        $this->dispatcher->method('dispatch')->willReturnCallback(
+            fn ($event) => $this->createMockEvent($entityName, $entityId)
+        );
 
         $this->commandTester->execute([
             '--entity'   => $entityName,

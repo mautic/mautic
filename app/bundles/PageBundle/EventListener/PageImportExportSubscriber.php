@@ -62,7 +62,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             'footer_script'        => $page->getFooterScript(),
             'redirect_type'        => $page->getRedirectType(),
             'redirect_url'         => $page->getRedirectUrl(),
-            'is_preference_center' => $page->isPreferenceCenter(),
+            'is_preference_center' => $page->getIsPreferenceCenter(),
             'no_index'             => $page->getNoIndex(),
             'lang'                 => $page->getLanguage(),
             'variant_settings'     => $page->getVariantSettings(),
@@ -126,7 +126,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            $output->writeln('<info>Imported page: '.$object->getName().' with ID: '.$object->getId().'</info>');
+            $output->writeln('<info>Imported page: '.$object->getTitle().' with ID: '.$object->getId().'</info>');
         }
     }
 }

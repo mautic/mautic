@@ -37,9 +37,10 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             return;
         }
 
-        $campaignId = $event->getEntityId();
+        $campaignId = (int) $event->getEntityId();
         $campaign   = $this->campaignModel->getEntity($campaignId);
-        if (!$campaign) {
+
+        if (!$campaign instanceof Campaign) {
             return;
         }
 
@@ -47,6 +48,10 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $data           = [];
 
         foreach ($campaignEvents as $campaignEvent) {
+            if (!$campaignEvent instanceof Event) {
+                continue;
+            }
+
             $eventData  = $this->createEventData($campaign, $campaignEvent);
             $dependency = $this->createDependency($campaignId, $campaignEvent);
 
@@ -56,14 +61,15 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $event->addDependencyEntity(Event::ENTITY_NAME, $dependency);
         }
 
-        if (!empty($data)) {
-            foreach ($data as $entityName => $entities) {
-                $event->addEntities([$entityName => array_values($entities)]);
-            }
+        foreach ($data as $entityName => $entities) {
+            $event->addEntities([$entityName => $entities]);
         }
     }
 
-    private function createEventData($campaign, $campaignEvent): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function createEventData(Campaign $campaign, Event $campaignEvent): array
     {
         $parentId = $campaignEvent->getParent()?->getId();
 
@@ -86,19 +92,25 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         ];
     }
 
-    private function createDependency($campaignId, $campaignEvent): array
+    /**
+     * @return array<string, int>
+     */
+    private function createDependency(int $campaignId, Event $campaignEvent): array
     {
-        $channel   = $campaignEvent->getChannel() ?: '';
-        $channelId = $campaignEvent->getChannelId() ?: 0;
+        $channel   = $campaignEvent->getChannel() ?? '';
+        $channelId = $campaignEvent->getChannelId() ?? 0;
 
         return [
-            Campaign::ENTITY_NAME    => (int) $campaignId,
-            Event::ENTITY_NAME       => (int) $campaignEvent->getId(),
-            $channel                 => (int) $channelId,
+            Campaign::ENTITY_NAME  => (int) $campaignId,
+            Event::ENTITY_NAME     => (int) $campaignEvent->getId(),
+            $channel               => (int) $channelId,
         ];
     }
 
-    private function handleChannelExport($campaignEvent, &$data): void
+    /**
+     * @param array<array<string, mixed>> $data
+     */
+    private function handleChannelExport(Event $campaignEvent, array &$data): void
     {
         $channel   = $campaignEvent->getChannel();
         $channelId = $campaignEvent->getChannelId();
@@ -108,7 +120,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $this->dispatcher->dispatch($event);
 
             foreach ($event->getEntities()[$channel] ?? [] as $entity) {
-                $data[$channel][$entity['id']] = $entity;
+                $data[$channel][(string) $entity['id']] = $entity;
             }
         }
     }
@@ -118,14 +130,19 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
+
         $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
 
-        if (!$elements) {
+        if (empty($elements)) {
             return;
         }
 
         foreach ($elements as $element) {
+            if (!is_array($element)) {
+                continue;
+            }
+
             $campaignEvent = $this->createCampaignEvent($element);
             $this->entityManager->persist($campaignEvent);
             $this->entityManager->flush();
@@ -137,6 +154,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $this->updateParentEvents($event);
     }
 
+    /**
+     * @param array<string, mixed> $element
+     */
     private function createCampaignEvent(array $element): Event
     {
         $campaignEvent = new Event();
@@ -154,7 +174,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $campaignEvent->setChannelId($element['channel_id'] ?? 0);
 
         $campaign = $this->campaignModel->getEntity($element['campaign_id']);
-        $campaignEvent->setCampaign($campaign);
+        if ($campaign instanceof Campaign) {
+            $campaignEvent->setCampaign($campaign);
+        }
 
         return $campaignEvent;
     }
@@ -162,6 +184,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     private function updateParentEvents(EntityImportEvent $event): void
     {
         $idMap = $event->getEntityIdMap();
+
         foreach ($event->getEntityData() as $element) {
             if (isset($element['parent_id'])) {
                 $originalParentId = (int) $element['parent_id'];

@@ -102,10 +102,10 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         foreach ($elements as $element) {
             $email = new Email();
 
-            $email->setTranslationParentId($element['translation_parent_id'] ?? null);
-            $email->setVariantParentId($element['variant_parent_id'] ?? null);
-            $email->setUnsubscribeFormId($element['unsubscribeform_id'] ?? null);
-            $email->setPreferenceCenterId($element['preference_center_id'] ?? null);
+            $email->setTranslationParent($element['translation_parent_id'] ?? null);
+            $email->setVariantParent($element['variant_parent_id'] ?? null);
+            $email->setUnsubscribeForm($element['unsubscribeform_id'] ?? null);
+            $email->setPreferenceCenter($element['preference_center_id'] ?? null);
             $email->setIsPublished((bool) ($element['is_published'] ?? false));
             $email->setName($element['name'] ?? '');
             $email->setDescription($element['description'] ?? '');
@@ -135,7 +135,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $email->getId());
-            $output->writeln('<info>Imported email: '.$email->getTitle().' with ID: '.$email->getId().'</info>');
+            $output->writeln('<info>Imported email: '.$email->getName().' with ID: '.$email->getId().'</info>');
         }
     }
 }

@@ -78,9 +78,8 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
 
         foreach ($elements as $element) {
             $object = new DynamicContent();
-            $object->setId($element['id'] ?? null);
-            $object->setTranslationParentId($element['translation_parent_id'] ?? null);
-            $object->setVariantParentId($element['variant_parent_id'] ?? null);
+            $object->setTranslationParent($element['translation_parent_id'] ?? null);
+            $object->setVariantParent($element['variant_parent_id'] ?? null);
             $object->setIsPublished((bool) ($element['is_published'] ?? false));
             $object->setName($element['name'] ?? '');
             $object->setDescription($element['description'] ?? '');
