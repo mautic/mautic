@@ -99,9 +99,4 @@ final class Version20211020114811 extends AbstractMauticMigration
 
         return $stmt->fetchAllAssociative();
     }
-
-    private function getPrefixedTableName(string $tableName): string
-    {
-        return $this->prefix.$tableName;
-    }
 }
