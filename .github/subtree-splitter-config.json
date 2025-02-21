@@ -234,6 +234,11 @@
             "name": "theme-formscape",
             "directory": "themes/formscape",
             "target": "git@github.com:mautic/theme-formscape.git"
+        },
+        {
+            "name": "theme-capture",
+            "directory": "themes/capture",
+            "target": "git@github.com:mautic/theme-capture.git"
         }
 
     ]
