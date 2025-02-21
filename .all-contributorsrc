@@ -1469,6 +1469,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Jaishree2310",
+      "name": "Jaishree Singh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73012522?v=4",
+      "profile": "https://linktr.ee/Jaishree2310",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "kingsedem",
+      "name": "Kingsley_E_",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47061881?v=4",
+      "profile": "https://github.com/kingsedem",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
