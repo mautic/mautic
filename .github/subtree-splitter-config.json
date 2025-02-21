@@ -235,6 +235,7 @@
             "directory": "themes/reachout",
             "target": "git@github.com:mautic/theme-reachout.git"
         },
+        {
             "name": "theme-capture",
             "directory": "themes/capture",
             "target": "git@github.com:mautic/theme-capture.git"
