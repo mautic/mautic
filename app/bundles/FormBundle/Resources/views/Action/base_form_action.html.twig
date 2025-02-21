@@ -1,0 +1,39 @@
+{#
+Base Template for Mautic Form Actions
+Extend this template in child templates and override blocks as needed.
+
+Variables
+- id
+- formId
+- action
+#}
+
+<div class="mauticform-row pa-0 panel {% block panel_classes %}{% endblock %}" id="mauticform_action_{{ id }}">
+    <div class="panel-body">
+        {% block content %}
+            {% if inForm is defined %}
+                {{ include('@MauticForm/Builder/_actions.html.twig', {
+                    'id': id,
+                    'route': 'mautic_formaction_action',
+                    'actionType': 'action',
+                    'formId': formId,
+                }) }}
+            {% endif %}
+
+            <a data-toggle="ajaxmodal" data-target="#formComponentModal" href="{{ path('mautic_formaction_action', {'objectAction': 'edit', 'objectId': id, 'formId': formId}) }}">
+                <span class="action-label">{{ action.name }}</span>
+            </a>
+
+            {% if action.description is not empty %}
+                <span class="action-descr">{{ action.description|purify }}</span>
+            {% endif %}
+        {% endblock %}
+    </div>
+
+    {% if block('action_label') is not empty %}
+        <div class="d-flex panel-footer as-stretch gap-3 ai-center">
+            {% block action_label %}{% endblock %}
+        </div>
+    {% endif %}
+</div>
+
