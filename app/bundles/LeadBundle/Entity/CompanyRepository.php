@@ -143,13 +143,21 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     protected function addCatchAllWhereClause($q, $filter): array
     {
-        return $this->addStandardCatchAllWhereClause(
-            $q,
-            $filter,
+        $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'company');
+        $availableForSearch = array_map(fn ($alias) => 'comp.'.$alias, $customFields);
+
+        $columns = array_merge(
             [
                 'comp.companyname',
                 'comp.companyemail',
-            ]
+            ],
+            $availableForSearch,
+        );
+
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            $columns
         );
     }
 

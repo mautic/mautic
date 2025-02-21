@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -359,8 +360,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $event->addCategoryLeftJoin($qb, 'p');
                 break;
             case self::CONTEXT_PAGE_HITS:
-                $event->applyDateFilters($qb, 'date_hit', 'ph');
-
+                $event->applyDateFiltersWithoutNullValues($qb, 'date_hit', 'ph');
                 $qb->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
                     ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
