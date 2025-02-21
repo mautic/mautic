@@ -85,7 +85,7 @@
         <dl class="dl-horizontal">
             {% for key, value in parentDetails.properties %}
                 <dt>{{ key|capitalize }}:</dt>
-                <dd>{{ value|json_encode() }}</dd>
+                <dd>{{ value|json_encode()|trim('"') }}</dd>
             {% endfor %}
         </dl>
     {% endif %}

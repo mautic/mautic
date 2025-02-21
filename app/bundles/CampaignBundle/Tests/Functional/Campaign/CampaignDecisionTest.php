@@ -92,8 +92,6 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead1->getId()));
-
         if ('in' === $operator) {
             $this->assertCampaignLeadEventLog(
                 $campaign,

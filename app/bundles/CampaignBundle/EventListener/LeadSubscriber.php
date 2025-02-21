@@ -108,12 +108,15 @@ class LeadSubscriber implements EventSubscriberInterface
                     'log' => $log,
                 ];
 
-                $pathIcon = '';
                 if (!empty($log['parent_id'])) {
                     $parentEvent = $this->getParentEvent($log['parent_id']);
                     if ($parentEvent) {
                         $extra['parentDetails'] = $this->getParentDetails($parentEvent, $log);
-                        $pathIcon               = 'yes' === $log['decision_path'] ? 'ri-corner-down-right-fill' : 'ri-corner-down-left-fill';
+
+                        $toolTipClass = 'yes' === $log['decision_path'] ? 'text-success' : 'text-danger';
+                        $toolTip      = $this->translator->trans('mautic.campaign.event.path.tooltip', ['%path%' => ucfirst($log['decision_path'])]);
+
+                        $label .= sprintf(' <i class="ri-node-tree %s" data-toggle="tooltip" title="%s"></i>', $toolTipClass, $toolTip);
                     }
                 }
 
@@ -137,7 +140,6 @@ class LeadSubscriber implements EventSubscriberInterface
                         'extra'           => $extra,
                         'contentTemplate' => $template,
                         'icon'            => 'ri-time-line',
-                        'pathIcon'        => $pathIcon,
                         'contactId'       => $log['lead_id'],
                     ]
                 );
@@ -170,7 +172,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $properties = ArrayHelper::removeEmptyValues($parentEvent->getProperties());
 
         // Remove unnecessary properties
-        $keysToRemove = ['canvasSettings', 'anchor', 'type', 'eventType', 'campaignId', '_token', 'buttons', 'anchorEventType', 'tempId', 'id', 'order', 'contactLog', 'changes', 'failedCount'];
+        $keysToRemove = ['canvasSettings', 'anchor', 'type', 'eventType', 'campaignId', '_token', 'buttons', 'anchorEventType', 'tempId', 'id', 'order', 'contactLog', 'changes', 'failedCount', 'properties'];
         foreach ($keysToRemove as $key) {
             unset($properties[$key]);
         }
