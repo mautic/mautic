@@ -235,6 +235,7 @@
             "directory": "themes/blend",
             "target": "git@github.com:mautic/theme-blend.git"
         },
+        {
             "name": "theme-capture",
             "directory": "themes/capture",
             "target": "git@github.com:mautic/theme-capture.git"
