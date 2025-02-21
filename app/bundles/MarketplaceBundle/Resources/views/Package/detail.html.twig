@@ -26,17 +26,8 @@
 {% endblock %}
 
 {% block actions %}
-{% set buttons = {
-    0: {
-        'attr' : {
-            'href' : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
-            'class' : 'btn btn-tertiary'
-        },
-        'btnText'   : 'marketplace.package.details.close'|trans,
-        'iconClass' : 'ri-arrow-go-back-line',
-        'primary'   : true,
-}
- } %}
+{% set buttons = {} %}
+
  {% if latestVersion and latestVersion.issues %}
  {% set buttons = buttons|merge({0: {
      'attr' : {
