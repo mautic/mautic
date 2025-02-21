@@ -144,7 +144,9 @@ class DetailsType extends AbstractType
 
         $builder->add('in_auth', HiddenType::class, ['mapped' => false]);
 
-        $builder->add('buttons', FormButtonsType::class);
+        $builder->add('buttons', FormButtonsType::class, [
+            'form-buttons' => 'new_button',
+        ]);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

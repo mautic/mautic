@@ -38,7 +38,7 @@ class FormButtonsType extends AbstractType
                     'attr'  => array_merge(
                         $options['apply_attr'],
                         [
-                            'class'   => $options['apply_class'],
+                            'class'   => $options['apply_class'].' '.$options['form-buttons'],
                             'icon'    => $options['apply_icon'],
                             'onclick' => $options['apply_onclick'],
                         ]
@@ -103,6 +103,7 @@ class FormButtonsType extends AbstractType
                 'apply_text'         => 'mautic.core.form.apply',
                 'apply_icon'         => 'ri-check-line',
                 'apply_class'        => 'btn btn-primary btn-apply',
+                'form-buttons'       => '',
                 'apply_onclick'      => false,
                 'apply_attr'         => [],
                 'apply_type'         => SubmitType::class,
