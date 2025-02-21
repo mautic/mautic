@@ -1,0 +1,371 @@
+{% extends "@themes/"~template~"/html/base.html.twig" %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="wrapper--row wrapper--header">
+        <img class="logo--medium" src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+        <div><a href="#" target="_blank" class="button">Call us now</a>
+        </div>
+    </div>
+    <div class="wrapper--content">
+        <div class="wrapper--content-header">
+            <div class="content-header--main">
+                <div class="prefix">
+                    <p>Local business</p>
+                </div>
+                <div class="h3">
+                    <p>HVAC service</p>
+                </div>
+                <div class="subtitle subtitle--header">
+                    <p>Expert HVAC repair at your door today.</p>
+                    <p>Simple, fast, done right.</p>
+                </div>
+            </div>
+        </div>
+        <div class="wrapper--content-body">
+            <div style="padding: 10px;">
+                <p>{form=1}</p>
+            </div>
+            <div class="wrapper--row security-info">
+                <img class="icon--small" src="{{ getAssetUrl('themes/'~template~'/assets/lock-fill.png', null, null, true) }}">
+                <div class="text--secondary">
+                    <p></p><p>100% secure. We never share your information.</p><p></p>
+                </div>
+            </div>
+            <div class="wrapper--row stars">
+                <div>
+                    <img alt="star-s-fill.png" src="{{ getAssetUrl('themes/'~template~'/assets/star-s-fill.png', null, null, true) }}" id="ions8">
+                    <img alt="star-s-fill.png" src="{{ getAssetUrl('themes/'~template~'/assets/star-s-fill.png', null, null, true) }}" id="ib1us">
+                    <img alt="star-s-fill.png" src="{{ getAssetUrl('themes/'~template~'/assets/star-s-fill.png', null, null, true) }}" id="ilkl4">
+                    <img alt="star-s-fill.png" src="{{ getAssetUrl('themes/'~template~'/assets/star-s-fill.png', null, null, true) }}" id="i3ouj">
+                    <img alt="star-s-fill.png" src="{{ getAssetUrl('themes/'~template~'/assets/star-s-fill.png', null, null, true) }}" id="ivxvj">
+                </div>
+                <div>
+                    <p>4.9/5 stars by 200+ customers</p>
+                </div>
+            </div>
+            <iframe frameborder="0" src="https://maps.google.com/maps?&amp;q=Moutstraat 60 9000 Ghent&amp;z=15&amp;t=q&amp;output=embed" class="gmap"></iframe>
+            <div class="subtitle subtitle--footer">
+                <p>Moutstraat 60, 9000 Ghent | Belgium</p>
+                <p>+12 3 456 78 90</p>
+                <p>example.com</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper--content">
+        <div class="wrapper--content-header wrapper--content-header--secondary">
+            <div>
+                <p>Customer reviews</p>
+            </div>
+            <img src="{{ getAssetUrl('themes/'~template~'/assets/chat-quote-line.png', null, null, true) }}">
+        </div>
+        <div class="wrapper--content-body">
+            <div class="wrapper--row customer-review">
+                <img class="customer-review--picture" src="{{ getAssetUrl('themes/'~template~'/assets/user-smile-fill_2.png', null, null, true) }}">
+                <div>
+                    <img src="{{ getAssetUrl('themes/'~template~'/assets/double-quotes-l.png', null, null, true) }}">
+                    <div class="customer-review--name">
+                        <p>Jhonny Mayo</p>
+                    </div>
+                    <div class="customer-review--text text--secondary">
+                        <p>Excellent service at a reasonable rate. They were on time and the job done was immaculate. I'll definitely be using them again in the future</p>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper--row customer-review">
+                <img class="customer-review--picture" src="{{ getAssetUrl('themes/'~template~'/assets/user-smile-fill_2.png', null, null, true) }}">
+                <div>
+                    <img src="{{ getAssetUrl('themes/'~template~'/assets/double-quotes-l.png', null, null, true) }}">
+                    <div class="customer-review--name">
+                        <p>Sarah Miller</p>
+                    </div>
+                    <div class="customer-review--text text--secondary">
+                        <p>Fast response time and top-notch work. The technician explained everything clearly and had my AC running perfectly in no time. Couldn't be happier with the service.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper--row customer-review">
+                <img class="customer-review--picture" src="{{ getAssetUrl('themes/'~template~'/assets/user-smile-fill_2.png', null, null, true) }}">
+                <div>
+                    <img src="{{ getAssetUrl('themes/'~template~'/assets/double-quotes-l.png', null, null, true) }}">
+                    <div class="customer-review--name">
+                        <p>Mike Patterson</p>
+                    </div>
+                    <div class="customer-review--text text--secondary">
+                        <p>Called in the morning with a broken furnace, and they were here by afternoon. Clean, professional, and efficient work. No surprises on the bill - exactly what was quoted.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<style>
+    @font-face {
+    font-family: 'IBM Plex Sans';
+    src: url("{{ getAssetUrl('themes/'~template~'/assets/ibm-plex-sans-v19-latin-500.woff2', null, null, true) }}") format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    }
+
+    @font-face {
+    font-family: 'IBM Plex Sans';
+    src: url("{{ getAssetUrl('themes/'~template~'/assets/ibm-plex-sans-v19-latin-700.woff2', null, null, true) }}") format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    }
+
+    * {
+        font-family: 'IBM Plex Sans', sans-serif;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    p {
+        margin: 0;
+        padding: 0;
+        line-height: 1.4em;
+    }
+
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        gap: 20px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+        background-size: cover;
+        background-image: url('{{ getAssetUrl('themes/'~template~'/assets/elimende-inagella-zx7VUt9txos-unsplash.jpg', null, null, true) }}');
+    }
+
+    .wrapper--content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        font-size: 12px;
+        border-radius: 16px;
+        box-shadow: rgb(0 0 0 / 30%) 0px 6px 24px 5px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    }
+
+    .wrapper--content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(160deg, rgba(0,0,0,1) 20%, rgba(0,0,0,0.3) 100%);
+        backdrop-filter: blur(8px);
+        border-radius: 16px 16px 0 0;
+        padding: 20px 20px 15px;
+        font-weight: bold;
+        font-size: 14px;
+        color: white;
+    }
+
+    .wrapper--content-header--secondary {
+        background-color: #161616;
+    }
+
+    .wrapper--content-body {
+        display: flex;
+        flex-direction: column;
+        background-color: #ffffff;
+        padding: 25px 20px;
+        border-radius: 16px;
+    }
+
+    .prefix {
+        text-transform: uppercase;
+        font-size: 80%;
+        margin-top: 30px;
+    }
+
+    .wrapper--content-header + .wrapper--content-body {
+            border-radius: 0 0 16px 16px;
+        }
+
+    .button {
+        display: inline-block;
+        text-decoration: none;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 12px 12px 12px 12px;
+        background-color: #000000;
+        font-size: 16px;
+        color: #ffffff;
+        border: 10px solid #000000;
+        width: 100%;
+    }
+
+    .wrapper--content .mauticform_wrapper {
+        margin: 0;
+    }
+
+    .wrapper--content .mauticform-button-wrapper {
+        text-align: center;
+    }
+
+    .wrapper--row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+    }
+
+    .wrapper--header {
+        justify-content: space-between;
+        min-width: 420px;
+        max-width: 480px;
+        padding: 0px 15px;
+    }
+
+    .content-header--main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-grow: 1;
+    }
+
+    .security-info {
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    .stars {
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 40px;
+    }
+
+    .customer-review {
+        gap: 10px;
+    }
+
+    .customer-review + .customer-review {
+        margin-top: 40px;
+    }
+
+    .customer-review--name {
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .customer-review--picture {
+        height: 60px;
+        width: fit-content;
+        border-radius: 12px;
+    }
+
+    .gmap {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .text--secondary {
+        font-size: 11px;
+        color: #525252;
+    }
+
+    .icon--small {
+        height: 14px;
+        width: fit-content;
+        margin-right: 4px;
+    }
+
+    .h3 {
+        padding: 0 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        font-size: 35px;
+        max-width: fit-content;
+        font-weight: bold;
+        text-align: center;
+        align-self: center;
+    }
+
+    .h3 p {
+        line-height: 1em;
+    }
+
+    .subtitle {
+        padding: 0 10px;
+        font-size: 13px;
+        color: #525252;
+        margin: 0;
+        display: flex;
+        width: 100%;
+        max-width: fit-content;
+        align-self: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .subtitle.subtitle--header {
+        margin-bottom: 20px;
+        text-align: center;
+        color: #c5c5c5;
+    }
+
+    .subtitle.subtitle--footer {
+        margin-top: 60px;
+        text-align: center;
+    }
+
+    .logo--medium {
+        padding: 0 10px;
+        height: 50px;
+        width: fit-content;
+        align-self: center;
+    }
+
+    /* Media Queries for Larger Screens */
+
+    /* Tablet and Up */
+    @media (min-width: 768px) {
+        .wrapper {
+            padding: 40px;
+        }
+
+        .wrapper--content {
+            width: 30%;
+            min-width: 420px;
+            max-width: 470px;
+        }
+
+        .wrapper--content-body {
+            padding: 40px 35px;
+        }
+
+        .wrapper--content-header {
+            padding: 15px 30px 12px;
+        }
+
+        .h3 {
+            font-size: 44px;
+        }
+
+        .subtitle {
+            max-width: fit-content;
+        }
+
+        .wrapper-header {
+            padding: 0 35px;
+        }
+    }
+</style>
+{% endblock %}

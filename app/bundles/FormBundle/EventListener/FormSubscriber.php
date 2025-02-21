@@ -105,6 +105,7 @@ class FormSubscriber implements EventSubscriberInterface
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
+            'template'          => '@MauticForm/Action/form_email.html.twig',
         ]);
 
         $event->addSubmitAction('form.repost', [
