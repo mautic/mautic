@@ -22,9 +22,25 @@
     <div class="sidebar--right"></div>
 </div>
 <style>
+    @font-face {
+        font-family: 'Inter';
+        src: url("{{ getAssetUrl('themes/'~template~'/assets/InterDisplay-Medium.woff2', null, null, true) }}") format('woff2');
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'Inter';
+        src: url("{{ getAssetUrl('themes/'~template~'/assets/InterDisplay-Bold.woff2', null, null, true) }}") format('woff2');
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+    }
+
     * {
         box-sizing: border-box;
-        font-family: sans-serif;
+        font-family: 'Inter', sans-serif;
     }
 
     body {
@@ -48,7 +64,6 @@
         justify-content: center;
         padding: 10px;
         gap: 20px;
-        flex-wrap: wrap;
     }
 
     .sidebar--left {
@@ -73,7 +88,6 @@
         margin: 0;
         padding: 20px 0;
         padding-left: 10px;
-        min-width: 290px;
         min-height: 200px;
         background-repeat: repeat;
         background-position: center center;
@@ -93,7 +107,7 @@
         margin-bottom: 5px;
         display: flex;
         font-weight: 700;
-        font-size: 17px;
+        font-size: 24px;
         max-width: fit-content;
     }
 
@@ -129,26 +143,26 @@
             flex-direction: row;
             justify-content: end;
             flex-wrap: nowrap;
-            gap: 100px;
+            gap: 40px;
             padding: 40px;
         }
 
         .sidebar--left {
-            width: 30%;
+            width: 40%;
             min-width: 350px;
             max-width: 420px;
             padding: 50px 15px;
         }
 
         .sidebar--right {
-            width: 50%;
+            width: 40%;
             padding: 50px 0;
             align-self: stretch;
             border-radius: 24px;
         }
 
         .h3 {
-            font-size: 17px;
+            font-size: 28px;
         }
 
         .subtitle {
