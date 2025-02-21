@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -335,5 +336,41 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $pageHit->setSourceId($email->getId());
             $this->em->persist($pageHit);
         }
+    }
+
+    public function testGetBuilderTokensAction(): void
+    {
+        $this->createDwcTokens();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:getBuilderTokens');
+        $this->assertResponseIsSuccessful();
+
+        $tokens = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('tokens', $tokens);
+        $this->assertArrayHasKey('{contactfield=email}', $tokens['tokens']);
+        $this->assertArrayHasKey('{dwc=test-dwc-token}', $tokens['tokens']);
+    }
+
+    private function createDwcTokens(): void
+    {
+        // create dwc token
+        $dwcToken = new DynamicContent();
+        $dwcToken->setName('Test DWC Token');
+        $dwcToken->setSlotName('test-dwc-token');
+        $dwcToken->setContent('Dynamic Web Content');
+        $dwcToken->setIsCampaignBased(false);
+        $dwcToken->setIsPublished(true);
+        $dwcToken->setFilters([
+            [
+                'glue' => 'and',
+                'field' => 'email',
+                'object' => 'lead',
+                'type' => 'email',
+                'operator' => '!empty',
+            ],
+        ]);
+        $this->em->persist($dwcToken);
+
+        $this->em->flush();
     }
 }
