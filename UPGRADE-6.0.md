@@ -5,6 +5,15 @@
 - The Froala editor got removed due to security issues of the old version we couldn't update due to licencing issues. It was used in the legacy builder only.
 
 ## BC breaks in the code
+
+### Javascript
+
+As the legacy builder was removed these JS libraries were removed as well:
+- Froala (outdated with security vulnerabilities)
+- CodeMirror JS (still installed in the GrapesJS plugin, but not part of Mautic itself)
+- Jquery UI - Safe Blur
+
+### PHP
 - Multiple method signatures changed to improve type coverage. Some forced by dependency updates, some in Mautic itself. Run `composer phpstan` when your plugin is installed to get the full list related to your plugin.
 - `Mautic\PointBundle\Form\Type\GenericPointSettingsType` was removed. See https://github.com/mautic/mautic/pull/13904
 - Changes necessary for https://symfony.com/blog/new-in-symfony-5-3-guard-component-deprecation, see https://github.com/mautic/mautic/pull/14219

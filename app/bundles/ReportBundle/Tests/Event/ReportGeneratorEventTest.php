@@ -10,19 +10,20 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
+class ReportGeneratorEventTest extends TestCase
 {
     /**
-     * @var MockObject|Report
+     * @var Report|MockObject
      */
-    private MockObject $report;
+    private $report;
 
     /**
-     * @var MockObject|QueryBuilder
+     * @var QueryBuilder|MockObject
      */
-    private MockObject $queryBuilder;
+    private $queryBuilder;
 
     private ChannelListHelper $channelListHelper;
 
@@ -284,5 +285,96 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
       ->method('leftJoin');
 
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
+    }
+
+    /**
+     * @dataProvider applyFilterProvider
+     */
+    public function testApplyFilters(bool $dateOnly, string $condition, string $dateFormat): void
+    {
+        $tablePrefix = 't';
+        $dateColumn  = 'a_date';
+        $dateFrom    = new \DateTime('-30 days');
+        $dateTo      = new \DateTime();
+
+        $this->reportGeneratorEvent->setOptions([
+            'dateFrom' => $dateFrom,
+            'dateTo'   => $dateTo,
+        ]);
+
+        $this
+            ->queryBuilder
+            ->expects($this->once())
+            ->method('andWhere')
+            ->with($condition)
+            ->willReturn($this->queryBuilder);
+
+        $this
+            ->queryBuilder
+            ->expects($this->any())
+            ->method('setParameter')
+            ->withConsecutive(
+                ['dateFrom', $this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat)],
+                ['dateTo', $this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat)]
+            )
+            ->willReturnOnConsecutiveCalls($this->queryBuilder, $this->queryBuilder);
+
+        $this->reportGeneratorEvent->applyDateFilters($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function applyFilterProvider(): array
+    {
+        return [
+            [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s'],
+            [true, 't.a_date IS NULL OR (DATE(t.a_date) BETWEEN :dateFrom AND :dateTo)', 'Y-m-d'],
+        ];
+    }
+
+    /**
+     * @dataProvider applyFilterWithoutNullValuesProvider
+     */
+    public function testApplyFiltersWithoutNullValues(bool $dateOnly, string $condition, string $dateFormat): void
+    {
+        $tablePrefix = 't';
+        $dateColumn  = 'a_date';
+        $dateFrom    = new \DateTime('-30 days');
+        $dateTo      = new \DateTime();
+
+        $this->reportGeneratorEvent->setOptions([
+            'dateFrom' => $dateFrom,
+            'dateTo'   => $dateTo,
+        ]);
+
+        $this->queryBuilder
+            ->expects($this->once())
+            ->method('andWhere')
+            ->with($condition)
+            ->willReturn($this->queryBuilder);
+
+        $this
+            ->queryBuilder
+            ->expects($this->any())
+            ->method('setParameter')
+            ->withConsecutive(
+                ['dateFrom', $this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat)],
+                ['dateTo', $this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat)]
+            )
+            ->willReturnOnConsecutiveCalls($this->queryBuilder, $this->queryBuilder);
+
+        $this->reportGeneratorEvent->applyDateFiltersWithoutNullValues($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function applyFilterWithoutNullValuesProvider(): array
+    {
+        return [
+            [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s'],
+            [true, 'DATE(t.a_date) BETWEEN :dateFrom AND :dateTo', 'Y-m-d'],
+        ];
     }
 }

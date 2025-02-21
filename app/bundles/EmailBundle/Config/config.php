@@ -111,7 +111,9 @@ return [
         ],
     ],
     'categories' => [
-        'email' => null,
+        'email' => [
+            'class' => Mautic\EmailBundle\Entity\Email::class,
+        ],
     ],
     'services' => [
         'other' => [

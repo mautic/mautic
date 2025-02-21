@@ -44,6 +44,8 @@ return [
     ],
 
     'categories' => [
-        'stage' => null,
+        'stage' => [
+            'class' => Mautic\StageBundle\Entity\Stage::class,
+        ],
     ],
 ];
