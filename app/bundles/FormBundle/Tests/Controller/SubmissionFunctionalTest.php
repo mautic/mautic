@@ -833,6 +833,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'mappedObject' => 'company',
                 ],
                 [
+                    'label'        => 'Message',
+                    'type'         => 'textarea',
+                    'alias'        => 'message',
+                ],
+                [
                     'label' => 'Submit',
                     'type'  => 'button',
                 ],
@@ -930,6 +935,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => 'Acme Inc',
                     'company_country' => 'United States',
                     'company_city'    => 'New York',
+                    'message'         => 'Hello, this is a normal submission.',
                 ],
                 'expected' => [
                     'email'           => 'john@example.com',
@@ -939,6 +945,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => 'Acme Inc',
                     'company_country' => 'United States',
                     'company_city'    => 'New York',
+                    'message'         => 'Hello, this is a normal submission.',
                 ],
             ],
             'special_characters' => [
@@ -950,6 +957,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => '"Super" R&D Company, Ltd.',
                     'company_country' => 'Ireland',
                     'company_city'    => 'Dublin',
+                    'message'         => 'Super & Special',
                 ],
                 'expected' => [
                     'email'           => 'jane@example.com',
@@ -959,6 +967,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => '"Super" R&D Company, Ltd.',
                     'company_country' => 'Ireland',
                     'company_city'    => 'Dublin',
+                    'message'         => 'Super & Special',
                 ],
             ],
             'xss_attempt' => [
@@ -970,6 +979,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
                     'company_country' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
                     'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                    'message'         => '<script>alert("XSS")</script>',
                 ],
                 'expected' => [
                     'email'           => 'hacker@evil.com',
@@ -979,6 +989,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => 'alert("XSS")',
                     'company_country' => 'alert("XSS")',
                     'company_city'    => 'alert("XSS")',
+                    'message'         => 'alert("XSS")',
                 ],
             ],
             'sql_injection_attempt' => [
@@ -990,6 +1001,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
                     'company_country' => 'United States',
                     'company_city'    => 'SQL City',
+                    'message'         => "Robert'; DROP TABLE messages; --",
                 ],
                 'expected' => [
                     'email'           => 'sqlhacker@evil.com',
@@ -999,6 +1011,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
                     'company_country' => 'United States',
                     'company_city'    => 'SQL City',
+                    'message'         => "Robert'; DROP TABLE messages; --",
                 ],
             ],
             'unicode_characters' => [
@@ -1010,6 +1023,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => '株式会社スマイル',
                     'company_country' => 'Japan',
                     'company_city'    => '東京',
+                    'message'         => 'こんにちは、世界！',
                 ],
                 'expected' => [
                     'email'           => 'unicode@example.com',
@@ -1019,6 +1033,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'company_name'    => '株式会社スマイル',
                     'company_country' => 'Japan',
                     'company_city'    => '東京',
+                    'message'         => 'こんにちは、世界！',
                 ],
             ],
         ];
