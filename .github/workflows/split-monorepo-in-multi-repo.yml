@@ -85,6 +85,8 @@ jobs:
                     - theme-attract
                     - theme-creative
                     - theme-blend
+                    - theme-capture
+
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
             -   uses: actions/checkout@v4
