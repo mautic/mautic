@@ -73,7 +73,6 @@
         justify-content: center;
         padding: 10px;
         gap: 20px;
-        flex-wrap: wrap;
     }
 
     .sidebar--left {
@@ -100,7 +99,7 @@
         height: auto;
         min-height: 200px;
         margin: 0;
-        padding: 100px 15px;
+        padding: 100px 25px;
         background-repeat: repeat;
         background-position: center center;
         background-attachment: scroll;
@@ -147,7 +146,7 @@
     }
 
     .quote--text {
-        font-size: 50px;
+        font-size: 30px;
         font-weight: bold;
         font-feature-settings: "cv10" 1, "cv06" 1, "cv11" 1, "ss08" 1, "ss07" 1, "ss02" 1, "dlig" 1, "calt" 1, "cv12" 1, "cv13" 1;
     }
@@ -179,12 +178,10 @@
             flex-direction: row;
             justify-content: end;
             flex-wrap: nowrap;
-            gap: 100px;
             padding: 40px;
         }
 
         .sidebar--left {
-            width: 30%;
             min-width: 350px;
             max-width: 420px;
             padding: 50px 35px;
@@ -196,12 +193,23 @@
             align-self: stretch;
         }
 
+        .quote--text {
+            font-size: 50px;
+        }
+
         .h3 {
             font-size: 37px;
         }
 
         .subtitle {
             max-width: fit-content;
+        }
+    }
+    /* Desktop and Up */
+    @media (min-width: 1200px) {
+        .sidebars {
+            gap: 100px;
+            padding: 40px;
         }
     }
 </style>
