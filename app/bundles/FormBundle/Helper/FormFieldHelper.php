@@ -95,26 +95,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $this->getChoiceList($customFields);
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->types;
     }
 
-    /**
-     * Get fields input filter.
-     *
-     * @return string
-     */
-    public function getFieldFilter($type)
+    public function getFieldFilter(string $type): string
     {
-        if (array_key_exists($type, $this->types)) {
-            return $this->types[$type]['filter'] ?? 'clean';
-        }
-
-        return 'alphanum';
+        return $this->types[$type]['filter'] ?? 'string';
     }
 
     /**

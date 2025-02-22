@@ -269,7 +269,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         $adjustPointEvent->setTriggerHour($triggerHourDate->format('H:00:00'));
         $adjustPointEvent->setTriggerIntervalUnit('d');
         // This must conform the format of the date in the \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::getGroupExecutionDateTime
-        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('N')]);
+        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('w')]);
 
         yield 'Schedule the event when Send From is in the future on the selected day when the day is today' => [
             $adjustPointEvent,
@@ -283,7 +283,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $adjustPointEvent->setTriggerHour('15:00:00');
         $adjustPointEvent->setTriggerIntervalUnit('d');
-        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime('tomorrow'))->format('N')]);
+        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime('tomorrow'))->format('w')]);
 
         yield 'Schedule the event when Send From is in the future on the selected day when the day is tomorrow' => [
             $adjustPointEvent,
@@ -301,7 +301,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $adjustPointEvent->setTriggerHour($triggerHourDate->format('H:00:00'));
         $adjustPointEvent->setTriggerIntervalUnit('d');
-        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('N')]);
+        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('w')]);
 
         yield 'Execute the event when Send From is in the past on the selected day when the day is today' => [
             $adjustPointEvent,

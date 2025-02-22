@@ -82,7 +82,9 @@ return [
     ],
 
     'categories' => [
-        'page' => null,
+        'page' => [
+            'class' => Mautic\PageBundle\Entity\Page::class,
+        ],
     ],
 
     'services' => [
