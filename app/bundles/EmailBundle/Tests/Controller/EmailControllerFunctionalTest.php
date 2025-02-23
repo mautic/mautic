@@ -19,6 +19,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -640,5 +641,33 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($dynamicContent);
 
         return $dynamicContent;
+    }
+
+    public function testBatchDeleteAction(): void
+    {
+        $emailA = $this->createEmail('Email A', 'Test Email A', 'list', 'blank', 'Test html');
+        $emailB = $this->createEmail('Email B', 'Test Email B', 'list', 'blank', 'Test html');
+        $emailC = $this->createEmail('Email C', 'Test Email C', 'list', 'blank', 'Test html');
+        $this->em->flush();
+        $this->assertNotNull($emailA->getId());
+        $this->assertNotNull($emailB->getId());
+        $this->assertNotNull($emailC->getId());
+
+        // Perform batch delete action for contact A.
+        $this->client->request('POST', sprintf('/s/emails/batchDelete?ids=["%s"]', $emailA->getId()));
+        // Assert response is correct.
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $emails = $this->em->getRepository(Email::class)->findAll();
+        $this->assertCount(2, $emails);
+        $emailNames = array_map(function ($form) {return $form->getName(); }, $emails);
+        $this->assertNotContains($emailA->getName(), $emailNames);
+        $this->assertContains($emailB->getName(), $emailNames);
+        $this->assertContains($emailC->getName(), $emailNames);
+        // Perform batch delete action for all.
+        $this->client->request('POST', '/s/emails/batchDelete?ids=all');
+        // Assert that all emails have been deleted.
+        $emails = $this->em->getRepository(Email::class)->findAll();
+        $this->assertCount(0, $emails);
     }
 }

@@ -568,7 +568,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertContains($formC->getAlias(), $formAliases);
         // Perform batch delete action for all.
         $this->client->request('POST', '/s/forms/batchDelete?ids=all');
-        // Assert that all contacts have been deleted.
+        // Assert that all emails have been deleted.
         $forms = $this->em->getRepository(Form::class)->findAll();
         $this->assertCount(0, $forms);
     }
