@@ -850,25 +850,35 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
+                if ($filter->not) {
+                    $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                    $sq->select('1')
+                        ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'xtag')
+                        ->innerJoin('xtag', MAUTIC_TABLE_PREFIX.'lead_tags', 'tag', 'xtag.tag_id = tag.id')
+                        ->where('l.id = xtag.lead_id')
+                        ->andWhere($q->expr()->like('tag.tag', ':'.$unique));
+                    $q->andWhere('NOT EXISTS ('.$sq->getSQL().')');
+                } else {
+                    $this->applySearchQueryRelationship(
+                        $q,
                         [
-                            'from_alias' => 'l',
-                            'table'      => 'lead_tags_xref',
-                            'alias'      => 'xtag',
-                            'condition'  => 'l.id = xtag.lead_id',
+                            [
+                                'from_alias' => 'l',
+                                'table'      => 'lead_tags_xref',
+                                'alias'      => 'xtag',
+                                'condition'  => 'l.id = xtag.lead_id',
+                            ],
+                            [
+                                'from_alias' => 'xtag',
+                                'table'      => 'lead_tags',
+                                'alias'      => 'tag',
+                                'condition'  => 'xtag.tag_id = tag.id',
+                            ],
                         ],
-                        [
-                            'from_alias' => 'xtag',
-                            'table'      => 'lead_tags',
-                            'alias'      => 'tag',
-                            'condition'  => 'xtag.tag_id = tag.id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'tag.tag', $likeExpr, $unique, null)
-                );
+                        $innerJoinTables,
+                        $this->generateFilterExpression($q, 'tag.tag', $likeExpr, $unique, null)
+                    );
+                }
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
