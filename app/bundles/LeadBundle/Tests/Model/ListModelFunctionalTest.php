@@ -181,14 +181,14 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $content = $response->getContent();
         $this->assertStringContainsString(sprintf('Segment %s cannot be deleted,', $segmentB->getName()), $content);
-        $this->assertStringContainsString('1 lists have been deleted!', $content);
+        $this->assertStringContainsString('1 segments have been deleted!', $content);
         $this->assertNull($segmentC->getId());
 
         // Test Batch delete action for all.
         $this->client->request('POST', '/s/segments/batchDelete?ids=all');
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('2 lists have been deleted!', $response->getContent());
+        $this->assertStringContainsString('2 segments have been deleted!', $response->getContent());
         $this->assertNull($segmentA->getId());
         $this->assertNull($segmentB->getId());
     }
