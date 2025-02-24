@@ -1,0 +1,40 @@
+{% extends '@MauticForm/Action/base_form_action.html.twig' %}
+
+{% set footerContent %}
+    {% if action.properties.copy_lead is defined and action.properties.copy_lead == 1 %}
+        <!-- Send to contact -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': 'mautic.form.form.send_to_contact',
+                'color': 'blue',
+                'icon': 'ri-mail-send-fill'
+            }]
+        } %}
+    {% endif %}
+
+    {% if action.properties.set_replyto is defined and action.properties.set_replyto == 1 %}
+        <!-- Reply to contact -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': 'mautic.form.form.reply_to_contact',
+                'color': 'blue',
+                'icon': 'ri-reply-fill'
+            }]
+        } %}
+    {% endif %}
+
+    {% if action.properties.email_to_owner is defined and action.properties.email_to_owner == 1 %}
+        <!-- Send to owner -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            'tags': [{
+                'label': 'mautic.form.form.send_to_owner',
+                'color': 'blue',
+                'icon': 'ri-mail-send-fill'
+            }]
+        } %}
+    {% endif %}
+{% endset %}
+
+{% block action_label %}
+    {{ footerContent|raw }}
+{% endblock %}
