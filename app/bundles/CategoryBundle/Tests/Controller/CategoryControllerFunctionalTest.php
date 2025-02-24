@@ -200,6 +200,6 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
-        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['newContent']);
     }
 }
