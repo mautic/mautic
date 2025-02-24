@@ -288,8 +288,8 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         yield 'Invalid contact locale, fallback to page locale' => [
-            'contactLocale'  => 'fr', // Assume 'yy' is not a valid locale
-            'pageLocale'     => 'ja',
+            'contactLocale'  => 'yy', // Assume 'yy' is not a valid locale
+            'pageLocale'     => 'fr',
             'expectedLocale' => 'fr',
         ];
 
