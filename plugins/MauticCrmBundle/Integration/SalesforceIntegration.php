@@ -1489,7 +1489,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, array<int|string, int|string>|null>|null $personIds
      * @param array<string, array<string, int|string>|null>          $config
      *
-     * @return array
+     * @return bool|array
      */
     public function pushLeadToCampaign(Lead $lead, $integrationCampaignId, $personIds = null, array $config = [])
     {

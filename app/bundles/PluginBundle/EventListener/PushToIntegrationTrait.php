@@ -46,10 +46,8 @@ trait PushToIntegrationTrait
      * @param array<string, array<string, int|string>|null> $config
      * @param Lead                                          $lead
      * @param mixed[]                                       $errors
-     *
-     * @return bool
      */
-    protected static function pushIt($config, $lead, &$errors)
+    protected static function pushIt($config, $lead, &$errors): bool
     {
         $integration         = (!empty($config['integration'])) ? $config['integration'] : null;
         $integrationCampaign = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
