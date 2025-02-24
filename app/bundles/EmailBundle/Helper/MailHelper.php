@@ -701,7 +701,7 @@ class MailHelper
         }
 
         if ($asset->isPublished()) {
-            $asset->setUploadDir($this->factory->getParameter('upload_dir'));
+            $asset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
             $this->assets[$asset->getId()] = $asset;
         }
     }

@@ -232,6 +232,14 @@
     ],
     "history": [
       {
+        "year": 2024,
+        "income": 131354.07,
+        "expenses": 164543.95,
+        "taxes": 0,
+        "currency": "USD",
+        "description": "The financial report can be found here: https://community.mautic.org/assemblies/council/f/55/proposals/91 which will be proposed for formal acceptance in 2025's General Assembly.\n\nMore detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+      },
+      {
         "year": 2023,
         "income": 148948.48,
         "expenses": 122047.34,

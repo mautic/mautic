@@ -49,7 +49,9 @@ return [
     ],
 
     'categories' => [
-        'asset' => null,
+        'asset' => [
+            'class' => Mautic\AssetBundle\Entity\Asset::class,
+        ],
     ],
 
     'services' => [

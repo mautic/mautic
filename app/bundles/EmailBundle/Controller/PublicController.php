@@ -177,8 +177,8 @@ class PublicController extends CommonFormController
                 $contactTracker->setTrackedContact($lead);
 
                 // Set lead lang
-                if ($lead->getPreferredLocale()) {
-                    $this->translator->setLocale($lead->getPreferredLocale());
+                if ($language = $lead->getPreferredLocale()) {
+                    $this->translator->setLocale($language);
                 }
 
                 // Add contact ID to the session name in case more contacts
@@ -243,6 +243,11 @@ class PublicController extends CommonFormController
                 $formView = $form->createView();
                 /** @var Page $prefCenter */
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
+                    // Set the page language if there is no lead preferred locale
+                    if (empty($language) && $language = $prefCenter->getLanguage()) {
+                        $this->translator->setLocale($language);
+                    }
+
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     if (str_contains($html, BuilderSubscriber::saveprefsRegex)) {

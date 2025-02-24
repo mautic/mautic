@@ -255,34 +255,26 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * @param string $tablePrefix
      * @param bool   $dateOnly
      *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
+    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false): ReportGeneratorEvent
     {
-        if ($tablePrefix) {
-            $tablePrefix .= '.';
-        }
+        $this->setDateRangeQueryFilters(
+            $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,
+            '%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)',
+            '%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)'
+        );
 
-        if (empty($this->options['dateFrom'])) {
-            $this->options['dateFrom'] = new \DateTime();
-            $this->options['dateFrom']->modify('-30 days');
-        }
+        return $this;
+    }
 
-        if (empty($this->options['dateTo'])) {
-            $this->options['dateTo'] = new \DateTime();
-        }
-
-        if ($dateOnly) {
-            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
-            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
-            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
-        } else {
-            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
-            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
-            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
-        }
+    public function applyDateFiltersWithoutNullValues(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): ReportGeneratorEvent
+    {
+        $this->setDateRangeQueryFilters(
+            $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,
+            'DATE(%1$s) BETWEEN :dateFrom AND :dateTo',
+            '%1$s BETWEEN :dateFrom AND :dateTo'
+        );
 
         return $this;
     }
@@ -421,6 +413,32 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
         foreach ($filters as $field) {
             $this->sortedFilters[$field['column']] = true;
+        }
+    }
+
+    private function setDateRangeQueryFilters(QueryBuilder $queryBuilder, string $tablePrefix, bool $dateOnly, string $dateColumn, string $dateOnlyFilter, string $dateTimeFilter): void
+    {
+        if ($tablePrefix) {
+            $tablePrefix .= '.';
+        }
+
+        if (empty($this->options['dateFrom'])) {
+            $this->options['dateFrom'] = new \DateTime();
+            $this->options['dateFrom']->modify('-30 days');
+        }
+
+        if (empty($this->options['dateTo'])) {
+            $this->options['dateTo'] = new \DateTime();
+        }
+
+        if ($dateOnly) {
+            $queryBuilder->andWhere(sprintf($dateOnlyFilter, $tablePrefix.$dateColumn));
+            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
+            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
+        } else {
+            $queryBuilder->andWhere(sprintf($dateTimeFilter, $tablePrefix.$dateColumn));
+            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
+            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }
     }
 
