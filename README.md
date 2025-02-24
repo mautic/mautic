@@ -265,7 +265,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/levente999"><img src="https://avatars.githubusercontent.com/u/168987998?v=4?s=100" width="100px;" alt="levente999"/><br /><sub><b>levente999</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=levente999" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rishithreddy89"><img src="https://avatars.githubusercontent.com/u/178993450?v=4?s=100" width="100px;" alt="rishithreddy89"/><br /><sub><b>rishithreddy89</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rishithreddy89" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rishithreddy89"><img src="https://avatars.githubusercontent.com/u/178993450?v=4?s=100" width="100px;" alt="rishithreddy89"/><br /><sub><b>rishithreddy89</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rishithreddy89" title="Code">💻</a> <a href="#userTesting-rishithreddy89" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>
