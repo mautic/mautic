@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-mono",
+            "directory": "themes/mono",
+            "target": "git@github.com:mautic/theme-mono.git"
+        }
+    ]
+}

@@ -107,7 +107,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
      */
     private $properties = [];
 
-    private ?bool $isIndex = false;
+    private bool $isIndex = false;
 
     /**
      * The column in lead_fields table was not created yet if this property is true.
@@ -180,6 +180,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
         $builder->createField('isShortVisible', 'boolean')
             ->columnName('is_short_visible')
+            ->nullable(false)
+            ->option('default', false)
             ->build();
 
         $builder->createField('isListable', 'boolean')
@@ -191,7 +193,12 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             ->build();
 
         $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
-        $builder->addNullableField('isIndex', 'boolean', 'is_index');
+
+        $builder->createField('isIndex', 'boolean')
+            ->columnName('is_index')
+            ->option('default', false)
+            ->nullable(false)
+            ->build();
 
         $builder->createField('charLengthLimit', 'integer')
             ->columnName('char_length_limit')
@@ -599,15 +606,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->getIsVisible();
     }
 
-    /**
-     * Set isShortVisible.
-     *
-     * @param bool $isShortVisible
-     *
-     * @return LeadField
-     */
-    public function setIsShortVisible($isShortVisible)
+    public function setIsShortVisible(?bool $isShortVisible): self
     {
+        $isShortVisible = $isShortVisible ?? false;
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
 
@@ -830,8 +831,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->isIndex;
     }
 
-    public function setIsIndex(bool $indexable): void
+    public function setIsIndex(?bool $indexable): void
     {
-        $this->isIndex = $indexable;
+        $this->isIndex = $indexable ?? false;
     }
 }

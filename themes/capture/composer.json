@@ -1,0 +1,10 @@
+{
+  "name": "mautic/theme-capture",
+  "description": "Mautic Capture Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": ">=5.2.2"
+  }
+}

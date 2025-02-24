@@ -84,22 +84,6 @@ Mautic.domToString = function(dom) {
 };
 
 /**
- * Receives a file URL from Filemanager when selected
- */
-Mautic.setFileUrl = function(url, width, height, alt) {
-    Mautic.insertTextAtCMCursor(url);
-}
-
-/**
- * Inserts the text to the cursor position or replace selected range
- */
-Mautic.insertTextAtCMCursor = function(text) {
-    var doc = Mautic.builderCodeMirror.getDoc();
-    var cursor = doc.getCursor();
-    doc.replaceRange(text, cursor);
-}
-
-/**
  * Opens new window on the URL
  */
 Mautic.openServerBrowser = function(url, width, height) {

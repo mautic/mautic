@@ -2,7 +2,8 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
 use Mautic\PluginBundle\Event\PluginUpdateEvent;
@@ -16,7 +17,6 @@ class ReloadHelper
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
-        private MauticFactory $factory,
     ) {
     }
 
@@ -59,6 +59,10 @@ class ReloadHelper
 
     /**
      * Updates plugins that exist in the filesystem and in the database and their version changed.
+     *
+     * @param array<string, array<class-string, ClassMetadata>> $pluginMetadata
+     * @param array<string, Plugin>                             $installedPlugins
+     * @param array<string, Schema>                             $installedPluginsSchemas
      */
     public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
@@ -71,16 +75,12 @@ class ReloadHelper
                 $plugin       = $this->mapConfigToPluginEntity($plugin, $pluginConfig);
 
                 // compare versions to see if an update is necessary
-                if ((empty($oldVersion) && !empty($plugin->getVersion())) || (!empty($oldVersion) && -1 == version_compare($oldVersion, $plugin->getVersion()))) {
-                    // call the update callback
-                    $callback        = $pluginConfig['bundleClass'];
+                if ((empty($oldVersion) && !empty($plugin->getVersion())) || (!empty($oldVersion) && -1 === version_compare($oldVersion, $plugin->getVersion()))) {
                     $metadata        = $pluginMetadata[$pluginConfig['namespace']] ?? null;
                     $installedSchema = isset($installedPluginsSchemas[$pluginConfig['namespace']])
                         ? $installedPluginsSchemas[$allPlugins[$bundle]['namespace']] : null;
 
-                    $callback::onPluginUpdate($plugin, $this->factory, $metadata, $installedSchema);
-
-                    $event = new PluginUpdateEvent($plugin, $oldVersion);
+                    $event = new PluginUpdateEvent($plugin, $oldVersion, $metadata, $installedSchema);
 
                     $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_UPDATE);
 
@@ -96,6 +96,8 @@ class ReloadHelper
 
     /**
      * Installs plugins that does not exist in the database yet.
+     *
+     * @param array<string, array<class-string, ClassMetadata>> $pluginMetadata
      */
     public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
@@ -105,8 +107,6 @@ class ReloadHelper
             if (!isset($existingPlugins[$bundle])) {
                 $entity = $this->mapConfigToPluginEntity(new Plugin(), $pluginConfig);
 
-                // Call the install callback
-                $callback        = $pluginConfig['bundleClass'];
                 $metadata        = $pluginMetadata[$pluginConfig['namespace']] ?? null;
                 $installedSchema = null;
 
@@ -114,9 +114,7 @@ class ReloadHelper
                     $installedSchema = true;
                 }
 
-                $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
-
-                $event = new PluginInstallEvent($entity);
+                $event = new PluginInstallEvent($entity, $metadata, $installedSchema);
 
                 $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL);
 
