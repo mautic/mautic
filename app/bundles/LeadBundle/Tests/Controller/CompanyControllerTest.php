@@ -189,4 +189,24 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $savedCompany = $this->em->find(Company::class, $this->company1Id);
         $this->assertSame($project->getId(), $savedCompany->getProjects()->first()->getId());
     }
+
+    public function testBatchDeleteAction(): void
+    {
+        $companyRepository = $this->em->getRepository(Company::class);
+        $companies         = $companyRepository->findAll();
+        $this->assertCount(2, $companies);
+        // Perform batch delete action for company 1.
+        $this->client->request(Request::METHOD_POST, sprintf('/s/companies/batchDelete?ids=["%s"]', $this->company1Id));
+        // Assert response is correct.
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $companies = $companyRepository->findAll();
+        $this->assertCount(1, $companies);
+        $this->assertNull($companyRepository->find($this->company1Id));
+        // Perform batch delete action for all.
+        $this->client->request(Request::METHOD_POST, '/s/companies/batchDelete?ids=all');
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertCount(0, $companyRepository->findAll());
+    }
 }
