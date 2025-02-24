@@ -74,7 +74,7 @@
     &.active > a {
       overflow: hidden;
       border-top-color: transparent;
-      font-weight: bold;
+      font-weight: 600;
 
       &:after { background-color: @nav-pills-active-link-hover-bg; }
     }
@@ -146,6 +146,9 @@
 
 // Tabs content
 // -------------------------
+.tab-content.contained {
+  background-color: var(--layer);
+}
 /*
 .tab-content {
   > .tab-pane {

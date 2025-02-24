@@ -994,6 +994,16 @@
     --ck-color-tooltip-text: var(--text-secondary);
 }
 
+/// Dynamic lightness for custom backgrounds
+//// Themes with light background
+:root[theme^="light"] {
+    --custom-bg-overlay-opacity: 0.025;
+}
+//// Themes with dark background
+:root[theme^="dark"] {
+    --custom-bg-overlay-opacity: 0.2;
+}
+
 // Layering model
 /// Default
 :root,

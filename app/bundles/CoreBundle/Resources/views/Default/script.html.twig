@@ -16,6 +16,5 @@
     var mauticLocale                    = '{{ app.request.getLocale() }}';
     var mauticEditorFonts               = {{ editor_fonts|json_encode|raw }};
     var mauticContactExportInBackground = {{ configGetParameter('contact_export_in_background')|number_format }};
-    var mauticFroalaEnabled = {{ configGetParameter('load_froala_assets')|number_format }};
 </script>
 {{ outputSystemScripts(true) }}

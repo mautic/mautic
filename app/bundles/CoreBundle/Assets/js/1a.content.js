@@ -572,17 +572,12 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         }
     });
-    Mautic.activateGlobalFroalaOptions();
     Mautic.getBuilderContainer = function() {
         return container;
     }
 
     // This turns all textarea elements with class "editor" into CKEditor ones, except for Dynamic Content elements, which can be initialized with Mautic.setDynamicContentEditors().
-    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
-        mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
-            mQuery(this).froalaEditor();
-        });
-    } else if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
+    if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             const textarea = mQuery(this);
 
@@ -728,12 +723,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
 Mautic.setDynamicContentEditors = function(container) {
     // The editor for dynamic content should only be initialized when the modal is opened due to conflicts and not being able to edit content otherwise
-    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor-dynamic-content').length && Mautic.getActiveBuilderName() === 'legacy') {
-        console.log('[Builder] Using Froala for the Dynamic Content editor (legacy)');
-        mQuery(container + ' textarea.editor-dynamic-content').each(function () {
-            mQuery(this).froalaEditor();
-        });
-    } else if (mQuery(container + ' textarea.editor-dynamic-content').length) {
+    if (mQuery(container + ' textarea.editor-dynamic-content').length) {
         console.log('[Builder] Using CKEditor for the Dynamic Content editor');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             const textarea = mQuery(this);
@@ -822,15 +812,11 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
-            mQuery('textarea').froalaEditor('destroy');
-        } else {
-            if (ckEditors.size > 0) {
-                ckEditors.forEach(function(value, key, map){
-                    map.get(key).destroy()
-                })
-                ckEditors.clear();
-            }
+        if (ckEditors.size > 0) {
+            ckEditors.forEach(function(value, key, map){
+                map.get(key).destroy()
+            })
+            ckEditors.clear();
         }
 
         mQuery(container + " input[data-toggle='color']").each(function() {

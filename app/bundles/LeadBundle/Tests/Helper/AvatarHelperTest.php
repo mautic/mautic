@@ -45,7 +45,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $this->assetsHelperMock = new AssetsHelper($packagesMock, $coreParametersHelper);
+        $this->assetsHelperMock = new AssetsHelper($packagesMock);
         $this->pathsHelperMock  = $this->createMock(PathsHelper::class);
         $this->pathsHelperMock->method('getSystemPath')
         ->willReturn('http://localhost');
