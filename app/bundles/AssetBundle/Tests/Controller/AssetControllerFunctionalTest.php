@@ -29,16 +29,13 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testIndexAction(): void
     {
-        $asset = new Asset();
-        $asset->setTitle('test');
-        $asset->setAlias('test');
-        $asset->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
-        $asset->setDateModified(new \DateTime('2020-03-21 20:29:02'));
-        $asset->setCreatedByUser('Test User');
-
-        $this->em->persist($asset);
-        $this->em->flush();
-        $this->em->detach($asset);
+        $asset = $this->createAsset([
+            'title'     => 'test',
+            'alias'     => 'test',
+            'createdAt' => new \DateTime('2020-02-07 20:29:02'),
+            'updatedAt' => new \DateTime('2020-03-21 20:29:02'),
+            'createdBy' => 'Test User',
+        ]);
 
         $urlAlias   = 'assets';
         $routeAlias = 'asset';
@@ -125,13 +122,14 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $userEditor  = $this->getUser(self::SALES_USER);
         $this->setPermission($userEditor, ['asset:assets' => $permission]);
 
-        $asset = new Asset();
-        $asset->setTitle('Asset A');
-        $asset->setAlias('asset-a');
-        $asset->setStorageLocation('local');
-        $asset->setPath('broken-image.jpg');
-        $asset->setExtension('jpg');
-        $asset->setCreatedByUser($userCreator->getUserIdentifier());
+        $asset = $this->createAsset([
+            'title'     => 'Asset A',
+            'alias'     => 'asset-a',
+            'storage'   => 'local',
+            'path'      => 'broken-image.jpg',
+            'extension' => 'jpg',
+            'createdBy' => $userCreator->getUserIdentifier(),
+        ]);
         $asset->setCreatedBy($userCreator->getId());
         $this->em->persist($asset);
         $this->em->flush();
@@ -144,6 +142,50 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->client->request(Request::METHOD_GET, "/s/assets/{$route}/{$asset->getId()}");
 
         Assert::assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testBatchDeleteAction(): void
+    {
+        $assetA = $this->createAsset([
+            'title'     => 'Asset A',
+            'alias'     => 'asset_a',
+            'storage'   => 'local',
+            'path'      => 'broken-image.jpg',
+            'extension' => 'jpg',
+        ]);
+        $assetB = $this->createAsset([
+            'title'     => 'Asset B',
+            'alias'     => 'asset_b',
+            'storage'   => 'local',
+            'path'      => 'broken-image.jpg',
+            'extension' => 'jpg',
+        ]);
+        $assetC = $this->createAsset([
+            'title'     => 'Asset C',
+            'alias'     => 'asset_c',
+            'storage'   => 'local',
+            'path'      => 'broken-image.jpg',
+            'extension' => 'jpg',
+        ]);
+        $this->assertNotNull($assetA->getId());
+        $this->assertNotNull($assetB->getId());
+        $this->assertNotNull($assetC->getId());
+
+        // Perform batch delete action for Asset A.
+        $this->client->request(Request::METHOD_POST, sprintf('/s/assets/batchDelete?ids=["%s"]', $assetA->getId()));
+        // Assert response is correct.
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $assets      = $this->em->getRepository(Asset::class)->findAll();
+        $assetTitles = array_map(function ($form) {return $form->getTitle(); }, $assets);
+        $this->assertNotContains($assetA->getTitle(), $assetTitles);
+        $this->assertContains($assetB->getTitle(), $assetTitles);
+        $this->assertContains($assetC->getTitle(), $assetTitles);
+        // Perform batch delete action for all.
+        $this->client->request('POST', '/s/assets/batchDelete?ids=all');
+        // Assert that all assets have been deleted.
+        $assets = $this->em->getRepository(Asset::class)->findAll();
+        $this->assertCount(0, $assets);
     }
 
     /**
