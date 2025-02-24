@@ -55,7 +55,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $eventData  = $this->createEventData($campaign, $campaignEvent);
             $dependency = $this->createDependency($campaignId, $campaignEvent);
 
-            $this->handleChannelExport($campaignEvent, $data);
+            $this->handleChannelExport($campaignEvent, $data, $event);
 
             $event->addEntity(Event::ENTITY_NAME, $eventData);
             $event->addDependencyEntity(Event::ENTITY_NAME, $dependency);
@@ -110,17 +110,26 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     /**
      * @param array<array<string, mixed>> $data
      */
-    private function handleChannelExport(Event $campaignEvent, array &$data): void
+    private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
         $channel   = $campaignEvent->getChannel();
         $channelId = $campaignEvent->getChannelId();
 
         if ($channel && $channelId) {
-            $event = new EntityExportEvent($channel, $channelId);
-            $this->dispatcher->dispatch($event);
+            $subEvent = new EntityExportEvent($channel, $channelId);
+            $this->dispatcher->dispatch($subEvent);
+            $event->addDependencies($subEvent->getDependencies());
 
-            foreach ($event->getEntities()[$channel] ?? [] as $entity) {
-                $data[$channel][(string) $entity['id']] = $entity;
+            foreach ($subEvent->getEntities() as $key => $values) {
+                if (!isset($data[$key])) {
+                    $data[$key] = $values;
+                } else {
+                    $existingIds = array_column($data[$key], 'id');
+
+                    $data[$key] = array_merge($data[$key], array_filter($values, function ($value) use ($existingIds) {
+                        return !in_array($value['id'], $existingIds);
+                    }));
+                }
             }
         }
     }

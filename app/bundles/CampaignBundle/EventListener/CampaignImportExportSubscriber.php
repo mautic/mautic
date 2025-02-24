@@ -148,7 +148,23 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $entityEvent = new EntityExportEvent($type, $entityId);
             $entityEvent = $this->dispatcher->dispatch($entityEvent);
 
-            $event->addEntities($entityEvent->getEntities());
+            $eventData = $event->getEntities();
+
+            foreach ($entityEvent->getEntities() as $key => $values) {
+                if (!isset($eventData[$key])) {
+                    $event->addEntities($entityEvent->getEntities());
+                } else {
+                    $existingIds = array_column($values, 'id');
+
+                    foreach ($eventData[$key] as $dataValue) {
+                        if (!in_array($dataValue['id'], $existingIds)) {
+                            $values[] = $dataValue;
+                        }
+                    }
+
+                    $event->addEntities([$key => $values]);
+                }
+            }
             $event->addDependencyEntity($type, $dependency);
         } catch (\Exception $e) {
             $this->logger->error('Error dispatching and adding entity: '.$e->getMessage(), ['exception' => $e]);

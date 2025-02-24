@@ -9,8 +9,11 @@ use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class EmailImportExportSubscriber implements EventSubscriberInterface
@@ -19,6 +22,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         private EmailModel $emailModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -73,6 +77,27 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Email::ENTITY_NAME, $emailData);
+
+        $form = $email->getUnsubscribeForm();
+        if ($form) {
+            $subEvent = new EntityExportEvent(Form::ENTITY_NAME, (int) $form->getId());
+            $this->dispatcher->dispatch($subEvent);
+            $event->addEntities($subEvent->getEntities());
+            $event->addDependencyEntity(Email::ENTITY_NAME, [
+                Email::ENTITY_NAME => (int) $emailId,
+                Form::ENTITY_NAME  => (int) $form->getId(),
+            ]);
+        }
+        $page = $email->getPreferenceCenter();
+        if ($page) {
+            $subEvent = new EntityExportEvent(Page::ENTITY_NAME, (int) $page->getId());
+            $this->dispatcher->dispatch($subEvent);
+            $event->addEntities($subEvent->getEntities());
+            $event->addDependencyEntity(Email::ENTITY_NAME, [
+                Email::ENTITY_NAME => (int) $emailId,
+                Page::ENTITY_NAME  => (int) $page->getId(),
+            ]);
+        }
     }
 
     public function onEmailImport(EntityImportEvent $event): void
@@ -104,8 +129,8 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
             $email->setTranslationParent($element['translation_parent_id'] ?? null);
             $email->setVariantParent($element['variant_parent_id'] ?? null);
-            $email->setUnsubscribeForm($element['unsubscribeform_id'] ?? null);
-            $email->setPreferenceCenter($element['preference_center_id'] ?? null);
+            // $email->setUnsubscribeForm($element['unsubscribeform_id'] ?? null);
+            // $email->setPreferenceCenter($element['preference_center_id'] ?? null);
             $email->setIsPublished((bool) ($element['is_published'] ?? false));
             $email->setName($element['name'] ?? '');
             $email->setDescription($element['description'] ?? '');
