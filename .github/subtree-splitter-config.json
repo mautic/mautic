@@ -229,6 +229,21 @@
             "name": "theme-creative",
             "directory": "themes/creative",
             "target": "git@github.com:mautic/theme-creative.git"
+        },
+        {
+            "name": "theme-blend",
+            "directory": "themes/blend",
+            "target": "git@github.com:mautic/theme-blend.git"
+        },
+        {
+            "name": "theme-mono",
+            "directory": "themes/mono",
+            "target": "git@github.com:mautic/theme-mono.git"
+        },
+        {
+            "name": "theme-capture",
+            "directory": "themes/capture",
+            "target": "git@github.com:mautic/theme-capture.git"
         }
 
     ]
