@@ -22,14 +22,9 @@ class ContactSegmentFilterDictionary
      */
     private $filters = [];
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

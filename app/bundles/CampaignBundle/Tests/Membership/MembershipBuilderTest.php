@@ -18,29 +18,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MembershipManager|\PHPUnit\Framework\MockObject\MockObject
+     * @var MembershipManager|MockObject
      */
-    private $manager;
+    private MockObject $manager;
 
     /**
      * @var CampaignMemberRepository|MockObject
      */
-    private $campaignMemberRepository;
+    private MockObject $campaignMemberRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private $leadRepository;
+    private MockObject $leadRepository;
 
     /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
+    private MembershipBuilder $membershipBuilder;
 
     protected function setUp(): void
     {

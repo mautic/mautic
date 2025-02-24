@@ -1,44 +1,55 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
+
 {% block mauicContent %}message
 {% endblock %}
+
 {% block headerTitle %}
 	{{ item.getName() }}
 {% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : item,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['channel:messages:viewown'], permissions['channel:messages:viewother'], item.getCreatedBy()),
+        },
+        'routeBase'       : 'message',
+        'targetLabel'     : 'mautic.channel.messages'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
-	{{- include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
         'item': item,
         'templateButtons': {
             'edit': securityHasEntityAccess(permissions['channel:messages:editown'], permissions['channel:messages:editother'], item.getCreatedBy()),
             'clone': permissions['channel:messages:create'],
-            'delete': securityHasEntityAccess(permissions['channel:messages:deleteown'], permissions['channel:messages:deleteown'], item.getCreatedBy()),
+            'delete': securityHasEntityAccess(permissions['channel:messages:deleteown'], permissions['channel:messages:deleteother'], item.getCreatedBy()),
         },
         'routeBase': 'message'
     }) -}}
 {% endblock %}
+
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
 {% endblock %}
+
 {% block content %}
 <!-- start: box layout -->
     <div class="box-layout">
         <!-- left section -->
         <div class="col-md-9 height-auto">
-            <div class="bg-auto">
+            <div>
                 <!-- form detail header -->
-                <div class="pr-md pl-md pt-lg pb-lg">
-                    <div class="box-layout">
-                        <div class="col-xs-10">
-                            <div class="text-muted">{{ item.getDescription()|purify }}</div>
-                        </div>
-
-                    </div>
-                </div>
+                {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
                 <!--/ form detail header -->
                 <!-- form detail collapseable -->
-                <div class="collapse" id="focus-details">
+                <div class="collapse pr-md pl-md" id="focus-details">
                     <div class="pr-md pl-md pb-md">
                         <div class="panel shd-none mb-0">
-                            <table class="table table-bordered table-striped mb-0">
+                            <table class="table table-hover mb-0">
                                 <tbody>
                                 {{- include('@MauticCore/Helper/details.html.twig', {'entity' : item}) -}}
                                 </tbody>
@@ -50,7 +61,7 @@
             </div>
 
         <!--/ form detail collapseable toggler -->
-            <div class="bg-auto bg-dark-xs">
+            <div>
                 <!-- form detail collapseable toggler -->
                 <div class="hr-expand nm">
                         <span data-toggle="tooltip" title="{% trans %}mautic.core.details{% endtrans %}">
@@ -65,7 +76,7 @@
                                 <div class="panel-body box-layout">
                                     <div class="col-md-6 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">
-                                            <div><i class="fa fa-line-chart pull-left"></i>
+                                            <div><i class="ri-line-chart-fill pull-left"></i>
                                                 <span class="pull-left"> {% trans %}mautic.messages.processed.messages{% endtrans %}</span></div>
                                         </h5>
                                     </div>
@@ -81,10 +92,10 @@
                     </div>
                 </div>
                 <!--/ stats -->
-                {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+                {{ customContent('details.stats.graph.below', _context) }}
 
                 <!-- tabs controls -->
-                <ul class="nav nav-tabs pr-md pl-md">
+                <ul class="nav nav-tabs nav-tabs-contained">
                     {% set active = 'active' %}
                     {% for channel, contacts in messagedLeads %}
                     <li class="{{ active }}">
@@ -114,11 +125,11 @@
             </div>
         </div>
         <!-- right section -->
-        <div class="col-md-3 bg-white bdr-l height-auto">
+        <div class="col-md-3 bdr-l height-auto">
             <!-- recent activity -->
             {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
             {% block rightFormContent %}
             {% endblock %}
         </div>
-    </div> 
+    </div>
 {% endblock %}

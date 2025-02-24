@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
-class ReferenceValueDAO
+class ReferenceValueDAO implements \Stringable
 {
-    /**
-     * @var int
-     */
-    private $value;
+    private ?int $value = null;
 
-    /**
-     * @var string|null
-     */
-    private $type;
+    private ?string $type = null;
 
     public function getValue(): ?int
     {
@@ -39,5 +33,21 @@ class ReferenceValueDAO
     public function __toString(): string
     {
         return (string) $this->value;
+    }
+
+    /** @return array<string, mixed> */
+    public function __serialize(): array
+    {
+        return [
+            'value' => $this->value,
+            'types' => $this->type,
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    public function __unserialize(array $data): void
+    {
+        $this->value = $data['value'] ?? null;
+        $this->type  = $data['type'] ?? null;
     }
 }

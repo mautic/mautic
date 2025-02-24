@@ -9,27 +9,22 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class ContactFiltersEvaluateEvent extends Event
 {
-    /**
-     * @var mixed[]
-     */
-    private array $filters;
-
     private bool $isEvaluated = false;
-    private Lead $contact;
-    private bool $isMatched = false;
+
+    private bool $isMatched   = false;
 
     /**
      * @param mixed[] $filters
      */
-    public function __construct(array $filters, Lead $contact)
-    {
-        $this->filters = $filters;
-        $this->contact = $contact;
+    public function __construct(
+        private array $filters,
+        private Lead $contact
+    ) {
     }
 
     public function isMatch(): bool
     {
-        return $this->isEvaluated() ? $this->isMatched : false;
+        return $this->isEvaluated() && $this->isMatched;
     }
 
     public function isEvaluated(): bool

@@ -9,34 +9,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class GravatarHelper
 {
-    /**
-     * @var bool
-     */
-    private $devMode;
+    private bool $devMode;
 
     /**
      * @var array<string>
      */
-    private $devHosts = [];
-
-    /**
-     * @var DefaultAvatarHelper
-     */
-    private $defaultAvatarHelper;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private array $devHosts;
 
     public function __construct(
-        DefaultAvatarHelper $defaultAvatarHelper,
+        private DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
-        RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
-        $this->defaultAvatarHelper = $defaultAvatarHelper;
-        $this->requestStack        = $requestStack;
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
     }
 
@@ -44,10 +29,8 @@ final class GravatarHelper
      * @param string $email
      * @param string $size
      * @param string $default
-     *
-     * @return string
      */
-    public function getImage($email, $size = '250', $default = null)
+    public function getImage($email, $size = '250', $default = null): string
     {
         $request      = $this->requestStack->getCurrentRequest();
         $localDefault = ($this->devMode
@@ -67,7 +50,7 @@ final class GravatarHelper
             $default = $localDefault;
         }
 
-        $default = (false !== strpos($default, '.') && 0 !== strpos($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
+        $default = (str_contains($default, '.') && !str_starts_with($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
 
         return $url.('&d='.urlencode($default));
     }

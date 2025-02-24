@@ -20,27 +20,25 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ExceptionListener extends ErrorListener
 {
     /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
      * @param LoggerInterface $controller
      */
-    public function __construct(Router $router, $controller, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        protected Router $router,
+        $controller,
+        LoggerInterface $logger = null
+    ) {
         parent::__construct($controller, $logger);
-
-        $this->router = $router;
     }
 
-    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null)
+    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null): void
     {
         $exception = $event->getThrowable();
 
         if ($exception instanceof LightSamlException) {
+            // Convert the LightSamlException to a AuthenticationException so it can be passed in the session.
+            $exception = new AuthenticationException($exception->getMessage());
             // Redirect to login page with message
-            $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception->getMessage());
+            $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
             $event->setResponse(new RedirectResponse($this->router->generate('login')));
 
             return;
@@ -53,7 +51,7 @@ class ExceptionListener extends ErrorListener
         }
 
         if (!$exception instanceof AccessDeniedHttpException && !$exception instanceof NotFoundHttpException) {
-            $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+            $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $exception::class, $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
         $exception = $event->getThrowable();
@@ -68,7 +66,7 @@ class ExceptionListener extends ErrorListener
                 $e,
                 sprintf(
                     'Exception thrown when handling an exception (%s: %s at %s line %s)',
-                    get_class($e),
+                    $e::class,
                     $e->getMessage(),
                     $e->getFile(),
                     $e->getLine()

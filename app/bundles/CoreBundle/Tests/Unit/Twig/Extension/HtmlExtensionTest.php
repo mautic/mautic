@@ -27,7 +27,7 @@ final class HtmlExtensionTest extends TestCase
     /**
      * @return array<int, mixed>
      */
-    public function convertStringToArrayProvider(): iterable
+    public static function convertStringToArrayProvider(): iterable
     {
         yield ['id="test-id" class="test-class"', [
             'id'    => 'test-id',

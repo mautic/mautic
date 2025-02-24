@@ -23,7 +23,7 @@ class HttpFactory implements AuthProviderInterface
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
     public function getAuthType(): string
     {
@@ -32,7 +32,6 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param CredentialsInterface|AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface                           $config
      *
      * @throws PluginNotConfiguredException
      */

@@ -9,9 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-/**
- * Class ProfileController.
- */
 class ProfileController extends FormController
 {
     /**
@@ -86,7 +83,7 @@ class ProfileController extends FormController
                         break;
 
                     case 'editUsername':
-                        $overrides['username'] = $me->getUsername();
+                        $overrides['username'] = $me->getUserIdentifier();
                         $form->remove('username');
                         $form->add(
                             'username_unbound',
@@ -97,7 +94,7 @@ class ProfileController extends FormController
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
-                                'data'       => $me->getUsername(),
+                                'data'       => $me->getUserIdentifier(),
                                 'required'   => false,
                             ]
                         );

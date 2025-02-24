@@ -7,11 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 class NullableProcessorTest extends TestCase
 {
-    public function testNullReturnedIfEmptyString()
+    public function testNullReturnedIfEmptyString(): void
     {
-        $getEnv = function (string $name) {
-            return '';
-        };
+        $getEnv = fn (string $name) => '';
 
         $processor = new NullableProcessor();
 
@@ -20,11 +18,9 @@ class NullableProcessorTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testValueReturnedIfNotEmptyString()
+    public function testValueReturnedIfNotEmptyString(): void
     {
-        $getEnv = function (string $name) {
-            return 'foobar';
-        };
+        $getEnv = fn (string $name) => 'foobar';
 
         $processor = new NullableProcessor();
 

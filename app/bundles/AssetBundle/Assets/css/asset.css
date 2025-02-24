@@ -34,7 +34,8 @@
   20% { -webkit-transform: scale(1); -moz-transform: scale(1); -ms-transform: scale(1); -o-transform: scale(1); transform: scale(1); } }
 .mdropzone, .mdropzone * { box-sizing: border-box; }
 
-.mdropzone { min-height: 150px; border: 2px solid rgba(0, 0, 0, 0.3); background: white; padding: 30px 30px; }
+.mdropzone { min-height: 150px; border: none; background: var(--field); padding: 30px 30px; transition: var(--transition-all-productive); border-radius: var(--border-radius-md);}
+.mdropzone:hover { background: var(--field-hover); }
 .has-error .mdropzone {border: 2px solid #a94442;}
 .is-success .mdropzone {border: 2px solid #00a08a;}
 .mdropzone.dz-clickable { cursor: pointer; }

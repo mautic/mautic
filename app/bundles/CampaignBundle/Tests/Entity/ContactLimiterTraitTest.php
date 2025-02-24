@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,39 +10,37 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 
 class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 {
     use ContactLimiterTrait;
+    use MockedConnectionTrait;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection = $this->getMockedConnection();
 
         $expr = new ExpressionBuilder($this->connection);
         $this->connection->method('getExpressionBuilder')
-            ->willReturn($expr);
-
-        $platform = $this->createMock(AbstractPlatform::class);
-        $this->connection->method('getDatabasePlatform')
-            ->willReturn($platform);
+          ->willReturn($expr);
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->entityManager->method('getExpressionBuilder')
             ->willReturn(new Expr());
     }
 
-    public function testSpecificContactId()
+    public function testSpecificContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, 1);
 
@@ -59,7 +56,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testListOfContacts()
+    public function testListOfContacts(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [1, 2, 3]);
 
@@ -75,7 +72,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMinContactId()
+    public function testMinContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
@@ -91,7 +88,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testBatchMinContactId()
+    public function testBatchMinContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
@@ -108,7 +105,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMaxContactId()
+    public function testMaxContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, 10);
 
@@ -124,7 +121,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMinAndMaxContactId()
+    public function testMinAndMaxContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 1, 10);
 
@@ -141,7 +138,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testThreads()
+    public function testThreads(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [], 1, 5);
 
@@ -158,7 +155,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMaxResultsIgnoredForCountQueries()
+    public function testMaxResultsIgnoredForCountQueries(): void
     {
         $contactLimiter = new ContactLimiter(50, 1);
 

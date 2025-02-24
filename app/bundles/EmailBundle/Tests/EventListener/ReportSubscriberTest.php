@@ -10,7 +10,9 @@ use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -27,61 +29,66 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    use MockedConnectionTrait;
     /**
      * @var MockObject|Connection
      */
-    private $connectionMock;
+    private MockObject $connectionMock;
 
     /**
      * @var MockObject|CompanyReportData
      */
-    private $companyReportDataMock;
+    private MockObject $companyReportDataMock;
 
     /**
      * @var MockObject|StatRepository
      */
-    private $statRepository;
+    private MockObject $statRepository;
+
+    /**
+     * @var MockObject|EmailRepository
+     */
+    private MockObject $emailRepository;
 
     /**
      * @var MockObject&GeneratedColumnsProviderInterface
      */
-    private $generatedColumnsProvider;
+    private MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Report
      */
-    private $report;
+    private MockObject $report;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private QueryBuilder $queryBuilder;
 
     private ReportSubscriber $subscriber;
 
     /**
      * @var MockObject|FieldsBuilder
      */
-    private $fieldsBuilderMock;
+    private MockObject $fieldsBuilderMock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->connectionMock           = $this->createMock(Connection::class);
-        $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
-        $this->statRepository           = $this->createMock(StatRepository::class);
-        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
-        $this->fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
-        $this->subscriber               = new ReportSubscriber(
+        $this->connectionMock            = $this->getMockedConnection();
+        $this->companyReportDataMock     = $this->createMock(CompanyReportData::class);
+        $this->statRepository            = $this->createMock(StatRepository::class);
+        $this->emailRepository           = $this->createMock(EmailRepository::class);
+        $this->generatedColumnsProvider  = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->fieldsBuilderMock         = $this->createMock(FieldsBuilder::class);
+        $this->subscriber                = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
             $this->statRepository,
+            $this->emailRepository,
             $this->generatedColumnsProvider,
             $this->fieldsBuilderMock
         );
@@ -225,7 +232,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $resultMock        = $this->createMock(Result::class);
         $translatorMock    = $this->createMock(TranslatorInterface::class);
 
-        $queryBuilderMock->method('execute')->willReturn($resultMock);
+        $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
 
         $eventMock->expects($this->once())
@@ -268,6 +275,105 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 ReportSubscriber::DNC_PREFIX,
                 'e.id = dnc.channel_id AND dnc.channel=\'email\''
             );
+
+        $this->subscriber->onReportGraphGenerate($eventMock);
+    }
+
+    public function testOnReportGraphGenerateForEmailContextWithEmailMultiSieriesPieGraph(): void
+    {
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
+
+        $eventMock
+            ->method('checkContext')
+            ->withConsecutive(
+                [['email.stats', 'emails']],
+                ['emails']
+            )
+            ->willReturn(true);
+
+        $eventMock->expects($this->once())
+            ->method('getRequestedGraphs')
+            ->willReturn(['mautic.email.graph.pie.sent.read.clicked.unsubscribed']);
+
+        $eventMock->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilderMock);
+
+        $eventMock->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['chartQuery' => $chartQueryMock, 'translator' => $translatorMock]);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getSentReadNotReadCount')
+            ->willReturn([
+                'sent_count'=> 10,
+                'read_count'=> 4,
+                'not_read'  => 6,
+            ]);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getUniqueClicks')
+            ->willReturn(5);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getUnsubscribedCount')
+            ->willReturn(1);
+
+        $this->subscriber->onReportGraphGenerate($eventMock);
+    }
+
+    public function testOnReportGraphGenerateForEmailContextWithEmailGraph1(): void
+    {
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $resultMock        = $this->createMock(Result::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
+
+        $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
+        $resultMock->method('fetchOne')->willReturn([]);
+
+        $eventMock->expects($this->once())
+            ->method('getRequestedGraphs')
+            ->willReturn(['mautic.email.table.most.emails.failed']);
+
+        $eventMock->method('checkContext')
+            ->withConsecutive(
+                [['email.stats', 'emails']],
+                ['emails']
+            )
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $eventMock->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilderMock);
+
+        $eventMock->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['chartQuery' => $chartQueryMock, 'translator' => $translatorMock]);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('select')
+            ->with('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
+            )->willReturn($queryBuilderMock);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('andWhere')
+            ->with('es.is_failed = 1'
+            )->willReturn($queryBuilderMock);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('groupBy')
+            ->with('e.id, e.subject'
+            )->willReturn($queryBuilderMock);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('having')
+            ->with('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0'
+            )->willReturn($queryBuilderMock);
 
         $this->subscriber->onReportGraphGenerate($eventMock);
     }

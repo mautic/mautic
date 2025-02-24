@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class PermissionClassMetadataTest extends TestCase
 {
-    public function testPermissionsFound()
+    public function testPermissionsFound(): void
     {
         $metadataArray = [
             'isPlugin'          => false,
@@ -31,7 +31,7 @@ class PermissionClassMetadataTest extends TestCase
         $this->assertCount(1, $metadata->toArray()['permissionClasses']);
     }
 
-    public function testCompatibilityWithPermissionServices()
+    public function testCompatibilityWithPermissionServices(): void
     {
         $metadataArray = [
             'isPlugin'          => false,

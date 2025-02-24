@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class HourStatTest extends TestCase
 {
-    public function testAll()
+    public function testAll(): void
     {
         $hour     = '2018-12-07 12';
         $hourStat = new HourStat('2018-12-07 12');

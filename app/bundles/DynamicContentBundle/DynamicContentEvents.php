@@ -3,7 +3,6 @@
 namespace Mautic\DynamicContentBundle;
 
 /**
- * Class DynamicContentEvents
  * Events available for DynamicContentBundle.
  */
 final class DynamicContentEvents

@@ -16,35 +16,24 @@ class MaxMindDoNotSellDownloadHelper
     /**
      * @var array<string>
      */
-    private $auth;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var HttpClientInterface
-     */
-    private $httpClient;
+    private array $auth;
 
     /**
      * @var string
      */
     private $listPath;
 
-    public function __construct($auth, LoggerInterface $logger, HttpClientInterface $httpClient, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->logger     = $logger;
+    public function __construct(
+        $auth,
+        private LoggerInterface $logger,
+        private HttpClientInterface $httpClient,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $this->auth       = explode(':', (string) $auth, 2);
-        $this->httpClient = $httpClient;
         $this->listPath   = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
     }
 
-    /**
-     * @return bool
-     */
-    public function downloadRemoteDataStore()
+    public function downloadRemoteDataStore(): bool
     {
         if (empty($this->getUser()) || empty($this->getPassword())) {
             $this->logger->error('Missing user ID or license key for MaxMind');
@@ -90,10 +79,8 @@ class MaxMindDoNotSellDownloadHelper
 
     /**
      * Service URL.
-     *
-     * @return string
      */
-    public function getRemoteDataStoreDownloadUrl()
+    public function getRemoteDataStoreDownloadUrl(): string
     {
         return self::REMOTE_DATA;
     }
@@ -108,28 +95,20 @@ class MaxMindDoNotSellDownloadHelper
         return $this->listPath;
     }
 
-    /**
-     * @return string
-     */
-    private function getUser()
+    private function getUser(): string
     {
         return $this->getAuthPart(0);
     }
 
-    /**
-     * @return string
-     */
-    protected function getPassword()
+    protected function getPassword(): string
     {
         return $this->getAuthPart(1);
     }
 
     /**
      * @param int $position
-     *
-     * @return string
      */
-    private function getAuthPart($position)
+    private function getAuthPart($position): string
     {
         if (array_key_exists($position, $this->auth)) {
             return $this->auth[$position];

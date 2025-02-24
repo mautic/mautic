@@ -11,38 +11,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
-     * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
-     *
-     * @var mixed
-     */
-    protected $choices;
-
-    /**
-     * Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
-     *
-     * @var mixed[]
-     */
-    protected $operators;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    private string $search;
-
-    /**
      * @param mixed[] $choices
-     * @param mixed[] $operators
+     * @param mixed[] $operators Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
      */
-    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null, string $search = '')
-    {
+    public function __construct(
+        protected $choices,
+        protected $operators,
+        protected TranslatorInterface $translator,
+        Request $request = null,
+        private string $search = ''
+    ) {
         parent::__construct($request);
-
-        $this->choices    = $choices;
-        $this->operators  = $operators;
-        $this->translator = $translator;
-        $this->search     = $search;
     }
 
     /**
@@ -82,7 +61,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      * @param string  $choiceKey
      * @param mixed[] $choiceConfig
      */
-    public function addChoice($object, $choiceKey, $choiceConfig)
+    public function addChoice($object, $choiceKey, $choiceConfig): void
     {
         if (!isset($this->choices[$object])) {
             $this->choices[$object] = [];

@@ -47,6 +47,7 @@ class GroupType extends AbstractType
             $data = $options['data']->isPublished(false);
         }
         $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label'     => 'mautic.core.form.available',
             'data'      => $data,
         ]);
 
@@ -57,9 +58,6 @@ class GroupType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

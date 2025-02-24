@@ -1,0 +1,20 @@
+{# accordion.html.twig #}
+<!-- Accordion -->
+<ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+    {% for item in items %}
+    <!-- {{ item.title|trans }} -->
+        <li class="panel">
+            <a role="button" id="heading{{ item.id }}" class="accordion-heading collapsed" data-toggle="collapse"
+               data-parent="#accordion" href="#collapse{{ item.id }}" aria-expanded="false" aria-controls="collapse{{ item.id }}">
+                <i class="ri-arrow-down-s-line accordion-arrow"></i>
+                <span class="accordion-title">{{ item.title|trans }}</span>
+            </a>
+
+            <div id="collapse{{ item.id }}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{ item.id }}">
+                <div class="accordion-content">
+                    {{ item.content|raw }}
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+</ul>

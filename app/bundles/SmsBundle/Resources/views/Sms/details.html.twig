@@ -5,6 +5,23 @@
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{sms.getName()}}{% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : sms,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(
+                permissions['sms:smses:viewown'],
+                permissions['sms:smses:viewother'],
+                sms.getCreatedBy()
+            ),
+        },
+        'routeBase' : 'sms',
+        'targetLabel': 'mautic.sms.smses'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
     {% set customButtons = [] %}
     {{- include('@MauticCore/Helper/page_actions.html.twig',
@@ -23,11 +40,6 @@
                     permissions['sms:smses:deleteother'],
                     sms.getCreatedBy()
                 ),
-                'close' : securityHasEntityAccess(
-                    permissions['sms:smses:viewown'],
-                    permissions['sms:smses:viewother'],
-                    sms.getCreatedBy()
-                ),
             },
             'routeBase' : 'sms',
         }
@@ -35,35 +47,51 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : sms}) -}}
+{{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+    'entity': sms,
+    'status': sms.getPublishUp() is not null ? 'sending' : 'available'
+}) -}}
+{% set tags = [
+    {
+        color: 'warm-gray',
+        label: smsType == 'list'
+            ? 'mautic.sms.type.list.header'
+            : (smsType == 'template' ? 'mautic.sms.type.template.header' : type)
+    }
+] %}
+
+{% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
-{# This doesn't seem to be used anywhere: #}
-{# {% set smsType = sms.getSmsType() %}
+
+{% set smsType = sms.getSmsType() %}
 {% if smsType is empty %}
     {% set smsType = 'template' %}
-{% endif %} #}
+{% endif %}
 
 {% block content %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- page detail header -->
             <!-- sms detail collapseable toggler -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10">
-                        <div class="text-white dark-sm mb-0">{{ sms.getDescription()|purify }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="collapse" id="sms-details">
+            <div class="collapse pr-md pl-md" id="sms-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                                 {{- include('@MauticCore/Helper/details.html.twig', {'entity' : sms}) -}}
+                                {% if sms.getSmsType() == 'list' %}
+                                    <tr>
+                                        <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.lead.lists'|trans }}</span></td>
+                                        <td>
+                                            {% set segments = sms.getLists %}
+                                            {% set segmentNames = segments.toArray|map(segment => segment.getName) %}
+                                            {{ segmentNames|join(', ') }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -71,7 +99,7 @@
             </div>
         </div>
             <!--/ sms detail collapseable toggler -->
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#sms-details">
@@ -87,7 +115,7 @@
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-line-chart"></span>
+                                        <span class="ri-line-chart-fill"></span>
                                         {{ 'mautic.core.stats'|trans }}
                                     </h5>
                                 </div>
@@ -104,10 +132,10 @@
             </div>
             <!--/ stats -->
 
-            {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+            {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
-            <ul class="nav nav-tabs pr-md pl-md">
+            <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
                     <a href="#clicks-container" role="tab" data-toggle="tab">
                         {{ 'mautic.trackable.click_counts'|trans }}
@@ -141,7 +169,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- activity feed -->
         {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
     </div>

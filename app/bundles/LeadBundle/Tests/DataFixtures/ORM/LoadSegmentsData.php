@@ -11,26 +11,13 @@ use Mautic\LeadBundle\Model\ListModel;
 
 class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(ListModel $listModel, LeadModel $contactModel)
-    {
-        $this->listModel    = $listModel;
-        $this->contactModel = $contactModel;
+    public function __construct(
+        private ListModel $listModel,
+        private LeadModel $contactModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $segments = [
             [ // ID 2
@@ -868,8 +855,8 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'type'       => 'boolean',
                         'operator'   => '=',
                         'properties' => [
-                                'filter' => 1,
-                            ],
+                            'filter' => 1,
+                        ],
                     ],
                 ],
                 'populate' => false,
@@ -886,8 +873,8 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'type'       => 'boolean',
                         'operator'   => '=',
                         'properties' => [
-                                'filter' => 1,
-                            ],
+                            'filter' => 1,
+                        ],
                     ],
                 ],
                 'populate' => false,
@@ -905,8 +892,8 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'type'       => 'boolean',
                         'operator'   => '=',
                         'properties' => [
-                                'filter' => 0,
-                            ],
+                            'filter' => 0,
+                        ],
                     ],
                 ],
                 'populate' => false,
@@ -923,8 +910,8 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'type'       => 'datetime',
                         'operator'   => 'gte',
                         'properties' => [
-                                'filter' => (new \DateTime())->format('Y-m-d H:i'),
-                            ],
+                            'filter' => (new \DateTime())->format('Y-m-d H:i'),
+                        ],
                     ],
                 ],
                 'populate' => false,
@@ -941,8 +928,8 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'type'       => 'boolean',
                         'operator'   => '=',
                         'properties' => [
-                                'filter' => 1,
-                            ],
+                            'filter' => 1,
+                        ],
                     ],
                 ],
                 'populate' => false,
@@ -959,8 +946,8 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'type'       => 'datetime',
                         'operator'   => 'gte',
                         'properties' => [
-                                'filter' => (new \DateTime())->format('Y-m-d H:i'),
-                            ],
+                            'filter' => (new \DateTime())->format('Y-m-d H:i'),
+                        ],
                     ],
                 ],
                 'populate' => false,
@@ -1054,6 +1041,24 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                     ],
                 ],
                 'populate' => true,
+            ],
+            [ // ID 52
+                'name'    => 'Missing table name',
+                'alias'   => 'table-name-missing-in-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'custom_object',
+                        'field'    => 'firstnameLOL',
+                        'operator' => '!=',
+                        'filter'   => 'xxxxx',
+                        'display'  => null,
+                        'table'    => '',
+                    ],
+                ],
+                'populate' => false,
             ],
         ];
 

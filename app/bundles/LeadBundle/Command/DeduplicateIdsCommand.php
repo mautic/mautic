@@ -16,13 +16,10 @@ class DeduplicateIdsCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate:ids';
 
-    private ContactDeduper $contactDeduper;
-
-    public function __construct(ContactDeduper $contactDeduper)
-    {
+    public function __construct(
+        private ContactDeduper $contactDeduper
+    ) {
         parent::__construct();
-
-        $this->contactDeduper = $contactDeduper;
     }
 
     public function configure(): void
@@ -62,7 +59,7 @@ EOT
         if (!$contactIds) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $output->writeln("{$duplicateCount} contacts passed to deduplicate");
@@ -79,7 +76,8 @@ EOT
         $event = $stopwatch->stop('deduplicate');
         $output->writeln("Duration: {$event->getDuration()} ms, Memory: {$event->getMemory()} bytes");
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Merge contacts based on same unique identifiers';
 }

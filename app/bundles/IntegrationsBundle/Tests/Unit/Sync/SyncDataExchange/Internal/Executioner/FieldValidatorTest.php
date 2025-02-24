@@ -19,17 +19,14 @@ class FieldValidatorTest extends TestCase
     /**
      * @var LeadFieldRepository|MockObject
      */
-    private $leadFieldRepository;
+    private MockObject $leadFieldRepository;
 
     /**
      * @var BulkNotification|MockObject
      */
-    private $bulkNotification;
+    private MockObject $bulkNotification;
 
-    /**
-     * @var FieldValidator
-     */
-    private $fieldValidator;
+    private FieldValidator $fieldValidator;
 
     protected function setup(): void
     {

@@ -40,7 +40,7 @@ class PluginFactory implements SecurityFactoryInterface
         return 'mautic_plugin_auth';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
     }
 }

@@ -14,15 +14,14 @@ use Symfony\Component\Validator\Constraints\Valid;
 
 class MessageType extends AbstractFormStandardType
 {
-    protected MessageModel $model;
-
-    public function __construct(MessageModel $messageModel, CorePermissions $security)
-    {
-        $this->model    = $messageModel;
+    public function __construct(
+        protected MessageModel $model,
+        CorePermissions $security
+    ) {
         $this->security = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Add standard fields
         $options = array_merge($options, ['model_name' => 'channel.message', 'permission_base' => 'channel:messages']);
@@ -64,10 +63,7 @@ class MessageType extends AbstractFormStandardType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

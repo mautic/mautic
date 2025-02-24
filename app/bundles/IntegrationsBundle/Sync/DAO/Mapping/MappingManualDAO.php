@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
@@ -18,26 +9,15 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class MappingManualDAO
 {
-    private $integration;
+    private array $objectsMapping = [];
 
-    /**
-     * @var array
-     */
-    private $objectsMapping = [];
+    private array $internalObjectsMapping = [];
 
-    /**
-     * @var array
-     */
-    private $internalObjectsMapping = [];
+    private array $integrationObjectsMapping = [];
 
-    /**
-     * @var array
-     */
-    private $integrationObjectsMapping = [];
-
-    public function __construct(string $integration)
-    {
-        $this->integration = $integration;
+    public function __construct(
+        private string $integration
+    ) {
     }
 
     public function getIntegration(): string

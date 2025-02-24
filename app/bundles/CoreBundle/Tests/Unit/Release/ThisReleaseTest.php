@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ThisReleaseTest extends TestCase
 {
-    public function testMetadataParsed()
+    public function testMetadataParsed(): void
     {
         $metadata = ThisRelease::getMetadata();
 

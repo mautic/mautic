@@ -15,7 +15,7 @@ final class SummarizeCommandTest extends AbstractCampaignTest
      */
     public function testBackwardSummarizationWhenThereAreNoCampaignEventLogs(): void
     {
-        $output = $this->runCommand(
+        $commandResult = $this->testSymfonyCommand(
             SummarizeCommand::NAME,
             [
                 '--env'       => 'test',
@@ -28,7 +28,7 @@ final class SummarizeCommandTest extends AbstractCampaignTest
         Assert::assertCount(0, $summaryRepo->findAll());
         Assert::assertStringContainsString(
             'There are no records in the campaign lead event log table. Nothing to summarize.',
-            $output
+            $commandResult->getDisplay()
         );
     }
 
@@ -41,7 +41,7 @@ final class SummarizeCommandTest extends AbstractCampaignTest
 
         $campaign = $this->saveSomeCampaignLeadEventLogs();
 
-        $this->runCommand(
+        $this->testSymfonyCommand(
             SummarizeCommand::NAME,
             [
                 '--env'       => 'test',

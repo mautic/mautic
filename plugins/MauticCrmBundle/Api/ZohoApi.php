@@ -87,7 +87,6 @@ class ZohoApi extends CrmApi
 
     /**
      * @param string $object
-     * @param null   $id
      *
      * @return array
      *
@@ -123,8 +122,6 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param null $id
-     *
      * @return array
      *
      * @throws ApiErrorException

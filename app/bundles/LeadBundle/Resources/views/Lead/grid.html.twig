@@ -19,7 +19,8 @@
 {% extends isIndex ? '@MauticLead/Lead/list.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block content %}
-<div class="pa-md bg-auto">
+    {{ include('@MauticLead/Lead/_filter.html.twig') }}
+<div class="pa-md">
     {% if items|length > 0 %}
         <div class="row shuffle-grid">
             {% for item in items %}

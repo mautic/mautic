@@ -9,15 +9,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IframeAvailabilityCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var IframeAvailabilityChecker|MockObject
      */
-    private $helper;
+    private IframeAvailabilityChecker $helper;
 
     public function setUp(): void
     {

@@ -19,29 +19,25 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Point>
+ */
 class PointType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    public function __construct(CorePermissions $security)
-    {
-        $this->security = $security;
+    public function __construct(
+        private CorePermissions $security
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
         $builder->add(
             'name',
-            TextType::class, [
+            TextType::class,
+            [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
@@ -50,7 +46,8 @@ class PointType extends AbstractType
 
         $builder->add(
             'description',
-            TextareaType::class, [
+            TextareaType::class,
+            [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control editor'],
@@ -88,9 +85,9 @@ class PointType extends AbstractType
         );
 
         $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
-        if ($type) {
-            $formType = (!empty($options['pointActions']['actions'][$type]['formType'])) ?
-                $options['pointActions']['actions'][$type]['formType'] : GenericPointSettingsType::class;
+
+        if ($type && !empty($options['pointActions']['actions'][$type]['formType'])) {
+            $formType   = $options['pointActions']['actions'][$type]['formType'];
             $properties = ($options['data']) ? $options['data']->getProperties() : [];
             $builder->add(
                 'properties',
@@ -144,8 +141,13 @@ class PointType extends AbstractType
             'repeatable',
             YesNoButtonGroupType::class,
             [
-                'label' => 'mautic.point.form.repeat',
-                'data'  => $options['data']->getRepeatable() ?: false,
+                'label'     => 'mautic.point.form.repeat',
+                'data'      => $options['data']->getRepeatable() ?: false,
+                'attr'      => [
+                    'tooltip' => 'mautic.point.form.repeat.help',
+                ],
+                'yes_label' => 'mautic.point.form.repeat.yes',
+                'no_label'  => 'mautic.point.form.repeat.no',
             ]
         );
 
@@ -167,10 +169,7 @@ class PointType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['data_class' => Point::class]);
         $resolver->setRequired(['pointActions']);

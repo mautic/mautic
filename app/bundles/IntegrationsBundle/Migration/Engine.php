@@ -9,32 +9,15 @@ use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
 class Engine
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private string $migrationsPath;
 
-    /**
-     * @var string
-     */
-    private $tablePrefix;
-
-    /**
-     * @var string
-     */
-    private $migrationsPath;
-
-    /**
-     * @var string
-     */
-    private $bundleName;
-
-    public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath, string $bundleName)
-    {
-        $this->entityManager  = $entityManager;
-        $this->tablePrefix    = $tablePrefix;
+    public function __construct(
+        private EntityManager $entityManager,
+        private string $tablePrefix,
+        string $pluginPath,
+        private string $bundleName,
+    ) {
         $this->migrationsPath = $pluginPath.'/Migrations/';
-        $this->bundleName     = $bundleName;
     }
 
     /**
@@ -64,7 +47,12 @@ class Engine
                 }
             }
 
-            $this->entityManager->commit();
+            // PHP 8+ and pdo_mysql might autocommit a transaction and can throw "No active transaction"
+            // So check directly if the transaction is still active before committing
+            $connection = $this->entityManager->getConnection()->getNativeConnection();
+            if (!$connection instanceof \PDO || $connection->inTransaction()) {
+                $this->entityManager->commit();
+            }
         } catch (\Doctrine\DBAL\Exception $e) {
             $this->entityManager->rollback();
 

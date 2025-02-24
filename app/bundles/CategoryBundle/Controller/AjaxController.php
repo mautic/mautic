@@ -7,15 +7,9 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function categoryListAction(Request $request)
+    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $bundle        = InputHelper::clean($request->query->get('bundle'));
         $filter        = InputHelper::clean($request->query->get('filter'));

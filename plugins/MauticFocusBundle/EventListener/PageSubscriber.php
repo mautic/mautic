@@ -13,44 +13,17 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    private $regex = '{focus=(.*?)}';
-
-    /**
-     * @var FocusModel
-     */
-    private $model;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
+    private string $regex = '{focus=(.*?)}';
 
     public function __construct(
-        CorePermissions $security,
-        FocusModel $model,
-        RouterInterface $router,
-        BuilderTokenHelperFactory $builderTokenHelperFactory
+        private CorePermissions $security,
+        private FocusModel $model,
+        private RouterInterface $router,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
     ) {
-        $this->security                  = $security;
-        $this->router                    = $router;
-        $this->model                     = $model;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
@@ -61,7 +34,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
-    public function onPageBuild(PageBuilderEvent $event)
+    public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->tokensRequested($this->regex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
@@ -69,7 +42,7 @@ class PageSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $regex   = '/'.$this->regex.'/i';

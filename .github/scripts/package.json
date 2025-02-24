@@ -1,0 +1,9 @@
+{
+    "name": "bounties",
+    "version": "1.0.0",
+    "description": "GitHub Action for handling bounty issues",
+    "main": "bounties.js",
+    "dependencies": {
+      "@octokit/core": "^3.5.1"
+    }
+  }

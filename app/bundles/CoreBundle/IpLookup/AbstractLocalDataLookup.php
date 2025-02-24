@@ -2,11 +2,9 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 
-/**
- * Class AbstractLocalDataLookup.
- */
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
     /**
@@ -42,8 +40,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function getConfigFormThemes()
@@ -62,8 +58,15 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     {
         $package   = $this->getRemoteDateStoreDownloadUrl();
 
+        if (empty($package)) {
+            $this->logger->error('Failed to fetch remote IP data: Invalid or inactive MaxMind license key');
+
+            return false;
+        }
         try {
-            $data = $this->client->get($package);
+            $data = $this->client->get($package, [
+                RequestOptions::ALLOW_REDIRECTS => true,
+            ]);
         } catch (\Exception $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }
@@ -191,11 +194,9 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      *
      * @param string $haystack
      * @param string $needle
-     *
-     * @return bool
      */
-    private function endsWith($haystack, $needle)
+    private function endsWith($haystack, $needle): bool
     {
-        return 0 === substr_compare($haystack, $needle, -strlen($needle));
+        return str_ends_with($haystack, $needle);
     }
 }

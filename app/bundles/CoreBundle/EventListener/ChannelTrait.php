@@ -44,7 +44,7 @@ trait ChannelTrait
         if ($channelModel = $this->getChannelModel($channel)) {
             try {
                 $channelEntity = $channelModel->getEntity($channelId);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Not found
             }
         }

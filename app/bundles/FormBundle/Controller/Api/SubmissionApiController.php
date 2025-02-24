@@ -99,8 +99,6 @@ class SubmissionApiController extends CommonApiController
     /**
      * Obtains a specific entity as defined by the API URL.
      *
-     * @param int $id Entity ID
-     *
      * @return Response
      */
     public function getEntityAction(Request $request, $formId = null, $submissionId = null)

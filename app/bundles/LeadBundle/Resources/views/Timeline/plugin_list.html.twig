@@ -12,9 +12,9 @@
     <style>.container { margin: auto !important; }</style>
     <!-- filter form -->
     <form method="post" action="{% if lead is defined %}{{ path('mautic_plugin_timeline_view', {'leadId': lead.id, 'integration': integration}) }}{% else %}{{ path('mautic_plugin_timeline_index', {'integration': integration}) }}{% endif %}" class="panel" id="timeline-filters">
-        <div class="form-control-icon pa-xs">
+        <div class="form-control-icon pa-md">
             <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events.filters.search|e }}">
-            <span class="the-icon fa fa-search text-muted mt-xs"></span>
+            <span class="the-icon ri-search-line text-muted"></span>
         </div>
         {% if events.types is defined and events.types is iterable %}
             <div class="history-search panel-footer text-muted">
@@ -139,7 +139,7 @@
   <!-- timeline -->
   <div class="event-list" id="timeline-container">
       {% for event in event.events %}
-          {% set icon = event.icon is defined ? event.icon : 'fa-history' %}
+          {% set icon = event.icon is defined ? event.icon : 'ri-history-line' %}
           {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
           {% if eventLabel is iterable %}
               {% set eventLabel %}
@@ -160,19 +160,29 @@
               <span class="timeline-row-lead-id hide">{% if event.leadId is defined %}{{ event.leadId }}{% endif %}</span>
               <div class="btn-group" role="group" style="float: right;">
                   <span class="timeline-icon">
-                      <a href="javascript:void(0);"
-                         onclick="mQuery('#timeline-details-{{ loop.index }}').toggleClass('hide')"
-                         data-activate-details="{{ loop.index }}"
-                         class="btn btn-xs btn-nospin btn-default {% if details is empty %}disabled{% endif %}"
-                         data-toggle="tooltip"
-                         title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
-                          <span class="fa fa-fw {{ icon }}"></span>
-                      </a>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: 'mautic.lead.timeline.toggle_details',
+                                variant: 'ghost',
+                                size: 'xs',
+                                icon: icon,
+                                icon_only: true,
+                                onclick: "mQuery('#timeline-details-{{ loop.index }}').toggleClass('hide')",
+                                attributes: {
+                                    'data-activate-details': loop.index,
+                                    'class': details is empty ? 'disabled' : '',
+                                    'data-toggle': 'tooltip',
+                                }
+                            }
+                        ]
+                    } %}
+
                   </span>
 
                   <span class="timeline-icon">
-                      <a href="javascript:void(0);" class="btn btn-xs btn-nospin btn-default" data-toggle="tooltip" onclick="mQuery(this).toggleClass('btn-warning')" title="Mute notifications">
-                          <span class="fa fa-fw fa-bell-slash-o"></span>
+                      <a href="javascript:void(0);" class="btn btn-xs btn-nospin btn-ghost" data-toggle="tooltip" onclick="mQuery(this).toggleClass('btn-warning')" title="Mute notifications">
+                          <span class="ri-notification-off-line"></span>
                       </a>
                   </span>
               </div>

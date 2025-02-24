@@ -1,0 +1,303 @@
+<!-- Contact fields tokens -->
+<li class="panel">
+    <a role="button" id="headingContactFields" class="accordion-heading collapsed" data-toggle="collapse"
+        data-parent="#tokensAccordion" href="#collapseContactFields" aria-expanded="false"
+        aria-controls="collapseContactFields">
+        <i class="ri-arrow-down-s-line accordion-arrow"></i>
+        <span class="accordion-title">{{ 'mautic.placeholder_tokens.contact_fields'|trans }}</span>
+    </a>
+    <div id="collapseContactFields" class="collapse accordion-wrapper" role="tabpanel"
+        aria-labelledby="headingContactFields">
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.attribution'|trans }}</td>
+                    <td><code>{contactfield=attribution}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.attribution_date'|trans }}</td>
+                    <td><code>{contactfield=attribution_date}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.address1'|trans }}</td>
+                    <td><code>{contactfield=address1}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.address2'|trans }}</td>
+                    <td><code>{contactfield=address2}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.country'|trans }}</td>
+                    <td><code>{contactfield=country}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.city'|trans }}</td>
+                    <td><code>{contactfield=city}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.company'|trans }}</td>
+                    <td><code>{contactfield=company}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.id'|trans }}</td>
+                    <td><code>{contactfield=id}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.email'|trans }}</td>
+                    <td><code>{contactfield=email}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.facebook'|trans }}</td>
+                    <td><code>{contactfield=facebook}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.fax'|trans }}</td>
+                    <td><code>{contactfield=fax}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.firstname'|trans }}</td>
+                    <td><code>{contactfield=firstname}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.foursquare'|trans }}</td>
+                    <td><code>{contactfield=foursquare}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.googleplus'|trans }}</td>
+                    <td><code>{contactfield=googleplus}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.instagram'|trans }}</td>
+                    <td><code>{contactfield=instagram}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.ipaddress'|trans }}</td>
+                    <td><code>{contactfield=ipAddress}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.lastname'|trans }}</td>
+                    <td><code>{contactfield=lastname}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.linkedin'|trans }}</td>
+                    <td><code>{contactfield=linkedin}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.mobile'|trans }}</td>
+                    <td><code>{contactfield=mobile}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.phone'|trans }}</td>
+                    <td><code>{contactfield=phone}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.position'|trans }}</td>
+                    <td><code>{contactfield=position}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.skype'|trans }}</td>
+                    <td><code>{contactfield=skype}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.state'|trans }}</td>
+                    <td><code>{contactfield=state}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.twitter'|trans }}</td>
+                    <td><code>{contactfield=twitter}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.title'|trans }}</td>
+                    <td><code>{contactfield=title}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.website'|trans }}</td>
+                    <td><code>{contactfield=website}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.contact.zipcode'|trans }}</td>
+                    <td><code>{contactfield=zipcode}</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</li>
+
+<!-- Contact Owner fields tokens -->
+<li class="panel">
+    <a role="button" id="headingOwnerFields" class="accordion-heading collapsed" data-toggle="collapse"
+        data-parent="#tokensAccordion" href="#collapseOwnerFields" aria-expanded="false" aria-controls="collapseOwnerFields">
+        <i class="ri-arrow-down-s-line accordion-arrow"></i>
+        <span class="accordion-title">{{ 'mautic.placeholder_tokens.contact_owner_fields'|trans }}</span>
+    </a>
+    <div id="collapseOwnerFields" class="collapse accordion-wrapper" role="tabpanel"
+        aria-labelledby="headingOwnerFields">
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.owner.firstname'|trans }}</td>
+                    <td><code>{ownerfield=firstname}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.owner.lastname'|trans }}</td>
+                    <td><code>{ownerfield=lastname}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.owner.email'|trans }}</td>
+                    <td><code>{ownerfield=email}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.owner.position'|trans }}</td>
+                    <td><code>{ownerfield=position}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.owner.signature'|trans }}</td>
+                    <td><code>{ownerfield=signature}</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</li>
+
+<!-- Company Contact fields tokens -->
+<li class="panel">
+    <a role="button" id="headingCompanyFields" class="accordion-heading collapsed" data-toggle="collapse"
+        data-parent="#tokensAccordion" href="#collapseCompanyFields" aria-expanded="false"
+        aria-controls="collapseCompanyFields">
+        <i class="ri-arrow-down-s-line accordion-arrow"></i>
+        <span class="accordion-title">{{ 'mautic.placeholder_tokens.company_contact_fields'|trans }}</span>
+    </a>
+    <div id="collapseCompanyFields" class="collapse accordion-wrapper" role="tabpanel"
+        aria-labelledby="headingCompanyFields">
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.address1'|trans }}</td>
+                    <td><code>{contactfield=companyaddress1}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.address2'|trans }}</td>
+                    <td><code>{contactfield=companyaddress2}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.annual_revenue'|trans }}</td>
+                    <td><code>{contactfield=companyannual_revenue}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.city'|trans }}</td>
+                    <td><code>{contactfield=companycity}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.country'|trans }}</td>
+                    <td><code>{contactfield=companycountry}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.description'|trans }}</td>
+                    <td><code>{contactfield=companydescription}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.email'|trans }}</td>
+                    <td><code>{contactfield=companyemail}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.fax'|trans }}</td>
+                    <td><code>{contactfield=companyfax}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.industry'|trans }}</td>
+                    <td><code>{contactfield=companyindustry}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.name'|trans }}</td>
+                    <td><code>{contactfield=companyname}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.number_of_employees'|trans }}</td>
+                    <td><code>{contactfield=companynumber_of_employees}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.phone'|trans }}</td>
+                    <td><code>{contactfield=companyphone}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.state'|trans }}</td>
+                    <td><code>{contactfield=companystate}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.website'|trans }}</td>
+                    <td><code>{contactfield=companywebsite}</code></td>
+                </tr>
+                <tr>
+                    <td>{{ 'mautic.placeholder_tokens.company.zipcode'|trans }}</td>
+                    <td><code>{contactfield=companyzipcode}</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</li>
+
+<!-- Custom fields tokens -->
+<li class="panel">
+    <a role="button" id="headingCustomFields" class="accordion-heading collapsed" data-toggle="collapse"
+      data-parent="#tokensAccordion" href="#collapseCustomFields" aria-expanded="false"
+      aria-controls="collapseCustomFields">
+      <i class="ri-arrow-down-s-line accordion-arrow"></i>
+      <span class="accordion-title">{{ 'mautic.placeholder_tokens.custom_fields'|trans }}</span>
+    </a>
+
+    <div id="collapseCustomFields" class="collapse accordion-wrapper" role="tabpanel"
+      aria-labelledby="headingCustomFields">
+      <div class="accordion-content">
+        <h4 class="mb-xs fw-sb">{{ 'mautic.placeholder_tokens.custom_fields.date_and_time'|trans }}</h4>
+        <p>{{ 'mautic.placeholder_tokens.custom_fields.date_and_time.description'|trans }}</p>
+      </div>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+            <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.custom_fields.datetime'|trans }}</td>
+            <td><code>{contactfield=aliasofyourcustomdatefield|datetime}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.custom_fields.date'|trans }}</td>
+            <td><code>{contactfield=aliasofyourcustomdatefield|date}</code></td>
+          </tr>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.custom_fields.time'|trans }}</td>
+            <td><code>{contactfield=aliasofyourcustomdatefield|time}</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="accordion-content">
+        <div class="alert alert-info">
+          {{ 'mautic.placeholder_tokens.custom_fields.note'|trans }}
+        </div>
+      </div>
+    </div>
+  </li>

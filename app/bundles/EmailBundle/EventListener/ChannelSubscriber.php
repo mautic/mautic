@@ -19,17 +19,14 @@ const CHANNEL_COLUMN_CREATED_BY_USER = 'created_by_user';
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 100],
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         $event->addChannel(
             'email',

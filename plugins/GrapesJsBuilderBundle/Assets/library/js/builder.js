@@ -1,12 +1,8 @@
 import AssetService from './asset.service';
 import BuilderService from './builder.service';
-// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
 
 // all css get combined into one builder.css and automatically loaded via js/parcel
 import 'grapesjs/dist/css/grapes.min.css';
-// not compatible with the newsletter preset css, brings the redish color
-// import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
-import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import './grapesjs-custom.css';
 
 /**
@@ -26,17 +22,28 @@ function launchBuilderGrapesjs(formName) {
   mQuery('body').css('overflow-y', 'hidden');
   mQuery('.builder-panel').css('padding', 0);
   mQuery('.builder-panel').css('display', 'block');
-  mQuery('.builder').addClass('builder-active').removeClass('hide');
+  const $builder = mQuery('.builder');
+  $builder.addClass('builder-active').removeClass('hide');
 
-  const assetsConfig = AssetService.getAssetsConfig();
-  const builder = new BuilderService(assetsConfig);
+  const assetService = new AssetService();
+  const builder = new BuilderService(assetService);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
 
+  // trigger show event on DOM element
+  $builder.trigger('builder:show', [builder.editor])
+  // trigger show event on editor instance
+  builder.editor.trigger('show');
+
   // Load and add assets
-  AssetService.getAssetsXhr(function (result) {
-    builder.editor.AssetManager.add(result.data);
-  });
+  (async () => {
+    try {
+      const result = await assetService.getAssetsXhr();
+      builder.editor.AssetManager.add(result.data);
+    } catch (error) {
+      console.error('Error loading initial assets:', error);
+    }
+  })();
 }
 
 /**
@@ -78,10 +85,12 @@ function setThemeHtml(theme) {
       }
 
       // If MJML template, generate HTML before save
-      // if (!textareaHtml.val().length && textareaMjml.val().length) {
-      //   builder.mjmlToHtml(textareaMjml, textareaHtml);
-      // }
-      // }
+      if (!textareaHtml.val().length && textareaMjml.val().length) {
+        const assetService = new AssetService();
+        const builder = new BuilderService(assetService);
+
+        textareaHtml.val(builder.mjmlToHtml(response.templateMjml));
+      }
     },
     error(request, textStatus) {
       console.log(`setThemeHtml - Request failed: ${textStatus}`);

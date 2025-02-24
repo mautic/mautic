@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\FormBundle\Tests\Controller;
+namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -22,7 +22,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     /**
      * @dataProvider valueProvider
      */
-    public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result): void
+    public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result, string $operator = '='): void
     {
         $formPayload = [
             'name'     => 'Test Form',
@@ -58,6 +58,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Creating the form via API so it would create the submission table.
@@ -88,7 +89,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'form'     => $formId,
                 'field'    => 'select_a',
                 'value'    => $valueToCompare,
-                'operator' => '=',
+                'operator' => $operator,
             ]
         );
 
@@ -117,7 +118,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         );
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = self::$container->get('event_dispatcher');
+        $dispatcher = static::getContainer()->get('event_dispatcher');
 
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
@@ -125,7 +126,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($result, $event->getResult());
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): \Generator
     {
         yield [
             'test & test',
@@ -138,13 +139,27 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'unicorn',
             false,
         ];
+
+        yield [
+            'test',
+            'tester',
+            false,
+            '!like',
+        ];
+
+        yield [
+            'test',
+            'tst',
+            true,
+            '!like',
+        ];
     }
 
     protected function beforeTearDown(): void
     {
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
+        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_test_form");
         }
     }

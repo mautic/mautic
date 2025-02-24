@@ -36,12 +36,12 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->listModel = self::$container->get('mautic.lead.model.list');
+        $this->listModel = static::getContainer()->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
         $this->listRepo = $this->listModel->getRepository();
         \assert($this->listRepo instanceof LeadListRepository);
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         /* @var LeadRepository $leadRepo */
         $this->leadRepo = $leadModel->getRepository();
     }
@@ -140,7 +140,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
-        $segment = $segment ?? new LeadList();
+        $segment ??= new LeadList();
         $segment->setName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
@@ -177,7 +177,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $contact1Id = $contacts[0]->getId();
 
         // Rebuild segment - set current count to the cache.
-        $this->runCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
 
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
@@ -338,9 +338,9 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(2, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
         $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
@@ -364,11 +364,11 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(3, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
         $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
@@ -410,7 +410,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<int, array<int, bool|string|null>>
      */
-    public function dateFieldProvider(): array
+    public static function dateFieldProvider(): array
     {
         return [
             ['Today', true],

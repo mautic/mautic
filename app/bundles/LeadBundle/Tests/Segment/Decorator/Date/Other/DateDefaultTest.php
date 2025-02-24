@@ -11,7 +11,7 @@ class DateDefaultTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault::getParameterValue
      */
-    public function testGetParameterValue()
+    public function testGetParameterValue(): void
     {
         $dateDecorator             = $this->createMock(DateDecorator::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);

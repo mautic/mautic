@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -34,12 +35,8 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param null $listId
-     *
-     * @return array
      */
-    public function getSentStats($notificationId, $listId = null)
+    public function getSentStats($notificationId, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
@@ -147,7 +144,7 @@ class StatRepository extends CommonRepository
         $query = $this->createQueryBuilder('s');
 
         $query->select('IDENTITY(s.notification) AS notification_id, s.id, s.dateRead, s.dateSent, e.title, s.isRead, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.clickDetails')
-            ->leftJoin(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'WITH', 'e.id = s.notification')
+            ->leftJoin(Notification::class, 'e', 'WITH', 'e.id = s.notification')
             ->leftJoin(\Mautic\LeadBundle\Entity\LeadList::class, 'l', 'WITH', 'l.id = s.list')
             ->where(
                 $query->expr()->andX(
@@ -162,17 +159,12 @@ class StatRepository extends CommonRepository
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = 'e.title';
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = 'e.dateRead, e.dateSent';
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => 'e.title',
+                default      => 'e.dateRead, e.dateSent',
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }
@@ -204,28 +196,24 @@ class StatRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostNotifications($query, $limit = 10, $offset = 0)
+    public function getMostNotifications($query, $limit = 10, $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
      * Get sent counts based grouped by notification Id.
      *
      * @param array $notificationIds
-     *
-     * @return array
      */
-    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')
@@ -258,7 +246,7 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'push_notification_stats')
@@ -270,15 +258,12 @@ class StatRepository extends CommonRepository
     /**
      * Delete a stat.
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'push_notification_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }

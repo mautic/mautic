@@ -14,12 +14,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class FilterSelectorType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Build a list of columns
         $builder->add(
@@ -39,15 +39,14 @@ class FilterSelectorType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $formEvent) use ($options) {
+        $formModifier = function (FormEvent $formEvent) use ($options): void {
             $data   = $formEvent->getData();
             $column = $data['column'] ?? null;
             $form   = $formEvent->getForm();
             if (null === $column) {
-                reset($options['filterList']);
-                $column = key($options['filterList']);
+                $column = array_key_first($options['filterList']);
             }
-            $choices = (isset($options['operatorList'][$column])) ? $options['operatorList'][$column] : [];
+            $choices = $options['operatorList'][$column] ?? [];
 
             // Build a list of condition values
             $form->add(
@@ -132,10 +131,7 @@ class FilterSelectorType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace(
             $view->vars,
@@ -145,10 +141,7 @@ class FilterSelectorType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

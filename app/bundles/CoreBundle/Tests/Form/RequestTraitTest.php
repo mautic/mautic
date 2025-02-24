@@ -15,10 +15,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 {
     use RequestTrait;
 
-    /**
-     * @var Form
-     */
-    private $form;
+    private Form $form;
 
     protected function setUp(): void
     {
@@ -34,7 +31,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->form = new Form($fooConfig);
     }
 
-    public function testMultiSelectPrepareParametersFromRequest()
+    public function testMultiSelectPrepareParametersFromRequest(): void
     {
         $params = [
             'multiselect'  => '',
@@ -94,7 +91,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<?int,int|bool|string|null>>
      */
-    public function boolProvider(): iterable
+    public static function boolProvider(): iterable
     {
         yield [true, '1'];
         yield [true, 1];
@@ -213,16 +210,16 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValues, $fieldData);
     }
 
-    public function testDatTimePrepareParametersFromRequest(): void
+    public function testDateTimePrepareParametersFromRequest(): void
     {
         $params = [
             'datetime'  => '',
-            'datetime2' => '2023-01-01 21:00:00',
+            'datetime2' => '2023-01-01 21:00:10',
         ];
 
         $expectedValues =
             [
-                'datetime2' => '2023-01-01 21:00',
+                'datetime2' => '2023-01-01 21:00:10',
             ];
 
         foreach ($params as $alias => $value) {

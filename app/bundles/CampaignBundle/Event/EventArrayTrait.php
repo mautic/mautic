@@ -63,10 +63,7 @@ trait EventArrayTrait
         return $this->eventArray[$eventId];
     }
 
-    /**
-     * @return array
-     */
-    protected function getLegacyEventsArray(LeadEventLog $log)
+    protected function getLegacyEventsArray(LeadEventLog $log): array
     {
         $event = $log->getEvent();
 
@@ -77,10 +74,7 @@ trait EventArrayTrait
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getLegacyEventsConfigArray(Event $event, AbstractEventAccessor $config)
+    protected function getLegacyEventsConfigArray(Event $event, AbstractEventAccessor $config): array
     {
         return [
             $event->getEventType() => [

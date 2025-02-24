@@ -12,15 +12,12 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
-    /**
-     * @return string
-     */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.channel_click.value';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator   = $filter->getOperator();
@@ -81,6 +78,6 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 
     private function isDateBased(string $name): bool
     {
-        return false !== strpos($name, '_date');
+        return str_contains($name, '_date');
     }
 }

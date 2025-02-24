@@ -10,9 +10,6 @@ use Twig\TwigFunction;
 
 class SerializerExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

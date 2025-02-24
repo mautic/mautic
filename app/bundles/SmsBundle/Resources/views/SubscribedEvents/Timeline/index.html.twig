@@ -12,7 +12,7 @@
                 {% endif %}
                 {% set errors = failedDetails|join('<br />') %}
             {% endif %}
-        <span class="text-danger mt-0 mb-10"><i class="fa fa-warning"></i>
+        <span class="text-danger mt-0 mb-10"><i class="ri-alert-line"></i>
             {% if errors is defined and errors is not empty %}
                 {{ errors }}
             {% else %}
@@ -29,7 +29,7 @@
 
 {% if errors is defined %}
 <p class="text-danger mt-0 mb-10">
-    <i class="fa fa-warning"></i> {{ 'mautic.campaign.event.last_error'|trans ~ ': ' ~ errors }}
+    <i class="ri-alert-line"></i> {{ 'mautic.campaign.event.last_error'|trans ~ ': ' ~ errors }}
 </p>
 {% else %}
 <dl class="dl-horizontal">
@@ -44,6 +44,9 @@
     <dt>{{ 'mautic.sms.timeline.type'|trans }}</dt>
     <dd>{{ item.type|trans }}</dd>
 </dl>
+{% endif %}
+
+{% if item.message is defined and item.message is not empty %}
 <div class="small">
     <hr />
     <strong>{{ 'mautic.sms.timeline.content.heading'|trans }}</strong>

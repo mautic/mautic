@@ -9,17 +9,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 0],
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         $event->addChannel(
             'dynamicContent',

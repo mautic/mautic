@@ -17,7 +17,7 @@ class NoteController extends FormController
     /**
      * Generate's default list view.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, $leadId = 0, $page = 1)
     {
@@ -127,7 +127,7 @@ class NoteController extends FormController
     /**
      * Generate's new note and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, $leadId)
     {
@@ -211,7 +211,7 @@ class NoteController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $leadId, $objectId)
     {

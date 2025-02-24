@@ -16,47 +16,71 @@ class BcInterfaceTokenTransport implements TransportInterface
      */
     private $transports = []; // @phpstan-ignore-line
 
+    /**
+     * @var string[]
+     */
     private $fromAddresses = [];
 
-    private $metadatas = [];
-
-    private $validate = false;
+    /**
+     * @var string[]
+     */
+    private $fromNames = [];
 
     private $numberToFail;
 
+    /**
+     * @var mixed[]
+     */
+    private array $metadatas = [];
+
+    /**
+     * @var RawMessage
+     */
     private $message;
 
     /**
-     * BatchTransport constructor.
-     *
      * @param bool $validate
      */
-    public function __construct($validate = false, $numberToFail = 1)
-    {
-        $this->validate           = $validate;
+    public function __construct(
+        private $validate = false,
+        $numberToFail = 1
+    ) {
         $this->numberToFail       = (int) $numberToFail;
         $this->transports['main'] = $this;
     }
 
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $address = null;
         if ($message instanceof Email) {
-            $address = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+            $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+            $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
         }
 
-        $this->message         = $message;
-        $this->fromAddresses[] = $address;
-        $this->metadatas[]     = $this->getMetadata();
+        $this->message     = $message;
+        $this->metadatas[] = $this->getMetadata();
 
         return null;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFromAddresses(): array
     {
         return $this->fromAddresses;
     }
 
+    /**
+     * @return string[]
+     */
+    public function getFromNames(): array
+    {
+        return $this->fromNames;
+    }
+
+    /**
+     * @return mixed[]
+     */
     public function getMetadatas(): array
     {
         return $this->metadatas;

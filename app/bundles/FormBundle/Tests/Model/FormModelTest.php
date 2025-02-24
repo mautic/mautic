@@ -39,92 +39,89 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&RequestStack
      */
-    private $requestStack;
+    private MockObject $requestStack;
 
     /**
      * @var MockObject&Environment
      */
-    private $twigMock;
+    private MockObject $twigMock;
 
     /**
      * @var MockObject&ThemeHelper
      */
-    private $themeHelper;
+    private MockObject $themeHelper;
 
     /**
      * @var MockObject&ActionModel
      */
-    private $formActionModel;
+    private MockObject $formActionModel;
 
     /**
      * @var MockObject&FieldModel
      */
-    private $formFieldModel;
+    private MockObject $formFieldModel;
 
     /**
      * @var MockObject&EventDispatcher
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject&Translator
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject&EntityManager
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject&FormUploader
      */
-    private $formUploaderMock;
+    private MockObject $formUploaderMock;
 
     /**
      * @var MockObject&ColumnSchemaHelper
      */
-    private $columnSchemaHelper;
+    private MockObject $columnSchemaHelper;
 
     /**
      * @var MockObject&TableSchemaHelper
      */
-    private $tableSchemaHelper;
+    private MockObject $tableSchemaHelper;
 
     /**
      * @var MockObject&FormRepository
      */
-    private $formRepository;
+    private MockObject $formRepository;
 
     /**
      * @var MockObject&LeadFieldModel
      */
-    private $leadFieldModel;
+    private MockObject $leadFieldModel;
 
     /**
      * @var MockObject&ContactTracker
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject&FormFieldHelper
      */
-    private $fieldHelper;
+    private MockObject $fieldHelper;
 
     /**
      * @var MockObject&PrimaryCompanyHelper
      */
-    private $primaryCompanyHelper;
+    private MockObject $primaryCompanyHelper;
 
     /**
      * @var MockObject&MappedObjectCollectorInterface
      */
-    private $mappedObjectCollector;
+    private MockObject $mappedObjectCollector;
 
-    /**
-     * @var FormModel
-     */
-    private $formModel;
+    private FormModel $formModel;
 
     protected function setUp(): void
     {
@@ -152,7 +149,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [\Mautic\FormBundle\Entity\Form::class, $this->formRepository],
+                        [Form::class, $this->formRepository],
                     ]
                 )
             );
@@ -416,7 +413,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string[]>
      */
-    public function fieldTypeProvider(): array
+    public static function fieldTypeProvider(): array
     {
         return [
             ['select'],
@@ -647,6 +644,35 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->fieldHelper->expects($this->once())
             ->method('populateField')
             ->with($emailField, 'john@doe.email', 'form-', $formHtml);
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWithSuffixEMail(): void
+    {
+        $formHtml   = '<html>';
+        $form       = new Form();
+        $emailField = new Field();
+        $contact    = new Lead();
+
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('contact');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $contactCompanyData = [
+            'email' => 'john+test@doe.email',
+        ];
+
+        $this->contactTracker->method('getContact')
+            ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
+
+        $this->fieldHelper->expects($this->once())
+            ->method('populateField')
+            ->with($emailField, 'john+test@doe.email', 'form-', $formHtml);
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }

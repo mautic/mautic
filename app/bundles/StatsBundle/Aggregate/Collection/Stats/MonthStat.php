@@ -7,21 +7,14 @@ class MonthStat implements StatInterface
     /**
      * @var DayStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     /**
-     * @var string
-     */
-    private $month;
-
-    /**
-     * MonthStat constructor.
-     *
      * @param string $month "2019-01" format
      */
-    public function __construct($month)
-    {
-        $this->month = $month;
+    public function __construct(
+        private $month
+    ) {
     }
 
     /**
@@ -63,10 +56,7 @@ class MonthStat implements StatInterface
         return $sum;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return count($this->stats);
     }

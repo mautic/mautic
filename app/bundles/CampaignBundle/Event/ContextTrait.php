@@ -8,10 +8,8 @@ trait ContextTrait
 {
     /**
      * Check if an event is applicable.
-     *
-     * @return bool
      */
-    public function checkContext($eventType)
+    public function checkContext($eventType): bool
     {
         if (!$this->event) {
             return false;
@@ -19,6 +17,6 @@ trait ContextTrait
 
         $type = ($this->event instanceof Event) ? $this->event->getType() : $this->event['type'];
 
-        return strtolower($eventType) === strtolower($type);
+        return strtolower((string) $eventType) === strtolower((string) $type);
     }
 }

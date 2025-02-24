@@ -10,10 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UpdateFieldController extends CommonController
 {
-    /**
-     * @return JsonResponse
-     */
-    public function updateAction(Request $request, string $integration, string $object, string $field)
+    public function updateAction(Request $request, string $integration, string $object, string $field): JsonResponse
     {
         // Clear the session of previously stored fields in case it got stuck
         $session       = $request->getSession();

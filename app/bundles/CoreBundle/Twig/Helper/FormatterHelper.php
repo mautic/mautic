@@ -10,19 +10,10 @@ final class FormatterHelper
 {
     public const FLOAT_PRECISION = 4;
 
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
-    {
-        $this->dateHelper = $dateHelper;
-        $this->translator = $translator;
+    public function __construct(
+        private DateHelper $dateHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -56,7 +47,7 @@ final class FormatterHelper
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
                     } else {
-                        $stringParts[] = $v;
+                        $stringParts[] = InputHelper::clean($v);
                     }
                 }
                 if (1 === $round) {
@@ -75,10 +66,12 @@ final class FormatterHelper
                 $string = $this->dateHelper->toDate($val, 'utc');
                 break;
             case 'url':
-                $string = ($textOnly) ? $val : '<a href="'.$val.'" target="_new">'.$val.'</a>';
+                $url        = InputHelper::url($val);
+                $string     = ($textOnly) ? $url : '<a href="'.$url.'" target="_blank">'.$url.'</a>';
                 break;
             case 'email':
-                $string = ($textOnly) ? $val : '<a href="mailto:'.$val.'">'.$val.'</a>';
+                $url    = InputHelper::url($val);
+                $string = ($textOnly) ? $url : '<a href="mailto:'.$url.'">'.$url.'</a>';
                 break;
             case 'int':
                 $string = strval((int) $val);
@@ -134,10 +127,8 @@ final class FormatterHelper
     /**
      * @param string                $delimeter
      * @param array<string, string> $array
-     *
-     * @return string
      */
-    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />'): string
     {
         $pairs = [];
         foreach ($array as $key => $value) {
@@ -155,7 +146,7 @@ final class FormatterHelper
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray($csv, $type = null)
+    public function simpleCsvToArray($csv, $type = null): array
     {
         if (!$csv) {
             return [];
@@ -187,10 +178,7 @@ final class FormatterHelper
         return $string;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'formatter';
     }

@@ -48,22 +48,29 @@ class LeadApiController extends CommonApiController
     /**
      * @var LeadModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private DoNotContactModel $doNotContactModel;
 
-    private ContactMerger $contactMerger;
-
-    private UserHelper $userHelper;
-
-    private IpLookupHelper $ipLookupHelper;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, ContactMerger $contactMerger, UserHelper $userHelper, IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        DoNotContactModel $doNotContactModel,
+        AppVersion $appVersion,
+        private ContactMerger $contactMerger,
+        private UserHelper $userHelper,
+        private IpLookupHelper $ipLookupHelper,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
         $this->doNotContactModel = $doNotContactModel;
-        $this->contactMerger     = $contactMerger;
-        $this->userHelper        = $userHelper;
-        $this->ipLookupHelper    = $ipLookupHelper;
 
         $leadModel = $modelFactory->getModel(self::MODEL_ID);
         \assert($leadModel instanceof LeadModel);
@@ -74,14 +81,12 @@ class LeadApiController extends CommonApiController
         $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
-
-        $this->setCleaningRules();
     }
 
     /**
      * Obtains a list of users for lead owner edits.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getOwnersAction(Request $request)
     {
@@ -104,10 +109,15 @@ class LeadApiController extends CommonApiController
         return $this->handleView($view);
     }
 
+    protected function getTotalCountTtl(): ?int
+    {
+        return $this->coreParametersHelper->get('contact_api_count_cache_ttl', 5);
+    }
+
     /**
      * Obtains a list of custom fields.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getFieldsAction()
     {
@@ -140,7 +150,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getNotesAction(Request $request, $id)
     {
@@ -192,7 +202,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of devices on a specific lead.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getDevicesAction(Request $request, $id)
     {
@@ -244,7 +254,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact segments the contact is in.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getListsAction($id)
     {
@@ -282,7 +292,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact companies the contact is in.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getCompaniesAction($id)
     {
@@ -312,7 +322,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of campaigns the lead is part of.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getCampaignsAction($id)
     {
@@ -357,7 +367,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getActivityAction(Request $request, $id)
     {
@@ -377,7 +387,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getAllActivityAction(Request $request, $lead = null)
     {
@@ -405,7 +415,7 @@ class LeadApiController extends CommonApiController
     /**
      * Adds a DNC to the contact.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function addDncAction(Request $request, $id, $channel)
     {
@@ -448,7 +458,7 @@ class LeadApiController extends CommonApiController
     /**
      * Removes a DNC from the contact.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function removeDncAction($id, $channel)
     {
@@ -482,7 +492,7 @@ class LeadApiController extends CommonApiController
      * @param string           $method
      * @param array<mixed>|int $data
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     protected function applyUtmTagsAction($id, $method, $data)
     {
@@ -522,7 +532,7 @@ class LeadApiController extends CommonApiController
      *
      * @param int $id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function addUtmTagsAction(Request $request, $id)
     {
@@ -535,7 +545,7 @@ class LeadApiController extends CommonApiController
      * @param int $id
      * @param int $utmid
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function removeUtmTagsAction($id, $utmid)
     {
@@ -552,9 +562,6 @@ class LeadApiController extends CommonApiController
         return $this->model->checkForDuplicateContact($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         // Unset the tags from params to avoid a validation error
@@ -563,10 +570,8 @@ class LeadApiController extends CommonApiController
         }
 
         // keep existing tags
-        if (count($entity->getTags()) > 0) {
-            foreach ($entity->getTags() as $tag) {
-                $parameters['tags'][] = $tag->getId();
-            }
+        foreach ($entity->getTags() as $tag) {
+            $parameters['tags'][] = $tag->getId();
         }
 
         // keep existing owner if it is not set or should be reset to null
@@ -582,8 +587,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   $entity
      * @param array  $parameters
      * @param string $action
@@ -599,7 +602,7 @@ class LeadApiController extends CommonApiController
             if ($entity->getId() && $existingEntity->getId()) {
                 try {
                     $entity = $contactMerger->merge($entity, $existingEntity);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             } elseif ($existingEntity->getId()) {
                 $entity = $existingEntity;
@@ -707,22 +710,16 @@ class LeadApiController extends CommonApiController
      * Helper method to be used in FrequencyRuleTrait.
      *
      * @param Form $form
-     *
-     * @return bool
      */
-    protected function isFormCancelled($form = null)
+    protected function isFormCancelled($form = null): bool
     {
         return false;
     }
 
     /**
      * Helper method to be used in FrequencyRuleTrait.
-     *
-     * @param array $data
-     *
-     * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(Form $form, array $data = null): bool
     {
         $form->submit($data, 'PATCH' !== $this->requestStack->getCurrentRequest()->getMethod());
 

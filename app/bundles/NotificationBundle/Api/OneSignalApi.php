@@ -43,7 +43,8 @@ class OneSignalApi extends AbstractNotificationApi
                     'Authorization' => 'Basic '.$restApiKey,
                     'Content-Type'  => 'application/json',
                 ],
-                \GuzzleHttp\RequestOptions::JSON => $data,
+                \GuzzleHttp\RequestOptions::JSON        => $data,
+                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
             ]
         );
     }

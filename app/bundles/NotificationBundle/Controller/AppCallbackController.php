@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AppCallbackController extends CommonController
 {
-    public function indexAction(Request $request, EntityManagerInterface $em)
+    public function indexAction(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $requestBody = json_decode($request->getContent(), true);
         $contactRepo = $em->getRepository(Lead::class);

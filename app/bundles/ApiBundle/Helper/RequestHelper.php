@@ -8,7 +8,7 @@ class RequestHelper
 {
     public static function hasBasicAuth(Request $request): bool
     {
-        return 0 === strpos(strtolower((string) $request->headers->get('Authorization')), 'basic');
+        return str_starts_with(strtolower((string) $request->headers->get('Authorization')), 'basic');
     }
 
     public static function isApiRequest(Request $request): bool
@@ -16,7 +16,7 @@ class RequestHelper
         $requestUrl = $request->getRequestUri();
 
         // Check if /oauth or /api
-        $isApiRequest = (false !== strpos($requestUrl, '/oauth') || false !== strpos($requestUrl, '/api'));
+        $isApiRequest = (str_contains($requestUrl, '/oauth') || str_contains($requestUrl, '/api'));
 
         defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
 

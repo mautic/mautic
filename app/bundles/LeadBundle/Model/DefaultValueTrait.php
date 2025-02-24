@@ -12,7 +12,6 @@ trait DefaultValueTrait
     protected function setEntityDefaultValues(CustomFieldEntityInterface $entity, $object = 'lead')
     {
         if (!$entity->getId()) {
-            /** @var FieldModel $fieldModel */
             $fields = $this->leadFieldModel->getFieldListWithProperties($object);
             foreach ($fields as $alias => $field) {
                 // Prevent defaults from overwriting values already set

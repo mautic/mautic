@@ -6,13 +6,13 @@ use Mautic\CoreBundle\Event\CustomTemplateEvent;
 
 class CustomTemplateEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNullRequestDoesNotThrowException()
+    public function testNullRequestDoesNotThrowException(): void
     {
         $event = new CustomTemplateEvent(null, 'test');
         $this->assertSame('test', $event->getTemplate());
     }
 
-    public function testEmptyTemplateThrowsException()
+    public function testEmptyTemplateThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 

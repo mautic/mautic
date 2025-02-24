@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SlotSocialFollowType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
 
@@ -57,7 +57,7 @@ class SlotSocialFollowType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
     }
 

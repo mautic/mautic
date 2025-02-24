@@ -8,11 +8,9 @@ use Mautic\FormBundle\Collection\MappedObjectCollection;
 
 final class MappedObjectCollector implements MappedObjectCollectorInterface
 {
-    private FieldCollectorInterface $fieldCollector;
-
-    public function __construct(FieldCollectorInterface $fieldCollector)
-    {
-        $this->fieldCollector = $fieldCollector;
+    public function __construct(
+        private FieldCollectorInterface $fieldCollector
+    ) {
     }
 
     public function buildCollection(string ...$objects): MappedObjectCollection

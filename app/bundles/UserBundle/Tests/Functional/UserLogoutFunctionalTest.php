@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\UserBundle\Tests\Controller\Api;
+namespace Mautic\UserBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
@@ -26,16 +26,16 @@ class UserLogoutFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $user->setRole($role);
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword('mautic', null));
+        $encoder = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $user->setPassword($encoder->hash('mautic'));
         $this->em->persist($user);
 
         $this->em->flush();
         $this->em->clear();
 
         // Login newly created non-admin user
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(Request::METHOD_GET, '/s/logout');

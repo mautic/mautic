@@ -14,27 +14,24 @@ class FinalizeUpdateStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private MockObject $session;
 
     /**
      * @var MockObject|AppVersion
      */
-    private $appVersion;
+    private MockObject $appVersion;
 
-    /**
-     * @var FinalizeUpdateStep
-     */
-    private $step;
+    private FinalizeUpdateStep $step;
 
     protected function setUp(): void
     {
@@ -48,7 +45,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->session, $this->appVersion);
     }
 
-    public function testFinalizationCleansUpFiles()
+    public function testFinalizationCleansUpFiles(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');
@@ -87,7 +84,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
 
-    public function testFinalizationWithPostUpgradeMessage()
+    public function testFinalizationWithPostUpgradeMessage(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');

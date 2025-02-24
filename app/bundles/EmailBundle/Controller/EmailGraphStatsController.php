@@ -33,7 +33,7 @@ class EmailGraphStatsController extends AbstractController
         $isVariant,
         $dateFrom = null,
         $dateTo = null
-    ) {
+    ): \Symfony\Component\HttpFoundation\Response {
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
 

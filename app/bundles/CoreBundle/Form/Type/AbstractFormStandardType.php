@@ -13,6 +13,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 abstract class AbstractFormStandardType extends AbstractType
 {
     /**
@@ -20,7 +23,7 @@ abstract class AbstractFormStandardType extends AbstractType
      */
     protected $security;
 
-    public function setSecurity(CorePermissions $security)
+    public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }
@@ -28,7 +31,7 @@ abstract class AbstractFormStandardType extends AbstractType
     /**
      * @throws \Exception
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!isset($options['data'])) {
             throw new \Exception('$options[\'data\'] must be defined');
@@ -74,7 +77,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 'category',
                 CategoryListType::class,
                 [
-                    'bundle' => isset($options['category_bundle']) ? $options['category_bundle'] : 'global',
+                    'bundle' => $options['category_bundle'] ?? 'global',
                 ]
             );
         }
@@ -103,8 +106,9 @@ abstract class AbstractFormStandardType extends AbstractType
                 'isPublished',
                 YesNoButtonGroupType::class,
                 [
-                    'data' => $data,
-                    'attr' => [
+                    'label' => 'mautic.core.form.available',
+                    'data'  => $data,
+                    'attr'  => [
                         'readonly' => $readonly,
                     ],
                 ]
@@ -112,10 +116,10 @@ abstract class AbstractFormStandardType extends AbstractType
 
             if (!$builder->has('publishUp') && method_exists($options['data'], 'getPublishUp')) {
                 $builderOptions = [
-                  'attr' => [
-                      'class'       => 'form-control',
-                      'data-toggle' => 'datetime',
-                      'readonly'    => $readonly,
+                    'attr' => [
+                        'class'       => 'form-control',
+                        'data-toggle' => 'datetime',
+                        'readonly'    => $readonly,
                     ],
                 ];
                 $builder->add('publishUp', PublishUpDateType::class, $builderOptions);
@@ -138,7 +142,7 @@ abstract class AbstractFormStandardType extends AbstractType
             );
         }
 
-        $buttonOptions = isset($options['button_options']) ? $options['button_options'] : [];
+        $buttonOptions = $options['button_options'] ?? [];
         if (!empty($options['update_select'])) {
             if (!$builder->has('buttons')) {
                 $builder->add(

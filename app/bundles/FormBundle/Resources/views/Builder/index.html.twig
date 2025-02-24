@@ -36,17 +36,17 @@
 
   {{ form_start(form) }}
   <div class="box-layout">
-      <div class="col-md-9 height-auto bg-white">
+      <div class="col-md-9 height-auto">
           <div class="row">
               <div class="col-xs-12">
 
                   <!-- tabs controls -->
-                  <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                  <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active"><a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
                       <li id="fields-tab" class="text-danger">
                           <a class="{% if fieldsTabError %}text-danger{% endif %}" href="#fields-container" role="tab" data-toggle="tab">
                             {{- 'mautic.form.tab.fields'|trans }}
-                            {% if fieldsTabError %}<i class="fa fa-warning"></i>{% endif -%}
+                            {% if fieldsTabError %}<i class="ri-alert-line"></i>{% endif -%}
                           </a>
                       </li>
                       <li id="actions-tab"><a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a></li>
@@ -68,7 +68,6 @@
                           </div>
                       </div>
                       <div class="tab-pane fade bdr-w-0" id="fields-container">
-                          {{ include('@MauticForm/Builder/_style.html.twig') }}
                           <div id="mauticforms_fields">
                               <div class="row">
                                   <div class="available-fields mb-md col-sm-4">
@@ -186,20 +185,31 @@
               </div>
           </div>
       </div>
-      <div class="col-md-3 bg-white height-auto bdr-l">
+      <div class="col-md-3 height-auto bdr-l">
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.category) }}
-              {{ form_row(form.isPublished) }}
-              {{ form_row(form.publishUp) }}
-              {{ form_row(form.publishDown) }}
+              {{ form_row(form.isPublished, {
+				'attr': {
+					'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
+					'data-start': 'mautic.core.form.available_on_scheduled_date',
+					'data-both': 'mautic.core.form.available_during_scheduled_period',
+					'data-end': 'mautic.core.form.available_until_scheduled_end'
+				}
+			}) }}
+              {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+              {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
               {{ form_row(form.noIndex) }}
               {{ form_row(form.inKioskMode) }}
               {{ form_row(form.renderStyle) }}
               {{ form_row(form.template) }}
+              {{ form_row(form.language) }}
           </div>
       </div>
   </div>
   {{ form_end(form) }}
+
+  {% set typeOneDifferences = ['mautic.form.type.one.differences.1st', 'mautic.form.type.one.differences.2nd', 'mautic.form.type.one.differences.3rd'] %}
+  {% set typeTwoDifferences = ['mautic.form.type.two.differences.1st', 'mautic.form.type.two.differences.2nd', 'mautic.form.type.two.differences.3rd'] %}
 
   {% if activeForm.formType is null or (forceTypeSelection is defined and forceTypeSelection is not empty) %}
       {{ include('@MauticCore/Helper/form_selecttype.html.twig', {
@@ -212,12 +222,12 @@
               'cancelUrl': 'mautic_form_index',
               'header': 'mautic.form.type.header',
               'typeOneHeader': 'mautic.form.type.campaign.header',
-              'typeOneIconClass': 'fa-cubes',
-              'typeOneDescription': 'mautic.form.type.campaign.description',
+              'typeOneIconClass': 'ri-megaphone-fill',
+              'typeOneDifferences': typeOneDifferences,
               'typeOneOnClick': "Mautic.selectFormType('campaign');",
               'typeTwoHeader': 'mautic.form.type.standalone.header',
-              'typeTwoIconClass': 'fa-list',
-              'typeTwoDescription': 'mautic.form.type.standalone.description',
+              'typeTwoIconClass': 'ri-survey-fill',
+              'typeTwoDifferences': typeTwoDifferences,
               'typeTwoOnClick': "Mautic.selectFormType('standalone');",
       }, with_context=false) }}
   {% endif %}

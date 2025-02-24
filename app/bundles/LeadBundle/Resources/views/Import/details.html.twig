@@ -15,7 +15,7 @@
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
 {% endblock %}
 
-{% block actions %}
+{% block indexButton %}
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'routeBase': 'import',
             'langVar': 'lead.import',
@@ -27,6 +27,7 @@
                     'object': app.request.get('object', 'contacts'),
                 },
             },
+            'targetLabel'  : 'mautic.lead.import.list'|trans
     }) }}
 {% endblock %}
 
@@ -50,13 +51,13 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- asset detail collapseable -->
-            <div class="collapse" id="asset-details">
+            <div class="collapse pr-md pl-md" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                                 {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
 
@@ -120,7 +121,7 @@
             <!--/ asset detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
@@ -139,14 +140,14 @@
                             <div class="panel-body box-layout">
                                 <div class="va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-row-statuses"></span>
+                                        <span class="fa-row-statuses"></span>
                                         {{ 'mautic.lead.import.row.statuses'|trans }}
                                     </h5>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
-                                      'chartData': item.rowStatusesPieChart(translatorGetHelper()),
+                                      'chartData': item.getRowStatusesPieChart(translatorGetHelper()),
                                       'chartType': 'pie',
                                       'chartHeight': 210,
                                 }) }}
@@ -158,7 +159,7 @@
                             <div class="panel-body box-layout">
                                 <div class="va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-row-statuses"></span>
+                                        <span class="fa-row-statuses"></span>
                                         {{ 'mautic.lead.import.processed.rows.minute'|trans }}
                                     </h5>
                                 </div>
@@ -182,7 +183,7 @@
         <div class="tab-content pa-md preview-detail">
         {% if failedRows is not empty and failedRows|length > 0 %}
         <h3>{{ 'mautic.lead.import.failed.rows'|trans }}</h3>
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                       <th>{{ 'mautic.lead.import.csv.line.number'|trans }}</th>
@@ -218,7 +219,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
 
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}

@@ -9,34 +9,23 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class FormFieldTextType.
+ * @extends AbstractType<mixed>
  */
 class FormFieldTelType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * FormFieldTelType constructor.
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'international',
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.field.type.tel.international',
-                'data'  => isset($options['data']['international']) ? $options['data']['international'] : false,
+                'data'  => $options['data']['international'] ?? false,
             ]
         );
 

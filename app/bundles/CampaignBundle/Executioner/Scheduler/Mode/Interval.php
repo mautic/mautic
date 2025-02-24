@@ -16,36 +16,18 @@ class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private ?\DateTimeZone $defaultTimezone = null;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var \DateTimeZone
-     */
-    private $defaultTimezone;
-
-    /**
-     * Interval constructor.
-     */
-    public function __construct(LoggerInterface $logger, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private LoggerInterface $logger,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
-     * @return \DateTimeInterface
-     *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime): \DateTimeInterface
     {
         $interval = $event->getTriggerInterval();
         $unit     = $event->getTriggerIntervalUnit();
@@ -120,7 +102,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null)
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null): array
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
@@ -139,11 +121,12 @@ class Interval implements ScheduleModeInterface
                 $endTime,
                 $daysOfWeek
             );
-            if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
-                $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
+            $key = $groupExecutionDate->format(DateTimeHelper::FORMAT_DB);
+            if (!isset($groupedExecutionDates[$key])) {
+                $groupedExecutionDates[$key] = new GroupExecutionDateDAO($groupExecutionDate);
             }
 
-            $groupedExecutionDates[$groupExecutionDate->getTimestamp()]->addContact($contact);
+            $groupedExecutionDates[$key]->addContact($contact);
         }
 
         return $groupedExecutionDates;
@@ -151,12 +134,14 @@ class Interval implements ScheduleModeInterface
 
     /**
      * Checks if an event has a relative time configured.
-     *
-     * @return bool
      */
-    public function isContactSpecificExecutionDateRequired(Event $event)
+    public function isContactSpecificExecutionDateRequired(Event $event): bool
     {
-        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event)) {
+        if ($this->isTriggerModeOptimized($event)) {
+            return true;
+        }
+
+        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event)) {
             return false;
         }
 
@@ -168,16 +153,31 @@ class Interval implements ScheduleModeInterface
         return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
     }
 
+    private function isTriggerModeOptimized(Event $event): bool
+    {
+        return Event::TRIGGER_MODE_OPTIMIZED === $event->getTriggerMode();
+    }
+
     private function isRestrictedToDailyScheduling(Event $event): bool
     {
-        return !in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']);
+        return !in_array($event->getTriggerIntervalUnit(), ['i', 'h', 'd', 'm', 'y'])
+            && empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     private function hasTimeRelatedRestrictions(Event $event): bool
     {
-        return null === $event->getTriggerHour() &&
-            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
-            empty($event->getTriggerRestrictedDaysOfWeek());
+        return null === $event->getTriggerHour()
+            && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
+            && empty($event->getTriggerRestrictedDaysOfWeek());
+    }
+
+    private function isNegativePath(Event $event): bool
+    {
+        if ($event->getParent()) {
+            return Event::TYPE_DECISION === $event->getParent()->getEventType() && Event::TYPE_ACTION === $event->getEventType() && Event::PATH_INACTION === $event->getDecisionPath();
+        }
+
+        return false;
     }
 
     /**
@@ -249,38 +249,19 @@ class Interval implements ScheduleModeInterface
         /** @var \DateTime $groupHour */
         $groupHour = clone $hour;
 
-        // Set execution to UTC
-        if ($timezone = $contact->getTimezone()) {
-            try {
-                // Set the group's timezone to the contact's
-                $contactTimezone = new \DateTimeZone($timezone);
+        /** @var \DateTime $groupExecutionDate */
+        $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
+        $groupExecutionDate->setTime((int) $groupExecutionDate->format('H'), (int) $groupExecutionDate->format('i'));
 
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
-                );
+        $testGroupHour = clone $groupExecutionDate;
+        $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
 
-                // Get now in the contacts timezone then add the number of days from now and the original execution date
-                /** @var \DateTime $groupExecutionDate */
-                $groupExecutionDate = clone $compareFromDateTime;
-                $groupExecutionDate->setTimezone($contactTimezone);
-
-                $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
-
-                return $groupExecutionDate;
-            } catch (\Exception $exception) {
-                // Timezone is not recognized so use the default
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
-                );
-            }
+        if ($groupExecutionDate <= $testGroupHour) {
+            // Schedule for the configured hour today if it's not passed yet.
+            return $testGroupHour;
         }
 
-        /** @var \DateTime $groupExecutionDate */
-        $groupExecutionDate = clone $compareFromDateTime;
-        $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-
-        $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
-
+        // Execute rigt away if the hour has passed.
         return $groupExecutionDate;
     }
 
@@ -307,40 +288,13 @@ class Interval implements ScheduleModeInterface
             unset($tempStartTime);
         }
 
-        // Set execution to UTC
-        if ($timezone = $contact->getTimezone()) {
-            try {
-                // Set the group's timezone to the contact's
-                $contactTimezone = new \DateTimeZone($timezone);
-
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
-                );
-
-                // Get now in the contacts timezone then add the number of days from now and the original execution date
-                /** @var \DateTime $groupExecutionDate */
-                $groupExecutionDate = clone $compareFromDateTime;
-                $groupExecutionDate->setTimezone($contactTimezone);
-            } catch (\Exception $exception) {
-                // Timezone is not recognized so use the default
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
-                );
-            }
-        }
-
-        if (!isset($groupExecutionDate)) {
-            /** @var \DateTime $groupExecutionDate */
-            $groupExecutionDate = clone $compareFromDateTime;
-            $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-        }
+        /** @var \DateTime $groupExecutionDate */
+        $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
 
         // Is the time between the start and end hours?
-        /* @var \DateTime $testStartDateTime */
         $testStartDateTime = clone $groupExecutionDate;
         $testStartDateTime->setTime($startTime->format('H'), $startTime->format('i'));
 
-        /* @var \DateTime $testStopDateTime */
         $testStopDateTime = clone $groupExecutionDate;
         $testStopDateTime->setTime($endTime->format('H'), $endTime->format('i'));
 
@@ -351,7 +305,7 @@ class Interval implements ScheduleModeInterface
 
         if ($groupExecutionDate >= $testStopDateTime) {
             // Too late so try again tomorrow
-            $groupExecutionDate->modify('+1 day')->setTime($startTime->format('H'), $startTime->format('i'));
+            $groupExecutionDate->modify('+1 day')->setTime((int) $startTime->format('H'), (int) $startTime->format('i'));
         }
 
         return $groupExecutionDate;
@@ -371,5 +325,32 @@ class Interval implements ScheduleModeInterface
         );
 
         return $this->defaultTimezone;
+    }
+
+    private function getGroupExecutionDateWithTimeZone(Lead $contact, int $eventId, \DateTimeInterface $compareFromDateTime): \DateTimeInterface
+    {
+        /** @var \DateTime $groupExecutionDate */
+        $groupExecutionDate = clone $compareFromDateTime;
+        $contactTimezone    = $this->getDefaultTimezone();
+        // Set execution to UTC
+        if ($timezone = $contact->getTimezone()) {
+            try {
+                // Set the group's timezone to the contact's
+                $contactTimezone = new \DateTimeZone($timezone);
+
+                $this->logger->debug(
+                    'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
+                );
+            } catch (\Exception) {
+                // Timezone is not recognized so use the default
+                $this->logger->debug(
+                    'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
+                );
+            }
+        }
+
+        $groupExecutionDate->setTimezone($contactTimezone);
+
+        return $groupExecutionDate;
     }
 }

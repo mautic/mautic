@@ -12,7 +12,7 @@
 #}
 {% if items|length > 0 %}
     <div class="table-responsive page-list">
-        <table class="table table-hover table-striped table-bordered pagetable-list" id="pageTable">
+        <table class="table table-hover pagetable-list" id="pageTable">
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -106,17 +106,17 @@
                                 <span>
                                     {% if item.isVariant %}
                                         <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
-                                            <i class="fa fa-fw fa-sitemap"></i>
+                                            <i class="ri-fw ri-organization-chart"></i>
                                         </span>
                                     {% endif %}
                                     {% if item.isTranslation %}
                                         <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
-                                            <i class="fa fa-fw fa-language"></i>
+                                            <i class="ri-fw ri-translate"></i>
                                         </span>
                                     {% endif %}
                                     {% if item.isPreferenceCenter %}
                                         <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.preference_center'|trans }}">
-                                            <i class="fa fa-fw fa-cog"></i>
+                                            <i class="ri-settings-5-line"></i>
                                         </span>
                                     {% endif %}
                                 </span>
@@ -126,11 +126,8 @@
                     <td class="visible-md visible-lg">
                         {% set category = item.category %}
                         {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : 'inherit' %}
-                        <span style="white-space: nowrap;">
-                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
-                          <span>{{ catName }}</span>
-                        </span>
+                        {% set color = category ? '#' ~ category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-md visible-lg">{{ item.hits }}</td>
                     <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
@@ -141,7 +138,7 @@
                     </td>
                     <td class="visible-md visible-lg">{{ item.createdByUser }}</td>
                     <td class="visible-md visible-lg">
-                        <a href="{{ path('mautic_page_results', {'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
+                        <a href="{{ path('mautic_page_results', {'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
                             {{- 'mautic.form.form.viewresults'|trans({'%count%': i.submission_count}) -}}
                         </a>
                     </td>

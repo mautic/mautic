@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class DoctrineEventSubscriber implements EventSubscriber
 {
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             'postGenerateSchema',

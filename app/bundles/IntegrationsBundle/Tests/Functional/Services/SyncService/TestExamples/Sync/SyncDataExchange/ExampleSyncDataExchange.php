@@ -55,9 +55,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      */
     private $valueNormalizer;
 
-    /**
-     * ExampleSyncDataExchange constructor.
-     */
     public function __construct()
     {
         // Using the default normalizer for this example but each integration may need it's own if

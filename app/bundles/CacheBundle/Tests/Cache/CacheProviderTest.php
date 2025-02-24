@@ -15,25 +15,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CacheProviderTest extends TestCase
 {
-    /**
-     * @var CacheProvider
-     */
-    private $cacheProvider;
+    private CacheProvider $cacheProvider;
 
     /**
      * @var MockObject|FilesystemTagAwareAdapter
      */
-    private $adapter;
+    private MockObject $adapter;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|ContainerInterface
      */
-    private $container;
+    private MockObject $container;
 
     public function setUp(): void
     {

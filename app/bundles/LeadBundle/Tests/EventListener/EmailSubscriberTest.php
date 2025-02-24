@@ -38,7 +38,7 @@ class EmailSubscriberTest extends TestCase
     /**
      * @return \Generator<string[]>
      */
-    public function onEmailAddressReplacementProvider(): \Generator
+    public static function onEmailAddressReplacementProvider(): \Generator
     {
         yield ['{contactfield=unicorn}', ''];
         yield ['{contactfield=unicorn|default@value.email}', 'default@value.email'];

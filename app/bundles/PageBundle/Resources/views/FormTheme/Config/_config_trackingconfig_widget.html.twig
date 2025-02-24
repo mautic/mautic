@@ -18,7 +18,12 @@
         <div class="row">
             {% for name, f in form.children %}
                 {% if name in ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url', 'do_not_track_404_anonymous'] %}
-                    <div class="col-md-6">{{ form_row(f) }}</div>
+                    <div class="col-md-6">
+                        {{ form_row(f) }}
+                        {% if name == 'anonymize_ip' %}
+                            <div class="anonymize_ip_address hide text-danger">{{ 'mautic.page.config.form.anonymize_ip.warning'|trans }}</div>
+                        {% endif %}
+                    </div>
                 {% endif %}
             {% endfor %}
         </div>

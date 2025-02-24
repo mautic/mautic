@@ -14,28 +14,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ApiSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        Translator $translator
+        private CoreParametersHelper $coreParametersHelper,
+        private Translator $translator
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST  => ['onKernelRequest', 255],
@@ -48,7 +33,7 @@ class ApiSubscriber implements EventSubscriberInterface
      *
      * @throws AccessDeniedHttpException
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
@@ -104,7 +89,7 @@ class ApiSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $request      = $event->getRequest();
         $isApiRequest = RequestHelper::isApiRequest($request);
@@ -118,7 +103,7 @@ class ApiSubscriber implements EventSubscriberInterface
         // Ignore if this does not contain an error response
         $response = $event->getResponse();
         $content  = $response->getContent();
-        if (false === strpos($content, 'error')) {
+        if (!str_contains($content, 'error')) {
             return;
         }
 

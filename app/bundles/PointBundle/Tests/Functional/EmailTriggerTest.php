@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\PointBundle\Tests\Functional\EmailTriggerTest;
+namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;

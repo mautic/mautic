@@ -20,7 +20,9 @@ class LogProcessorTest extends TestCase
             'level_name' => 'DEBUG',
             'channel'    => 'mautic',
             'datetime'   => new \DateTime(),
-            'extra'      => [],
+            'extra'      => [
+                'existing' => 'value',
+            ],
         ];
         $outputRecord = $logProcessor($record);
 

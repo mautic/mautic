@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class TriggerEventController.
- */
 class TriggerEventController extends CommonFormController
 {
     /**
@@ -42,9 +39,9 @@ class TriggerEventController extends CommonFormController
         }
 
         // ajax only for form fields
-        if (!$eventType ||
-            !$request->isXmlHttpRequest() ||
-            !$this->security->isGranted([
+        if (!$eventType
+            || !$request->isXmlHttpRequest()
+            || !$this->security->isGranted([
                 'point:triggers:edit',
                 'point:triggers:create',
             ], 'MATCH_ONE')
@@ -165,9 +162,9 @@ class TriggerEventController extends CommonFormController
             $triggerEvent['settings'] = $events[$eventType];
 
             // ajax only for form fields
-            if (!$eventType ||
-                !$request->isXmlHttpRequest() ||
-                !$this->security->isGranted([
+            if (!$eventType
+                || !$request->isXmlHttpRequest()
+                || !$this->security->isGranted([
                     'point:triggers:edit',
                     'point:triggers:create',
                 ], 'MATCH_ONE')
@@ -191,6 +188,7 @@ class TriggerEventController extends CommonFormController
                         // save the properties to session
                         $session  = $request->getSession();
                         $events   = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
+                        /** @var array<mixed> $formData */
                         $formData = $form->getData();
                         // overwrite with updated data
                         $triggerEvent = array_merge($events[$objectId], $formData);
@@ -276,8 +274,8 @@ class TriggerEventController extends CommonFormController
         $delete    = $session->get('mautic.point.'.$triggerId.'.triggerevents.deleted', []);
 
         // ajax only for form fields
-        if (!$request->isXmlHttpRequest() ||
-            !$this->security->isGranted([
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted([
                 'point:triggers:edit',
                 'point:triggers:create',
             ], 'MATCH_ONE')
@@ -337,8 +335,8 @@ class TriggerEventController extends CommonFormController
         $delete    = $session->get('mautic.point.'.$triggerId.'.triggerevents.deleted', []);
 
         // ajax only for form fields
-        if (!$request->isXmlHttpRequest() ||
-            !$this->security->isGranted([
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted([
                 'point:triggers:edit',
                 'point:triggers:create',
             ], 'MATCH_ONE')

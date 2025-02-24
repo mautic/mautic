@@ -10,38 +10,32 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Report
-     */
-    private $report;
+    private Report $report;
 
-    /**
-     * @var Scheduler
-     */
-    private $scheduler;
+    private Scheduler $scheduler;
 
-    /**
-     * @var SendSchedule
-     */
-    private $sendSchedule;
+    private SendSchedule $sendSchedule;
 
     /**
      * @var MockObject|MailHelper
      */
-    private $mailHelperMock;
+    private MockObject $mailHelperMock;
 
     /**
      * @var MockObject|MessageSchedule
      */
-    private $messageSchedule;
+    private MockObject $messageSchedule;
 
     /**
      * @var MockObject|FileHandler
      */
-    private $fileHandler;
+    private MockObject $fileHandler;
+
+    private \PHPUnit\Framework\MockObject\MockObject|EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -52,6 +46,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock  = $this->createMock(MailHelper::class);
         $this->messageSchedule = $this->createMock(MessageSchedule::class);
         $this->fileHandler     = $this->createMock(FileHandler::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
         $this->mailHelperMock->expects($this->once())
             ->method('getMailer')
@@ -60,11 +55,12 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule = new SendSchedule(
             $this->mailHelperMock,
             $this->messageSchedule,
-            $this->fileHandler
+            $this->fileHandler,
+            $this->eventDispatcher
         );
     }
 
-    public function testSendScheduleWithCsvFile()
+    public function testSendScheduleWithCsvFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 
@@ -109,7 +105,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
 
-    public function testSendScheduleWithZipFile()
+    public function testSendScheduleWithZipFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 
@@ -166,7 +162,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
 
-    public function testSendScheduleWithoutFile()
+    public function testSendScheduleWithoutFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 

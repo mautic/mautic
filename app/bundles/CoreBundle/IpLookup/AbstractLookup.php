@@ -3,40 +3,35 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\Client;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractLookup
 {
     public $city         = '';
+
     public $region       = '';
+
     public $zipcode      = '';
+
     public $country      = '';
+
     public $latitude     = '';
+
     public $longitude    = '';
+
     public $isp          = '';
+
     public $organization = '';
+
     public $timezone     = '';
+
     public $extra        = '';
 
-    protected ?Client $client;
-
     /**
-     * @var string IP Address
+     * @var string|null IP Address
      */
     protected $ip;
-
-    /**
-     * Authorization for lookup service.
-     */
-    protected ?string $auth;
-
-    protected ?string $cacheDir;
-    protected ?LoggerInterface $logger;
-
-    /**
-     * @var mixed
-     */
-    protected $config;
 
     /**
      * Return attribution HTML displayed in the configuration UI.
@@ -50,19 +45,14 @@ abstract class AbstractLookup
      */
     abstract protected function lookup();
 
-    /**
-     * AbstractLookup constructor.
-     *
-     * @param null $ipLookupConfig
-     * @param null $cacheDir
-     */
-    public function __construct(?string $auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
-    {
-        $this->cacheDir  = $cacheDir;
-        $this->logger    = $logger;
-        $this->auth      = $auth;
-        $this->config    = $ipLookupConfig;
-        $this->client    = $client;
+    public function __construct(
+        protected ?string $auth = null,
+        protected $config = null,
+        protected ?string $cacheDir = null,
+        protected ?LoggerInterface $logger = null,
+        protected ?Client $client = null,
+        protected ?CoreParametersHelper $coreParametersHelper = null
+    ) {
     }
 
     /**
@@ -72,8 +62,10 @@ abstract class AbstractLookup
     {
         $this->ip = $ip;
 
-        // Fetch details from the service
-        $this->lookup();
+        if ($this->shouldPerformLookup()) {
+            // Fetch details from the service
+            $this->lookup();
+        }
 
         return $this;
     }
@@ -97,5 +89,10 @@ abstract class AbstractLookup
             'timezone'     => $this->timezone,
             'extra'        => $this->extra,
         ];
+    }
+
+    protected function shouldPerformLookup(): bool
+    {
+        return true;
     }
 }

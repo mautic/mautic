@@ -3,6 +3,7 @@
     - pages
 #}
 {% set count = pages|length %}
+{% if count > 0 %}
 <div class="page-lang-bar">
     {% for page in pages %}
       {% set active = app.request.requestUri == page.url %}
@@ -18,3 +19,4 @@
       {% set count = count - 1 %}
     {% endfor %}
 </div>
+{% endif %}

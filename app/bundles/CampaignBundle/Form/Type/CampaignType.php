@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -18,25 +19,18 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Campaign>
+ */
 class CampaignType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(CorePermissions $security, TranslatorInterface $translator)
-    {
-        $this->security   = $security;
-        $this->translator = $translator;
+    public function __construct(
+        private CorePermissions $security,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('campaign', $options));
@@ -81,7 +75,7 @@ class CampaignType extends AbstractType
                 'data-confirm-callback' => 'dismissConfirmation',
                 'data-cancel-text'      => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
                 'data-cancel-callback'  => 'setPublishedButtonToYes',
-                'class'                 => 'btn btn-default',
+                'class'                 => 'btn btn-ghost',
             ];
         } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
             $readonly = true;
@@ -115,19 +109,23 @@ class CampaignType extends AbstractType
                     'name'  => 'builder',
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-default btn-dnd',
-                        'icon'    => 'fa fa-cube',
+                        'class'   => 'btn btn-ghost btn-dnd',
+                        'icon'    => 'ri-organization-chart',
                         'onclick' => 'Mautic.launchCampaignEditor();',
                     ],
                 ],
             ],
         ]);
+
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'Mautic\CampaignBundle\Entity\Campaign',
+            'data_class' => Campaign::class,
         ]);
     }
 }

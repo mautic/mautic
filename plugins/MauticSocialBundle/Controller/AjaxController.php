@@ -13,10 +13,7 @@ class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel, FormFactoryInterface $formFactory)
+    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
     {
         // get the form type
         $type = InputHelper::clean($request->request->get('networkType'));

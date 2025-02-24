@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Event\CompanyEvent;
 
 class CompanyEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructGettersSetters()
+    public function testConstructGettersSetters(): void
     {
         $company = new Company();
         $isNew   = false;

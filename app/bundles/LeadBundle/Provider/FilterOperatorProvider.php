@@ -11,21 +11,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorProvider implements FilterOperatorProviderInterface
 {
-    private EventDispatcherInterface $dispatcher;
-
-    private TranslatorInterface $translator;
-
     /**
      * @var mixed[]
      */
     private array $cachedOperators = [];
 
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator
+        private EventDispatcherInterface $dispatcher,
+        private TranslatorInterface $translator
     ) {
-        $this->dispatcher = $dispatcher;
-        $this->translator = $translator;
     }
 
     /**

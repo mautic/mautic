@@ -10,21 +10,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
-        RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
-        $this->requestStack = $requestStack;
     }
 
     /**
-     * @return mixed[]
+     * @return array<int, array<string, string>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             [
@@ -34,7 +28,7 @@ class SerializerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function changeEmptyArraysToObject(ObjectEvent $event)
+    public function changeEmptyArraysToObject(ObjectEvent $event): void
     {
         $request  = $this->requestStack->getCurrentRequest();
 

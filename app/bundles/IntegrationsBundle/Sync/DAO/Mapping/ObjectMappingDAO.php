@@ -7,38 +7,24 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 class ObjectMappingDAO
 {
     public const SYNC_TO_MAUTIC       = 'mautic';
+
     public const SYNC_TO_INTEGRATION  = 'integration';
+
     public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
-    /**
-     * @var string
-     */
-    private $internalObjectName;
+    private array $internalIdMapping = [];
 
-    /**
-     * @var string
-     */
-    private $integrationObjectName;
-
-    /**
-     * @var array
-     */
-    private $internalIdMapping = [];
-
-    /**
-     * @var array
-     */
-    private $integrationIdMapping = [];
+    private array $integrationIdMapping = [];
 
     /**
      * @var FieldMappingDAO[]
      */
-    private $fieldMappings = [];
+    private array $fieldMappings = [];
 
-    public function __construct(string $internalObjectName, string $integrationObjectName)
-    {
-        $this->internalObjectName    = $internalObjectName;
-        $this->integrationObjectName = $integrationObjectName;
+    public function __construct(
+        private string $internalObjectName,
+        private string $integrationObjectName
+    ) {
     }
 
     /**

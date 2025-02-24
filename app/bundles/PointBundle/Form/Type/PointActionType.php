@@ -7,12 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class PointActionType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks           = [];
         $formTypeOptions = [
@@ -21,7 +21,10 @@ class PointActionType extends AbstractType
         if (!empty($options['formTypeOptions'])) {
             $formTypeOptions = array_merge($formTypeOptions, $options['formTypeOptions']);
         }
-        $builder->add('properties', $options['formType'], $formTypeOptions);
+
+        if (isset($options['formType'])) {
+            $builder->add('properties', $options['formType'], $formTypeOptions);
+        }
 
         if (isset($options['settings']['formTypeCleanMasks'])) {
             $masks['properties'] = $options['settings']['formTypeCleanMasks'];
@@ -30,20 +33,14 @@ class PointActionType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'formType'        => GenericPointSettingsType::class,
+            'formType'        => null,
             'formTypeOptions' => [],
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointaction';

@@ -6,32 +6,24 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class AllowlistEntry
 {
-    /**
-     * Packagist package in the format vendor/package.
-     */
-    public string $package;
-
-    /**
-     * Human readable name.
-     */
-    public string $displayName;
-
-    /**
-     * Minimum Mautic version in semver format (e.g. 4.1.2).
-     */
-    public ?string $minimumMauticVersion;
-
-    /**
-     * Maximum Mautic version in semver format (e.g. 4.1.2).
-     */
-    public ?string $maximumMauticVersion;
-
-    public function __construct(string $package, string $displayName, ?string $minimumMauticVersion, ?string $maximumMauticVersion)
-    {
-        $this->package              = $package;
-        $this->displayName          = $displayName;
-        $this->minimumMauticVersion = $minimumMauticVersion;
-        $this->maximumMauticVersion = $maximumMauticVersion;
+    public function __construct(
+        /**
+         * Packagist package in the format vendor/package.
+         */
+        public string $package,
+        /**
+         * Human readable name.
+         */
+        public string $displayName,
+        /**
+         * Minimum Mautic version in semver format (e.g. 4.1.2).
+         */
+        public ?string $minimumMauticVersion,
+        /**
+         * Maximum Mautic version in semver format (e.g. 4.1.2).
+         */
+        public ?string $maximumMauticVersion
+    ) {
     }
 
     /**

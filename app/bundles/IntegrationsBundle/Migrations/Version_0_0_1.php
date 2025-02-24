@@ -10,26 +10,17 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_1 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'sync_object_mapping';
+    private string $table = 'sync_object_mapping';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isApplicable(Schema $schema): bool
     {
         try {
             return !$schema->getTable($this->concatPrefix($this->table))->hasColumn('integration_reference_id');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function up(): void
     {
         $this->addSql("

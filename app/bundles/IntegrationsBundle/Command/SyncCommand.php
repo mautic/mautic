@@ -17,16 +17,10 @@ class SyncCommand extends Command
 {
     public const NAME = 'mautic:integrations:sync';
 
-    /**
-     * @var SyncServiceInterface
-     */
-    private $syncService;
-
-    public function __construct(SyncServiceInterface $syncService)
-    {
+    public function __construct(
+        private SyncServiceInterface $syncService
+    ) {
         parent::__construct();
-
-        $this->syncService = $syncService;
     }
 
     protected function configure(): void
@@ -105,11 +99,14 @@ class SyncCommand extends Command
         } catch (InvalidValueException $e) {
             $io->error($e->getMessage());
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         try {
             defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
+
+            // Tell audit log to use integration name rather than "System"
+            defined('MAUTIC_AUDITLOG_USER') or define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
 
             $this->syncService->processIntegrationSync($inputOptions);
         } catch (\Throwable $e) {
@@ -119,12 +116,13 @@ class SyncCommand extends Command
 
             $io->error($e->getMessage());
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetch objects from integration.';
 }

@@ -56,7 +56,7 @@ interface FilterDecoratorInterface
      *
      * @return string|bool if no func needed
      */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate);
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool;
 
     /**
      * Returns a special where condition which is needed to be added to QueryBuilder (like email_stats.is_read = 1 for 'Read emails')

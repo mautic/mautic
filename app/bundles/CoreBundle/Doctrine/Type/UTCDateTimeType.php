@@ -7,15 +7,9 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-/**
- * Class UTCDateTimeType.
- */
 class UTCDateTimeType extends DateTimeType
 {
-    /**
-     * @var \DateTimeZone
-     */
-    private static $utc;
+    private static ?\DateTimeZone $utc = null;
 
     /**
      * @param \DateTime $value

@@ -22,7 +22,7 @@ trait PushToIntegrationTrait
     /**
      * Used by methodCalls to event subscribers.
      */
-    public function setIntegrationHelper(IntegrationHelper $integrationHelper)
+    public function setIntegrationHelper(IntegrationHelper $integrationHelper): void
     {
         static::setStaticIntegrationHelper($integrationHelper);
     }
@@ -30,12 +30,12 @@ trait PushToIntegrationTrait
     /**
      * Used by callback methods such as point triggers.
      */
-    public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper)
+    public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper): void
     {
         static::$integrationHelper = $integrationHelper;
     }
 
-    protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
+    protected function pushToIntegration(array $config, Lead $lead, array &$errors = []): bool
     {
         return static::pushIt($config, $lead, $errors);
     }
@@ -49,18 +49,15 @@ trait PushToIntegrationTrait
      *
      * @return bool
      */
-    protected static function pushIt($config, $lead, &$errors)
+    protected static function pushIt($config, $lead, &$errors): bool
     {
         $integration         = (!empty($config['integration'])) ? $config['integration'] : null;
         $integrationCampaign = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
         $services            = static::$integrationHelper->getIntegrationObjects($integration);
         $success             = true;
 
-        /**
-         * @var string
-         * @var AbstractIntegration $s
-         */
         foreach ($services as $s) {
+            /** @var AbstractIntegration $s */
             $settings = $s->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;

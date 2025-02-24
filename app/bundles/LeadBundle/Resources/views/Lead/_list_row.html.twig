@@ -13,7 +13,7 @@
                 'data-method': 'POST',
             },
             'btnText': 'mautic.core.details',
-            'iconClass': 'fa fa-info-circle',
+            'iconClass': 'ri-information-line',
         }] %}
 
         {% if hasEditAccess and currentList is not empty %}
@@ -25,7 +25,7 @@
                     'data-method': 'POST',
                 },
                 'btnText': 'mautic.lead.lead.remove.fromlist',
-                'iconClass': 'fa fa-remove',
+                'iconClass': 'ri-close-line',
             }]) %}
         {% endif %}
 
@@ -38,7 +38,7 @@
                     'href': path('mautic_contact_action', {'objectId': item.id, 'objectAction': 'email', 'list': 1}),
                 },
                 'btnText': 'mautic.lead.email.send_email',
-                'iconClass': 'fa fa-send',
+                'iconClass': 'ri-mail-send-line',
             }]) %}
         {% endif %}
 

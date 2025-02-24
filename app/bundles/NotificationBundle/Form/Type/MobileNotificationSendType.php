@@ -10,21 +10,16 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class NotificationSendType.
+ * @extends AbstractType<array<mixed>>
  */
 class MobileNotificationSendType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'notification',
@@ -62,7 +57,7 @@ class MobileNotificationSendType extends AbstractType
                         'onclick' => 'Mautic.loadNewWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
-                        'icon' => 'fa fa-plus',
+                        'icon' => 'ri-add-line',
                     ],
                     'label' => 'mautic.notification.send.new.notification',
                 ]
@@ -90,7 +85,7 @@ class MobileNotificationSendType extends AbstractType
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardNotificationUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($notification),
-                        'icon'     => 'fa fa-edit',
+                        'icon'     => 'ri-edit-line',
                     ],
                     'label' => 'mautic.notification.send.edit.notification',
                 ]
@@ -98,7 +93,7 @@ class MobileNotificationSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }

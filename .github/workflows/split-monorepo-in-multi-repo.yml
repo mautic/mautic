@@ -55,15 +55,12 @@ jobs:
                     - theme-blank
                     - theme-brienz
                     - theme-cards
-                    - theme-coffee
                     - theme-confirmme
                     - theme-fresh-center
                     - theme-fresh-fixed
                     - theme-fresh-left
                     - theme-fresh-wide
                     - theme-goldstar
-                    - theme-mauve
-                    - theme-nature
                     - theme-neopolitan
                     - theme-oxygen
                     - theme-paprika
@@ -72,9 +69,24 @@ jobs:
                     - theme-sunday
                     - theme-trulypersonal
                     - theme-vibrant
+                    - theme-1-2-1-2-column
+                    - theme-1-2-1-column
+                    - theme-1-2-column
+                    - theme-1-3-1-3-column
+                    - theme-1-3-column
+                    - theme-connect-through-content
+                    - theme-educate
+                    - theme-gallery
+                    - theme-make-announcement
+                    - theme-showcase
+                    - theme-simple-text
+                    - theme-survey
+                    - theme-welcome
+                    - theme-attract
+                    - theme-creative
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
-            -   uses: actions/checkout@v3
+            -   uses: actions/checkout@v4
                 with:
                     persist-credentials: false
                     fetch-depth: 0
@@ -88,7 +100,7 @@ jobs:
 
             # Cache the splitsh executable to speedup future runs
             -   name: Cache splitsh-lite
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: './splitsh'
                     key: '${{ runner.os }}-${{ matrix.config }}-splitsh-v101'

@@ -24,7 +24,7 @@ class PointEvent extends CommonEvent
         return $this->entity;
     }
 
-    public function setPoint(Point $point)
+    public function setPoint(Point $point): void
     {
         $this->entity = $point;
     }

@@ -59,21 +59,6 @@ final class ButtonHelper
     private $location;
 
     /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var string|null
      */
     private $wrapOpeningTag;
@@ -83,10 +68,7 @@ final class ButtonHelper
      */
     private $wrapClosingTag;
 
-    /**
-     * @var string
-     */
-    private $groupType = self::TYPE_GROUP;
+    private string $groupType = self::TYPE_GROUP;
 
     /**
      * @var string|null
@@ -103,15 +85,9 @@ final class ButtonHelper
      */
     private $buttonCount = 0;
 
-    /**
-     * @var bool
-     */
-    private $buttonsFetched = false;
+    private bool $buttonsFetched = false;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private ?Request $request = null;
 
     /**
      * @var mixed
@@ -123,11 +99,11 @@ final class ButtonHelper
      */
     private $listMarker = 3;
 
-    public function __construct(Environment $twig, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
-    {
-        $this->twig       = $twig;
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private Environment $twig,
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
@@ -205,10 +181,8 @@ final class ButtonHelper
     /**
      * @param string $dropdownHtml
      * @param string $closingDropdownHtml
-     *
-     * @return string
      */
-    public function renderButtons($dropdownHtml = '', $closingDropdownHtml = '')
+    public function renderButtons($dropdownHtml = '', $closingDropdownHtml = ''): string
     {
         $this->fetchCustomButtons();
         $this->orderButtons();
@@ -263,7 +237,6 @@ final class ButtonHelper
      *
      * @param string $buttonCount
      * @param string $groupType
-     * @param null   $item
      *
      * @return $this
      */
@@ -284,10 +257,7 @@ final class ButtonHelper
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'buttons';
     }
@@ -295,14 +265,12 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      * @param int                 $buttonCount
-     *
-     * @return string
      */
-    private function buildButton($button, $buttonCount = 0)
+    private function buildButton($button, $buttonCount = 0): string
     {
         $buttons = '';
 
-        // Wrap links in a tag
+        // Wrap links in a <li> tag for dropdowns
         if (self::TYPE_DROPDOWN == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
@@ -312,35 +280,55 @@ final class ButtonHelper
             $button['attr'] = [];
         }
 
+        // Add or remove button classes based on group type
         if (self::TYPE_GROUP == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount < $this->listMarker)) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
         }
 
+        // Render confirm dialog if required
         if (isset($button['confirm'])) {
             $button['confirm']['btnTextAttr'] = $this->generateTextAttributes($button);
             $buttons .= $this->wrapOpeningTag.$this->twig->render('@MauticCore/Helper/confirm.html.twig', $button['confirm']).
                 "{$this->wrapClosingTag}\n";
         } else {
-            $attr = $this->menuLink;
-
+            // Default `data-toggle` for buttons
             if (!isset($button['attr']['data-toggle'])) {
                 $button['attr']['data-toggle'] = 'ajax';
             }
 
+            // Generate tooltip and other attributes
             $btnTextAttr = $this->generateTextAttributes($button);
             $tooltip     = $this->generateTooltipAttributes($button);
 
+            // Prepare attributes for the `<a>` tag
+            $attr = $this->menuLink;
             foreach ($button['attr'] as $k => $v) {
                 $attr .= " $k=".'"'.$v.'"';
             }
 
-            $buttonContent = (isset($button['iconClass'])) ? '<i class="'.$button['iconClass'].'"></i> ' : '';
+            // Add aria-label if btnText is set
             if (!empty($button['btnText'])) {
-                $buttonContent .= '<span'.$btnTextAttr.'>'.$this->translator->trans($button['btnText']).'</span>';
+                $attr .= ' aria-label="'.$this->translator->trans($button['btnText']).'"';
             }
-            $buttons .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltip}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
+
+            // Create button content without extra wrapping span
+            $buttonContent = '';
+
+            // Add icon with aria-hidden and focusable attributes
+            if (isset($button['iconClass'])) {
+                $iconTooltip = empty($button['btnText']) ? $tooltip : ''; // Attach tooltip to icon only if btnText is absent
+                $buttonContent .= '<i class="'.$button['iconClass'].'" aria-hidden="true" focusable="false"'.$iconTooltip.'></i> ';
+            }
+
+            // Add btnText if available, with tooltip if no icon exists or if btnText should carry it
+            if (!empty($button['btnText'])) {
+                $buttonContent .= '<span'.$btnTextAttr.$tooltip.'>'.$this->translator->trans($button['btnText']).'</span>';
+            }
+
+            // Build final button structure
+            $buttons .= "{$this->wrapOpeningTag}<a{$attr}>{$buttonContent}</a>{$this->wrapClosingTag}\n";
         }
 
         return $buttons;
@@ -375,7 +363,7 @@ final class ButtonHelper
 
         uasort(
             $this->buttons,
-            function ($a, $b) {
+            function ($a, $b): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : 0);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
@@ -438,10 +426,8 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return string
      */
-    private function generateTextAttributes(&$button)
+    private function generateTextAttributes(&$button): string
     {
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
@@ -460,10 +446,8 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return string
      */
-    private function generateTooltipAttributes($button)
+    private function generateTooltipAttributes($button): string
     {
         $tooltip = '';
         if (isset($button['tooltip'])) {
@@ -516,9 +500,9 @@ final class ButtonHelper
         if (!empty($addTo['btnClass'])) {
             $addTo['attr']['class'] = $addTo['btnClass'];
         } elseif (!isset($button['attr']['class'])) {
-            $addTo['attr']['class'] = 'btn btn-default';
+            $addTo['attr']['class'] = 'btn btn-tertiary';
         } elseif (!strstr($addTo['attr']['class'], 'btn-')) {
-            $addTo['attr']['class'] .= ' btn btn-default';
+            $addTo['attr']['class'] .= ' btn btn-ghost';
         }
 
         if (self::LOCATION_PAGE_ACTIONS == $this->location) {
@@ -545,7 +529,7 @@ final class ButtonHelper
         }
 
         $search = [
-            'btn-default',
+            'btn-ghost',
             'btn-primary',
             'btn-success',
             'btn-info',

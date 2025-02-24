@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigSaveEventTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $name        = 'name';
         $integration = $this->createMock(Integration::class);

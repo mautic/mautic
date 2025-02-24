@@ -13,14 +13,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
-    private TranslatorInterface $translator;
-    private MessageQueueModel $messageQueueModel;
-
-    public function __construct(TranslatorInterface $translator, MessageQueueModel $messageQueueModel, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->translator        = $translator;
-        $this->messageQueueModel = $messageQueueModel;
-
+    public function __construct(
+        private TranslatorInterface $translator,
+        private MessageQueueModel $messageQueueModel,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
@@ -75,5 +73,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Process sending of messages queue.';
 }

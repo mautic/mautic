@@ -10,30 +10,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TrackingSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * TrackingSubscriber constructor.
-     */
-    public function __construct(StatRepository $statRepository)
-    {
-        $this->statRepository = $statRepository;
+    public function __construct(
+        private StatRepository $statRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION => ['onIdentifyContact', 0],
         ];
     }
 
-    public function onIdentifyContact(ContactIdentificationEvent $event)
+    public function onIdentifyContact(ContactIdentificationEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 

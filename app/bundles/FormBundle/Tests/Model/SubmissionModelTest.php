@@ -47,137 +47,131 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|Environment
      */
-    private $twigMock;
+    private MockObject $twigMock;
 
     /**
      * @var MockObject|FormModel
      */
-    private $formModel;
+    private MockObject $formModel;
 
     /**
      * @var MockObject|PageModel
      */
-    private $pageModel;
+    private MockObject $pageModel;
 
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject|CampaignModel
      */
-    private $campaignModel;
+    private MockObject $campaignModel;
 
     /**
      * @var MockObject|MembershipManager
      */
-    private $membershipManager;
+    private MockObject $membershipManager;
 
     /**
      * @var MockObject|LeadFieldModel
      */
-    private $leadFieldModel;
+    private MockObject $leadFieldModel;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private $companyModel;
+    private MockObject $companyModel;
 
     /**
      * @var MockObject|FormFieldHelper
      */
-    private $fieldHelper;
+    private MockObject $fieldHelper;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|Translator
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var MockObject|DateHelper
-     */
-    private $dateHelper;
+    private DateHelper $dateHelper;
 
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelper;
+    private MockObject $userHelper;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject|SubmissionRepository
      */
-    private $submissioRepository;
+    private MockObject $submissioRepository;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private $leadRepository;
+    private MockObject $leadRepository;
 
     /**
      * @var MockObject|Logger
      */
-    private $mockLogger;
+    private MockObject $mockLogger;
 
     /**
      * @var MockObject|UploadFieldValidator
      */
-    private $uploadFieldValidatorMock;
+    private MockObject $uploadFieldValidatorMock;
 
     /**
      * @var MockObject|FormUploader
      */
-    private $formUploaderMock;
+    private MockObject $formUploaderMock;
 
     /**
      * @var MockObject|DeviceTrackingServiceInterface
      */
-    private $deviceTrackingService;
+    private MockObject $deviceTrackingService;
 
     /**
      * @var MockObject|UploadedFile
      */
-    private $file1Mock;
+    private MockObject $file1Mock;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private $router;
+    private MockObject $router;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|ContactMerger
      */
-    private $contactMerger;
+    private MockObject $contactMerger;
 
-    /**
-     * @var SubmissionModel
-     */
-    private $submissionModel;
+    private SubmissionModel $submissionModel;
 
     /**
      * @var \ReflectionClass<SubmissionModel>
      */
-    private $submissionModelReflection;
+    private \ReflectionClass $submissionModelReflection;
 
     protected function setUp(): void
     {
@@ -201,7 +195,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'Y-m-d',
             'H:i',
             $this->translator,
-            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class)
         );
         $this->userHelper               = $this->createMock(UserHelper::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
@@ -284,7 +278,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [\Mautic\LeadBundle\Entity\Lead::class, $this->leadRepository],
+                        [Lead::class, $this->leadRepository],
                         [Submission::class, $this->submissioRepository],
                     ]
                 )
@@ -345,7 +339,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->submissionModel->saveSubmission($post, $server, $form, $request));
     }
 
-    public function testNormalizeValues()
+    public function testNormalizeValues(): void
     {
         $reflection = new \ReflectionClass(SubmissionModel::class);
         $method     = $reflection->getMethod('normalizeValue');
@@ -444,7 +438,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->setUpExport();
         $response = $this->submissionModel->exportResults('csv', new Form(), []);
 
-        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertSame($response::class, \Symfony\Component\HttpFoundation\StreamedResponse::class);
         $this->assertStringContainsString('.csv', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }
@@ -454,7 +448,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->setUpExport();
         $response = $this->submissionModel->exportResults('xlsx', new Form(), []);
 
-        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertSame($response::class, \Symfony\Component\HttpFoundation\StreamedResponse::class);
         $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }
@@ -466,16 +460,14 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->any())
             ->method('trans')
             ->with($this->anything())
-            ->will($this->returnCallback(function ($text) use ($values) {
-                return match ($text) {
-                    'mautic.form.report.submission.id'  => $values[0],
-                    'mautic.lead.report.contact_id'     => $values[1],
-                    'mautic.form.result.thead.date'     => $values[2],
-                    'mautic.core.ipaddress'             => $values[3],
-                    'mautic.form.result.thead.referrer' => $values[4],
-                    'mautic.form.report.form_id'        => $values[5],
-                    default                             => null,
-                };
+            ->will($this->returnCallback(fn ($text) => match ($text) {
+                'mautic.form.report.submission.id'  => $values[0],
+                'mautic.lead.report.contact_id'     => $values[1],
+                'mautic.form.result.thead.date'     => $values[2],
+                'mautic.core.ipaddress'             => $values[3],
+                'mautic.form.result.thead.referrer' => $values[4],
+                'mautic.form.report.form_id'        => $values[5],
+                default                             => null,
             }));
     }
 

@@ -5,12 +5,9 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class SlotImageCardType.
- */
 class SlotImageCardType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'caption',
@@ -42,7 +39,7 @@ class SlotImageCardType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(
@@ -61,7 +58,7 @@ class SlotImageCardType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(

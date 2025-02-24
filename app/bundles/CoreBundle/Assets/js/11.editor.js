@@ -202,6 +202,8 @@ Mautic.MentionLinks =  function (editor) {
 
 /*
  * Customizes the way the list of user suggestions is displayed.
+ *
+ * @deprecated: will be removed in M6
  */
 Mautic.customItemRenderer = function (item) {
     let tokenId = item.id;
@@ -210,11 +212,9 @@ Mautic.customItemRenderer = function (item) {
     const idElement = document.createElement( 'span' );
     idElement.classList.add( 'custom-item-id' );
     itemElement.classList.add( 'custom-item' );
-    const tokenNameArr = tokenName.split(':');
 
-    if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
-    {
-        tokenId = tokenName =  tokenNameArr[1];
+    if (tokenName.startsWith('a:')) {
+        tokenName = tokenName.substring(2);
     }
 
     if (tokenId.match(/dwc=/i)){
@@ -230,6 +230,9 @@ Mautic.customItemRenderer = function (item) {
     return itemElement;
 }
 
+/*
+ * @deprecated: will be removed in M6
+ */
 Mautic.getFeedItems = function (queryText) {
     return new Promise( resolve => {
         setTimeout( () => {
@@ -281,8 +284,8 @@ Mautic.getCKEditorFonts = function(fonts) {
     const CKEditorFonts = [];
 
     for (let i = 0; i < fonts.length; i++) {
-        if ('undefined' != typeof fonts[i].name) {
-            CKEditorFonts.push(fonts[i].name);
+        if ('undefined' != typeof fonts[i].font) {
+            CKEditorFonts.push(fonts[i].font);
         }
     }
 
@@ -302,7 +305,23 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
 Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback) {
     const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
     const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
-
+    const ckEditorColors = [
+        { color: '#000000', label: 'Black' },
+        { color: '#4d4d4d', label: 'Dim grey' },
+        { color: '#999999', label: 'Grey' },
+        { color: '#e6e6e6', label: 'Light grey' },
+        { color: '#ffffff', label: 'White', hasBorder: true },
+        { color: '#e64c4c', label: 'Red' },
+        { color: '#e6994c', label: 'Orange' },
+        { color: '#e6e64c', label: 'Yellow' },
+        { color: '#99e64c', label: 'Light green' },
+        { color: '#4ce64c', label: 'Green' },
+        { color: '#4ce699', label: 'Aquamarine' },
+        { color: '#4ce6e6', label: 'Turquoise' },
+        { color: '#4c99e6', label: 'Light blue' },
+        { color: '#4c4ce6', label: 'Blue' },
+        { color: '#994ce6', label: 'Purple' }
+    ];
     const ckEditorOption = {
         toolbar: {
             items: ckEditorToolbar,
@@ -315,7 +334,47 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
         fontSize: {
             options: [8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48, 72],
             supportAllValues : true
-        }
+        },
+        fontColor: {
+            // Use 'hex' format for output instead of 'hsl' as it causes problems in emails
+            colorPicker: {
+                format: 'hex'
+            },
+            colors: ckEditorColors
+        },
+        fontBackgroundColor: {
+            // Use 'hex' format for output instead of 'hsl' as it causes problems in emails
+            colorPicker: {
+                format: 'hex'
+            },
+            colors: ckEditorColors
+        },
+        link: {
+            allowCreatingEmptyLinks: true, // allow creation of empty links, as it was before the 14.x update of cke5
+            decorators: {
+                // based on: https://ckeditor.com/docs/ckeditor5/latest/features/link.html#adding-target-and-rel-attributes-to-external-links
+                openInNewTab: {
+                    mode: 'manual',
+                    label: 'Open in a new tab',
+                    attributes: {
+                        target: '_blank',
+                        rel: 'noopener noreferrer'
+                    }
+                }
+            },
+            // You can use `s?` suffix like below to allow both `http` and `https` protocols at the same time.
+            allowedProtocols: [ 'https?', 'tel', 'sms', 'sftp', 'smb', 'slack' ]
+        },
+        htmlSupport: {
+            allow: [
+                {
+                    name: /^(a|span)$/,
+                    attributes: true,
+                    classes: true,
+                    styles: true
+                }
+            ],
+        },
     };
 
 

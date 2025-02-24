@@ -7,6 +7,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
@@ -185,7 +186,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             $event  = new CampaignExecutionEvent($args, true);
 
             /** @var EventDispatcherInterface $dispatcher */
-            $dispatcher = self::$container->get('event_dispatcher');
+            $dispatcher = static::getContainer()->get('event_dispatcher');
             $result     = $dispatcher->dispatch(
                 $event,
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
@@ -885,21 +886,23 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     public function testManipulatorSetOnCampaignTriggerAction(): void
     {
+        $campaignEvent = new Event();
+        $campaign      = new Campaign();
+        $campaignEvent->setCampaign($campaign);
         $lead = new Lead();
+        $log  = new LeadEventLog();
+        $log->setEvent($campaignEvent);
+
         $args = [
-            'lead'  => $lead,
-            'event' => [
-                'campaign'   => ['id' => 1],
-                'properties' => ['integration' => 'vTiger', 'config' => ['campaigns' => 1]],
-                'type'       => 'test',
-            ],
+            'lead'            => $lead,
+            'event'           => $campaignEvent,
             'eventDetails'    => null,
             'systemTriggered' => false,
             'eventSettings'   => [],
         ];
 
-        $event           = new CampaignExecutionEvent($args, false);
-        $eventDispatcher = self::$container->get('event_dispatcher');
+        $event           = new CampaignExecutionEvent($args, false, $log);
+        $eventDispatcher = static::getContainer()->get('event_dispatcher');
         $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
 
         $leadManipulator = $lead->getManipulator();

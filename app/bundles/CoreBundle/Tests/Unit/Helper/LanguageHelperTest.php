@@ -18,29 +18,30 @@ class LanguageHelperTest extends TestCase
     /**
      * @var PathsHelper&MockObject
      */
-    private $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var Logger&MockObject
      */
-    private $logger;
+    private MockObject $logger;
 
     /**
      * @var CoreParametersHelper&MockObject
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var Client&MockObject
      */
-    private $client;
+    private MockObject $client;
 
     /**
      * @var TranslatorInterface&MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
     private string $translationsPath;
+
     private string $tmpPath;
 
     protected function setUp(): void

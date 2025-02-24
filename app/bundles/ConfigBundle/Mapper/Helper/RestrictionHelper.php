@@ -6,10 +6,8 @@ class RestrictionHelper
 {
     /**
      * Ensure that the array has string indexes for congruency with a nested array similar to ['db_host', 'monitored_email' => ['EmailBundle_bounces'];.
-     *
-     * @return array
      */
-    public static function prepareRestrictions(array $restrictedParameters)
+    public static function prepareRestrictions(array $restrictedParameters): array
     {
         $prepared = [];
         foreach ($restrictedParameters as $key => $value) {
@@ -22,10 +20,8 @@ class RestrictionHelper
 
     /**
      * Remove fields that are restricted.
-     *
-     * @return array
      */
-    public static function applyRestrictions(array $configParameters, array $restrictedParameters, $restrictedParentKey = null)
+    public static function applyRestrictions(array $configParameters, array $restrictedParameters, $restrictedParentKey = null): array
     {
         if ($restrictedParentKey) {
             if (!isset($restrictedParameters[$restrictedParentKey])) {

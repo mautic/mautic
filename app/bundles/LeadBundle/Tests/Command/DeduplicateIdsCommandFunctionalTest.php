@@ -28,7 +28,7 @@ final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(6, $contactRepository->count([]));
 
-        $this->runCommand(DeduplicateIdsCommand::NAME, ['--contact-ids' => "{$contact1->getId()},{$contact2->getId()},{$contact3->getId()}"]);
+        $this->testSymfonyCommand(DeduplicateIdsCommand::NAME, ['--contact-ids' => "{$contact1->getId()},{$contact2->getId()},{$contact3->getId()}"]);
 
         Assert::assertSame(3, $contactRepository->count([]));
     }

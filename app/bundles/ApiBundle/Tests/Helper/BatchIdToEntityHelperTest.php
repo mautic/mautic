@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class BatchIdToEntityHelperTest extends TestCase
 {
-    public function testIdsAreExtractedFromIdKeyArray()
+    public function testIdsAreExtractedFromIdKeyArray(): void
     {
         $parameters = ['ids' => [1, 2, 3]];
         $helper     = new BatchIdToEntityHelper($parameters);
@@ -20,7 +20,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1, 2, 3], $helper->getIds());
     }
 
-    public function testIdsAreExtractedFromIdKeyCSVString()
+    public function testIdsAreExtractedFromIdKeyCSVString(): void
     {
         $parameters = ['ids' => '1,2,3'];
         $helper     = new BatchIdToEntityHelper($parameters);
@@ -34,7 +34,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([12], $helper->getIds());
     }
 
-    public function testErrorSetForIdKeyThatsNotRecognized()
+    public function testErrorSetForIdKeyThatsNotRecognized(): void
     {
         $parameters = ['ids' => 'foo'];
 
@@ -44,7 +44,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals(['mautic.api.call.id_missing'], $helper->getErrors());
     }
 
-    public function testIdsAreExtractedFromSimpleArray()
+    public function testIdsAreExtractedFromSimpleArray(): void
     {
         $parameters = [1, 2, 3];
         $helper     = new BatchIdToEntityHelper($parameters);
@@ -55,7 +55,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1, 2, 3], $helper->getIds());
     }
 
-    public function testIdsAreExtractedFromAssociativeArray()
+    public function testIdsAreExtractedFromAssociativeArray(): void
     {
         $parameters = [
             ['id' => 1, 'foo' => 'bar'],
@@ -74,7 +74,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1, 2, 3], $helper->getIds());
     }
 
-    public function testErrorsSetForAssociativeArrayWhenIdKeyIsNotFound()
+    public function testErrorsSetForAssociativeArrayWhenIdKeyIsNotFound(): void
     {
         $parameters = [
             ['id' => 1, 'foo' => 'bar'],
@@ -88,7 +88,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1 => 'mautic.api.call.id_missing'], $helper->getErrors());
     }
 
-    public function testOriginalKeyOrderingForIdKeyArray()
+    public function testOriginalKeyOrderingForIdKeyArray(): void
     {
         $entityMock1 = $this->createMock(Lead::class);
         $entityMock1->expects($this->once())
@@ -116,7 +116,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1, 2, 4], array_keys($orderedEntities));
     }
 
-    public function testOriginalKeyOrderingForIdKeyCSVString()
+    public function testOriginalKeyOrderingForIdKeyCSVString(): void
     {
         $entityMock1 = $this->createMock(Lead::class);
         $entityMock1->expects($this->never())
@@ -136,7 +136,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([0, 1, 2], array_keys($orderedEntities));
     }
 
-    public function testOriginalKeyOrderingForSimpleArray()
+    public function testOriginalKeyOrderingForSimpleArray(): void
     {
         $entityMock1 = $this->createMock(Lead::class);
         $entityMock1->expects($this->once())
@@ -164,7 +164,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1, 2, 4], array_keys($orderedEntities));
     }
 
-    public function testOriginalKeyOrderingForAssociativeArray()
+    public function testOriginalKeyOrderingForAssociativeArray(): void
     {
         $entityMock1 = $this->createMock(Lead::class);
         $entityMock1->expects($this->once())
@@ -202,7 +202,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1, 2, 4], array_keys($orderedEntities));
     }
 
-    public function testOriginalKeyOrderingForFullAssociativeArray()
+    public function testOriginalKeyOrderingForFullAssociativeArray(): void
     {
         $entityMock1 = $this->createMock(Lead::class);
         $entityMock1

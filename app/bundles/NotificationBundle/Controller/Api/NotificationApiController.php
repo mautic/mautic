@@ -26,14 +26,21 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class NotificationApiController extends CommonApiController
 {
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, ContactTracker $contactTracker, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
-    {
-        $this->contactTracker = $contactTracker;
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        protected ContactTracker $contactTracker,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
         $notificationModel    = $modelFactory->getModel('notification');
         \assert($notificationModel instanceof NotificationModel);
 
@@ -47,10 +54,8 @@ class NotificationApiController extends CommonApiController
 
     /**
      * Receive Web Push subscription request.
-     *
-     * @return JsonResponse
      */
-    public function subscribeAction(Request $request)
+    public function subscribeAction(Request $request): JsonResponse
     {
         $osid = $request->get('osid');
         if ($osid) {

@@ -14,28 +14,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LanguageHelper
 {
     private string $cacheFile;
-    private Client $client;
-    private PathsHelper $pathsHelper;
-    private LoggerInterface $logger;
+
     private Installer $installer;
-    private CoreParametersHelper $coreParametersHelper;
-    private TranslatorInterface $translator;
+
     private array $supportedLanguages = [];
+
     private string $installedTranslationsDirectory;
+
     private string $defaultTranslationsDirectory;
 
     public function __construct(
-        PathsHelper $pathsHelper,
-        LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper,
-        Client $client,
-        TranslatorInterface $translator
+        private PathsHelper $pathsHelper,
+        private LoggerInterface $logger,
+        private CoreParametersHelper $coreParametersHelper,
+        private Client $client,
+        private TranslatorInterface $translator
     ) {
-        $this->pathsHelper                    = $pathsHelper;
-        $this->logger                         = $logger;
-        $this->coreParametersHelper           = $coreParametersHelper;
-        $this->client                         = $client;
-        $this->translator                     = $translator;
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
         $this->installer                      = new Installer($this->installedTranslationsDirectory);
@@ -44,6 +38,9 @@ class LanguageHelper
         $this->cacheFile = $pathsHelper->getSystemPath('cache').'/../languageList.txt';
     }
 
+    /**
+     * @return array<string>
+     */
     public function getSupportedLanguages(): array
     {
         if (!empty($this->supportedLanguages)) {
@@ -59,10 +56,8 @@ class LanguageHelper
      * Extracts a downloaded package for the specified language.
      *
      * This will attempt to download the package if it is not found
-     *
-     * @return array
      */
-    public function extractLanguagePackage($languageCode)
+    public function extractLanguagePackage($languageCode): array
     {
         $packagePath = $this->pathsHelper->getSystemPath('cache').'/'.$languageCode.'.zip';
 
@@ -81,29 +76,13 @@ class LanguageHelper
         $archive = $zipper->open($packagePath);
 
         if (true !== $archive) {
-            // Get the exact error
-            switch ($archive) {
-                case \ZipArchive::ER_EXISTS:
-                    $error = 'mautic.core.update.archive_file_exists';
-                    break;
-                case \ZipArchive::ER_INCONS:
-                case \ZipArchive::ER_INVAL:
-                case \ZipArchive::ER_MEMORY:
-                    $error = 'mautic.core.update.archive_zip_corrupt';
-                    break;
-                case \ZipArchive::ER_NOENT:
-                    $error = 'mautic.core.update.archive_no_such_file';
-                    break;
-                case \ZipArchive::ER_NOZIP:
-                    $error = 'mautic.core.update.archive_not_valid_zip';
-                    break;
-                case \ZipArchive::ER_READ:
-                case \ZipArchive::ER_SEEK:
-                case \ZipArchive::ER_OPEN:
-                default:
-                    $error = 'mautic.core.update.archive_could_not_open';
-                    break;
-            }
+            $error = match ($archive) {
+                \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
+                \ZipArchive::ER_INCONS, \ZipArchive::ER_INVAL, \ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
+                \ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
+                \ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
+                default               => 'mautic.core.update.archive_could_not_open',
+            };
 
             return [
                 'error'   => true,
@@ -226,14 +205,19 @@ class LanguageHelper
      * Fetches a language package from the remote server.
      *
      * @param string $languageCode
-     *
-     * @return array
      */
-    public function fetchPackage($languageCode)
+    public function fetchPackage($languageCode): array
     {
         // Check if we have a cache file, generate it if not
         if (!is_readable($this->cacheFile)) {
             $this->fetchLanguages();
+        }
+
+        if (!is_readable($this->cacheFile)) {
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.language.helper.error.fetching.languages',
+            ];
         }
 
         $cacheData = json_decode(file_get_contents($this->cacheFile), true);
@@ -357,7 +341,7 @@ class LanguageHelper
         }
     }
 
-    private function loadSupportedLanguages()
+    private function loadSupportedLanguages(): void
     {
         // Find available translations
         $finder = new Finder();
@@ -380,5 +364,26 @@ class LanguageHelper
             $config                            = json_decode(file_get_contents($configFile), true);
             $this->supportedLanguages[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
         }
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getLanguageChoices(): array
+    {
+        // Get the list of available languages
+        $languages   = $this->fetchLanguages(false, false);
+        $choices     = [];
+
+        foreach ($languages as $code => $langData) {
+            $choices[$langData['name']] = $code;
+        }
+
+        $choices = array_merge($choices, array_flip($this->getSupportedLanguages()));
+
+        // Alpha sort the languages by name
+        ksort($choices, SORT_FLAG_CASE | SORT_NATURAL);
+
+        return $choices;
     }
 }

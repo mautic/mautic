@@ -13,8 +13,6 @@ class TablePrefix
     protected $prefix = '';
 
     /**
-     * TablePrefix constructor.
-     *
      * @param string $prefix
      */
     public function __construct($prefix)
@@ -22,7 +20,7 @@ class TablePrefix
         $this->prefix = (string) $prefix;
     }
 
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
     {
         /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $eventArgs->getClassMetadata();
@@ -37,7 +35,7 @@ class TablePrefix
         }
     }
 
-    private function addPrefixToIndexes($prefix, array &$table, $key)
+    private function addPrefixToIndexes($prefix, array &$table, $key): void
     {
         if (!isset($table[$key])) {
             return;

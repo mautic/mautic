@@ -6,14 +6,8 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ApiPermissions.
- */
 class ApiPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -26,18 +20,12 @@ class ApiPermissions extends AbstractPermissions
         $this->addStandardPermissions('clients', false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'api';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $builder->add(
             'api:access',
@@ -56,9 +44,6 @@ class ApiPermissions extends AbstractPermissions
         $this->addStandardFormFields('api', 'clients', $builder, $data, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValue($name, $perm)
     {
         // ensure api is enabled system wide
@@ -69,17 +54,11 @@ class ApiPermissions extends AbstractPermissions
         return parent::getValue($name, $perm);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return !empty($this->params['api_enabled']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getSynonym($name, $level)
     {
         if ('access' == $name && 'granted' == $level) {

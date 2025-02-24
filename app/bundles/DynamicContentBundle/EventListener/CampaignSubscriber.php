@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -11,36 +12,21 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DynamicContentModel
-     */
-    private $dynamicContentModel;
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(DynamicContentModel $dynamicContentModel, SessionInterface $session, EventDispatcherInterface $dispatcher)
-    {
-        $this->dynamicContentModel = $dynamicContentModel;
-        $this->session             = $session;
-        $this->dispatcher          = $dispatcher;
+    public function __construct(
+        private DynamicContentModel $dynamicContentModel,
+        protected CacheProvider $cache,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['onCampaignBuild', 0],
@@ -49,7 +35,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'dwc.push_content',
@@ -93,7 +79,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return bool|CampaignExecutionEvent
+     * @return false|CampaignExecutionEvent
+     *
+     * @throws InvalidArgumentException
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
@@ -115,7 +103,11 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
         }
 
-        $this->session->set('dwc.slot_name.lead.'.$lead->getId(), $eventDetails);
+        /** @var CacheItemInterface $item */
+        $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
+        $item->set($eventDetails);
+        $item->expiresAfter(86400); // one day in seconds
+        $this->cache->save($item);
 
         $event->stopPropagation();
 
@@ -126,7 +118,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
-        $slot        = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
+        /* @var CacheItemInterface $item */
+        $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
+        $slot = $item->get();
 
         $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
 
@@ -138,9 +132,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
             }
 
-            $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+            $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+            $tokenEvent->setStat($stat);
             $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
             $content = $tokenEvent->getContent();

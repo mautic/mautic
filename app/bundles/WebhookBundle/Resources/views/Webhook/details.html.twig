@@ -1,5 +1,21 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
+{% block indexButton %}
+{{- include(
+    '@MauticCore/Helper/page_actions.html.twig', {
+        item: item,
+        templateButtons: {
+            'close': securityHasEntityAccess(
+                permissions['webhook:webhooks:viewown'],
+                permissions['webhook:webhooks:viewother'],
+                item.getCreatedBy()
+            ),
+        },
+        routeBase: 'webhook',
+        'targetLabel': 'mautic.webhook.webhooks'|trans
+}) -}}
+{% endblock %}
+
 {% block headerTitle %}{{ item.getName() }}{% endblock %}
 {% block mauticContent %}mauticWebhook{% endblock %}
 
@@ -28,25 +44,8 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
-            <!-- page detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10">
-                        <div class="text-muted">{{ item.getDescription()|purify }}</div>
-                    </div>
-                    <div class="col-xs-2 text-right">
-                        {{- include(
-                            '@MauticCore/Helper/page_actions.html.twig', {
-                                entity: item
-                            }
-                        ) }}
-                    </div>
-                </div>
-            </div>
-            <!--/ page detail header -->
-        </div>
+    <div class="col-md-9 height-auto">
+        {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
         <div class="pa-md">
             <div class="row">
                 <div class="col-md-12">
@@ -61,7 +60,7 @@
                             </p>
                         </div>
                     {% else %}
-                        <table class="table table-responsive table-striped">
+                        <table class="table table-responsive">
                             <thead>
                                 <tr>
                                     <th>
@@ -112,9 +111,9 @@
     </div>
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{% trans %}mautic.webhook.webhook_url{% endtrans %}</div>
             </div>
@@ -123,9 +122,17 @@
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
                            value="{{ item.getWebhookUrl()|escape('html_attr') }}" />
                     <span class="input-group-btn">
-                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ item.getWebhookUrl()|escape('html_attr') }}', '_blank');">
-                            <i class="fa fa-external-link"></i>
-                        </button>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.core.open_link',
+                                    variant: 'ghost',
+                                    icon_only: true,
+                                    icon: 'ri-external-link-line',
+                                    onclick: 'window.open("' ~ item.getWebhookUrl()|escape('html_attr') ~ '", "_blank");',
+                                }
+                            ]
+                        } %}
                     </span>
                 </div>
             </div>

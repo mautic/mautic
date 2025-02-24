@@ -5,12 +5,10 @@ namespace Mautic\DashboardBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
 
-/**
- * Class WidgetFormEvent.
- */
 class WidgetFormEvent extends CommonEvent
 {
     protected $form;
+
     protected $type;
 
     /**
@@ -18,7 +16,7 @@ class WidgetFormEvent extends CommonEvent
      *
      * @param string $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -38,15 +36,13 @@ class WidgetFormEvent extends CommonEvent
      *
      * @param string $form
      */
-    public function setForm($form)
+    public function setForm($form): void
     {
         $this->form = $form;
     }
 
     /**
      * Returns the widget edit form.
-     *
-     * @param string $form
      */
     public function getForm()
     {

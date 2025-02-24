@@ -27,7 +27,7 @@ class CompanyLead
      */
     private $primary = false;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -60,7 +60,7 @@ class CompanyLead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date)
+    public function setDateAdded($date): void
     {
         $this->dateAdded = $date;
     }
@@ -76,7 +76,7 @@ class CompanyLead
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -100,7 +100,7 @@ class CompanyLead
     /**
      * @param Company $company
      */
-    public function setCompany($company)
+    public function setCompany($company): void
     {
         $this->company = $company;
     }
@@ -108,7 +108,7 @@ class CompanyLead
     /**
      * @param bool $primary
      */
-    public function setPrimary($primary)
+    public function setPrimary($primary): void
     {
         $this->primary = $primary;
     }

@@ -321,10 +321,6 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
-                return trim($td->text());
-            });
-        });
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
     }
 }

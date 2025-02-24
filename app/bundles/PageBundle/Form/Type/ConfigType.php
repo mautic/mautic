@@ -8,11 +8,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class ConfigType.
+ * @extends AbstractType<array<mixed>>
  */
 class ConfigType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'cat_in_page_url',
@@ -32,6 +32,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.page.config.form.google.analytics',
                 'label_attr' => ['class' => 'control-label'],
+                'data'       => htmlspecialchars_decode((string) $options['data']['google_analytics']),
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.config.form.google.analytics.tooltip',
@@ -42,9 +43,6 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pageconfig';

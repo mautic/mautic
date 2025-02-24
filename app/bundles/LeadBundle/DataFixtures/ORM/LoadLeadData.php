@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -15,20 +14,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-    }
-
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var LeadRepository $leadRepo */
         $leadRepo        = $manager->getRepository(Lead::class);
@@ -44,7 +30,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
             $lead = new Lead();
             $lead->setDateAdded($today);
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($l['ip'], $this->coreParametersHelper->get('parameters'));
+            $ipAddress->setIpAddress($l['ip']);
             $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);

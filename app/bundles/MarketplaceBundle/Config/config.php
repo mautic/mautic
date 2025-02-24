@@ -39,7 +39,7 @@ return [
     'services' => [
         'permissions' => [
             'marketplace.permissions' => [
-                'class'     => \Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class,
+                'class'     => Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'marketplace.service.config',
@@ -48,7 +48,7 @@ return [
         ],
         'api' => [
             'marketplace.api.connection' => [
-                'class'     => \Mautic\MarketplaceBundle\Api\Connection::class,
+                'class'     => Mautic\MarketplaceBundle\Api\Connection::class,
                 'arguments' => [
                     'mautic.http.client',
                     'monolog.logger.mautic',
@@ -57,24 +57,24 @@ return [
         ],
         'other' => [
             'marketplace.service.plugin_collector' => [
-                'class'     => \Mautic\MarketplaceBundle\Service\PluginCollector::class,
+                'class'     => Mautic\MarketplaceBundle\Service\PluginCollector::class,
                 'arguments' => [
                     'marketplace.api.connection',
                     'marketplace.service.allowlist',
                 ],
             ],
             'marketplace.service.route_provider' => [
-                'class'     => \Mautic\MarketplaceBundle\Service\RouteProvider::class,
+                'class'     => RouteProvider::class,
                 'arguments' => ['router'],
             ],
             'marketplace.service.config' => [
-                'class'     => \Mautic\MarketplaceBundle\Service\Config::class,
+                'class'     => Config::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
             'marketplace.service.allowlist' => [
-                'class'     => \Mautic\MarketplaceBundle\Service\Allowlist::class,
+                'class'     => Mautic\MarketplaceBundle\Service\Allowlist::class,
                 'arguments' => [
                     'marketplace.service.config',
                     'mautic.cache.provider',
