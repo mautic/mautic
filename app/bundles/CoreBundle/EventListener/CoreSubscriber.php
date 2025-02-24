@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\Model\UserModel;
@@ -19,8 +17,6 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -33,42 +29,22 @@ class CoreSubscriber implements EventSubscriberInterface
         private BundleHelper $bundleHelper,
         private MenuHelper $menuHelper,
         private UserHelper $userHelper,
-        private AssetsHelper $assetsHelper,
         private CoreParametersHelper $coreParametersHelper,
         private AuthorizationCheckerInterface $securityContext,
         private UserModel $userModel,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
-        private FormRepository $formRepository,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::CONTROLLER => [
-                ['onKernelRequestAddGlobalJS', 0],
-            ],
             CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
             CoreEvents::BUILD_ROUTE           => ['onBuildRoute', 0],
             CoreEvents::FETCH_ICONS           => ['onFetchIcons', 9999],
             SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0],
         ];
-    }
-
-    /**
-     * Add mauticForms in js script tag for Froala.
-     */
-    public function onKernelRequestAddGlobalJS(ControllerEvent $event): void
-    {
-        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMainRequest()) {
-            return;
-        }
-
-        $list        = $this->formRepository->getSimpleList();
-        $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
-
-        $this->assetsHelper->addScriptDeclaration("var mauticForms = {$mauticForms};");
     }
 
     /**

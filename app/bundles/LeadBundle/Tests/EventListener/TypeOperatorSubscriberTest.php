@@ -154,7 +154,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->categoryModel->expects($this->once())
             ->method('getLookupResults')
-            ->with('global')
+            ->with('global', '', 300)
             ->willReturn([['title' => 'Category E', 'id' => 66]]);
 
         $this->emailModel->expects($this->once())

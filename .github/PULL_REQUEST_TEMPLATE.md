@@ -12,11 +12,11 @@ c = future major release
 
 | Q                                      | A
 | -------------------------------------- | ---
-| Bug fix? (use the a.b branch)          | 🔴🟢 <!-- Use emojis to indicate positive (green) or negative (red) for each item in the table. -->
-| New feature/enhancement? (use the a.x branch)      | 🔴🟢
-| Deprecations?                          | 🔴🟢
-| BC breaks? (use the c.x branch)        | 🔴🟢
-| Automated tests included?              | 🔴🟢 <!-- All PRs must maintain or improve code coverage -->
+| Bug fix? (use the a.b branch)          | ✔️❌ <!-- Use emojis to indicate positive (green) or negative (red) for each item in the table. -->
+| New feature/enhancement? (use the a.x branch)      | ✔️❌
+| Deprecations?                          | ✔️❌
+| BC breaks? (use the c.x branch)        | ✔️❌
+| Automated tests included?              | ✔️❌ <!-- All PRs must maintain or improve code coverage -->
 | Related user documentation PR URL      | mautic/user-documentation#... <!-- required for new features -->
 | Related developer documentation PR URL | mautic/developer-documentation-new#... <!-- required for developer-facing changes -->
 | Issue(s) addressed                     | Fixes #... <!-- prefix each issue number with "Fixes #", no need to create an issue if none exists, explain below instead -->

@@ -28,7 +28,6 @@
 
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/css/libraries/**/*.css
-/app/bundles/CoreBundle/Assets/css/libraries/Froala/plugins/*.css
 !/app/bundles/CoreBundle/Assets/css/libraries/builder.css
 !/app/bundles/CoreBundle/Assets/css/*.css
 
@@ -91,6 +90,7 @@
 !/media/images/mejs
 !/media/images/apple-touch-icon.png
 !/media/images/avatar.png
+!/media/images/placeholder*
 !/media/images/favicon.ico
 !/media/images/mautic_logo*
 !/media/images/.htaccess
@@ -127,15 +127,12 @@ tests/**/*.sql
 !/themes/aurora
 !/themes/blank
 !/themes/cards
-!/themes/coffee
 !/themes/confirmme
 !/themes/fresh-center
 !/themes/fresh-fixed
 !/themes/fresh-left
 !/themes/fresh-wide
 !/themes/goldstar
-!/themes/Mauve
-!/themes/nature
 !/themes/neopolitan
 !/themes/oxygen
 !/themes/skyline

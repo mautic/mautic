@@ -197,7 +197,10 @@ return [
     ],
 
     'categories' => [
-        'plugin:mauticSocial' => 'mautic.social.monitoring',
+        'plugin:mauticSocial' => [
+            'label' => 'mautic.social.monitoring',
+            'class' => MauticPlugin\MauticSocialBundle\Entity\Monitoring::class,
+        ],
     ],
 
     'twitter' => [

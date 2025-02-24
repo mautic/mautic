@@ -42,6 +42,7 @@
     right: 8px;
     bottom: 10px;
     z-index: 1;
+    height: fit-content;
 }
 #mauticforms_fields .chosen-container-single .chosen-search input[type="text"] {
     width: 100%;

@@ -1,0 +1,184 @@
+{% extends "@themes/"~template~"/html/base.html.twig" %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="wrapper--content">
+        <img class="logo--medium" src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+        <div class="h3">
+            <p>Confirm attendance</p>
+        </div>
+        <div class="subtitle subtitle--header">
+            <p>Fill your information to check in for the event</p>
+        </div>
+        <div style="padding: 10px;">
+            <p>{form=INSERT_FORM_ID_HERE}</p>
+        </div>
+        <div class="subtitle subtitle--footer">
+            <p>By submitting this form, you agree to our <a href="https://">privacy policy</a> and consent to the processing of your personal data. You can withdraw your consent at any time.</p>
+        </div>
+    </div>
+</div>
+<style>
+    @font-face {
+    font-family: 'Syne';
+    src: url("{{ getAssetUrl('themes/'~template~'/assets/syne-v22-latin-500.woff2', null, null, true) }}") format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    }
+
+    @font-face {
+    font-family: 'Syne';
+    src: url("{{ getAssetUrl('themes/'~template~'/assets/syne-v22-latin-700.woff2', null, null, true) }}") format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    }
+
+    * {
+        font-family: 'Syne', sans-serif;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    p {
+        margin: 0;
+        padding: 0;
+        line-height: 1.4em;
+    }
+
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        gap: 20px;
+        flex-wrap: wrap;
+        background-color: bisque;
+    }
+
+    .wrapper--content {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        border-radius: 24px;
+        background-color: #F7F1ED;
+        padding: 65px 15px;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        font-size: 12px;
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    }
+
+    .sidebar--right {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        width: 100%;
+        max-width: 100%;
+        min-width: 290px;
+        height: auto;
+        min-height: 200px;
+        margin: 0;
+        padding: 100px 15px;
+        background-repeat: repeat;
+        background-position: center center;
+        background-attachment: scroll;
+        background-size: cover;
+        background-image: url({{ getAssetUrl('themes/'~template~'/assets/mymind-3dmu0gu23uc-unsplash.jpg', null, null, true) }});
+        border-radius: 44px 0px 44px 0px;
+    }
+
+    .wrapper--content .mauticform_wrapper {
+        margin: 0;
+    }
+
+    .wrapper--content .mauticform-button-wrapper {
+        text-align: center;
+    }
+
+    .h3 {
+        padding: 0 10px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        display: flex;
+        font-size: 27px;
+        max-width: fit-content;
+        font-weight: bold;
+        text-align: center;
+        align-self: center;
+    }
+
+    .h3 p {
+        line-height: 1em;
+    }
+
+    .subtitle {
+        padding: 0 10px;
+        font-size: 13px;
+        color: #525252;
+        margin: 0;
+        display: flex;
+        width: 100%;
+        max-width: fit-content;
+        align-self: center;
+    }
+
+    .subtitle.subtitle--header {
+        margin-bottom: 40px;
+    }
+
+    .subtitle.subtitle--footer {
+        margin-top: 60px;
+    }
+
+    .logo--medium {
+        padding: 0 10px;
+        height: 50px;
+        width: fit-content;
+        align-self: center;
+    }
+
+    /* Media Queries for Larger Screens */
+
+    /* Tablet and Up */
+    @media (min-width: 768px) {
+        .wrapper {
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 100px;
+            padding: 40px;
+        }
+
+        .wrapper--content {
+            width: 30%;
+            min-width: 420px;
+            max-width: 480px;
+            padding: 50px 35px;
+        }
+
+        .sidebar--right {
+            width: 50%;
+            padding: 50px;
+            align-self: stretch;
+        }
+
+        .h3 {
+            font-size: 37px;
+        }
+
+        .subtitle {
+            max-width: fit-content;
+        }
+    }
+</style>
+{% endblock %}

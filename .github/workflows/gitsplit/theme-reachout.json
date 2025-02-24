@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-reachout",
+            "directory": "themes/reachout",
+            "target": "git@github.com:mautic/theme-reachout.git"
+        }
+    ]
+}

@@ -3,7 +3,6 @@
   "author": "Mautic team based on a theme by Sendwithus",
   "authorUrl": "https://www.sendwithus.com/resources/templates/goldstar",
   "features": [
-    "email",
-    "form"
+    "email"
   ]
 }
