@@ -653,7 +653,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotNull($emailB->getId());
         $this->assertNotNull($emailC->getId());
 
-        // Perform batch delete action for contact A.
+        // Perform batch delete action for Email A.
         $this->client->request('POST', sprintf('/s/emails/batchDelete?ids=["%s"]', $emailA->getId()));
         // Assert response is correct.
         $response = $this->client->getResponse();

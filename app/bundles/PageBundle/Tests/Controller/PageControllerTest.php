@@ -304,4 +304,39 @@ class PageControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         Assert::assertTrue($response->isOk());
     }
+
+    public function testBatchDeleteAction(): void
+    {
+        $pageA = $this->createTestPage([
+            'title' => 'Page A',
+            'alias' => 'page_a',
+        ]);
+        $pageB = $this->createTestPage([
+            'title' => 'Page B',
+            'alias' => 'page_b',
+        ]);
+        $pageC = $this->createTestPage([
+            'title' => 'Page C',
+            'alias' => 'page_c',
+        ]);
+        $this->assertNotNull($pageA->getId());
+        $this->assertNotNull($pageB->getId());
+        $this->assertNotNull($pageC->getId());
+
+        // Perform batch delete action for Page A.
+        $this->client->request(Request::METHOD_POST, sprintf('/s/pages/batchDelete?ids=["%s"]', $pageA->getId()));
+        // Assert response is correct.
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $pages      = $this->em->getRepository(Page::class)->findAll();
+        $pageTitles = array_map(function ($form) {return $form->getTitle(); }, $pages);
+        $this->assertNotContains($pageA->getTitle(), $pageTitles);
+        $this->assertContains($pageB->getTitle(), $pageTitles);
+        $this->assertContains($pageC->getTitle(), $pageTitles);
+        // Perform batch delete action for all.
+        $this->client->request('POST', '/s/pages/batchDelete?ids=all');
+        // Assert that all pages have been deleted.
+        $pages = $this->em->getRepository(Page::class)->findAll();
+        $this->assertCount(0, $pages);
+    }
 }
