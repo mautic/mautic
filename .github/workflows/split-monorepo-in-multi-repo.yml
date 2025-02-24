@@ -84,6 +84,7 @@ jobs:
                     - theme-welcome
                     - theme-attract
                     - theme-creative
+                    - theme-reachout
                     - theme-blend
                     - theme-mono
                     - theme-capture

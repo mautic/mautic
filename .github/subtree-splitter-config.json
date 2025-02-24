@@ -231,6 +231,11 @@
             "target": "git@github.com:mautic/theme-creative.git"
         },
         {
+            "name": "theme-reachout",
+            "directory": "themes/reachout",
+            "target": "git@github.com:mautic/theme-reachout.git"
+        },
+        {
             "name": "theme-blend",
             "directory": "themes/blend",
             "target": "git@github.com:mautic/theme-blend.git"

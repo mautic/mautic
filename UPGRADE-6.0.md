@@ -82,6 +82,9 @@ As the legacy builder was removed these JS libraries were removed as well:
 - `updateSession` was removed from `Mautic\PageBundle\Helper\TrackingHelper` No session for anonymous users. Use `updateCacheItem`.
 - `getNewVsReturningPieChartData` was removed from `Mautic\PageBundle\Model\PageModel`. Use `getUniqueVsReturningPieChartData()` instead.
 - Replaced the `tightenco/collect:^8.16.0` package with `illuminate/collections:^10.48`.
+- Form submissions now store data without HTML entity encoding instead of with encoded entities (e.g., `R&R` instead of `R&#x26;R`)
+- `FormFieldHelper::getTypes` signature has been changed
+- `FormFieldHelper::getFieldFilter` signature has been changed and now returns `string` filter by default
 
 ## Most notable changes required by Symfony 6
 

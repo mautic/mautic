@@ -235,10 +235,10 @@ class SubmissionModel extends CommonFormModel
                         } elseif (is_callable($params['valueFilter'])) {
                             $value = call_user_func_array($params['valueFilter'], [$f, $value]);
                         } else {
-                            $value = InputHelper::_($value, 'clean');
+                            $value = InputHelper::_($value, 'string');
                         }
                     } else {
-                        $value = InputHelper::_($value, 'clean');
+                        $value = InputHelper::_($value, 'string');
                     }
                 }
             } elseif (!empty($value)) {
