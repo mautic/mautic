@@ -6209,7 +6209,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "ee07931ff37f532acd4a2a36213e8f5a4a569cb9"
+                "reference": "eabbf65f642f7e25813e18f21299057b4959fc7b"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6315,7 +6315,6 @@
                     "file-mapping": {
                         "[project-root]/.env": "assets/scaffold/files/.env",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
-                        "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
                         "[project-root]/webpack.config.js": "assets/scaffold/files/webpack.config.js",
                         "[project-root]/tsconfig.json": "assets/scaffold/files/tsconfig.json",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
