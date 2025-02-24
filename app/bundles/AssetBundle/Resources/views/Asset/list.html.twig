@@ -199,6 +199,7 @@
                                 {{ item.getTitle() }} ({{ item.getAlias() }})
                             </a>
                             <i class="{{ item.getIconClass() }}"></i>
+                            {{ customContent('asset.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}

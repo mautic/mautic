@@ -71,6 +71,7 @@
                             {% else %}
                                 {{ item.name }}
                             {% endif %}
+                            {{ customContent('point.name', _context) }}
                         </div>
                         {% if item.description is not empty %}
                             <div class="text-secondary mt-4">

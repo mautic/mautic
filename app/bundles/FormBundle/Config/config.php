@@ -136,7 +136,9 @@ return [
     ],
 
     'categories' => [
-        'form' => null,
+        'form' => [
+            'class' => Mautic\FormBundle\Entity\Form::class,
+        ],
     ],
 
     'services' => [

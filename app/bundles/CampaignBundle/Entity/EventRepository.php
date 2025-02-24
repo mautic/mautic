@@ -370,6 +370,23 @@ class EventRepository extends CommonRepository
     }
 
     /**
+     * Update the failed count using DBAL to avoid
+     * race conditions and deadlocks.
+     */
+    public function decreaseFailedCount(Event $event): void
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('failed_count', 'failed_count - 1')
+            ->where($q->expr()->eq('id', ':id'))
+            ->andWhere($q->expr()->gt('failed_count', 0))
+            ->setParameter('id', $event->getId());
+
+        $q->executeStatement();
+    }
+
+    /**
      * Get the up to date failed count
      * for the given Event.
      */
@@ -400,5 +417,21 @@ class EventRepository extends CommonRepository
             ->setParameter('campaignId', $campaign->getId());
 
         $q->executeStatement();
+    }
+
+    /**
+     * Get the count of failed event for Lead/Event.
+     */
+    public function getFailedCountLeadEvent(int $leadId, int $eventId): int
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(le.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
+            ->innerJoin('le', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')
+            ->where('le.lead_id = :leadId')
+            ->andWhere('le.event_id = :eventId')
+            ->setParameters(['leadId' => $leadId, 'eventId' => $eventId]);
+
+        return (int) $q->executeQuery()->fetchOne();
     }
 }

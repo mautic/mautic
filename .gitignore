@@ -91,6 +91,7 @@
 !/media/images/mejs
 !/media/images/apple-touch-icon.png
 !/media/images/avatar.png
+!/media/images/placeholder*
 !/media/images/favicon.ico
 !/media/images/mautic_logo*
 !/media/images/.htaccess
@@ -127,15 +128,12 @@ tests/**/*.sql
 !/themes/aurora
 !/themes/blank
 !/themes/cards
-!/themes/coffee
 !/themes/confirmme
 !/themes/fresh-center
 !/themes/fresh-fixed
 !/themes/fresh-left
 !/themes/fresh-wide
 !/themes/goldstar
-!/themes/Mauve
-!/themes/nature
 !/themes/neopolitan
 !/themes/oxygen
 !/themes/skyline
