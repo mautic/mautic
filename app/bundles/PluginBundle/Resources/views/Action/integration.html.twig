@@ -1,0 +1,17 @@
+{% extends '@MauticForm/Action/base_form_action.html.twig' %}
+
+{% block action_label %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [
+            {
+                label: action.properties.integration,
+                icon: 'ri-plug-line',
+                color: 'warm-gray',
+                attributes: securityIsGranted('plugin:plugins:manage') ? {
+                href: path('mautic_plugin_index'),
+                'target': '_blank'
+            } : {}
+            }
+        ]
+    } %}
+{% endblock %}

@@ -4,7 +4,6 @@
   "authorUrl": "https://www.sendwithus.com/resources/templates/skyline",
   "features": [
     "page",
-    "email",
-    "form"
+    "email"
   ]
 }
