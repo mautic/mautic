@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
@@ -49,7 +48,6 @@ final class AssetsHelper
 
     public function __construct(
         private Packages $packages,
-        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

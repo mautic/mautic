@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\Model\UserModel;
@@ -31,13 +29,11 @@ class CoreSubscriber implements EventSubscriberInterface
         private BundleHelper $bundleHelper,
         private MenuHelper $menuHelper,
         private UserHelper $userHelper,
-        private AssetsHelper $assetsHelper,
         private CoreParametersHelper $coreParametersHelper,
         private AuthorizationCheckerInterface $securityContext,
         private UserModel $userModel,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
-        private FormRepository $formRepository,
     ) {
     }
 

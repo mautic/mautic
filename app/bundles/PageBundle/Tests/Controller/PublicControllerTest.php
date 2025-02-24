@@ -231,13 +231,13 @@ class PublicControllerTest extends MauticMysqlTestCase
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $assetHelper = new AssetsHelper($packagesMock, $coreParametersHelper);
+        $assetHelper = new AssetsHelper($packagesMock);
 
         $mauticSecurity = $this->createMock(CorePermissions::class);
         $mauticSecurity->method('hasEntityAccess')
             ->will($this->returnValue(false));
 
-        $analyticsHelper = new AnalyticsHelper($this->createMock(CoreParametersHelper::class));
+        $analyticsHelper = new AnalyticsHelper($coreParametersHelper);
 
         $pageModel = $this->createMock(PageModel::class);
         $pageModel->method('getHitQuery')
