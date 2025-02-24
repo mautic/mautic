@@ -2,7 +2,6 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -81,10 +80,7 @@ EOF
         /** @var Packages&MockObject $packagesMock */
         $packagesMock = $this->createMock(Packages::class);
 
-        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
-        $assetsHelperMock     = new AssetsHelper($packagesMock, $coreParametersHelper);
+        $assetsHelperMock     = new AssetsHelper($packagesMock);
         $ipLookupHelperMock   = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock    = $this->createMock(AuditLogModel::class);
         $hitRepository        = $this->createMock(HitRepository::class);

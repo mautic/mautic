@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Extension\AppExtension;
 use Mautic\CoreBundle\Twig\Extension\AssetExtension;
@@ -28,9 +27,6 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         /** @var Packages&MockObject $packagesMock */
         $packagesMock = $this->createMock(Packages::class);
 
-        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
         /** @var PathsHelper&MockObject $pathHelperMock */
         $pathHelperMock = $this->createMock(PathsHelper::class);
 
@@ -42,7 +38,7 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
                 return "{$path}/{$packageName}/{$version}/{$absolute}/{$ignorePrefix}}";
             }));
 
-        $assetsHelper = new AssetsHelper($packagesMock, $coreParametersHelper);
+        $assetsHelper = new AssetsHelper($packagesMock);
         $pathHelperMock->method('getSystemPath')->willReturn('https://example.com/');
         $assetsHelper->setPathsHelper($pathHelperMock);
 
