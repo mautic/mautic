@@ -2,8 +2,8 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
-use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
