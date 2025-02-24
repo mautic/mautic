@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\PluginBundle\Tests\FormType;
+namespace Mautic\PluginBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\PluginBundle\Entity\Integration;
@@ -150,7 +150,7 @@ class DetailsTypeTest extends TestCase
         self::assertSame(2, $calls);
     }
 
-    public function authorizedDataProvider(): \Generator
+    public static function authorizedDataProvider(): \Generator
     {
         yield 'authorized' => [true, 'reauthorize'];
         yield 'not authorized' => [false, 'authorize'];
@@ -232,7 +232,7 @@ class DetailsTypeTest extends TestCase
         self::assertSame(2, $calls);
     }
 
-    public function withFeaturesProvider(): \Generator
+    public static function withFeaturesProvider(): \Generator
     {
         yield 'create integration' => [null, ['non-configured']];
         yield 'edit integration' => [1, ['configured']];

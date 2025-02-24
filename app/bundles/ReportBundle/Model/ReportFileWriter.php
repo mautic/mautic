@@ -9,26 +9,16 @@ use Mautic\ReportBundle\Exception\FileIOException;
 
 class ReportFileWriter
 {
-    /**
-     * @var CsvExporter
-     */
-    private $csvExporter;
-
-    /**
-     * @var ExportHandler
-     */
-    private $exportHandler;
-
-    public function __construct(CsvExporter $csvExporter, ExportHandler $exportHandler)
-    {
-        $this->csvExporter   = $csvExporter;
-        $this->exportHandler = $exportHandler;
+    public function __construct(
+        private CsvExporter $csvExporter,
+        private ExportHandler $exportHandler
+    ) {
     }
 
     /**
      * @throws FileIOException
      */
-    public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions)
+    public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions): void
     {
         $fileName = $this->getFileName($scheduler);
         $handler  = $this->exportHandler->getHandler($fileName);
@@ -36,28 +26,23 @@ class ReportFileWriter
         $this->exportHandler->closeHandler($handler);
     }
 
-    public function clear(Scheduler $scheduler)
+    public function clear(Scheduler $scheduler): void
     {
         $fileName = $this->getFileName($scheduler);
         $this->exportHandler->removeFile($fileName);
     }
 
     /**
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getFilePath(Scheduler $scheduler)
+    public function getFilePath(Scheduler $scheduler): string
     {
         $fileName = $this->getFileName($scheduler);
 
         return $this->exportHandler->getPath($fileName);
     }
 
-    /**
-     * @return string
-     */
-    private function getFileName(Scheduler $scheduler)
+    private function getFileName(Scheduler $scheduler): string
     {
         $date       = $scheduler->getScheduleDate();
         $dateString = $date->format('Y-m-d');

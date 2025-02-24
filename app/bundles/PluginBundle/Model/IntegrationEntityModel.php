@@ -16,7 +16,7 @@ class IntegrationEntityModel extends FormModel
         return $this->em->getRepository(IntegrationEntity::class);
     }
 
-    public function logDataSync(IntegrationObject $integrationObject)
+    public function logDataSync(IntegrationObject $integrationObject): void
     {
     }
 
@@ -42,7 +42,10 @@ class IntegrationEntityModel extends FormModel
         );
     }
 
-    public function getRecordList($integrationObject)
+    /**
+     * @return array<mixed, array<'id', mixed>>
+     */
+    public function getRecordList($integrationObject): array
     {
         $recordList = [];
 
@@ -55,7 +58,7 @@ class IntegrationEntityModel extends FormModel
         return $recordList;
     }
 
-    public function formatListOfContacts($recordList)
+    public function formatListOfContacts($recordList): ?string
     {
         if (empty($recordList)) {
             return null;

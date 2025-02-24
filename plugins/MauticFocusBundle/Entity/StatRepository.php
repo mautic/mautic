@@ -15,8 +15,7 @@ class StatRepository extends CommonRepository
     /**
      * Fetch the base stat data from the database.
      *
-     * @param int  $id
-     * @param null $fromDate
+     * @param int $id
      *
      * @return mixed
      */

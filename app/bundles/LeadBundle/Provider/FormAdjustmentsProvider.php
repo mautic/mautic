@@ -11,18 +11,16 @@ use Symfony\Component\Form\FormInterface;
 
 final class FormAdjustmentsProvider implements FormAdjustmentsProviderInterface
 {
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
-     * @param FormInterface<FormInterface> $form
-     * @param mixed[]                      $fieldDetails
+     * @param FormInterface<FormInterface<mixed>> $form
+     * @param mixed[]                             $fieldDetails
      *
-     * @return FormInterface<FormInterface>
+     * @return FormInterface<FormInterface<mixed>>
      */
     public function adjustForm(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails): FormInterface
     {

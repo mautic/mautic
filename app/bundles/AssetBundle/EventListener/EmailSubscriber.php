@@ -9,17 +9,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria

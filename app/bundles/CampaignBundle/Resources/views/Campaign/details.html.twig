@@ -1,5 +1,20 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': campaign,
+    'templateButtons': {
+        'close': securityHasEntityAccess(
+            permissions['campaign:campaigns:viewown'],
+            permissions['campaign:campaigns:viewother'],
+            campaign.createdBy
+        ),
+    },
+    'routeBase': 'campaign',
+    'targetLabel': 'mautic.campaign.campaigns'|trans
+  }) -}}
+{% endblock %}
+
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
@@ -17,11 +32,6 @@
             permissions['campaign:campaigns:deleteother'],
             campaign.createdBy
         ),
-        'close': securityHasEntityAccess(
-            permissions['campaign:campaigns:viewown'],
-            permissions['campaign:campaigns:viewother'],
-            campaign.createdBy
-        ),
     },
     'routeBase': 'campaign',
   }) -}}
@@ -35,23 +45,17 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- campaign detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <div class="text-white dark-sm mb-0">{{ campaign.description|purify }}</div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': campaign.description} %}
             <!--/ campaign detail header -->
 
             <!-- campaign detail collapseable -->
-            <div class="collapse" id="campaign-details">
+            <div class="collapse pr-md pl-md" id="campaign-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': campaign}) }}
                             {% for sourceType, typeNames in sources %}
@@ -74,7 +78,7 @@
             <!--/ campaign detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- campaign detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
@@ -85,43 +89,56 @@
             </div>
             <!--/ campaign detail collapseable toggler -->
 
-            {{ customContent('left.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            {{ customContent('left.section.top', _context) }}
+            {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
+            {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
             <!-- some stats -->
-            <div class="pa-md">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="panel">
-                            <div class="panel-body box-layout">
-                                <div class="col-md-3 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-line-chart"></span>
-                                        {{ 'mautic.campaign.stats'|trans }}
-                                    </h5>
-                                </div>
-                                <div class="col-md-9 va-m">
-                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
-                                      'dateRangeForm': dateRangeForm,
-                                      'class':  'pull-right',
-                                    }) -}}
-                                </div>
-                            </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
-                                  {{- include('@MauticCore/Helper/chart.html.twig', {
-                                    'chartData': stats,
-                                    'chartType': 'line',
-                                    'chartHeight': 300
-                                  }) -}}
-                            </div>
-                        </div>
+            <div class="stats-menu pl-md mt-lg">
+                <!-- tabs controls -->
+                <ul class="nav nav-tabs nav-tabs-contained">
+                    <li class="active">
+                        <a href="#stats-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.campaign.stats'|trans }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
+                            {{ 'mautic.email.thead.maps'|trans }}
+                        </a>
+                    </li>
+                </ul>
+                <!--/ tabs controls -->
+                <div class="date-range">
+                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                        'dateRangeForm': dateRangeForm,
+                    }) }}
+                </div>
+            </div>
+            <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
+                <div class="tab-pane active bdr-w-0" id="stats-container">
+                    <div id="emailGraphStats">
+                        {{- include('@MauticCore/Helper/chart.html.twig', {
+                            'chartData': stats,
+                            'chartType': 'line',
+                            'chartHeight': 300
+                        }) -}}
+                    </div>
+
+                </div>
+                <div class="tab-pane bdr-w-0" id="reads-map-container"
+                     data-map-url="{{ path('mautic_campaign_map_stats', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
+                >
+                    <div class="spinner">
+                        <i class="ri-loader-3-line ri-spin"></i>
                     </div>
                 </div>
             </div>
             <!--/ stats -->
 
-            {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
-            <ul class="nav nav-tabs pr-md pl-md">
+            <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
                     <a href="#preview-container" role="tab" data-toggle="tab">
                         {{ 'mautic.campaign.preview.header'|trans }}
@@ -153,7 +170,7 @@
                         {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>
-                {{ customContent('tabs', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+                {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -190,24 +207,24 @@
             <div class="tab-pane fade in bdr-w-0 page-list"
                  id="leads-container"
                  data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
-                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                 <div class="clearfix"></div>
             </div>
-            {{ customContent('tabs.content', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            {{ customContent('tabs.content', _context) }}
         </div>
         <!--/ end: tab-content -->
 
-        {{ customContent('left.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+        {{ customContent('left.section.bottom', _context) }}
     </div>
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
-        {{ customContent('right.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+    <div class="col-md-3 bdr-l height-auto">
+        {{ customContent('right.section.top', _context) }}
 
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
 
-        {{ customContent('right.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+        {{ customContent('right.section.bottom', _context) }}
     </div>
     <!--/ right section -->
 </div>

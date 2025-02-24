@@ -7,30 +7,25 @@ namespace Mautic\LeadBundle\Field;
 class FieldsWithUniqueIdentifier
 {
     /**
-     * @var array
+     * @var array<mixed>
      */
-    private $uniqueIdentifierFields = [];
+    private array $uniqueIdentifierFields = [];
 
-    /**
-     * @var FieldList
-     */
-    private $fieldList;
-
-    public function __construct(FieldList $fieldList)
-    {
-        $this->fieldList = $fieldList;
+    public function __construct(
+        private FieldList $fieldList
+    ) {
     }
 
     /**
-     * Retrieves a list of published fields that are unique identifiers.
+     * Retrieves a list of cached published fields that are unique identifiers.
      *
-     * @return mixed
+     * @param array<mixed> $filters
+     *
+     * @return array<mixed>
      */
-    public function getFieldsWithUniqueIdentifier(array $filters = [])
+    public function getFieldsWithUniqueIdentifier(array $filters = []): array
     {
-        $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
-        $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;
-        $filters['object']            = isset($filters['object']) ? $filters['object'] : 'lead';
+        $filters = $this->prepareFilters($filters);
 
         $key = base64_encode(json_encode($filters));
         if (!isset($this->uniqueIdentifierFields[$key])) {
@@ -38,5 +33,33 @@ class FieldsWithUniqueIdentifier
         }
 
         return $this->uniqueIdentifierFields[$key];
+    }
+
+    /**
+     * Retrieves a list of published fields that are unique identifiers fresh from the DB each time.
+     *
+     * @param array<mixed> $filters
+     *
+     * @return array<mixed>
+     */
+    public function getLiveFields(array $filters = []): array
+    {
+        $filters = $this->prepareFilters($filters);
+
+        return $this->fieldList->getFieldList(false, true, $filters);
+    }
+
+    /**
+     * @param array<mixed> $filters
+     *
+     * @return array<mixed>
+     */
+    private function prepareFilters(array $filters): array
+    {
+        $filters['isPublished'] ??= true;
+        $filters['isUniqueIdentifer'] ??= true;
+        $filters['object'] ??= 'lead';
+
+        return $filters;
     }
 }

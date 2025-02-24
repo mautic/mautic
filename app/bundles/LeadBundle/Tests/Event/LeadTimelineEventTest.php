@@ -9,11 +9,11 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets
      *
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::addEvent()
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::getEvents()
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::generateEventId()
+     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::addEvent
+     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::getEvents
+     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::generateEventId
      */
-    public function testEventIdIsGeneratedIfNotSetBySubscriber()
+    public function testEventIdIsGeneratedIfNotSetBySubscriber(): void
     {
         $payload = [
             [
@@ -24,7 +24,7 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
                 'extra'      => [
                     'something' => 'something',
                 ],
-                'icon'      => 'fa-tachometer',
+                'icon'      => 'ri-speed-up-line',
                 'contactId' => 1,
             ],
             [
@@ -35,7 +35,7 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
                 'extra'      => [
                     'something' => 'something else',
                 ],
-                'icon'      => 'fa-tachometer',
+                'icon'      => 'ri-speed-up-line',
                 'contactId' => 2,
             ],
             [
@@ -47,7 +47,7 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
                 'extra'      => [
                     'something' => 'something else',
                 ],
-                'icon'      => 'fa-tachometer',
+                'icon'      => 'ri-speed-up-line',
                 'contactId' => 2,
             ],
         ];

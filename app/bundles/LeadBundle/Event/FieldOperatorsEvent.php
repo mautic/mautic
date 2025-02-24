@@ -11,20 +11,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class FieldOperatorsEvent extends Event
 {
-    private string $type;
-
-    private string $field;
-
-    /**
-     * @var array<string,string>
-     */
-    private array $operators;
-
-    /**
-     * @var array<string,array<string,string>>
-     */
-    private array $allOperators;
-
     /**
      * $allOperators example:
      * [
@@ -46,15 +32,15 @@ final class FieldOperatorsEvent extends Event
      *      'not equal' => '!='
      * ]
      *
-     * @param array<string,string>               $defaultOperators
+     * @param array<string, string>              $operators
      * @param array<string,array<string,string>> $allOperators
      */
-    public function __construct(string $type, string $field, array $allOperators, array $defaultOperators)
-    {
-        $this->type         = $type;
-        $this->field        = $field;
-        $this->allOperators = $allOperators;
-        $this->operators    = $defaultOperators;
+    public function __construct(
+        private string $type,
+        private string $field,
+        private array $allOperators,
+        private array $operators
+    ) {
     }
 
     /**

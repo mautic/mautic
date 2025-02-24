@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class DateWeekLast extends DateWeekAbstract
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
         $dateTimeHelper->setDateTime('midnight monday last week', null);

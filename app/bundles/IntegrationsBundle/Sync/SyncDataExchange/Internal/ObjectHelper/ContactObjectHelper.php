@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -17,49 +18,33 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $model;
+    private ?array $availableFields = null;
 
     /**
-     * @var LeadRepository
+     * @var string[]|null
      */
-    private $repository;
+    private ?array $uniqueIdentifierFields = null;
 
     /**
-     * @var Connection
+     * @var array<string,Lead>
      */
-    private $connection;
+    private array $contactsCreated = [];
 
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var array
-     */
-    private $availableFields;
-
-    /**
-     * @var DoNotContactModel
-     */
-    private $dncModel;
-
-    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
-    {
-        $this->model      = $model;
-        $this->repository = $repository;
-        $this->connection = $connection;
-        $this->fieldModel = $fieldModel;
-        $this->dncModel   = $dncModel;
+    public function __construct(
+        private LeadModel $model,
+        private LeadRepository $repository,
+        private Connection $connection,
+        private DoNotContactModel $dncModel,
+        private FieldList $fieldList,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+    ) {
     }
 
     /**
@@ -73,8 +58,8 @@ class ContactObjectHelper implements ObjectHelperInterface
         $objectMappings  = [];
 
         foreach ($objects as $object) {
-            $contact = new Lead();
             $fields  = $object->getFields();
+            $contact = $this->getContactEntity($fields);
 
             $pseudoFields = [];
             foreach ($fields as $field) {
@@ -93,16 +78,13 @@ class ContactObjectHelper implements ObjectHelperInterface
             // Process the pseudo field
             $this->processPseudoFields($contact, $pseudoFields, $object->getIntegration());
 
-            // Detach to free RAM
-            $this->repository->detachEntity($contact);
-
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 sprintf(
                     'Created lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $objectMapping = new ObjectMapping();
@@ -114,6 +96,14 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setInternalObjectId($contact->getId());
             $objectMappings[] = $objectMapping;
         }
+
+        // Detach to free RAM after all contacts are processed in case there are duplicates in the same batch
+        foreach ($this->contactsCreated as $contact) {
+            $this->repository->detachEntity($contact);
+        }
+
+        // Reset contacts created for the next batch
+        $this->contactsCreated = [];
 
         return $objectMappings;
     }
@@ -134,7 +124,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 count($contacts),
                 implode(', ', $ids)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         $availableFields      = $this->getAvailableFields();
@@ -171,7 +161,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                     'Updated lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Integration name and ID are stored in the change's mappedObject/mappedObjectId
@@ -289,20 +279,45 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'c');
         $qb->where('c.owner_id IS NOT NULL');
         $qb->andWhere('c.id IN (:objectIds)');
-        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+        $qb->setParameter('objectIds', $objectIds, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
+    }
+
+    public function findObjectById(int $id): ?Lead
+    {
+        return $this->repository->getEntity($id);
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function setFieldValues(Lead $lead): void
+    {
+        $this->model->setFieldValues($lead, []);
     }
 
     private function getAvailableFields(): array
     {
         if (null === $this->availableFields) {
-            $availableFields = $this->fieldModel->getFieldList(false, false);
-
+            $availableFields       = $this->fieldList->getFieldList(false, false);
             $this->availableFields = array_keys($availableFields);
         }
 
         return $this->availableFields;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getUniqueIdentifierFields(): array
+    {
+        if (null === $this->uniqueIdentifierFields) {
+            $uniqueIdentifierFields       = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => MauticSyncDataExchange::OBJECT_CONTACT]);
+            $this->uniqueIdentifierFields = array_keys($uniqueIdentifierFields);
+        }
+
+        return $this->uniqueIdentifierFields;
     }
 
     /**
@@ -311,7 +326,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     private function processPseudoFields(Lead $contact, array $fields, string $integration): void
     {
         foreach ($fields as $name => $field) {
-            if (0 === strpos($name, 'mautic_internal_dnc_')) {
+            if (str_starts_with($name, 'mautic_internal_dnc_')) {
                 $channel   = str_replace('mautic_internal_dnc_', '', $name);
 
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());
@@ -341,10 +356,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         }
     }
 
-    /**
-     * @return int
-     */
-    private function getDoNotContactReason($value)
+    private function getDoNotContactReason($value): int
     {
         $value = (int) $value;
 
@@ -356,16 +368,29 @@ class ContactObjectHelper implements ObjectHelperInterface
         return DoNotContact::MANUAL;
     }
 
-    public function findObjectById(int $id): ?Lead
-    {
-        return $this->repository->getEntity($id);
-    }
-
     /**
-     * @throws ImportFailedException
+     * @param FieldDAO[] $fields
      */
-    public function setFieldValues(Lead $lead): void
+    private function getContactEntity(array $fields): Lead
     {
-        $this->model->setFieldValues($lead, []);
+        $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+
+        // Create a key based on the concatenation of unique identifier values
+        $contactKey = '';
+        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
+            if (isset($fields[$uniqueIdentifierField])) {
+                $contactKey .= strtolower($fields[$uniqueIdentifierField]->getValue()->getNormalizedValue());
+            }
+        }
+
+        // Check if a contact with matching values was created in the same batch as another
+        if (!empty($contactKey) && isset($this->contactsCreated[$contactKey])) {
+            return $this->contactsCreated[$contactKey];
+        }
+
+        // Create a new contact but ensure a unique key
+        $contactKey = $contactKey ?: uniqid();
+
+        return $this->contactsCreated[$contactKey] = new Lead();
     }
 }

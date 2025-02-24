@@ -15,10 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ?ContainerInterface $container = null;
 
     public static function getGroups(): array
     {

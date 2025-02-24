@@ -4,7 +4,7 @@
     {% if form.children.channel is defined %}
         {% set channel = form.children.channel.vars.data %}
         {% set enabled = form.children.isEnabled.vars.data %}
-        {% set channelContent = customContent('channel.right', mauticTemplateVars is defined ? mauticTemplateVars : []) %}
+        {% set channelContent = customContent('channel.right', _context) %}
         {% set leftCol = channelContent ? 6 : 12 %}
         {% set enableCol = channelContent ? '' : 'col-md-2' %}
         {% set propsCol = channelContent ? '' : 'col-md-10' %}
@@ -51,7 +51,7 @@
             },
         } %}
         {% if formContainsErrors(form.channels[channel]) %}
-            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'fa-warning'}) %}
+            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'ri-alert-fill'}) %}
         {% elseif form.channels[channel].isEnabled.vars.data %}
             {% set tab = tab|merge({'published': true}) %}
         {% endif %}
@@ -72,8 +72,15 @@
 
 {% block rightFormContent %}
 {{ form_row(form.category) }}
-{{ form_row(form.isPublished) }}
-{{ form_row(form.publishUp) }}
-{{ form_row(form.publishDown) }}
+{{ form_row(form.isPublished, {
+    'attr': {
+        'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
+        'data-start': 'mautic.core.form.available_on_scheduled_date',
+        'data-both': 'mautic.core.form.available_during_scheduled_period',
+        'data-end': 'mautic.core.form.available_until_scheduled_end'
+    }
+}) }}
+{{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+{{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
 {% endblock %}
 {% block _content %}{% endblock %}

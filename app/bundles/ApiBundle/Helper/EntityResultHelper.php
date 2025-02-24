@@ -82,10 +82,8 @@ class EntityResultHelper
 
     /**
      * @param array<mixed>|Paginator<mixed> $results
-     *
-     * @return bool
      */
-    private function isKeyedById($results)
+    private function isKeyedById($results): bool
     {
         return !$results instanceof Paginator;
     }

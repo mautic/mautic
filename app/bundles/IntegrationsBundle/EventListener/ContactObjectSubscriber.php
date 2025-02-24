@@ -20,16 +20,10 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ContactObjectSubscriber implements EventSubscriberInterface
 {
-    private ContactObjectHelper $contactObjectHelper;
-
-    private RouterInterface $router;
-
     public function __construct(
-        ContactObjectHelper $contactObjectHelper,
-        RouterInterface $router
+        private ContactObjectHelper $contactObjectHelper,
+        private RouterInterface $router
     ) {
-        $this->contactObjectHelper = $contactObjectHelper;
-        $this->router              = $router;
     }
 
     public static function getSubscribedEvents(): array

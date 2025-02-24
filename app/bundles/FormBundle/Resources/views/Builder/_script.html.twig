@@ -1,6 +1,8 @@
-{% set scriptSrc = getAssetUrl('media/js/' ~ ('dev' == app.environment ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true)|replace({
-  '/index.php': ''
+{% set src = 'dev' == app.environment ? 'app/assets/js/mautic-form-src.js' : 'media/js/mautic-form.js' %}
+{% set scriptSrc = getAssetUrl(src, null, null, true)|replace({
+    '/index.php': ''
 }) %}
+
 <script type="text/javascript">
     /** This section is only needed once per page if manually copying **/
     if (typeof MauticSDKLoaded == 'undefined') {
@@ -15,7 +17,7 @@
         head.appendChild(script);
         var MauticDomain = '{{ assetGetBaseUrl()|replace({'/index.php': ''}) }}';
         var MauticLang   = {
-            'submittingMessage': "{{ 'mautic.form.submission.pleasewait'|trans }}"
+            'submittingMessage': "{{ 'mautic.form.submission.pleasewait'|trans([], 'messages', form.getLanguage())}}"
         }
     }else if (typeof MauticSDK != 'undefined') {
         MauticSDK.onLoad();

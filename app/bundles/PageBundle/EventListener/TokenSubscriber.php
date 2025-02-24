@@ -8,17 +8,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TokenSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['decodeTokens', 254],
         ];
     }
 
-    public function decodeTokens(PageDisplayEvent $event)
+    public function decodeTokens(PageDisplayEvent $event): void
     {
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();

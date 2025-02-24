@@ -15,22 +15,19 @@ class InstallNewFilesStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|UpdateHelper
      */
-    private $updateHelper;
+    private MockObject $updateHelper;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private $pathsHelper;
+    private MockObject $pathsHelper;
 
-    /**
-     * @var InstallNewFilesStep
-     */
-    private $step;
+    private InstallNewFilesStep $step;
 
     protected function setUp(): void
     {
@@ -45,7 +42,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $this->step = new InstallNewFilesStep($this->translator, $this->updateHelper, $this->pathsHelper);
     }
 
-    public function testUpdatePackageUnzipped()
+    public function testUpdatePackageUnzipped(): void
     {
         $resourcePath = __DIR__.'/resources';
 
@@ -82,7 +79,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $filesystem->remove($resourcePath.'/update');
     }
 
-    public function testCustomUpdatePackageUnzipped()
+    public function testCustomUpdatePackageUnzipped(): void
     {
         $resourcePath = __DIR__.'/resources';
 
@@ -118,7 +115,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $filesystem->remove($resourcePath.'/update');
     }
 
-    public function testUpdateFailedExceptionThrownIfCustomPackageDoesNotExist()
+    public function testUpdateFailedExceptionThrownIfCustomPackageDoesNotExist(): void
     {
         $this->expectException(UpdateFailedException::class);
 
@@ -135,7 +132,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testUpdateFailedExceptionThrownIfUnzippingFails()
+    public function testUpdateFailedExceptionThrownIfUnzippingFails(): void
     {
         $this->expectException(UpdateFailedException::class);
 

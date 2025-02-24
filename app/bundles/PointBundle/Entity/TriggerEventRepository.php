@@ -23,7 +23,7 @@ class TriggerEventRepository extends CommonRepository
         $q = $this->createQueryBuilder('a')
             ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}')
             ->leftJoin('a.trigger', 'r')
-            ->orderBy('a.order');
+            ->orderBy('a.order,r.points');
 
         // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'r');
@@ -103,10 +103,8 @@ class TriggerEventRepository extends CommonRepository
 
     /**
      * @param int $leadId
-     *
-     * @return array
      */
-    public function getLeadTriggeredEvents($leadId)
+    public function getLeadTriggeredEvents($leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.*')
@@ -130,10 +128,8 @@ class TriggerEventRepository extends CommonRepository
 
     /**
      * @param int $eventId
-     *
-     * @return array
      */
-    public function getLeadsForEvent($eventId)
+    public function getLeadsForEvent($eventId): array
     {
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.lead_id')

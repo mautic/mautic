@@ -1,0 +1,87 @@
+.map-options {
+  margin-left: 10px;
+  margin-bottom: 10px;
+
+  h5 {
+    color: @text-color;
+    font-size: 13px;
+  }
+
+  &__cointainer {
+    display: flex;
+    flex-direction: row;
+  }
+  &__item.active,
+  &__item.active:hover {
+    color: #fff;
+    background-color: #3a7e6f;
+  }
+  &__item:focus,
+  &__item.focus,
+  &__item:active,
+  &__item.active.focus {
+    color: #fff;
+    background-color: #3a7e6f;
+  }
+}
+
+.jvectormap-zoomin, .jvectormap-zoomout {
+  width:  30px;
+  height: 30px;
+  line-height: 30px;
+  left: 10px;
+  padding: 0;
+  background-color: var(--button-primary);
+  border-radius: 4px;
+  box-shadow: 0 -2px 4px 0 rgba(0,0,0,0.04), 0 2px 4px 0 rgba(0,0,0,0.04), 0 6px 12px 0 rgba(0,0,0,0.16);
+  font-size: 20px;
+  transition: var(--transition-all-productive);
+}
+
+.jvectormap-zoomin:hover, .jvectormap-zoomout:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.jvectormap-zoomin {
+  top: 16px;
+}
+
+.jvectormap-zoomout {
+  top: 52px;
+}
+
+.jvectormap-tip {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.jvectormap-legend-cnt {
+  right: auto;
+  left: 0;
+}
+
+.jvectormap-legend-cnt-h .jvectormap-legend {
+  margin: 0 0 16px 10px;
+  padding: 8px;
+  &-title {
+    font-weight: normal;
+  }
+}
+
+.jvectormap-legend .jvectormap-legend-inner {
+  display: none;
+}
+
+.map-options__item.btn {
+  &,
+  &:active,
+  &.focus,
+  &:focus,
+  &.active,
+  &:active:focus,
+  &.active:focus {
+    outline: 0 !important;
+  }
+}

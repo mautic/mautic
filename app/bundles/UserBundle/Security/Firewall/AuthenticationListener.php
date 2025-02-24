@@ -23,40 +23,19 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 final class AuthenticationListener
 {
-    private TokenStorageInterface $tokenStorage;
-    private AuthenticationHandler $authenticationHandler;
-    private AuthenticationManagerInterface $authenticationManager;
-    private LoggerInterface $logger;
-    private EventDispatcherInterface $dispatcher;
-    private PermissionRepository $permissionRepository;
-    private EntityManagerInterface $entityManager;
-
-    /**
-     * @var string|mixed
-     */
-    private $providerKey;
-
     /**
      * @param string|mixed $providerKey
      */
     public function __construct(
-        AuthenticationHandler $authenticationHandler,
-        TokenStorageInterface $tokenStorage,
-        AuthenticationManagerInterface $authenticationManager,
-        LoggerInterface $logger,
-        EventDispatcherInterface $dispatcher,
-        $providerKey,
-        PermissionRepository $permissionRepository,
-        EntityManagerInterface $entityManager
+        private AuthenticationHandler $authenticationHandler,
+        private TokenStorageInterface $tokenStorage,
+        private AuthenticationManagerInterface $authenticationManager,
+        private LoggerInterface $logger,
+        private EventDispatcherInterface $dispatcher,
+        private $providerKey,
+        private PermissionRepository $permissionRepository,
+        private EntityManagerInterface $entityManager
     ) {
-        $this->tokenStorage          = $tokenStorage;
-        $this->authenticationManager = $authenticationManager;
-        $this->providerKey           = $providerKey;
-        $this->authenticationHandler = $authenticationHandler;
-        $this->logger                = $logger;
-        $this->dispatcher            = $dispatcher;
-        $this->permissionRepository  = $permissionRepository;
-        $this->entityManager         = $entityManager;
     }
 
     public function __invoke(RequestEvent $event): void
@@ -76,12 +55,12 @@ final class AuthenticationListener
             if ($authToken instanceof PluginToken) {
                 $response = $authToken->getResponse();
 
-                if ($authToken->isAuthenticated()) {
+                if (null !== $authToken->getUser()) {
                     $this->tokenStorage->setToken($authToken);
 
                     $this->setActivePermissionsOnAuthToken();
 
-                    if ('api' != $this->providerKey) {
+                    if ('api' !== $this->providerKey) {
                         $response = $this->onSuccess($request, $authToken, $response);
                     }
                 } elseif (empty($response)) {

@@ -14,7 +14,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getOperator
      */
-    public function testGetOperatorEqual()
+    public function testGetOperatorEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -33,7 +33,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getOperator
      */
-    public function testGetOperatorNotEqual()
+    public function testGetOperatorNotEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -52,7 +52,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getOperator
      */
-    public function testGetOperatorLessOrEqual()
+    public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -75,7 +75,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
-    public function testGetParameterValuePlusDaysWithGreaterOperator()
+    public function testGetParameterValuePlusDaysWithGreaterOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -100,7 +100,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
-    public function testGetParameterValueMinusMonthWithNotEqualOperator()
+    public function testGetParameterValueMinusMonthWithNotEqualOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -125,7 +125,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
-    public function testGetParameterValueDaysAgoWithNotEqualOperator()
+    public function testGetParameterValueDaysAgoWithNotEqualOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -150,7 +150,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
-    public function testGetParameterValueYearsAgoWithGreaterOperator()
+    public function testGetParameterValueYearsAgoWithGreaterOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -175,7 +175,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
-    public function testGetParameterValueDaysWithEqualOperator()
+    public function testGetParameterValueDaysWithEqualOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

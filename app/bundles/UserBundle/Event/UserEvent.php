@@ -5,9 +5,6 @@ namespace Mautic\UserBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class UserEvent.
- */
 class UserEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class UserEvent extends CommonEvent
     /**
      * Sets the User entity.
      */
-    public function setUser(User $user)
+    public function setUser(User $user): void
     {
         $this->entity = $user;
     }

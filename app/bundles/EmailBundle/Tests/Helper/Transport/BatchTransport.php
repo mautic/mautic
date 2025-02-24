@@ -19,7 +19,20 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
      * @var array<string, mixed>
      */
     private $transports = []; // @phpstan-ignore-line
+
     private $metadatas  = [];
+
+    /**
+     * @var string[]
+     */
+    private array $fromAddresses = [];
+
+    /**
+     * @var string[]
+     */
+    private array $fromNames = [];
+
+    private ?MauticMessage $message = null;
 
     public function __construct(private bool $validate = false, private int $maxRecipients = 4, private int $numberToFail = 1)
     {
@@ -34,7 +47,11 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
     protected function doSend(SentMessage $message): void
     {
         $message = $message->getOriginalMessage();
-        \assert($message instanceof MauticMessage);
+
+        if (!$message instanceof MauticMessage) {
+            return;
+        }
+
         $this->metadatas[] = $message->getMetadata();
 
         if ($this->validate && $this->numberToFail) {
@@ -44,6 +61,10 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
                 throw new TransportException('Subject empty');
             }
         }
+
+        $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
+        $this->message         = $message;
     }
 
     public function getMaxBatchLimit(): int
@@ -54,5 +75,26 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
     public function getMetadatas(): array
     {
         return $this->metadatas;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFromAddresses(): array
+    {
+        return $this->fromAddresses;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFromNames(): array
+    {
+        return $this->fromNames;
+    }
+
+    public function getMessage(): ?MauticMessage
+    {
+        return $this->message;
     }
 }

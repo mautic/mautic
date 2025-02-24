@@ -24,7 +24,7 @@ final class BarStringTransformerTest extends TestCase
     /**
      * @return \Generator<array<mixed>>
      */
-    public function transformProvider(): \Generator
+    public static function transformProvider(): \Generator
     {
         yield [null, ''];
         yield [[], ''];
@@ -51,7 +51,7 @@ final class BarStringTransformerTest extends TestCase
     /**
      * @return \Generator<array<mixed>>
      */
-    public function reverseTransformProvider(): \Generator
+    public static function reverseTransformProvider(): \Generator
     {
         yield [null, []];
         yield [[], []];

@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
@@ -33,40 +32,34 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
+    private EventDispatcher $dispatcher;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MessageModel
      */
-    private $messageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $messageModel;
 
-    /**
-     * @var ActionDispatcher
-     */
-    private $eventDispatcher;
+    private ActionDispatcher $eventDispatcher;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
      */
-    private $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LegacyEventDispatcher
      */
-    private $legacyDispatcher;
+    private LegacyEventDispatcher $legacyDispatcher;
 
     protected function setUp(): void
     {
@@ -128,10 +121,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $notificationHelper = $this->getMockBuilder(NotificationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $contactTracker = $this->getMockBuilder(ContactTracker::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -140,7 +129,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
-            $notificationHelper,
             $factory,
             $contactTracker
         );
@@ -149,7 +137,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,
-            $notificationHelper,
             $this->legacyDispatcher
         );
 
@@ -210,7 +197,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, [$this, 'sendMarketingMessageSms']);
     }
 
-    public function testCorrectChannelIsUsed()
+    public function testCorrectChannelIsUsed(): void
     {
         $event  = $this->getEvent();
         $config = new ActionAccessor(
@@ -255,7 +242,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(empty($successful->get(1)->getMetadata()));
     }
 
-    public function sendMarketingMessageEmail(PendingEvent $event)
+    public function sendMarketingMessageEmail(PendingEvent $event): void
     {
         $contacts = $event->getContacts();
         $logs     = $event->getPending();
@@ -279,7 +266,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * BC support for old campaign.
      */
-    public function sendMarketingMessageSms(CampaignExecutionEvent $event)
+    public function sendMarketingMessageSms(CampaignExecutionEvent $event): void
     {
         $lead = $event->getLead();
         if (1 === $lead->getId()) {
@@ -310,9 +297,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setProperties(
             [
                 'canvasSettings'      => [
-                        'droppedX' => '337',
-                        'droppedY' => '155',
-                    ],
+                    'droppedX' => '337',
+                    'droppedY' => '155',
+                ],
                 'name'                => '',
                 'triggerMode'         => 'immediate',
                 'triggerDate'         => null,
@@ -320,16 +307,16 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 'triggerIntervalUnit' => 'd',
                 'anchor'              => 'leadsource',
                 'properties'          => [
-                        'marketingMessage' => '1',
-                    ],
+                    'marketingMessage' => '1',
+                ],
                 'type'                => 'message.send',
                 'eventType'           => 'action',
                 'anchorEventType'     => 'source',
                 'campaignId'          => '1',
                 '_token'              => 'q7FpcDX7iye6fBuBzsqMvQWKqW75lcD77jSmuNAEDXg',
                 'buttons'             => [
-                        'save' => '',
-                    ],
+                    'save' => '',
+                ],
                 'marketingMessage'    => '1',
             ]
         );

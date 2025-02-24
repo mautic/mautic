@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
+use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,24 +24,24 @@ class UserController extends FormController
      *
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
         if (!$this->security->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
-
         $pageHelper = $pageHelperFactory->make('mautic.user', $page);
 
         $this->setListFilters();
 
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $orderBy    = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
-        $orderByDir = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
-        $search     = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
-        $search     = html_entity_decode($search);
+        $currentUserId = $this->user->getId();
+        $limit         = $pageHelper->getLimit();
+        $start         = $pageHelper->getStart();
+        $orderBy       = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
+        $orderByDir    = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
+        $search        = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
+        $search        = html_entity_decode($search);
         $request->getSession()->set('mautic.user.filter', $search);
 
         // do some default filtering
@@ -81,12 +82,13 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'       => $users,
-                'searchValue' => $search,
-                'page'        => $page,
-                'limit'       => $limit,
-                'tmpl'        => $tmpl,
-                'permissions' => [
+                'items'         => $users,
+                'searchValue'   => $search,
+                'page'          => $page,
+                'limit'         => $limit,
+                'tmpl'          => $tmpl,
+                'currentUserId' => $currentUserId,
+                'permissions'   => [
                     'create' => $this->security->isGranted('user:users:create'),
                     'edit'   => $this->security->isGranted('user:users:editother'),
                     'delete' => $this->security->isGranted('user:users:deleteother'),
@@ -103,7 +105,7 @@ class UserController extends FormController
     /**
      * Generate's form and processes new post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
@@ -111,7 +113,7 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        /** @var UserModel $model */
         $model = $this->getModel('user.user');
 
         // retrieve the user entity
@@ -209,7 +211,7 @@ class UserController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, $objectId, $ignorePost = false)
     {
@@ -219,6 +221,30 @@ class UserController extends FormController
         $model = $this->getModel('user.user');
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
+        if (null === $user) {
+            return $this->postActionRedirect([
+                'returnUrl'       => $this->generateUrl('mautic_user_index'),
+                'flashes'         => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.user.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        }
+        $oldEmail = $user->getEmail();
+
+        /** @var AuditLogModel $auditLogModel */
+        $auditLogModel      = $this->getModel('core.auditlog');
+        $auditLogRepository = $auditLogModel->getRepository();
+        $userActivity       = $auditLogRepository->getLogsForUser($user);
+        $users              = $model->getEntities();
+
+        $roleModel = $this->getModel('user.role');
+        \assert($roleModel instanceof RoleModel);
+        $roleRepository     = $roleModel->getRepository();
+        $roles              = $roleRepository->getEntities();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
@@ -236,19 +262,7 @@ class UserController extends FormController
             ],
         ];
 
-        if (null === $user) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => [
-                        [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.user.user.error.notfound',
-                            'msgVars' => ['%id%' => $objectId],
-                        ],
-                    ],
-                ])
-            );
-        } elseif ($model->isLocked($user)) {
+        if ($model->isLocked($user)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $user, 'user.user');
         }
@@ -265,11 +279,19 @@ class UserController extends FormController
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+                $newEmail          = $formUser['email'] ?? null;
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
                     $user->setPassword($password);
                     $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    if (!empty($submittedPassword)) {
+                        $model->sendChangePasswordInfo($user);
+                    }
+
+                    if ($newEmail !== $oldEmail) {
+                        $model->sendChangeEmailInfo($oldEmail, $user);
+                    }
 
                     // check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $languageHelper->getSupportedLanguages();
@@ -319,7 +341,13 @@ class UserController extends FormController
         }
 
         return $this->delegateView([
-            'viewParameters'  => ['form' => $form->createView()],
+            'viewParameters'  => [
+                'form'          => $form->createView(),
+                'logs'          => $userActivity,
+                'users'         => $users,
+                'roles'         => $roles,
+                'editAction'    => true,
+            ],
             'contentTemplate' => '@MauticUser/User/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',

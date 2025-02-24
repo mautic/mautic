@@ -10,7 +10,7 @@ use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
 class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
-    public function testFieldMatchingPriority()
+    public function testFieldMatchingPriority(): void
     {
         $config = [
             'update_mautic' => [
@@ -52,7 +52,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         );
     }
 
-    public function testCompanyDataIsMappedForNewCompanies()
+    public function testCompanyDataIsMappedForNewCompanies(): void
     {
         $data = [
             'custom_company_name' => 'Some Business',
@@ -66,7 +66,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
         $companyModel = $this->getMockBuilder(CompanyModelStub::class)
-            ->setMethodsExcept(['setFieldValues', 'setFieldModel', 'setEmailValidator', 'setCompanyDeduper'])
+            ->onlyMethods(['fetchCompanyFields', 'organizeFieldsByGroup', 'saveEntity'])
             ->disableOriginalConstructor()
             ->getMock();
         $companyModel->setFieldModel($this->fieldModel);
@@ -114,7 +114,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->integrationEntityModel,
                 $this->doNotContact,
             ])
-            ->setMethodsExcept(['getMauticCompany', 'setCompanyModel', 'setFieldModel', 'hydrateCompanyName'])
+            ->onlyMethods(['populateMauticLeadData', 'mergeConfigToFeatureSettings'])
             ->getMock();
 
         $integration->expects($this->once())
@@ -128,11 +128,10 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $this->assertEquals('some value', $company->getFieldValue('some_custom_field'));
     }
 
-    public function testLimitString()
+    public function testLimitString(): void
     {
         $integration = $this->getMockBuilder(StubIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['limitString'])
             ->getMock();
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');

@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -18,38 +19,16 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
     public const EVENT_NAME = 'campaign.jump_to_event';
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
-
-    /**
-     * @var EventExecutioner
-     */
-    private $eventExecutioner;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator, LeadRepository $leadRepository)
-    {
-        $this->eventRepository  = $eventRepository;
-        $this->eventExecutioner = $eventExecutioner;
-        $this->translator       = $translator;
-        $this->leadRepository   = $leadRepository;
+    public function __construct(
+        private EventRepository $eventRepository,
+        private EventExecutioner $eventExecutioner,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository,
+        private EventScheduler $eventScheduler
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE     => ['processCampaignEventsAfterSave', 1],
@@ -61,7 +40,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add action to jump to another event in the campaign flow.
         $event->addAction(self::EVENT_NAME, [
@@ -88,7 +67,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function onJumpToEvent(PendingEvent $campaignEvent)
+    public function onJumpToEvent(PendingEvent $campaignEvent): void
     {
         $event      = $campaignEvent->getEvent();
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
@@ -105,12 +84,23 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
                 );
             }
         } else {
+            $contacts = $campaignEvent->getContactsKeyedById();
+
             // Increment the campaign rotation for the given contacts and current campaign
             $this->leadRepository->incrementCampaignRotationForContacts(
-                $campaignEvent->getContactsKeyedById()->getKeys(),
+                $contacts->getKeys(),
                 $event->getCampaign()->getId()
             );
-            $this->eventExecutioner->executeForContacts($jumpTarget, $campaignEvent->getContactsKeyedById());
+
+            // Schedule the jump action as per configuration, if any.
+            $executionDate       = $event->getTriggerDate() ?? new \DateTime();
+            $targetExecutionDate = $this->eventScheduler->getExecutionDateTime($jumpTarget, $executionDate);
+            if ($this->eventScheduler->shouldScheduleEvent($jumpTarget, $targetExecutionDate, $executionDate)) {
+                $this->eventScheduler->schedule($jumpTarget, $targetExecutionDate, $contacts);
+            } else {
+                $this->eventExecutioner->executeForContacts($jumpTarget, $contacts);
+            }
+
             $campaignEvent->passRemaining();
         }
     }
@@ -122,7 +112,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
      */
-    public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent)
+    public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent): void
     {
         $campaign = $campaignEvent->getCampaign();
         $events   = $campaign->getEvents();

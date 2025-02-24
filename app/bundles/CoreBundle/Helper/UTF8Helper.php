@@ -2,10 +2,15 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * @deprecated as unused and unnecessary. To be removed in Mautic 6 without replacement.
+ */
 class UTF8Helper
 {
     public const ICONV_TRANSLIT = 'TRANSLIT';
+
     public const ICONV_IGNORE   = 'IGNORE';
+
     public const WITHOUT_ICONV  = '';
 
     protected static $win1252ToUtf8 = [
@@ -240,7 +245,7 @@ class UTF8Helper
         return self::toUTF8(static::utf8_decode($text, $option));
     }
 
-    public static function UTF8FixWin1252Chars($text)
+    public static function UTF8FixWin1252Chars($text): string
     {
         // If you received an UTF-8 string that was converted from Windows-1252 as it was ISO8859-1
         // (ignoring Windows-1252 chars from 80 to 9F) use this function to fix it.
@@ -258,13 +263,13 @@ class UTF8Helper
         return $str;
     }
 
-    protected static function strlen($text)
+    protected static function strlen($text): int
     {
         return (function_exists('mb_strlen') && ((int) ini_get('mbstring.func_overload')) & 2) ?
             mb_strlen($text, '8bit') : strlen($text);
     }
 
-    public static function normalizeEncoding($encodingLabel)
+    public static function normalizeEncoding($encodingLabel): string
     {
         $encoding     = strtoupper($encodingLabel);
         $encoding     = preg_replace('/[^a-zA-Z0-9\s]/', '', $encoding);
@@ -297,20 +302,15 @@ class UTF8Helper
         return self::toUTF8($text);
     }
 
+    /**
+     * @return string|false
+     */
     protected static function utf8_decode($text, $option)
     {
-        if (self::WITHOUT_ICONV == $option || !function_exists('iconv')) {
-            $o = utf8_decode(
-                str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), self::toUTF8($text))
-            );
-        } else {
-            $o = iconv(
-                'UTF-8',
-                'Windows-1252'.(self::ICONV_TRANSLIT == $option ? '//TRANSLIT' : (self::ICONV_IGNORE == $option ? '//IGNORE' : '')),
-                $text
-            );
-        }
-
-        return $o;
+        return iconv(
+            'UTF-8',
+            'Windows-1252'.(self::ICONV_TRANSLIT == $option ? '//TRANSLIT' : (self::ICONV_IGNORE == $option ? '//IGNORE' : '')),
+            $text
+        );
     }
 }

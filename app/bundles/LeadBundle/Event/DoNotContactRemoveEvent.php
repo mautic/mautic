@@ -11,26 +11,11 @@ final class DoNotContactRemoveEvent extends Event
 {
     public const REMOVE_DONOT_CONTACT = 'mautic.lead.remove_donot_contact';
 
-    /**
-     * @var Lead
-     */
-    private $lead;
-
-    /**
-     * @var string
-     */
-    private $channel;
-
-    /**
-     * @var bool
-     */
-    private $persist;
-
-    public function __construct(Lead $lead, string $channel, bool $persist = true)
-    {
-        $this->lead    = $lead;
-        $this->channel = $channel;
-        $this->persist = $persist;
+    public function __construct(
+        private Lead $lead,
+        private string $channel,
+        private bool $persist = true
+    ) {
     }
 
     public function getLead(): Lead

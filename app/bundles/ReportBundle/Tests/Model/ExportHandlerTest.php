@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Model\ExportHandler;
 
 class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testHandler()
+    public function testHandler(): void
     {
         $tmpDir = sys_get_temp_dir();
 
@@ -33,16 +33,13 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $exportHandler = new ExportHandler($coreParametersHelperMock, $filePathResolver);
 
         $handler = $exportHandler->getHandler('myFile');
+        $this->assertIsResource($handler);
 
-        $this->assertTrue(is_resource($handler));
-
-        $handler = $exportHandler->closeHandler($handler);
-
-        $this->assertFalse(is_resource($handler));
-        $this->assertNull($handler);
+        $exportHandler->closeHandler($handler);
+        $this->assertIsClosedResource($handler);
     }
 
-    public function testCreateDirectoryError()
+    public function testCreateDirectoryError(): void
     {
         $tmpDir = sys_get_temp_dir();
 
@@ -71,7 +68,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $exportHandler->getHandler('myFile');
     }
 
-    public function testOpenFileError()
+    public function testOpenFileError(): void
     {
         $tmpDir = 'xxx';
 

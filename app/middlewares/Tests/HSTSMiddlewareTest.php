@@ -16,9 +16,13 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
     public const HSTS_KEY = 'strict-transport-security';
 
     protected \ReflectionProperty $addHSTS;
+
     protected \ReflectionProperty $includeDubDomains;
+
     protected \ReflectionProperty $preload;
+
     protected HSTSMiddleware $middleware;
+
     protected \ReflectionClass $middlewareReflection;
 
     /**

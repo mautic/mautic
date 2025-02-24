@@ -10,26 +10,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_POST_SAVE     => ['onPointPostSave', 0],
@@ -42,7 +29,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPointPostSave(Events\PointEvent $event)
+    public function onPointPostSave(Events\PointEvent $event): void
     {
         $point = $event->getPoint();
         if ($details = $event->getChanges()) {
@@ -61,7 +48,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onPointDelete(Events\PointEvent $event)
+    public function onPointDelete(Events\PointEvent $event): void
     {
         $point = $event->getPoint();
         $log   = [
@@ -78,7 +65,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onTriggerPostSave(Events\TriggerEvent $event)
+    public function onTriggerPostSave(Events\TriggerEvent $event): void
     {
         $trigger = $event->getTrigger();
         if ($details = $event->getChanges()) {
@@ -97,7 +84,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onTriggerDelete(Events\TriggerEvent $event)
+    public function onTriggerDelete(Events\TriggerEvent $event): void
     {
         $trigger = $event->getTrigger();
         $log     = [

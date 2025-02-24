@@ -7,9 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Plugin.
- */
 class IntegrationEntity extends CommonEntity
 {
     /**
@@ -57,15 +54,12 @@ class IntegrationEntity extends CommonEntity
      */
     private $internal;
 
-    /**
-     * IntegrationEntity constructor.
-     */
     public function __construct()
     {
         $this->internal = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 

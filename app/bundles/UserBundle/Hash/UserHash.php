@@ -8,10 +8,8 @@ class UserHash
 
     /**
      * Return fake user hash for emails etc. Users does not have hash, only Contacts.
-     *
-     * @return string
      */
-    public static function getFakeUserHash()
+    public static function getFakeUserHash(): string
     {
         return self::FAKE_USER_HASH;
     }

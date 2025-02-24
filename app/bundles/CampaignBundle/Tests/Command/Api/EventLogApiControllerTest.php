@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CampaignBundle\Tests\Controller\Api;
+namespace Mautic\CampaignBundle\Tests\Command\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;

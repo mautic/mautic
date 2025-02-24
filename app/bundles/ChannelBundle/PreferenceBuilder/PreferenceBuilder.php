@@ -13,26 +13,14 @@ class PreferenceBuilder
     /**
      * @var ChannelPreferences[]
      */
-    private $channels = [];
+    private array $channels = [];
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var Event
-     */
-    private $event;
-
-    /**
-     * PreferenceBuilder constructor.
-     */
-    public function __construct(ArrayCollection $logs, Event $event, array $channels, LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-        $this->event  = $event;
-
+    public function __construct(
+        ArrayCollection $logs,
+        private Event $event,
+        array $channels,
+        private LoggerInterface $logger
+    ) {
         $this->buildRules($logs, $channels);
     }
 
@@ -44,7 +32,7 @@ class PreferenceBuilder
         return $this->channels;
     }
 
-    public function removeLogFromAllChannels(LeadEventLog $log)
+    public function removeLogFromAllChannels(LeadEventLog $log): void
     {
         foreach ($this->channels as $channelPreferences) {
             $channelPreferences->removeLog($log);
@@ -55,7 +43,7 @@ class PreferenceBuilder
      * @param string $channel
      * @param int    $priority
      */
-    private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority)
+    private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority): void
     {
         $channelPreferences = $this->getChannelPreferenceObject($channel, $priority);
 
@@ -93,7 +81,7 @@ class PreferenceBuilder
         return $this->channels[$channel];
     }
 
-    private function buildRules(ArrayCollection $logs, array $channels)
+    private function buildRules(ArrayCollection $logs, array $channels): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {

@@ -11,14 +11,9 @@ use Twig\TwigFunction;
 
 class LeadExtension extends AbstractExtension
 {
-    /**
-     * @var AvatarHelper
-     */
-    protected $avatarHelper;
-
-    public function __construct(AvatarHelper $avatarHelper)
-    {
-        $this->avatarHelper = $avatarHelper;
+    public function __construct(
+        protected AvatarHelper $avatarHelper
+    ) {
     }
 
     /**

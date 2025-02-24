@@ -10,7 +10,7 @@ use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
 class CampaignBuilderEventTest extends CampaignTestAbstract
 {
-    public function testAddGetDecision()
+    public function testAddGetDecision(): void
     {
         $decisionKey = 'email.open';
         $decision    = [
@@ -35,7 +35,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         $this->assertSame([$decisionKey => $decision], $decisions);
     }
 
-    public function testEventDecisionSort()
+    public function testEventDecisionSort(): void
     {
         $decision = [
             'label'                  => 'mautic.email.campaign.event.open',
@@ -69,7 +69,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    public function testEventConditionSort()
+    public function testEventConditionSort(): void
     {
         $condition = [
             'label'       => 'mautic.form.campaign.event.field_value',
@@ -98,13 +98,13 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    public function testEventActionSort()
+    public function testEventActionSort(): void
     {
         $action = [
             'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
-            'callback'    => ['\\Mautic\\AssetBundle\\Helper\\PointActionHelper', 'validateAssetDownload'],
+            'callback'    => [\Mautic\AssetBundle\Helper\PointActionHelper::class, 'validateAssetDownload'],
             'formType'    => PointActionAssetDownloadType::class,
         ];
         $event = $this->initEvent();

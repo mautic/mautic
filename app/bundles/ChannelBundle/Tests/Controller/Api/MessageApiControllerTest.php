@@ -74,7 +74,7 @@ JSON;
      *
      * @return iterable<mixed[]>
      */
-    public function patchProvider(): iterable
+    public static function patchProvider(): iterable
     {
         yield [
             [

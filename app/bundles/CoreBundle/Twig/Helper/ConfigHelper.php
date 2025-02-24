@@ -13,14 +13,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
  */
 final class ConfigHelper
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
@@ -33,10 +28,7 @@ final class ConfigHelper
         return $this->coreParametersHelper->get($name, $default);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'config';
     }

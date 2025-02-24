@@ -7,36 +7,23 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 class SocialMonitorEvent extends CommonEvent
 {
-    /**
-     * @var string
-     */
-    protected $integrationName;
+    protected int $newLeadCount;
 
-    /**
-     * @var int
-     */
-    protected $newLeadCount = 0;
-
-    /**
-     * @var int
-     */
-    protected $updatedLeadCount = 0;
-
-    /**
-     * @var array
-     */
-    protected $leadIds = [];
+    protected int $updatedLeadCount;
 
     /**
      * @param string $integrationName
      * @param int    $newLeadCount
      * @param int    $updatedLeadCount
      */
-    public function __construct($integrationName, Monitoring $monitoring, array $leadIds, $newLeadCount, $updatedLeadCount)
-    {
-        $this->integrationName  = $integrationName;
+    public function __construct(
+        protected $integrationName,
+        Monitoring $monitoring,
+        protected array $leadIds,
+        $newLeadCount,
+        $updatedLeadCount
+    ) {
         $this->entity           = $monitoring;
-        $this->leadIds          = $leadIds;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;
     }
@@ -53,28 +40,21 @@ class SocialMonitorEvent extends CommonEvent
 
     /**
      * Get count of new leads.
-     *
-     * @return int
      */
-    public function getNewLeadCount()
+    public function getNewLeadCount(): int
     {
         return $this->newLeadCount;
     }
 
     /**
      * Get count of updated leads.
-     *
-     * @return int
      */
-    public function getUpdatedLeadCount()
+    public function getUpdatedLeadCount(): int
     {
         return $this->updatedLeadCount;
     }
 
-    /**
-     * @return array|int
-     */
-    public function getTotalLeadCount()
+    public function getTotalLeadCount(): int
     {
         return $this->updatedLeadCount + $this->newLeadCount;
     }

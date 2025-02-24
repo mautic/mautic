@@ -13,7 +13,7 @@
             <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        {{ ('mautic.email.send.' ~ status)|trans({'%subject%' : emoji_to_html(email.getSubject(), 'short')})|purify }}
+                        {{ ('mautic.email.send.' ~ status)|trans({ '%subject%' : email.getSubject() })|purify }}
                     </h4>
                 </div>
                 <div class="panel-body">

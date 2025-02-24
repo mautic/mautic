@@ -6,6 +6,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
+use Mautic\LeadBundle\Entity\Company;
 use PHPUnit\Framework\TestCase;
 
 class FieldChangeRepositoryTest extends TestCase
@@ -40,5 +41,20 @@ class FieldChangeRepositoryTest extends TestCase
             );
 
         $this->repository->findChangesForObject($integration, $objectType, $objectId);
+    }
+
+    public function testDeleteEntitiesForObject(): void
+    {
+        $this->connection->expects($this->once())
+            ->method('executeStatement')
+            ->with(
+                'DELETE FROM '.MAUTIC_TABLE_PREFIX.'sync_object_field_change_report WHERE (object_type = :objectType) AND (object_id = :objectId)',
+                [
+                    'objectType'  => Company::class,
+                    'objectId'    => 123,
+                ]
+            )->willReturn(1);
+
+        $this->repository->deleteEntitiesForObject(123, Company::class);
     }
 }

@@ -22,22 +22,19 @@ class DecisionDispatcherTest extends TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|LegacyEventDispatcher
      */
-    private $legacyDispatcher;
+    private MockObject $legacyDispatcher;
 
     /**
      * @var MockObject|DecisionAccessor
      */
-    private $config;
+    private MockObject $config;
 
-    /**
-     * @var DecisionDispatcher
-     */
-    private $decisionDispatcher;
+    private DecisionDispatcher $decisionDispatcher;
 
     protected function setUp(): void
     {

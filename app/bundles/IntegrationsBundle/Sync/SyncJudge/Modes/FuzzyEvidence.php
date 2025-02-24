@@ -18,21 +18,21 @@ class FuzzyEvidence implements JudgementModeInterface
     ): InformationChangeRequestDAO {
         try {
             return BestEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
-        } catch (ConflictUnresolvedException $exception) {
+        } catch (ConflictUnresolvedException) {
         }
 
         if (
-            $leftChangeRequest->getCertainChangeDateTime() &&
-            $rightChangeRequest->getPossibleChangeDateTime() &&
-            $leftChangeRequest->getCertainChangeDateTime() > $rightChangeRequest->getPossibleChangeDateTime()
+            $leftChangeRequest->getCertainChangeDateTime()
+            && $rightChangeRequest->getPossibleChangeDateTime()
+            && $leftChangeRequest->getCertainChangeDateTime() > $rightChangeRequest->getPossibleChangeDateTime()
         ) {
             return $leftChangeRequest;
         }
 
         if (
-            $rightChangeRequest->getCertainChangeDateTime() &&
-            $leftChangeRequest->getPossibleChangeDateTime() &&
-            $rightChangeRequest->getCertainChangeDateTime() > $leftChangeRequest->getPossibleChangeDateTime()
+            $rightChangeRequest->getCertainChangeDateTime()
+            && $leftChangeRequest->getPossibleChangeDateTime()
+            && $rightChangeRequest->getCertainChangeDateTime() > $leftChangeRequest->getPossibleChangeDateTime()
         ) {
             return $rightChangeRequest;
         }

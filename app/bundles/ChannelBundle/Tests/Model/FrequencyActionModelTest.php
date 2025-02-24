@@ -15,32 +15,29 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Lead
      */
-    private $contactMock5;
+    private MockObject $contactMock5;
 
     /**
      * @var MockObject|LeadModel
      */
-    private $contactModelMock;
+    private MockObject $contactModelMock;
 
     /**
      * @var MockObject|FrequencyRuleRepository
      */
-    private $frequencyRepoMock;
+    private MockObject $frequencyRepoMock;
 
     /**
      * @var MockObject|FrequencyRule
      */
-    private $frequencyRuleEmailMock;
+    private MockObject $frequencyRuleEmailMock;
 
     /**
      * @var MockObject|FrequencyRule
      */
-    private $frequencyRuleSmsMock;
+    private MockObject $frequencyRuleSmsMock;
 
-    /**
-     * @var FrequencyActionModel
-     */
-    private $actionModel;
+    private FrequencyActionModel $actionModel;
 
     protected function setUp(): void
     {

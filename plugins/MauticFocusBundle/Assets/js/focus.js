@@ -19,15 +19,15 @@ Mautic.focusOnLoad = function () {
             mQuery(this).click(function () {
                 if (mQuery(this).hasClass('active')) {
                     // Deactivate
-                    mQuery(this).removeClass('active btn-primary').addClass('btn-default');
+                    mQuery(this).removeClass('active btn-primary').addClass('btn-ghost');
 
                     mQuery('#websiteCanvas').css('cursor', 'inherit');
                 } else {
                     // Remove active state from all the droppers
-                    mQuery('.btn-dropper').removeClass('active btn-primary').addClass('btn-default');
+                    mQuery('.btn-dropper').removeClass('active btn-primary').addClass('btn-ghost');
 
                     // Activate this dropper
-                    mQuery(this).removeClass('btn-default').addClass('active btn-primary');
+                    mQuery(this).removeClass('btn-ghost').addClass('active btn-primary');
 
                     // Activate the cross hairs for image
                     mQuery('#websiteCanvas').css('cursor', 'crosshair');
@@ -188,6 +188,9 @@ Mautic.focusOnLoad = function () {
 
     if (mQuery('[data-conversion-rate-table]').length) {
         Mautic.focusLoadConversionRateTable();
+    }
+    else {
+        Mautic.focusLoadViewCountTable();
     }
 };
 
@@ -378,11 +381,11 @@ Mautic.closeFocusBuilder = function (el) {
 Mautic.focusInitViewportSwitcher = function () {
     mQuery('.btn-viewport').on('click', function () {
         if (mQuery(this).data('viewport') == 'mobile') {
-            mQuery('.btn-viewport i').removeClass('fa-desktop fa-2x').addClass('fa-mobile-phone fa-3x');
+            mQuery('.btn-viewport i').removeClass('ri-macbook-line ri-2x').addClass('ri-smartphone-line ri-2x');
             mQuery(this).data('viewport', 'desktop');
             Mautic.launchFocusBuilder(true);
         } else {
-            mQuery('.btn-viewport i').removeClass('fa-mobile-phone fa-3x').addClass('fa-desktop fa-2x');
+            mQuery('.btn-viewport i').removeClass('ri-smartphone-line ri-2x').addClass('ri-macbook-line ri-2x');
             mQuery(this).data('viewport', 'mobile');
             Mautic.launchFocusBuilder(true);
         }
@@ -456,5 +459,22 @@ Mautic.focusLoadConversionRateTable = function() {
     Mautic.ajaxActionRequest('plugin:focus:getClickThroughCount', {focusId: focusId}, function(response){
         clickThrough = response.clickThrough;
         updateTotalClickThroughRate();
+    }, false, true, "GET");
+}
+
+Mautic.focusLoadViewCountTable = function() {
+    var $viewTable = mQuery('[data-view-table]');
+    var $focusTotalViewsCell = mQuery('[data-focus-total-views-cell]');
+    var $focusTotalUniqueViewsCell = mQuery('[data-focus-total-unique-views-cell]');
+    var focusId = $viewTable.data('entity-id');
+    var views = null;
+    var uniqueViews = null;
+
+    Mautic.ajaxActionRequest('plugin:focus:getViewsCount', {focusId: focusId}, function(response){
+        views = response.views;
+        uniqueViews = response.uniqueViews;
+
+        $focusTotalViewsCell.html(views);
+        $focusTotalUniqueViewsCell.html(uniqueViews);
     }, false, true, "GET");
 }

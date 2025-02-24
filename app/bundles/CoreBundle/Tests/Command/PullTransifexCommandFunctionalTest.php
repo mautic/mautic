@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
     private const FAKE_TRANSLATION_DIR = __DIR__.'/../Fixtures/Transifex/Translations';
+
     private Filesystem $filesystem;
 
     protected function setUp(): void
@@ -23,7 +24,7 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->filesystem = self::$container->get('mautic.filesystem');
+        $this->filesystem = static::getContainer()->get('mautic.filesystem');
         $this->filesystem->mkdir(self::FAKE_TRANSLATION_DIR);
     }
 
@@ -34,7 +35,7 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
         // Using the same translation for both file as we don't know which response will be processed first.
         $someTranslation = 'some.translation="Some translation"';
 
-        $handlerStack = self::$container->get(MockHandler::class);
+        $handlerStack = static::getContainer()->get(MockHandler::class);
         $handlerStack->append(
             // Fetches all languages for webhook's messages.ini
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/language-stats.json')),

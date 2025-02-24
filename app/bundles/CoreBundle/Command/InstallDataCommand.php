@@ -15,13 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class InstallDataCommand extends Command
 {
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
         parent::__construct();
-
-        $this->translator = $translator;
     }
 
     protected function configure()
@@ -55,7 +52,7 @@ EOT
             $question       = new ConfirmationQuestion($questionString, false);
 
             if (!$helper->ask($input, $output, $question)) {
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
+                return Command::SUCCESS;
             }
         }
 
@@ -113,7 +110,8 @@ EOT
             $this->translator->trans('mautic.core.command.install_data_success')
         );
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Installs Mautic with sample data';
 }

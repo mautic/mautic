@@ -1,26 +1,29 @@
-<div class="media pt-sm pb-sm pr-md pl-md nm bdr-b notification" id="notification{{ n.id }}">
-    <span class="pull-left mt-xs" style="width:36px">
-        {% if n.iconClass starts with 'img:' %}
-        <span class="img-wrapper img-rounded">
-            <img class="media-object" src="{{ n.iconClass|slice(4) }}" />
-        </span>
-        {% else %}
-        {% set tooltip = n.type ? ' data-toggle="tooltip" title="{% trans %}mautic.notifications.type.{{ n.type }}{% endtrans %}' : '' %}
-        <i class="fa fa-2x {{ n.iconClass ? n.iconClass : 'fa-star' }}"{{ tooltip }}></i>
-        {% endif %}
-    </span>
-    <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right do-not-close" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clear{% endtrans %}" onclick="Mautic.clearNotification({{ n.id }});"><i class="fa fa-times do-not-close"></i></a>
-    {% if not n.isRead %}
-        <span class="pull-right is-unread text-danger"><i class="fa fa-asterisk"></i></span>
-    {% endif %}
-    <div class="media-body">
-        {% if n.header %}
-            <div class="media-heading fw-sb mb-0 text-primary">{{ format(n.header) }}</div>
-        {% endif %}
-        <div>{{ format(n.message, 'html') }}</div>
-        <div class="clearfix mt-xs">
-            <span class="fa fa-clock-o text-success pull-left mr-xs notification-timer-icon"></span>
-            <span class="fs-10 text-muted pull-left">{{ dateToText(n.dateAdded) }}</span>
+<div class="alert {% if n.type is defined %}alert-{{ n.type }}{% endif %} ma-0 bdr-b notification" id="notification{{ n.id }}">
+    <div class="media-body notification">
+        <div class="text-muted fw-b mb-xs {% if n.type is defined %}ml-lg{% endif %}">
+            {{ dateToHumanized(n.dateAdded) }}
+            {% if not n.isRead %}
+                <span class="is-unread text-danger"><i class="ri-asterisk"></i></span>
+            {% endif %}
         </div>
+        {% if n.header %}
+            <div class="notification-header fs-b-e fw-b mb-3 mt-sm">{{ format(n.header)|trans }}</div>
+        {% endif %}
+        <div class="text-muted">{{ format(n.message, 'html') }}</div>
     </div>
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                variant: 'ghost',
+                icon_only: true,
+                icon: 'ri-close-line do-not-close',
+                label: 'mautic.core.notifications.clear',
+                size: 'xs',
+                attributes: {
+                    'class': 'pull-right close do-not-close'
+                },
+                onclick: 'Mautic.clearNotification(' ~ n.id ~ ');'
+            }
+        ]
+    } %}
 </div>

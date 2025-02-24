@@ -13,7 +13,7 @@ class MenuExtensionTest extends AbstractMauticTestCase
 {
     public function testParseMenuAttributes(): void
     {
-        $menuExtension = self::$container->get(MenuExtension::class);
+        $menuExtension = static::getContainer()->get(MenuExtension::class);
         \assert($menuExtension instanceof MenuExtension);
 
         $menuAttributes = [
@@ -29,7 +29,7 @@ class MenuExtensionTest extends AbstractMauticTestCase
 
     public function testBuildMenuClasses(): void
     {
-        $menuExtension = self::$container->get(MenuExtension::class);
+        $menuExtension = static::getContainer()->get(MenuExtension::class);
         \assert($menuExtension instanceof MenuExtension);
 
         // create a menu and menu items to test with

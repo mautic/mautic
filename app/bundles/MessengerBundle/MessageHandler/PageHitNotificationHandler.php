@@ -28,7 +28,9 @@ class PageHitNotificationHandler implements MessageHandlerInterface
     ) {
     }
 
-    /** @throws InvalidPayloadException */
+    /**
+     * @throws InvalidPayloadException
+     */
     public function __invoke(PageHitNotification $message, Acknowledger $ack = null): void
     {
         $parsed = $this->parseMessage($message);

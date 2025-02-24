@@ -17,8 +17,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class GroupListType extends AbstractType
 {
-    public function __construct(private EntityManager $em, private GroupRepository $repo)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private GroupRepository $repo
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -32,7 +34,7 @@ class GroupListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $groups  = $this->repo->getEntities();
                 $choices = [];
                 foreach ($groups as $l) {

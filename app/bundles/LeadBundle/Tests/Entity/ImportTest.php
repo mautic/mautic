@@ -7,21 +7,21 @@ use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
 class ImportTest extends StandardImportTestHelper
 {
-    public function testSetPath()
+    public function testSetPath(): void
     {
         $import = $this->initImportEntity();
 
         $this->assertSame(self::$csvPath, $import->getFilePath());
     }
 
-    public function testCanProceed()
+    public function testCanProceed(): void
     {
         $import = $this->initImportEntity();
 
         $this->assertTrue($import->canProceed());
     }
 
-    public function testIsBackgroundProcess()
+    public function testIsBackgroundProcess(): void
     {
         $import = $this->initImportEntity();
 
@@ -32,7 +32,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertFalse($import->isBackgroundProcess());
     }
 
-    public function testIncreaseInsertedCount()
+    public function testIncreaseInsertedCount(): void
     {
         $count  = 4;
         $import = $this->initImportEntity();
@@ -45,7 +45,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(5, $import->getInsertedCount());
     }
 
-    public function testIncreaseUpdatedCount()
+    public function testIncreaseUpdatedCount(): void
     {
         $count  = 4;
         $import = $this->initImportEntity();
@@ -58,7 +58,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(5, $import->getUpdatedCount());
     }
 
-    public function testIncreaseIgnoredCount()
+    public function testIncreaseIgnoredCount(): void
     {
         $count  = 4;
         $import = $this->initImportEntity();
@@ -71,7 +71,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(5, $import->getIgnoredCount());
     }
 
-    public function testGetProcessedRows()
+    public function testGetProcessedRows(): void
     {
         $count  = 4;
         $import = $this->initImportEntity();
@@ -90,7 +90,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(3 * $count + 2, $import->getProcessedRows());
     }
 
-    public function testGetProgressPercentage()
+    public function testGetProgressPercentage(): void
     {
         $import = $this->initImportEntity()
             ->setLineCount(100);
@@ -107,7 +107,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertEquals(5, $import->getProgressPercentage());
     }
 
-    public function testStart()
+    public function testStart(): void
     {
         $import = $this->initImportEntity();
 
@@ -129,7 +129,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame($startDate, $import->getDateStarted());
     }
 
-    public function testEnd()
+    public function testEnd(): void
     {
         $import = $this->initImportEntity();
 
@@ -142,7 +142,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertTrue($import->getDateEnded() instanceof \DateTime);
     }
 
-    public function testGetRunTime()
+    public function testGetRunTime(): void
     {
         $import = $this->initImportEntity()->start();
 
@@ -156,7 +156,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(10, $import->getRunTime()->i);
     }
 
-    public function testGetRunTimeSeconds()
+    public function testGetRunTimeSeconds(): void
     {
         $import = $this->initImportEntity()->start();
 
@@ -169,7 +169,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(600, $import->getRunTimeSeconds());
     }
 
-    public function testGetSpeed()
+    public function testGetSpeed(): void
     {
         $import = $this->initImportEntity()->start();
 
@@ -183,7 +183,7 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(1.5, $import->getSpeed());
     }
 
-    public function testGetSpeedWhenRunTimeIsUnderOneSecond()
+    public function testGetSpeedWhenRunTimeIsUnderOneSecond(): void
     {
         $import = $this->initImportEntity()->start();
 

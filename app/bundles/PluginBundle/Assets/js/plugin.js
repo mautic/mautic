@@ -27,7 +27,7 @@ Mautic.matchedFields = function (index, object, integration) {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic_company' + index + ']"]:checked').val();
     }
     Mautic.ajaxActionRequest('plugin:matchFields', {object: object, integration: integration, integrationField : integrationField, mauticField: mauticField, updateMautic : updateMauticField}, function(response) {
-        var theMessage = (response.success) ? '<i class="fa fa-check-circle text-success"></i>' : '';
+        var theMessage = (response.success) ? '<i class="ri-check-line-circle text-success"></i>' : '';
         mQuery('#matched-' + index + "-" + object).html(theMessage);
     });
 };

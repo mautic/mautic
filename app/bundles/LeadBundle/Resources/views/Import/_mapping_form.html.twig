@@ -31,11 +31,9 @@
             {{ form_errors(form) }}
             {% for key, child in form.children %}
                 {% if 'properties' != key and not child.isRendered %}
-                    {{ cycle(['','','<div class="row">'], loop.index0)|raw }}
                     <div class="col-sm-4">
                         {{ form_row(child) }}
                     </div>
-                    {{ cycle(['','','</div>'], loop.index0)|raw }}
                 {% endif %}
             {% endfor %}
         </div>

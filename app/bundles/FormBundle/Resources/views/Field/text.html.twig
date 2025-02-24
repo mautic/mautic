@@ -62,7 +62,7 @@
 {# Label and input #}
 {% if inForm is defined and (true == inForm or inForm is not empty) %}
   {% if field.type in ['button', 'pagebreak'] %}
-    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' %}
   {% endif %}
 
   {% set labelAttributes = labelAttributes|merge({
@@ -106,13 +106,12 @@
   }) %}
 {% endif %}
 
-
 {# Field is required #}
 {% if field.isRequired is defined and field.isRequired %}
   {% set required = true %}
   {% set validationMessage = field.validationMessage %}
   {% if validationMessage is empty %}
-        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) %}
   {% endif %}
   {% set containerAttributes = containerAttributes|merge({
           'class': containerAttributes.class|default([])|merge([
@@ -137,12 +136,17 @@
 {# end: field_helper #}
 
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
+  {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>{% endif %}
 
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
   {% if 'textarea' == field.type %}
     <textarea {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.defaultValue }}</textarea>
+  {% elseif 'number' == field.type %}
+      <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} step="{{ step }}"/>
+  {% elseif 'companyLookup' == field.type %}
+      <input class="{{ defaultInputClass }}" placeholder="start typing" data-toggle="field-company-lookup" data-set-id="mauticform_input{{ formName }}_{{ field.alias }}" type="search"  dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="191"/>
+      <input type="number" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} style="display: none;">
   {% else %}
     <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
   {% endif %}

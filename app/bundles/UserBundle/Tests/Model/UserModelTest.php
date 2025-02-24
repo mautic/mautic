@@ -27,42 +27,42 @@ class UserModelTest extends TestCase
     /**
      * @var MockObject&MailHelper
      */
-    private $mailHelper;
+    private MockObject $mailHelper;
 
     /**
      * @var MockObject&EntityManager
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject&Router
      */
-    private $router;
+    private MockObject $router;
 
     /**
      * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject&User
      */
-    private $user;
+    private MockObject $user;
 
     /**
      * @var MockObject&UserToken
      */
-    private $userToken;
+    private MockObject $userToken;
 
     /**
      * @var MockObject&UserTokenServiceInterface
      */
-    private $userTokenService;
+    private MockObject $userTokenService;
 
     /**
      * @var MockObject&LoggerInterface
      */
-    private $logger;
+    private MockObject $logger;
 
     public function setUp(): void
     {

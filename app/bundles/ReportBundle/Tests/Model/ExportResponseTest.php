@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ExportResponseTest extends \PHPUnit\Framework\TestCase
 {
-    public function testResponse()
+    public function testResponse(): void
     {
         $responce = new Response();
         ExportResponse::setResponseHeaders($responce, 'fileName.csv');

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 trait MessageRequestTrait
 {
     private ?\DateTimeInterface $eventTime = null;
+
     private Request $request;
 
     public function getEventTime(): ?\DateTimeInterface

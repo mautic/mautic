@@ -131,5 +131,6 @@ EOT
         $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
         $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
     }
+
     protected static $defaultDescription = 'Combines and minifies asset files into single production files';
 }

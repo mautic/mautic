@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -34,7 +33,7 @@ class CompanyApiController extends CommonApiController
     /**
      * @var CompanyModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
@@ -48,36 +47,21 @@ class CompanyApiController extends CommonApiController
         $this->serializerGroups[] = 'companyDetails';
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
-
-        $this->setCleaningRules('company');
     }
 
-    /**
-     * If an existing company is matched, it'll be merged. Otherwise it'll be created.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function newEntityAction(Request $request)
+    public function getNewEntity(array $params)
     {
-        // Check for an email to see if the lead already exists
-        $parameters = $request->request->all();
-
-        if (empty($parameters['force'])) {
-            $leadCompanyModel = $this->getModel('lead.company');
-            \assert($leadCompanyModel instanceof CompanyModel);
-            list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
-
-            if (count($companyEntities)) {
-                return $this->editEntityAction($request, $company['id']);
-            }
+        $leadCompanyModel = $this->getModel('lead.company');
+        \assert($leadCompanyModel instanceof CompanyModel);
+        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $leadCompanyModel);
+        if (count($companyEntities)) {
+            return $this->model->getEntity($company['id']);
         }
 
-        return parent::newEntityAction($request);
+        return $this->model->getEntity();
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   &$entity
      * @param string $action
      */
@@ -92,7 +76,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId Company ID
      * @param int $contactId Contact ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -121,7 +105,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId List ID
      * @param int $contactId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

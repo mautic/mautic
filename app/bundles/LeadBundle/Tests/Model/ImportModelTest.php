@@ -178,7 +178,7 @@ class ImportModelTest extends StandardImportTestHelper
         try {
             $model->beginImport($entity, new Progress());
             $this->fail();
-        } catch (ImportDelayedException $e) {
+        } catch (ImportDelayedException) {
             // This is expected
         }
 
@@ -215,7 +215,7 @@ class ImportModelTest extends StandardImportTestHelper
         try {
             $model->beginImport($entity, new Progress());
             $this->fail();
-        } catch (ImportFailedException $e) {
+        } catch (ImportFailedException) {
             // This is expected
         }
 

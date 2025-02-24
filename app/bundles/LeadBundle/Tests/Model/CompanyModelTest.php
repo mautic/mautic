@@ -14,22 +14,22 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadFieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var EmailValidator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $emailValidator;
+    private \PHPUnit\Framework\MockObject\MockObject $emailValidator;
 
     /**
      * @var CompanyDeduper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyDeduper;
+    private \PHPUnit\Framework\MockObject\MockObject $companyDeduper;
 
     public function setUp(): void
     {
@@ -44,7 +44,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      */
-    public function testArrayValueIsFlattenedBeforeSave()
+    public function testArrayValueIsFlattenedBeforeSave(): void
     {
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
@@ -77,7 +77,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testImportCompanySkipIfExistsTrue()
+    public function testImportCompanySkipIfExistsTrue(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -90,7 +90,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel->importCompany([], [], null, false, true);
     }
 
-    public function testImportCompanySkipIfExistsFalse()
+    public function testImportCompanySkipIfExistsFalse(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -148,7 +148,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $reflectedProp->setValue($object, $value);
     }
 
-    public function testExtractCompanyDataFromImport()
+    public function testExtractCompanyDataFromImport(): void
     {
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)

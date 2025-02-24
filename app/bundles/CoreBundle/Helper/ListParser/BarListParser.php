@@ -12,7 +12,7 @@ class BarListParser implements ListParserInterface
             throw new FormatNotSupportedException();
         }
 
-        if (false === strpos($list, '|')) {
+        if (!str_contains($list, '|')) {
             throw new FormatNotSupportedException();
         }
 

@@ -5,14 +5,8 @@ namespace Mautic\WebhookBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class WebhookPermissions.
- */
 class WebhookPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -20,20 +14,12 @@ class WebhookPermissions extends AbstractPermissions
         $this->addStandardPermissions('categories');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'webhook';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('webhook', 'categories', $builder, $data);
         $this->addExtendedFormFields('webhook', 'webhooks', $builder, $data);

@@ -36,26 +36,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'campaign:campaigns:viewother',
     ];
 
-    /**
-     * @var EventModel
-     */
-    protected $campaignEventModel;
-
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
-
-    public function __construct(CampaignModel $campaignModel, EventModel $campaignEventModel)
-    {
-        $this->campaignModel      = $campaignModel;
-        $this->campaignEventModel = $campaignEventModel;
+    public function __construct(
+        protected CampaignModel $campaignModel,
+        protected EventModel $campaignEventModel
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('campaign:campaigns:viewother');

@@ -20,7 +20,7 @@ class CleanupListener implements TestListener
         $reflection = new \ReflectionObject($test);
 
         foreach ($reflection->getProperties() as $property) {
-            if (!$property->isStatic() && 0 !== strpos($property->getDeclaringClass()->getName(), 'PHPUnit\\')) {
+            if (!$property->isStatic() && !str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit\\')) {
                 $this->unsetProperty($test, $property->getName());
             }
         }
@@ -28,7 +28,7 @@ class CleanupListener implements TestListener
 
     private function unsetProperty(object $object, string $property): void
     {
-        $closure = function (object $object) use ($property) {
+        $closure = function (object $object) use ($property): void {
             unset($object->$property);
         };
 

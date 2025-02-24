@@ -11,28 +11,17 @@ use Mautic\UserBundle\Model\RoleModel;
 
 class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_mautic_install_data'];
     }
 
-    /**
-     * @var RoleModel
-     */
-    private $roleModel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(RoleModel $roleModel)
-    {
-        $this->roleModel = $roleModel;
+    public function __construct(
+        private RoleModel $roleModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         if (!$this->hasReference('admin-role')) {
             $role = new Role();
@@ -62,9 +51,6 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->addReference('sales-role', $role);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 1;

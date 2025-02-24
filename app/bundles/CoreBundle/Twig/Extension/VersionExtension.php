@@ -10,16 +10,11 @@ use Twig\TwigFunction;
 
 class VersionExtension extends AbstractExtension
 {
-    private AppVersion $appVersion;
-
-    public function __construct(AppVersion $appVersion)
-    {
-        $this->appVersion = $appVersion;
+    public function __construct(
+        private AppVersion $appVersion
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

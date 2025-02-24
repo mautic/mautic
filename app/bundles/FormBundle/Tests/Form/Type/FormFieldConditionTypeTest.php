@@ -17,22 +17,19 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private MockObject $fieldModel;
 
     /**
      * @var MockObject|PropertiesAccessor
      */
-    private $propertiesAccessor;
+    private MockObject $propertiesAccessor;
 
     /**
      * @var MockObject&FormBuilderInterface<string|FormBuilderInterface>
      */
-    private $formBuilder;
+    private MockObject $formBuilder;
 
-    /**
-     * @var FormFieldConditionType
-     */
-    private $form;
+    private FormFieldConditionType $form;
 
     protected function setUp(): void
     {
@@ -71,7 +68,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         ],
                         'required' => false,
                     ],
-                    ],
+                ],
                 [
                     'any',
                     YesNoButtonGroupType::class,
@@ -80,7 +77,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         'attr'  => [
                             'data-show-on' => '{"formfield_conditions_expr": "in"}',
                         ],
-                        'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
+                        'data' => false,
                     ],
                 ],
                 [

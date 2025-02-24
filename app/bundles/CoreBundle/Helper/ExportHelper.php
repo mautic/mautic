@@ -20,20 +20,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ExportHelper
 {
     public const EXPORT_TYPE_EXCEL = 'xlsx';
+
     public const EXPORT_TYPE_CSV   = 'csv';
 
-    private TranslatorInterface $translator;
-    private CoreParametersHelper $coreParametersHelper;
-    private FilePathResolver $filePathResolver;
-
     public function __construct(
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
-        FilePathResolver $filePathResolver
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
+        private FilePathResolver $filePathResolver
     ) {
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->filePathResolver     = $filePathResolver;
     }
 
     /**
@@ -110,7 +104,7 @@ class ExportHelper
         $objWriter->setPreCalculateFormulas(false);
 
         $response = new StreamedResponse(
-            function () use ($objWriter) {
+            function () use ($objWriter): void {
                 $objWriter->save('php://output');
             }
         );
@@ -155,7 +149,7 @@ class ExportHelper
         $objWriter->setUseBOM(true);
 
         $response = new StreamedResponse(
-            function () use ($objWriter) {
+            function () use ($objWriter): void {
                 $objWriter->save('php://output');
             }
         );

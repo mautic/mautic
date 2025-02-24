@@ -10,17 +10,9 @@ use Twig\TwigFunction;
 
 class AssetExtension extends AbstractExtension
 {
-    /**
-     * @var AssetsHelper
-     */
-    protected $assetsHelper;
-
-    /**
-     * AssetExtension constructor.
-     */
-    public function __construct(AssetsHelper $assetsHelper)
-    {
-        $this->assetsHelper = $assetsHelper;
+    public function __construct(
+        protected AssetsHelper $assetsHelper
+    ) {
     }
 
     /**
@@ -42,6 +34,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
             new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
             new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
+            new TwigFunction('assetAddCustomDeclaration', [$this, 'addCustomDeclaration']),
             new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
             new TwigFunction('assetGetBaseUrl', [$this, 'getBaseUrl'], ['is_safe' => ['html']]),
             new TwigFunction('assetMakeLinks', [$this, 'makeLinks'], ['is_safe' => ['html']]),
@@ -149,9 +142,18 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->getAssetPrefix($includeEndingslash);
     }
 
-    public function addScriptDeclaration(string $script, string $location = 'head'): AssetsHelper
+    public function addScriptDeclaration(string $script, string $location = 'head'): string
     {
-        return $this->assetsHelper->addScriptDeclaration($script, $location);
+        $this->assetsHelper->addScriptDeclaration($script, $location);
+
+        return '';
+    }
+
+    public function addCustomDeclaration(string $script, string $location): string
+    {
+        $this->assetsHelper->addCustomDeclaration($script, $location);
+
+        return '';
     }
 
     /**

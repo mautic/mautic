@@ -12,26 +12,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ControllerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
-
-    /**
-     * @var ControllerResolverInterface
-     */
-    private $resolver;
-
-    public function __construct(IntegrationsHelper $integrationsHelper, ControllerResolverInterface $resolver)
-    {
-        $this->integrationsHelper = $integrationsHelper;
-        $this->resolver           = $resolver;
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper,
+        private ControllerResolverInterface $resolver
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => ['onKernelController', 0],
@@ -62,7 +49,7 @@ class ControllerSubscriber implements EventSubscriberInterface
 
                 $controller = $this->resolver->getController($request);
                 $event->setController($controller);
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Old integration so ignore and let old PluginBundle code handle it
             }
         }

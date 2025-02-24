@@ -13,28 +13,13 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     public const UTM_TAG = 'lead.utmTag';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
     public function __construct(
-        FieldsBuilder $fieldsBuilder,
-        CompanyReportData $companyReportData
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData
     ) {
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
@@ -45,7 +30,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::UTM_TAG])) {
             return;
@@ -89,7 +74,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::UTM_TAG])) {
             return;

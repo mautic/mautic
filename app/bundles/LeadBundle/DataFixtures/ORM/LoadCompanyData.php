@@ -11,20 +11,12 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(CompanyModel $companyModel)
-    {
-        $this->companyModel = $companyModel;
+    public function __construct(
+        private CompanyModel $companyModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $today     = new \DateTime();
         $companies = CsvHelper::csv_to_array(__DIR__.'/fakecompanydata.csv');
@@ -34,7 +26,7 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
             foreach ($l as $col => $val) {
                 $company->addUpdatedField($col, $val);
             }
-            $this->companyModel->saveEntity($company);
+            $this->companyModel->getRepository()->saveEntity($company);
 
             $this->setReference('company-'.$count, $company);
         }

@@ -18,7 +18,7 @@
 
 {% block content %}
     {% if isIndex %}
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div id="page-list-wrapper" class="panel panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'searchHelp'  : 'mautic.api.client.help.searchcommands',
@@ -35,13 +35,14 @@
 
 {% block listResults %}
 <div class="table-responsive panel-collapse pull out page-list">
-    <table class="table table-hover table-striped table-bordered client-list">
+    <table class="table table-hover client-list">
         <thead>
         <tr>
             {{- include(
                 '@MauticCore/Helper/tableheader.html.twig',
                 {
-                    'checkall'        : 'true',
+                    'checkall'        : false,
+                    'text'            : null,
                     'target'          : '.client-list',
                     'action'          : currentRoute,
                     'routeBase'       : 'client',

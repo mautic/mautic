@@ -77,6 +77,10 @@ class AuditlogController extends CommonController
             return $lead;
         }
 
+        if (!$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
         $this->setListFilters();
 
         $session = $request->getSession();
@@ -98,15 +102,15 @@ class AuditlogController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper) {
-            $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+        $resultsCallback = function ($event) use ($dateHelper): array {
+            $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];
             }
 
             return [
                 'eventName'      => $eventLabel,
-                'eventType'      => isset($event['eventType']) ? $event['eventType'] : '',
+                'eventType'      => $event['eventType'] ?? '',
                 'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };

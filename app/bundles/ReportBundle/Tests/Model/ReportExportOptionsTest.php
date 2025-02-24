@@ -7,7 +7,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 
 class ReportExportOptionsTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBatch()
+    public function testBatch(): void
     {
         $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()

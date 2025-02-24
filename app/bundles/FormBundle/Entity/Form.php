@@ -20,6 +20,8 @@ class Form extends FormEntity
      */
     private $id;
 
+    private ?string $language = null;
+
     /**
      * @var string
      */
@@ -53,7 +55,7 @@ class Form extends FormEntity
     /**
      * @var string
      */
-    private $postAction = 'return';
+    private $postAction = 'message';
 
     /**
      * @var string|null
@@ -98,9 +100,9 @@ class Form extends FormEntity
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: \Mautic\FormBundle\Entity\Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
-    private \Doctrine\Common\Collections\Collection $submissions;
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
+    private Collection $submissions;
 
     /**
      * @var int
@@ -143,16 +145,21 @@ class Form extends FormEntity
         $this->submissions = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('forms')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FormRepository');
+            ->setCustomRepositoryClass(FormRepository::class);
 
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->nullable()
+            ->build();
 
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
@@ -220,7 +227,7 @@ class Form extends FormEntity
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -253,10 +260,7 @@ class Form extends FormEntity
         ]));
     }
 
-    /**
-     * @return array
-     */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
     {
         $data   = $form->getData();
         $groups = ['form'];
@@ -279,7 +283,7 @@ class Form extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('form')
             ->addListProperties(
@@ -306,6 +310,7 @@ class Form extends FormEntity
                     'postActionProperty',
                     'noIndex',
                     'formAttributes',
+                    'language',
                 ]
             )
             ->build();
@@ -439,15 +444,16 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostActionProperty()
+    public function getPostActionProperty(): ?string
     {
+        if ('return' === $this->getPostAction()) {
+            return null;
+        }
+
         return $this->postActionProperty;
     }
 
-    public function getResultCount()
+    public function getResultCount(): int
     {
         return count($this->submissions);
     }
@@ -512,7 +518,7 @@ class Form extends FormEntity
     /**
      * @param int|string $key
      */
-    public function removeField($key, Field $field)
+    public function removeField($key, Field $field): void
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -528,10 +534,7 @@ class Form extends FormEntity
         return $this->fields;
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldAliases()
+    public function getFieldAliases(): array
     {
         $aliases = [];
         $fields  = $this->getFields();
@@ -554,13 +557,11 @@ class Form extends FormEntity
     {
         return array_filter(
             array_map(
-                function (Field $field) {
-                    return [
-                        'formFieldId'  => $field->getId(),
-                        'mappedObject' => $field->getMappedObject(),
-                        'mappedField'  => $field->getMappedField(),
-                    ];
-                },
+                fn (Field $field): array => [
+                    'formFieldId'  => $field->getId(),
+                    'mappedObject' => $field->getMappedObject(),
+                    'mappedField'  => $field->getMappedField(),
+                ],
                 $this->getFields()->getValues()
             ),
             fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
@@ -579,9 +580,7 @@ class Form extends FormEntity
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        function (Field $field) {
-                            return $field->getMappedObject();
-                        }
+                        fn (Field $field) => $field->getMappedObject()
                     )->toArray()
                 )
             )
@@ -619,13 +618,13 @@ class Form extends FormEntity
         return $this;
     }
 
-    public function removeSubmission(Submission $submissions)
+    public function removeSubmission(Submission $submissions): void
     {
         $this->submissions->removeElement($submissions);
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return Collection|Submission[]
      */
     public function getSubmissions()
     {
@@ -647,7 +646,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    public function removeAction(Action $action)
+    public function removeAction(Action $action): void
     {
         $this->actions->removeElement($action);
     }
@@ -655,7 +654,7 @@ class Form extends FormEntity
     /**
      * Removes all actions.
      */
-    public function clearActions()
+    public function clearActions(): void
     {
         $this->actions = new ArrayCollection();
     }
@@ -679,7 +678,7 @@ class Form extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -695,7 +694,7 @@ class Form extends FormEntity
     /**
      * @param mixed $template
      */
-    public function setTemplate($template)
+    public function setTemplate($template): void
     {
         $this->template = $template;
     }
@@ -711,7 +710,7 @@ class Form extends FormEntity
     /**
      * @param mixed $inKioskMode
      */
-    public function setInKioskMode($inKioskMode)
+    public function setInKioskMode($inKioskMode): void
     {
         $this->inKioskMode = $inKioskMode;
     }
@@ -719,7 +718,7 @@ class Form extends FormEntity
     /**
      * @param mixed $renderStyle
      */
-    public function setRenderStyle($renderStyle)
+    public function setRenderStyle($renderStyle): void
     {
         $this->renderStyle = $renderStyle;
     }
@@ -755,7 +754,7 @@ class Form extends FormEntity
     /**
      * @param bool|null $noIndex
      */
-    public function setNoIndex($noIndex)
+    public function setNoIndex($noIndex): void
     {
         $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedNoIndex);
@@ -791,10 +790,20 @@ class Form extends FormEntity
         return $this->formAttributes;
     }
 
-    /**
-     * @return bool
-     */
-    public function isStandalone()
+    public function setLanguage(?string $language): self
+    {
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
+    }
+
+    public function isStandalone(): bool
     {
         return 'campaign' != $this->formType;
     }

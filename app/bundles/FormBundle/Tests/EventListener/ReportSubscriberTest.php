@@ -29,42 +29,36 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     /**
      * @var CompanyReportData|MockObject
      */
-    private $companyReportData;
+    private MockObject $companyReportData;
 
     /**
      * @var SubmissionRepository|MockObject
      */
-    private $submissionRepository;
+    private MockObject $submissionRepository;
 
     /**
      * @var FormModel|MockObject
      */
-    private $formModel;
+    private MockObject $formModel;
 
     /**
      * @var FormRepository|MockObject
      */
-    private $formRepository;
+    private MockObject $formRepository;
 
-    /**
-     * @var ReportHelper|MockObject
-     */
-    private $reportHelper;
+    private ReportHelper $reportHelper;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var ReportSubscriber
-     */
-    private $subscriber;
+    private ReportSubscriber $subscriber;
 
     public function setUp(): void
     {
@@ -134,7 +128,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(2))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
+            ->willReturnCallback(function () use (&$setTables): void {
                 $args = func_get_args();
 
                 $setTables[] = $args;
@@ -142,7 +136,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs) {
+            ->willReturnCallback(function () use (&$setGraphs): void {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;

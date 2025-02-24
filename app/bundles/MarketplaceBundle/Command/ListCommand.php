@@ -16,12 +16,10 @@ class ListCommand extends Command
 {
     public const NAME = 'mautic:marketplace:list';
 
-    private PluginCollector $pluginCollector;
-
-    public function __construct(PluginCollector $pluginCollector)
-    {
+    public function __construct(
+        private PluginCollector $pluginCollector
+    ) {
         parent::__construct();
-        $this->pluginCollector = $pluginCollector;
     }
 
     protected function configure(): void
@@ -63,7 +61,8 @@ class ListCommand extends Command
         $io->writeln("<fg=green>Total packages: {$this->pluginCollector->getTotal()}</>");
         $io->writeln("<fg=green>Execution time: {$event->getDuration()} ms</>");
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Lists plugins that are available at Packagist.org';
 }

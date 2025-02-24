@@ -11,12 +11,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DecisionHelper
 {
-    private LeadRepository $leadRepository;
-
     public function __construct(
-        LeadRepository $leadRepository
+        private LeadRepository $leadRepository
     ) {
-        $this->leadRepository = $leadRepository;
     }
 
     /**
@@ -35,7 +32,7 @@ class DecisionHelper
         }
 
         // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
-        if ($channel && $event->getChannel() && false === strpos($channel, $event->getChannel())) {
+        if ($channel && $event->getChannel() && !str_contains($channel, $event->getChannel())) {
             throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
         }
 
@@ -46,9 +43,10 @@ class DecisionHelper
         // Check if parent taken path is the path of this event, otherwise exit
         $parentEvent = $event->getParent();
 
-        if (null !== $parentEvent && null !== $event->getDecisionPath()) {
-            $rotation    = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
-            $log         = $parentEvent->getLogByContactAndRotation($contact, $rotation);
+        if (null !== $parentEvent && !$parentEvent->isDeleted() && null !== $event->getDecisionPath()) {
+            $rotation      = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
+            $rotationValue = isset($rotation[$contact->getId()]) ? $rotation[$contact->getId()]['rotation'] : null;
+            $log           = $parentEvent->getLogByContactAndRotation($contact, $rotationValue);
 
             if (null === $log) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");

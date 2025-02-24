@@ -6,12 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class AccessToken.
- */
 class AccessToken extends BaseAccessToken
 {
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -27,7 +24,7 @@ class AccessToken extends BaseAccessToken
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('user', \Mautic\UserBundle\Entity\User::class)
             ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
             ->build();
 

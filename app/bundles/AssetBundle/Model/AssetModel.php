@@ -43,59 +43,19 @@ use Symfony\Contracts\EventDispatcher\Event;
 class AssetModel extends FormModel
 {
     /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
      * @var int
      */
     protected $maxAssetSize;
 
-    /**
-     * @var DeviceCreatorServiceInterface
-     */
-    private $deviceCreatorService;
-
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
-        LeadModel $leadModel,
-        CategoryModel $categoryModel,
-        RequestStack $requestStack,
-        IpLookupHelper $ipLookupHelper,
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        ContactTracker $contactTracker,
+        protected LeadModel $leadModel,
+        protected CategoryModel $categoryModel,
+        private RequestStack $requestStack,
+        protected IpLookupHelper $ipLookupHelper,
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -105,23 +65,12 @@ class AssetModel extends FormModel
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadModel              = $leadModel;
-        $this->categoryModel          = $categoryModel;
-        $this->requestStack           = $requestStack;
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->deviceCreatorService   = $deviceCreatorService;
-        $this->deviceDetectorFactory  = $deviceDetectorFactory;
-        $this->deviceTrackingService  = $deviceTrackingService;
-        $this->contactTracker         = $contactTracker;
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
@@ -158,14 +107,13 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param null   $request
      * @param string $code
      * @param array  $systemEntry
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = [])
+    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -174,6 +122,12 @@ class AssetModel extends FormModel
 
         if (null == $request) {
             $request = $this->requestStack->getCurrentRequest();
+        }
+
+        if (!($request instanceof Request)) {
+            // likely this download came via a cron (no request), do not bother logging the download.
+            // https://github.com/mautic/mautic/issues/13577
+            return;
         }
 
         $download = new Download();
@@ -222,7 +176,7 @@ class AssetModel extends FormModel
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
+                    $emailRepo = $this->em->getRepository(Email::class);
                     if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
@@ -249,7 +203,7 @@ class AssetModel extends FormModel
                 $lead = $systemEntry['lead'];
                 if (!$lead instanceof Lead) {
                     $leadId = is_array($lead) ? $lead['id'] : $lead;
-                    $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+                    $lead   = $this->em->getReference(Lead::class, $leadId);
                 }
 
                 $download->setLead($lead);
@@ -264,7 +218,7 @@ class AssetModel extends FormModel
                 $email = $systemEntry['email'];
                 if (!$email instanceof Email) {
                     $emailId = is_array($email) ? $email['id'] : $email;
-                    $email   = $this->em->getReference(\Mautic\EmailBundle\Entity\Email::class, $emailId);
+                    $email   = $this->em->getReference(Email::class, $emailId);
                 }
 
                 $download->setEmail($email);
@@ -308,10 +262,7 @@ class AssetModel extends FormModel
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
-
-        if (null !== $request) {
-            $download->setReferer($request->server->get('HTTP_REFERER'));
-        }
+        $download->setReferer($request->server->get('HTTP_REFERER'));
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
@@ -340,7 +291,7 @@ class AssetModel extends FormModel
      * @param int        $increaseBy
      * @param bool|false $unique
      */
-    public function upDownloadCount($asset, $increaseBy = 1, $unique = false)
+    public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
     {
         $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
 
@@ -352,7 +303,7 @@ class AssetModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Asset::class);
+        return $this->em->getRepository(Asset::class);
     }
 
     /**
@@ -360,31 +311,23 @@ class AssetModel extends FormModel
      */
     public function getDownloadRepository()
     {
-        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Download::class);
+        return $this->em->getRepository(Download::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'asset:assets';
     }
 
-    /**
-     * @return string
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -399,10 +342,8 @@ class AssetModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Asset|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Asset
     {
         if (null === $id) {
             $entity = new Asset();
@@ -414,11 +355,9 @@ class AssetModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -470,8 +409,8 @@ class AssetModel extends FormModel
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
                 // During the form submit & edit, make sure that the data is checked against available assets
-                if ('mautic_segment_action' === $request->get('_route') &&
-                    (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
+                if ('mautic_segment_action' === $request->get('_route')
+                    && (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
                 ) {
                     $limit = 0;
                 }
@@ -525,7 +464,7 @@ class AssetModel extends FormModel
         if ($humanReadable) {
             $number = Asset::convertBytesToHumanReadable($maxAllowed);
         } else {
-            list($number, $unit) = Asset::convertBytesToUnit($maxAllowed, $unit);
+            [$number, $unit] = Asset::convertBytesToUnit($maxAllowed, $unit);
         }
 
         return $number;
@@ -570,10 +509,8 @@ class AssetModel extends FormModel
      * @param string      $dateFormat
      * @param array       $filter
      * @param bool        $canViewOthers
-     *
-     * @return array
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -600,10 +537,8 @@ class AssetModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart   = new PieChart();
         $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -637,10 +572,8 @@ class AssetModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
@@ -659,17 +592,15 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -689,6 +620,6 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

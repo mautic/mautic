@@ -6,7 +6,7 @@
 // The editor creator to use.
 import { ClassicEditor as ClassicEditorBase } from '@ckeditor/ckeditor5-editor-classic';
 import { Essentials } from '@ckeditor/ckeditor5-essentials';
-import { UploadAdapter } from '@ckeditor/ckeditor5-adapter-ckfinder';
+import { CKFinderUploadAdapter } from '@ckeditor/ckeditor5-adapter-ckfinder';
 import { Autoformat } from '@ckeditor/ckeditor5-autoformat';
 import { Bold, Italic, Underline, Code, Strikethrough, Subscript, Superscript } from '@ckeditor/ckeditor5-basic-styles';
 import { BlockQuote } from '@ckeditor/ckeditor5-block-quote';
@@ -29,6 +29,7 @@ import { CloudServices } from '@ckeditor/ckeditor5-cloud-services';
 import { Alignment } from "@ckeditor/ckeditor5-alignment";
 import { RemoveFormat } from "@ckeditor/ckeditor5-remove-format";
 import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
+import { GeneralHtmlSupport } from "@ckeditor/ckeditor5-html-support";
 import { Mention } from "@ckeditor/ckeditor5-mention";
 import TokenPlugin from './TokenPlugin';
 
@@ -54,13 +55,14 @@ export default class ClassicEditor extends ClassicEditorBase {
         FontBackgroundColor,
         RemoveFormat,
         SourceEditing,
+        GeneralHtmlSupport,
         TokenPlugin,
         FontColor,
         FontFamily,
         FontSize,
         Essentials,
         Underline,
-        UploadAdapter,
+        CKFinderUploadAdapter,
         Autoformat,
         Bold,
         Italic,

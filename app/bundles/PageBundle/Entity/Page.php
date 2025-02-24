@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
+use Mautic\CoreBundle\Validator\EntityEvent;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -108,7 +109,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $redirectUrl;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     private $category;
 
@@ -136,21 +137,18 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         parent::__clone();
     }
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
         $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('pages')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository')
+            ->setCustomRepositoryClass(PageRepository::class)
             ->addIndex(['alias'], 'page_alias_search');
 
         $builder->addId();
@@ -227,14 +225,14 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         self::addVariantMetadata($builder, self::class);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('title', new NotBlank([
             'message' => 'mautic.core.title.required',
         ]));
 
         $metadata->addConstraint(new Callback([
-            'callback' => function (Page $page, ExecutionContextInterface $context) {
+            'callback' => function (Page $page, ExecutionContextInterface $context): void {
                 $type = $page->getRedirectType();
                 if (!is_null($type)) {
                     $validator  = $context->getValidator();
@@ -273,12 +271,14 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                 }
             },
         ]));
+
+        $metadata->addConstraint(new EntityEvent());
     }
 
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('page')
             ->addListProperties(
@@ -631,8 +631,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set category.
      *
-     * @param \Mautic\CategoryBundle\Entity\Category $category
-     *
      * @return Page
      */
     public function setCategory(Category $category = null)
@@ -646,7 +644,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get category.
      *
-     * @return \Mautic\CategoryBundle\Entity\Category
+     * @return Category
      */
     public function getCategory()
     {
@@ -678,7 +676,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param bool|null $noIndex
      */
-    public function setNoIndex($noIndex)
+    public function setNoIndex($noIndex): void
     {
         $sanitizedValue = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedValue);
@@ -795,7 +793,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param mixed $variantHits
      */
-    public function setVariantHits($variantHits)
+    public function setVariantHits($variantHits): void
     {
         $this->variantHits = $variantHits;
     }
@@ -811,7 +809,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param mixed $customHtml
      */
-    public function setCustomHtml($customHtml)
+    public function setCustomHtml($customHtml): void
     {
         $this->customHtml = $customHtml;
     }

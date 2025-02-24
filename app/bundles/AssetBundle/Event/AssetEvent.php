@@ -5,9 +5,6 @@ namespace Mautic\AssetBundle\Event;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class AssetEvent.
- */
 class AssetEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class AssetEvent extends CommonEvent
     /**
      * Sets the Asset entity.
      */
-    public function setAsset(Asset $asset)
+    public function setAsset(Asset $asset): void
     {
         $this->entity = $asset;
     }

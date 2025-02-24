@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class CalculatorTest extends TestCase
 {
-    public function testSumByYearReturnsExpectedCount()
+    public function testSumByYearReturnsExpectedCount(): void
     {
         $expected = [
             2018 => 600,
@@ -18,7 +18,7 @@ class CalculatorTest extends TestCase
         $this->assertEquals($expected, $this->getCalculator()->getSumsByYear()->getStats());
     }
 
-    public function testSumByMonthReturnsExpectedCount()
+    public function testSumByMonthReturnsExpectedCount(): void
     {
         $expected = [
             1   => 0,
@@ -56,7 +56,7 @@ class CalculatorTest extends TestCase
         $this->assertEquals($expected, $this->getCalculator()->getSumsByMonth('Y-m')->getStats());
     }
 
-    public function testSumByDayReturnsExpectedCount()
+    public function testSumByDayReturnsExpectedCount(): void
     {
         $expected = [
             7  => 500,

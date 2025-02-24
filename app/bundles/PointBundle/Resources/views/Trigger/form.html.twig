@@ -19,11 +19,11 @@
 {% block content %}
 {{ form_start(form) }}
 <div class="box-layout">
-    <div class="col-md-9 bg-white height-auto">
+    <div class="col-md-9 height-auto">
         <div class="row">
             <div class="col-xs-12">
                 <!-- tabs controls -->
-                <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active"><a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
                     <li class=""><a href="#events-container" role="tab" data-toggle="tab">{{ 'mautic.point.trigger.tab.events'|trans }}</a></li>
                 </ul>
@@ -52,9 +52,8 @@
                     <div class="tab-pane fade bdr-w-0" id="events-container">
                         <div id="triggerEvents">
                             <div class="mb-md">
-                                <p>{{ 'mautic.point.trigger.addevent'|trans }}</p>
                                 <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                    <button class="btn btn-ghost dropdown-toggle" type="button" data-toggle="dropdown">
                                         {{ 'mautic.point.trigger.event.add'|trans }}
                                         <span class="caret"></span>
                                     </button>
@@ -100,7 +99,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto bdr-l">
+    <div class="col-md-3 height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.category) }}
             {{ form_row(form.isPublished) }}

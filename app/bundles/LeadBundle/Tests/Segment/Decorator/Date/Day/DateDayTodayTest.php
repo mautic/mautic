@@ -14,7 +14,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday::getOperator
      */
-    public function testGetOperatorBetween()
+    public function testGetOperatorBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -33,7 +33,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday::getOperator
      */
-    public function testGetOperatorLessOrEqual()
+    public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -56,7 +56,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday::getParameterValue
      */
-    public function testGetParameterValueBetween()
+    public function testGetParameterValueBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -81,7 +81,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday::getParameterValue
      */
-    public function testGetParameterValueSingle()
+    public function testGetParameterValueSingle(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

@@ -8,7 +8,7 @@
     - nameGetter
 #}
 {% set isCurrent = translation.id is same as activeEntity.id %}
-<li class="list-group-item bg-auto bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
+<li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
     <div class="box-layout">
         <div class="col-md-1 va-m">
             <h3>

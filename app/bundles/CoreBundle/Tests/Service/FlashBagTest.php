@@ -17,32 +17,29 @@ class FlashBagTest extends TestCase
     /**
      * @var MockObject|SymfonyFlashBag
      */
-    private $symfonyFlashBag;
+    private MockObject $symfonyFlashBag;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private MockObject $session;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|RequestStack
      */
-    private $requestStack;
+    private MockObject $requestStack;
 
     /**
      * @var NotificationModel|MockObject
      */
-    private $notificationModel;
+    private MockObject $notificationModel;
 
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
+    private FlashBag $flashBag;
 
     protected function setUp(): void
     {
@@ -150,17 +147,17 @@ class FlashBagTest extends TestCase
 
     public function testAddTypeError(): void
     {
-        $this->assertAddTypeCases(FlashBag::LEVEL_ERROR, 'text-danger fa-exclamation-circle');
+        $this->assertAddTypeCases(FlashBag::LEVEL_ERROR, 'text-danger ri-error-warning-line-circle');
     }
 
     public function testAddTypeNotice(): void
     {
-        $this->assertAddTypeCases(FlashBag::LEVEL_NOTICE, 'fa-info-circle');
+        $this->assertAddTypeCases(FlashBag::LEVEL_NOTICE, 'ri-information-2-line');
     }
 
     public function testAddTypeDefault(): void
     {
-        $this->assertAddTypeCases('default', 'fa-info-circle');
+        $this->assertAddTypeCases('default', 'ri-information-2-line');
     }
 
     private function assertReadStatus(int $mauticUserLastActive, bool $isRead): void
@@ -203,7 +200,7 @@ class FlashBagTest extends TestCase
         $this->notificationModel
             ->expects($this->once())
             ->method('addNotification')
-            ->with($message, $level, $isRead, null, 'fa-info-circle');
+            ->with($message, $level, $isRead, null, 'ri-information-2-line');
 
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }

@@ -26,10 +26,7 @@ class ReportRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -40,15 +37,12 @@ class ReportRepository extends CommonRepository
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
@@ -84,9 +78,9 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -97,25 +91,22 @@ class ReportRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['r.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'r';
     }
 
-    public function findReportsWithGraphs($ownedBy = null)
+    /**
+     * @return mixed[]
+     */
+    public function findReportsWithGraphs($ownedBy = null): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

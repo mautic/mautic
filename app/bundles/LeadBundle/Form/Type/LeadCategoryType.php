@@ -8,20 +8,21 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class LeadCategoryType extends AbstractType
 {
-    private $categoryModel;
-
-    public function __construct(CategoryModel $categoryModel)
-    {
-        $this->categoryModel = $categoryModel;
+    public function __construct(
+        private CategoryModel $categoryModel
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices'           => function (Options $options) {
-                $categories = $this->categoryModel->getLookupResults('global');
+            'choices'           => function (Options $options): array {
+                $categories = $this->categoryModel->getLookupResults('global', '', 300);
                 $choices    = [];
 
                 foreach ($categories as $cat) {
@@ -36,7 +37,7 @@ class LeadCategoryType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string
      */
     public function getParent()
     {

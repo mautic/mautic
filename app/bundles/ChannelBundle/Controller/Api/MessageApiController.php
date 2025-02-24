@@ -29,14 +29,22 @@ class MessageApiController extends CommonApiController
     /**
      * @var MessageModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    private RequestStack $requestStack;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
-    {
-        $this->requestStack = $requestStack;
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        private RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
         $messageModel = $modelFactory->getModel('channel.message');
         \assert($messageModel instanceof MessageModel);
         $this->model            = $messageModel;

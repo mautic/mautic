@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Executioner\Result\Responses;
 
 class ResponsesTest extends \PHPUnit\Framework\TestCase
 {
-    public function testExtractingResponsesFromLog()
+    public function testExtractingResponsesFromLog(): void
     {
         $actionEvent = $this->createMock(Event::class);
         $actionEvent->method('getEventType')

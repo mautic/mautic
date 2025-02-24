@@ -8,20 +8,24 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CompanyMergeType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'company_to_merge',
             CompanyListType::class,
             [
-                'multiple'    => false,
-                'label'       => 'mautic.company.to.merge.into',
-                'required'    => true,
-                'modal_route' => false,
-                'main_entity' => $options['main_entity'],
-                'constraints' => [
+                'multiple'            => false,
+                'label'               => 'mautic.company.to.merge.into',
+                'required'            => true,
+                'modal_route'         => false,
+                'main_entity'         => $options['main_entity'],
+                'model_lookup_method' => $options['model_lookup_method'],
+                'constraints'         => [
                     new NotBlank(
                         ['message' => 'mautic.company.choosecompany.notblank']
                     ),
@@ -34,7 +38,7 @@ class CompanyMergeType extends AbstractType
             [
                 'apply_text' => false,
                 'save_text'  => 'mautic.lead.merge',
-                'save_icon'  => 'fa fa-building',
+                'save_icon'  => 'ri-building-2-line',
             ]
         );
 
@@ -43,10 +47,10 @@ class CompanyMergeType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(
-            ['main_entity']
+            ['main_entity', 'model_lookup_method']
         );
     }
 }

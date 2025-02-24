@@ -205,6 +205,36 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(5, $content['totalClicks']);
     }
 
+    /**
+     * Test email lookup with name with special chars.
+     */
+    public function testEmailGetLookupChoiceListAction(): void
+    {
+        $emailName = 'It\'s an email';
+        $email     = new Email();
+        $email->setName($emailName);
+        $email->setSubject('Email Subject');
+        $email->setEmailType('template');
+        $this->em->persist($email);
+        $this->em->flush($email);
+
+        $payload = [
+            'action'     => 'email:getLookupChoiceList',
+            'email_type' => 'template',
+            'top_level'  => 'variant',
+            'searchKey'  => 'email',
+            'email'      => $emailName,
+        ];
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertNotEmpty($response);
+        $this->assertEquals($emailName, $response[0]['items'][$email->getId()]);
+    }
+
     private function createContact(string $email): Lead
     {
         $lead = new Lead();
@@ -241,7 +271,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<integer, mixed> $segments
+     * @param array<int, mixed> $segments
      *
      * @throws \Doctrine\ORM\ORMException
      */

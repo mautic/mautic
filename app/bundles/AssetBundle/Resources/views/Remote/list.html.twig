@@ -6,23 +6,23 @@
             <div class="list-group remote-file-list">
                 {% if items.dirs is defined %}
                     {% for item in items.dirs %}
-                        <a class="list-group-item" href="#" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}', '/{{ item|trim('/','right') }}');">
+                        <a class="list-group-item" href="javascript: void(0);" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}', '/{{ item|trim('/','right') }}');">
                             {{ item }}
                         </a>
                     {% endfor %}
                     {% for item in items.keys %}
-                        <a class="list-group-item" href="#" onclick="Mautic.selectRemoteFile('{{ integration.getPublicUrl(item) }}');">
+                        <a class="list-group-item" href="javascript: void(0);" onclick="Mautic.selectRemoteFile('{{ integration.getPublicUrl(item) }}');">
                             {{ item }}
                         </a>
                     {% endfor %}
                 {% else %}
                     {% for item in items %}
                         {% if connector.getAdapter().isDirectory(item) %}
-                            <a class="list-group-item" href="#" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}', '/{{ item|trim('/', 'right') }}');">
+                            <a class="list-group-item" href="javascript: void(0);" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}', '/{{ item|trim('/', 'right') }}');">
                                 {{ item }}
                             </a>
                         {% else %}
-                            <a class="list-group-item" href="#" onclick="Mautic.selectRemoteFile('{{ integration.getPublicUrl(item) }}');">
+                            <a class="list-group-item" href="javascript: void(0);" onclick="Mautic.selectRemoteFile('{{ integration.getPublicUrl(item) }}');">
                                 {{ item }}
                             </a>
                         {% endif %}

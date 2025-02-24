@@ -6,27 +6,21 @@ use Mautic\EmailBundle\Entity\Stat;
 
 class Reference
 {
-    /**
-     * @var int
-     */
-    private $emailId;
+    private ?int $emailId;
 
     /**
      * @var int
      */
     private $leadId = 0;
 
-    /**
-     * @var int|null
-     */
-    private $statId;
+    private ?int $statId;
 
     public function __construct(Stat $stat)
     {
         $this->statId  = $stat->getId();
         $this->emailId = $stat->getEmail()->getId();
         if ($lead = $stat->getLead()) {
-            $this->leadId = $stat->getLead()->getId();
+            $this->leadId = $lead->getId();
         }
     }
 

@@ -10,35 +10,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TrackingSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * TrackingSubscriber constructor.
-     */
-    public function __construct(StatRepository $statRepository)
-    {
-        $this->statRepository = $statRepository;
+    public function __construct(
+        private StatRepository $statRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION => ['onIdentifyContact', 0],
         ];
     }
 
-    public function onIdentifyContact(ContactIdentificationEvent $event)
+    public function onIdentifyContact(ContactIdentificationEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 
         // Nothing left to identify by so stick to the tracked lead
-        if (empty($clickthrough['channel']['email']) && empty($clickthrough['stat'])) {
+        if (empty($clickthrough['stat'])) {
             return;
         }
 
@@ -50,7 +39,7 @@ class TrackingSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($stat->getEmail() && (int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
+        if (isset($clickthrough['channel']['email']) && $stat->getEmail() && (int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
             // ID mismatch - fishy so use tracked lead
             return;
         }

@@ -11,8 +11,16 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class GroupRepository extends CommonRepository
 {
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'pl';
+    }
+
+    public function getEntities(array $args = [])
+    {
+        // Without qb it returns entities indexed by id instead of array indexes
+        $args['qb'] = $this->createQueryBuilder($this->getTableAlias());
+
+        return parent::getEntities($args);
     }
 }

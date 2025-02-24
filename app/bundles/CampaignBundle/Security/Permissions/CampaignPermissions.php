@@ -5,14 +5,8 @@ namespace Mautic\CampaignBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignPermissions.
- */
 class CampaignPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -20,18 +14,12 @@ class CampaignPermissions extends AbstractPermissions
         $this->addStandardPermissions('categories');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'campaign';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('campaign', 'categories', $builder, $data);
         $this->addExtendedFormFields('campaign', 'campaigns', $builder, $data);

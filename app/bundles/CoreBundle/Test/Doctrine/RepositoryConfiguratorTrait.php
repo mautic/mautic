@@ -18,6 +18,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 trait RepositoryConfiguratorTrait
 {
+    use MockedConnectionTrait;
+
     /**
      * @var MockObject&EntityManagerInterface
      */
@@ -51,7 +53,7 @@ trait RepositoryConfiguratorTrait
         $this->classMetadata   = $this->createMock(ClassMetadata::class);
         $this->entityManager   = $this->createMock(EntityManagerInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->connection      = $this->createMock(Connection::class);
+        $this->connection      = $this->getMockedConnection();
         $this->result          = $this->createMock(Result::class);
 
         $this->configureMocks($entityClass);

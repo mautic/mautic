@@ -8,17 +8,12 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-/**
- * Class BodyParser.
- */
 class BodyParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message, $contactEmail = null)
+    public function getBounce(Message $message, $contactEmail = null): BouncedEmail
     {
         $report = $this->parse($message->textPlain, $contactEmail);
 
@@ -40,10 +35,8 @@ class BodyParser
      * @todo - refactor to get rid of the if/else statements
      *
      * @param string $knownEmail
-     *
-     * @return array
      */
-    public function parse($body, $knownEmail = '')
+    public function parse($body, $knownEmail = ''): array
     {
         // initialize the result array
         $result = [
@@ -409,12 +402,12 @@ class BodyParser
             $result['rule_no']  = '0166';
             $result['email']    = $match[1];
 
-            /*
-            * rule: mailbox full;
-            * sample:
-            * name@domain.com
-            * Delay reason: LMTP error after end of data: 452 4.2.2 <name@domain.com> Mailbox is full / Blocks limit exceeded / Inode limit exceeded
-            */
+        /*
+        * rule: mailbox full;
+        * sample:
+        * name@domain.com
+        * Delay reason: LMTP error after end of data: 452 4.2.2 <name@domain.com> Mailbox is full / Blocks limit exceeded / Inode limit exceeded
+        */
         } elseif (preg_match("/\s<(\S+@\S+\w)>\sMailbox.*full/i", $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0166';

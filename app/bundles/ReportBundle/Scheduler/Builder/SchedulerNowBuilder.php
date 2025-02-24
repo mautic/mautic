@@ -19,7 +19,7 @@ class SchedulerNowBuilder implements BuilderInterface
     {
         try {
             $rule->setFreq('SECONDLY');
-        } catch (InvalidArgument $e) {
+        } catch (InvalidArgument) {
             throw new InvalidSchedulerException();
         }
 

@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadField;
 
-/**
- * Class LeadFieldEvent.
- */
 class LeadFieldEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class LeadFieldEvent extends CommonEvent
     /**
      * Sets the LeadField entity.
      */
-    public function setField(LeadField $field)
+    public function setField(LeadField $field): void
     {
         $this->entity = $field;
     }

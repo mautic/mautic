@@ -6,7 +6,7 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 
 class CounterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCounterIncrements()
+    public function testCounterIncrements(): void
     {
         $counter = new Counter(1, 1, 1, 1, 1, 1);
 

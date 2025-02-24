@@ -16,22 +16,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
-
-    public function __construct(TranslatorInterface $translator, FieldHelper $fieldHelper)
-    {
-        $this->translator  = $translator;
-        $this->fieldHelper = $fieldHelper;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private FieldHelper $fieldHelper
+    ) {
     }
 
     /**

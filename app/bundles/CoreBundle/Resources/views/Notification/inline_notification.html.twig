@@ -1,0 +1,29 @@
+{% set pathSegments = app.request.pathinfo | trim('/', 'left') | split('/') %}
+{% set lastSegment = pathSegments | last %}
+
+{% if lastSegment is defined and lastSegment matches '/^\\d+$/' %}
+    {% set cleanedPath = pathSegments | slice(0, pathSegments | length - 1) %}
+{% else %}
+    {% set cleanedPath = pathSegments %}
+{% endif %}
+
+{% set cleanedPathString = cleanedPath | join('-') | replace({' ' : '_'}) | lower %}
+{% set sanitizedTitle = title | replace({'.' : '-'}) | lower %}
+{% set alertId = (dismissible ? 'dismissible-' : '') ~ 'alert-' ~ cleanedPathString ~ '-' ~ sanitizedTitle %}
+
+<div id="{{ alertId }}" class="alert alert-{{ alert_type }}">
+    <div class="d-flex fd-column fd-row-md jc-space-between fg-1">
+        <div class="d-flex ai-center fw-wrap mr-xs">
+            <strong class="mr-xs">{{ title | trans }}</strong>
+            {{ content | trans }}
+        </div>
+
+        {% if action_label is defined and action_link is defined %}
+            <a class="fs-0{% if dismissible %} mr-lg{% endif %}" href="{{ action_link }}">{{ action_label | trans }}</a>
+        {% endif %}
+
+        {% if dismissible %}
+            <button type="button" class="close" user-dismiss="alert" aria-hidden="true"><i class="ri-close-line"></i></button>
+        {% endif %}
+    </div>
+</div>

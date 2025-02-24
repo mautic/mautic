@@ -38,3 +38,23 @@ span.input-group-addon i.fa {
 .inline-login .login-form {
     margin: 20px;
 }
+
+.accent-color {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    cursor: pointer;
+}
+
+.accent-color,
+.accent-dropdown {
+    outline: 2px var(--outline-style) transparent;
+    outline-offset: 2px;
+    transition: var(--transition-all-productive);
+}
+
+input:checked + .accent-color,
+.dropdown.open .accent-dropdown {
+    outline: 2px var(--outline-style) var(--focus);
+    outline-offset: 2px;
+}

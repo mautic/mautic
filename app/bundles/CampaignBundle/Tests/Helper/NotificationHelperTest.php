@@ -18,27 +18,27 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|UserModel
      */
-    private $userModel;
+    private \PHPUnit\Framework\MockObject\MockObject $userModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|NotificationModel
      */
-    private $notificationModel;
+    private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Router
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
@@ -63,7 +63,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testContactOwnerIsNotified()
+    public function testContactOwnerIsNotified(): void
     {
         $event    = new Event();
         $campaign = new Campaign();
@@ -100,7 +100,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfFailure($lead, $event);
     }
 
-    public function testCampaignCreatorIsNotified()
+    public function testCampaignCreatorIsNotified(): void
     {
         $event    = new Event();
         $campaign = new Campaign();
@@ -139,7 +139,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfFailure($lead, $event);
     }
 
-    public function testSystemAdminIsNotified()
+    public function testSystemAdminIsNotified(): void
     {
         $event    = new Event();
         $campaign = new Campaign();
@@ -179,7 +179,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfFailure($lead, $event);
     }
 
-    public function testNotificationIgnoredIfUserNotFound()
+    public function testNotificationIgnoredIfUserNotFound(): void
     {
         $event    = new Event();
         $campaign = new Campaign();

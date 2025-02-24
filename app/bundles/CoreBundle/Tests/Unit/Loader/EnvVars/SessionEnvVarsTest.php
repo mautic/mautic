@@ -30,7 +30,7 @@ class SessionEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testSessionNameIsCorrectlyGenerated()
+    public function testSessionNameIsCorrectlyGenerated(): void
     {
         $this->config->set('secret_key', 'topsecret');
         $this->defaultConfig->set('local_config_path', '/foo/bar');

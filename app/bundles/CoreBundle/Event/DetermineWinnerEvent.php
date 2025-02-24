@@ -8,22 +8,12 @@ class DetermineWinnerEvent extends Event
 {
     /**
      * @var array{
-     *             parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
-     *             children?: array<mixed>,
-     *             page?: \Mautic\PageBundle\Entity\Page,
-     *             email?: \Mautic\EmailBundle\Entity\Email
-     *             }
-     */
-    private $parameters;
-
-    /**
-     * @var array{
      *             winners: array,
      *             support?: mixed,
      *             supportTemplate?: string
      *             }
      */
-    private $abTestResults;
+    private ?array $abTestResults = null;
 
     /**
      * @param array{
@@ -33,9 +23,9 @@ class DetermineWinnerEvent extends Event
      *   email?: \Mautic\EmailBundle\Entity\Email
      * } $parameters
      */
-    public function __construct(array $parameters)
-    {
-        $this->parameters = $parameters;
+    public function __construct(
+        private array $parameters
+    ) {
     }
 
     /**

@@ -9,13 +9,11 @@ use Twig\TwigFunction;
 
 final class HtmlExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
             new TwigFunction('htmlAttributesStringToArray', [$this, 'convertHtmlAttributesToArray']),
+            new TwigFunction('htmlEntityDecode', [$this, 'htmlEntityDecode']),
         ];
     }
 
@@ -44,7 +42,7 @@ final class HtmlExtension extends AbstractExtension
 
         try {
             $attributes = current((array) new \SimpleXMLElement("<element $attributes />"));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return [];
         }
 
@@ -55,7 +53,7 @@ final class HtmlExtension extends AbstractExtension
         foreach ($attributes as $attr => $value) {
             $value = trim($value);
 
-            if (false !== strpos($value, ' ')) {
+            if (str_contains($value, ' ')) {
                 $dirty = explode(' ', $value);
                 foreach ($dirty as $i => $v) {
                     if (empty($v)) {
@@ -74,5 +72,10 @@ final class HtmlExtension extends AbstractExtension
         }
 
         return $attributes;
+    }
+
+    public function htmlEntityDecode(string $content): string
+    {
+        return html_entity_decode($content);
     }
 }

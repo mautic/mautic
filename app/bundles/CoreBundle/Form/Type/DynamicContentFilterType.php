@@ -10,23 +10,24 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DynamicContentFilterType extends AbstractType
 {
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    public function __construct(BuilderIntegrationsHelper $builderIntegrationsHelper)
-    {
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+    public function __construct(
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $extraClasses = '';
 
         try {
             $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
             $mauticBuilder->getName();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             // Assume legacy builder
             $extraClasses = ' legacy-builder';
         }
@@ -73,7 +74,7 @@ class DynamicContentFilterType extends AbstractType
         );
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

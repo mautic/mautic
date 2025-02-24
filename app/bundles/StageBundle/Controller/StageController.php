@@ -108,7 +108,7 @@ class StageController extends AbstractFormController
     /**
      * Generates new form and processes post data.
      *
-     * @param \Mautic\StageBundle\Entity\Stage $entity
+     * @param Stage $entity
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -118,7 +118,7 @@ class StageController extends AbstractFormController
         \assert($model instanceof StageModel);
 
         if (!($entity instanceof Stage)) {
-            /** @var \Mautic\StageBundle\Entity\Stage $entity */
+            /** @var Stage $entity */
             $entity = $model->getEntity();
         }
 

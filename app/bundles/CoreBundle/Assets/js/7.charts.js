@@ -1,10 +1,15 @@
 //set global Chart defaults
 if (typeof Chart != 'undefined') {
     // configure global Chart options
-    Chart.defaults.global.elements.line.borderWidth = 1;
-    Chart.defaults.global.elements.point.radius = 2;
+    Chart.defaults.global.elements.line.borderWidth = 2;
+    Chart.defaults.global.elements.point.radius = 0;
     Chart.defaults.global.legend.labels.boxWidth = 12;
     Chart.defaults.global.maintainAspectRatio = false;
+    Chart.defaults.scale.ticks.padding = 10;
+    Chart.defaults.global.elements.point.hoverRadius = 6;
+    Chart.defaults.global.elements.point.hitRadius = 20;
+    Chart.defaults.global.legend.labels.usePointStyle = true;
+    Chart.defaults.global.legend.labels.pointStyle = 'circle';
 }
 
 /**
@@ -61,10 +66,50 @@ Mautic.renderLineChart = function(canvas) {
         options: {
             lineTension : 0.2,
             borderWidth: 1,
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
             scales: {
-                yAxes: [{
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    },
                     ticks: {
-                        beginAtZero: true
+                        maxRotation: 0,
+                        callback: function(value, index, values) {
+                            if (index === 0 || index === values.length - 1) {
+                                return value;
+                            }
+                            return '';
+                        }
+                    }
+                }],
+                yAxes: [{
+                    afterBuildTicks: function(scale) {
+                        scale.ticks = [];
+                        scale.ticks.push(scale.min);
+                        scale.ticks.push((scale.max - scale.min) / 2);
+                        scale.ticks.push(scale.max);
+                    },
+                    gridLines: {
+                        drawBorder: false,
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value, index, values) {
+                            if (index === 0 || index === values.length - 1) {
+                                return value;
+                            }
+                            if (/^\d+\.5$/.test(value.toString())) {
+                                return '';
+                            }
+                            if (index === Math.floor(values.length / 2)) {
+                                return value !== 0.5 ? value : '';
+                            }
+                            return '';
+                        }
+                        
                     }
                 }]
             }
@@ -227,7 +272,7 @@ Mautic.renderHorizontalBarChart = function(canvas) {
 
 /**
  * Render vector maps
- *
+ * @deprecated please use MauticMap class
  * @param mQuery element scope
  */
 Mautic.renderMaps = function(scope) {
@@ -249,7 +294,7 @@ Mautic.renderMaps = function(scope) {
 };
 
 /**
- *
+ * @deprecated please use MauticMap class
  * @param wrapper
  * @returns {*}
  */
@@ -333,6 +378,7 @@ Mautic.renderMap = function(wrapper) {
 
 /**
  * Destroy a jVector map
+ * @deprecated please use MauticMap class
  */
 Mautic.destroyMap = function(wrapper) {
     if (wrapper.hasClass('map-rendered')) {

@@ -2,7 +2,6 @@
 
 namespace Mautic\UserBundle\Security\SAML\User;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\SpBundle\Security\User\UserCreatorInterface;
@@ -16,35 +15,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCreator implements UserCreatorInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private int $defaultRole;
 
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var UserPasswordHasher
-     */
-    private $hasher;
-
-    /**
-     * @var int
-     */
-    private $defaultRole;
-
-    /**
-     * @var array
-     */
-    private $requiredFields = [
+    private array $requiredFields = [
         'username',
         'firstname',
         'lastname',
@@ -52,16 +25,12 @@ class UserCreator implements UserCreatorInterface
     ];
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        UserMapper $userMapper,
-        UserModel $userModel,
-        UserPasswordHasher $hasher,
+        private EntityManagerInterface $entityManager,
+        private UserMapper $userMapper,
+        private UserModel $userModel,
+        private UserPasswordHasher $hasher,
         $defaultRole
     ) {
-        $this->entityManager = $entityManager;
-        $this->userMapper    = $userMapper;
-        $this->userModel     = $userModel;
-        $this->hasher        = $hasher;
         $this->defaultRole   = (int) $defaultRole;
     }
 
@@ -75,7 +44,7 @@ class UserCreator implements UserCreatorInterface
         }
 
         /** @var Role $defaultRole */
-        $defaultRole = $this->entityManager->getReference(\Mautic\UserBundle\Entity\Role::class, $this->defaultRole);
+        $defaultRole = $this->entityManager->getReference(Role::class, $this->defaultRole);
 
         $user = $this->userMapper->getUser($response);
         $user->setPassword($this->userModel->checkNewPassword($user, $this->hasher, EncryptionHelper::generateKey()));

@@ -16,6 +16,7 @@ class FullContact_Company extends FullContact_Base
      * @var array
      */
     protected $_supportedMethods = ['domain'];
+
     protected $_resourceUri      = '/company/lookup.json';
 
     public function lookupByDomain($search)

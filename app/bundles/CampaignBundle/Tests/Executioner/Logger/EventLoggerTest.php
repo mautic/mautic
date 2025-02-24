@@ -22,27 +22,27 @@ class EventLoggerTest extends TestCase
     /**
      * @var LeadRepository|MockObject
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var ContactTracker|MockObject
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var LeadEventLogRepository|MockObject
      */
-    private $leadEventLogRepository;
+    private MockObject $leadEventLogRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private $leadRepository;
+    private MockObject $leadRepository;
 
     /**
      * @var SummaryModel|MockObject
      */
-    private $summaryModel;
+    private MockObject $summaryModel;
 
     protected function setUp(): void
     {
@@ -78,13 +78,17 @@ class EventLoggerTest extends TestCase
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
-    public function testBuildLogEntry()
+    public function testBuildLogEntry(): void
     {
         $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
 
         $this->leadRepository->expects($this->exactly(3))
             ->method('getContactRotations')
-            ->willReturnOnConsecutiveCalls([1 => 1], [1 => 2], [1 => 1]);
+            ->willReturnOnConsecutiveCalls(
+                [1 => ['rotation' => 1, 'manually_removed' => 0]],
+                [1 => ['rotation' => 2, 'manually_removed' => 0]],
+                [1 => ['rotation' => 1, 'manually_removed' => 0]],
+            );
 
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')->willReturnOnConsecutiveCalls([1, 1, 2]);

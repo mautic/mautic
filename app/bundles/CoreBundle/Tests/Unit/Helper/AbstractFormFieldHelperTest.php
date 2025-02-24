@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use PHPUnit\Framework\Assert;
 
 class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -169,6 +170,33 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
             [0 => 0],
             [0 => '0'],
         ];
+    }
+
+    public function testparseChoiceListWithNullValue(): void
+    {
+        Assert::assertEquals(
+            [0 => 'label4'],
+            AbstractFormFieldHelper::parseList(
+                [
+                    [
+                        'label' => 'label1',
+                        'value' => '',
+                    ],
+                    [
+                        'label' => 'label2',
+                        'value' => null,
+                    ],
+                    [
+                        'label' => 'label3',
+                        'value' => 0,
+                    ],
+                    [
+                        'label' => 'label4',
+                        'value' => '0',
+                    ],
+                ]
+            )
+        );
     }
 
     /**

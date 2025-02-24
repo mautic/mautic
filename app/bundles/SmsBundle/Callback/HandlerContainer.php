@@ -9,9 +9,9 @@ class HandlerContainer
     /**
      * @var CallbackInterface[]
      */
-    private $handlers;
+    private ?array $handlers = null;
 
-    public function registerHandler(CallbackInterface $handler)
+    public function registerHandler(CallbackInterface $handler): void
     {
         $this->handlers[$handler->getTransportName()] = $handler;
     }

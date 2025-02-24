@@ -9,7 +9,7 @@ interface ProcessorInterface
     /**
      * Process the message.
      *
-     * @return bool
+     * @return bool|void
      */
     public function process(Message $message);
 }

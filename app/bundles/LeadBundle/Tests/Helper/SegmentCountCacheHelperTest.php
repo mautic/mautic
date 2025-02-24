@@ -15,12 +15,9 @@ class SegmentCountCacheHelperTest extends TestCase
     /**
      * @var CacheStorageHelper|MockObject
      */
-    private $cacheStorageHelperMock;
+    private MockObject $cacheStorageHelperMock;
 
-    /**
-     * @var SegmentCountCacheHelper
-     */
-    private $segmentCountCacheHelper;
+    private SegmentCountCacheHelper $segmentCountCacheHelper;
 
     protected function setUp(): void
     {

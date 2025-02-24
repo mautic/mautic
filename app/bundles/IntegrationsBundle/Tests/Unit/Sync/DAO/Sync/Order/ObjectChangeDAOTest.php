@@ -36,4 +36,17 @@ class ObjectChangeDAOTest extends TestCase
 
         Assert::assertSame($objectMapping, $objectChangeDAO->getObjectMapping());
     }
+
+    public function testThatFieldCanBeRemoved(): void
+    {
+        $objectChangeDAO = new ObjectChangeDAO('foo', 'bar', 1, 'contact', 1);
+        $value           = new NormalizedValueDAO('type', 1);
+        $field           = new FieldDAO('fieldName', $value);
+
+        Assert::assertCount(0, $objectChangeDAO->getFields());
+        $objectChangeDAO->addField($field);
+        Assert::assertCount(1, $objectChangeDAO->getFields());
+        $objectChangeDAO->removeField('fieldName');
+        Assert::assertCount(0, $objectChangeDAO->getFields());
+    }
 }

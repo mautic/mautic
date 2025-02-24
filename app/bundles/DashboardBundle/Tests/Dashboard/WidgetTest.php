@@ -23,27 +23,24 @@ class WidgetTest extends TestCase
     /**
      * @var DashboardModel|MockObject
      */
-    private $dashboardModel;
+    private MockObject $dashboardModel;
 
     /**
      * @var UserHelper|MockObject
      */
-    private $userHelper;
+    private MockObject $userHelper;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private MockObject $session;
 
     /**
      * @var User|MockObject
      */
-    private $user;
+    private MockObject $user;
 
-    /**
-     * @var Widget
-     */
-    private $widget;
+    private Widget $widget;
 
     protected function setUp(): void
     {

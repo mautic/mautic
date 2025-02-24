@@ -101,11 +101,9 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
         $integration->method('makeHttpClient')
             ->willReturn(
                 new class($assertRequest) extends Client {
-                    private object $assertRequest;
-
-                    public function __construct(object $assertRequest)
-                    {
-                        $this->assertRequest = $assertRequest;
+                    public function __construct(
+                        private object $assertRequest
+                    ) {
                     }
 
                     /**
@@ -126,7 +124,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @return iterable<mixed[]>
      */
-    public function requestProvider(): iterable
+    public static function requestProvider(): iterable
     {
         // Test with JSON.
         yield [

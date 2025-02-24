@@ -4,45 +4,53 @@
 
 {% block headerTitle %}{{ item.name }}{% endblock %}
 
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : item,
+        'templateButtons' : {
+            'close' : securityIsGranted('focus:items:view'),
+        },
+        'routeBase' : 'focus',
+        'targetLabel': 'mautic.focus.focus_items'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item': item,
             'templateButtons': {
                 'edit': securityHasEntityAccess(permissions['focus:items:editown'], permissions['focus:items:editother'], item.createdBy),
                 'clone': permissions['focus:items:create'],
                 'delete': securityHasEntityAccess(permissions['focus:items:deleteown'], permissions['focus:items:deleteother'], item.createdBy),
-                'close': securityIsGranted('focus:items:view'),
             },
             'routeBase': 'focus',
             'langVar': 'focus',
-    }) }}
+    }) -}}
 {% endblock %}
+
 
 {% block content %}
   {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 bg-white height-auto">
+      <div class="col-md-9 height-auto">
           <div class="bg-auto">
               <!-- form detail header -->
-              <div class="pr-md pl-md pt-lg pb-lg">
-                  <div class="box-layout">
-                      <div class="col-xs-10">
-                          <div class="text-muted">{{ item.description|purify }}</div>
-                      </div>
-                      <div class="col-xs-2 text-right">
-                          {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
-                      </div>
-                  </div>
-              </div>
+              {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
               <!--/ form detail header -->
 
               <!-- form detail collapseable -->
-              <div class="collapse" id="focus-details">
+              <div class="collapse pr-md pl-md" id="focus-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-bordered table-striped mb-0">
+                          <table class="table table-hover mb-0" data-view-table data-entity-id="{{ item.id }}>
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
                               <tr>
@@ -50,7 +58,7 @@
                                       <span class="fw-b">{{ 'mautic.focus.details.views'|trans }}</span>
                                   </td>
                                   <td data-focus-total-views-cell>
-                                      <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                                   </td>
                               </tr>
                               <tr>
@@ -58,7 +66,7 @@
                                       <span class="fw-b">{{ 'mautic.focus.details.unique_views'|trans }}</span>
                                   </td>
                                   <td data-focus-total-unique-views-cell>
-                                      <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                                   </td>
                               </tr>
                               </tbody>
@@ -88,7 +96,7 @@
                               <div class="panel-body box-layout">
                                   <div class="col-xs-4 va-m">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
-                                          <span class="fa fa-line-chart"></span>
+                                          <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.focus.graph.stats'|trans }}
                                       </h5>
                                   </div>
@@ -105,11 +113,11 @@
               </div>
               <!--/ stats -->
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+              {{ customContent('details.stats.graph.below', _context) }}
 
               {% if trackables is defined and trackables is not empty %}
                   <!-- tabs controls -->
-                  <ul class="nav nav-tabs pr-md pl-md">
+                  <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active">
                           <a href="#clicks-container" role="tab" data-toggle="tab">
                               {{ 'mautic.trackable.click_counts'|trans }}
@@ -136,7 +144,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bg-white bdr-l height-auto">
+      <div class="col-md-3 bdr-l height-auto">
           <!-- form HTML -->
           <div class="pa-md">
               <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
@@ -152,7 +160,7 @@
           <hr class="hr-w-2" style="width:50%">
 
           {# we can leverage data from audit_log table and build activity feed from it #}
-          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+          <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
               <!-- recent activity -->
               {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
           </div>

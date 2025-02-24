@@ -20,7 +20,7 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->helper = $this->getContainer()->get(RequestStorageHelper::class);
+        $this->helper = static::getContainer()->get(RequestStorageHelper::class);
     }
 
     public function testStoreRequest(): void

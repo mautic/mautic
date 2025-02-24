@@ -14,7 +14,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {
@@ -24,16 +24,14 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                function ($key) {
-                    return $key;
-                }
+                fn ($key) => $key
             );
     }
 
     /**
      * @covers \Mautic\LeadBundle\Model\CompanyReportData::getCompanyData
      */
-    public function testGetCompanyData()
+    public function testGetCompanyData(): void
     {
         $fieldModelMock = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -93,7 +91,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Model\CompanyReportData::eventHasCompanyColumns
      */
-    public function testEventHasCompanyColumns()
+    public function testEventHasCompanyColumns(): void
     {
         $fieldModelMock = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -127,7 +125,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Model\CompanyReportData::eventHasCompanyColumns
      */
-    public function testEventDoesNotHaveCompanyColumns()
+    public function testEventDoesNotHaveCompanyColumns(): void
     {
         $fieldModelMock = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()

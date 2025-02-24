@@ -4,20 +4,13 @@ namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationKeyEvent.
- */
 class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var array
-     */
-    private $keys;
-
-    public function __construct(UnifiedIntegrationInterface $integration, array $keys = null)
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private ?array $keys = null
+    ) {
         $this->integration = $integration;
-        $this->keys        = $keys;
     }
 
     /**
@@ -31,7 +24,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
     /**
      * Set new keys array.
      */
-    public function setKeys(array $keys)
+    public function setKeys(array $keys): void
     {
         $this->keys = $keys;
     }

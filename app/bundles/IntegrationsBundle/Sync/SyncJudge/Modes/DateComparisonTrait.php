@@ -11,7 +11,7 @@ trait DateComparisonTrait
     /**
      * @return string self::LEFT_WINNER|self::RIGHT_WINNER|self::NO_WINNER
      */
-    private static function compareDateTimes(?\DateTimeInterface $leftDateTime = null, ?\DateTimeInterface $rightDateTime = null)
+    private static function compareDateTimes(?\DateTimeInterface $leftDateTime = null, ?\DateTimeInterface $rightDateTime = null): string
     {
         if (null !== $leftDateTime && (null === $rightDateTime || $leftDateTime > $rightDateTime)) {
             return SyncJudgeInterface::LEFT_WINNER;

@@ -16,12 +16,9 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
-    /**
-     * @var FieldChoicesProvider
-     */
-    private $provider;
+    private FieldChoicesProvider $provider;
 
     protected function setUp(): void
     {

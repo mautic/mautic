@@ -1,6 +1,27 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 {% block mauticContent %}asset{% endblock %}
-{% block headerTitle %}{{ activeAsset.getTitle() }}{% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+        {
+            'item'            : activeAsset,
+            'templateButtons' : {
+                'close' : securityHasEntityAccess(
+                    permissions['asset:assets:viewown'],
+                    permissions['asset:assets:viewother'],
+                    activeAsset.getCreatedBy()
+                ),
+            },
+            'routeBase'  : 'asset',
+            'langVar'    : 'asset.asset',
+            'nameGetter' : 'getTitle',
+            'targetLabel': 'mautic.asset.assets'|trans
+        }
+    ) -}}
+{% endblock %}
+
+{% block headerTitle %} {{ activeAsset.getTitle() }} {% endblock %}
+
 {% block actions %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
         {
@@ -17,11 +38,6 @@
                     permissions['asset:assets:deleteother'],
                     activeAsset.getCreatedBy()
                 ),
-                'close' : securityHasEntityAccess(
-                    permissions['asset:assets:viewown'],
-                    permissions['asset:assets:viewother'],
-                    activeAsset.getCreatedBy()
-                ),
             },
             'routeBase'  : 'asset',
             'langVar'    : 'asset.asset',
@@ -30,29 +46,26 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : activeAsset}) -}}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activeAsset,
+        'status': 'available'
+    }) -}}
 {% endblock %}
 {% block content %}
 
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- asset detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10 va-m">
-                        <div class="text-white dark-sm mb-0">{{ activeAsset.getDescription()|purify }}</div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeAsset.description} %}
             <!--/ asset detail header -->
             <!-- asset detail collapseable -->
-            <div class="collapse" id="asset-details">
+            <div class="collapse pr-md pl-md" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                             {{- include(
                                 '@MauticCore/Helper/details.html.twig',
@@ -87,7 +100,7 @@
             <!--/ asset detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
@@ -105,7 +118,7 @@
                             <div class="panel-body box-layout">
                                 <div class="col-md-2 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-download"></span>
+                                        <span class="ri-download-line"></span>
                                         {% trans %}mautic.asset.graph.line.downloads{% endtrans %}
                                     </h5>
                                 </div>
@@ -128,13 +141,13 @@
             <!--/ stats -->
         </div>
 
-        {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+        {{ customContent('details.stats.graph.below', _context) }}
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
             {{- include('@MauticAsset/Asset/preview.html.twig',
                 {
-                    'activeAsset' : activeAsset, 
+                    'activeAsset' : activeAsset,
                     'assetDownloadUrl' : url(
                     'mautic_asset_action',
                     {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
@@ -145,9 +158,9 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{% trans %}mautic.asset.asset.url{% endtrans %}</div>
             </div>
@@ -156,10 +169,18 @@
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly value="{{ assetDownloadUrl|escape }}"/>
                 <span class="input-group-btn">
-                    <button class="btn btn-default btn-nospin"
-                            onclick="window.open('{{ assetDownloadUrl }}', '_blank');">
-                        <i class="fa fa-external-link"></i>
-                    </button>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                icon: 'ri-external-link-line',
+                                icon_only: true,
+                                tooltip_placement: 'left',
+                                label: 'mautic.core.open_link',
+                                onclick: "window.open('" ~ assetDownloadUrl ~ "', '_blank')",
+                                variant: 'ghost'
+                            }
+                        ]
+                    } %}
                 </span>
                 </div>
             </div>

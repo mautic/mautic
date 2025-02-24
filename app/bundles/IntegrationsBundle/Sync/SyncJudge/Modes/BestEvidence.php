@@ -21,7 +21,7 @@ class BestEvidence implements JudgementModeInterface
     ): InformationChangeRequestDAO {
         try {
             return HardEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
-        } catch (ConflictUnresolvedException $exception) {
+        } catch (ConflictUnresolvedException) {
         }
 
         if (null === $leftChangeRequest->getPossibleChangeDateTime() || null === $rightChangeRequest->getPossibleChangeDateTime()) {

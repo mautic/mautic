@@ -9,11 +9,11 @@
     'customButtons' : {
         0: {
             'attr' : {
-                'class'       : 'btn btn-default btn-nospin',
+                'class'       : 'btn btn-primary btn-nospin',
                 'data-toggle' : 'ajax',
                 'href'        : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_CLEAR_CACHE')),
             },
-            'iconClass' : 'fa fa-trash',
+            'iconClass' : 'ri-refresh-line',
             'btnText'   : 'marketplace.clear.cache',
             'tooltip'   : 'marketplace.clear.cache.tooltip',
         },
@@ -34,7 +34,7 @@
                 {% trans %}marketplace.composer.required{% endtrans %}
             </div>
         {% endif %}
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div id="page-list-wrapper" class="panel panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'action'      : currentRoute,
@@ -51,14 +51,14 @@
 {% block listResults %}
 {% if items|length %}
         <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered" id="marketplace-packages-table">
+        <table class="table table-hover" id="marketplace-packages-table">
             <thead>
             <tr>
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'  : 'true',
-                        'target'    : '#packages-table',
+                        'target'    : '#marketplace-packages-table',
                         'langVar'   : 'marketplace.package',
                         'routeBase' : 'marketplace',
                     }

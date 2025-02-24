@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessExport()
+    public function testProcessExport(): void
     {
         $batchSize = 2;
 

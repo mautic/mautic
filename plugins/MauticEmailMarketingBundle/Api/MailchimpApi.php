@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class MailchimpApi extends EmailMarketingApi
 {
-    private $version = '3.0';
+    private string $version = '3.0';
 
     /**
      * @param array  $parameters

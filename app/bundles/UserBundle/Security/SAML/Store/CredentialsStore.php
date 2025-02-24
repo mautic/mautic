@@ -11,28 +11,12 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class CredentialsStore implements CredentialStoreInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private ?X509Credential $credentials = null;
 
-    /**
-     * @var string
-     */
-    private $entityId;
-
-    /**
-     * @var X509Credential|null
-     */
-    private $credentials;
-
-    /**
-     * CredentialsStore constructor.
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper, string $entityId)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->entityId             = $entityId;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private string $entityId
+    ) {
     }
 
     public function getByEntityId($entityId): array
@@ -82,8 +66,8 @@ class CredentialsStore implements CredentialStoreInterface
 
             // Generate a new private (and public) key pair
             $privkey = openssl_pkey_new([
-              'private_key_bits' => 2048,
-              'private_key_type' => OPENSSL_KEYTYPE_RSA,
+                'private_key_bits' => 2048,
+                'private_key_type' => OPENSSL_KEYTYPE_RSA,
             ]);
 
             // Generate a certificate signing request

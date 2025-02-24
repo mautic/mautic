@@ -11,12 +11,12 @@ class ObjectMappingsDAO
     /**
      * @var ObjectMapping[]
      */
-    private $updatedMappings = [];
+    private array $updatedMappings = [];
 
     /**
      * @var ObjectMapping[]
      */
-    private $newMappings = [];
+    private array $newMappings = [];
 
     public function addUpdatedObjectMapping(ObjectMapping $objectMapping): void
     {

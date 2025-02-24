@@ -7,7 +7,7 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-final class Version20220428083702 extends AbstractMauticMigration
+final class Version20230307083702 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
