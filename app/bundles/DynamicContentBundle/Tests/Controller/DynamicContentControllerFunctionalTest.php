@@ -167,10 +167,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionIsSuccessful(): void
     {
-        $entity = new DynamicContent();
-        $entity->setName('Test Dynamic Content');
-        $this->em->persist($entity);
-        $this->em->flush();
+        $entity = $this->createDynamicContent();
 
         $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$entity->getId());
         $response = $this->client->getResponse();
@@ -180,10 +177,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testViewActionIsSuccessful(): void
     {
-        $entity = new DynamicContent();
-        $entity->setName('Test Dynamic Content');
-        $this->em->persist($entity);
-        $this->em->flush();
+        $entity = $this->createDynamicContent();
 
         $this->client->request(Request::METHOD_GET, '/s/dwc/view/'.$entity->getId());
         $response = $this->client->getResponse();
@@ -203,5 +197,42 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertStringContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
+    }
+
+    public function testBatchDeleteAction(): void
+    {
+        $dcA = $this->createDynamicContent('Dynamic Content A');
+        $dcB = $this->createDynamicContent('Dynamic Content B');
+        $dcC = $this->createDynamicContent('Dynamic Content C');
+        $this->assertNotNull($dcA->getId());
+        $this->assertNotNull($dcB->getId());
+        $this->assertNotNull($dcC->getId());
+
+        // Perform batch delete action for Dynamic Content A.
+        $this->client->request(Request::METHOD_POST, sprintf('/s/dwc/batchDelete?ids=["%s"]', $dcA->getId()));
+        // Assert response is correct.
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $dynamicContent = $this->em->getRepository(DynamicContent::class)->findAll();
+        $this->assertCount(2, $dynamicContent);
+        $dcNames = array_map(function ($form) {return $form->getName(); }, $dynamicContent);
+        $this->assertNotContains($dcA->getName(), $dcNames);
+        $this->assertContains($dcB->getName(), $dcNames);
+        $this->assertContains($dcC->getName(), $dcNames);
+        // Perform batch delete action for all.
+        $this->client->request(Request::METHOD_POST, '/s/dwc/batchDelete?ids=all');
+        // Assert that all emails have been deleted.
+        $dynamicContent = $this->em->getRepository(DynamicContent::class)->findAll();
+        $this->assertCount(0, $dynamicContent);
+    }
+
+    private function createDynamicContent(string $name = 'Test Dynamic Content'): DynamicContent
+    {
+        $entity = new DynamicContent();
+        $entity->setName($name);
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        return $entity;
     }
 }
