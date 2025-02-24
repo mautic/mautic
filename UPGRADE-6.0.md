@@ -12,6 +12,7 @@ As the legacy builder was removed these JS libraries were removed as well:
 - Froala (outdated with security vulnerabilities)
 - CodeMirror JS (still installed in the GrapesJS plugin, but not part of Mautic itself)
 - Jquery UI - Safe Blur
+- Modernizr as not necessary anymore as the modern browsers support open standards
 
 ### PHP
 - Multiple method signatures changed to improve type coverage. Some forced by dependency updates, some in Mautic itself. Run `composer phpstan` when your plugin is installed to get the full list related to your plugin.
