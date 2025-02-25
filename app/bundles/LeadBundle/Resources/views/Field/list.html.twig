@@ -22,22 +22,19 @@
 
 {% block headerTitle %}{{ 'mautic.lead.field.header.index'|trans }}{% endblock %}
 
-{% block actions %}
-  {{- include('@MauticCore/Helper/page_actions.html.twig', {
-          'templateButtons': {
-              'new': true,
-          },
-          'routeBase': 'contactfield',
-          'langVar': 'lead.field',
-  }) -}}
-{% endblock %}
-
 {% block content %}
   {% if isIndex %}
-    <div id="page-list-wrapper" class="panel">
+    <div id="page-list-wrapper" class="panel panel-default">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue': searchValue,
-                'action': currentRoute,
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                'templateButtons': {
+                    'new': true,
+                },
+                'routeBase': 'contactfield',
+                'langVar': 'lead.field',
+            })
         }) }}
         <div class="page-list">
   {% endif %}

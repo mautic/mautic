@@ -397,6 +397,28 @@ code:hover > .copy-icon {
   }
 }
 
+.list-toolbar {
+  .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
+  .form-control.search,
+  .input-group .input-group-btn button,
+  .btn,
+  div {
+    height: 48px;
+    border-radius: unset;
+    margin: 0;
+  }
+  .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
+  .form-control.search,
+  .input-group .input-group-btn button,
+  .btn-ghost {
+    &:hover {background-color: var(--field-hover);}
+  }
+
+  > .btn {
+    &:last-child, &:only-of-type + .input-group > input { border-radius: 0 var(--border-radius-lg) 0 0; }
+    &:first-child { border-radius: var(--border-radius-lg) 0 0 0; }
+  }
+}
 .well { box-shadow: none; }
 
 .collapsed .arrow { transform: scaleY(-1); }

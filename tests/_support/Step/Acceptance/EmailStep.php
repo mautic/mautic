@@ -32,11 +32,16 @@ class EmailStep extends \AcceptanceTester
     public function changeEmailCategory(): string
     {
         $I = $this;
+
         $I->waitForElementClickable(EmailsPage::$NEW_CATEGORY_DROPDOWN);
         $I->click(EmailsPage::$NEW_CATEGORY_DROPDOWN);
+
         $I->waitForElementVisible(EmailsPage::$NEW_CATEGORY_OPTION);
         $newCategoryName = $I->grabTextFrom(EmailsPage::$NEW_CATEGORY_OPTION);
+
+        $I->waitForElementClickable(EmailsPage::$NEW_CATEGORY_OPTION);
         $I->click(EmailsPage::$NEW_CATEGORY_OPTION);
+
         $I->waitForElementClickable(EmailsPage::$SAVE_BUTTON);
         $I->click(EmailsPage::$SAVE_BUTTON);
 

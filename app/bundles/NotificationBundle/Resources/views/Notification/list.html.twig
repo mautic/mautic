@@ -18,23 +18,45 @@
 
 {% block headerTitle %}{{ 'mautic.notification.notifications'|trans }}{% endblock %}
 
-{% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
-            'templateButtons': {
-                'new': permissions['notification:notifications:create'],
-            },
-            'routeBase': 'notification',
-    }) }}
-{% endblock %}
-
 {% block content %}
   {% if isIndex %}
-    <div id="page-list-wrapper" class="panel">
+    <div id="page-list-wrapper" class="panel panel-default">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue': searchValue,
-                'searchHelp': 'mautic.notification.help.searchcommands',
-                'searchId': 'notification-search',
-                'action': currentRoute,
+            'searchValue': searchValue,
+            'searchId': 'notification-search',
+            'action': currentRoute,
+            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                'templateButtons': {
+                    'new': permissions['notification:notifications:create'],
+                },
+                'routeBase': 'notification',
+            }),
+            'quickFilters': [
+                {
+                    'search': 'mautic.core.searchcommand.ispublished',
+                    'label': 'mautic.core.form.available',
+                    'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                    'icon': 'ri-check-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isunpublished',
+                    'label': 'mautic.core.form.unavailable',
+                    'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                    'icon': 'ri-close-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isuncategorized',
+                    'label': 'mautic.core.form.uncategorized',
+                    'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                    'icon': 'ri-folder-unknow-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.ismine',
+                    'label': 'mautic.core.searchcommand.ismine.label',
+                    'tooltip': 'mautic.core.searchcommand.ismine.description',
+                    'icon': 'ri-user-line'
+                }
+            ]
         }) }}
         <div class="page-list">
   {% endif %}

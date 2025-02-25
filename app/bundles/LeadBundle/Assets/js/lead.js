@@ -1283,10 +1283,10 @@ Mautic.removeTagFromLead = function (el, leadId, tagId) {
 Mautic.toggleLiveLeadListUpdate = function () {
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
         Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
-        mQuery('#liveModeButton').addClass('btn-primary');
+        mQuery('#liveModeButton').addClass('active');
     } else {
         Mautic.clearModeratedInterval('leadListLiveUpdate');
-        mQuery('#liveModeButton').removeClass('btn-primary');
+        mQuery('#liveModeButton').removeClass('active');
     }
 };
 

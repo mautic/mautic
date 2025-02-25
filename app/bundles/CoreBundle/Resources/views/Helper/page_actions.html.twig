@@ -43,15 +43,28 @@
         ) }}
     {% endif %}
 
-    <div class="std-toolbar btn-group">
-        {{ buttonsRender(
-            (
-                '<button type="button" class="btn btn-primary btn-nospin dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="ri-arrow-down-s-line"></i></button>\n'
-                ~ '<ul class="dropdown-menu dropdown-menu-right" role="menu">'
-            )
-            , '</ul>'
-        )|raw }}
+    <div class="std-toolbar">
+        {% set dropdownButton %}
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        variant: 'primary',
+                        icon_only: true,
+                        icon: 'ri-arrow-down-s-line',
+                        label: 'mautic.core.options',
+                        attributes: {
+                            'class': 'dropdown-toggle',
+                            'data-toggle': 'dropdown',
+                            'aria-expanded': 'false'
+                        }
+                    }
+                ]
+            } %}
+        {% endset %}
+
+        {{ buttonsRender(dropdownButton ~ '<ul class="dropdown-menu dropdown-menu-right" role="menu">', '</ul>')|raw }}
     </div>
+
 {% endif %}
 
 {{ extraHtml|raw }}

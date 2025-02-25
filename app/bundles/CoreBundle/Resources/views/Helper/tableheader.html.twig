@@ -63,19 +63,27 @@
 {% set dir = dir|default(app.session.get('mautic.' ~ sessionVar ~ '.orderbydir', 'ASC')) %}
 {% set filters = filters|default(app.session.get('mautic.' ~ sessionVar ~ '.filters', [])) %}
 {% set tmpl = tmpl|default('list') %}
-<th{% if class is defined and class is not empty %} class="{{ class }}"{% endif %}>
-    <div class="thead-filter">
-        {% if orderBy is defined and orderBy is not empty %}
-        <a href="javascript: void(0);" onclick="Mautic.reorderTableData('{{ sessionVar }}','{{ orderBy }}','{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});">
-            <span>{{ text|trans }}</span>
-            {% if order == orderBy %}
-            <i class="ri-sort-{{ dir|lower }}"></i>
+<th{% if class is defined and class is not empty %} class="{{ class }} pa-0"{% endif %}
+    scope="col"
+    aria-sort="{% if orderBy is defined and orderBy is not empty and order == orderBy %}{% if dir == 'ASC' %}ascending{% else %}descending{% endif %}{% else %}none{% endif %}">
+    {% if orderBy is defined and orderBy is not empty %}
+    <a aria-label="{% if order == orderBy and dir == 'ASC' %}{{ 'mautic.core.sort.descending.description'|trans({'%header%': text|trans}) }}{% else %}{{ 'mautic.core.sort.ascending.description'|trans({'%header%': text|trans}) }}{% endif %}" class="btn btn-ghost btn-block jc-space-between table-sort" href="javascript: void(0);" onclick="Mautic.reorderTableData('{{ sessionVar }}','{{ orderBy }}','{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});">
+        <span class="fw-b">{{ text|trans }}</span>
+        {% if order == orderBy %}
+            {% if dir == 'ASC' %}
+                <i class="ri-arrow-up-line ri-lg fw-n" aria-hidden="true" focusable="false"></i>
+            {% else %}
+                <i class="ri-arrow-down-line ri-lg fw-n" aria-hidden="true" focusable="false"></i>
             {% endif %}
-        </a>
         {% else %}
-            <span>{{ text|trans }}</span>
+        <i class="ri-arrow-up-down-line ri-lg fw-n table-sort__icon-unsorted" aria-hidden="true" focusable="false"></i>
         {% endif %}
+    </a>
+    {% else %}
+    <span class="pa-md">{{ text|trans }}</span>
+    {% endif %}
 
+    <div class="thead-filter">
         {% if filterBy is defined and filterBy is not empty %}
         {% set value = filters[filterBy] is defined ? filters[filterBy].value : '' %}
         <div class="input-group input-group-sm">

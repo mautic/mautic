@@ -555,12 +555,12 @@
 //** Popover arrow width
 @popover-arrow-width:                 10px;
 //** Popover arrow color
-@popover-arrow-color:                 @popover-bg;
+@popover-arrow-color:                 var(--layer-02);
 
 //** Popover outer arrow width
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
 //** Popover outer arrow color
-@popover-arrow-outer-color:           fadein(@popover-border-color, 5%);
+@popover-arrow-outer-color:           @popover-border-color;
 //** Popover outer arrow fallback color
 @popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
 
@@ -601,7 +601,7 @@
 @modal-title-line-height:     @line-height-base;
 
 //** Background color of modal content area
-@modal-content-bg:                             var(--layer);
+@modal-content-bg:                             var(--background);
 //** Modal content border color
 @modal-content-border-color:                   transparent;
 //** Modal content border color **for IE8**
@@ -721,7 +721,7 @@
 
 @panel-default-text:          inherit;
 @panel-default-border:        @panel-inner-border;
-@panel-default-heading-bg:    inherit;
+@panel-default-heading-bg:    @panel-footer-bg;
 
 @panel-primary-text:          var(--text-on-color);
 @panel-primary-border:        transparent;

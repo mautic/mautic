@@ -45,12 +45,45 @@ mQuery.ajaxSetup({
     cache: false
 });
 
-mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+// Attach document click handler once
+mQuery(document).on('click', function (e) {
+    var target = mQuery(e.target);
+    // Check if the click is outside the popover and its trigger
+    if (!target.closest('.popover').length && !target.closest('[data-toggle="popover"]').length) {
+        mQuery('[data-toggle="popover"]').each(function () {
+            var $this = mQuery(this);
+            var popover = $this.data('bs.popover');
+            if (popover && popover.tip().hasClass('in')) {
+                $this.popover('hide');
+                popover.inState.click = false; // Reset the internal click state
+            }
+        });
+    }
+});
+
+mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.stopPageLoadingBar();
     if (xhr.responseJSON && xhr.responseJSON.flashes) {
         Mautic.setFlashes(xhr.responseJSON.flashes);
     }
     Mautic.attachDismissHandlers();
+
+    // Initialize Bootstrap Popovers
+    mQuery('[data-toggle="popover"]').popover({
+        sanitize: false
+    });
+
+    // Handle popover insertion
+    mQuery('[data-toggle="popover"]').on('inserted.bs.popover', function () {
+        // Initialize Chosen on select elements inside popover
+        mQuery('.popover-content select').chosen({
+            allow_single_deselect: true,
+            disable_search_threshold: 10
+        });
+
+        // Initialize tooltips inside popovers
+        mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
+    });
 });
 
 // Force stop the page loading bar when no more requests are being in progress

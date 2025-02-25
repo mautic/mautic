@@ -222,15 +222,13 @@
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
   &:hover { outline: 2px var(--outline-style) transparent; }
-  &:active, &.active,
-  &:focus, &.focus { outline: 2px var(--outline-style) var(--focus); }
+  &:focus, &.focus, &:focus-visible { outline: 2px var(--outline-style) var(--focus); }
 }
 
 .outline-noff() {
   outline: 2px solid transparent;
   outline-offset: 1px;
   &:hover { outline: 2px solid transparent; }
-  &:active, &.active,
   &:focus, &.focus {
     outline: 2px solid var(--focus);
     outline-offset: 1px;
@@ -273,7 +271,7 @@
   .open > .dropdown-toggle& {
     color: @hover-text-color;
     background-color: @active-background;
-    border: 1px solid @active-background;
+    border: 1px solid transparent;
     i { color: @hover-text-color; }
 
     &:hover,

@@ -1592,33 +1592,3 @@
         &:hover {text-decoration: underline;}
     }
 }
-
-// Handle alternate layer colors automatically
-.modal-content,
-.tile,
-.nav-tabs-contained + .tab-content,
-.nav-tabs-contained + form > .tab-content {
-    > * {
-        /// Layer
-        --layer: var(--layer-02);
-        --layer-hover: var(--layer-hover-02);
-        --layer-active: var(--layer-active-02);
-        --layer-selected: var(--layer-selected-02);
-        --layer-selected-hover: var(--layer-selected-hover-02);
-
-        /// Layer accent
-        --layer-accent: var(--layer-accent-02);
-        --layer-accent-hover: var(--layer-accent-hover-02);
-        --layer-accent-active: var(--layer-accent-active-02);
-
-        /// Field
-        --field: var(--field-02);
-        --field-hover: var(--field-hover-02);
-
-        /// Border
-        --border-subtle: var(--border-subtle-02);
-        --border-subtle-selected: var(--border-subtle-selected-02);
-        --border-strong: var(--border-strong-02);
-        --border-tile: var(--border-tile-02);
-    }
-}

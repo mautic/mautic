@@ -18,7 +18,7 @@
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">
-            {{ include('@MauticCore/Helper/builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');'}, with_context=false) }}
+            {{ include('@MauticCore/Helper/builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');', 'draftDetail' : draftDetail is defined ? draftDetail : null,}, with_context=false) }}
 
             <div class="code-mode-toolbar {% if not isCodeMode %}hide{% endif %}">
                 <button class="btn btn-ghost btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.media.manager.desc'|trans }}">
@@ -51,7 +51,27 @@
                 </div>
             </div>
         {% endif %}
-
+        {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
+        <div class="panel panel-default" id="preview">
+            <div class="panel-heading">
+                <h4 class="panel-title">{{ 'mautic.email.drafturlvariant'|trans }}</h4>
+            </div>
+            <div class="panel-body">
+                <div id="public-preview-container" class="col-md-12">
+                    <div class="input-group">
+                        <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                               readonly
+                               value="{{ draftPreviewUrl }}"/>
+                        <span class="input-group-btn">
+                                <button class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
+                                    <i class="fa fa-external-link"></i>
+                                </button>
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="code-editor {% if not isCodeMode %}hide{% endif %}">
             <div id="customHtmlContainer"></div>
             <i class="text-muted">{{ 'mautic.core.code.mode.token.dropdown.hint'|trans|purify }}</i>

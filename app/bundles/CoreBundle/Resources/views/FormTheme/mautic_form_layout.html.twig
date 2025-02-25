@@ -33,17 +33,15 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:button_group_widget.html.php #}
 {% block button_group_widget %}
-{# Apply attributes to radios #}
+{# apply attributes to radios #}
 {% set attr = form.vars.attr %}
-<div class="list-group nav-justified" data-toggle="list-group">
+<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons">
     {% for child in form %}
-        {% set class = (child.vars.checked ? ' active' : '') ~ (child.vars.disabled or (attr.readonly|default(false)) ? ' disabled' : '') %}
-        <li class="list-group-item{{ class }}">
-            <label class="list-group-item-text">
-                {{ form_widget(child, {'attr': attr|merge({'class': 'input-radio visually-hidden'})}) }}
-                {{ child.vars.label|trans }}
-            </label>
-        </li>
+        {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
+        <label class="btn {{ class }} btn-block mt-0 list-group-item">
+            {{ form_widget(child, {'attr': attr}) }}
+            <span class="list-group-item-text btn-block text-left">{{ child.vars.label|trans }}</span>
+        </label>
     {% endfor %}
 </div>
 {% endblock %}

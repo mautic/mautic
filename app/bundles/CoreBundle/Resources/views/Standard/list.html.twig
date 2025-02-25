@@ -25,34 +25,28 @@
 
 {% block headerTitle %}{{ headerTitle }}{% endblock %}
 
-{% block actions %}
-    {{- include('@MauticCore/Helper/page_actions.html.twig',
-    {
-        'templateButtons' : {
-            'new' : permissions[permissionBase ~ ':create'],
-        },
-        'actionRoute'     : actionRoute,
-        'indexRoute'      : indexRoute,
-        'translationBase' : translationBase,
-    }) -}}
-{% endblock %}
-
 {% block content %}
     {% if isIndex %}
-        <div id="page-list-wrapper" class="panel">
-            {{- include('@MauticCore/Helper/list_toolbar.html.twig',
-                {
-                    'searchValue'      : searchValue,
-                    'searchHelp'       : searchHelp is defined ? searchHelp : '',
-                    'action'           : currentRoute,
-                    'actionRoute'      : actionRoute,
-                    'indexRoute'       : indexRoute,
-                    'translationBase'  : translationBase,
-                    'preCustomButtons' : toolBarButtons is defined ? toolBarButtons : null,
-                    'templateButtons'  : {
-                        'delete' : permissions[permissionBase ~ ':delete'],
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'actionRoute': actionRoute,
+                'indexRoute': indexRoute,
+                'translationBase': translationBase,
+                'preCustomButtons': toolBarButtons is defined ? toolBarButtons : null,
+                'templateButtons': {
+                    'delete': permissions[permissionBase ~ ':delete'],
+                },
+                'filters': filters is defined ? filters : [],
+                'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                    'templateButtons': {
+                        'new': permissions[permissionBase ~ ':create'],
                     },
-                    'filters' : filters is defined ? filters : [],
+                    'actionRoute': actionRoute,
+                    'indexRoute': indexRoute,
+                    'translationBase': translationBase,
+                })
             }) -}}
 
             <div class="page-list">

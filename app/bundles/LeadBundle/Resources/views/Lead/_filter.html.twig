@@ -26,12 +26,80 @@
             'iconClass': 'ri-spy-line',
         }]) %}
     {% endif %}
-    <div id="page-list-wrapper" class="panel">
-        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-            'searchValue': searchValue|default(''),
-            'searchHelp': 'mautic.lead.lead.help.searchcommands',
-            'action': currentRoute,
-            'customButtons': toolbarButtons,
-        }) }}
+    <div id="page-list-wrapper" class="panel panel-default">
+        {%- set pageButtons = [] %}
+{% if permissions['lead:leads:create'] %}
+    {% set pageButtons = pageButtons|merge([{
+        'attr': {
+            'class': 'btn btn-ghost btn-nospin quickadd',
+            'data-toggle': 'ajaxmodal',
+            'data-target': '#MauticSharedModal',
+            'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
+            'data-header': 'mautic.lead.lead.menu.quickadd'|trans,
+        },
+        'iconClass': 'ri-flashlight-line',
+        'btnText': 'mautic.lead.lead.menu.quickadd',
+        'primary': true,
+    }]) %}
+
+    {% if permissions['lead:imports:create'] %}
+        {% set pageButtons = pageButtons|merge([{
+            'attr': {
+                'href': path('mautic_import_action', {'object': 'contacts', 'objectAction': 'new'}),
+            },
+            'iconClass': 'ri-import-line',
+            'btnText': 'mautic.lead.lead.import',
+        }]) %}
+    {% endif %}
+
+    {% if permissions['lead:imports:view'] %}
+        {% set pageButtons = pageButtons|merge([{
+            'attr': {
+                'href': path('mautic_import_index', {'object': 'contacts'}),
+            },
+            'iconClass': 'ri-history-line',
+            'btnText': 'mautic.lead.lead.import.index',
+        }]) %}
+    {% endif %}
+{% endif %}
+
+{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+    'searchValue': searchValue|default(''),
+    'action': currentRoute,
+    'customButtons': toolbarButtons,
+    'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+        'templateButtons': {'new': permissions['lead:leads:create']},
+        'routeBase': 'contact',
+        'langVar': 'lead.lead',
+        'customButtons': pageButtons,
+
+    }),
+    'quickFilters': [
+        {
+            'search': 'mautic.core.searchcommand.ismine',
+            'label': 'mautic.core.searchcommand.ismine.label',
+            'tooltip': 'mautic.core.searchcommand.ismine.description',
+            'icon': 'ri-user-line'
+        },
+        {
+            'search': 'mautic.lead.lead.searchcommand.isunowned',
+            'label': 'mautic.lead.lead.searchcommand.isunowned.label',
+            'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
+            'icon': 'ri-user-unfollow-line'
+        }
+    ]
+}) -}}
+<div class="btn-group ml-5 sr-only ">
+    <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
+      <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-ghost">
+          <i class="ri-table-line"></i>
+      </a>
+    </span>
+    <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-placement="left">
+      <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-ghost">
+        <i class="ri-layout-grid-line"></i>
+      </a>
+    </span>
+</div>
         <div class="page-list">
 {% endif %}

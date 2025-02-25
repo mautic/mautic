@@ -49,6 +49,16 @@ class AcceptanceTester extends Codeception\Actor
         $this->waitForElementClickable(CategoriesPage::$BUNDLE_EMAIL_OPTION);
         $this->click(CategoriesPage::$BUNDLE_EMAIL_OPTION);
         $this->fillField(CategoriesPage::$TITLE_FIELD, $name);
+        $this->waitForElementClickable(CategoriesPage::$SAVE_AND_CLOSE);
         $this->click(CategoriesPage::$SAVE_AND_CLOSE);
+    }
+
+    /**
+     * Ensures that a notification appears after an action and contains the expected text.
+     */
+    public function ensureNotificationAppears(string $message): void
+    {
+        $this->waitForElementVisible('#flashes .alert', 10);
+        $this->see($message, '#flashes .alert');
     }
 }

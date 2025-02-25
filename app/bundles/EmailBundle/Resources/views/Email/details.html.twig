@@ -472,6 +472,34 @@
               </div>
           </div>
 
+          <!-- Draft preview URL -->
+          {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
+          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel-heading">
+                  <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
+              </div>
+              <div class="panel-body pt-xs">
+                  <div class="input-group">
+                      <div class="input-group-addon">
+                          {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                              'item'  : email.getDraft(),
+                              'model' : 'email.email_draft',
+                              'query' : 'customToggle=publicPreview'
+                          }) -}}
+                      </div>
+                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                             readonly
+                             value="{{ draftPreviewUrl|escape }}"/>
+                      <span class="input-group-btn">
+                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </span>
+                  </div>
+              </div>
+          </div>
+          {% endif %}
+
           <!-- email usages -->
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
               <div class="panel-heading">

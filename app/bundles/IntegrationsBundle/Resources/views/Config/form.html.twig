@@ -50,7 +50,7 @@
     <div class="tab-pane fade{% if 'details-container' == activeTab %} in active{% endif %} bdr-w-0" id="details-container">
         {% if useConfigFormNotes and integrationObject.getAuthorizationNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getAuthorizationNote().getType() }}">
-                {{ integrationObject.getAuthorizationNote().getNote()|trans  }}
+                {{ integrationObject.getAuthorizationNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
         {{ form_row(form.isPublished) }}
@@ -96,7 +96,7 @@
     <div class="tab-pane fade{% if 'features-container' == activeTab %} in active{% endif %} bdr-w-0" id="features-container">
         {% if useConfigFormNotes and integrationObject.getFeaturesNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getFeaturesNote().getType() }}">
-                {{ integrationObject.getFeaturesNote().getNote()|trans  }}
+                {{ integrationObject.getFeaturesNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
 
@@ -136,7 +136,7 @@
 
         {% if useConfigFormNotes and integrationObject.getFieldMappingNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getFieldMappingNote().getType() }}">
-                {{ integrationObject.getFieldMappingNote().getNote()|trans  }}
+                {{ integrationObject.getFieldMappingNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
 

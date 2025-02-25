@@ -6,25 +6,40 @@
 
 {% block headerTitle 'mautic.report.reports'|trans %}
 
-{% block actions %}
-  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+{% block content %}
+  {% if isIndex %}
+  <div id="page-list-wrapper" class="panel panel-default">
+    {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+      'searchValue': searchValue,
+      'action': currentRoute,
+      'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
           'templateButtons': {
               'new': permissions['report:reports:create'],
           },
           'routeBase': 'report',
           'langVar': 'report.report',
-      }
-  ) }}
-{% endblock %}
-
-{% block content %}
-  {% if isIndex %}
-  <div id="page-list-wrapper" class="panel">
-      {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-              'searchValue': searchValue,
-              'searchHelp': 'mautic.report.report.help.searchcommands',
-              'action': currentRoute,
-      }) }}
+      }),
+      'quickFilters': [
+          {
+              'search': 'mautic.core.searchcommand.ispublished',
+              'label': 'mautic.core.form.available',
+              'tooltip': 'mautic.core.searchcommand.ispublished.description',
+              'icon': 'ri-check-line'
+          },
+          {
+              'search': 'mautic.core.searchcommand.isunpublished',
+              'label': 'mautic.core.form.unavailable',
+              'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+              'icon': 'ri-close-line'
+          },
+          {
+              'search': 'mautic.core.searchcommand.ismine',
+              'label': 'mautic.core.searchcommand.ismine.label',
+              'tooltip': 'mautic.core.searchcommand.ismine.description',
+              'icon': 'ri-user-line'
+          }
+      ]
+  }) }}
       <div class="page-list">
         {{- include('@MauticReport/Report/_list.html.twig') -}}
       </div>

@@ -4901,14 +4901,14 @@ button.list-group-item-danger.active:focus {
 }
 .panel-default > .panel-heading {
   color: inherit;
-  background-color: inherit;
+  background-color: var(--layer);
   border-color: var(--layer);
 }
 .panel-default > .panel-heading + .panel-collapse > .panel-body {
   border-top-color: var(--layer);
 }
 .panel-default > .panel-heading .badge {
-  color: inherit;
+  color: var(--layer);
   background-color: inherit;
 }
 .panel-default > .panel-footer + .panel-collapse > .panel-body {
@@ -5120,7 +5120,7 @@ button.close {
 }
 .modal-content {
   position: relative;
-  background-color: var(--layer);
+  background-color: var(--background);
   background-clip: padding-box;
   border: 1px solid #999;
   border: 1px solid transparent;
@@ -5380,14 +5380,14 @@ button.close {
   left: 50%;
   margin-left: -11px;
   border-top-color: #999999;
-  border-top-color: rgba(0, 0, 0, 0.15);
+  border-top-color: rgba(0, 0, 0, 0.1);
   border-bottom-width: 0;
 }
 .popover.top > .arrow:after {
   bottom: 1px;
   margin-left: -10px;
   content: " ";
-  border-top-color: transparent;
+  border-top-color: var(--layer-02);
   border-bottom-width: 0;
 }
 .popover.right > .arrow {
@@ -5395,14 +5395,14 @@ button.close {
   left: -11px;
   margin-top: -11px;
   border-right-color: #999999;
-  border-right-color: rgba(0, 0, 0, 0.15);
+  border-right-color: rgba(0, 0, 0, 0.1);
   border-left-width: 0;
 }
 .popover.right > .arrow:after {
   bottom: -10px;
   left: 1px;
   content: " ";
-  border-right-color: transparent;
+  border-right-color: var(--layer-02);
   border-left-width: 0;
 }
 .popover.bottom > .arrow {
@@ -5411,14 +5411,14 @@ button.close {
   margin-left: -11px;
   border-top-width: 0;
   border-bottom-color: #999999;
-  border-bottom-color: rgba(0, 0, 0, 0.15);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 .popover.bottom > .arrow:after {
   top: 1px;
   margin-left: -10px;
   content: " ";
   border-top-width: 0;
-  border-bottom-color: transparent;
+  border-bottom-color: var(--layer-02);
 }
 .popover.left > .arrow {
   top: 50%;
@@ -5426,14 +5426,14 @@ button.close {
   margin-top: -11px;
   border-right-width: 0;
   border-left-color: #999999;
-  border-left-color: rgba(0, 0, 0, 0.15);
+  border-left-color: rgba(0, 0, 0, 0.1);
 }
 .popover.left > .arrow:after {
   right: 1px;
   bottom: -10px;
   content: " ";
   border-right-width: 0;
-  border-left-color: transparent;
+  border-left-color: var(--layer-02);
 }
 .popover-title {
   padding: 8px 14px;

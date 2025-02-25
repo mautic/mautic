@@ -19,26 +19,57 @@
   {{ 'mautic.form.forms'|trans }}
 {% endblock %}
 
-{% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
-            'templateButtons': {
-                'new': permissions['form:forms:create'],
-            },
-            'routeBase': 'form',
-            'langVar': 'form.form',
-        }
-    ) }}
-{% endblock %}
-
 {% block content %}
   {% if isIndex %}
-    <div id="page-list-wrapper" class="panel">
-      {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+    <div id="page-list-wrapper" class="panel panel-default">
+      {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue': searchValue,
-        'searchHelp': 'mautic.form.form.help.searchcommands',
         'searchId': 'list-search',
         'action': currentRoute,
+        'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'templateButtons': {
+                'new': permissions['form:forms:create']
+            },
+            'routeBase': 'form',
+            'langVar': 'form.form'
+        }),
         'quickFilters': [
+            {
+                'search': 'mautic.core.searchcommand.ispublished',
+                'label': 'mautic.core.form.available',
+                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                'icon': 'ri-check-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isunpublished',
+                'label': 'mautic.core.form.unavailable',
+                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                'icon': 'ri-close-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.isuncategorized',
+                'label': 'mautic.core.form.uncategorized',
+                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                'icon': 'ri-folder-unknow-line'
+            },
+            {
+                'search': 'mautic.core.searchcommand.ismine',
+                'label': 'mautic.core.searchcommand.ismine.label',
+                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                'icon': 'ri-user-line'
+            },
+            {
+                'search': 'mautic.form.form.searchcommand.isexpired',
+                'label': 'mautic.core.form.no_longer_available',
+                'tooltip': 'mautic.form.form.searchcommand.isexpired.description',
+                'icon': 'ri-time-line'
+            },
+            {
+                'search': 'mautic.form.form.searchcommand.ispending',
+                'label': 'mautic.core.form.not_yet_available',
+                'tooltip': 'mautic.form.form.searchcommand.ispending.description',
+                'icon': 'ri-timer-line'
+            },
             {
                 'search': 'has:results',
                 'label': 'mautic.core.search.quickfilter.form_results',
@@ -46,7 +77,7 @@
                 'icon': 'ri-file-list-2-line'
             }
         ]
-    }) }}
+    }) -}}
 
         <div class="page-list">
           {{ include('@MauticForm/Form/_list.html.twig') }}

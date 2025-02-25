@@ -79,6 +79,7 @@
                 {% set hasVariants  = item.isVariant() %}
                 {% set hasTranslations  = item.isTranslation() %}
                 {% set type = item.getEmailType() %}
+                {% set hasDraft  = item.hasDraft() %}
                 {% set mauticTemplateVars = _context|merge({'item' : item}) %}
                 <tr id="row_email_{{ item.id }}">
                     <td>
@@ -144,6 +145,11 @@
                                 {% endif %}
                                 {% if 'list' == type %}
                                   <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="ri-pie-chart-line fs-14"></i></span>
+                                {% endif %}
+                                {% if isDraftEnabled and hasDraft %}
+                                <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                    <i class="fa fa-fw fa-file"></i>
+                                </span>
                                 {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>

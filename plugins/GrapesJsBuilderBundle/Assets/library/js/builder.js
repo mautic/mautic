@@ -85,10 +85,12 @@ function setThemeHtml(theme) {
       }
 
       // If MJML template, generate HTML before save
-      // if (!textareaHtml.val().length && textareaMjml.val().length) {
-      //   builder.mjmlToHtml(textareaMjml, textareaHtml);
-      // }
-      // }
+      if (!textareaHtml.val().length && textareaMjml.val().length) {
+        const assetService = new AssetService();
+        const builder = new BuilderService(assetService);
+
+        textareaHtml.val(builder.mjmlToHtml(response.templateMjml));
+      }
     },
     error(request, textStatus) {
       console.log(`setThemeHtml - Request failed: ${textStatus}`);

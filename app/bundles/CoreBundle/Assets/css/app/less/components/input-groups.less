@@ -37,7 +37,7 @@
 
 .input-group {
   .input-group-btn {
-    button {
+    .btn.btn-ghost {
       height: 32px;
       width: 100%;
       background-color: var(--field);
@@ -47,11 +47,15 @@
       }
     }
 
-    &:last-child {
+    &:last-child, &:only-of-type {
       .btn {border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;}
     }
     &:first-child {
       .btn {border-radius: var(--border-radius-sm) 0 0 var(--border-radius-sm);}
+    }
+
+    &:last-child {
+      .btn {border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;}
     }
   }
 }

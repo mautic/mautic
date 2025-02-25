@@ -9,7 +9,7 @@ class EmailsPage
     public static $URL                       = '/s/emails';
     public static $NEW                       = '#new';
     public static $SUBJECT_FIELD             = 'emailform[subject]';
-    public static $NEW_CATEGORY_OPTION       = '#email_batch_newCategory_chosen > div > ul > li.active-result:nth-child(2)';
+    public static $NEW_CATEGORY_OPTION       = '#email_batch_newCategory_chosen > div > ul > li.active-result:nth-child(1)';
     public static $NEW_CATEGORY_DROPDOWN     = '#email_batch_newCategory_chosen';
     public static $CHANGE_CATEGORY_ACTION    = "a[href='/s/emails/batch/categories/view']";
     public static $SELECTED_ACTIONS_DROPDOWN = '#page-list-wrapper > div.page-list > div.table-responsive > table > thead > tr > th.col-actions > div > div > button > i';

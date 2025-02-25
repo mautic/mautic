@@ -185,7 +185,6 @@ kbd {
 .tooltip-inner { padding: 12px; }
 .popover {
   border-radius: 10px;
-  overflow: hidden;
   padding: 0;
   border: 0;
 }
@@ -201,5 +200,13 @@ kbd {
 
 .popover-content {
   padding: 12px 16px 16px;
+  border-radius: var(--border-radius-md);
   background-color: var(--layer-02);
+}
+
+@media (min-width: 768px) {
+  .popover:has([class^="col-"]) {
+    max-width: 450px;
+    width: 450px;
+  }
 }
