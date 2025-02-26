@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LeadEvent extends CommonEvent
+final class LeadEvent extends CommonEvent
 {
     public function __construct(
         Lead $lead,
