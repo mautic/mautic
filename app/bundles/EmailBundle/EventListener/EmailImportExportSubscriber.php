@@ -129,8 +129,25 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
             $email->setTranslationParent($element['translation_parent_id'] ?? null);
             $email->setVariantParent($element['variant_parent_id'] ?? null);
-            // $email->setUnsubscribeForm($element['unsubscribeform_id'] ?? null);
-            // $email->setPreferenceCenter($element['preference_center_id'] ?? null);
+
+            if (!empty($element['unsubscribeform_id'])) {
+                $unsubscribeForm = $this->entityManager->getRepository(Form::class)->find($element['unsubscribeform_id']);
+                if ($unsubscribeForm) {
+                    $email->setUnsubscribeForm($unsubscribeForm);
+                } else {
+                    $output->writeln('<comment>Unsubscribe Form ID '.$element['unsubscribeform_id'].' not found.</comment>');
+                }
+            }
+
+            if (!empty($element['preference_center_id'])) {
+                $preferenceCenter = $this->entityManager->getRepository(Page::class)->find($element['preference_center_id']);
+                if ($preferenceCenter) {
+                    $email->setPreferenceCenter($preferenceCenter);
+                } else {
+                    $output->writeln('<comment>Preference Center Page ID '.$element['preference_center_id'].' not found.</comment>');
+                }
+            }
+
             $email->setIsPublished((bool) ($element['is_published'] ?? false));
             $email->setName($element['name'] ?? '');
             $email->setDescription($element['description'] ?? '');

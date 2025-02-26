@@ -11,6 +11,8 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
@@ -213,6 +215,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 LeadList::ENTITY_NAME,
                 Asset::ENTITY_NAME,
                 Page::ENTITY_NAME,
+                DynamicContent::ENTITY_NAME,
             ];
 
             foreach ($dependentEntities as $entity) {
@@ -224,6 +227,16 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
 
                 $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
+            }
+
+            if (isset($entityData[Email::ENTITY_NAME])) {
+                $this->updateEmails($entityData, $entityData['dependencies']);
+
+                $emailEvent = new EntityImportEvent(Email::ENTITY_NAME, $entityData[Email::ENTITY_NAME], $userId);
+                $emailEvent = $this->dispatcher->dispatch($emailEvent);
+                $this->logger->info('Imported dependent entity: '.Email::ENTITY_NAME, ['entityIdMap' => $emailEvent->getEntityIdMap()]);
+
+                $this->updateDependencies($entityData['dependencies'], $emailEvent->getEntityIdMap(), Email::ENTITY_NAME);
             }
 
             $this->processDependencies($entityData['dependencies']);
@@ -409,7 +422,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $eventDependencies = $this->getEventDependencies($dependencies);
+        $eventDependencies = $this->getSubDependencies($dependencies, Event::ENTITY_NAME);
         if (empty($eventDependencies)) {
             return;
         }
@@ -425,28 +438,77 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @param array<string, mixed>             $data
+     * @param array<int, array<string, mixed>> $dependencies
+     */
+    private function updateEmails(array &$data, array $dependencies): void
+    {
+        if (empty($data[Email::ENTITY_NAME])) {
+            return;
+        }
+
+        $emailDependencies = $this->getSubDependencies($dependencies, Email::ENTITY_NAME);
+        if (empty($emailDependencies)) {
+            return;
+        }
+
+        foreach ($data[Email::ENTITY_NAME] as &$email) {
+            foreach ($emailDependencies as $dependency) {
+                if (isset($email['id']) && $email['id'] === $dependency[Email::ENTITY_NAME]) {
+                    if (isset($email['unsubscribeform_id']) && isset($dependency[Form::ENTITY_NAME])) {
+                        $email['unsubscribeform_id'] = $dependency[Form::ENTITY_NAME];
+                    }
+                    if (isset($email['preference_center_id']) && isset($dependency[Page::ENTITY_NAME])) {
+                        $email['preference_center_id'] = $dependency[Page::ENTITY_NAME];
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * @param array<string, mixed> $event
      * @param array<string, mixed> $eventDependency
      */
     private function updateEventChannel(array &$event, array $eventDependency): void
     {
-        if (isset($event['channel']) && isset($eventDependency[$event['channel']])) {
-            $event['channel_id']                                      = $eventDependency[$event['channel']];
-            $event['properties'][$event['channel'].'s']               = [$eventDependency[$event['channel']]];
-            $event['properties']['properties'][$event['channel'].'s'] = [$eventDependency[$event['channel']]];
+        if (!isset($event['channel']) || !isset($eventDependency[$event['channel']])) {
+            return;
+        }
+
+        $channelKey = $event['channel'];
+        $channelId  = $eventDependency[$channelKey];
+
+        $event['channel_id'] = $channelId;
+
+        if (isset($event['properties'][$channelKey.'s'])) {
+            $event['properties'][$channelKey.'s'] = [$channelId];
+        }
+
+        if (isset($event['properties'][$channelKey])) {
+            $event['properties'][$channelKey] = $channelId;
+        }
+
+        if (isset($event['properties']['properties'][$channelKey.'s'])) {
+            $event['properties']['properties'][$channelKey.'s'] = [$channelId];
+        }
+
+        if (isset($event['properties']['properties'][$channelKey])) {
+            $event['properties']['properties'][$channelKey] = $channelId;
         }
     }
 
     /**
      * @param array<int, array<string, mixed>> $dependencies
+     * @param string                           $entity
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getEventDependencies(array $dependencies): array
+    private function getSubDependencies(array $dependencies, $entity): array
     {
         foreach ($dependencies as $dependencyGroup) {
-            if (isset($dependencyGroup[Event::ENTITY_NAME])) {
-                return $dependencyGroup[Event::ENTITY_NAME];
+            if (isset($dependencyGroup[$entity])) {
+                return $dependencyGroup[$entity];
             }
         }
 
