@@ -13,7 +13,7 @@ class NotificationSendEvent extends CommonEvent
     public function __construct(
         protected $message,
         protected $heading,
-        protected Lead $lead
+        protected Lead $lead,
     ) {
     }
 

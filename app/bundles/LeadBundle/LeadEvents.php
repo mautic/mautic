@@ -71,7 +71,7 @@ final class LeadEvents
      * The mautic.lead_category_change event is dispatched if a lead's subscribed categories change.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadCategoryEvent instance.
+     * Mautic\LeadBundle\Event\CategoryChangeEvent instance.
      *
      * @var string
      */
@@ -497,6 +497,8 @@ final class LeadEvents
     public const FILTER_CHOICE_FIELDS = 'mautic.filter_choice_fields';
 
     /**
+     * @deprecated Listen to ON_CAMPAIGN_BATCH_ACTION instead.
+     *
      * The mautic.lead.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
@@ -505,6 +507,16 @@ final class LeadEvents
      * @var string
      */
     public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
+
+    /**
+     * The mautic.lead.on_campaign_batch_action event is dispatched when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    public const ON_CAMPAIGN_BATCH_ACTION = 'mautic.lead.on_campaign_batch_action';
 
     /**
      * The mautic.lead.on_campaign_action_delete_contact event is dispatched when the campaign action to delete a contact is executed.
@@ -781,6 +793,8 @@ final class LeadEvents
      * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
      */
     public const POST_CONTACT_EXPORT_SCHEDULED = 'mautic.post_contact_export_scheduled';
+
+    public const POST_CONTACT_EXPORT = 'mautic.post_contact_export';
 
     /**
      * The mautic.contact_export_prepare_file event is dispatched when a contact export is being processed.

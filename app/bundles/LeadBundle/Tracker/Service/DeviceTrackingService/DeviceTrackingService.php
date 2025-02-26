@@ -24,7 +24,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         private LeadDeviceRepository $leadDeviceRepository,
         private RandomHelperInterface $randomHelper,
         private RequestStack $requestStack,
-        private CorePermissions $security
+        private CorePermissions $security,
     ) {
     }
 
@@ -34,13 +34,13 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     }
 
     /**
-     * @return LeadDevice
+     * @return ?LeadDevice
      */
     public function getTrackedDevice()
     {
         if (!$this->security->isAnonymous()) {
             // Do not track Mautic users
-            return;
+            return null;
         }
 
         if ($this->trackedDevice) {

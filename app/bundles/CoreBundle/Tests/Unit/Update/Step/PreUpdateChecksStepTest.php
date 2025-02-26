@@ -71,7 +71,6 @@ class PreUpdateChecksStepTest extends AbstractStepTest
 
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);
-            $this->assertTrue(true);
         } catch (UpdateFailedException) {
             $this->fail('UpdateFailedException should not have been thrown');
         }

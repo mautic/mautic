@@ -7,17 +7,6 @@ Mautic.pageOnLoad = function (container, response) {
     if (mQuery(container + ' #page_template').length) {
         Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
 
-        //Handle autohide of "Redirect URL" field if "Redirect Type" is none
-        if (mQuery(container + ' select[name="page[redirectType]"]').length) {
-            //Auto-hide on page loading
-            Mautic.autoHideRedirectUrl(container);
-
-            //Auto-hide on select changing
-            mQuery(container + ' select[name="page[redirectType]"]').chosen().change(function(){
-                Mautic.autoHideRedirectUrl(container);
-            });
-        }
-
         // Preload tokens for code mode builder
         Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(){});
         Mautic.initSelectTheme(mQuery('#page_template'));
@@ -72,17 +61,4 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
             Mautic.removeLabelLoadingIndicator();
         }
     });
-};
-
-Mautic.autoHideRedirectUrl = function(container) {
-    var select = mQuery(container + ' select[name="page[redirectType]"]');
-    var input = mQuery(container + ' input[name="page[redirectUrl]"]');
-
-    //If value is none we autohide the "Redirect URL" field and empty it
-    if (select.val() == '') {
-        input.closest('.form-group').hide();
-        input.val('');
-    } else {
-        input.closest('.form-group').show();
-    }
 };

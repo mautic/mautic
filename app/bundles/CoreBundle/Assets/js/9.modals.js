@@ -90,7 +90,8 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
     //move the modal to the body tag to get around positioned div issues
     element.one('show.bs.modal', function () {
         if (header) {
-            element.find(".modal-title").html(header);
+            // use text instead of html method to prevent XSS
+            element.find(".modal-title").text(header);
         }
 
         if (footer && footer != 'false') {
@@ -309,6 +310,7 @@ Mautic.showConfirmation = function (el) {
     var confirmHeaderDiv = mQuery("<div />").attr({"class": "modal-header"});
     confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(message));
     var confirmButton = mQuery('<button type="button" />')
+        .attr("id", "confirm")
         .addClass(confirmBtnClass)
         .css("marginRight", "5px")
         .css("marginLeft", "5px")

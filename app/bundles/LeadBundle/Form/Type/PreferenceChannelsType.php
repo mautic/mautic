@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PreferenceChannelsType extends AbstractType
 {
     public function __construct(
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
     ) {
     }
 
@@ -35,7 +35,7 @@ class PreferenceChannelsType extends AbstractType
         );
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

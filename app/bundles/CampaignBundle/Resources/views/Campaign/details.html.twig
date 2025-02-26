@@ -1,5 +1,20 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': campaign,
+    'templateButtons': {
+        'close': securityHasEntityAccess(
+            permissions['campaign:campaigns:viewown'],
+            permissions['campaign:campaigns:viewother'],
+            campaign.createdBy
+        ),
+    },
+    'routeBase': 'campaign',
+    'targetLabel': 'mautic.campaign.campaigns'|trans
+  }) -}}
+{% endblock %}
+
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
@@ -15,11 +30,6 @@
         'delete': securityHasEntityAccess(
             permissions['campaign:campaigns:deleteown'],
             permissions['campaign:campaigns:deleteother'],
-            campaign.createdBy
-        ),
-        'close': securityHasEntityAccess(
-            permissions['campaign:campaigns:viewown'],
-            permissions['campaign:campaigns:viewother'],
             campaign.createdBy
         ),
     },
@@ -38,17 +48,11 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- campaign detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <div class="text-white dark-sm mb-0">{{ campaign.description|purify }}</div>
-                    </div>
-                </div>
-            </div>
+            {% include '@MauticCore/Helper/description.html.twig' with {'description': campaign.description} %}
             <!--/ campaign detail header -->
 
             <!-- campaign detail collapseable -->
-            <div class="collapse" id="campaign-details">
+            <div class="collapse pr-md pl-md" id="campaign-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
@@ -78,7 +82,7 @@
             <!-- campaign detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
                        data-target="#campaign-details"><span
                             class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                 </span>
@@ -91,12 +95,19 @@
             <!-- some stats -->
             <div class="stats-menu pl-md mt-lg">
                 <!-- tabs controls -->
-                <ul class="nav nav-tabs">
+                <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
                         <a href="#stats-container" role="tab" data-toggle="tab">
                             {{ 'mautic.campaign.stats'|trans }}
                         </a>
                     </li>
+                    {%  if showEmailStats|default(false) %}
+                        <li>
+                            <a href="#campaign-email-stats" role="tab" data-toggle="tab" data-load="campaign-email-stats">
+                                {{ 'mautic.campaign.email_stats'|trans }}
+                            </a>
+                        </li>
+                    {% endif %}
                     <li>
                         <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
                             {{ 'mautic.email.thead.maps'|trans }}
@@ -110,7 +121,7 @@
                     }) }}
                 </div>
             </div>
-            <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
+            <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
                 <div class="tab-pane active bdr-w-0" id="stats-container">
                     <div id="emailGraphStats">
                         {{- include('@MauticCore/Helper/chart.html.twig', {
@@ -125,16 +136,42 @@
                      data-map-url="{{ path('mautic_campaign_map_stats', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
                 >
                     <div class="spinner">
-                        <i class="fa fa-spin fa-spinner"></i>
+                        <i class="ri-loader-3-line ri-spin"></i>
                     </div>
                 </div>
+                {% if showEmailStats|default(false) %}
+                <div class="tab-pane bdr-w-0" id="campaign-email-stats">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
+                            <div data-campaign-email-stats-weekdays="{{ path('mautic_campaign_metrics_email_weekdays', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
+                                <div class="d-flex jc-center ai-center">
+                                    <div class="spinner fs-42">
+                                        <i class="ri-loader-3-line ri-spin"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
+                            <div data-campaign-email-stats-hours="{{ path('mautic_campaign_metrics_email_hours', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
+                                <div class="d-flex jc-center ai-center">
+                                    <div class="spinner fs-42">
+                                        <i class="ri-loader-3-line ri-spin"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
             <!--/ stats -->
 
             {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
-            <ul class="nav nav-tabs pr-md pl-md">
+            <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
                     <a href="#preview-container" role="tab" data-toggle="tab">
                         {{ 'mautic.campaign.preview.header'|trans }}
@@ -203,7 +240,7 @@
             <div class="tab-pane fade in bdr-w-0 page-list"
                  id="leads-container"
                  data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
-                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                 <div class="clearfix"></div>
             </div>
             {{ customContent('tabs.content', _context) }}

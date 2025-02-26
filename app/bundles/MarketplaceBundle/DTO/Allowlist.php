@@ -12,7 +12,7 @@ final class Allowlist
      * @param AllowlistEntry[] $entries
      */
     public function __construct(
-        public array $entries
+        public array $entries,
     ) {
     }
 

@@ -112,7 +112,7 @@ class DoctrineStepType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-lock',
+                    'preaddon' => 'ri-lock-fill',
                 ],
                 'required' => false,
             ]
@@ -170,7 +170,7 @@ class DoctrineStepType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'install_doctrine_step';
     }

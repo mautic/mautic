@@ -188,7 +188,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/html/page.html.twig');
-        $this->assertEquals('@themes/aurora/html/page.html.twig', $template);
+        $this->assertEquals('@themes/_1-2-1-2-column/html/page.html.twig', $template);
     }
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
@@ -231,7 +231,7 @@ class ThemeHelperTest extends TestCase
     public function testCopyWithNoNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class() extends PathsHelper {
+            new class extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -244,17 +244,17 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class() extends Translator {
+            new class extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class() extends CoreParametersHelper {
+            new class extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class() extends Filesystem {
+            new class extends Filesystem {
                 public function __construct()
                 {
                 }
@@ -294,7 +294,7 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class() extends Finder {
+            new class extends Finder {
                 /** @var SplFileInfo[] */
                 private array $dirs = [];
 
@@ -302,7 +302,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs)
+                public function in($dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
@@ -325,7 +325,7 @@ class ThemeHelperTest extends TestCase
     public function testCopyWithNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class() extends PathsHelper {
+            new class extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -338,17 +338,17 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class() extends Translator {
+            new class extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class() extends CoreParametersHelper {
+            new class extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class() extends Filesystem {
+            new class extends Filesystem {
                 public function __construct()
                 {
                 }
@@ -356,7 +356,7 @@ class ThemeHelperTest extends TestCase
                 /**
                  * @param string $files
                  */
-                public function exists($files)
+                public function exists($files): bool
                 {
                     if ('/path/to/themes/requested-theme-dir' === $files) {
                         return false;
@@ -388,7 +388,7 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class() extends Finder {
+            new class extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */
@@ -398,7 +398,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs)
+                public function in($dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),

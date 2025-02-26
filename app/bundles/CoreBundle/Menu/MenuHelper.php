@@ -18,7 +18,7 @@ class MenuHelper
         protected CorePermissions $security,
         protected RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
-        protected IntegrationHelper $integrationHelper
+        protected IntegrationHelper $integrationHelper,
     ) {
     }
 

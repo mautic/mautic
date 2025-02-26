@@ -31,7 +31,7 @@ class PullTransifexCommand extends Command
         private TransifexFactory $transifexFactory,
         private TranslatorInterface $translator,
         private PathsHelper $pathsHelper,
-        private LanguageHelper $languageHelper
+        private LanguageHelper $languageHelper,
     ) {
         parent::__construct();
     }

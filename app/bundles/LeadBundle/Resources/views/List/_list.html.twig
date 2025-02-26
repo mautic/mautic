@@ -13,12 +13,7 @@
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#leadListTable',
-                        'langVar': 'lead.list',
-                        'routeBase': 'segment',
-                        'templateButtons': {
-                            'delete': permissions['lead:lists:deleteother'],
-                        },
-                }) }}
+                    }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'lead.list',
                         'orderBy': 'l.name',

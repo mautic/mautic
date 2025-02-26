@@ -42,7 +42,7 @@ class MessageController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         private RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -254,7 +254,7 @@ class MessageController extends AbstractStandardFormController
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $channel,
-        $page = 1
+        $page = 1,
     ) {
         $filter = [];
         if ('all' !== $channel) {

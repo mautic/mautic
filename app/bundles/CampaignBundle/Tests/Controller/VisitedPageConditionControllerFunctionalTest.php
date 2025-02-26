@@ -24,13 +24,13 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         array $startDate,
         array $endDate,
         array $accumulativeTime,
-        array $page
+        array $page,
     ): void {
         // Fetch the campaign condition form.
         $uri = 's/campaigns/events/new?type=lead.pageHit&eventType=condition&campaignId=3&anchor=leadsource&anchorEventType=source&_=1682493324393&mauticUserLastActive=897&mauticLastNotificationId=';
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
         $responseData = json_decode($response->getContent(), true);
@@ -51,9 +51,10 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
     }

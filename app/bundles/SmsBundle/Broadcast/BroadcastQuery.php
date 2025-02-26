@@ -20,7 +20,7 @@ class BroadcastQuery
 
     public function __construct(
         private EntityManager $entityManager,
-        private SmsModel $smsModel
+        private SmsModel $smsModel,
     ) {
     }
 

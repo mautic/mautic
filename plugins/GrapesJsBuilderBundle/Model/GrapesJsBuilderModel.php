@@ -34,7 +34,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -78,6 +78,9 @@ class GrapesJsBuilderModel extends AbstractCommonModel
             $this->getRepository()->saveEntity($grapesJsBuilder);
 
             $customHtml = $this->requestStack->getCurrentRequest()->get('emailform')['customHtml'] ?? null;
+            if (is_null($customHtml)) {
+                $customHtml = $this->requestStack->getCurrentRequest()->get('customHtml') ?? null;
+            }
             $email->setCustomHtml($customHtml);
             $this->emailModel->getRepository()->saveEntity($email);
         }

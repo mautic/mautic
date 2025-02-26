@@ -3,6 +3,8 @@
 namespace Mautic\CoreBundle\Tests\Traits;
 
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response;
 
 trait ControllerTrait
 {
@@ -11,7 +13,7 @@ trait ControllerTrait
         string $routeAlias,
         string $column,
         string $tableAlias,
-        string $column2
+        string $column2,
     ): void {
         $crawler         = $this->client->request('GET', '/s/'.$urlAlias);
         $clientResponse  = $this->client->getResponse();
@@ -32,7 +34,7 @@ trait ControllerTrait
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-desc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'ri-arrow-down-line')]"
             )->count(),
             'The order must be desc'
         );
@@ -41,10 +43,11 @@ trait ControllerTrait
             'GET',
             '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column
         );
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-asc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'ri-arrow-up-line')]"
             )->count(),
             'The order must be asc'
         );
@@ -56,7 +59,7 @@ trait ControllerTrait
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-asc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'ri-arrow-up-line')]"
             )->count(),
             'The order must be asc'
         );
@@ -68,7 +71,7 @@ trait ControllerTrait
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-desc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'ri-arrow-down-line')]"
             )->count(),
             'The order must be desc'
         );

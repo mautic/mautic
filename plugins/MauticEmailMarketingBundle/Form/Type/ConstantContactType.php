@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -24,17 +24,21 @@ class ConstantContactType extends AbstractType
     public function __construct(
         private IntegrationHelper $integrationHelper,
         private PluginModel $pluginModel,
-        protected SessionInterface $session,
-        protected CoreParametersHelper $coreParametersHelper
+        protected RequestStack $requestStack,
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration $object */
         $object          = $this->integrationHelper->getIntegrationObject('ConstantContact');
         $integrationName = $object->getName();
-        $session         = $this->session;
+        $session         = $this->requestStack->getSession();
         $limit           = $session->get(
             'mautic.plugin.'.$integrationName.'.lead.limit',
             $this->coreParametersHelper->get('default_pagelimit')
@@ -111,10 +115,7 @@ class ConstantContactType extends AbstractType
         $resolver->setDefined(['form_area']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'emailmarketing_constantcontact';
     }

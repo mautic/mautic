@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\UserTokenSetter;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,7 +48,9 @@ class ImportCommandTest extends TestCase
             ->method('setToken');
         $userTokenSetter  = new UserTokenSetter($userRepositoryMock, $tokenStorageMock);
 
-        $importCommand =  new class($translatorMock, $importModelMock, new ProcessSignalService(), $userTokenSetter) extends ImportCommand {
+        $loggerMock = $this->createMock(Logger::class);
+
+        $importCommand =  new class($translatorMock, $importModelMock, new ProcessSignalService(), $userTokenSetter, $loggerMock) extends ImportCommand {
             public function getExecute(InputInterface $input, OutputInterface $output): int
             {
                 return $this->execute($input, $output);

@@ -12,7 +12,7 @@ class UniqueCustomField extends Constraint
 
     public string $object;
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }

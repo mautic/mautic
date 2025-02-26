@@ -2,20 +2,18 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,7 +24,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PageController extends FormController
 {
-    use BuilderControllerTrait;
     use FormErrorMessagesTrait;
 
     /**
@@ -273,7 +270,7 @@ class PageController extends FormController
         }
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_page_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -365,7 +362,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
+    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, $entity = null)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page.page');
@@ -418,7 +415,7 @@ class PageController extends FormController
                         $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity->getId(), true);
+                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $entity->getId(), true);
                     }
                 }
             } else {
@@ -442,10 +439,6 @@ class PageController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
-
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -461,11 +454,7 @@ class PageController extends FormController
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
-                'themes'        => $this->factory->getInstalledThemes('page', true),
-                'slots'         => $this->buildSlotForms($slotTypes),
-                'sections'      => $this->buildSlotForms($sections),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                'sectionForm'   => $sectionForm->createView(),
+                'themes'        => $themeHelper->getInstalledThemes('page', true),
                 'permissions'   => $permissions,
             ],
             'contentTemplate' => '@MauticPage/Page/form.html.twig',
@@ -494,8 +483,9 @@ class PageController extends FormController
         Translator $translator,
         RouterInterface $routerHelper,
         CoreParametersHelper $coreParametersHelper,
+        ThemeHelper $themeHelper,
         $objectId,
-        $ignorePost = false
+        $ignorePost = false,
     ) {
         /** @var PageModel $model */
         $model    = $this->getModel('page.page');
@@ -608,21 +598,13 @@ class PageController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
-
         return $this->delegateView([
             'viewParameters' => [
                 'form'          => $form->createView(),
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
-                'themes'        => $this->factory->getInstalledThemes('page', true),
-                'slots'         => $this->buildSlotForms($slotTypes),
-                'sections'      => $this->buildSlotForms($sections),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                'sectionForm'   => $sectionForm->createView(),
+                'themes'        => $themeHelper->getInstalledThemes('page', true),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'permissions'   => $security->isGranted(
                     [
@@ -653,7 +635,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model  = $this->getModel('page.page');
@@ -682,7 +664,7 @@ class PageController extends FormController
             $session->set($contentName, $entity->getCustomHtml());
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $entity);
     }
 
     /**
@@ -748,10 +730,8 @@ class PageController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.page.page', 1);
         $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
@@ -822,7 +802,7 @@ class PageController extends FormController
      *
      * @return Response
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page.page');
@@ -849,27 +829,13 @@ class PageController extends FormController
         if (empty($template)) {
             throw new \InvalidArgumentException('No template found');
         }
-        $slots    = $this->factory->getTheme($template)->getSlots('page');
 
-        // merge any existing changes
-        $newContent = $request->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', []);
-        $content    = $entity->getContent();
-
-        if (is_array($newContent)) {
-            $content = array_merge($content, $newContent);
-            // Update the content for processSlots
-            $entity->setContent($content);
-        }
-
-        $this->processSlots($slotsHelper, $slots, $entity);
-
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
         return $this->render($logicalName, [
             'isNew'       => $isNew,
-            'slots'       => $slots,
             'formFactory' => $this->formFactory,
-            'content'     => $content,
+            'content'     => $entity->getContent(),
             'page'        => $entity,
             'template'    => $template,
             'basePath'    => $request->getBasePath(),
@@ -881,7 +847,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model  = $this->getModel('page.page');
@@ -912,7 +878,7 @@ class PageController extends FormController
         $clone->setIsPublished(false);
         $clone->setVariantParent($entity);
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $clone);
     }
 
     /**
@@ -982,46 +948,6 @@ class PageController extends FormController
                 'flashes' => $flashes,
             ])
         );
-    }
-
-    /**
-     * PreProcess page slots for public view.
-     *
-     * @param array $slots
-     * @param Page  $entity
-     */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
-    {
-        $slotsHelper->inBuilder(true);
-
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            // backward compatibility - if slotConfig array does not exist
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            // define default config if does not exist
-            if (!isset($slotConfig['type'])) {
-                $slotConfig['type'] = 'html';
-            }
-
-            if (!isset($slotConfig['placeholder'])) {
-                $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
-            }
-
-            $value = $content[$slot] ?? '';
-
-            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
-        }
-
-        $slotsHelper->start('builder'); ?>
-<input type="hidden" id="builder_entity_id"
-    value="<?php echo $entity->getSessionId(); ?>" />
-<?php
-        $slotsHelper->stop();
     }
 
     /**

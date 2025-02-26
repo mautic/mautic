@@ -41,7 +41,7 @@
               <div class="col-xs-12">
 
                   <!-- tabs controls -->
-                  <ul class="nav nav-tabs pr-md pl-md">
+                  <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active"><a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
                       <li id="fields-tab" class="text-danger">
                           <a class="{% if fieldsTabError %}text-danger{% endif %}" href="#fields-container" role="tab" data-toggle="tab">
@@ -161,7 +161,7 @@
                               <div class="drop-here">
                                 {% for action in formActions %}
                                     {% if action.id not in deletedActions %}
-                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/_generic.html.twig') %}
+                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/base_form_action.html.twig') %}
                                         {% set action = action|merge({
                                               'settings': actionSettings[action.type],
                                         }) %}
@@ -188,9 +188,16 @@
       <div class="col-md-3 height-auto bdr-l">
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.category) }}
-              {{ form_row(form.isPublished) }}
-              {{ form_row(form.publishUp) }}
-              {{ form_row(form.publishDown) }}
+              {{ form_row(form.isPublished, {
+				'attr': {
+					'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
+					'data-start': 'mautic.core.form.available_on_scheduled_date',
+					'data-both': 'mautic.core.form.available_during_scheduled_period',
+					'data-end': 'mautic.core.form.available_until_scheduled_end'
+				}
+			}) }}
+              {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+              {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
               {{ form_row(form.noIndex) }}
               {{ form_row(form.inKioskMode) }}
               {{ form_row(form.renderStyle) }}

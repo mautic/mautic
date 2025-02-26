@@ -15,7 +15,7 @@ interface BulkNotificationInterface
         string $header = null,
         string $iconClass = null,
         \DateTime $datetime = null,
-        User $user = null
+        User $user = null,
     ): void;
 
     public function flush(\DateTime $deduplicateDateTimeFrom = null): void;

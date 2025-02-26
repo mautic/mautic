@@ -64,7 +64,7 @@ class TrackableModel extends AbstractCommonModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -303,8 +303,12 @@ class TrackableModel extends AbstractCommonModel
         if ('html' == $type) {
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
+                // Make the search regular expression match both "&" and "&amp;".
+                $search  = preg_quote($search, '/');
+                $search  = str_replace('&amp;', '&', $search);
+                $search  = str_replace('&', '(?:&|&amp;)', $search);
                 $content = preg_replace(
-                    '/<(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
+                    '/<(.*?) href=(["\'])'.$search.'(.*?)\\2(.*?)>/i',
                     '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
@@ -592,13 +596,11 @@ class TrackableModel extends AbstractCommonModel
 
             parse_str($query, $queryParts);
 
-            if (is_array($queryParts)) {
-                foreach ($queryParts as $key => $value) {
-                    if (preg_match('/(\{\S+?\})/', $key) || preg_match('/(\{\S+?\})/', $value)) {
-                        $tokenizedParams[$key] = $value;
-                    } else {
-                        $untokenizedParams[$key] = $value;
-                    }
+            foreach ($queryParts as $key => $value) {
+                if (preg_match('/(\{\S+?\})/', $key) || preg_match('/(\{\S+?\})/', $value)) {
+                    $tokenizedParams[$key] = $value;
+                } else {
+                    $untokenizedParams[$key] = $value;
                 }
             }
         }
@@ -787,7 +789,7 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param array<int, Redirect|Trackable> $trackableTokens
+     * @param array<int|string, Redirect|Trackable> $trackableTokens
      *
      * @return string
      */

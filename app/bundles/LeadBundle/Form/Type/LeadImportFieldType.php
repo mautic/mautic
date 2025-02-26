@@ -21,7 +21,7 @@ class LeadImportFieldType extends AbstractType
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
     ) {
     }
 
@@ -120,10 +120,10 @@ class LeadImportFieldType extends AbstractType
                 $buttons,
                 [
                     'apply_text'  => 'mautic.lead.import.in.background',
-                    'apply_class' => 'btn btn-success',
-                    'apply_icon'  => 'fa fa-history',
+                    'apply_class' => 'btn btn-secondary',
+                    'apply_icon'  => 'ri-history-line',
                     'save_text'   => 'mautic.lead.import.start',
-                    'save_class'  => 'btn btn-primary',
+                    'save_class'  => 'btn btn-secondary',
                     'save_icon'   => 'ri-import-line',
                 ]
             );
@@ -154,10 +154,7 @@ class LeadImportFieldType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'lead_field_import';
     }

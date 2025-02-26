@@ -45,7 +45,7 @@ class TwitterType extends AbstractType
             'attr'       => [
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.integration.Twitter.share.username',
-                'preaddon'    => 'fa fa-at',
+                'preaddon'    => 'ri-at-line',
             ],
         ]);
 
@@ -56,7 +56,7 @@ class TwitterType extends AbstractType
             'attr'       => [
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.integration.Twitter.share.username',
-                'preaddon'    => 'fa fa-at',
+                'preaddon'    => 'ri-at-line',
             ],
         ]);
 
@@ -79,10 +79,7 @@ class TwitterType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'socialmedia_twitter';
     }

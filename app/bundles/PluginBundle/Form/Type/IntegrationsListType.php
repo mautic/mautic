@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class IntegrationsListType extends AbstractType
 {
     public function __construct(
-        private IntegrationHelper $integrationHelper
+        private IntegrationHelper $integrationHelper,
     ) {
     }
 
@@ -132,7 +132,7 @@ class IntegrationsListType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'integration_list';
     }

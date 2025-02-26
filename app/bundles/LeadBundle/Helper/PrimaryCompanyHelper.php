@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class PrimaryCompanyHelper
 {
     public function __construct(
-        private CompanyLeadRepository $companyLeadRepository
+        private CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 

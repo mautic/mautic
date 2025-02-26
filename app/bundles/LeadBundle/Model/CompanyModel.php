@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyMergeEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
@@ -73,7 +74,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        private FieldList $fieldList,
     ) {
         $this->leadFieldModel = $leadFieldModel;
 
@@ -117,7 +119,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->repoSetup = true;
             $repo->setDispatcher($this->dispatcher);
             // set the point trigger model in order to get the color code for the lead
-            $fields = $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+            $fields = $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
 
             $searchFields = [];
             foreach ($fields as $groupFields) {
@@ -228,10 +230,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * Populates custom field values for updating the company.
-     *
-     * @param bool|false $overwriteWithBlank
      */
-    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false): void
+    public function setFieldValues(Company $company, array $data, bool $overwriteWithBlank = false): void
     {
         // save the field values
         $fieldValues = $company->getFields();
@@ -266,7 +266,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen($newValue) > 0 || (0 === strlen($newValue) && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (strlen($newValue) > 0 || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -517,6 +517,58 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * Get a list of companies with names only.
+     *
+     * @param mixed[]|string $filter
+     *
+     * @return string[]
+     */
+    public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, ?string $exclude = ''): array
+    {
+        $valueColumn = 'id';
+        if (!in_array($type, ['companyfield', 'lead.company'])) {
+            return [];
+        }
+        if ('lead.company' === $type) {
+            $column    = 'companyname';
+            $filterVal = $filter;
+        } else {
+            if (is_array($filter)) {
+                $column    = $filter[0];
+                $filterVal = $filter[1];
+            } else {
+                $column = $filter;
+            }
+        }
+
+        $expr      = new ExpressionBuilder($this->em->getConnection());
+        $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
+
+        // Exclude company if $exclude is provided
+        if ('' !== $exclude) {
+            $composite = $expr->and(
+                $composite,
+                $expr->neq('comp.id', $exclude)
+            );
+        }
+
+        // Validate owner permissions
+        if (!$this->security->isGranted('lead:leads:viewother')) {
+            $composite->with(
+                $expr->or(
+                    $expr->and(
+                        $expr->isNull('comp.owner_id'),
+                        $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                    ),
+                    $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                )
+            );
+        }
+
+        return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%', 'onlyNames' => true], $column, $valueColumn);
+    }
+
+    /**
      * Get list of entities for autopopulate fields.
      *
      * @param string         $type
@@ -726,13 +778,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param mixed[] $fields
-     * @param mixed[] $data
-     * @param bool    $skipIfExists
-     *
-     * @throws \Exception
+     * @param array<string>   $fields
+     * @param array<mixed>    $data
+     * @param int|string|null $owner
      */
-    public function import($fields, $data, $owner = null, $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false): bool
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 

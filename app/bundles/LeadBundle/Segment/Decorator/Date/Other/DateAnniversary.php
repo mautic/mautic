@@ -11,7 +11,7 @@ class DateAnniversary implements FilterDecoratorInterface
 {
     public function __construct(
         private DateDecorator $dateDecorator,
-        private DateOptionParameters $dateOptionParameters
+        private DateOptionParameters $dateOptionParameters,
     ) {
     }
 
@@ -56,7 +56,7 @@ class DateAnniversary implements FilterDecoratorInterface
             $date->modify($relativeFilter);
         }
 
-        return $date->toLocalString('%-m-d');
+        return $date->toLocalString('%-m-d%');
     }
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string

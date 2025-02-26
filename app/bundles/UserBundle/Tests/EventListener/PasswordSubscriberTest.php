@@ -9,11 +9,16 @@ use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
-use Mautic\UserBundle\UserEvents;
+use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CredentialsInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 final class PasswordSubscriberTest extends TestCase
 {
@@ -32,7 +37,7 @@ final class PasswordSubscriberTest extends TestCase
     private $pluginToken;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private $dispatcher;
 
@@ -51,27 +56,44 @@ final class PasswordSubscriberTest extends TestCase
 
     public function testThatItIsSubscribedToEvents(): void
     {
-        Assert::assertArrayHasKey(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION, PasswordSubscriber::getSubscribedEvents());
+        $subscribedEvents = PasswordSubscriber::getSubscribedEvents();
+        Assert::assertCount(1, $subscribedEvents);
+        Assert::assertArrayHasKey(CheckPassportEvent::class, $subscribedEvents);
     }
 
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void
     {
         $this->expectException(WeakPasswordException::class);
 
-        $this->pluginToken->expects($this->once())
-            ->method('getCredentials')
-            ->willReturn('11111111');
+        $passwordStrengthBadge = new PasswordStrengthBadge('11111111');
 
-        $this->passwordSubscriber->onUserFormAuthentication($this->authenticationEvent);
+        $this->passwordSubscriber->checkPassport(
+            new CheckPassportEvent(
+                $this->createMock(AuthenticatorInterface::class),
+                new Passport(
+                    $this->createMock(UserBadge::class),
+                    $this->createMock(CredentialsInterface::class),
+                    [$passwordStrengthBadge]
+                )
+            )
+        );
     }
 
     public function testThatItDoesntThrowExceptionIfPasswordIsStrong(): void
     {
-        $this->pluginToken->expects($this->once())
-            ->method('getCredentials')
-            ->willReturn(uniqid());
+        $passwordStrengthBadge = new PasswordStrengthBadge(uniqid('password_strength', true));
 
-        $this->passwordSubscriber->onUserFormAuthentication($this->authenticationEvent);
+        $this->passwordSubscriber->checkPassport(
+            new CheckPassportEvent(
+                $this->createMock(AuthenticatorInterface::class),
+                new Passport(
+                    $this->createMock(UserBadge::class),
+                    $this->createMock(CredentialsInterface::class),
+                    [$passwordStrengthBadge]
+                )
+            )
+        );
+
         $this->addToAssertionCount(1); // Verify that no exception is thrown
     }
 }

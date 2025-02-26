@@ -2,13 +2,16 @@
     <a href="{{ url('mautic_stage_index', {'search' : searchString}) }}" data-toggle="ajax">
         <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
     </a>
-</div>
+    </div>
 {% else %}
-{% if canEdit %}
-<a href="{{ url('mautic_stage_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}" data-toggle="ajax">
-    {{ item.getName() }}
-</a>
-{% else %}
-<span>{{ item.getName() }}</span>
-{% endif %}
+    <a href="{{ url('mautic_stage_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
+        <span class="fw-sb">{{ item.name }}</span>
+        <span class="ml-4 mr-sm">#{{ item.getId() }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': item,
+            'status': 'active',
+            'simplified': 'true'
+        }) -}}
+    </a>
+    <div class="clearfix"></div>
 {% endif %}

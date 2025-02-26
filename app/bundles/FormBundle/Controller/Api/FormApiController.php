@@ -49,7 +49,7 @@ class FormApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
     ) {
         $formModel = $modelFactory->getModel('form');
         \assert($formModel instanceof FormModel);
@@ -85,7 +85,7 @@ class FormApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $fieldsToDelete = $request->get('fields');
+        $fieldsToDelete = $request->query->all()['fields'] ?? $request->request->all()['fields'] ?? [];
 
         if (!is_array($fieldsToDelete)) {
             return $this->badRequest('The fields attribute must be array.');
@@ -115,7 +115,7 @@ class FormApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $actionsToDelete = $request->get('actions');
+        $actionsToDelete = $request->query->all()['actions'] ?? $request->request->all()['actions'] ?? [];
 
         if (!is_array($actionsToDelete)) {
             return $this->badRequest('The actions attribute must be array.');
@@ -195,8 +195,9 @@ class FormApiController extends CommonApiController
                         throw new InvalidArgumentException($msg, Response::HTTP_NOT_FOUND);
                     }
 
-                    $fieldEntityArray           = $fieldEntity->convertToArray();
-                    $fieldEntityArray['formId'] = $formId;
+                    $fieldEntityArray                 = $fieldEntity->convertToArray();
+                    $fieldEntityArray['formId']       = $formId;
+                    $fieldEntityArray['mappedObject'] = $fieldParams['mappedObject'] ?? null;
 
                     if (!empty($fieldParams['alias'])) {
                         $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);

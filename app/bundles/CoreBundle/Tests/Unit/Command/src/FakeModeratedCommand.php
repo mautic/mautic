@@ -15,11 +15,11 @@ class FakeModeratedCommand extends ModeratedCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->checkRunStatus($input, $output);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     public function forceCompleteRun(): void

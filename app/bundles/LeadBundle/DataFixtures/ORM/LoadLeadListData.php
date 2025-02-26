@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\ListModel;
 class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private ListModel $segmentModel
+        private ListModel $segmentModel,
     ) {
     }
 

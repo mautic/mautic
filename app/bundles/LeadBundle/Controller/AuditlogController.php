@@ -31,8 +31,8 @@ class AuditlogController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.auditlog.filters', $filters);
         } else {
@@ -77,14 +77,18 @@ class AuditlogController extends CommonController
             return $lead;
         }
 
+        if (!$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
         $this->setListFilters();
 
         $session = $request->getSession();
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.auditlog.filters', $filters);
         } else {

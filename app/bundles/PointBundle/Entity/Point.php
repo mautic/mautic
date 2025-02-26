@@ -60,7 +60,7 @@ class Point extends FormEntity
     private $properties = [];
 
     /**
-     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
+     * @var ArrayCollection<int,LeadPointLog>
      */
     private $log;
 

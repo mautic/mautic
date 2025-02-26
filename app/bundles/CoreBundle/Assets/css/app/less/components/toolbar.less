@@ -1,0 +1,81 @@
+.toolbar--table-toolbar {
+    position: relative;
+}
+
+.toolbar--toolbar-content {
+    .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
+    .form-control.search,
+    .input-group .input-group-btn button,
+    .btn,
+    div {
+      height: 48px;
+      border-radius: unset;
+      margin: 0;
+    }
+    .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
+    .form-control.search,
+    .input-group .input-group-btn button,
+    .btn-ghost {
+      &:hover { background-color: var(--field-hover); }
+    }
+
+    > .btn {
+      &:last-child, &:only-of-type + .input-group > input { border-radius: 0 var(--border-radius-lg) 0 0; }
+      &:first-child { border-radius: var(--border-radius-lg) 0 0 0; }
+    }
+}
+
+.toolbar--batch-actions {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--background-brand);
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    inset-block-end: 0;
+    inset-inline: 0;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-transform: translate3d(0, 48px, 0);
+    transform: translate3d(0, 48px, 0);
+    transition: var(--transition-all-productive);
+    will-change: transform;
+    z-index: 5;
+
+    .btn {
+    padding-inline: var(--spacing-05);
+    gap: var(--spacing-02);
+
+    i { font-size: 16px; }
+    }
+}
+
+.toolbar--batch-actions--active {
+    clip-path: polygon(0 0, 300% 0, 300% 300%, 0 100vh);
+    opacity: 1;
+    pointer-events: all;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+.toolbar--batch-summary {
+    position: sticky;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-05);
+    background-color: var(--background-brand, #0f62fe);
+    color: var(--text-on-color, #ffffff);
+    inset-inline-start: 0;
+    min-block-size: 3rem;
+}
+
+.toolbar--action-list {
+    display: flex;
+    align-items: center;
+}
+
+.toolbar--batch-summary__divider {
+    -webkit-padding-start: var(--spacing-03);
+    padding-inline-start: var(--spacing-03);
+}

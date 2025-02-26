@@ -14,7 +14,7 @@ class ContactHelper
     public function __construct(
         private LeadRepository $leadRepository,
         private Connection $connection,
-        private PhoneNumberHelper $phoneNumberHelper
+        private PhoneNumberHelper $phoneNumberHelper,
     ) {
     }
 

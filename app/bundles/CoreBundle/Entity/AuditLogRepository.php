@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -184,7 +185,7 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+        $query->orderBy('al.dateAdded', Order::Descending->value)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();

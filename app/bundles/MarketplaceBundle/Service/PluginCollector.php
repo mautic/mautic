@@ -20,7 +20,7 @@ class PluginCollector
 
     public function __construct(
         private Connection $connection,
-        private Allowlist $allowlist
+        private Allowlist $allowlist,
     ) {
     }
 

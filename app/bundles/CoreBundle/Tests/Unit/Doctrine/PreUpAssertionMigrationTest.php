@@ -14,7 +14,7 @@ class PreUpAssertionMigrationTest extends TestCase
 {
     public function testPreUpWithoutSkipAssertions(): void
     {
-        $migration = new class() extends PreUpAssertionMigration {
+        $migration = new class extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -44,7 +44,7 @@ class PreUpAssertionMigrationTest extends TestCase
 
     public function testPreUpSkipped(): void
     {
-        $migration = new class() extends PreUpAssertionMigration {
+        $migration = new class extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -60,20 +60,14 @@ class PreUpAssertionMigrationTest extends TestCase
             protected function preUpAssertions(): void
             {
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'First exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'Second exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'Third exists');
             }
@@ -100,7 +94,7 @@ class PreUpAssertionMigrationTest extends TestCase
 
     public function testPreUpNotSkipped(): void
     {
-        $migration = new class() extends PreUpAssertionMigration {
+        $migration = new class extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -116,20 +110,14 @@ class PreUpAssertionMigrationTest extends TestCase
             protected function preUpAssertions(): void
             {
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'First exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'Second exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return false;
                 }, 'Third does not exist');
             }

@@ -58,7 +58,7 @@ class Trigger extends FormEntity
     private $category;
 
     /**
-     * @var ArrayCollection<int, \Mautic\PointBundle\Entity\TriggerEvent>
+     * @var ArrayCollection<int, TriggerEvent>
      */
     private $events;
 

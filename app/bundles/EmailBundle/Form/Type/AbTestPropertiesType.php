@@ -30,7 +30,7 @@ class AbTestPropertiesType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'email_abtest_settings';
     }

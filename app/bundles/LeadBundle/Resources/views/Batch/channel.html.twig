@@ -23,7 +23,7 @@
 
     {% for channel in form['subscribed_channels'].vars['choices'] %}
         {% set contactMe = leadChannels[channel.value] is defined %}
-        {% set isContactable = contactMe ? '' : 'text-muted' %}
+        {% set isContactable = contactMe ? '' : 'text-secondary' %}
         {% set hidden = contactMe ? '' : 'hide' %}
         {% set checked = contactMe ? 'checked' : '' %}
         {% set disabled = leadChannels[channel.value] is defined ? '' : 'disabled' %}
@@ -66,7 +66,7 @@
             <td colspan="2" style="border-top:none">
                 <div id="frequency_{{ channel.value }}" class="{{ hidden }}">
                     <div>
-                        <label class="text-muted fw-n">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                        <label class="text-secondary fw-n">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                     </div>
                     <div>
                         {{ form_widget(form['contact_pause_start_date_'~channel.value]) }}

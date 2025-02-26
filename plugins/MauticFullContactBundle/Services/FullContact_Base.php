@@ -53,7 +53,7 @@ class FullContact_Base
     }
 
     /**
-     * @param string $hdr
+     * @param mixed[] $hdr
      */
     private function _update_rate_limit($hdr): void
     {
@@ -71,7 +71,7 @@ class FullContact_Base
      * @param string $_apiKey
      */
     public function __construct(
-        protected $_apiKey
+        protected $_apiKey,
     ) {
         $this->_next_req_time = new \DateTime('@0');
     }
@@ -143,14 +143,14 @@ class FullContact_Base
 
         // open connection
         $connection = curl_init($fullUrl);
-        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($connection, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
-        curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
+        curl_setopt($connection, CURLOPT_HEADER, true); // return HTTP headers with response
 
         if (null !== $postData) {
             curl_setopt($connection, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
             curl_setopt($connection, CURLOPT_POSTFIELDS, json_encode($postData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            curl_setopt($connection, CURLOPT_POST, 1);
+            curl_setopt($connection, CURLOPT_POST, true);
         }
 
         // execute request

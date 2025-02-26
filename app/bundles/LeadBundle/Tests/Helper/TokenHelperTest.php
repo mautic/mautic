@@ -22,7 +22,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
     {
         $reflectionProperty = new \ReflectionProperty(TokenHelper::class, 'parameters');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue([
+        $reflectionProperty->setValue(null, [
             'date_format_dateonly' => 'F j, Y',
             'date_format_timeonly' => 'g:i a',
         ]);

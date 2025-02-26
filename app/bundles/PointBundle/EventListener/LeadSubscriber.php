@@ -21,7 +21,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private PointsChangeLogRepository $pointsChangeLogRepository,
         private LeadPointLogRepository $leadPointLogRepository,
-        private LeadTriggerLogRepository $leadTriggerLogRepository
+        private LeadTriggerLogRepository $leadTriggerLogRepository,
     ) {
     }
 
@@ -91,7 +91,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon'      => 'fa-calculator',
+                        'icon'      => 'ri-calculator-line',
                         'contactId' => $log['lead_id'],
                     ]
                 );

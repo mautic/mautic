@@ -37,7 +37,22 @@
         </div>
 
         <div class="col-xs-2 col-sm-1">
-            <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.report.report.label.removefilter',
+                        variant: 'ghost',
+                        icon_only: true,
+                        size: 'xs',
+                        danger: 'true',
+                        icon: 'ri-delete-bin-line',
+                        href: 'javascript: void(0);',
+                        attributes: {
+                            'class': 'remove-selected text-danger pull-right'
+                        }
+                    }
+                ]
+            } %}
         </div>
         {{ form_widget(form.field) }}
         {{ form_widget(form.type) }}

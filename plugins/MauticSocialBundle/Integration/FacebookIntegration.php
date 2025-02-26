@@ -59,7 +59,7 @@ class FacebookIntegration extends SocialIntegration
         if (null === $values) {
             parse_str($data, $values);
 
-            $this->session->set($this->getName().'_tokenResponse', $values);
+            $this->requestStack->getSession()->set($this->getName().'_tokenResponse', $values);
         }
 
         return $values;

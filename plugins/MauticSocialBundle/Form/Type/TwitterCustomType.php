@@ -18,7 +18,7 @@ class TwitterCustomType extends TwitterAbstractType
             'attr'       => [
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.social.monitoring.twitter.custom.tooltip',
-                'preaddon' => 'fa fa-crosshairs',
+                'preaddon' => 'ri-focus-3-line',
             ],
         ]);
 
@@ -26,7 +26,7 @@ class TwitterCustomType extends TwitterAbstractType
         parent::buildForm($builder, $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'twitter_custom';
     }

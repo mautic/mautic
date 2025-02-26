@@ -18,7 +18,7 @@ class UserListType extends AbstractType
     private array $choices = [];
 
     public function __construct(
-        private UserModel $userModel
+        private UserModel $userModel,
     ) {
     }
 
@@ -35,10 +35,7 @@ class UserListType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

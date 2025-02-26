@@ -26,12 +26,15 @@ class GrapesJsBuilder
      */
     private $customMjml;
 
+    private ?string $draftCustomMjml = null;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('bundle_grapesjsbuilder')
             ->setCustomRepositoryClass(GrapesJsBuilderRepository::class)
             ->addNamedField('customMjml', Types::TEXT, 'custom_mjml', true)
+            ->addNamedField('draftCustomMjml', Types::TEXT, 'draft_custom_mjml', true)
             ->addId();
 
         $builder->createManyToOne(
@@ -69,7 +72,7 @@ class GrapesJsBuilder
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCustomMjml()
     {
@@ -86,5 +89,15 @@ class GrapesJsBuilder
         $this->customMjml = $customMjml;
 
         return $this;
+    }
+
+    public function getDraftCustomMjml(): ?string
+    {
+        return $this->draftCustomMjml;
+    }
+
+    public function setDraftCustomMjml(?string $draftCustomMjml): void
+    {
+        $this->draftCustomMjml = $draftCustomMjml;
     }
 }

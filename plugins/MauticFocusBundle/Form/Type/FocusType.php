@@ -28,7 +28,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FocusType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security
+        private CorePermissions $security,
     ) {
     }
 
@@ -197,7 +197,7 @@ class FocusType extends AbstractType
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-default btn-dnd btn-nospin',
+                    'class'   => 'btn btn-ghost btn-dnd btn-nospin',
                     'icon'    => 'ri-layout-line',
                     'onclick' => 'Mautic.launchFocusBuilder();',
                 ],

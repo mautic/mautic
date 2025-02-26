@@ -7,6 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class GlobalSearchEvent extends Event
 {
+    public const RESULTS_LIMIT = 3;
     /**
      * @var array
      */
@@ -20,7 +21,7 @@ class GlobalSearchEvent extends Event
      */
     public function __construct(
         $searchString,
-        protected $translator
+        protected $translator,
     ) {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
     }

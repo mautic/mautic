@@ -4,11 +4,17 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,14 +27,14 @@ class PublicController extends CommonFormController
     /**
      * @return RedirectResponse|Response
      */
-    public function submitAction(Request $request, DateHelper $dateTemplateHelper)
+    public function submitAction(Request $request, DateHelper $dateTemplateHelper, PageTokenHelper $pageTokenHelper)
     {
         if ('POST' !== $request->getMethod()) {
             return $this->accessDenied();
         }
-        $isAjax        = $request->query->get('ajax', false);
+        $isAjax        = $request->query->get('ajax');
         $form          = null;
-        $post          = $request->request->get('mauticform');
+        $post          = $request->request->all()['mauticform'] ?? [];
         $messengerMode = (!empty($post['messenger']));
         $server        = $request->server->all();
         $return        = $post['return'] ?? false;
@@ -128,7 +134,7 @@ class PublicController extends CommonFormController
 
         if (isset($submissionEvent) && !empty($postActionProperty)) {
             // Replace post action property with tokens to support custom redirects, etc
-            $postActionProperty = $this->replacePostSubmitTokens($postActionProperty, $submissionEvent);
+            $postActionProperty = $this->replacePostSubmitTokens($postActionProperty, $submissionEvent, $pageTokenHelper);
         }
 
         if ($messengerMode || $isAjax) {
@@ -234,7 +240,7 @@ class PublicController extends CommonFormController
     /**
      * Displays a message.
      */
-    public function messageAction(Request $request): Response
+    public function messageAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper): Response
     {
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);
@@ -242,13 +248,13 @@ class PublicController extends CommonFormController
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
         $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $analytics = $analyticsHelper->getCode();
 
         if (!empty($analytics)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            $assetsHelper->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig');
 
         return $this->render($logicalName, [
             'message'  => $msg,
@@ -260,14 +266,12 @@ class PublicController extends CommonFormController
     /**
      * Gives a preview of the form.
      *
-     * @param int $id
-     *
      * @return Response
      *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, $id = 0)
+    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0)
     {
         $model = $this->getModel('form.form');
         \assert($model instanceof FormModel);
@@ -298,7 +302,7 @@ class PublicController extends CommonFormController
             // Use form specific template or system-wide default theme
             $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
             if (!empty($template)) {
-                $theme = $this->factory->getTheme($template);
+                $theme = $themeHelper->getTheme($template);
                 if ($theme->getTheme() != $template) {
                     $config = $theme->getConfig();
                     if (in_array('form', $config['features'])) {
@@ -313,15 +317,12 @@ class PublicController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
-            $assetsHelper = $this->factory->getHelper('template.assets');
-            $analytics    = $this->factory->getHelper('twig.analytics')->getCode();
+            $logicalName  = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+            $analytics    = $analyticsHelper->getCode();
 
             foreach ($customStylesheets as $css) {
                 $assetsHelper->addStylesheet($css);
             }
-
-            $this->factory->getHelper('template.slots')->set('pageTitle', $form->getName());
 
             if (!empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);
@@ -398,20 +399,48 @@ class PublicController extends CommonFormController
     /**
      * @return string|string[]
      */
-    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent, PageTokenHelper $pageTokenHelper): string|array
     {
-        if (empty($this->tokens)) {
-            if ($lead = $submissionEvent->getLead()) {
-                $this->tokens = array_merge(
-                    $submissionEvent->getTokens(),
-                    TokenHelper::findLeadTokens(
-                        $string,
-                        $lead->getProfileFields()
-                    )
-                );
-            }
+        if (count($this->tokens)) {
+            return $this->tokens;
         }
 
+        if ($lead = $submissionEvent->getLead()) {
+            $this->tokens = array_merge(
+                $submissionEvent->getTokens(),
+                TokenHelper::findLeadTokens(
+                    $string,
+                    $lead->getProfileFields()
+                )
+            );
+        }
+
+        $this->tokens = array_merge(
+            $this->tokens,
+            $pageTokenHelper->findPageTokens($string)
+        );
+
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
+    }
+
+    public function lookupCompanyAction(Request $request, FieldModel $fieldModel, CompanyModel $companyModel): JsonResponse
+    {
+        $parameters = json_decode($request->getContent(), true);
+        $search     = InputHelper::clean($parameters['search'] ?? '');
+        $formId     = (int) ($parameters['formId'] ?? 0);
+
+        // Intentionally vague message as the JS takes care of this.
+        // Make it hard to abuse this public endpoint.
+        $vagueErrorMessage = ['error' => 'Invalid request param'];
+
+        if (mb_strlen($search) < 3 || !$formId) {
+            return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        if (!$fieldModel->getRepository()->fieldExistsByFormAndType($formId, 'companyLookup')) {
+            return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse($companyModel->getRepository()->getCompanyLookupData($search));
     }
 }

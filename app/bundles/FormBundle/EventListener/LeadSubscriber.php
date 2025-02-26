@@ -19,7 +19,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private PageModel $pageModel,
         private SubmissionRepository $submissionRepository,
         private TranslatorInterface $translator,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
@@ -74,7 +74,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'page'       => $this->pageModel->getEntity($row['page_id']),
                         ],
                         'contentTemplate' => '@MauticForm/SubscribedEvents/Timeline/index.html.twig',
-                        'icon'            => 'fa-pencil-square-o',
+                        'icon'            => 'ri-edit-2-line',
                         'contactId'       => $row['lead_id'],
                     ]
                 );

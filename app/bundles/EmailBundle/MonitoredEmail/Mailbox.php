@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail;
 
+use IMAP\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
@@ -194,8 +195,6 @@ class Mailbox
 
     /**
      * Returns if a mailbox is configured.
-     *
-     * @throws MailboxException
      */
     public function isConfigured($bundleKey = null, $folderKey = null): bool
     {
@@ -347,7 +346,7 @@ class Mailbox
     /**
      * Get IMAP mailbox connection stream.
      *
-     * @return resource|null
+     * @return Connection
      */
     public function getImapStream()
     {
@@ -361,7 +360,7 @@ class Mailbox
     }
 
     /**
-     * @return resource
+     * @return Connection
      *
      * @throws MailboxException
      */
@@ -392,7 +391,7 @@ class Mailbox
      */
     protected function isConnected(): bool
     {
-        return $this->isConfigured() && $this->imapStream && is_resource($this->imapStream) && @imap_ping($this->imapStream);
+        return $this->isConfigured() && $this->imapStream && @imap_ping($this->imapStream);
     }
 
     /**

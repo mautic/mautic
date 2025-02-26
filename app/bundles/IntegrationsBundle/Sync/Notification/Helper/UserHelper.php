@@ -9,7 +9,7 @@ use Doctrine\DBAL\Connection;
 class UserHelper
 {
     public function __construct(
-        private Connection $connection
+        private Connection $connection,
     ) {
     }
 

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ConvertConfigCommand extends Command
 {
     public function __construct(
-        private PathsHelper $pathsHelper
+        private PathsHelper $pathsHelper,
     ) {
         parent::__construct();
     }

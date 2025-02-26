@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-eclipse",
+            "directory": "themes/eclipse",
+            "target": "git@github.com:mautic/theme-eclipse.git"
+        }
+    ]
+}

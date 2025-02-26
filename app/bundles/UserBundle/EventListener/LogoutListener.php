@@ -15,7 +15,7 @@ class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscrib
     public function __construct(
         protected UserModel $userModel,
         protected EventDispatcherInterface $dispatcher,
-        UserHelper $userHelper
+        UserHelper $userHelper,
     ) {
         $this->user       = $userHelper->getUser();
     }

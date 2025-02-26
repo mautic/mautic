@@ -14,7 +14,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private MessageQueueRepository $messageQueueRepository
+        private MessageQueueRepository $messageQueueRepository,
     ) {
     }
 
@@ -66,7 +66,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'log' => $log,
                         ],
                         'contentTemplate' => '@MauticChannel/SubscribedEvents/Timeline/queued_messages.html.twig',
-                        'icon'            => 'fa-comments-o',
+                        'icon'            => 'ri-question-answer-line',
                         'contactId'       => $log['lead_id'],
                     ]
                 );

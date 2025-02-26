@@ -16,7 +16,7 @@ class TrackingEvent extends Event
     public function __construct(
         private Lead $contact,
         private Request $request,
-        array $mtcSessionResponses
+        array $mtcSessionResponses,
     ) {
         $this->response = new ParameterBag($mtcSessionResponses);
     }

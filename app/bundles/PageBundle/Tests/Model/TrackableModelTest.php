@@ -152,7 +152,7 @@ class TrackableModelTest extends TestCase
      */
     public function testStandardLinkWithStandardQuery(?bool $useMap): void
     {
-        $url   = 'https://foo-bar.com?foo=bar';
+        $url   = 'https://foo-bar.com?foo=bar&amp;one=two&three=four&amp;five=six';
         $model = $this->getModel();
 
         if (null !== $useMap) {
@@ -182,7 +182,7 @@ class TrackableModelTest extends TestCase
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        Assert::assertEquals($url, $redirect->getUrl());
+        Assert::assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
     }
 
     /**

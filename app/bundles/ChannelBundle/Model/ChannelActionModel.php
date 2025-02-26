@@ -13,7 +13,7 @@ class ChannelActionModel
     public function __construct(
         private LeadModel $contactModel,
         private DoNotContact $doNotContact,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -34,15 +34,12 @@ class AjaxController extends CommonAjaxController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @param string $name
-     */
-    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields'): JsonResponse
+    public function reorderFieldsAction(Request $request, string $name = 'fields'): JsonResponse
     {
         if ('form' === $name) {
             $name = 'fields';
@@ -52,7 +49,7 @@ class AjaxController extends CommonAjaxController
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
         $session     = $request->getSession();
         $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
-        $order       = InputHelper::clean($request->request->get($orderName));
+        $order       = InputHelper::clean($request->request->all()[$orderName]);
         $components  = $session->get($sessionName);
 
         if (!empty($order) && !empty($components)) {

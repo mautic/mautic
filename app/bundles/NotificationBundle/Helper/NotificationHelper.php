@@ -20,7 +20,7 @@ class NotificationHelper
         protected IntegrationHelper $integrationHelper,
         protected Router $router,
         protected RequestStack $requestStack,
-        private \Mautic\LeadBundle\Model\DoNotContact $doNotContact
+        private \Mautic\LeadBundle\Model\DoNotContact $doNotContact,
     ) {
     }
 

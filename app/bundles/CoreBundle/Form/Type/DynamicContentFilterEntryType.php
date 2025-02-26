@@ -23,7 +23,7 @@ class DynamicContentFilterEntryType extends AbstractType
     /**
      * @var mixed[]
      */
-    private $fieldChoices = [];
+    private array $fieldChoices = [];
 
     /**
      * @var mixed[]
@@ -48,7 +48,7 @@ class DynamicContentFilterEntryType extends AbstractType
     public function __construct(
         ListModel $listModel,
         private StageModel $stageModel,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper
+        private BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -134,7 +134,6 @@ class DynamicContentFilterEntryType extends AbstractType
                 $key,
                 [
                     'company',
-                    'leadlist',
                     'campaign',
                     'device_type',
                     'device_brand',

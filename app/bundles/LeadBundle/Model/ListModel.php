@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -49,7 +50,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadList>
  */
-class ListModel extends FormModel
+class ListModel extends FormModel implements GlobalSearchInterface
 {
     use OperatorListTrait;
 
@@ -71,7 +72,7 @@ class ListModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -161,8 +162,6 @@ class ListModel extends FormModel
      * @param array       $options
      *
      * @return FormInterface<LeadList>
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
@@ -810,10 +809,8 @@ class ListModel extends FormModel
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true)
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -833,7 +830,7 @@ class ListModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1103,10 +1100,8 @@ class ListModel extends FormModel
 
     /**
      * @param $segmentId *
-     *
-     * @return array
      */
-    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name'): array
     {
         $filter = [
             'force'  => [
@@ -1177,6 +1172,40 @@ class ListModel extends FormModel
     }
 
     /**
+     * @return array<int, int>
+     */
+    public function getSegmentIdsWithDependenciesOnTag(int $tagId): array
+    {
+        $entities = $this->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        [
+                            'column' => 'l.filters',
+                            'expr'   => 'LIKE',
+                            'value'  => '%"tags"%',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                // BC support for old filters where the field existed outside of properties.
+                $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
+                if ($filter && 'tags' === $entityFilter['type'] && in_array($tagId, $filter)) {
+                    $dependents[] = $entity->getId();
+                    break;
+                }
+            }
+        }
+
+        return array_unique($dependents);
+    }
+
+    /**
      * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
      *
      * @param array $segmentIds
@@ -1204,9 +1233,9 @@ class ListModel extends FormModel
                     continue;
                 }
 
-                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
                 $bcFilterValue     = $eachFilter['filter'] ?? [];
                 $filterValue       = $eachFilter['properties']['filter'] ?? $bcFilterValue;
+                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $filterValue));
                 foreach ($filterValue as $val) {
                     if (!empty($dependency[$val])) {
                         $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);

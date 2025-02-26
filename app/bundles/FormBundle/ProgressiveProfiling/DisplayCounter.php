@@ -12,7 +12,7 @@ class DisplayCounter
     private int $alreadyAlwaysDisplayed = 0;
 
     public function __construct(
-        private Form $form
+        private Form $form,
     ) {
     }
 

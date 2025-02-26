@@ -13,7 +13,7 @@ class FieldDAO
      */
     public function __construct(
         private $name,
-        private NormalizedValueDAO $value
+        private NormalizedValueDAO $value,
     ) {
     }
 

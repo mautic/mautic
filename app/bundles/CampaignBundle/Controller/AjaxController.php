@@ -32,7 +32,7 @@ class AjaxController extends CommonAjaxController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -41,7 +41,7 @@ class AjaxController extends CommonAjaxController
     {
         $session        = $request->getSession();
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
-        $canvasSettings = $request->request->get('canvasSettings') ?? [];
+        $canvasSettings = $request->request->all()['canvasSettings'] ?? [];
         if (empty($campaignId)) {
             $dataArray = ['success' => 0];
         } else {

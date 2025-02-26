@@ -26,7 +26,7 @@ class InternalObjectFindEvent extends Event
     private array $fieldValues = [];
 
     public function __construct(
-        private ObjectInterface $object
+        private ObjectInterface $object,
     ) {
     }
 
@@ -44,7 +44,7 @@ class InternalObjectFindEvent extends Event
     }
 
     /**
-     * @param int[] $ids
+     * @param int[]|string[] $ids
      */
     public function setIds(array $ids): void
     {

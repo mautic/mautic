@@ -22,7 +22,7 @@ class EmailType extends AbstractType
     public const REPLY_TO_ADDRESS = 'replyToAddress';
 
     public function __construct(
-        private UserHelper $userHelper
+        private UserHelper $userHelper,
     ) {
     }
 
@@ -134,7 +134,7 @@ class EmailType extends AbstractType
             'apply_text'  => false,
             'save_text'   => 'mautic.email.send',
             'save_class'  => 'btn btn-primary',
-            'save_icon'   => 'fa fa-send',
+            'save_icon'   => 'ri-send-plane-line',
             'cancel_icon' => 'ri-close-line',
         ]);
 
@@ -143,10 +143,7 @@ class EmailType extends AbstractType
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'lead_quickemail';
     }

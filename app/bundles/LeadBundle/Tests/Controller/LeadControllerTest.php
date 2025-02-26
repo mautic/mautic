@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -14,7 +15,10 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -26,7 +30,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
@@ -329,17 +332,11 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testExcelIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
-
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getInternalResponse()->getContent();
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, strlen($content) > 10000);
+        $this->assertTrue(strlen($content) > 10000, $content);
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void
@@ -420,6 +417,13 @@ class LeadControllerTest extends MauticMysqlTestCase
             '<option value="cs_CZ">Czech (Czechia)</option>',
             $this->client->getResponse()->getContent()
         );
+    }
+
+    public function testQuickAddAction(): void
+    {
+        $this->client->request('GET', '/s/contacts/quickAdd');
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
     public function testAddContactsErrorMessage(): void
@@ -852,9 +856,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         ];
 
         $uri = "/s/contacts/contactGroupPoints/{$contact->getId()}";
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
+        $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
 
         // Get the form HTML element out of the response, fill it in and submit.
         $responseData = json_decode($response->getContent(), true);
@@ -869,9 +873,10 @@ class LeadControllerTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
+        $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
 
         $scores = $contact->getGroupScores();
         $this->assertCount(2, $scores);
@@ -891,5 +896,113 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         self::assertSame('multiple', $multiple);
+    }
+
+    public function testCompanyMergeList(): void
+    {
+        $companyA = new Company();
+        $companyA->setName('Company A');
+
+        $this->em->persist($companyA);
+
+        $companyB = new Company();
+        $companyB->setName('Company B');
+
+        $this->em->persist($companyB);
+
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/companies/merge/'.$companyA->getId());
+        $response = $this->client->getResponse();
+
+        Assert::assertTrue($response->isOk());
+
+        $content = $response->getContent();
+
+        Assert::assertStringContainsString('Company B', $content);
+        Assert::assertStringNotContainsString('Company A', $content);
+    }
+
+    public function testBatchDncIsNotUpdatingLeadEntities(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $this->em->persist($contact);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/contacts/batchDnc');
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $form    = $crawler->selectButton('Save')->form();
+        $form->setValues(
+            [
+                'lead_batch_dnc[reason]' => 'Test Reason',
+                'lead_batch_dnc[ids]'    => json_encode([$contact->getId()]),
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $clientResponse = $this->client->getResponse();
+
+        Assert::assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        Assert::assertStringContainsString('1 contact affected', $clientResponse->getContent());
+
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        \assert($dncRepository instanceof DoNotContactRepository);
+
+        $contactRepository = $this->em->getRepository(Lead::class);
+        \assert($contactRepository instanceof LeadRepository);
+
+        $dnc = $dncRepository->findOneBy(['lead' => $contact]);
+        \assert($dnc instanceof DoNotContact);
+
+        $fetchedContact = $contactRepository->find($contact->getId());
+        \assert($fetchedContact instanceof Lead);
+
+        // Ensure the DNC recored was created.
+        Assert::assertSame(DoNotContact::MANUAL, $dnc->getReason());
+        Assert::assertSame('Test Reason', $dnc->getComments());
+        Assert::assertSame($contact->getId(), $dnc->getLead()->getId());
+
+        // Ensure the dateModified is still empty. Meaning the lead record was not updated which is correct.
+        Assert::assertNull($fetchedContact->getDateModified());
+    }
+
+    public function testAuditLogBatchExportContact(): void
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
+        $content = $this->client->getInternalResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertTrue(strlen($content) > 10000, $content);
+
+        /** @var AuditLog $auditLog */
+        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([
+            'object' => 'ContactExports',
+            'bundle' => 'lead',
+            'userId' => 1,
+            'action' => 'create',
+        ]);
+        $this->assertNotNull($auditLog);
+        Assert::assertTrue(isset($auditLog->getDetails()['args']), json_encode($auditLog, JSON_PRETTY_PRINT));
+        Assert::assertSame(
+            [
+                'start'  => 0,
+                'limit'  => 200,
+                'filter' => [
+                    'string' => '',
+                    'force'  => ' !is:anonymous',
+                ],
+                'orderBy'        => 'l.last_active, l.id',
+                'orderByDir'     => 'DESC',
+                'withTotalCount' => true,
+            ],
+            $auditLog->getDetails()['args']
+        );
     }
 }

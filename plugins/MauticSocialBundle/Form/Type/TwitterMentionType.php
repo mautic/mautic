@@ -16,7 +16,7 @@ class TwitterMentionType extends TwitterAbstractType
             'attr'       => [
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.social.monitoring.twitter.handle.tooltip',
-                'preaddon' => 'fa fa-at',
+                'preaddon' => 'ri-at-line',
             ],
         ]);
 
@@ -39,7 +39,7 @@ class TwitterMentionType extends TwitterAbstractType
         parent::buildForm($builder, $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'twitter_handle';
     }

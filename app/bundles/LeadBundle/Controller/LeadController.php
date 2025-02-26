@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Event\ContactExportEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
@@ -33,6 +34,7 @@ use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -50,6 +52,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class LeadController extends FormController
 {
@@ -63,9 +66,9 @@ class LeadController extends FormController
      */
     public function indexAction(
         Request $request,
-        \Mautic\LeadBundle\Model\DoNotContact $leadDNCModel,
+        DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
-        $page = 1
+        $page = 1,
     ) {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -203,7 +206,7 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        \assert($leadDNCModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
+        \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
 
         return $this->delegateView(
@@ -236,7 +239,7 @@ class LeadController extends FormController
         );
     }
 
-    public function quickAddAction(Request $request): Response
+    public function quickAddAction(Request $request, TokenStorageInterface $tokenStorage): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -285,6 +288,16 @@ class LeadController extends FormController
                             'value'  => 'lead',
                         ],
                     ],
+                    'order' => [
+                        [
+                            'col' => 'f.isFixed',
+                            'dir' => 'DESC',
+                        ],
+                        [
+                            'col' => 'f.order',
+                            'dir' => 'ASC',
+                        ],
+                    ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
                 'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
@@ -294,7 +307,7 @@ class LeadController extends FormController
         $quickForm = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
-        $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+        $currentUser = $tokenStorage->getToken()->getUser();
         $quickForm->get('owner')->setData($currentUser);
 
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -471,7 +484,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -495,7 +508,7 @@ class LeadController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // get custom field values
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -581,7 +594,7 @@ class LeadController extends FormController
                     }
                 } else {
                     if ($request->get('qf', false)) {
-                        return $this->quickAddAction($request);
+                        return $this->quickAddAction($request, $tokenStorage);
                     }
 
                     $formErrors = $this->getFormErrorMessages($form);
@@ -613,7 +626,7 @@ class LeadController extends FormController
             }
         } else {
             // set the default owner to the currently logged in user
-            $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+            $currentUser = $tokenStorage->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
         }
 
@@ -706,7 +719,7 @@ class LeadController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data = $request->request->get('lead');
+                    $data = $request->request->all()['lead'] ?? [];
 
                     // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -1174,10 +1187,8 @@ class LeadController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1366,10 +1377,8 @@ class LeadController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0)
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -1433,32 +1442,47 @@ class LeadController extends FormController
 
                     $bodyCheck = trim(strip_tags($email['body']));
                     if (!empty($bodyCheck)) {
-                        $mailer = $mailHelper->getMailer();
+                        $mailer      = $mailHelper->getMailer();
+                        $emailEntity = null;
+                        $subject     = $email['subject'];
 
+                        // Set the email entity template so the email configuration like preheader would apply.
+                        if ($email['templates']) {
+                            $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
+                        }
+
+                        // Overwrite the mailer with the values from the form.
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            // The reply to address must be set into an email entity in order to take an effect. Otherwise it's overridden.
-                            $emailEntity = new Email();
-                            $emailEntity->setSubject($email['subject']);
+                            $emailEntity = $emailEntity ?? new Email();
                             $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
+                        }
+
+                        if (!empty($email['from'])) {
+                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity->setFromAddress($email['from']);
+                        }
+
+                        if (!empty($email['fromname'])) {
+                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity->setFromName($email['fromname']);
+                        }
+
+                        if ($emailEntity) {
+                            $emailEntity->setSubject($subject);
                             $mailer->setEmail($emailEntity);
                         }
 
-                        $mailer->setFrom(
-                            $email['from'],
-                            empty($email['fromname']) ? null : $email['fromname']
-                        );
-
                         // Set Content
+                        $mailer->setReplyTo($email['from']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-                        $mailer->setSubject($email['subject']);
+                        $mailer->setSubject($subject);
 
                         // Ensure safe emoji for notification
-                        $subject = $email['subject'];
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
                             $this->addFlashMessage(
@@ -1676,16 +1700,11 @@ class LeadController extends FormController
     /**
      * Bulk add leads to the DNC list.
      *
-     * @param int $objectId
-     *
      * @return JsonResponse|Response
      */
-    public function batchDncAction(Request $request, \Mautic\LeadBundle\Model\DoNotContact $doNotContact, $objectId = 0)
+    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model)
     {
-        if ('POST' === $request->getMethod()) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
-
+        if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
             $ids  = json_decode($data['ids'], true);
 
@@ -1707,7 +1726,9 @@ class LeadController extends FormController
                 );
             }
 
-            if ($count = count($entities)) {
+            $count = count($entities);
+
+            if ($count) {
                 foreach ($entities as $lead) {
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                         $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
@@ -1718,7 +1739,7 @@ class LeadController extends FormController
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
@@ -1728,34 +1749,28 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchDnc',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            DncType::class,
-                            [],
-                            [
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchDnc',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(DncType::class, [], ['action' => $route])->createView(),
+                ],
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1968,6 +1983,8 @@ class LeadController extends FormController
 
     /**
      * Bulk export contacts.
+     *
+     * @throws \Exception
      */
     public function batchExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher): Response
     {
@@ -2043,14 +2060,23 @@ class LeadController extends FormController
         ];
 
         $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
+        $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
-        return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $details['total'] = $iterator->getTotal();
+        $details['args']  = $iterator->getArgs();
+
+        $dispatcher->dispatch(
+            new ContactExportEvent($details, 'ContactExports'),
+            LeadEvents::POST_CONTACT_EXPORT
+        );
+
+        return $response;
     }
 
     /**
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, $contactId)
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId)
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2077,6 +2103,11 @@ class LeadController extends FormController
         }
 
         $contactFields = $lead->getProfileFields();
+        $args[]        = [
+            'lead'          => $contactId,
+            'dataType'      => $dataType,
+        ];
+
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
             $export[] = [
@@ -2084,6 +2115,11 @@ class LeadController extends FormController
                 'value' => $contactField,
             ];
         }
+
+        $dispatcher->dispatch(
+            new ContactExportEvent($args, 'ContactExport'),
+            LeadEvents::POST_CONTACT_EXPORT
+        );
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
     }

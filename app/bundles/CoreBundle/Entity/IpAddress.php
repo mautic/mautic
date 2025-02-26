@@ -72,7 +72,7 @@ class IpAddress
      * @param string|null $ipAddress
      */
     public function __construct(
-        private $ipAddress = null
+        private $ipAddress = null,
     ) {
     }
 

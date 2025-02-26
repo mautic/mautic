@@ -74,7 +74,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->createDoNotContact($contact2, $email, DoNotContact::BOUNCED);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$email->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$email->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([
@@ -129,7 +129,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$emailEn->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$emailEn->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([
@@ -172,7 +172,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->emulateLinkClick($email, $trackables[1], $contacts[1]);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:heatmap&id={$email->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:heatmap&id={$email->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $content = json_decode($response->getContent(), true);
@@ -203,6 +203,36 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ], $content['clickStats']);
         $this->assertSame(3, $content['totalUniqueClicks']);
         $this->assertSame(5, $content['totalClicks']);
+    }
+
+    /**
+     * Test email lookup with name with special chars.
+     */
+    public function testEmailGetLookupChoiceListAction(): void
+    {
+        $emailName = 'It\'s an email';
+        $email     = new Email();
+        $email->setName($emailName);
+        $email->setSubject('Email Subject');
+        $email->setEmailType('template');
+        $this->em->persist($email);
+        $this->em->flush($email);
+
+        $payload = [
+            'action'     => 'email:getLookupChoiceList',
+            'email_type' => 'template',
+            'top_level'  => 'variant',
+            'searchKey'  => 'email',
+            'email'      => $emailName,
+        ];
+
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertNotEmpty($response);
+        $this->assertEquals($emailName, $response[0]['items'][$email->getId()]);
     }
 
     private function createContact(string $email): Lead

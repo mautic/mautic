@@ -1,0 +1,10 @@
+{
+  "name": "mautic/theme-attract",
+  "description": "Attract email theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^6.0"
+  }
+}

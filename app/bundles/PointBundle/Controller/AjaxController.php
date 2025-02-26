@@ -4,7 +4,6 @@ namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\PointBundle\Form\Type\GenericPointSettingsType;
 use Mautic\PointBundle\Form\Type\PointActionType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +18,7 @@ class AjaxController extends CommonAjaxController
         $sessionName = 'mautic.point.'.$triggerId.'.triggerevents.modified';
         $order       = InputHelper::clean($request->request->get('triggerEvent'));
         $components  = $session->get($sessionName);
+
         if (!empty($order) && !empty($components)) {
             $components = array_replace(array_flip($order), $components);
             $session->set($sessionName, $components);
@@ -30,11 +30,11 @@ class AjaxController extends CommonAjaxController
 
     public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
     {
+        $type      = InputHelper::clean($request->request->get('actionType'));
         $dataArray = [
             'success' => 0,
             'html'    => '',
         ];
-        $type = InputHelper::clean($request->request->get('actionType'));
 
         if (!empty($type)) {
             // get the HTML for the form
@@ -44,11 +44,12 @@ class AjaxController extends CommonAjaxController
 
             if (isset($actions['actions'][$type])) {
                 $themes = ['@MauticPoint/FormTheme/Action/_pointaction_properties_row.html.twig'];
+
                 if (!empty($actions['actions'][$type]['formTheme'])) {
                     $themes[] = $actions['actions'][$type]['formTheme'];
                 }
 
-                $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : GenericPointSettingsType::class;
+                $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : null;
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
                 $form            = $formFactory->create(PointActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
                 $html            = $this->renderView('@MauticPoint/Point/actionform.html.twig', [

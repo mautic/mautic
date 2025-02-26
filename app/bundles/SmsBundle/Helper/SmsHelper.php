@@ -23,7 +23,7 @@ class SmsHelper
         protected SmsModel $smsModel,
         protected IntegrationHelper $integrationHelper,
         private DoNotContact $doNotContact,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

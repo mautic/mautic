@@ -26,7 +26,7 @@ abstract class AbstractFormatter
     }
 
     public function __construct(
-        protected Connection $db
+        protected Connection $db,
     ) {
         $this->platform = $this->db->getDatabasePlatform();
         $this->name     = DatabasePlatform::getDatabasePlatform($this->platform);

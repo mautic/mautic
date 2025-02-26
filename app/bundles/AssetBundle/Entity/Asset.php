@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -894,8 +895,8 @@ class Asset extends FormEntity
             $ch = curl_init($this->getRemotePath());
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
             curl_exec($ch);
 
@@ -930,8 +931,8 @@ class Asset extends FormEntity
             $ch = curl_init($this->getRemotePath());
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_exec($ch);
 
             return curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -945,7 +946,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Returns Font Awesome icon class based on file type.
+     * Returns icon class based on file type.
      */
     public function getIconClass(): string
     {
@@ -953,7 +954,7 @@ class Asset extends FormEntity
 
         // return missing file icon if file type is empty
         if (!$fileType) {
-            return 'fa fa-ban';
+            return 'ri-prohibited-line';
         }
 
         $fileTypes = $this->getFileExtensions();
@@ -961,12 +962,12 @@ class Asset extends FormEntity
         // Search for icon name by file extension.
         foreach ($fileTypes as $icon => $extensions) {
             if (in_array($fileType, $extensions)) {
-                return 'fa fa-file-'.$icon.'-o';
+                return 'ri-file-'.$icon.'-line';
             }
         }
 
         // File extension is unknown, display general file icon.
-        return 'fa fa-file-o';
+        return 'ri-file-line';
     }
 
     /**
@@ -1018,7 +1019,7 @@ class Asset extends FormEntity
             'audio' => [
                 'mp3',
             ],
-            'archive' => [
+            'zip' => [
                 'zip',
                 'rar',
                 'iso',
@@ -1049,7 +1050,7 @@ class Asset extends FormEntity
                 'htm',
                 'sql',
             ],
-            'powerpoint' => [
+            'ppt' => [
                 'ppt',
                 'pptx',
                 'pptm',
@@ -1164,6 +1165,29 @@ class Asset extends FormEntity
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
+            $loader           = new ParameterLoader();
+            $parameters       = $loader->getParameterBag();
+            $mimeTypesAllowed = $parameters->get('allowed_mimetypes');
+
+            if (!empty($object->getFileMimeType()) && !in_array($object->getFileMimeType(), $mimeTypesAllowed)) {
+                $context->buildViolation('mautic.asset.asset.error.invalid.mimetype', [
+                    '%fileMimetype%'=> $object->getFileMimeType(),
+                    '%mimetypes%'   => implode(', ', $mimeTypesAllowed),
+                ])->atPath('file')
+                    ->setTranslationDomain('validators')
+                    ->addViolation();
+            }
+
+            $extensionsAllowed = array_keys($mimeTypesAllowed);
+            $fileType          = $object->getExtension();
+            if (null !== $object->getExtension() && !in_array($fileType, $extensionsAllowed)) {
+                $context->buildViolation('mautic.asset.asset.error.file.extension', [
+                    '%fileExtension%'=> $object->getExtension(),
+                    '%extensions%'   => implode(', ', $extensionsAllowed),
+                ])->atPath('file')
+                    ->setTranslationDomain('validators')
+                    ->addViolation();
+            }
 
             // Unset any remote file data
             $object->setRemotePath(null);
@@ -1244,8 +1268,8 @@ class Asset extends FormEntity
                 $ch = curl_init($this->getRemotePath());
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_HEADER, 1);
-                curl_setopt($ch, CURLOPT_NOBODY, 1);
+                curl_setopt($ch, CURLOPT_HEADER, true);
+                curl_setopt($ch, CURLOPT_NOBODY, true);
                 curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
                 curl_exec($ch);

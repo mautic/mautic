@@ -3,13 +3,13 @@
 {% set activeTab = activeTab|default('details-container') %}
 
 {{ form_start(form) }}
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs nav-tabs-contained">
     <!-- Enabled\Auth -->
     <li class="{% if 'details-container' == activeTab %} active{% endif %}" id="details-tab">
         <a href="#details-container" role="tab" data-toggle="tab">
             {{ 'mautic.plugin.integration.tab.details'|trans }}
             {% if (hasAuthErrors) %}
-                <i class="fa fa-fw fa-warning text-danger"></i>
+                <i class="ri-fw ri-alert-fill text-danger"></i>
             {% endif %}
         </a>
     </li>
@@ -21,7 +21,7 @@
             <a href="#features-container" role="tab" data-toggle="tab">
                 {{ 'mautic.plugin.integration.tab.features'|trans }}
                 {% if hasFeatureErrors is not empty %}
-                <i class="fa fa-fw fa-warning text-danger"></i>
+                <i class="ri-fw ri-alert-fill text-danger"></i>
                 {% endif %}
             </a>
         </li>
@@ -36,7 +36,7 @@
             <a href="#field-mappings-{{ object }}-container" role="tab" data-toggle="tab">
                 {{ 'mautic.integration.sync_field_mapping'|trans({'%object%' : objects[object]|trans }) }}
                 {% if formContainsErrors(objectFieldMapping) %}
-                    <i class="fa fa-fw fa-warning text-danger"></i>
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
                 {% endif %}
             </a>
         </li>
@@ -50,7 +50,7 @@
     <div class="tab-pane fade{% if 'details-container' == activeTab %} in active{% endif %} bdr-w-0" id="details-container">
         {% if useConfigFormNotes and integrationObject.getAuthorizationNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getAuthorizationNote().getType() }}">
-                {{ integrationObject.getAuthorizationNote().getNote()|trans  }}
+                {{ integrationObject.getAuthorizationNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
         {{ form_row(form.isPublished) }}
@@ -70,14 +70,20 @@
             <div class="row">
                 <div class="col-xs-12 text-center">
                     <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
-                    <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
-                        <i class="fa fa-key "></i>
-                        {% if integrationObject.isAuthorized() %}
-                            {{ 'mautic.integration.form.reauthorize'|trans }}
-                        {% else %}
-                            {{ 'mautic.integration.form.authorize'|trans }}
-                        {% endif %}
-                    </button>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: integrationObject.isAuthorized() ? 'mautic.integration.form.reauthorize' : 'mautic.integration.form.authorize',
+                                variant: 'success',
+                                icon: 'ri-key-2-line',
+                                attributes: {
+                                    'id': 'integration_details_authButton',
+                                    'name': 'integration_details[authButton]'
+                                },
+                                onclick: 'Mautic.authorizeIntegration()'
+                            }
+                        ]
+                    } %}
                 </div>
             </div>
             {% endif %}
@@ -90,7 +96,7 @@
     <div class="tab-pane fade{% if 'features-container' == activeTab %} in active{% endif %} bdr-w-0" id="features-container">
         {% if useConfigFormNotes and integrationObject.getFeaturesNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getFeaturesNote().getType() }}">
-                {{ integrationObject.getFeaturesNote().getNote()|trans  }}
+                {{ integrationObject.getFeaturesNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
 
@@ -130,7 +136,7 @@
 
         {% if useConfigFormNotes and integrationObject.getFieldMappingNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getFieldMappingNote().getType() }}">
-                {{ integrationObject.getFieldMappingNote().getNote()|trans  }}
+                {{ integrationObject.getFieldMappingNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
 

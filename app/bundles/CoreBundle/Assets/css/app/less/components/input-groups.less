@@ -11,3 +11,51 @@
     }
   }
 }
+
+.input-group-addon {
+  border-width: var(--border-bottom);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--field-hover);
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+}
+
+.table .input-group-sm {
+  & > .input-group-addon {
+    line-height: 1em;
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+  }
+
+  .dropdown-toggle {
+    border: 0;
+    background-color: transparent;
+    padding: 5px 8px;
+  }
+}
+
+.input-group {
+  .input-group-btn {
+    .btn.btn-ghost {
+      height: 32px;
+      width: 100%;
+      background-color: var(--field);
+
+      &:hover {
+        background-color: var(--field-hover);
+      }
+    }
+
+    &:last-child, &:only-of-type {
+      .btn {border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;}
+    }
+    &:first-child {
+      .btn {border-radius: var(--border-radius-sm) 0 0 var(--border-radius-sm);}
+    }
+
+    &:last-child {
+      .btn {border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;}
+    }
+  }
+}

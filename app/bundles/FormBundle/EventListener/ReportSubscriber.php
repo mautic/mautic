@@ -30,7 +30,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private ReportHelper $reportHelper,
         private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -263,7 +263,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-check-square-o';
+                    $graphData['iconClass'] = 'ri-check-line';
                     $graphData['link']      = 'mautic_form_action';
                     $event->setGraph($g, $graphData);
                     break;

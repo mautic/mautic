@@ -2,7 +2,7 @@
 {% set color = (props.colors.primary is not empty and props.colors.primary is color light) ? '000000' : 'ffffff' %}
 {% set animate = preview is not empty and props.animate is not empty ? ' mf-animate' : '' %}
 
-<div class="mautic-focus mf-bar mf-bar-{{ props.bar.size }} mf-bar-{{ props.bar.placement }} {% if props.bar.sticky %}mf-bar-sticky{% endif %} {{ animate }}" style="background-color: #{{ props.colors.primary }};">
+<div class="mautic-focus mf-bar mf-bar-{{ props.bar.size }} mf-bar-{{ props.bar.placement }} {% if props.bar.sticky %}mf-bar-sticky{% endif %} {{ animate }}" style="background-color: #{{ props.colors.primary|replace({'#': ''}) }};">
     <div class="mf-content">
         {% if htmlMode in ['editor', 'html'] %}
             {{ focus[htmlMode]|raw }}
@@ -22,7 +22,7 @@
 
 {% if props.bar.allow_hide %}
     <div class="mf-copy-to-parent mf-bar-collapser mf-bar-collapser-{{ props.bar.placement }} mf-bar-collapser-{{ props.bar.size }} {% if props.bar.sticky %}mf-bar-collapser-sticky{% endif %} mf-bar-collapser-{{ focus.id }}"
-         style="background-color: #{{ props.colors.primary }}; color: #{{ props.colors.text }};">
+         style="background-color: #{{ props.colors.primary|replace({'#': ''}) }}; color: #{{ props.colors.text|replace({'#': ''}) }};">
         <style scoped>
             .mf-bar-collapser-icon {
                 color: #{{ color }};

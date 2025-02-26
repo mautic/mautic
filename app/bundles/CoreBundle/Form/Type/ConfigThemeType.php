@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -26,6 +27,20 @@ class ConfigThemeType extends AbstractType
             ]
         );
 
+        // Accent
+        $builder->add(
+            'accent',
+            HiddenType::class,
+            [
+                'label'      => 'mautic.user.preferences.accent',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'required' => false,
+            ]
+        );
+
         $builder->add(
             $builder->create(
                 'theme_import_allowed_extensions',
@@ -44,7 +59,7 @@ class ConfigThemeType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'themeconfig';
     }

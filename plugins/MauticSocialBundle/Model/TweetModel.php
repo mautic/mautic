@@ -125,8 +125,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param Tweet        $entity
      * @param array<mixed> $options
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {

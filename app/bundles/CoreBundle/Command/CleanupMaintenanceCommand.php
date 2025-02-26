@@ -29,7 +29,7 @@ class CleanupMaintenanceCommand extends ModeratedCommand
         PathsHelper $pathsHelper,
         private CoreParametersHelper $coreParametersHelper,
         private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper
+        private IpLookupHelper $ipLookupHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }

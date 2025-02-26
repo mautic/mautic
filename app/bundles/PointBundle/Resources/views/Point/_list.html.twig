@@ -4,12 +4,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#pointTable',
-                        'routeBase': 'point',
-                        'templateButtons': {
-                            'delete': permissions['point:points:delete'],
-                        },
+                    'checkall': 'true',
+                    'target': '#pointTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -75,9 +71,10 @@
                             {% else %}
                                 {{ item.name }}
                             {% endif %}
+                            {{ customContent('point.name', _context) }}
                         </div>
                         {% if item.description is not empty %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.description|purify }}</small>
                             </div>
                         {% endif %}
@@ -85,11 +82,8 @@
                     <td class="visible-md visible-lg">
                         {% set category = item.category %}
                         {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : 'inherit' %}
-                        <span style="white-space: nowrap;">
-                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
-                          <span>{{ catName }}</span>
-                        </span>
+                        {% set color = category ? '#' ~ category.color : '' %}
+                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                     </td>
                     <td class="visible-md visible-lg">
                         {% set group = item.group %}

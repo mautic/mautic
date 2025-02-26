@@ -51,7 +51,7 @@ class PasswordResetConfirmType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => 'mautic.user.user.passwordreset.password.placeholder',
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => true,
@@ -75,7 +75,7 @@ class PasswordResetConfirmType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => 'mautic.user.user.passwordreset.confirm.placeholder',
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => true,
@@ -107,7 +107,7 @@ class PasswordResetConfirmType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'passwordresetconfirm';
     }

@@ -14,7 +14,7 @@ class IntegrationTokenFactory implements TokenFactoryInterface
      */
     public function __construct(
         private array $extraKeysToStore = [],
-        private ?int $defaultExpiresIn = null
+        private ?int $defaultExpiresIn = null,
     ) {
     }
 

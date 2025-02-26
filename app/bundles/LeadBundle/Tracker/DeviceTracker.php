@@ -22,7 +22,7 @@ class DeviceTracker
         private DeviceCreatorServiceInterface $deviceCreatorService,
         private DeviceDetectorFactoryInterface $deviceDetectorFactory,
         private DeviceTrackingServiceInterface $deviceTrackingService,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

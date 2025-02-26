@@ -20,16 +20,16 @@
         }
         .mautic-focus {
             font-family: {{ props.content.font }};
-            color: #{{ props.colors.text }};
+            color: #{{ props.colors.text|replace({'#': ''}) }};
         }
 
         {% if props.colors is defined and props.colors is not empty %}
           .mf-content a.mf-link, .mf-content .mauticform-button, .mf-content .mauticform-pagebreak {
-              background-color: #{{ props.colors.button }};
+              background-color: #{{ props.colors.button|replace({'#': ''}) }};
               color: #{{ props.colors.button_text }};
           }
           .mauticform-input:focus, select:focus {
-              border: 1px solid #{{ props.colors.button }};
+              border: 1px solid #{{ props.colors.button|replace({'#': ''}) }};
           }
         {% endif %}
 

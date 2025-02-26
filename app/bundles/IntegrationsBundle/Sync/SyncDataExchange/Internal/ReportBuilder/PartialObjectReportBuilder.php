@@ -21,10 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PartialObjectReportBuilder
 {
-    /**
-     * @var array
-     */
-    private $reportObjects = [];
+    private array $reportObjects = [];
 
     private array $lastProcessedTrackedId = [];
 
@@ -37,7 +34,7 @@ class PartialObjectReportBuilder
         private FieldHelper $fieldHelper,
         private FieldBuilder $fieldBuilder,
         private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

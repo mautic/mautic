@@ -107,6 +107,46 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('No failed rows found', $crawler->html(), 'No failed rows exist.');
     }
 
+    public function testImportFailedWithImportFailedException(): void
+    {
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadForm = $crawler->selectButton('Upload')->form();
+        $file       = new UploadedFile(
+            dirname(__FILE__).'/../Fixtures/contacts.csv',
+            'contacs.csv',
+            'itext/csv'
+        );
+
+        $uploadForm['lead_import[file]']->setValue((string) $file);
+
+        $crawler     = $this->client->submit($uploadForm);
+        $mappingForm = $crawler->selectButton('Import')->form();
+        $crawler     = $this->client->submit($mappingForm);
+
+        Assert::assertStringContainsString(
+            'Import process was successfully created. You will be notified when finished.',
+            $crawler->html(),
+            $crawler->html()
+        );
+
+        /** @var ImportRepository $importRepository */
+        $importRepository = $this->em->getRepository(Import::class);
+
+        /** @var Import $importEntity */
+        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts.csv']);
+
+        $importEntity->setStatus(4);
+        $importRepository->saveEntity($importEntity);
+
+        $applicationTester = $this->testSymfonyCommand(ImportCommand::COMMAND_NAME, ['--id' => $importEntity->getId()]);
+
+        $this->em->clear();
+
+        $expectedString = 'Reason: Import could not be triggered since it is not queued nor delayed';
+
+        Assert::assertStringContainsString($expectedString, $applicationTester->getDisplay());
+    }
+
     private function setPhoneFieldIsRequired(bool $required): void
     {
         /** @var LeadFieldRepository $fieldRepository */
