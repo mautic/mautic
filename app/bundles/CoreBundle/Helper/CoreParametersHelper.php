@@ -58,14 +58,6 @@ class CoreParametersHelper
         return $this->resolvedParameters;
     }
 
-    /**
-     * @deprecated 3.0.0 to be removed in 4.0; use get() instead
-     */
-    public function getParameter($name, $default = null)
-    {
-        return $this->get($name, $default);
-    }
-
     private function stripMauticPrefix(string $name): string
     {
         return str_replace('mautic.', '', $name);

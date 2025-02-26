@@ -71,6 +71,7 @@ As the legacy builder was removed these JS libraries were removed as well:
 - Removed `Mautic\IntegrationsBundle\Form\Type\NotBlankIfPublishedConstraintTrait` as unused.
 - Removed `Mautic\IntegrationsBundle\Form\Type\Auth\BasicAuthKeysTrait` as unused.
 - Removed `Mautic\IntegrationsBundle\Form\Type\Auth\Oauth1aTwoLeggedKeysTrait` as unused.
+- Removed `Mautic\CoreBundle\Helper\CoreParametersHelper::getParameter()`. Use `Mautic\CoreBundle\Helper\CoreParametersHelper::get()` instead.
 - Removed these services as the authentication system in Symfony 6 has changed and these services were using code that no longer existed.
     - `mautic.user.form_guard_authenticator` (`Mautic\UserBundle\Security\Authenticator\FormAuthenticator::class`)
     - `mautic.user.preauth_authenticator` (`Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator::class`)
