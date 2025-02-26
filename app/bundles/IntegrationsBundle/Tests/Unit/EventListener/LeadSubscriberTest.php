@@ -104,7 +104,7 @@ class LeadSubscriberTest extends TestCase
         $this->syncIntegrationsHelper->expects($this->never())
             ->method('hasObjectSyncEnabled');
 
-        $this->subscriber->onLeadPostSave(new Leadevent($lead));
+        $this->subscriber->onLeadPostSave(new LeadEvent($lead));
     }
 
     public function testOnLeadPostSaveLeadObjectSyncNotEnabled(): void
