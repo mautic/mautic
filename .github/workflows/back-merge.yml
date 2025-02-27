@@ -1,0 +1,67 @@
+name: Check 7.x Backmerge Compatibility
+
+on:
+  pull_request:
+    branches: [6.x]
+
+permissions: 
+  pull-requests: write
+
+jobs:
+  check-backmerge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 7.x branch
+        uses: actions/checkout@v4
+        with:
+          ref: 7.x
+          fetch-depth: 0
+
+      - name: Configure Git user
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Fetch PR commit
+        run: |
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-head
+
+      - name: Check merge compatibility
+        id: merge-check
+        continue-on-error: true
+        run: |
+          if git merge --no-commit --no-ff pr-head; then
+            echo "status=clean" >> $GITHUB_OUTPUT
+            git merge --abort
+          else
+            echo "status=conflict" >> $GITHUB_OUTPUT
+            CONFLICTS=$(git diff --name-only --diff-filter=U | tr '\n' ', ')
+            echo "conflicts=${CONFLICTS%,}" >> $GITHUB_OUTPUT
+            git merge --abort
+          fi
+
+      - name: Merge check summary
+        if: always()
+        run: |
+          if [ "${{ steps.merge-check.outputs.status }}" = "clean" ]; then
+            echo "## ✅ Clean Backmerge" >> $GITHUB_STEP_SUMMARY
+            echo "This PR can be cleanly merged into 7.x branch" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ⚠️ Merge Conflicts Detected" >> $GITHUB_STEP_SUMMARY
+            echo "### Required Action:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Create a separate PR targeting 7.x branch" >> $GITHUB_STEP_SUMMARY
+            echo "2. Resolve the conflicts shown below" >> $GITHUB_STEP_SUMMARY
+            echo "**Conflicting files:**" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.merge-check.outputs.conflicts }}" | sed 's/, /\n- /g' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Post PR comment
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          comment-tag: backmerge-check
+          message: |
+            ## 🔄 7.x Backmerge Check Result
+            
+            ${{ steps.merge-check.outputs.status == 'clean' && '✅ **Clean merge** - No conflicts with 7.x branch' || '❌ **Conflicts detected** - Requires separate 7.x PR' }}
+            
+            **Details:** [View workflow summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
