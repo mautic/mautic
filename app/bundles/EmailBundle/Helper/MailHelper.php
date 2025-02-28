@@ -1239,7 +1239,7 @@ class MailHelper
         $subject = $email->getSubject();
 
         // Set message settings from the email
-        $this->setSubject($subject);
+        $this->setSubject($subject) ?? '';
 
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
