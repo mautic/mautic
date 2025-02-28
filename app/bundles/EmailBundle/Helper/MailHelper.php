@@ -1230,9 +1230,9 @@ class MailHelper
 
         $this->email = $email;
 
-        $fromEmail      = $email->getFromAddress() ?? $this->coreParametersHelper->get('mailer_from_email');
-        $fromName       = $email->getFromName() ?? $this->coreParametersHelper->get('mailer_from_name');
-        $replyToAddress = $email->getReplyToAddress() ?? $this->coreParametersHelper->get('mailer_reply_to_email');
+        $fromEmail      = $email->getFromAddress() ?? $this->coreParametersHelper->get('mailer_from_email', '');
+        $fromName       = $email->getFromName() ?? $this->coreParametersHelper->get('mailer_from_name', '');
+        $replyToAddress = $email->getReplyToAddress() ?? $this->coreParametersHelper->get('mailer_reply_to_email', '');
         $this->setFrom($fromEmail, $fromName);
         $this->setReplyTo($replyToAddress, '');
 

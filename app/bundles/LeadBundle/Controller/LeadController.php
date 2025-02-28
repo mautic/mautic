@@ -1478,8 +1478,8 @@ class LeadController extends FormController
                         }
 
                         // Initialize mailer attributes.
-                        $mailFromName = $this->coreParametersHelper->get('mailer_from_name');
-                        $mailFrom     = $this->coreParametersHelper->get('mailer_from_email');
+                        $mailFromName = $this->coreParametersHelper->get('mailer_from_name', '');
+                        $mailFrom     = $this->coreParametersHelper->get('mailer_from_email', '');
                         $mailReplyTo  = $this->coreParametersHelper->get('mailer_reply_to_email', $mailFrom);
 
                         $mailFromName = !empty($email['fromname']) ? $email['fromname'] : $mailFromName;
