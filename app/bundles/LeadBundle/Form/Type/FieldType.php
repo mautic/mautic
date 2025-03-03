@@ -660,7 +660,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class, ['save_text' => false]);
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
