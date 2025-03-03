@@ -7,9 +7,11 @@ namespace Mautic\DynamicContentBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\UserBundle\Model\UserModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,6 +21,8 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         private DynamicContentModel $dynamicContentModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
+        private LoggerInterface $logger,
+        private CorePermissions $security,
     ) {
     }
 
@@ -35,7 +39,11 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         if (DynamicContent::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
+        if (!$this->security->isAdmin() && !$this->security->isGranted(['dynamiccontent:dynamiccontents:viewown', 'dynamiccontent:dynamiccontents:viewother'], 'MATCH_ONE')) {
+            $this->logger->error('Access denied: User lacks permission to read dynamicContents.');
 
+            return;
+        }
         $object = $this->dynamicContentModel->getEntity($event->getEntityId());
         if (!$object) {
             return;
@@ -66,7 +74,11 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         if (DynamicContent::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
+        if (!$this->security->isAdmin() && !$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
+            $this->logger->error('Access denied: User lacks permission to create dynamicContents.');
 
+            return;
+        }
         $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
         if (!$elements) {

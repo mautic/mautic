@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
-use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,6 +17,7 @@ final class EntityExportCommand extends ModeratedCommand
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
+        private ExportHelper $exportHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
@@ -83,7 +84,7 @@ final class EntityExportCommand extends ModeratedCommand
             $filePath = $this->writeToFile($jsonOutput);
             $output->writeln('<info>JSON file created at:</info> '.$filePath);
         } elseif ($input->getOption('zip-file')) {
-            $zipPath = $this->writeToZipFile($jsonOutput);
+            $zipPath = $this->exportHelper->writeToZipFile($jsonOutput);
             $output->writeln(''.$zipPath);
         } else {
             $output->writeln('<error>You must specify one of --json-only, --json-file, or --zip-file options.</error>');
@@ -100,34 +101,5 @@ final class EntityExportCommand extends ModeratedCommand
         file_put_contents($filePath, $jsonOutput);
 
         return $filePath;
-    }
-
-    private function writeToZipFile(string $jsonOutput): string
-    {
-        $tempDir      = sys_get_temp_dir();
-        $jsonFilePath = sprintf('%s/campaign_data.json', $tempDir);
-        $zipFilePath  = sprintf('%s/campaign_data.zip', $tempDir);
-
-        file_put_contents($jsonFilePath, $jsonOutput);
-
-        $zip = new \ZipArchive();
-        if (true === $zip->open($zipFilePath, \ZipArchive::CREATE)) {
-            $zip->addFile($jsonFilePath, 'campaign_data.json');
-
-            $data = json_decode($jsonOutput, true);
-            if (isset($data[Asset::ENTITY_NAME])) {
-                foreach ($data[Asset::ENTITY_NAME] as $asset) {
-                    if ('local' === $asset['storage_location'] && !empty($asset['path'])) {
-                        $assetPath = $this->pathsHelper->getSystemPath('media').'/files/'.$asset['path'];
-                        if (file_exists($assetPath)) {
-                            $zip->addFile($assetPath, 'assets/'.basename($assetPath));
-                        }
-                    }
-                }
-            }
-            $zip->close();
-        }
-
-        return $zipFilePath;
     }
 }

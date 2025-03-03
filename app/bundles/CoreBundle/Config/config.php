@@ -611,6 +611,15 @@ return [
             'mautic.helper.url' => [
                 'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
             ],
+            'mautic.helper.export' => [
+                'class'     => Mautic\CoreBundle\Helper\ExportHelper::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.file_path_resolver',
+                    'mautic.helper.paths',
+                ],
+            ],
             'mautic.helper.composer' => [
                 'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
                 'arguments' => [

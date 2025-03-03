@@ -35,7 +35,7 @@ return [
                 'path'       => '/campaign/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
-            'mautic_campaign_map_stats' => [
+            'mautic_campaign_map_stats'    => [
                 'path'       => '/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignMapStatsController::viewAction',
             ],
@@ -46,6 +46,28 @@ return [
             'mautic_campaign_metrics_email_hours' => [
                 'path'       => '/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::emailHoursAction',
+            ],
+            'mautic_campaign_import_index' => [
+                'path'       => '/campaign/import',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::indexAction',
+            ],
+            'mautic_campaign_import_upload' => [
+                'path'       => '/campaign/import/upload',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::uploadAction',
+                'method'     => 'POST',
+            ],
+            'mautic_campaign_import_execute' => [
+                'path'       => '/campaign/import/execute',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::importAction',
+                'method'     => 'POST',
+            ],
+            'mautic_campaign_import_cancel' => [
+                'path'       => '/campaign/import/cancel',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::cancelAction',
+            ],
+            'mautic_campaign_import_progress' => [
+                'path'       => '/campaign/import/progress',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::getProgressAction',
             ],
         ],
         'api'  => [

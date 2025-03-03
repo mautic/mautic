@@ -9,6 +9,23 @@
 {% block content %}
   {% if isIndex %}
     <div id="page-list-wrapper" class="panel panel-default">
+        {%- set pageButtons = [] %}
+        {% if permissions['campaign:campaigns:create'] %}
+            {% if permissions['campaign:imports:create'] %}
+                {% set pageButtons = pageButtons|merge([
+                    {
+                        'attr': {
+                            'href': path('mautic_campaign_import_index'),
+                            'data-toggle': '0',
+                            'data-menu-link': 'mautic_campaign_import_index'
+                        },
+                        'iconClass': 'ri-import-line',
+                        'btnText': 'mautic.campaign.campaign.import',
+                    }
+                ]) %}
+            {% endif %}
+        {% endif %}
+
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
@@ -26,6 +43,7 @@
                 },
                 'routeBase': 'campaign',
                 'langVar': 'campaign.campaigns',
+                'customButtons': pageButtons,
             },
             'bulk_actions': {
                 'routeBase': 'campaign',
@@ -131,7 +149,7 @@
                                 item.createdBy
                               ),
                           'clone': permissions['campaign:campaigns:create'],
-                          'export': permissions['campaign:campaigns:create'],
+                          'export': enableExportPermission,
                           'delete': securityHasEntityAccess(
                                 permissions['campaign:campaigns:deleteown'],
                                 permissions['campaign:campaigns:deleteother'],

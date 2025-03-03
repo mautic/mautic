@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
@@ -32,6 +33,7 @@ class ExportHelper
         private CoreParametersHelper $coreParametersHelper,
         private FilePathResolver $filePathResolver,
         private ProcessSignalService $processSignalService,
+        private PathsHelper $pathsHelper,
     ) {
     }
 
@@ -241,5 +243,34 @@ class ExportHelper
                 'Pragma'              => 'public',
             ]
         );
+    }
+
+    public function writeToZipFile(string $jsonOutput): string
+    {
+        $tempDir      = sys_get_temp_dir();
+        $jsonFilePath = sprintf('%s/campaign_data.json', $tempDir);
+        $zipFilePath  = sprintf('%s/campaign_data.zip', $tempDir);
+
+        file_put_contents($jsonFilePath, $jsonOutput);
+
+        $zip = new \ZipArchive();
+        if (true === $zip->open($zipFilePath, \ZipArchive::CREATE)) {
+            $zip->addFile($jsonFilePath, 'campaign_data.json');
+
+            $data = json_decode($jsonOutput, true);
+            if (isset($data[Asset::ENTITY_NAME])) {
+                foreach ($data[Asset::ENTITY_NAME] as $asset) {
+                    if ('local' === $asset['storage_location'] && !empty($asset['path'])) {
+                        $assetPath = $this->pathsHelper->getSystemPath('media').'/files/'.$asset['path'];
+                        if (file_exists($assetPath)) {
+                            $zip->addFile($assetPath, 'assets/'.basename($assetPath));
+                        }
+                    }
+                }
+            }
+            $zip->close();
+        }
+
+        return $zipFilePath;
     }
 }

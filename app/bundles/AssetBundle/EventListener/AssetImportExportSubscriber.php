@@ -9,7 +9,9 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Model\UserModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,6 +21,8 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         private AssetModel $assetModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
+        private LoggerInterface $logger,
+        private CorePermissions $security,
     ) {
     }
 
@@ -35,7 +39,11 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         if (Asset::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
+        if (!$this->security->isAdmin() && !$this->security->isGranted(['asset:assets:viewown', 'asset:assets:viewother'], 'MATCH_ONE')) {
+            $this->logger->error('Access denied: User lacks permission to read assets.');
 
+            return;
+        }
         $assetId = $event->getEntityId();
         $asset   = $this->assetModel->getEntity($assetId);
         if (!$asset) {
@@ -70,7 +78,11 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         if (Asset::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
+        if (!$this->security->isAdmin() && !$this->security->isGranted('asset:assets:create')) {
+            $this->logger->error('Access denied: User lacks permission to create assets.');
 
+            return;
+        }
         $output    = new ConsoleOutput();
         $elements  = $event->getEntityData();
         $userId    = $event->getUserId();
