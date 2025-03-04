@@ -1,72 +1,54 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
+{% block mauticContent %}campaignImport{% endblock %}
+
 {% block headerTitle %}
     {{ 'mautic.campaign.campaign.import.title'|trans }}
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">{{ 'mautic.campaign.import.progress.title'|trans }}</h3>
-                    </div>
-                    <div class="panel-body">
-                        {% if complete %}
-                            <div class="alert alert-success">
-                                {{ 'mautic.campaign.import.success'|trans }}
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info">
-                                {{ 'mautic.campaign.import.inprogress'|trans }}
-                            </div>
-                        {% endif %}
-                        
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ progress[0] }}" aria-valuemin="0" aria-valuemax="{{ progress[1] }}" style="width: {{ (progress[0] / progress[1] * 100)|round(2) }}%;">
-                                <span class="sr-only">{{ progress[0] }}% {{ 'mautic.campaign.import.progress'|trans }}</span>
-                            </div>
+    {% set percent = progress.toPercent %}
+    {% set id = complete ? 'campaignImportProgressComplete' : 'campaignImportProgress' %}
+    {% set header = complete ? 'mautic.campaign.campaign.import.success' : 'mautic.campaign.campaign.import.donotleave' %}
+
+    <div class="row ma-lg" id="{{ id }}">
+        <div class="col-sm-offset-3 col-sm-6 text-center">
+            <div class="panel panel-{% if complete %}success{% else %}info{% endif %}">
+                <div class="panel-heading">
+                    <h4 class="panel-title">{{ header|trans }}</h4>
+                </div>
+                <div class="panel-body">
+                    {% if not complete %}
+                        <h4>{{ 'mautic.campaign.campaign.import.inprogress'|trans }}</h4>
+                    {% endif %}
+
+                    <div class="progress mt-md" style="height: 50px;">
+                        <div class="progress-bar progress-bar-striped {% if not complete %}active{% endif %}"
+                             role="progressbar"
+                             aria-valuenow="{{ progress.done }}"
+                             aria-valuemin="0"
+                             aria-valuemax="{{ progress.total }}"
+                             style="width: {{ percent }}%; height: 50px;">
+                            <span class="sr-only">{{ percent }}%</span>
                         </div>
+                    </div>
 
-                        <p>{{ 'mautic.campaign.import.processing'|trans }} {{ progress[0] }}/{{ progress[1] }} {{ 'mautic.campaign.import.records'|trans }}</p>
+                    <p class="small">
+                        {{ 'mautic.campaign.campaign.import.stats'|trans }}: <span class="imported-count">{{ progress.done }}</span> /
+                        <span class="total-count">{{ progress.total }}</span>
+                    </p>
+                </div>
 
-                        <div class="mt-3">
+                <div class="panel-footer">
+                    {% if not complete %}
+                        <div>
                             <button class="btn btn-danger" id="cancel-import">
-                                <i class="fa fa-times"></i> {{ 'mautic.campaign.import.cancel'|trans }}
+                                <i class="fa fa-times"></i> {{ 'mautic.core.form.cancel'|trans }}
                             </button>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block footer %}
-<script>
-    function fetchProgress() {
-        fetch("{{ path('mautic_campaign_import_progress') }}")
-        .then(response => response.json())
-        .then(data => {
-            let progressBar = document.querySelector(".progress-bar");
-            let progressText = document.querySelector("#progress-text");
-
-            if (data.complete) {
-                progressBar.style.width = "100%";
-                progressText.innerHTML = "{{ 'mautic.campaign.import.success'|trans }}";
-            } else {
-                let percent = (data.current / data.total * 100).toFixed(2);
-                progressBar.style.width = percent + "%";
-                progressText.innerHTML = data.current + "/" + data.total + " {{ 'mautic.campaign.import.records'|trans }}";
-                
-                setTimeout(fetchProgress, 2000); // Fetch progress every 2 seconds
-            }
-        })
-        .catch(error => console.error("Progress fetch error:", error));
-    }
-
-    // Start checking progress
-    fetchProgress();
-</script>
 {% endblock %}

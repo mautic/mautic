@@ -51,23 +51,9 @@ return [
                 'path'       => '/campaign/import',
                 'controller' => 'Mautic\CampaignBundle\Controller\ImportController::indexAction',
             ],
-            'mautic_campaign_import_upload' => [
-                'path'       => '/campaign/import/upload',
-                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::uploadAction',
-                'method'     => 'POST',
-            ],
-            'mautic_campaign_import_execute' => [
-                'path'       => '/campaign/import/execute',
-                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::importAction',
-                'method'     => 'POST',
-            ],
-            'mautic_campaign_import_cancel' => [
-                'path'       => '/campaign/import/cancel',
-                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::cancelAction',
-            ],
-            'mautic_campaign_import_progress' => [
-                'path'       => '/campaign/import/progress',
-                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::getProgressAction',
+            'mautic_campaign_import_action' => [
+                'path'       => '/campaign/import/{objectAction}',
+                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::executeAction',
             ],
         ],
         'api'  => [
@@ -388,5 +374,6 @@ return [
         'peak_interaction_timer_fetch_interactions_from'                                        => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_INTERACTIONS_FROM,
         'peak_interaction_timer_fetch_limit'                                                    => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_LIMIT,
         'peak_interaction_timer_max_optimal_days'                                               => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_MAX_OPTIMAL_DAYS,
+        'import_campaigns_dir'                                                                  => '%kernel.project_dir%/var/import',
     ],
 ];

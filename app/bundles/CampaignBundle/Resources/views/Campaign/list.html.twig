@@ -15,9 +15,8 @@
                 {% set pageButtons = pageButtons|merge([
                     {
                         'attr': {
-                            'href': path('mautic_campaign_import_index'),
+                            'href': path('mautic_campaign_import_action', {'objectAction': 'new'}),
                             'data-toggle': '0',
-                            'data-menu-link': 'mautic_campaign_import_index'
                         },
                         'iconClass': 'ri-import-line',
                         'btnText': 'mautic.campaign.campaign.import',
