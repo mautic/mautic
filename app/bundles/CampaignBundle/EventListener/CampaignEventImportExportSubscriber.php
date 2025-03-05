@@ -11,6 +11,11 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Page;
+use Mautic\PointBundle\Entity\Group;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -123,22 +128,93 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $channel   = $campaignEvent->getChannel();
         $channelId = $campaignEvent->getChannelId();
 
-        if ($channel && $channelId) {
+        if ($channelId) {
             $subEvent = new EntityExportEvent($channel, $channelId);
             $this->dispatcher->dispatch($subEvent);
             $event->addDependencies($subEvent->getDependencies());
+            $this->mergeExportData($data, $subEvent);
+        } else {
+            $eventType  = $campaignEvent->getType();
+            $properties = $campaignEvent->getProperties();
 
-            foreach ($subEvent->getEntities() as $key => $values) {
-                if (!isset($data[$key])) {
-                    $data[$key] = $values;
-                } else {
-                    $existingIds = array_column($data[$key], 'id');
-
-                    $data[$key] = array_merge($data[$key], array_filter($values, function ($value) use ($existingIds) {
-                        return !in_array($value['id'], $existingIds);
-                    }));
-                }
+            switch ($eventType) {
+                case 'lead.addtocompany':
+                    if (!empty($properties['company'])) {
+                        $this->exportEntity(Company::ENTITY_NAME, (int) $properties['company'], $data, $event);
+                    }
+                    break;
+                case 'lead.pageHit':
+                    if (!empty($properties['page'])) {
+                        $this->exportEntity(Page::ENTITY_NAME, (int) $properties['page'], $data, $event);
+                    }
+                    break;
+                case 'lead.changelist':
+                    if (!empty($properties['addToLists']) && is_array($properties['addToLists'])) {
+                        foreach ($properties['addToLists'] as $segmentId) {
+                            $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
+                        }
+                    }
+                    if (!empty($properties['removeFromLists']) && is_array($properties['removeFromLists'])) {
+                        foreach ($properties['removeFromLists'] as $segmentId) {
+                            $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
+                        }
+                    }
+                    break;
+                case 'lead.segments':
+                    if (!empty($properties['segments']) && is_array($properties['segments'])) {
+                        foreach ($properties['segments'] as $segmentId) {
+                            $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
+                        }
+                    }
+                    break;
+                case 'form.submit':
+                    if (!empty($properties['forms']) && is_array($properties['forms'])) {
+                        foreach ($properties['forms'] as $formId) {
+                            $this->exportEntity(Form::ENTITY_NAME, (int) $formId, $data, $event);
+                        }
+                    }
+                    break;
+                case 'lead.changepoints':
+                case 'lead.points':
+                    if (!empty($properties['group'])) {
+                        $this->exportEntity(Group::ENTITY_NAME, (int) $properties['group'], $data, $event);
+                    }
+                    break;
             }
+        }
+    }
+
+    /**
+     * Merge exported data avoiding duplicate entries.
+     *
+     * @param array<string, array> $data
+     */
+    private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
+    {
+        foreach ($subEvent->getEntities() as $key => $values) {
+            if (!isset($data[$key])) {
+                $data[$key] = $values;
+            } else {
+                $existingIds = array_column($data[$key], 'id');
+                $data[$key]  = array_merge($data[$key], array_filter($values, function ($value) use ($existingIds) {
+                    return !in_array($value['id'], $existingIds);
+                }));
+            }
+        }
+    }
+
+    /**
+     * Handle exporting an entity based on its ID.
+     *
+     * @param array<string, array> $data
+     */
+    private function exportEntity(string $entityName, ?int $entityId, array &$data, EntityExportEvent $event): void
+    {
+        if ($entityId) {
+            $subEvent = new EntityExportEvent($entityName, $entityId);
+            $this->dispatcher->dispatch($subEvent);
+            $event->addDependencies($subEvent->getDependencies());
+            $this->mergeExportData($data, $subEvent);
         }
     }
 

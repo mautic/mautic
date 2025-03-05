@@ -11,7 +11,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Group extends FormEntity
 {
-    public const TABLE_NAME = 'point_groups';
+    public const TABLE_NAME  = 'point_groups';
+    public const ENTITY_NAME = 'pointGroup';
 
     private ?int $id             = null;
 

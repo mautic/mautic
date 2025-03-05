@@ -15,8 +15,10 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -229,6 +231,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 Asset::ENTITY_NAME,
                 Page::ENTITY_NAME,
                 DynamicContent::ENTITY_NAME,
+                Company::ENTITY_NAME,
+                Group::ENTITY_NAME,
             ];
 
             foreach ($dependentEntities as $entity) {
