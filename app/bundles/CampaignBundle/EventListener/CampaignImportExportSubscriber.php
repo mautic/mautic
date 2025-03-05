@@ -218,7 +218,6 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 Asset::ENTITY_NAME,
                 Page::ENTITY_NAME,
                 DynamicContent::ENTITY_NAME,
-                Company::ENTITY_NAME,
                 Group::ENTITY_NAME,
             ];
 
@@ -247,6 +246,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             if (isset($entityData[Event::ENTITY_NAME])) {
                 $this->updateEvents($entityData, $entityData['dependencies']);
+                print_r($entityData[Event::ENTITY_NAME]);
 
                 $campaignEvent = new EntityImportEvent(Event::ENTITY_NAME, $entityData[Event::ENTITY_NAME], $userId);
                 $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
@@ -359,8 +359,20 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         foreach ($dependencies as &$dependencyGroup) {
             foreach ($dependencyGroup as &$items) {
                 foreach ($items as &$dependency) {
-                    if (isset($dependency[$key]) && isset($idMap[$dependency[$key]])) {
-                        $dependency[$key] = $idMap[$dependency[$key]];
+                    if (isset($dependency[$key])) {
+                        // If the value is an array, update each element inside it
+                        if (is_array($dependency[$key])) {
+                            foreach ($dependency[$key] as &$subKey) {
+                                if (isset($idMap[$subKey])) {
+                                    $subKey = $idMap[$subKey];
+                                }
+                            }
+                        } else {
+                            // If it's a single value, update it normally
+                            if (isset($idMap[$dependency[$key]])) {
+                                $dependency[$key] = $idMap[$dependency[$key]];
+                            }
+                        }
                     }
                 }
             }
@@ -476,30 +488,158 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      */
     private function updateEventChannel(array &$event, array $eventDependency): void
     {
-        if (!isset($event['channel']) || !isset($eventDependency[$event['channel']])) {
-            return;
+        if (!empty($event['channel']) && isset($eventDependency[$event['channel']])) {
+            $channelKey = $event['channel'];
+            $channelId = $eventDependency[$channelKey];
+
+            $event['channel_id'] = $channelId;
+            $this->updateChannelProperties($event, $channelKey, $channelId);
+        } else {
+            $this->processNonChannelEvent($event, $eventDependency);
+        }
+    }
+
+    /**
+     * Correctly updates channel properties, considering both array and non-array values.
+     *
+     * @param array<string, mixed> $event
+     * @param string $channelKey
+     * @param int $channelId
+     */
+    private function updateChannelProperties(array &$event, string $channelKey, int $channelId): void
+    {
+        // Define the possible locations where the channel ID may be stored
+        $propertyPaths = [
+            "properties.$channelKey",              
+            "properties.{$channelKey}s",            
+            "properties.properties.$channelKey",    
+            "properties.properties.{$channelKey}s", 
+        ];
+
+        foreach ($propertyPaths as $path) {
+            $existingValue = $this->getNestedValue($event, $path);
+
+            if (!is_null($existingValue)) {
+                if (is_array($existingValue)) {
+                    // If the existing value is an array, replace it with a single-element array
+                    $this->setNestedValue($event, $path, [$channelId]);
+                } else {
+                    // If it's a single value, replace it directly
+                    $this->setNestedValue($event, $path, $channelId);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $event
+     * @param array<string, mixed> $eventDependency
+     */
+    private function processNonChannelEvent(array &$event, array $eventDependency): void
+    {
+        $eventType = $event['type'] ?? null;
+        $properties = $event['properties'] ?? [];
+
+        switch ($eventType) {
+            case 'lead.pageHit':
+                $this->updateProperty($event, 'properties.page', $eventDependency, Page::ENTITY_NAME);
+                break;
+            case 'lead.changelist':
+                $this->updateArrayProperty($event, 'properties.addToLists', $eventDependency, LeadList::ENTITY_NAME);
+                $this->updateArrayProperty($event, 'properties.removeFromLists', $eventDependency, LeadList::ENTITY_NAME);
+                break;
+            case 'lead.segments':
+                $this->updateArrayProperty($event, 'properties.segments', $eventDependency, LeadList::ENTITY_NAME);
+                break;
+            case 'form.submit':
+                $this->updateArrayProperty($event, 'properties.forms', $eventDependency, Form::ENTITY_NAME);
+                break;
+            case 'lead.changepoints':
+            case 'lead.points':
+                $this->updateProperty($event, 'properties.group', $eventDependency, Group::ENTITY_NAME);
+                break;
+        }
+    }
+
+    /**
+     * Update a single property if it exists and is a valid reference.
+     *
+     * @param array<string, mixed> $event
+     * @param string $propertyPath
+     * @param array<string, mixed> $eventDependency
+     * @param string $entityName
+     */
+    private function updateProperty(array &$event, string $propertyPath, array $eventDependency, string $entityName): void
+    {
+        $propertyValue = $this->getNestedValue($event, $propertyPath);
+        if (!empty($propertyValue) && isset($eventDependency[$entityName][$propertyValue])) {
+            $this->setNestedValue($event, $propertyPath, $eventDependency[$entityName][$propertyValue]);
+        }
+    }
+
+    /**
+     * Update an array property if it exists and contains valid references.
+     *
+     * @param array<string, mixed> $event
+     * @param string $propertyPath
+     * @param array<string, mixed> $eventDependency
+     * @param string $entityName
+     */
+    private function updateArrayProperty(array &$event, string $propertyPath, array $eventDependency, string $entityName): void
+    {
+        $propertyValue = $this->getNestedValue($event, $propertyPath);
+        if (!empty($propertyValue) && is_array($propertyValue)) {
+            foreach ($propertyValue as &$id) {
+                if (isset($eventDependency[$entityName][$id])) {
+                    $id = $eventDependency[$entityName][$id];
+                }
+            }
+            $this->setNestedValue($event, $propertyPath, $propertyValue);
+        }
+    }
+
+    /**
+     * Retrieve a nested array value using dot notation.
+     *
+     * @param array<string, mixed> $array
+     * @param string $path
+     * @return mixed
+     */
+    private function getNestedValue(array &$array, string $path): mixed
+    {
+        $keys = explode('.', $path);
+        $temp = &$array;
+
+        foreach ($keys as $key) {
+            if (!isset($temp[$key])) {
+                return null;
+            }
+            $temp = &$temp[$key];
         }
 
-        $channelKey = $event['channel'];
-        $channelId  = $eventDependency[$channelKey];
+        return $temp;
+    }
 
-        $event['channel_id'] = $channelId;
+    /**
+     * Set a nested array value using dot notation.
+     *
+     * @param array<string, mixed> &$array
+     * @param string $path
+     * @param mixed $value
+     */
+    private function setNestedValue(array &$array, string $path, mixed $value): void
+    {
+        $keys = explode('.', $path);
+        $temp = &$array;
 
-        if (isset($event['properties'][$channelKey.'s'])) {
-            $event['properties'][$channelKey.'s'] = [$channelId];
+        foreach ($keys as $key) {
+            if (!isset($temp[$key]) || !is_array($temp[$key])) {
+                $temp[$key] = [];
+            }
+            $temp = &$temp[$key];
         }
 
-        if (isset($event['properties'][$channelKey])) {
-            $event['properties'][$channelKey] = $channelId;
-        }
-
-        if (isset($event['properties']['properties'][$channelKey.'s'])) {
-            $event['properties']['properties'][$channelKey.'s'] = [$channelId];
-        }
-
-        if (isset($event['properties']['properties'][$channelKey])) {
-            $event['properties']['properties'][$channelKey] = $channelId;
-        }
+        $temp = $value;
     }
 
     /**

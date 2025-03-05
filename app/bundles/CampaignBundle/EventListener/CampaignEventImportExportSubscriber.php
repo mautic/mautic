@@ -60,12 +60,10 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             }
 
             $eventData  = $this->createEventData($campaign, $campaignEvent);
-            $dependency = $this->createDependency($campaignId, $campaignEvent);
 
             $this->handleChannelExport($campaignEvent, $data, $event);
 
             $event->addEntity(Event::ENTITY_NAME, $eventData);
-            $event->addDependencyEntity(Event::ENTITY_NAME, $dependency);
         }
 
         foreach ($data as $entityName => $entities) {
@@ -100,29 +98,19 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @return array<string, int>
-     */
-    private function createDependency(int $campaignId, Event $campaignEvent): array
-    {
-        $channel   = $campaignEvent->getChannel() ?? '';
-        $channelId = $campaignEvent->getChannelId() ?? 0;
-
-        return [
-            Campaign::ENTITY_NAME  => (int) $campaignId,
-            Event::ENTITY_NAME     => (int) $campaignEvent->getId(),
-            $channel               => (int) $channelId,
-        ];
-    }
-
-    /**
      * @param array<array<string, mixed>> $data
      */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
         $channel   = $campaignEvent->getChannel();
         $channelId = $campaignEvent->getChannelId();
+        $dependencies = [
+            Campaign::ENTITY_NAME => (int) $campaignEvent->getCampaign()->getId(),
+            Event::ENTITY_NAME    => (int) $campaignEvent->getId(),
+        ];
 
-        if ($channelId) {
+        if ($channel && $channelId) {
+            $dependencies[$channel] = (int) $channelId;
             $subEvent = new EntityExportEvent($channel, $channelId);
             $this->dispatcher->dispatch($subEvent);
             $event->addDependencies($subEvent->getDependencies());
@@ -132,24 +120,22 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $properties = $campaignEvent->getProperties();
 
             switch ($eventType) {
-                case 'lead.addtocompany':
-                    if (!empty($properties['company'])) {
-                        $this->exportEntity(Company::ENTITY_NAME, (int) $properties['company'], $data, $event);
-                    }
-                    break;
                 case 'lead.pageHit':
                     if (!empty($properties['page'])) {
+                        $dependencies[Page::ENTITY_NAME] = (int) $properties['page'];
                         $this->exportEntity(Page::ENTITY_NAME, (int) $properties['page'], $data, $event);
                     }
                     break;
                 case 'lead.changelist':
                     if (!empty($properties['addToLists']) && is_array($properties['addToLists'])) {
                         foreach ($properties['addToLists'] as $segmentId) {
+                            $dependencies[LeadList::ENTITY_NAME][] = (int) $segmentId;
                             $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
                         }
                     }
                     if (!empty($properties['removeFromLists']) && is_array($properties['removeFromLists'])) {
                         foreach ($properties['removeFromLists'] as $segmentId) {
+                            $dependencies[LeadList::ENTITY_NAME][] = (int) $segmentId;
                             $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
                         }
                     }
@@ -157,6 +143,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 case 'lead.segments':
                     if (!empty($properties['segments']) && is_array($properties['segments'])) {
                         foreach ($properties['segments'] as $segmentId) {
+                            $dependencies[LeadList::ENTITY_NAME][] = (int) $segmentId;
                             $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
                         }
                     }
@@ -164,6 +151,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 case 'form.submit':
                     if (!empty($properties['forms']) && is_array($properties['forms'])) {
                         foreach ($properties['forms'] as $formId) {
+                            $dependencies[Form::ENTITY_NAME][] = (int) $formId;
                             $this->exportEntity(Form::ENTITY_NAME, (int) $formId, $data, $event);
                         }
                     }
@@ -171,11 +159,14 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 case 'lead.changepoints':
                 case 'lead.points':
                     if (!empty($properties['group'])) {
+                        $dependencies[Group::ENTITY_NAME] = (int) $properties['group'];
                         $this->exportEntity(Group::ENTITY_NAME, (int) $properties['group'], $data, $event);
                     }
                     break;
             }
         }
+
+        $event->addDependencyEntity(Event::ENTITY_NAME, $dependencies);
     }
 
     /**
