@@ -7,7 +7,6 @@ namespace Mautic\PointBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -22,7 +21,6 @@ final class TriggerImportExportSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -37,11 +35,6 @@ final class TriggerImportExportSubscriber implements EventSubscriberInterface
     public function onPointTriggerExport(EntityExportEvent $event): void
     {
         if (Trigger::ENTITY_NAME !== $event->getEntityName()) {
-            return;
-        }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('point:triggers:view')) {
-            $this->logger->error('Access denied: User lacks permission to read point triggers.');
-
             return;
         }
 
@@ -68,11 +61,6 @@ final class TriggerImportExportSubscriber implements EventSubscriberInterface
     public function onPointTriggerImport(EntityImportEvent $event): void
     {
         if (Trigger::ENTITY_NAME !== $event->getEntityName()) {
-            return;
-        }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('point:triggers:create')) {
-            $this->logger->error('Access denied: User lacks permission to create point triggers.');
-
             return;
         }
 

@@ -7,7 +7,6 @@ namespace Mautic\FormBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -22,7 +21,6 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private UserModel $userModel,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -39,11 +37,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         if (Form::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted(['form:forms:viewown', 'form:forms:viewother'], 'MATCH_ONE')) {
-            $this->logger->error('Access denied: User lacks permission to read forms.');
 
-            return;
-        }
         $formId       = $event->getEntityId();
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
@@ -96,11 +90,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         if (Form::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('form:forms:create')) {
-            $this->logger->error('Access denied: User lacks permission to create forms.');
 
-            return;
-        }
         $output   = new ConsoleOutput();
         $forms    = $event->getEntityData();
         $userId   = $event->getUserId();

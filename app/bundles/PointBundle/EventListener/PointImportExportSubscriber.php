@@ -7,7 +7,6 @@ namespace Mautic\PointBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -22,7 +21,6 @@ final class PointImportExportSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -37,11 +35,6 @@ final class PointImportExportSubscriber implements EventSubscriberInterface
     public function onPointExport(EntityExportEvent $event): void
     {
         if (Point::ENTITY_NAME !== $event->getEntityName()) {
-            return;
-        }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('point:points:view')) {
-            $this->logger->error('Access denied: User lacks permission to read points.');
-
             return;
         }
 
@@ -70,11 +63,6 @@ final class PointImportExportSubscriber implements EventSubscriberInterface
     public function onPointImport(EntityImportEvent $event): void
     {
         if (Point::ENTITY_NAME !== $event->getEntityName()) {
-            return;
-        }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('point:points:create')) {
-            $this->logger->error('Access denied: User lacks permission to create points.');
-
             return;
         }
 

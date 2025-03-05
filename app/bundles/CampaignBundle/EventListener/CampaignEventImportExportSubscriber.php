@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -28,7 +27,6 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         private EntityManagerInterface $entityManager,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -45,11 +43,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:campaigns:view')) {
-            $this->logger->error('Access denied: User lacks permission to read campaigns.');
 
-            return;
-        }
         $campaignId = (int) $event->getEntityId();
         $campaign   = $this->campaignModel->getEntity($campaignId);
 
@@ -223,11 +217,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:campaigns:create')) {
-            $this->logger->error('Access denied: User lacks permission to create campaigns.');
 
-            return;
-        }
         $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
 

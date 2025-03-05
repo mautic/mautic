@@ -7,7 +7,6 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -22,7 +21,6 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -39,11 +37,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         if (Page::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted(['page:pages:viewown', 'page:pages:viewother'], 'MATCH_ONE')) {
-            $this->logger->error('Access denied: User lacks permission to read pages.');
 
-            return;
-        }
         $pageId = $event->getEntityId();
         $page   = $this->pageModel->getEntity($pageId);
         if (!$page) {
@@ -84,11 +78,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         if (Page::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('page:pages:create')) {
-            $this->logger->error('Access denied: User lacks permission to create pages.');
 
-            return;
-        }
         $output    = new ConsoleOutput();
         $elements  = $event->getEntityData();
         $userId    = $event->getUserId();

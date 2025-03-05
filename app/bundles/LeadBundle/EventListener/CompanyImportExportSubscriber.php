@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -22,7 +21,6 @@ final class CompanyImportExportSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -37,11 +35,6 @@ final class CompanyImportExportSubscriber implements EventSubscriberInterface
     public function onCompanyExport(EntityExportEvent $event): void
     {
         if (Company::ENTITY_NAME !== $event->getEntityName()) {
-            return;
-        }
-        if (!$this->security->isAdmin() && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')) {
-            $this->logger->error('Access denied: User lacks permission to read companies.');
-
             return;
         }
 
@@ -75,11 +68,6 @@ final class CompanyImportExportSubscriber implements EventSubscriberInterface
     public function onCompanyImport(EntityImportEvent $event): void
     {
         if (Company::ENTITY_NAME !== $event->getEntityName()) {
-            return;
-        }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('lead:leads:create')) {
-            $this->logger->error('Access denied: User lacks permission to create companies.');
-
             return;
         }
 

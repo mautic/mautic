@@ -7,10 +7,8 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -23,7 +21,6 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -40,11 +37,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted([LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER], 'MATCH_ONE')) {
-            $this->logger->error('Access denied: User lacks permission to read segments.');
 
-            return;
-        }
         $leadListId = $event->getEntityId();
         $leadList   = $this->leadListModel->getEntity($leadListId);
         if (!$leadList) {
@@ -70,11 +63,6 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->security->isAdmin() && !$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
-            $this->logger->error('Access denied: User lacks permission to create segments.');
-
-            return;
-        }
         $output    = new ConsoleOutput();
         $elements  = $event->getEntityData();
         $userId    = $event->getUserId();

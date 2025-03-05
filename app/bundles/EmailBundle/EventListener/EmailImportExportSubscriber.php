@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Form;
@@ -26,7 +25,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         private EntityManagerInterface $entityManager,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
-        private CorePermissions $security,
     ) {
     }
 
@@ -43,11 +41,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted(['email:emails:viewown', 'email:emails:viewother'], 'MATCH_ONE')) {
-            $this->logger->error('Access denied: User lacks permission to read emails.');
 
-            return;
-        }
         $emailId = $event->getEntityId();
         $email   = $this->emailModel->getEntity($emailId);
         if (!$email) {
@@ -113,11 +107,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
             return;
         }
-        if (!$this->security->isAdmin() && !$this->security->isGranted('email:emails:create')) {
-            $this->logger->error('Access denied: User lacks permission to create emails.');
 
-            return;
-        }
         $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
         $userId   = $event->getUserId();
