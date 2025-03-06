@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Model;
@@ -64,6 +55,9 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(1, $contactsNew);
     }
 
+    /**
+     * @return mixed[]
+     */
     private function createFormWithCompanies(): array
     {
         $payload = [
@@ -117,6 +111,9 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         return $this->createForm($payload);
     }
 
+    /**
+     * @return mixed[]
+     */
     private function createFormWithoutCompanies(): array
     {
         $payload = [
@@ -152,7 +149,12 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         return $this->createForm($payload);
     }
 
-    private function createForm($payload): array
+    /**
+     * @param mixed[] $payload
+     *
+     * @return array{int,string}
+     */
+    private function createForm(array $payload): array
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
@@ -186,11 +188,15 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->submitForm($formId, $formAlias, $values);
     }
 
-    private function submitForm(int $formId, string $formAlias, $values): void
+    /**
+     * @param array<string,string> $values
+     */
+    private function submitForm(int $formId, string $formAlias, array $values): void
     {
-        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $this->assertResponseIsSuccessful();
         $formCrawler = $crawler->filter('form[id=mauticform_'.$formAlias.']');
-        $this::assertSame(1, $formCrawler->count(), $this->client->getResponse()->getContent());
+        $this::assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
         $form = $formCrawler->form();
         $form->setValues($values);
         $this->client->submit($form);
