@@ -2,18 +2,16 @@
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class PointEventHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testSendEmail(): void
     {
-        $helper = new PointEventHelper();
         $lead   = new Lead();
         $lead->setFields([
             'core' => [
@@ -29,65 +27,28 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $result = $helper->sendEmail($event, $lead, $this->getMockMauticFactory());
+        $emailModel = $this->getMockEmail(true, true);
+        $helper     = new PointEventHelper($emailModel);
+        $result     = $helper->sendEmail($event, $lead);
         $this->assertEquals(true, $result);
 
-        $result = $helper->sendEmail($event, $lead, $this->getMockMauticFactory(false));
+        $emailModel = $this->getMockEmail(false, true);
+        $helper     = new PointEventHelper($emailModel);
+        $result     = $helper->sendEmail($event, $lead);
         $this->assertEquals(false, $result);
 
-        $result = $helper->sendEmail($event, $lead, $this->getMockMauticFactory(true, false));
+        $emailModel = $this->getMockEmail(true, false);
+        $helper     = new PointEventHelper($emailModel);
+        $result     = $helper->sendEmail($event, $lead);
         $this->assertEquals(false, $result);
 
-        $result = $helper->sendEmail($event, new Lead(), $this->getMockMauticFactory(true, false));
+        $emailModel = $this->getMockEmail(true, false);
+        $helper     = new PointEventHelper($emailModel);
+        $result     = $helper->sendEmail($event, new Lead());
         $this->assertEquals(false, $result);
     }
 
-    /**
-     * @param bool $published
-     * @param bool $success
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockMauticFactory($published = true, $success = true)
-    {
-        $mock = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getModel'])
-            ->getMock();
-
-        $mock->expects($this->any())
-            ->method('getModel')
-            ->willReturnCallback(function ($model) use ($published, $success) {
-                switch ($model) {
-                    case 'email':
-                        return $this->getMockEmail($published, $success);
-                    case 'lead':
-                        return $this->getMockLead();
-                }
-            });
-
-        return $mock;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockLead()
-    {
-        $mock = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $mock;
-    }
-
-    /**
-     * @param bool $published
-     * @param bool $success
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockEmail($published = true, $success = true)
+    private function getMockEmail(bool $published = true, bool $success = true): EmailModel&MockObject
     {
         $sendEmail = $success ? true : ['error' => 1];
 

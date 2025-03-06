@@ -3,7 +3,6 @@
 namespace Mautic\PageBundle\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
@@ -13,17 +12,12 @@ class PointActionHelper
     {
     }
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public static function validatePageHit($factory, $eventDetails, $action): bool
+    public static function validatePageHit($eventDetails, $action): bool
     {
         $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
-            /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-            $pageModel               = $factory->getModel('page');
-            [$parent, $children]     = $pageHit->getVariants();
+            [$parent, $children] = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {

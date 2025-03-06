@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -41,7 +40,6 @@ class EventController extends CommonFormController
         private EventCollector $eventCollector,
         private DateHelper $dateHelper,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -52,7 +50,7 @@ class EventController extends CommonFormController
         CorePermissions $security,
         private CampaignModel $campaignModel,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

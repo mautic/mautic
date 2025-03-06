@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -38,11 +37,6 @@ class LegacyEventDispatcherTest extends TestCase
     private MockObject $scheduler;
 
     /**
-     * @var MockObject|MauticFactory
-     */
-    private MockObject $mauticFactory;
-
-    /**
      * @var MockObject|ContactTracker
      */
     private MockObject $contactTracker;
@@ -61,12 +55,11 @@ class LegacyEventDispatcherTest extends TestCase
     {
         parent::setUp();
 
-        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $this->scheduler          = $this->createMock(EventScheduler::class);
-        $this->mauticFactory      = $this->createMock(MauticFactory::class);
-        $this->contactTracker     = $this->createMock(ContactTracker::class);
-        $this->config             = $this->createMock(AbstractEventAccessor::class);
-        $this->pendingEvent       = $this->createMock(PendingEvent::class);
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $this->scheduler      = $this->createMock(EventScheduler::class);
+        $this->contactTracker = $this->createMock(ContactTracker::class);
+        $this->config         = $this->createMock(AbstractEventAccessor::class);
+        $this->pendingEvent   = $this->createMock(PendingEvent::class);
     }
 
     public function testAllEventsAreFailedWithBadConfig(): void
@@ -426,7 +419,6 @@ class LegacyEventDispatcherTest extends TestCase
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
-            $this->mauticFactory,
             $this->contactTracker
         );
     }

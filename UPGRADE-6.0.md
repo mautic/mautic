@@ -60,6 +60,8 @@ As the legacy builder was removed these JS libraries were removed as well:
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTheme` use DI with the `\Mautic\CoreBundle\Helper\ThemeHelper` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getInstalledThemes` use DI with the `\Mautic\CoreBundle\Helper\ThemeHelper` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getEntityManager` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getModel` use dependency injection instead. Quick replacement will be `Mautic\CoreBundle\Factory\ModelFactory::getModel`, but most sustainable is to use dependency injection.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory`, `'mautic.factory'` service.
 - Removed `Mautic\CampaignBundle\Entity::getEventsByChannel()` as unused and buggy. No replacement
 - Removed `Mautic\CoreBundle\Test::createAnotherClient()` as unused. No replacement.
 - Removed `Mautic\NotificationBundle\Entity::getLeadStats()` as unused and buggy. No replacment

@@ -3,7 +3,8 @@
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -18,6 +19,8 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -31,9 +34,6 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {
-        /** @var MockObject&MauticFactory $mockFactory */
-        $mockFactory = $this->createMock(MauticFactory::class);
-
         /** @var MockObject&FromEmailHelper $fromEmailHelper */
         $fromEmailHelper = $this->createMock(FromEmailHelper::class);
 
@@ -74,7 +74,6 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $tokens = ['{test}' => 'value'];
 
         $mailHelper = new MailHelper(
-            $mockFactory,
             new Mailer(new SmtpTransport()),
             $fromEmailHelper,
             $coreParametersHelper,
@@ -88,6 +87,10 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createMock(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
         );
         $mailHelper->setTokens($tokens);
 

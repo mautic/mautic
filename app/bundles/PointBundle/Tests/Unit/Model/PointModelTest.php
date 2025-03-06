@@ -6,7 +6,6 @@ namespace Mautic\PointBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -38,7 +37,6 @@ class PointModelTest extends TestCase
     private RequestStack&MockObject $requestStack;
     private IpLookupHelper&MockObject $ipLookupHelper;
     private LeadModel&MockObject $leadModel;
-    private MauticFactory&MockObject $mauticFactory;
     private ContactTracker&MockObject $contactTracker;
     private EntityManager&MockObject $em;
     private CorePermissions&MockObject $security;
@@ -56,7 +54,6 @@ class PointModelTest extends TestCase
         $this->requestStack         = $this->createMock(RequestStack::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->mauticFactory        = $this->createMock(MauticFactory::class); // @phpstan-ignore-line MauticFactory is deprecated.
         $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->em                   = $this->createMock(EntityManager::class);
         $this->security             = $this->createMock(CorePermissions::class);
@@ -71,7 +68,6 @@ class PointModelTest extends TestCase
             $this->requestStack,
             $this->ipLookupHelper,
             $this->leadModel,
-            $this->mauticFactory,
             $this->contactTracker,
             $this->em,
             $this->security,

@@ -3,8 +3,9 @@
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -20,6 +21,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -84,10 +87,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailBuild(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            self::fail('The mock does not contain LeadModel.');
-        }
+        $leadModel  = $this->getMockLeadModel();
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
         $event      = new EmailBuilderEvent($this->getMockTranslator());
         $subscriber->onEmailBuild($event);
@@ -100,10 +100,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerate(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            self::fail('The mock does not contain LeadModel.');
-        }
+        $leadModel  = $this->getMockLeadModel();
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
@@ -122,10 +119,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerateWithFakeOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            self::fail('The mock does not contain LeadModel.');
-        }
+        $leadModel  = $this->getMockLeadModel();
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
@@ -140,10 +134,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerateWithNoOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            self::fail('The mock does not contain LeadModel.');
-        }
+        $leadModel  = $this->getMockLeadModel();
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
@@ -162,10 +153,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplay(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            self::fail('The mock does not contain LeadModel.');
-        }
+        $leadModel  = $this->getMockLeadModel();
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
@@ -180,10 +168,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplayWithFakeOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            self::fail('The mock does not contain LeadModel.');
-        }
+        $leadModel  = $this->getMockLeadModel();
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
@@ -198,10 +183,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplayWithNoOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            self::fail('The mock does not contain LeadModel.');
-        }
+        $leadModel  = $this->getMockLeadModel();
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
@@ -218,7 +200,7 @@ class OwnerSubscriberTest extends TestCase
         $this->assertEquals('', $tokens['{ownerfield=lastname}']);
     }
 
-    protected function getMockFactory(): MauticFactory|MockObject
+    protected function getMockLeadModel(): LeadModel&MockObject
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -240,25 +222,13 @@ class OwnerSubscriberTest extends TestCase
         $mockLeadModel->method('getRepository')
             ->willReturn($mockLeadRepository);
 
-        /** @var MauticFactory&MockObject $mockFactory */
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockFactory->method('getModel')
-            ->willReturnMap(
-                [
-                    ['lead', $mockLeadModel],
-                ]
-            );
-
         $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockMailboxHelper->method('isConfigured')
             ->willReturn(false);
 
-        return $mockFactory;
+        return $mockLeadModel;
     }
 
     /**
@@ -289,7 +259,6 @@ class OwnerSubscriberTest extends TestCase
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
-        $mockFactory = $this->getMockFactory();
 
         /** @var FromEmailHelper|MockObject $fromEmaiHelper */
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
@@ -320,7 +289,6 @@ class OwnerSubscriberTest extends TestCase
         $mailer       = new Mailer($transport);
         $requestStack = new RequestStack();
         $mailerHelper = new MailHelper(
-            $mockFactory,
             $mailer,
             $fromEmaiHelper,
             $coreParametersHelper,
@@ -334,6 +302,10 @@ class OwnerSubscriberTest extends TestCase
             $this->createMock(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
         );
         $mailerHelper->setLead($lead);
 

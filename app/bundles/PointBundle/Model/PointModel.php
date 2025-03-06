@@ -3,7 +3,6 @@
 namespace Mautic\PointBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -47,10 +46,6 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         protected RequestStack $requestStack,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
-        /**
-         * @deprecated https://github.com/mautic/mautic/issues/8229
-         */
-        protected MauticFactory $mauticFactory,
         private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
@@ -237,7 +232,6 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
                     'points'     => $action->getDelta(),
                 ],
                 'lead'         => $lead,
-                'factory'      => $this->mauticFactory, // WHAT?
                 'eventDetails' => $eventDetails,
             ];
 
