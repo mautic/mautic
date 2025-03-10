@@ -8,13 +8,39 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class ParameterLoaderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected static array $backupDotEnv;
+    protected static array $backupSysEnv;
+    protected static array $backupEnvVars;
 
-        putenv('MAUTIC_CONFIG_PARAMETERS=');
-        putenv('MAUTIC_TRANSLATIONS_FETCH_URL=');
-        putenv('MAUTIC_ALLOWED_EXTENSIONS=');
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        self::$backupEnvVars = [
+            'MAUTIC_CONFIG_PARAMETERS',
+            'MAUTIC_TRANSLATIONS_FETCH_URL',
+            'MAUTIC_ALLOWED_EXTENSIONS',
+        ];
+        self::$backupSysEnv = array_intersect_key(getenv(), array_flip(self::$backupEnvVars));
+        self::$backupDotEnv = array_intersect_key($_ENV, array_flip(self::$backupEnvVars));
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        array_walk(self::$backupSysEnv, function ($value, $key) { putenv("{$key}={$value}"); });
+        array_walk(self::$backupDotEnv, function ($value, $key) { $_ENV[$key] = $value; });
+
+        parent::tearDownAfterClass();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        foreach (self::$backupEnvVars as $key) {
+            putenv("{$key}=");
+            unset($_ENV[$key]);
+        }
     }
 
     public function testDefaultParametersAreLoaded(): void

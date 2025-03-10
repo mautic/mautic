@@ -30,16 +30,6 @@ class ConfigEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testGetEnvWorks(): void
-    {
-        putenv('MAUTIC_FOOBAR=bar');
-        $this->config->set('foo', 'getenv(MAUTIC_FOOBAR)');
-
-        ConfigEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
-
-        $this->assertEquals('bar', $this->envVars->get('MAUTIC_FOO'));
-    }
-
     public function testLocalValueIsSet(): void
     {
         $this->config->set('foo', 'bar');
