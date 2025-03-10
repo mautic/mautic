@@ -71,9 +71,6 @@ class LeadListFilteringEvent extends CommonEvent
         return $this->func;
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
     public function getEntityManager(): ?EntityManagerInterface
     {
         return $this->em;
