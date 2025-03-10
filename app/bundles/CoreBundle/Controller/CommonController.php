@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
@@ -42,7 +41,6 @@ class CommonController extends AbstractController implements MauticController
      */
     public function __construct(
         protected ManagerRegistry $doctrine,
-        protected MauticFactory $factory,
         protected ModelFactory $modelFactory,
         UserHelper $userHelper,
         protected CoreParametersHelper $coreParametersHelper,

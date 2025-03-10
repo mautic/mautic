@@ -20,6 +20,37 @@
   overflow-y: auto;
 }
 
+// Color input fields
+.minicolors-swatch::after,
+.minicolors-theme-bootstrap .minicolors-swatch { border-radius: var(--swatch-size); }
+
+.minicolors-theme-bootstrap .minicolors-swatch {
+  --swatch-size: 20px;
+  height: var(--swatch-size);
+  width: var(--swatch-size);
+  top: 50%;
+  transform: translateY(-50%);
+  left: 6px;
+}
+
+.minicolors-swatch::after { box-shadow: none; }
+
+.minicolors .minicolors-grid {
+  border-radius: 10px;
+}
+
+.minicolors-slider, .minicolors-opacity-slider {
+  border-radius: 5px;
+}
+
+.minicolors-panel {
+  border-radius: 10px;
+}
+
+.minicolors-picker {
+  height: 5px;
+}
+
 // Contact image
 form[name="lead"] {
   .media-body, .contact-avatar {

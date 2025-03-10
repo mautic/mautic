@@ -6,7 +6,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -25,7 +24,6 @@ class BatchContactController extends AbstractFormController
         private ContactActionModel $actionModel,
         private CategoryModel $categoryModel,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -35,7 +33,7 @@ class BatchContactController extends AbstractFormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

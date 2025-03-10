@@ -59,6 +59,9 @@ As the legacy builder was removed these JS libraries were removed as well:
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTwig` use DI with the `\Twig\Environment` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getTheme` use DI with the `\Mautic\CoreBundle\Helper\ThemeHelper` instead.
 - Removed `Mautic\CoreBundle\Factory\MauticFactory::getInstalledThemes` use DI with the `\Mautic\CoreBundle\Helper\ThemeHelper` instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getEntityManager` use dependency injection instead.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory::getModel` use dependency injection instead. Quick replacement will be `Mautic\CoreBundle\Factory\ModelFactory::getModel`, but most sustainable is to use dependency injection.
+- Removed `Mautic\CoreBundle\Factory\MauticFactory`, `'mautic.factory'` service.
 - Removed `Mautic\CampaignBundle\Entity::getEventsByChannel()` as unused and buggy. No replacement
 - Removed `Mautic\CoreBundle\Test::createAnotherClient()` as unused. No replacement.
 - Removed `Mautic\NotificationBundle\Entity::getLeadStats()` as unused and buggy. No replacment
@@ -83,6 +86,7 @@ As the legacy builder was removed these JS libraries were removed as well:
 - `getSession` was removed from `Mautic\PageBundle\Helper\TrackingHelper` No session for anonymous users. Use `getCacheItem`.
 - `updateSession` was removed from `Mautic\PageBundle\Helper\TrackingHelper` No session for anonymous users. Use `updateCacheItem`.
 - `getNewVsReturningPieChartData` was removed from `Mautic\PageBundle\Model\PageModel`. Use `getUniqueVsReturningPieChartData()` instead.
+- `Mautic\PageBundle\Helper\PointActionHelper::validateUrlHit` is no longer static.
 - Replaced the `tightenco/collect:^8.16.0` package with `illuminate/collections:^10.48`.
 - Form submissions now store data without HTML entity encoding instead of with encoded entities (e.g., `R&R` instead of `R&#x26;R`)
 - `FormFieldHelper::getTypes` signature has been changed

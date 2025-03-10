@@ -1,8 +1,8 @@
 <style type="text/css" scoped>
     :root {
-        --form-primary-60: #222F64;
-        --form-primary-70: hsl(228, 49%, 21%);
-        --form-primary-80: hsl(228, 49%, 16%);
+        --form-primary-60: #{{ getBrandPrimaryColor() }};
+        --form-primary-70: color-mix(in hsl, var(--form-primary-60), black 10%);
+        --form-primary-80: color-mix(in hsl, var(--form-primary-60), black 20%);
         --form-font-family: Arial, Helvetica, sans-serif;
 
         --form-field: #EBEBEB;
@@ -18,7 +18,7 @@
         --form-text-primary: #161616;
         --form-text-secondary: #525252;
         --form-text-placeholder: #a8a8a8;
-        --form-text-on-color: #ffffff;
+        --form-text-on-color: #{{ getTextOnBrandColor() }};
         --form-text-on-color-disabled: #8d8d8d;
         --form-text-helper: #6f6f6f;
         --form-text-error: #da1e28;
@@ -211,7 +211,7 @@
         content: "";
         width: 14px;
         height: 14px;
-        background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23FFFFFF%22%3E%3Cpath%20d%3D%22M9.9997%2015.1709L19.1921%205.97852L20.6063%207.39273L9.9997%2017.9993L3.63574%2011.6354L5.04996%2010.2212L9.9997%2015.1709Z%22/%3E%3C/svg%3E');
+        background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23{{ getTextOnBrandColor() }}%22%3E%3Cpath%20d%3D%22M9.9997%2015.1709L19.1921%205.97852L20.6063%207.39273L9.9997%2017.9993L3.63574%2011.6354L5.04996%2010.2212L9.9997%2015.1709Z%22/%3E%3C/svg%3E');
         position: absolute;
     }
 
@@ -277,6 +277,11 @@
         border-color: #dddddd;
         opacity: 0.75;
         cursor: not-allowed;
+    }
+
+    .mauticform-button-wrapper .mauticform-button.btn-ghost[disabled]:hover,
+    .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost[disabled]:hover {
+        color: var(--form-primary-60);
     }
 
     .mauticform-pagebreak-wrapper .mauticform-button-wrapper {

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -24,6 +26,8 @@ use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
@@ -307,11 +311,13 @@ CONTENT,
                     ['mailer_from_name', null, 'No Body'],
                 ]
             );
-        $mockFactory  = $this->createMock(MauticFactory::class); /** @phpstan-ignore-line MauticFactory is deprecated */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+            ->method('getReference');
+
         $mailer       = new Mailer(new BatchTransport());
         $requestStack = new RequestStack();
         $mailHelper   = new MailHelper(
-            $mockFactory,
             $mailer,
             $fromEmailHelper,
             $coreParametersHelper,
@@ -323,7 +329,12 @@ CONTENT,
             $themeHelper,
             $this->createMock(PathsHelper::class),
             $this->createMock(EventDispatcherInterface::class),
-            $requestStack
+            $requestStack,
+            $entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
         );
 
         $email = new Email();

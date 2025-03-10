@@ -114,7 +114,8 @@
     "symfony/serializer": "^6.4"
   },
   "conflict": {
-    "psr/simple-cache": ">=3.0.0"
+    "psr/simple-cache": ">=3.0.0",
+    "symfony/dependency-injection": ">=6.0.0 <6.4.19 || >=7.0.0 <7.2.4"
   },
   "repositories": [
     {

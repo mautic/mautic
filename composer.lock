@@ -6209,7 +6209,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "d00991e022f638832ba44cea555cf3cea3f3ccfe"
+                "reference": "c19d14c20eaa3db8ae0af2722dae4897e5abb99e"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6308,7 +6308,8 @@
                 "wikimedia/less.php": "^4.1"
             },
             "conflict": {
-                "psr/simple-cache": ">=3.0.0"
+                "psr/simple-cache": ">=3.0.0",
+                "symfony/dependency-injection": ">=6.0.0 <6.4.19 || >=7.0.0 <7.2.4"
             },
             "type": "mautic-core",
             "extra": {
@@ -9499,16 +9500,16 @@
         },
         {
             "name": "symfony/dependency-injection",
-            "version": "v6.4.16",
+            "version": "v6.4.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-                "reference": "7a379d8871f6a36f01559c14e11141cc02eb8dc8"
+                "reference": "b343c3b2f1539fe41331657b37d5c96c1d1ea842"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/7a379d8871f6a36f01559c14e11141cc02eb8dc8",
-                "reference": "7a379d8871f6a36f01559c14e11141cc02eb8dc8",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/b343c3b2f1539fe41331657b37d5c96c1d1ea842",
+                "reference": "b343c3b2f1539fe41331657b37d5c96c1d1ea842",
                 "shasum": ""
             },
             "require": {
@@ -9560,7 +9561,7 @@
             "description": "Allows you to standardize and centralize the way objects are constructed in your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dependency-injection/tree/v6.4.16"
+                "source": "https://github.com/symfony/dependency-injection/tree/v6.4.19"
             },
             "funding": [
                 {
@@ -9576,7 +9577,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-25T14:52:46+00:00"
+            "time": "2025-02-20T10:02:49+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",

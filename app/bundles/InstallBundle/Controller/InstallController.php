@@ -7,7 +7,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -30,7 +29,6 @@ class InstallController extends CommonController
         private Configurator $configurator,
         private InstallService $installer,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -40,7 +38,7 @@ class InstallController extends CommonController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

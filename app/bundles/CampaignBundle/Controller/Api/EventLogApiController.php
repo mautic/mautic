@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -60,7 +59,6 @@ class EventLogApiController extends FetchCommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory,
     ) {
         $campaignEventLogModel = $modelFactory->getModel('campaign.event_log');
         \assert($campaignEventLogModel instanceof EventLogModel);
@@ -78,7 +76,7 @@ class EventLogApiController extends FetchCommonApiController
         // Only include the id of the parent
         $this->addExclusionStrategy(new FieldInclusionStrategy(['id'], 1, 'parent'));
 
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
