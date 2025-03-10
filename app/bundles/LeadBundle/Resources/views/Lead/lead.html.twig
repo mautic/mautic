@@ -572,6 +572,9 @@
                     <h5 class="mt-xs mr-xs">
                         <span class="label {{ cycle(classes, key) }} has-click-event">
                             <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">
+                                {% if list.leads[0].manuallyAdded is defined and list.leads[0].manuallyAdded == false %}
+                                     <i class="ri-filter-2-line" data-toggle="tooltip" title="{{ 'mautic.core.filters'|trans }}"></i>
+                                {% endif %}
                                 {{ list.name|purify }}
                             </a>
                         </span>
