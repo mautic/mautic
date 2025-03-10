@@ -4,32 +4,56 @@ namespace Mautic\CoreBundle\Tests\Unit\Loader;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Dotenv\Dotenv;
 
 class ParameterLoaderTest extends TestCase
 {
-    public function testParametersAreLoaded(): void
+    protected function tearDown(): void
     {
-        $envParameters = json_encode(['default_daterange_filter' => '-1 day']);
-        putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
-
-        $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
-        $loader->loadIntoEnvironment();
-
-        $parameterBag = $loader->getParameterBag();
-
-        $this->assertEquals('https://language-packs.mautic.com/', $parameterBag->get('translations_fetch_url'));
-        $this->assertEquals('https://language-packs.mautic.com/', $_ENV['MAUTIC_TRANSLATIONS_FETCH_URL']);
-
-        $this->assertEquals('-1 day', $parameterBag->get('default_daterange_filter'));
-        $this->assertEquals('-1 day', $_ENV['MAUTIC_DEFAULT_DATERANGE_FILTER']);
+        parent::tearDown();
 
         putenv('MAUTIC_CONFIG_PARAMETERS=');
+        putenv('MAUTIC_TRANSLATIONS_FETCH_URL=');
+        putenv('MAUTIC_ALLOWED_EXTENSIONS=');
     }
 
     public function testDefaultParametersAreLoaded(): void
     {
         $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
-        $this->assertIsArray($loader->getDefaultParameters());
-        $this->assertFalse($loader->getDefaultParameters()['api_enabled']);
+        $this->assertEquals('smtp://localhost:25', $loader->getDefaultParameters()['mailer_dsn']);
+        $this->assertEquals('https://language-packs.mautic.com/', $loader->getDefaultParameters()['translations_fetch_url']);
+        $this->assertIsArray($loader->getDefaultParameters()['allowed_extensions']);
+    }
+
+    public function testParametersAreLoadedFromLocalConfig(): void
+    {
+        $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
+        $this->assertEquals('foobar.com', $loader->getParameterBag()->get('mailer_dsn'));
+        $this->assertEquals('', $loader->getParameterBag()->get('translations_fetch_url'));
+        $this->assertEquals('', $loader->getParameterBag()->get('allowed_extensions'));
+    }
+
+    public function testParametersAreLoadedFromDotEnvFile(): void
+    {
+        $dotEnv = new Dotenv();
+        $dotEnv->loadEnv(__DIR__.'/TestRoot/.env');
+
+        $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
+        $this->assertEquals('bar.com', $loader->getParameterBag()->get('mailer_dsn'));
+        $this->assertEquals('https://language-packs.bar.com/', $loader->getParameterBag()->get('translations_fetch_url'));
+        $this->assertEquals(['png'], $loader->getParameterBag()->get('allowed_extensions'));
+    }
+
+    public function testParametersAreLoadedFromSystemEnvironment(): void
+    {
+        $envParameters = json_encode(['mailer_dsn' => 'foo.com']);
+        putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
+        putenv('MAUTIC_TRANSLATIONS_FETCH_URL=https://language-packs.foo.com/');
+        putenv('MAUTIC_ALLOWED_EXTENSIONS=["jpg"]');
+
+        $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
+        $this->assertEquals('foo.com', $loader->getParameterBag()->get('mailer_dsn'));
+        $this->assertEquals('https://language-packs.foo.com/', $loader->getParameterBag()->get('translations_fetch_url'));
+        $this->assertEquals(['jpg'], $loader->getParameterBag()->get('allowed_extensions'));
     }
 }
