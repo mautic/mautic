@@ -4,6 +4,10 @@ namespace Mautic\CoreBundle\Loader\Parameters;
 
 class EnvVarParameters implements ParametersInterface
 {
+    /**
+     * @param array<mixed, mixed>  $compiledParameters
+     * @param array<string, mixed> $defaultParameters
+     */
     public static function load(array &$compiledParameters, array $defaultParameters): void
     {
         // Overrule parameters via environment variable
