@@ -6,45 +6,51 @@
     {{ 'mautic.campaign.campaign.import.title'|trans }}
 {% endblock %}
 
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+            'routeBase': 'campaign',
+            'templateButtons': {'close': true},
+            'routeVars': {
+                'close': {
+                    'object': app.request.get('object', 'campaigns'),
+                },
+            },
+    }) -}}
+{% endblock %}
+
 {% block content %}
-    {% set percent = progress.toPercent %}
-    {% set id = complete ? 'campaignImportProgressComplete' : 'campaignImportProgress' %}
-    {% set header = complete ? 'mautic.campaign.campaign.import.success' : 'mautic.campaign.campaign.import.donotleave' %}
+    {% set hasErrors = importSummary.errors is not empty %}
+    {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}
+    {% set header = hasErrors ? 'mautic.campaign.campaign.import.error' : 'mautic.campaign.campaign.import.success' %}
 
     <div class="row ma-lg" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6 text-center">
-            <div class="panel panel-{% if complete %}success{% else %}info{% endif %}">
+            <div class="panel panel-{% if hasErrors %}danger{% else %}success{% endif %}">
                 <div class="panel-heading">
                     <h4 class="panel-title">{{ header|trans }}</h4>
                 </div>
                 <div class="panel-body">
-                    {% if not complete %}
-                        <h4>{{ 'mautic.campaign.campaign.import.inprogress'|trans }}</h4>
-                    {% endif %}
-
-                    <div class="progress mt-md" style="height: 50px;">
-                        <div class="progress-bar progress-bar-striped {% if not complete %}active{% endif %}"
-                             role="progressbar"
-                             aria-valuenow="{{ progress.done }}"
-                             aria-valuemin="0"
-                             aria-valuemax="{{ progress.total }}"
-                             style="width: {{ percent }}%; height: 50px;">
-                            <span class="sr-only">{{ percent }}%</span>
-                        </div>
-                    </div>
-
-                    <p class="small">
-                        {{ 'mautic.campaign.campaign.import.stats'|trans }}: <span class="imported-count">{{ progress.done }}</span> /
-                        <span class="total-count">{{ progress.total }}</span>
-                    </p>
-                </div>
-
-                <div class="panel-footer">
-                    {% if not complete %}
-                        <div>
-                            <button class="btn btn-danger" id="cancel-import">
-                                <i class="fa fa-times"></i> {{ 'mautic.core.form.cancel'|trans }}
-                            </button>
+                    {% if hasErrors %}
+                        <h4>{{ 'mautic.campaign.campaign.import.failed'|trans }}</h4>
+                        <ul class="text-danger">
+                            {% for error in importSummary.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <h4>{{ 'mautic.campaign.campaign.notice.import.finished'|trans }}</h4>
+                        <div class="pa-lg">
+                            <ul class="list-unstyled text-left import-summary">
+                                <li><i class="fa fa-bullhorn"></i> <strong>{{ importSummary.summary.campaign }}</strong> Campaign(s)</li>
+                                <li><i class="fa fa-list-alt"></i> <strong>{{ importSummary.summary.forms }}</strong> Form(s)</li>
+                                <li><i class="fa fa-users"></i> <strong>{{ importSummary.summary.lists }}</strong> List(s)</li>
+                                <li><i class="fa fa-file"></i> <strong>{{ importSummary.summary.asset }}</strong> Asset(s)</li>
+                                <li><i class="fa fa-globe"></i> <strong>{{ importSummary.summary.page }}</strong> Page(s)</li>
+                                <li><i class="fa fa-random"></i> <strong>{{ importSummary.summary.dynamicContent }}</strong> Dynamic Content(s)</li>
+                                <li><i class="fa fa-star"></i> <strong>{{ importSummary.summary.pointGroup }}</strong> Point Group(s)</li>
+                                <li><i class="fa fa-envelope"></i> <strong>{{ importSummary.summary.email }}</strong> Email(s)</li>
+                                <li><i class="fa fa-tasks"></i> <strong>{{ importSummary.summary.campaign_event }}</strong> Campaign Event(s)</li>
+                            </ul>
                         </div>
                     {% endif %}
                 </div>

@@ -11,10 +11,12 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
@@ -31,6 +33,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         private EntityManagerInterface $entityManager,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -44,58 +48,67 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
     public function onCampaignExport(EntityExportEvent $event): void
     {
-        try {
-            if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
-                return;
-            }
-
-            $campaignId   = $event->getEntityId();
-            $campaignData = $this->fetchCampaignData($campaignId);
-
-            if (!$campaignData) {
-                $this->logger->warning("Campaign data not found for ID: $campaignId");
-
-                return;
-            }
-
-            $event->addEntity(Campaign::ENTITY_NAME, $campaignData);
-
-            $campaignEvent = new EntityExportEvent('campaign_event', $campaignId);
-            $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
-            $event->addEntities($campaignEvent->getEntities());
-            $event->addDependencies($campaignEvent->getDependencies());
-
-            $this->exportRelatedEntities($event, $campaignId);
-            $event->addEntity('dependencies', $event->getDependencies());
-        } catch (\Exception $e) {
-            $this->logger->error('Error during campaign export: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
+        if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
+            return;
         }
+
+        $campaignId   = $event->getEntityId();
+        $campaignData = $this->fetchCampaignData($campaignId);
+
+        if (!$campaignData) {
+            $this->logger->warning("Campaign data not found for ID: $campaignId");
+
+            return;
+        }
+
+        $event->addEntity(Campaign::ENTITY_NAME, $campaignData);
+        $log = [
+            'bundle'    => 'campaign',
+            'object'    => 'campaign',
+            'objectId'  => $campaignId,
+            'action'    => 'export',
+            'details'   => $campaignData,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
+
+        $campaignEvent = new EntityExportEvent('campaign_event', $campaignId);
+        $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
+        $event->addEntities($campaignEvent->getEntities());
+        $event->addDependencies($campaignEvent->getDependencies());
+
+        $this->exportRelatedEntities($event, $campaignId);
+        $event->addEntity('dependencies', $event->getDependencies());
     }
 
     public function onCampaignImport(EntityImportEvent $event): void
     {
-        try {
-            if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
-                return;
-            }
+        $importSummary = []; // Dynamic tracking of imported entities
+        $errors        = [];
 
-            $userId   = $event->getUserId();
-            $userName = $this->getUserName($userId);
-
-            $entityData = $event->getEntityData();
-            if (!$entityData) {
-                $this->logger->warning('No entity data provided for import.');
-
-                return;
-            }
-
-            $this->importCampaigns($event, $entityData, $userName);
-            $this->importDependentEntities($event, $entityData, $userId);
-        } catch (\Exception $e) {
-            $this->logger->error('Error during campaign import: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
+        if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
+            return;
         }
+
+        $userId   = $event->getUserId();
+        $userName = $this->getUserName($userId);
+
+        $entityData = $event->getEntityData();
+        if (!$entityData) {
+            $this->logger->warning('No entity data provided for import.');
+            $event->setArgument('import_status', ['error' => 'No entity data provided.']);
+
+            return;
+        }
+
+        $this->importCampaigns($event, $entityData, $userName, $importSummary, $errors);
+        $this->importDependentEntities($event, $entityData, $userId, $importSummary, $errors);
+
+        $event->setArgument('import_status', [
+            'summary' => $importSummary,
+            'errors'  => $errors,
+        ]);
+        // $event->setArgument('import_status', ['error' => $e->getMessage()]);
     }
 
     /**
@@ -103,43 +116,33 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      */
     private function fetchCampaignData(int $campaignId): array
     {
-        try {
-            $campaign = $this->campaignModel->getEntity($campaignId);
-            if (!$campaign) {
-                $this->logger->warning("Campaign not found for ID: $campaignId");
+        $campaign = $this->campaignModel->getEntity($campaignId);
+        if (!$campaign) {
+            $this->logger->warning("Campaign not found for ID: $campaignId");
 
-                return [];
-            }
-
-            return [
-                'id'              => $campaign->getId(),
-                'name'            => $campaign->getName(),
-                'description'     => $campaign->getDescription(),
-                'is_published'    => $campaign->getIsPublished(),
-                'canvas_settings' => $campaign->getCanvasSettings(),
-            ];
-        } catch (\Exception $e) {
-            $this->logger->error('Error fetching campaign data: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
+            return [];
         }
+
+        return [
+            'id'              => $campaign->getId(),
+            'name'            => $campaign->getName(),
+            'description'     => $campaign->getDescription(),
+            'is_published'    => $campaign->getIsPublished(),
+            'canvas_settings' => $campaign->getCanvasSettings(),
+        ];
     }
 
     private function exportRelatedEntities(EntityExportEvent $event, int $campaignId): void
     {
-        try {
-            $campaignSources = $this->campaignModel->getLeadSources($campaignId);
+        $campaignSources = $this->campaignModel->getLeadSources($campaignId);
 
-            foreach ($campaignSources as $entityName => $entities) {
-                foreach ($entities as $entityId => $entityLabel) {
-                    $this->dispatchAndAddEntity($event, $entityName, (int) $entityId, [
-                        Campaign::ENTITY_NAME => $campaignId,
-                        $entityName           => (int) $entityId,
-                    ]);
-                }
+        foreach ($campaignSources as $entityName => $entities) {
+            foreach ($entities as $entityId => $entityLabel) {
+                $this->dispatchAndAddEntity($event, $entityName, (int) $entityId, [
+                    Campaign::ENTITY_NAME => $campaignId,
+                    $entityName           => (int) $entityId,
+                ]);
             }
-        } catch (\Exception $e) {
-            $this->logger->error('Error exporting related entities: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
         }
     }
 
@@ -148,117 +151,125 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      */
     private function dispatchAndAddEntity(EntityExportEvent $event, string $type, int $entityId, array $dependency): void
     {
-        try {
-            $entityEvent = new EntityExportEvent($type, $entityId);
-            $entityEvent = $this->dispatcher->dispatch($entityEvent);
+        $entityEvent = new EntityExportEvent($type, $entityId);
+        $entityEvent = $this->dispatcher->dispatch($entityEvent);
 
-            $eventData = $event->getEntities();
+        $eventData = $event->getEntities();
+        $event->addDependencies($entityEvent->getDependencies());
 
-            foreach ($entityEvent->getEntities() as $key => $values) {
-                if (!isset($eventData[$key])) {
-                    $event->addEntities($entityEvent->getEntities());
-                } else {
-                    $existingIds = array_column($values, 'id');
+        foreach ($entityEvent->getEntities() as $key => $values) {
+            if (!isset($eventData[$key])) {
+                $event->addEntities($entityEvent->getEntities());
+            } else {
+                $existingIds = array_column($values, 'id');
 
-                    foreach ($eventData[$key] as $dataValue) {
-                        if (!in_array($dataValue['id'], $existingIds)) {
-                            $values[] = $dataValue;
-                        }
+                foreach ($eventData[$key] as $dataValue) {
+                    if (!in_array($dataValue['id'], $existingIds)) {
+                        $values[] = $dataValue;
                     }
-
-                    $event->addEntities([$key => $values]);
                 }
+
+                $event->addEntities([$key => $values]);
             }
-            $event->addDependencyEntity($type, $dependency);
-        } catch (\Exception $e) {
-            $this->logger->error('Error dispatching and adding entity: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
         }
+        $event->addDependencyEntity($type, $dependency);
     }
 
     /**
+     * Import Campaigns and track progress.
+     *
      * @param array<string, array<string, mixed>> $entityData
+     * @param array<string, int>                  &$importSummary
+     * @param array<string>                       &$errors
      */
-    private function importCampaigns(EntityImportEvent $event, array $entityData, string $user): void
+    private function importCampaigns(EntityImportEvent $event, array $entityData, string $user, array &$importSummary, array &$errors): void
     {
-        try {
-            foreach ($entityData[Campaign::ENTITY_NAME] as $campaignData) {
-                $campaign = new Campaign();
-                $campaign->setName($campaignData['name']);
-                $campaign->setDescription($campaignData['description'] ?? '');
-                $campaign->setIsPublished($campaignData['is_published'] ?? false);
-                $campaign->setCanvasSettings($campaignData['canvas_settings'] ?? '');
-                $campaign->setDateAdded(new \DateTime());
-                $campaign->setDateModified(new \DateTime());
-                $campaign->setCreatedByUser($user);
+        foreach ($entityData[Campaign::ENTITY_NAME] as $campaignData) {
+            $campaign = new Campaign();
+            $campaign->setName($campaignData['name']);
+            $campaign->setDescription($campaignData['description'] ?? '');
+            $campaign->setIsPublished(false);
+            $campaign->setCanvasSettings($campaignData['canvas_settings'] ?? '');
+            $campaign->setDateAdded(new \DateTime());
+            $campaign->setDateModified(new \DateTime());
+            $campaign->setCreatedByUser($user);
 
-                $this->entityManager->persist($campaign);
-                $this->entityManager->flush();
+            $this->entityManager->persist($campaign);
+            $this->entityManager->flush();
 
-                $event->addEntityIdMap($campaignData['id'], $campaign->getId());
-                $this->logger->info('Imported campaign: '.$campaign->getName().' with ID: '.$campaign->getId());
-            }
-        } catch (\Exception $e) {
-            $this->logger->error('Error importing campaigns: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
+            $event->addEntityIdMap($campaignData['id'], $campaign->getId());
+
+            // Update import summary dynamically
+            $importSummary[Campaign::ENTITY_NAME] = ($importSummary[Campaign::ENTITY_NAME] ?? 0) + 1;
+
+            $log = [
+                'bundle'    => 'campaign',
+                'object'    => 'campaign',
+                'objectId'  => $campaign->getId(),
+                'action'    => 'import',
+                'details'   => $campaignData,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
     /**
+     * Import Dependent Entities Dynamically and Track Progress.
+     *
      * @param array<string, mixed> $entityData
+     * @param array<string, int>   &$importSummary
+     * @param array<string>        &$errors
      */
-    private function importDependentEntities(EntityImportEvent $event, array $entityData, ?int $userId): void
+    private function importDependentEntities(EntityImportEvent $event, array $entityData, ?int $userId, array &$importSummary, array &$errors): void
     {
-        try {
-            $this->updateDependencies($entityData['dependencies'], $event->getEntityIdMap(), Campaign::ENTITY_NAME);
+        $this->updateDependencies($entityData['dependencies'], $event->getEntityIdMap(), Campaign::ENTITY_NAME);
 
-            $dependentEntities = [
-                Form::ENTITY_NAME,
-                LeadList::ENTITY_NAME,
-                Asset::ENTITY_NAME,
-                Page::ENTITY_NAME,
-                DynamicContent::ENTITY_NAME,
-                Group::ENTITY_NAME,
-            ];
+        $dependentEntities = [
+            Form::ENTITY_NAME,
+            LeadList::ENTITY_NAME,
+            Asset::ENTITY_NAME,
+            Page::ENTITY_NAME,
+            DynamicContent::ENTITY_NAME,
+            Group::ENTITY_NAME,
+            LeadField::ENTITY_NAME,
+        ];
 
-            foreach ($dependentEntities as $entity) {
-                if (!isset($entityData[$entity])) {
-                    continue;
-                }
-                $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
-                $subEvent = $this->dispatcher->dispatch($subEvent);
-                $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
-
-                $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
+        foreach ($dependentEntities as $entity) {
+            if (!isset($entityData[$entity])) {
+                continue;
             }
+            $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
+            $subEvent = $this->dispatcher->dispatch($subEvent);
+            $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
+            $importSummary[$entity] = ($importSummary[$entity] ?? 0) + count($entityData[$entity]);
 
-            if (isset($entityData[Email::ENTITY_NAME])) {
-                $this->updateEmails($entityData, $entityData['dependencies']);
-
-                $emailEvent = new EntityImportEvent(Email::ENTITY_NAME, $entityData[Email::ENTITY_NAME], $userId);
-                $emailEvent = $this->dispatcher->dispatch($emailEvent);
-                $this->logger->info('Imported dependent entity: '.Email::ENTITY_NAME, ['entityIdMap' => $emailEvent->getEntityIdMap()]);
-
-                $this->updateDependencies($entityData['dependencies'], $emailEvent->getEntityIdMap(), Email::ENTITY_NAME);
-            }
-
-            $this->processDependencies($entityData['dependencies']);
-
-            if (isset($entityData[Event::ENTITY_NAME])) {
-                $this->updateEvents($entityData, $entityData['dependencies']);
-                print_r($entityData[Event::ENTITY_NAME]);
-
-                $campaignEvent = new EntityImportEvent(Event::ENTITY_NAME, $entityData[Event::ENTITY_NAME], $userId);
-                $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
-
-                $this->updateCampaignCanvasSettings($entityData, $campaignEvent->getEntityIdMap(), $event->getEntityIdMap());
-            }
-
-            $this->logger->info('Final entity ID map after import: ', ['entityIdMap' => $event->getEntityIdMap()]);
-        } catch (\Exception $e) {
-            $this->logger->error('Error importing dependent entities: '.$e->getMessage(), ['exception' => $e]);
-            throw $e;
+            $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
         }
+
+        if (isset($entityData[Email::ENTITY_NAME])) {
+            $this->updateEmails($entityData, $entityData['dependencies']);
+
+            $emailEvent = new EntityImportEvent(Email::ENTITY_NAME, $entityData[Email::ENTITY_NAME], $userId);
+            $emailEvent = $this->dispatcher->dispatch($emailEvent);
+            $this->logger->info('Imported dependent entity: '.Email::ENTITY_NAME, ['entityIdMap' => $emailEvent->getEntityIdMap()]);
+            $importSummary[Email::ENTITY_NAME] = ($importSummary[Email::ENTITY_NAME] ?? 0) + count($entityData[Email::ENTITY_NAME]);
+
+            $this->updateDependencies($entityData['dependencies'], $emailEvent->getEntityIdMap(), Email::ENTITY_NAME);
+        }
+
+        $this->processDependencies($entityData['dependencies']);
+        if (isset($entityData[Event::ENTITY_NAME])) {
+            $this->updateEvents($entityData, $entityData['dependencies']);
+
+            $campaignEvent                     = new EntityImportEvent(Event::ENTITY_NAME, $entityData[Event::ENTITY_NAME], $userId);
+            $campaignEvent                     = $this->dispatcher->dispatch($campaignEvent);
+            $importSummary[Event::ENTITY_NAME] = ($importSummary[Event::ENTITY_NAME] ?? 0) + count($entityData[Event::ENTITY_NAME]);
+
+            $this->updateCampaignCanvasSettings($entityData, $campaignEvent->getEntityIdMap(), $event->getEntityIdMap());
+        }
+
+        $this->logger->info('Final entity ID map after import: ', ['entityIdMap' => $event->getEntityIdMap()]);
     }
 
     private function getUserName(?int $userId): string
@@ -388,12 +399,20 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             foreach ($dependencyGroup as $key => $items) {
                 if (Form::ENTITY_NAME === $key) {
                     foreach ($items as &$dependency) {
-                        $this->insertCampaignFormXref($dependency[Campaign::ENTITY_NAME], $dependency[Form::ENTITY_NAME]);
+                        if (isset($dependency[Campaign::ENTITY_NAME])) {
+                            $this->insertCampaignFormXref($dependency[Campaign::ENTITY_NAME], $dependency[Form::ENTITY_NAME]);
+                        } else {
+                            // print_r($dependency[LeadField::ENTITY_NAME]);
+                        }
                     }
                 }
                 if (LeadList::ENTITY_NAME === $key) {
                     foreach ($items as &$dependency) {
-                        $this->insertCampaignSegmentXref($dependency[Campaign::ENTITY_NAME], $dependency[LeadList::ENTITY_NAME]);
+                        if (isset($dependency[Campaign::ENTITY_NAME])) {
+                            $this->insertCampaignSegmentXref($dependency[Campaign::ENTITY_NAME], $dependency[LeadList::ENTITY_NAME]);
+                        } else {
+                            // print_r($dependency[LeadField::ENTITY_NAME]);
+                        }
                     }
                 }
             }
@@ -402,30 +421,22 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
     private function insertCampaignFormXref(int $campaignId, int $formId): void
     {
-        try {
-            $this->entityManager->getConnection()->insert('campaign_form_xref', [
-                'campaign_id' => $campaignId,
-                'form_id'     => $formId,
-            ]);
+        $this->entityManager->getConnection()->insert('campaign_form_xref', [
+            'campaign_id' => $campaignId,
+            'form_id'     => $formId,
+        ]);
 
-            $this->logger->info("Inserted campaign_form_xref: campaign_id={$campaignId}, form_id={$formId}");
-        } catch (\Exception $e) {
-            $this->logger->error('Failed to insert into campaign_form_xref: '.$e->getMessage());
-        }
+        $this->logger->info("Inserted campaign_form_xref: campaign_id={$campaignId}, form_id={$formId}");
     }
 
     private function insertCampaignSegmentXref(int $campaignId, int $segmentId): void
     {
-        try {
-            $this->entityManager->getConnection()->insert('campaign_leadlist_xref', [
-                'campaign_id' => $campaignId,
-                'leadlist_id' => $segmentId,
-            ]);
+        $this->entityManager->getConnection()->insert('campaign_leadlist_xref', [
+            'campaign_id' => $campaignId,
+            'leadlist_id' => $segmentId,
+        ]);
 
-            $this->logger->info("Inserted campaign_leadlist_xref: campaign_id={$campaignId}, leadlist_id={$segmentId}");
-        } catch (\Exception $e) {
-            $this->logger->error('Failed to insert into campaign_leadlist_xref: '.$e->getMessage());
-        }
+        $this->logger->info("Inserted campaign_leadlist_xref: campaign_id={$campaignId}, leadlist_id={$segmentId}");
     }
 
     /**
@@ -490,7 +501,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         if (!empty($event['channel']) && isset($eventDependency[$event['channel']])) {
             $channelKey = $event['channel'];
-            $channelId = $eventDependency[$channelKey];
+            $channelId  = $eventDependency[$channelKey];
 
             $event['channel_id'] = $channelId;
             $this->updateChannelProperties($event, $channelKey, $channelId);
@@ -503,17 +514,15 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      * Correctly updates channel properties, considering both array and non-array values.
      *
      * @param array<string, mixed> $event
-     * @param string $channelKey
-     * @param int $channelId
      */
     private function updateChannelProperties(array &$event, string $channelKey, int $channelId): void
     {
         // Define the possible locations where the channel ID may be stored
         $propertyPaths = [
-            "properties.$channelKey",              
-            "properties.{$channelKey}s",            
-            "properties.properties.$channelKey",    
-            "properties.properties.{$channelKey}s", 
+            "properties.$channelKey",
+            "properties.{$channelKey}s",
+            "properties.properties.$channelKey",
+            "properties.properties.{$channelKey}s",
         ];
 
         foreach ($propertyPaths as $path) {
@@ -537,8 +546,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      */
     private function processNonChannelEvent(array &$event, array $eventDependency): void
     {
-        $eventType = $event['type'] ?? null;
-        $properties = $event['properties'] ?? [];
+        $eventType  = $event['type'] ?? null;
+        // $properties = $event['properties'] ?? [];
 
         switch ($eventType) {
             case 'lead.pageHit':
@@ -565,9 +574,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      * Update a single property if it exists and is a valid reference.
      *
      * @param array<string, mixed> $event
-     * @param string $propertyPath
      * @param array<string, mixed> $eventDependency
-     * @param string $entityName
      */
     private function updateProperty(array &$event, string $propertyPath, array $eventDependency, string $entityName): void
     {
@@ -581,9 +588,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      * Update an array property if it exists and contains valid references.
      *
      * @param array<string, mixed> $event
-     * @param string $propertyPath
      * @param array<string, mixed> $eventDependency
-     * @param string $entityName
      */
     private function updateArrayProperty(array &$event, string $propertyPath, array $eventDependency, string $entityName): void
     {
@@ -602,8 +607,6 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      * Retrieve a nested array value using dot notation.
      *
      * @param array<string, mixed> $array
-     * @param string $path
-     * @return mixed
      */
     private function getNestedValue(array &$array, string $path): mixed
     {
@@ -624,8 +627,6 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
      * Set a nested array value using dot notation.
      *
      * @param array<string, mixed> &$array
-     * @param string $path
-     * @param mixed $value
      */
     private function setNestedValue(array &$array, string $path, mixed $value): void
     {

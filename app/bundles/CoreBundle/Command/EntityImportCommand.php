@@ -75,6 +75,9 @@ final class EntityImportCommand extends ModeratedCommand
 
         $this->dispatcher->dispatch($event);
 
+        // $importSummary = $event->getArgument('import_status') ?? ['error' => 'Unknown status'];
+
+        // print_r($importSummary);
         $output->writeln('<info>Campaign data imported successfully.</info>');
 
         return self::SUCCESS;
