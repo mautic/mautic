@@ -7,11 +7,14 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentImportExportSubscriber implements EventSubscriberInterface
@@ -20,7 +23,10 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         private ListModel $leadListModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
-        private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private EventDispatcherInterface $dispatcher,
+        private FieldModel $fieldModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -54,7 +60,58 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             'is_global'            => $leadList->getIsGlobal(),
             'is_preference_center' => $leadList->getIsPreferenceCenter(),
         ];
+        $customFields   = $this->fieldModel->getLeadFieldCustomFields();
+        $filters        = $leadList->getFilters();
+        $data           = [];
+
+        foreach ($filters as $filter) {
+            if (isset($filter['object']) && in_array($filter['object'], ['lead', 'company'], true)) {
+                foreach ($customFields as $field) {
+                    if (isset($filter['field']) && $filter['field'] === $field->getAlias()) {
+                        $subEvent = new EntityExportEvent(LeadField::ENTITY_NAME, (int) $field->getId());
+                        $this->dispatcher->dispatch($subEvent);
+                        $this->mergeExportData($data, $subEvent);
+
+                        $event->addDependencyEntity(LeadList::ENTITY_NAME, [
+                            LeadList::ENTITY_NAME   => (int) $leadListId,
+                            LeadField::ENTITY_NAME  => (int) $field->getId(),
+                        ]);
+                    }
+                }
+            }
+        }
+        foreach ($data as $entityName => $entities) {
+            $event->addEntities([$entityName => $entities]);
+        }
         $event->addEntity(LeadList::ENTITY_NAME, $segmentData);
+        $log = [
+            'bundle'    => 'lead',
+            'object'    => 'segment',
+            'objectId'  => $leadListId,
+            'action'    => 'export',
+            'details'   => $segmentData,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Merge exported data avoiding duplicate entries.
+     *
+     * @param array<string, array> $data
+     */
+    private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
+    {
+        foreach ($subEvent->getEntities() as $key => $values) {
+            if (!isset($data[$key])) {
+                $data[$key] = $values;
+            } else {
+                $existingIds = array_column($data[$key], 'id');
+                $data[$key]  = array_merge($data[$key], array_filter($values, function ($value) use ($existingIds) {
+                    return !in_array($value['id'], $existingIds);
+                }));
+            }
+        }
     }
 
     public function onSegmentImport(EntityImportEvent $event): void
@@ -63,7 +120,6 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $output    = new ConsoleOutput();
         $elements  = $event->getEntityData();
         $userId    = $event->getUserId();
         $userName  = '';
@@ -72,8 +128,6 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             $user   = $this->userModel->getEntity($userId);
             if ($user) {
                 $userName = $user->getFirstName().' '.$user->getLastName();
-            } else {
-                $output->writeln('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
             }
         }
 
@@ -99,7 +153,15 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            $output->writeln('<info>Imported segment: '.$object->getName().' with ID: '.$object->getId().'</info>');
+            $log = [
+                'bundle'    => 'lead',
+                'object'    => 'segment',
+                'objectId'  => $object->getId(),
+                'action'    => 'import',
+                'details'   => $element,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 }

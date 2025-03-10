@@ -7,11 +7,11 @@ namespace Mautic\DynamicContentBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\UserBundle\Model\UserModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DynamicContentImportExportSubscriber implements EventSubscriberInterface
@@ -20,7 +20,8 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         private DynamicContentModel $dynamicContentModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
-        private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -43,7 +44,7 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             return;
         }
 
-        $event->addEntity(DynamicContent::ENTITY_NAME, [
+        $data = [
             'id'                     => $object->getId(),
             'translation_parent_id'  => $object->getTranslationParent(),
             'variant_parent_id'      => $object->getVariantParent(),
@@ -60,7 +61,18 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             'filters'                => $object->getFilters(),
             'is_campaign_based'      => $object->getIsCampaignBased(),
             'slot_name'              => $object->getSlotName(),
-        ]);
+        ];
+        $event->addEntity(DynamicContent::ENTITY_NAME, $data);
+
+        $log = [
+            'bundle'    => 'dynamicContent',
+            'object'    => 'dynamicContent',
+            'objectId'  => $object->getId(),
+            'action'    => 'export',
+            'details'   => $data,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
     }
 
     public function onImport(EntityImportEvent $event): void
@@ -69,15 +81,20 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             return;
         }
 
-        $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
         if (!$elements) {
             return;
         }
 
         $userId   = $event->getUserId();
-        $userName = $this->getUserName($userId, $output);
+        $userName = '';
 
+        if ($userId) {
+            $user = $this->userModel->getEntity($userId);
+            if ($user) {
+                $userName = $user->getFirstName().' '.$user->getLastName();
+            }
+        }
         foreach ($elements as $element) {
             $object = new DynamicContent();
             $object->setTranslationParent($element['translation_parent_id'] ?? null);
@@ -105,23 +122,15 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            $output->writeln("<info>Imported dynamic content: {$object->getName()} with ID: {$object->getId()}</info>");
+            $log = [
+                'bundle'    => 'dynamicContent',
+                'object'    => 'dynamicContent',
+                'objectId'  => $object->getId(),
+                'action'    => 'import',
+                'details'   => $element,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
-    }
-
-    private function getUserName(?int $userId, ConsoleOutput $output): string
-    {
-        if (!$userId) {
-            return '';
-        }
-
-        $user = $this->userModel->getEntity($userId);
-        if (!$user) {
-            $output->writeln("User ID $userId not found. Campaigns will not have a created_by_user field set.");
-
-            return '';
-        }
-
-        return $user->getFirstName().' '.$user->getLastName();
     }
 }

@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
@@ -102,8 +101,8 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
      */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
-        $channel   = $campaignEvent->getChannel();
-        $channelId = $campaignEvent->getChannelId();
+        $channel      = $campaignEvent->getChannel();
+        $channelId    = $campaignEvent->getChannelId();
         $dependencies = [
             Campaign::ENTITY_NAME => (int) $campaignEvent->getCampaign()->getId(),
             Event::ENTITY_NAME    => (int) $campaignEvent->getId(),
@@ -111,7 +110,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
         if ($channel && $channelId) {
             $dependencies[$channel] = (int) $channelId;
-            $subEvent = new EntityExportEvent($channel, $channelId);
+            $subEvent               = new EntityExportEvent($channel, $channelId);
             $this->dispatcher->dispatch($subEvent);
             $event->addDependencies($subEvent->getDependencies());
             $this->mergeExportData($data, $subEvent);

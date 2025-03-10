@@ -7,11 +7,14 @@ namespace Mautic\FormBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Model\UserModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormImportExportSubscriber implements EventSubscriberInterface
@@ -20,7 +23,10 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         private EntityManagerInterface $entityManager,
         private FormModel $formModel,
         private UserModel $userModel,
-        private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private FieldModel $fieldModel,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -57,14 +63,14 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
         $formFields = $queryBuilder
-            ->select('field.label, field.alias, field.type, field.is_required, field.properties')
+            ->select('field.id, field.label, field.show_label, field.alias, field.type, field.is_custom, field.custom_parameters, field.default_value, field.is_required, field.validation_message, field.help_message, field.field_order, field.properties, field.validation, field.parent_id, field.conditions, field.label_attr, field.input_attr, field.container_attr, field.lead_field, field.save_result, field.is_auto_fill, field.is_read_only, field.show_when_value_exists, field.show_after_x_submissions, field.always_display, field.mapped_object, field.mapped_field')
             ->from('form_fields', 'field')
             ->where('field.form_id = :formId')
             ->setParameter('formId', $formId, \Doctrine\DBAL\ParameterType::INTEGER)
             ->executeQuery()
             ->fetchAllAssociative();
 
-        $data = [
+        $formData = [
             'id'                   => $formId,
             'name'                 => $form->getName(),
             'is_published'         => $form->isPublished(),
@@ -81,8 +87,58 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             'form_actions'         => $formActions,
             'form_fields'          => $formFields,
         ];
+        $customFields   = $this->fieldModel->getLeadFieldCustomFields();
+        $data           = [];
 
-        $event->addEntity(Form::ENTITY_NAME, $data);
+        foreach ($formFields as $formField) {
+            if (isset($formField['mapped_object']) && in_array($formField['mapped_object'], ['contact', 'company'], true)) {
+                foreach ($customFields as $field) {
+                    if (isset($formField['mapped_field']) && $formField['mapped_field'] === $field->getAlias()) {
+                        $subEvent = new EntityExportEvent(LeadField::ENTITY_NAME, (int) $field->getId());
+                        $this->dispatcher->dispatch($subEvent);
+                        $this->mergeExportData($data, $subEvent);
+
+                        $event->addDependencyEntity(Form::ENTITY_NAME, [
+                            Form::ENTITY_NAME       => (int) $formId,
+                            LeadField::ENTITY_NAME  => (int) $field->getId(),
+                        ]);
+                    }
+                }
+            }
+        }
+        foreach ($data as $entityName => $entities) {
+            $event->addEntities([$entityName => $entities]);
+        }
+
+        $event->addEntity(Form::ENTITY_NAME, $formData);
+        $log = [
+            'bundle'    => 'form',
+            'object'    => 'form',
+            'objectId'  => $formId,
+            'action'    => 'export',
+            'details'   => $formData,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Merge exported data avoiding duplicate entries.
+     *
+     * @param array<string, array> $data
+     */
+    private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
+    {
+        foreach ($subEvent->getEntities() as $key => $values) {
+            if (!isset($data[$key])) {
+                $data[$key] = $values;
+            } else {
+                $existingIds = array_column($data[$key], 'id');
+                $data[$key]  = array_merge($data[$key], array_filter($values, function ($value) use ($existingIds) {
+                    return !in_array($value['id'], $existingIds);
+                }));
+            }
+        }
     }
 
     public function onFormImport(EntityImportEvent $event): void
@@ -91,7 +147,6 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $output   = new ConsoleOutput();
         $forms    = $event->getEntityData();
         $userId   = $event->getUserId();
         $userName = '';
@@ -100,8 +155,6 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $user   = $this->userModel->getEntity($userId);
             if ($user) {
                 $userName = $user->getFirstName().' '.$user->getLastName();
-            } else {
-                $output->writeln('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
             }
         }
 
@@ -139,9 +192,20 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                     $action->setDescription($actionData['description'] ?? '');
                     $action->setType($actionData['type']);
                     $action->setOrder($actionData['action_order'] ?? 0);
-                    $action->setProperties($actionData['properties'] ?? []);
+                    $action->setProperties($actionData['properties']);
 
                     $this->entityManager->persist($action);
+                    $this->entityManager->flush();
+
+                    $log = [
+                        'bundle'    => 'form',
+                        'object'    => 'formAction',
+                        'objectId'  => $action->getId(),
+                        'action'    => 'import',
+                        'details'   => $actionData,
+                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                    ];
+                    $this->auditLogModel->writeToLog($log);
                 }
             }
 
@@ -150,20 +214,58 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                 foreach ($formData['form_fields'] as $fieldData) {
                     $field = new \Mautic\FormBundle\Entity\Field();
                     $field->setForm($form);
-                    $field->setLabel($fieldData['label']);
-                    $field->setAlias($fieldData['alias']);
-                    $field->setType($fieldData['type']);
-                    $field->setIsRequired((bool) $fieldData['is_required']);
-                    $field->setProperties($fieldData['properties'] ?? []);
+                    $field->setLabel($fieldData['label'] ?? '');
+                    $field->setShowLabel((bool) $fieldData['show_label'] ?? true);
+                    $field->setAlias($fieldData['alias'] ?? '');
+                    $field->setType($fieldData['type'] ?? '');
+                    $field->setIsCustom((bool) $fieldData['is_custom'] ?? false);
+                    $field->setCustomParameters($fieldData['custom_parameters']);
+                    $field->setDefaultValue($fieldData['default_value'] ?? '');
+                    $field->setIsRequired((bool) $fieldData['is_required'] ?? false);
+                    $field->setValidationMessage($fieldData['validation_message'] ?? '');
+                    $field->setHelpMessage($fieldData['help_message'] ?? '');
+                    $field->setOrder($fieldData['field_order'] ?? 0);
+                    $field->setProperties($fieldData['properties']);
+                    $field->setValidation($fieldData['validation']);
+                    $field->setConditions($fieldData['conditions']);
+                    $field->setLabelAttributes($fieldData['label_attr']);
+                    $field->setInputAttributes($fieldData['input_attr']);
+                    $field->setContainerAttributes($fieldData['container_attr']);
+                    // $field->setLeadField($fieldData['lead_field'] ?? '');
+                    $field->setSaveResult((bool) $fieldData['save_result'] ?? false);
+                    $field->setIsAutoFill((bool) $fieldData['is_auto_fill'] ?? false);
+                    $field->setIsReadOnly((bool) $fieldData['is_read_only'] ?? false);
+                    $field->setShowWhenValueExists((bool) $fieldData['show_when_value_exists'] ?? false);
+                    $field->setShowAfterXSubmissions($fieldData['show_after_x_submissions']);
+                    $field->setAlwaysDisplay((bool) $fieldData['always_display'] ?? false);
+                    $field->setMappedObject($fieldData['mapped_object']);
+                    $field->setMappedField($fieldData['mapped_field']);
 
                     $this->entityManager->persist($field);
+                    $this->entityManager->flush();
+
+                    $log = [
+                        'bundle'    => 'form',
+                        'object'    => 'formField',
+                        'objectId'  => $field->getId(),
+                        'action'    => 'import',
+                        'details'   => $fieldData,
+                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                    ];
+                    $this->auditLogModel->writeToLog($log);
                 }
             }
 
-            $this->entityManager->flush();
-
             $event->addEntityIdMap((int) $formData['id'], (int) $form->getId());
-            $output->writeln('<info>Imported form: '.$form->getName().' with ID: '.$form->getId().'</info>');
+            $log = [
+                'bundle'    => 'form',
+                'object'    => 'form',
+                'objectId'  => $form->getId(),
+                'action'    => 'import',
+                'details'   => $formData,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 }

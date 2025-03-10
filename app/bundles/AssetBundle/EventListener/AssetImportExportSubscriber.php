@@ -9,9 +9,9 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Model\UserModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class AssetImportExportSubscriber implements EventSubscriberInterface
@@ -20,7 +20,8 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         private AssetModel $assetModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
-        private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -46,7 +47,6 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
 
         $assetData = [
             'id'                     => $asset->getId(),
-            // 'category_id'            => $asset->getCategory() ? $asset->getCategory()->getId() : null,
             'is_published'           => $asset->isPublished(),
             'title'                  => $asset->getTitle(),
             'description'            => $asset->getDescription(),
@@ -65,6 +65,15 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Asset::ENTITY_NAME, $assetData);
+        $log = [
+            'bundle'    => 'asset',
+            'object'    => 'asset',
+            'objectId'  => $asset->getId(),
+            'action'    => 'export',
+            'details'   => $assetData,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
     }
 
     public function onAssetImport(EntityImportEvent $event): void
@@ -73,7 +82,6 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $output    = new ConsoleOutput();
         $elements  = $event->getEntityData();
         $userId    = $event->getUserId();
         $userName  = '';
@@ -82,8 +90,6 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             $user   = $this->userModel->getEntity($userId);
             if ($user) {
                 $userName = $user->getFirstName().' '.$user->getLastName();
-            } else {
-                $output->writeln('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
             }
         }
 
@@ -116,7 +122,15 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            $output->writeln('<info>Imported asset: '.$object->getTitle().' with ID: '.$object->getId().'</info>');
+            $log = [
+                'bundle'    => 'asset',
+                'object'    => 'asset',
+                'objectId'  => $object->getId(),
+                'action'    => 'import',
+                'details'   => $element,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 }

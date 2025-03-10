@@ -7,11 +7,11 @@ namespace Mautic\PointBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\UserBundle\Model\UserModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class GroupImportExportSubscriber implements EventSubscriberInterface
@@ -20,7 +20,8 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
         private PointGroupModel $pointGroupModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
-        private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -52,6 +53,15 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Group::ENTITY_NAME, $pointGroupData);
+        $log = [
+            'bundle'    => 'point',
+            'object'    => 'pointGroup',
+            'objectId'  => $pointGroup->getId(),
+            'action'    => 'export',
+            'details'   => $pointGroupData,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
     }
 
     public function onPointGroupImport(EntityImportEvent $event): void
@@ -60,7 +70,6 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
         $userId   = $event->getUserId();
         $userName = '';
@@ -69,8 +78,6 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
             $user = $this->userModel->getEntity($userId);
             if ($user) {
                 $userName = $user->getFirstName().' '.$user->getLastName();
-            } else {
-                $output->writeln('User ID '.$userId.' not found. Point groups will not have a created_by_user field set.');
             }
         }
 
@@ -91,7 +98,15 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            $output->writeln('<info>Imported point group: '.$object->getName().' with ID: '.$object->getId().'</info>');
+            $log = [
+                'bundle'    => 'point',
+                'object'    => 'pointGroup',
+                'objectId'  => $object->getId(),
+                'action'    => 'import',
+                'details'   => $element,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 }

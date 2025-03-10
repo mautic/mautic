@@ -7,11 +7,11 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Model\UserModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class PageImportExportSubscriber implements EventSubscriberInterface
@@ -20,7 +20,8 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         private PageModel $pageModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
-        private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -71,6 +72,15 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Page::ENTITY_NAME, $pageData);
+        $log = [
+            'bundle'    => 'page',
+            'object'    => 'page',
+            'objectId'  => $page->getId(),
+            'action'    => 'export',
+            'details'   => $pageData,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
     }
 
     public function onPageImport(EntityImportEvent $event): void
@@ -79,7 +89,6 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $output    = new ConsoleOutput();
         $elements  = $event->getEntityData();
         $userId    = $event->getUserId();
         $userName  = '';
@@ -88,8 +97,6 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             $user   = $this->userModel->getEntity($userId);
             if ($user) {
                 $userName = $user->getFirstName().' '.$user->getLastName();
-            } else {
-                $output->writeln('User ID '.$userId.' not found. Campaigns will not have a created_by_user field set.');
             }
         }
 
@@ -128,7 +135,15 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            $output->writeln('<info>Imported page: '.$object->getTitle().' with ID: '.$object->getId().'</info>');
+            $log = [
+                'bundle'    => 'page',
+                'object'    => 'page',
+                'objectId'  => $object->getId(),
+                'action'    => 'import',
+                'details'   => $element,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 }

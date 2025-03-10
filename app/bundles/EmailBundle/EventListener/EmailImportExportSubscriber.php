@@ -7,13 +7,13 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Model\UserModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -24,7 +24,8 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private EventDispatcherInterface $dispatcher,
-        private LoggerInterface $logger,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -79,6 +80,15 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Email::ENTITY_NAME, $emailData);
+        $log = [
+            'bundle'    => 'email',
+            'object'    => 'email',
+            'objectId'  => $email->getId(),
+            'action'    => 'export',
+            'details'   => $emailData,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
 
         $form = $email->getUnsubscribeForm();
         if ($form) {
@@ -108,7 +118,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $output   = new ConsoleOutput();
         $elements = $event->getEntityData();
         $userId   = $event->getUserId();
         $userName = '';
@@ -117,8 +126,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $user = $this->userModel->getEntity($userId);
             if ($user) {
                 $userName = $user->getFirstName().' '.$user->getLastName();
-            } else {
-                $output->writeln('<comment>User ID '.$userId.' not found. Emails will not have a created_by_user field set.</comment>');
             }
         }
 
@@ -136,8 +143,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
                 $unsubscribeForm = $this->entityManager->getRepository(Form::class)->find($element['unsubscribeform_id']);
                 if ($unsubscribeForm) {
                     $email->setUnsubscribeForm($unsubscribeForm);
-                } else {
-                    $output->writeln('<comment>Unsubscribe Form ID '.$element['unsubscribeform_id'].' not found.</comment>');
                 }
             }
 
@@ -145,8 +150,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
                 $preferenceCenter = $this->entityManager->getRepository(Page::class)->find($element['preference_center_id']);
                 if ($preferenceCenter) {
                     $email->setPreferenceCenter($preferenceCenter);
-                } else {
-                    $output->writeln('<comment>Preference Center Page ID '.$element['preference_center_id'].' not found.</comment>');
                 }
             }
 
@@ -179,7 +182,15 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $email->getId());
-            $output->writeln('<info>Imported email: '.$email->getName().' with ID: '.$email->getId().'</info>');
+            $log = [
+                'bundle'    => 'email',
+                'object'    => 'email',
+                'objectId'  => $email->getId(),
+                'action'    => 'import',
+                'details'   => $element,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 }
