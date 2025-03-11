@@ -29,6 +29,7 @@
     "codeception/module-asserts": "^3.0",
     "codeception/module-db": "^3.1",
     "codeception/module-webdriver": "^3.2",
+    "cyclonedx/cyclonedx-php-composer": "^5.2",
     "friendsofphp/php-cs-fixer": "^3.14",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
@@ -170,10 +171,11 @@
     "allow-plugins": {
       "composer/installers": true,
       "composer/package-versions-deprecated": true,
-      "symfony/flex": true,
-      "phpstan/extension-installer": true,
+      "cweagans/composer-patches": true,
+      "cyclonedx/cyclonedx-php-composer": true,
       "php-http/discovery": true,
-      "cweagans/composer-patches": true
+      "phpstan/extension-installer": true,
+      "symfony/flex": true
     }
   },
   "extra": {
