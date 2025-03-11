@@ -22,10 +22,10 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Generate SBOM in XML format
-        run: composer CycloneDX:make-sbom --output-file=mautic-sbom.xml --output-format=XML
+        run: composer CycloneDX:make-sbom --output-file=mautic-sbom --output-format=XML
 
       - name: Generate SBOM in JSON format
-        run: composer CycloneDX:make-sbom --output-file=mautic-sbom.json --output-format=JSON
+        run: composer CycloneDX:make-sbom --output-file=mautic-sbom --output-format=JSON
 
       - name: Check for changes
         id: check_changes
