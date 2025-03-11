@@ -356,7 +356,8 @@ class MailHelper
                     $tokens['{signature}'] = $ownerSignature;
                 }
 
-                // Set metadata if applicable
+                // Set metadata if applicable, make sure to start clean
+                $this->message->clearMetadata();
                 foreach ($this->queuedRecipients as $email => $name) {
                     $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
                 }
