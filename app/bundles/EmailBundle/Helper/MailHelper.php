@@ -927,22 +927,32 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param array<string,?string> $addresses
-     * @param ?string               $name
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
      *
-     * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
+     * @return bool
      */
-    public function setCc($addresses, $name = null): bool
+    public function setCc($addresses, $name = null)
     {
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
         try {
             $ccAddresses = [];
-            // The email addresses are stored in the array keys not the values
-            // The name of the CC is passed in the function and not in the array
-            foreach ($addresses as $address => $noName) {
-                $ccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
+
+            foreach ($addresses as $key => $value) {
+                // Check if we have an indexed array (numeric keys)
+                if (is_numeric($key)) {
+                    $address     = $value;
+                    $addressName = $name;
+                } else {
+                    // We have an associative array (email => name)
+                    $address     = $key;
+                    $addressName = $value ?: $name; // Use provided name or default
+                }
+
+                $ccAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
             }
+
             $this->message->cc(...$ccAddresses);
 
             return true;
@@ -977,21 +987,30 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param array<string,?string> $addresses
-     * @param ?string               $name
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
      *
-     * //TODO: same bug for the name as the one we have in setCc
+     * @return bool
      */
-    public function setBcc($addresses, $name = null): bool
+    public function setBcc($addresses, $name = null)
     {
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
         try {
             $bccAddresses = [];
-            // The email addresses are stored in the array keys not the values
-            // The name of the Bcc is passed in the function and not in the array
-            foreach ($addresses as $address => $noName) {
-                $bccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
+
+            foreach ($addresses as $key => $value) {
+                // Check if we have an indexed array (numeric keys)
+                if (is_numeric($key)) {
+                    $address     = $value;
+                    $addressName = $name;
+                } else {
+                    // We have an associative array (email => name)
+                    $address     = $key;
+                    $addressName = $value ?: $name; // Use provided name or default
+                }
+
+                $bccAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
             }
 
             $this->message->bcc(...$bccAddresses);
