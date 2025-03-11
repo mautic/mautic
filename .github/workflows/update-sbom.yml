@@ -40,7 +40,7 @@ jobs:
           exit 1
 
       - name: Commit SBOM files
-        if: success()
+        if: steps.check_changes.outcome == 'failure'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
