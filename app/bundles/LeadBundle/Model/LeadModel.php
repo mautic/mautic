@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NonUniqueResultException;
@@ -1033,7 +1034,7 @@ class LeadModel extends FormModel
         }
 
         // Add non associated categories relations as removed.
-        $nonAssociatedCategories = $this->getLeadCategoryRepository()->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
+        $nonAssociatedCategories = $this->getLeadCategoryRepository()->getLeadCategoryMapping($lead, ['global', 'email']);
 
         $unsubscribeNewCategories = array_diff($nonAssociatedCategories, $data['global_categories']);
         if (!empty($unsubscribeNewCategories)) {
@@ -1167,7 +1168,10 @@ class LeadModel extends FormModel
      */
     public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
     {
-        return $this->getLeadCategoryRepository()->getSubscribedAndNewCategoryIds($lead, $types);
+        $criteria = Criteria::create()
+            ->andWhere(Criteria::expr()->eq('manuallyRemoved', 1));
+
+        return $this->getLeadCategoryRepository()->getLeadCategoryMapping($lead, $types, $criteria);
     }
 
     /**

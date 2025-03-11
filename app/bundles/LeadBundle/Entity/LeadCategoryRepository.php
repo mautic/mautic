@@ -66,30 +66,7 @@ class LeadCategoryRepository extends CommonRepository
      *
      * @return array<int, int>
      */
-    public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
-    {
-        $criteria = Criteria::create()
-            ->andWhere(Criteria::expr()->eq('manuallyRemoved', 1));
-
-        return $this->getLeadCategoriesMapping($lead, $types, $criteria);
-    }
-
-    /**
-     * @param string[] $types
-     *
-     * @return array<int, int>
-     */
-    public function getNonAssociatedCategoryIdsForAContact(Lead $lead, array $types): array
-    {
-        return $this->getLeadCategoriesMapping($lead, $types);
-    }
-
-    /**
-     * @param string[] $types
-     *
-     * @return array<int, int>
-     */
-    private function getLeadCategoriesMapping(Lead $lead, array $types, Criteria $criteria = null): array
+    public function getLeadCategoryMapping(Lead $lead, array $types, Criteria $criteria = null): array
     {
         $parentQ = $this->getEntityManager()->getRepository(Category::class)->createQueryBuilder('c');
         $parentQ->select('c.id');
