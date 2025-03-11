@@ -1,0 +1,49 @@
+name: Validate SBOM
+
+on:
+  pull_request:
+    paths:
+      - 'composer.json'
+      - 'composer.lock'
+
+jobs:
+  validate-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Generate SBOM in XML format
+        run: composer CycloneDX:make-sbom --output-file=mautic-sbom.xml --output-format=XML
+
+      - name: Generate SBOM in JSON format
+        run: composer CycloneDX:make-sbom --output-file=mautic-sbom.json --output-format=JSON
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git diff --exit-code mautic-sbom.xml mautic-sbom.json
+        continue-on-error: true
+
+      - name: Fail if changes are detected
+        if: steps.check_changes.outcome == 'failure'
+        run: |
+          echo "SBOM files have changed. Please commit the updated files."
+          exit 1
+
+      - name: Commit SBOM files
+        if: success()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add mautic-sbom.xml mautic-sbom.json
+          git commit -m "Automatically update SBOM"
+          git push
