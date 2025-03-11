@@ -8,8 +8,19 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class ParameterLoaderTest extends TestCase
 {
+    /**
+     * @var array<string, mixed>
+     */
     protected static array $backupDotEnv;
+
+    /**
+     * @var array<string, mixed>
+     */
     protected static array $backupSysEnv;
+
+    /**
+     * @var array<int, string>
+     */
     protected static array $backupEnvVars;
 
     public static function setUpBeforeClass(): void
