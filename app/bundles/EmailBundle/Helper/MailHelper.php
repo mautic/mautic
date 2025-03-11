@@ -929,10 +929,8 @@ class MailHelper
      *
      * @param array<string|int,?string> $addresses Array of emails as values or keys
      * @param ?string                   $name      Default name for addresses without specified names
-     *
-     * @return bool
      */
-    public function setCc($addresses, $name = null)
+    public function setCc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
@@ -989,10 +987,8 @@ class MailHelper
      *
      * @param array<string|int,?string> $addresses Array of emails as values or keys
      * @param ?string                   $name      Default name for addresses without specified names
-     *
-     * @return bool
      */
-    public function setBcc($addresses, $name = null)
+    public function setBcc($addresses, $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
