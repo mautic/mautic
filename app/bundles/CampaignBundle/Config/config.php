@@ -112,6 +112,11 @@ return [
                 'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::cloneCampaignAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_export_campaign' => [
+                'path'       => '/campaigns/export/{campaignId}',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::exportCampaignAction',
+                'method'     => 'GET',
+            ],
         ],
     ],
 

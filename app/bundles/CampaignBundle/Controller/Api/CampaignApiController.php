@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -353,6 +354,43 @@ class CampaignApiController extends CommonApiController
 
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK, $headers);
 
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Get a list of events.
+     *
+     * @return Response
+     */
+    public function exportCampaignAction(Request $request, int $campaignId)
+    {
+        // Check if the campaign exists
+        $campaign = $this->model->getEntity($campaignId);
+        if (!$campaign) {
+            return $this->notFound();
+        }
+
+        // Check if user has permission to export campaigns
+        if (!$this->security->isAdmin() && !$this->security->hasEntityAccess('campaign:campaigns:viewown', 'campaign:campaigns:viewother', $campaign)) {
+            return $this->accessDenied();
+        }
+
+        // Dispatch event to collect campaign data for export
+        $event = new EntityExportEvent(Campaign::ENTITY_NAME, $campaignId);
+        $this->dispatcher->dispatch($event);
+        $data = $event->getEntities();
+
+        // Check if there is data to export
+        if (empty($data)) {
+            return $this->handleView(
+                $this->view(['error' => $this->translator->trans('mautic.campaign.export.no_data', [], 'flashes')], Response::HTTP_BAD_REQUEST)
+            );
+        }
+
+        // Prepare response
+        $view = $this->view($data, Response::HTTP_OK);
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
