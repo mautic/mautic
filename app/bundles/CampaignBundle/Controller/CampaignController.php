@@ -99,7 +99,7 @@ class CampaignController extends AbstractStandardFormController
         CoreParametersHelper $coreParametersHelper,
         EventDispatcherInterface $dispatcher,
         Translator $translator,
-        private FlashBag $flashBag,
+        FlashBag $flashBag,
         private LoggerInterface $logger,
         private RequestStack $requestStack,
         CorePermissions $security,
@@ -169,42 +169,37 @@ class CampaignController extends AbstractStandardFormController
             return $this->notFound();
         }
 
-        try {
-            $date           = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
-            $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
+        $date           = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
+        $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
 
-            $event = new EntityExportEvent(Campaign::ENTITY_NAME, $objectId);
-            $event = $this->dispatcher->dispatch($event);
-            $data  = $event->getEntities();
+        $event = new EntityExportEvent(Campaign::ENTITY_NAME, $objectId);
+        $event = $this->dispatcher->dispatch($event);
+        $data  = $event->getEntities();
 
-            if (empty($data)) {
-                $this->logger->warning('No data found for campaign export', ['objectId' => $objectId]);
-                $this->addFlashMessage('mautic.campaign.export.no_data');
+        if (empty($data)) {
+            $this->logger->warning('No data found for campaign export', ['objectId' => $objectId]);
+            $this->addFlashMessage('mautic.campaign.export.no_data', ['%objectId%' => $objectId], FlashBag::LEVEL_ERROR);
 
-                return new JsonResponse(['error' => $this->translator->trans('mautic.campaign.export.no_data')], 400);
-            }
-
-            $jsonOutput = json_encode($data, JSON_PRETTY_PRINT);
-            $filePath   = $exportHelper->writeToZipFile($jsonOutput);
-
-            if (!file_exists($filePath)) {
-                $this->logger->error('Export file could not be created', ['filePath' => $filePath]);
-                $this->addFlashMessage('mautic.campaign.export.file_not_found');
-
-                return new JsonResponse(['error' => $this->translator->trans('mautic.campaign.export.file_not_found')], 500);
-            }
-
-            return $exportHelper->exportAsZip($filePath, $exportFileName);
-        } catch (\Exception $e) {
-            $this->logger->error('Error during campaign export', [
-                'objectId' => $objectId,
-                'error'    => $e->getMessage(),
-            ]);
-
-            $this->addFlashMessage('mautic.campaign.export.error_occurred');
-
-            return new JsonResponse(['error' => $this->translator->trans('mautic.campaign.export.error_occurred')], 500);
+            return new JsonResponse([
+                'error'   => $this->translator->trans('mautic.campaign.export.no_data', ['%objectId%' => $objectId], 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ], 400);
         }
+
+        $jsonOutput = json_encode($data, JSON_PRETTY_PRINT);
+        $filePath   = $exportHelper->writeToZipFile($jsonOutput);
+
+        if (!file_exists($filePath)) {
+            $this->logger->error('Export file could not be created', ['filePath' => $filePath]);
+            $this->addFlashMessage('mautic.campaign.export.file_not_found', ['%path%' => $filePath], FlashBag::LEVEL_ERROR);
+
+            return new JsonResponse([
+                'error'   => $this->translator->trans('mautic.campaign.export.file_not_found', ['%path%' => $filePath], 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ], 400);
+        }
+
+        return $exportHelper->exportAsZip($filePath, $exportFileName);
     }
 
     /**
