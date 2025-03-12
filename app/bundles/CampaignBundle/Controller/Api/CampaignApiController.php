@@ -11,10 +11,12 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -391,6 +393,35 @@ class CampaignApiController extends CommonApiController
 
         // Prepare response
         $view = $this->view($data, Response::HTTP_OK);
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+
+    public function importCampaignAction(Request $request, UserHelper $userHelper): Response
+    {
+        // Check if user has permission to import campaigns
+        if (!$this->security->isAdmin() && !$this->security->hasEntityAccess('campaign:campaigns:create', 'campaign:campaigns:editown')) {
+            return $this->accessDenied();
+        }
+
+        // Decode request JSON
+        $data = json_decode($request->getContent(), true);
+
+        // if (!$data || !isset($data['name']) || empty($data['name'])) {
+        if (!$data || !isset($data[Campaign::ENTITY_NAME])) {
+            return $this->handleView(
+                $this->view(['error' => $this->translator->trans('mautic.campaign.import.error.name_required', [], 'flashes')], Response::HTTP_BAD_REQUEST)
+            );
+        }
+
+        $userId = $userHelper->getUser()->getId();
+        $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $data, $userId);
+
+        $this->dispatcher->dispatch($event);
+
+        // Prepare response
+        $view = $this->view(['campaign' => $data[Campaign::ENTITY_NAME][0]['name']], Response::HTTP_CREATED);
         $this->setSerializationContext($view);
 
         return $this->handleView($view);

@@ -117,6 +117,11 @@ return [
                 'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::exportCampaignAction',
                 'method'     => 'GET',
             ],
+            'mautic_api_import_campaign' => [
+                'path'       => '/campaigns/import',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::importCampaignAction',
+                'method'     => 'POST',
+            ],
         ],
     ],
 

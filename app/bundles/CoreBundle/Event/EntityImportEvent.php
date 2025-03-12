@@ -21,7 +21,7 @@ class EntityImportEvent extends Event
      */
     private array $arguments = [];
 
-    public function __construct(private string $entityName, private array $data, private int $userId)
+    public function __construct(private string $entityName, private array $data, private ?int $userId)
     {
     }
 
@@ -35,7 +35,7 @@ class EntityImportEvent extends Event
         return $this->data;
     }
 
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
