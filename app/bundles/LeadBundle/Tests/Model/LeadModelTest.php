@@ -235,6 +235,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->logger,
         );
 
+        $this->setSecurity($this->leadModel);
+
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
@@ -429,6 +431,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -471,6 +474,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -509,6 +513,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -548,6 +553,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -833,5 +839,19 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($event);
 
         $leadModel->dispatchBatchEventForTest($action, $leadsParams);
+    }
+
+    private function setSecurity(LeadModel $companyModel): void
+    {
+        $security = $this->createMock(CorePermissions::class);
+        $security->method('hasEntityAccess')
+            ->willReturn(true);
+        $security->method('isGranted')
+            ->willReturn(true);
+
+        $reflection = new \ReflectionClass($companyModel);
+        $property   = $reflection->getProperty('security');
+        $property->setAccessible(true);
+        $property->setValue($companyModel, $security);
     }
 }
