@@ -1,0 +1,33 @@
+{# nav_tabs.html.twig #}
+{% macro generateTabId(translationKey) -%}
+    {%- set parts = translationKey|split('.') -%}
+    {%- set lastParts = parts|slice(-2) -%}
+    {{- lastParts|join('-')|lower -}}
+{%- endmacro %}
+
+<div class="tabs-container">
+    {# Nav tabs #}
+    <ul class="nav nav-tabs {% if style|default('line') == 'line' %}nav-tabs-line{% else %}nav-tabs-contained{% endif %}" role="tablist">
+        {% for tab in tabs %}
+            {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
+            <li role="presentation"{% if loop.first %} class="active"{% endif %}>
+                <a href="#{{ tabId }}"
+                   aria-controls="{{ tabId }}"
+                   role="tab"
+                   data-toggle="tab">{{ tab.title|trans }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {# Tab content #}
+    <div class="tab-content {% if style|default('') == 'contained' %}contained{% endif %}">
+        {% for tab in tabs %}
+            {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
+            <div role="tabpanel"
+                 class="tab-pane fade{% if loop.first %} in active{% endif %}{% if style|default('line') == 'contained' %} layer-{{ layer|default('two') }}{% endif %}"
+                 id="{{ tabId }}">
+                {{ tab.content|raw }}
+            </div>
+        {% endfor %}
+    </div>
+</div>

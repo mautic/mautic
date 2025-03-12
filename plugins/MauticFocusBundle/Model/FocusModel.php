@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Submission;
@@ -37,7 +38,7 @@ use Twig\Runtime\EscaperRuntime;
 /**
  * @extends FormModel<Focus>
  */
-class FocusModel extends FormModel
+class FocusModel extends FormModel implements GlobalSearchInterface
 {
     public function __construct(
         protected \Mautic\FormBundle\Model\FormModel $formModel,

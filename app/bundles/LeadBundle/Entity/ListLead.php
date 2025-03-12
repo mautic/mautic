@@ -63,6 +63,7 @@ class ListLead
             ->build();
 
         $builder->addIndex(['manually_removed'], 'manually_removed');
+        $builder->addIndex(['lead_id', 'leadlist_id', 'manually_removed'], 'lead_id_lists_id_removed');
     }
 
     /**

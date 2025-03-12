@@ -120,45 +120,7 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-lg">
-                            <h3 class="pt-20">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
-                            <div class="help-block mb-lg">
-                                {{ 'mautic.user.account.appearance.accent_help'|trans }}
-                                {% include '@MauticCore/Helper/toggletip.html.twig' with {
-                                    title: 'mautic.user.account.appearance.accent_toggletip.title',
-                                    content: 'mautic.user.account.appearance.accent_toggletip.content',
-                                } %}
-                            </div>
-                            <div class="d-flex fw-wrap gap-lg mb-lg">
-                                {{ include('@MauticUser/Helper/accent.html.twig', {
-                                    accents: [
-                                        { id: '01' },
-                                        { id: '02' },
-                                        { id: '03' },
-                                        { id: '04' },
-                                        { id: '05' },
-                                        { id: '06' },
-                                        { id: '07' },
-                                        { id: '08' },
-                                        { id: '09' },
-                                        { id: '10' },
-                                        { id: '11' },
-                                        { id: '12' },
-                                        { id: '13' },
-                                        { id: '14' },
-                                        { id: '15' },
-                                        { id: '16' },
-                                        { id: '17' },
-                                        { id: '18' },
-                                        { id: '19' },
-                                        { id: '20' },
-                                        { id: '21' },
-                                        { id: '22' },
-                                        { id: '23' },
-                                        { id: '24' },
-                                        { id: '25' }
-                                    ]
-                                }) }}
-                            </div>
+                            
                             <h3 class="pt-20">
                                 {{ 'mautic.user.account.appearance.theme_preferences'|trans }}
                                 {% include '@MauticCore/Helper/toggletip.html.twig' with {
@@ -184,19 +146,19 @@
                                             preview: '@MauticUser/Profile/images/_dark_preview.html.twig'
                                         },
                                         {
-                                            id: 'solarized-light',
+                                            id: 'light-solarized',
                                             name: 'mautic.user.account.appearance.theme_solarized_light',
                                             description: 'mautic.user.account.appearance.theme_solarized_light_description',
                                             preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_solarized_light_preview.svg'
                                         },
                                         {
-                                            id: 'solarized-dark',
+                                            id: 'dark-solarized',
                                             name: 'mautic.user.account.appearance.theme_solarized_dark',
                                             description: 'mautic.user.account.appearance.theme_solarized_dark_description',
                                             preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_solarized_dark_preview.svg'
                                         },
                                         {
-                                            id: 'freire',
+                                            id: 'dark-freire',
                                             name: 'mautic.user.account.appearance.theme_freire',
                                             description: 'mautic.user.account.appearance.theme_freire_description',
                                             preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_freire_preview.svg'

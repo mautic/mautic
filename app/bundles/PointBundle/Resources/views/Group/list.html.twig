@@ -10,13 +10,20 @@
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
-            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+            'page_actions': {
                 'templateButtons': {
                     'new': permissions['point:groups:create']
                 },
                 'routeBase': 'point.group',
                 'langVar': 'point.group'
-            })
+            },
+            'bulk_actions': {
+                'langVar': 'point.group',
+                'routeBase': 'point.group',
+                'templateButtons': {
+                    'delete': permissions['point:groups:delete'],
+                },
+            },
         }) -}}
         <div class="page-list">
             {% if items is defined and items is not empty %}
@@ -24,17 +31,10 @@
                     <table class="table table-hover" id="groupTable">
                         <thead>
                         <tr>
-                            {{ include(
-                                '@MauticCore/Helper/tableheader.html.twig',
-                                {
-                                    'checkall': 'true',
-                                    'target': '#groupTable',
-                                    'langVar': 'point.group',
-                                    'routeBase': 'point.group',
-                                    'templateButtons': {
-                                    'delete': permissions['point:groups:delete'],
-                                }
-                                }) }}
+                            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                'checkall': 'true',
+                                'target': '#groupTable',
+                            }) }}
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {

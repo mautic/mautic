@@ -10,6 +10,7 @@ use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
@@ -24,7 +25,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Client>
  */
-class ClientModel extends FormModel
+class ClientModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var string

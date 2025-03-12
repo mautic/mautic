@@ -1,0 +1,173 @@
+{% extends "@themes/"~template~"/html/base.html.twig" %}
+
+{% block content %}
+<div class="sidebars">
+    <div class="sidebar--left">
+        <img class="logo--medium" src="{{ getOverridableUrl('images/placeholder-logo.png') }}">
+        <div class="h3">
+            <p>Get in touch</p>
+        </div>
+        <div class="subtitle header">
+            <p>We typically respond within 24 hours.</p>
+        </div>
+        <div style="padding: 10px;">
+            <p>{form=INSERT_FORM_ID_HERE}</p>
+        </div>
+        <div class="subtitle footer">
+            <p></p>
+            <p></p>
+            <p>{{ "now"|date("Y") }} © {brand=name}. All rights reserved.</p>
+        </div>
+    </div>
+    <div class="sidebar--right"></div>
+</div>
+<style>
+    @font-face {
+        font-family: 'Inter';
+        src: url("{{ getAssetUrl('themes/'~template~'/assets/InterDisplay-Medium.woff2', null, null, true) }}") format('woff2');
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'Inter';
+        src: url("{{ getAssetUrl('themes/'~template~'/assets/InterDisplay-Bold.woff2', null, null, true) }}") format('woff2');
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    p {
+        margin: 0;
+        padding: 0;
+        line-height: 1.4em;
+    }
+
+    .sidebars {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        gap: 20px;
+    }
+
+    .sidebar--left {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        padding: 25px 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        box-sizing: border-box;
+        font-size: 12px;
+    }
+
+    .sidebar--right {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        margin: 0;
+        padding: 20px 0;
+        padding-left: 10px;
+        min-height: 200px;
+        background-repeat: repeat;
+        background-position: center center;
+        background-attachment: scroll;
+        background-size: cover;
+        background-image: url({{ getAssetUrl('themes/'~template~'/assets/chris-lee-70l1tDAI6rM-unsplash.jpg', null, null, true) }});
+        border-radius: 20px;
+    }
+
+    .sidebar--left .mauticform_wrapper {
+        margin: 0;
+    }
+
+    .h3 {
+        padding: 0 10px;
+        margin-top: 25px;
+        margin-bottom: 5px;
+        display: flex;
+        font-weight: 700;
+        font-size: 24px;
+        max-width: fit-content;
+    }
+
+    .subtitle {
+        padding: 0 10px;
+        font-size: 13px;
+        color: #525252;
+        margin: 0;
+        display: flex;
+        width: 100%;
+        max-width: fit-content;
+    }
+
+    .subtitle.header {
+        margin-bottom: 40px;
+    }
+
+    .subtitle.footer {
+        margin-top: 60px;
+    }
+
+    .logo--medium {
+        padding: 0 10px;
+        height: 50px;
+        width: fit-content;
+    }
+
+    /* Media Queries for Larger Screens */
+
+    /* Tablet and Up */
+    @media (min-width: 768px) {
+        .sidebars {
+            flex-direction: row;
+            justify-content: end;
+            flex-wrap: nowrap;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .sidebar--left {
+            width: 40%;
+            min-width: 350px;
+            max-width: 420px;
+            padding: 50px 15px;
+        }
+
+        .sidebar--right {
+            width: 40%;
+            padding: 50px 0;
+            align-self: stretch;
+            border-radius: 24px;
+        }
+
+        .h3 {
+            font-size: 28px;
+        }
+
+        .subtitle {
+            max-width: fit-content;
+        }
+    }
+</style>
+{% endblock %}

@@ -45,8 +45,6 @@ Javascript
 
     JQVMap - MIT - Copyright 2012, Peter Schmalfeldt; Copyright 2011-2012, Kirill Lebedev
 
-    Modernizr - MIT & BSD
-
     Moment.js - MIT - Tim Wood, Iskren Chernev, Moment.js contributors
 
     Mousetrap - Apache License, Version 2.0 - Copyright 2013 Craig Campbell

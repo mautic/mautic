@@ -20,13 +20,13 @@ export default (editor, opts = {}) => {
 
         modal.onceOpen(() => initCKEditor(ckEditorElementId));
         modal.onceClose(() => destroyCKEditor());
-
+        modal.config.backdrop = false;
         modal.open({
             title: 'Edit',
             content: `
                 <div id="${ckEditorElementId}">${el.innerHTML}</div>
                 <button type="button" class="gjs-btn-prim" id="gjs-cke-save-btn">Save</button>
-                <button type="button" class="gjs-btn-prim" id="gjs-cke-close-btn">Close</button>
+                <button type="button" class="gjs-btn-prim" id="gjs-cke-close-btn">Cancel</button>
             `,
             attributes: {
                 class: 'cke-modal'

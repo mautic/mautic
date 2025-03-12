@@ -70,6 +70,7 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
         $asset->setStorageLocation($assetData['storage'] ?? 'local');
         $asset->setPath($assetData['path'] ?? '');
         $asset->setExtension($assetData['extension'] ?? '');
+        $asset->setSize($this->csvPath ? filesize($this->csvPath) : 0);
 
         $this->em->persist($asset);
         $this->em->flush();

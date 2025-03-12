@@ -201,8 +201,8 @@ class ContactManagementCest
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
-        // Select delete option from dropdown for multiple selections
-        $contact->selectOptionFromDropDownForMultipleSelections(11);
+        // Click on the delete button.
+        $I->click('//*[@id="delete"]');
 
         // Wait for the modal to become visible and click on the button to confirm delete
         $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
@@ -378,6 +378,15 @@ class ContactManagementCest
         $I->pressKey(ContactPage::$addToTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
 
+        // Clear all selection
+        $I->click(ContactPage::$clearAllContactsSelection);
+
+        // Scroll to the search Bar to bring it into view
+        $I->scrollTo(ContactPage::$searchBar, 0, -100);
+
+        // Wait until the search Bar is clickable
+        $I->waitForElementClickable(ContactPage::$searchBar, 10);
+
         // Search again for contacts in the "Segment Test 3" segment
         $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
         $I->wait(1);
@@ -411,6 +420,15 @@ class ContactManagementCest
         $I->pressKey(ContactPage::$removeFromTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
 
+        // Clear all selection
+        $I->click(ContactPage::$clearAllContactsSelection);
+
+        // Scroll to the search Bar to bring it into view
+        $I->scrollTo(ContactPage::$searchBar, 0, -100);
+
+        // Wait until the search Bar is clickable
+        $I->waitForElementClickable(ContactPage::$searchBar, 10);
+
         // Search for contacts in the "Segment Test 3" segment
         $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
         $I->wait(1);
@@ -438,7 +456,7 @@ class ContactManagementCest
         $contact->selectContactFromList(2);
 
         // Select change segment option from dropdown for multiple selections
-        $contact->selectOptionFromDropDownForMultipleSelections(10);
+        $contact->selectOptionFromDropDownForMultipleSelections(9);
 
         $I->waitForElementClickable(ContactPage::$doNotContactSaveButton, 10);
         $I->click(ContactPage::$doNotContactSaveButton);

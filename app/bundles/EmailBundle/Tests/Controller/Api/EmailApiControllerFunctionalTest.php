@@ -431,6 +431,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmail('{custom-token}');
 
         // Send to contact:
+        $email = $createEmail();
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
 
         $clientResponse = $this->client->getResponse();
@@ -449,7 +453,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
         $emailId = $email->getId();
-
         // Send to segment:
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
@@ -471,6 +474,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Send to contact:
+        $email = $createEmail();
+        $email->setUseOwnerAsMailer(true);
+        $email->setReplyToAddress(null);
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
@@ -482,9 +491,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Test Custom Reply-To Address
+        $email = $createEmail();
+        $email->setUseOwnerAsMailer(true);
         $email->setReplyToAddress('reply@email.domain');
         $this->em->persist($email);
         $this->em->flush();
+        $emailId = $email->getId();
 
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();

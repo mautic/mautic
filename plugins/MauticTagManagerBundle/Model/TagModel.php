@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
@@ -9,7 +10,7 @@ use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class TagModel extends BaseTagModel
+class TagModel extends BaseTagModel implements GlobalSearchInterface
 {
     /**
      * @return TagRepository

@@ -2,12 +2,10 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,7 +14,6 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +24,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PageController extends FormController
 {
-    use BuilderControllerTrait;
     use FormErrorMessagesTrait;
 
     /**
@@ -443,10 +439,6 @@ class PageController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
-
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -463,10 +455,6 @@ class PageController extends FormController
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
                 'themes'        => $themeHelper->getInstalledThemes('page', true),
-                'slots'         => $this->buildSlotForms($slotTypes),
-                'sections'      => $this->buildSlotForms($sections),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                'sectionForm'   => $sectionForm->createView(),
                 'permissions'   => $permissions,
             ],
             'contentTemplate' => '@MauticPage/Page/form.html.twig',
@@ -610,10 +598,6 @@ class PageController extends FormController
             }
         }
 
-        $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
-        $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->formFactory->create(BuilderSectionType::class);
-
         return $this->delegateView([
             'viewParameters' => [
                 'form'          => $form->createView(),
@@ -621,10 +605,6 @@ class PageController extends FormController
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
                 'themes'        => $themeHelper->getInstalledThemes('page', true),
-                'slots'         => $this->buildSlotForms($slotTypes),
-                'sections'      => $this->buildSlotForms($sections),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
-                'sectionForm'   => $sectionForm->createView(),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'permissions'   => $security->isGranted(
                     [
@@ -822,7 +802,7 @@ class PageController extends FormController
      *
      * @return Response
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, ThemeHelper $themeHelper, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId)
     {
         /** @var PageModel $model */
         $model = $this->getModel('page.page');
@@ -849,27 +829,13 @@ class PageController extends FormController
         if (empty($template)) {
             throw new \InvalidArgumentException('No template found');
         }
-        $slots = $themeHelper->getTheme($template)->getSlots('page');
-
-        // merge any existing changes
-        $newContent = $request->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', []);
-        $content    = $entity->getContent();
-
-        if (is_array($newContent)) {
-            $content = array_merge($content, $newContent);
-            // Update the content for processSlots
-            $entity->setContent($content);
-        }
-
-        $this->processSlots($slotsHelper, $slots, $entity);
 
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
         return $this->render($logicalName, [
             'isNew'       => $isNew,
-            'slots'       => $slots,
             'formFactory' => $this->formFactory,
-            'content'     => $content,
+            'content'     => $entity->getContent(),
             'page'        => $entity,
             'template'    => $template,
             'basePath'    => $request->getBasePath(),
@@ -982,46 +948,6 @@ class PageController extends FormController
                 'flashes' => $flashes,
             ])
         );
-    }
-
-    /**
-     * PreProcess page slots for public view.
-     *
-     * @param array $slots
-     * @param Page  $entity
-     */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
-    {
-        $slotsHelper->inBuilder(true);
-
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            // backward compatibility - if slotConfig array does not exist
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            // define default config if does not exist
-            if (!isset($slotConfig['type'])) {
-                $slotConfig['type'] = 'html';
-            }
-
-            if (!isset($slotConfig['placeholder'])) {
-                $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
-            }
-
-            $value = $content[$slot] ?? '';
-
-            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
-        }
-
-        $slotsHelper->start('builder'); ?>
-<input type="hidden" id="builder_entity_id"
-    value="<?php echo $entity->getSessionId(); ?>" />
-<?php
-        $slotsHelper->stop();
     }
 
     /**

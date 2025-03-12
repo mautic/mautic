@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\ComposerHelper;
@@ -59,7 +58,6 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $logger               = $this->createMock(LoggerInterface::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
-        $factory              = $this->createMock(MauticFactory::class);
         $modelFactory         = $this->createMock(ModelFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -74,7 +72,6 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $cacheHelper,
             $logger,
             $doctrine,
-            $factory,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,

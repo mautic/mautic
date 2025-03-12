@@ -4,13 +4,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#monitoringTable',
-                        'langVar': 'mautic.social.monitoring',
-                        'routeBase': 'social',
-                        'templateButtons': {
-                            'delete': securityIsGranted('mauticSocial:monitoring:delete'),
-                        },
+                    'checkall': 'true',
+                    'target': '#monitoringTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {

@@ -84,6 +84,46 @@ class MatchFilterForLeadTraitTest extends TestCase
         self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
+    public function testMatchFilterForLeadWithNumberType(): void
+    {
+        $this->lead['custom'] = '10.5';
+
+        $this->filter[0]['type']     = 'number';
+        $this->filter[0]['operator'] = OperatorOptions::EQUAL_TO;
+        $this->filter[0]['filter']   = '10.5';
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+
+        $this->filter[0]['operator'] = OperatorOptions::GREATER_THAN_OR_EQUAL;
+        $this->filter[0]['filter']   = '5.5';
+        $this->filter                = [
+            1 => [
+                'display'  => null,
+                'field'    => 'custom',
+                'filter'   => '11.5',
+                'glue'     => 'and',
+                'object'   => 'lead',
+                'operator' => OperatorOptions::LESS_THAN_OR_EQUAL,
+                'type'     => 'number',
+            ],
+        ];
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+
+        $this->filter[0]['operator'] = OperatorOptions::LESS_THAN_OR_EQUAL;
+        $this->filter[0]['filter']   = '5.5';
+        $this->filter                = [
+            1 => [
+                'display'  => null,
+                'field'    => 'custom',
+                'filter'   => '11.5',
+                'glue'     => 'or',
+                'object'   => 'lead',
+                'operator' => OperatorOptions::GREATER_THAN_OR_EQUAL,
+                'type'     => 'number',
+            ],
+        ];
+        $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+    }
+
     /**
      * @dataProvider dateMatchTestProvider
      */

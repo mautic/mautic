@@ -6107,14 +6107,14 @@ button.close {
   transform: scale(0.8) rotateY(45deg) translateZ(calc(-340px + (40px * 5)));
 }
 /*
-* Remix Icon v4.3.0
+* Remix Icon v4.6.0
 * https://remixicon.com
 * https://github.com/Remix-Design/RemixIcon
 *
 * Copyright RemixIcon.com
 * Released under the Apache License Version 2.0
 *
-* Date: 2024-06-13
+* Date: 2024-12-17
 */
 @font-face {
   font-family: "remixicon";
@@ -6128,72 +6128,56 @@ button.close {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-[class^="ri-"].ri-lg,
-[class*=" ri-"].ri-lg {
+.ri-lg {
   font-size: 1.3333em;
   line-height: 0.75em;
   vertical-align: -0.0667em;
 }
-[class^="ri-"].ri-xl,
-[class*=" ri-"].ri-xl {
+.ri-xl {
   font-size: 1.5em;
   line-height: 0.6666em;
   vertical-align: -0.075em;
 }
-[class^="ri-"].ri-xxs,
-[class*=" ri-"].ri-xxs {
+.ri-xxs {
   font-size: 0.5em;
 }
-[class^="ri-"].ri-xs,
-[class*=" ri-"].ri-xs {
+.ri-xs {
   font-size: 0.75em;
 }
-[class^="ri-"].ri-sm,
-[class*=" ri-"].ri-sm {
+.ri-sm {
   font-size: 0.875em;
 }
-[class^="ri-"].ri-1x,
-[class*=" ri-"].ri-1x {
+.ri-1x {
   font-size: 1em;
 }
-[class^="ri-"].ri-2x,
-[class*=" ri-"].ri-2x {
+.ri-2x {
   font-size: 2em;
 }
-[class^="ri-"].ri-3x,
-[class*=" ri-"].ri-3x {
+.ri-3x {
   font-size: 3em;
 }
-[class^="ri-"].ri-4x,
-[class*=" ri-"].ri-4x {
+.ri-4x {
   font-size: 4em;
 }
-[class^="ri-"].ri-5x,
-[class*=" ri-"].ri-5x {
+.ri-5x {
   font-size: 5em;
 }
-[class^="ri-"].ri-6x,
-[class*=" ri-"].ri-6x {
+.ri-6x {
   font-size: 6em;
 }
-[class^="ri-"].ri-7x,
-[class*=" ri-"].ri-7x {
+.ri-7x {
   font-size: 7em;
 }
-[class^="ri-"].ri-8x,
-[class*=" ri-"].ri-8x {
+.ri-8x {
   font-size: 8em;
 }
-[class^="ri-"].ri-9x,
-[class*=" ri-"].ri-9x {
+.ri-9x {
   font-size: 9em;
 }
-[class^="ri-"].ri-10x,
-[class*=" ri-"].ri-10x {
+.ri-10x {
   font-size: 10em;
 }
-[class^="ri-"].ri-fw,
-[class*=" ri-"].ri-fw {
+.ri-fw {
   text-align: center;
   width: 1.25em;
 }
@@ -14873,6 +14857,504 @@ button.close {
 .ri-user-minus-line:before {
   content: "\f54c";
 }
+.ri-account-box-2-fill:before {
+  content: "\f54d";
+}
+.ri-account-box-2-line:before {
+  content: "\f54e";
+}
+.ri-account-circle-2-fill:before {
+  content: "\f54f";
+}
+.ri-account-circle-2-line:before {
+  content: "\f550";
+}
+.ri-alarm-snooze-fill:before {
+  content: "\f551";
+}
+.ri-alarm-snooze-line:before {
+  content: "\f552";
+}
+.ri-arrow-down-box-fill:before {
+  content: "\f553";
+}
+.ri-arrow-down-box-line:before {
+  content: "\f554";
+}
+.ri-arrow-left-box-fill:before {
+  content: "\f555";
+}
+.ri-arrow-left-box-line:before {
+  content: "\f556";
+}
+.ri-arrow-left-down-box-fill:before {
+  content: "\f557";
+}
+.ri-arrow-left-down-box-line:before {
+  content: "\f558";
+}
+.ri-arrow-left-up-box-fill:before {
+  content: "\f559";
+}
+.ri-arrow-left-up-box-line:before {
+  content: "\f55a";
+}
+.ri-arrow-right-box-fill:before {
+  content: "\f55b";
+}
+.ri-arrow-right-box-line:before {
+  content: "\f55c";
+}
+.ri-arrow-right-down-box-fill:before {
+  content: "\f55d";
+}
+.ri-arrow-right-down-box-line:before {
+  content: "\f55e";
+}
+.ri-arrow-right-up-box-fill:before {
+  content: "\f55f";
+}
+.ri-arrow-right-up-box-line:before {
+  content: "\f560";
+}
+.ri-arrow-up-box-fill:before {
+  content: "\f561";
+}
+.ri-arrow-up-box-line:before {
+  content: "\f562";
+}
+.ri-bar-chart-box-ai-fill:before {
+  content: "\f563";
+}
+.ri-bar-chart-box-ai-line:before {
+  content: "\f564";
+}
+.ri-brush-ai-fill:before {
+  content: "\f565";
+}
+.ri-brush-ai-line:before {
+  content: "\f566";
+}
+.ri-camera-ai-fill:before {
+  content: "\f567";
+}
+.ri-camera-ai-line:before {
+  content: "\f568";
+}
+.ri-chat-ai-fill:before {
+  content: "\f569";
+}
+.ri-chat-ai-line:before {
+  content: "\f56a";
+}
+.ri-chat-smile-ai-fill:before {
+  content: "\f56b";
+}
+.ri-chat-smile-ai-line:before {
+  content: "\f56c";
+}
+.ri-chat-voice-ai-fill:before {
+  content: "\f56d";
+}
+.ri-chat-voice-ai-line:before {
+  content: "\f56e";
+}
+.ri-code-ai-fill:before {
+  content: "\f56f";
+}
+.ri-code-ai-line:before {
+  content: "\f570";
+}
+.ri-color-filter-ai-fill:before {
+  content: "\f571";
+}
+.ri-color-filter-ai-line:before {
+  content: "\f572";
+}
+.ri-custom-size:before {
+  content: "\f573";
+}
+.ri-fediverse-fill:before {
+  content: "\f574";
+}
+.ri-fediverse-line:before {
+  content: "\f575";
+}
+.ri-flag-off-fill:before {
+  content: "\f576";
+}
+.ri-flag-off-line:before {
+  content: "\f577";
+}
+.ri-home-9-fill:before {
+  content: "\f578";
+}
+.ri-home-9-line:before {
+  content: "\f579";
+}
+.ri-image-ai-fill:before {
+  content: "\f57a";
+}
+.ri-image-ai-line:before {
+  content: "\f57b";
+}
+.ri-image-circle-ai-fill:before {
+  content: "\f57c";
+}
+.ri-image-circle-ai-line:before {
+  content: "\f57d";
+}
+.ri-info-card-fill:before {
+  content: "\f57e";
+}
+.ri-info-card-line:before {
+  content: "\f57f";
+}
+.ri-landscape-ai-fill:before {
+  content: "\f580";
+}
+.ri-landscape-ai-line:before {
+  content: "\f581";
+}
+.ri-letter-spacing-2:before {
+  content: "\f582";
+}
+.ri-line-height-2:before {
+  content: "\f583";
+}
+.ri-mail-ai-fill:before {
+  content: "\f584";
+}
+.ri-mail-ai-line:before {
+  content: "\f585";
+}
+.ri-mic-2-ai-fill:before {
+  content: "\f586";
+}
+.ri-mic-2-ai-line:before {
+  content: "\f587";
+}
+.ri-mic-ai-fill:before {
+  content: "\f588";
+}
+.ri-mic-ai-line:before {
+  content: "\f589";
+}
+.ri-movie-ai-fill:before {
+  content: "\f58a";
+}
+.ri-movie-ai-line:before {
+  content: "\f58b";
+}
+.ri-music-ai-fill:before {
+  content: "\f58c";
+}
+.ri-music-ai-line:before {
+  content: "\f58d";
+}
+.ri-notification-snooze-fill:before {
+  content: "\f58e";
+}
+.ri-notification-snooze-line:before {
+  content: "\f58f";
+}
+.ri-php-fill:before {
+  content: "\f590";
+}
+.ri-php-line:before {
+  content: "\f591";
+}
+.ri-pix-fill:before {
+  content: "\f592";
+}
+.ri-pix-line:before {
+  content: "\f593";
+}
+.ri-pulse-ai-fill:before {
+  content: "\f594";
+}
+.ri-pulse-ai-line:before {
+  content: "\f595";
+}
+.ri-quill-pen-ai-fill:before {
+  content: "\f596";
+}
+.ri-quill-pen-ai-line:before {
+  content: "\f597";
+}
+.ri-speak-ai-fill:before {
+  content: "\f598";
+}
+.ri-speak-ai-line:before {
+  content: "\f599";
+}
+.ri-star-off-fill:before {
+  content: "\f59a";
+}
+.ri-star-off-line:before {
+  content: "\f59b";
+}
+.ri-translate-ai-2:before {
+  content: "\f59c";
+}
+.ri-translate-ai:before {
+  content: "\f59d";
+}
+.ri-user-community-fill:before {
+  content: "\f59e";
+}
+.ri-user-community-line:before {
+  content: "\f59f";
+}
+.ri-vercel-fill:before {
+  content: "\f5a0";
+}
+.ri-vercel-line:before {
+  content: "\f5a1";
+}
+.ri-video-ai-fill:before {
+  content: "\f5a2";
+}
+.ri-video-ai-line:before {
+  content: "\f5a3";
+}
+.ri-video-on-ai-fill:before {
+  content: "\f5a4";
+}
+.ri-video-on-ai-line:before {
+  content: "\f5a5";
+}
+.ri-voice-ai-fill:before {
+  content: "\f5a6";
+}
+.ri-voice-ai-line:before {
+  content: "\f5a7";
+}
+.ri-ai-generate-2:before {
+  content: "\f5a8";
+}
+.ri-ai-generate-text:before {
+  content: "\f5a9";
+}
+.ri-anthropic-fill:before {
+  content: "\f5aa";
+}
+.ri-anthropic-line:before {
+  content: "\f5ab";
+}
+.ri-apps-2-ai-fill:before {
+  content: "\f5ac";
+}
+.ri-apps-2-ai-line:before {
+  content: "\f5ad";
+}
+.ri-camera-lens-ai-fill:before {
+  content: "\f5ae";
+}
+.ri-camera-lens-ai-line:before {
+  content: "\f5af";
+}
+.ri-clapperboard-ai-fill:before {
+  content: "\f5b0";
+}
+.ri-clapperboard-ai-line:before {
+  content: "\f5b1";
+}
+.ri-claude-fill:before {
+  content: "\f5b2";
+}
+.ri-claude-line:before {
+  content: "\f5b3";
+}
+.ri-closed-captioning-ai-fill:before {
+  content: "\f5b4";
+}
+.ri-closed-captioning-ai-line:before {
+  content: "\f5b5";
+}
+.ri-dvd-ai-fill:before {
+  content: "\f5b6";
+}
+.ri-dvd-ai-line:before {
+  content: "\f5b7";
+}
+.ri-film-ai-fill:before {
+  content: "\f5b8";
+}
+.ri-film-ai-line:before {
+  content: "\f5b9";
+}
+.ri-font-size-ai:before {
+  content: "\f5ba";
+}
+.ri-mixtral-fill:before {
+  content: "\f5bb";
+}
+.ri-mixtral-line:before {
+  content: "\f5bc";
+}
+.ri-movie-2-ai-fill:before {
+  content: "\f5bd";
+}
+.ri-movie-2-ai-line:before {
+  content: "\f5be";
+}
+.ri-mv-ai-fill:before {
+  content: "\f5bf";
+}
+.ri-mv-ai-line:before {
+  content: "\f5c0";
+}
+.ri-perplexity-fill:before {
+  content: "\f5c1";
+}
+.ri-perplexity-line:before {
+  content: "\f5c2";
+}
+.ri-poker-clubs-fill:before {
+  content: "\f5c3";
+}
+.ri-poker-clubs-line:before {
+  content: "\f5c4";
+}
+.ri-poker-diamonds-fill:before {
+  content: "\f5c5";
+}
+.ri-poker-diamonds-line:before {
+  content: "\f5c6";
+}
+.ri-poker-hearts-fill:before {
+  content: "\f5c7";
+}
+.ri-poker-hearts-line:before {
+  content: "\f5c8";
+}
+.ri-poker-spades-fill:before {
+  content: "\f5c9";
+}
+.ri-poker-spades-line:before {
+  content: "\f5ca";
+}
+.ri-safe-3-fill:before {
+  content: "\f5cb";
+}
+.ri-safe-3-line:before {
+  content: "\f5cc";
+}
+.ri-accessibility-fill:before {
+  content: "\f5cd";
+}
+.ri-accessibility-line:before {
+  content: "\f5ce";
+}
+.ri-alarm-add-fill:before {
+  content: "\f5cf";
+}
+.ri-alarm-add-line:before {
+  content: "\f5d0";
+}
+.ri-arrow-down-long-fill:before {
+  content: "\f5d1";
+}
+.ri-arrow-down-long-line:before {
+  content: "\f5d2";
+}
+.ri-arrow-left-down-long-fill:before {
+  content: "\f5d3";
+}
+.ri-arrow-left-down-long-line:before {
+  content: "\f5d4";
+}
+.ri-arrow-left-long-fill:before {
+  content: "\f5d5";
+}
+.ri-arrow-left-long-line:before {
+  content: "\f5d6";
+}
+.ri-arrow-left-up-long-fill:before {
+  content: "\f5d7";
+}
+.ri-arrow-left-up-long-line:before {
+  content: "\f5d8";
+}
+.ri-arrow-right-down-long-fill:before {
+  content: "\f5d9";
+}
+.ri-arrow-right-down-long-line:before {
+  content: "\f5da";
+}
+.ri-arrow-right-long-fill:before {
+  content: "\f5db";
+}
+.ri-arrow-right-long-line:before {
+  content: "\f5dc";
+}
+.ri-arrow-right-up-long-fill:before {
+  content: "\f5dd";
+}
+.ri-arrow-right-up-long-line:before {
+  content: "\f5de";
+}
+.ri-arrow-up-long-fill:before {
+  content: "\f5df";
+}
+.ri-arrow-up-long-line:before {
+  content: "\f5e0";
+}
+.ri-chess-fill:before {
+  content: "\f5e1";
+}
+.ri-chess-line:before {
+  content: "\f5e2";
+}
+.ri-diamond-fill:before {
+  content: "\f5e3";
+}
+.ri-diamond-line:before {
+  content: "\f5e4";
+}
+.ri-diamond-ring-fill:before {
+  content: "\f5e5";
+}
+.ri-diamond-ring-line:before {
+  content: "\f5e6";
+}
+.ri-figma-fill:before {
+  content: "\f5e7";
+}
+.ri-figma-line:before {
+  content: "\f5e8";
+}
+.ri-firefox-browser-fill:before {
+  content: "\f5e9";
+}
+.ri-firefox-browser-line:before {
+  content: "\f5ea";
+}
+.ri-jewelry-fill:before {
+  content: "\f5eb";
+}
+.ri-jewelry-line:before {
+  content: "\f5ec";
+}
+.ri-multi-image-fill:before {
+  content: "\f5ed";
+}
+.ri-multi-image-line:before {
+  content: "\f5ee";
+}
+.ri-no-credit-card-fill:before {
+  content: "\f5ef";
+}
+.ri-no-credit-card-line:before {
+  content: "\f5f0";
+}
+.ri-service-bell-fill:before {
+  content: "\f5f1";
+}
+.ri-service-bell-line:before {
+  content: "\f5f2";
+}
 .chosen-select {
   width: 100%;
 }
@@ -20687,413 +21169,4 @@ svg {
   font-size: smaller;
   color: #777;
   font-weight: normal;
-}
-/* BASICS */
-.CodeMirror {
-  /* Set height, width, borders, and global font properties here */
-  font-family: monospace;
-  height: 300px;
-  color: black;
-}
-/* PADDING */
-.CodeMirror-lines {
-  padding: 4px 0;
-  /* Vertical padding around content */
-}
-.CodeMirror pre {
-  padding: 0 4px;
-  /* Horizontal padding of content */
-}
-.CodeMirror-scrollbar-filler,
-.CodeMirror-gutter-filler {
-  background-color: white;
-  /* The little square between H and V scrollbars */
-}
-/* GUTTER */
-.CodeMirror-gutters {
-  border-right: 1px solid #ddd;
-  background-color: #f7f7f7;
-  white-space: nowrap;
-}
-.CodeMirror-linenumber {
-  padding: 0 3px 0 5px;
-  min-width: 20px;
-  text-align: right;
-  color: #999;
-  white-space: nowrap;
-}
-.CodeMirror-guttermarker {
-  color: black;
-}
-.CodeMirror-guttermarker-subtle {
-  color: #999;
-}
-/* CURSOR */
-.CodeMirror-cursor {
-  border-left: 1px solid black;
-  border-right: none;
-  width: 0;
-}
-/* Shown when moving in bi-directional text */
-.CodeMirror div.CodeMirror-secondarycursor {
-  border-left: 1px solid silver;
-}
-.cm-fat-cursor .CodeMirror-cursor {
-  width: auto;
-  border: 0 !important;
-  background: #7e7;
-}
-.cm-fat-cursor div.CodeMirror-cursors {
-  z-index: 1;
-}
-.cm-animate-fat-cursor {
-  width: auto;
-  border: 0;
-  -webkit-animation: blink 1.06s steps(1) infinite;
-  -moz-animation: blink 1.06s steps(1) infinite;
-  animation: blink 1.06s steps(1) infinite;
-  background-color: #7e7;
-}
-@-moz-keyframes blink {
-  50% {
-    background-color: transparent;
-  }
-}
-@-webkit-keyframes blink {
-  50% {
-    background-color: transparent;
-  }
-}
-@keyframes blink {
-  50% {
-    background-color: transparent;
-  }
-}
-/* Can style cursor different in overwrite (non-insert) mode */
-.cm-tab {
-  display: inline-block;
-  text-decoration: inherit;
-}
-.CodeMirror-ruler {
-  border-left: 1px solid #ccc;
-  position: absolute;
-}
-/* DEFAULT THEME */
-.cm-s-default .cm-header {
-  color: blue;
-}
-.cm-s-default .cm-quote {
-  color: #090;
-}
-.cm-negative {
-  color: #d44;
-}
-.cm-positive {
-  color: #292;
-}
-.cm-header,
-.cm-strong {
-  font-weight: bold;
-}
-.cm-em {
-  font-style: italic;
-}
-.cm-link {
-  text-decoration: underline;
-}
-.cm-strikethrough {
-  text-decoration: line-through;
-}
-.cm-s-default .cm-keyword {
-  color: #708;
-}
-.cm-s-default .cm-atom {
-  color: #219;
-}
-.cm-s-default .cm-number {
-  color: #164;
-}
-.cm-s-default .cm-def {
-  color: #00f;
-}
-.cm-s-default .cm-variable-2 {
-  color: #05a;
-}
-.cm-s-default .cm-variable-3 {
-  color: #085;
-}
-.cm-s-default .cm-comment {
-  color: #a50;
-}
-.cm-s-default .cm-string {
-  color: #a11;
-}
-.cm-s-default .cm-string-2 {
-  color: #f50;
-}
-.cm-s-default .cm-meta {
-  color: #555;
-}
-.cm-s-default .cm-qualifier {
-  color: #555;
-}
-.cm-s-default .cm-builtin {
-  color: #30a;
-}
-.cm-s-default .cm-bracket {
-  color: #997;
-}
-.cm-s-default .cm-tag {
-  color: #170;
-}
-.cm-s-default .cm-attribute {
-  color: #00c;
-}
-.cm-s-default .cm-hr {
-  color: #999;
-}
-.cm-s-default .cm-link {
-  color: #00c;
-}
-.cm-s-default .cm-error {
-  color: #f00;
-}
-.cm-invalidchar {
-  color: #f00;
-}
-.CodeMirror-composing {
-  border-bottom: 2px solid;
-}
-/* Default styles for common addons */
-div.CodeMirror span.CodeMirror-matchingbracket {
-  color: #0f0;
-}
-div.CodeMirror span.CodeMirror-nonmatchingbracket {
-  color: #f22;
-}
-.CodeMirror-matchingtag {
-  background: rgba(255, 150, 0, 0.3);
-}
-.CodeMirror-activeline-background {
-  background: #e8f2ff;
-}
-/* STOP */
-/* The rest of this file contains styles related to the mechanics of
-   the editor. You probably shouldn't touch them. */
-.CodeMirror {
-  position: relative;
-  overflow: hidden;
-  background: white;
-}
-.CodeMirror-scroll {
-  overflow: scroll !important;
-  /* Things will break if this is overridden */
-  /* 30px is the magic margin used to hide the element's real scrollbars */
-  /* See overflow: hidden in .CodeMirror */
-  margin-bottom: -30px;
-  margin-right: -30px;
-  padding-bottom: 30px;
-  height: 100%;
-  outline: none;
-  /* Prevent dragging from highlighting the element */
-  position: relative;
-}
-.CodeMirror-sizer {
-  position: relative;
-  border-right: 30px solid transparent;
-}
-/* The fake, visible scrollbars. Used to force redraw during scrolling
-   before actual scrolling happens, thus preventing shaking and
-   flickering artifacts. */
-.CodeMirror-vscrollbar,
-.CodeMirror-hscrollbar,
-.CodeMirror-scrollbar-filler,
-.CodeMirror-gutter-filler {
-  position: absolute;
-  z-index: 6;
-  display: none;
-}
-.CodeMirror-vscrollbar {
-  right: 0;
-  top: 0;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-.CodeMirror-hscrollbar {
-  bottom: 0;
-  left: 0;
-  overflow-y: hidden;
-  overflow-x: scroll;
-}
-.CodeMirror-scrollbar-filler {
-  right: 0;
-  bottom: 0;
-}
-.CodeMirror-gutter-filler {
-  left: 0;
-  bottom: 0;
-}
-.CodeMirror-gutters {
-  position: absolute;
-  left: 0;
-  top: 0;
-  min-height: 100%;
-  z-index: 3;
-}
-.CodeMirror-gutter {
-  white-space: normal;
-  height: 100%;
-  display: inline-block;
-  vertical-align: top;
-  margin-bottom: -30px;
-  /* Hack to make IE7 behave */
-  *zoom: 1;
-  *display: inline;
-}
-.CodeMirror-gutter-wrapper {
-  position: absolute;
-  z-index: 4;
-  background: none !important;
-  border: none !important;
-}
-.CodeMirror-gutter-background {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 4;
-}
-.CodeMirror-gutter-elt {
-  position: absolute;
-  cursor: default;
-  z-index: 4;
-}
-.CodeMirror-gutter-wrapper {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-.CodeMirror-lines {
-  cursor: text;
-  min-height: 1px;
-  /* prevents collapsing before first draw */
-}
-.CodeMirror pre {
-  /* Reset some styles that the rest of the page might have set */
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-  border-radius: 0;
-  border-width: 0;
-  background: transparent;
-  font-family: inherit;
-  font-size: inherit;
-  margin: 0;
-  white-space: pre;
-  word-wrap: normal;
-  line-height: inherit;
-  color: inherit;
-  z-index: 2;
-  position: relative;
-  overflow: visible;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-font-variant-ligatures: none;
-  font-variant-ligatures: none;
-}
-.CodeMirror-wrap pre {
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  word-break: normal;
-}
-.CodeMirror-linebackground {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 0;
-}
-.CodeMirror-linewidget {
-  position: relative;
-  z-index: 2;
-  overflow: auto;
-}
-.CodeMirror-code {
-  outline: none;
-}
-/* Force content-box sizing for the elements where we expect it */
-.CodeMirror-scroll,
-.CodeMirror-sizer,
-.CodeMirror-gutter,
-.CodeMirror-gutters,
-.CodeMirror-linenumber {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-.CodeMirror-measure {
-  position: absolute;
-  width: 100%;
-  height: 0;
-  overflow: hidden;
-  visibility: hidden;
-}
-.CodeMirror-cursor {
-  position: absolute;
-}
-.CodeMirror-measure pre {
-  position: static;
-}
-div.CodeMirror-cursors {
-  visibility: hidden;
-  position: relative;
-  z-index: 3;
-}
-div.CodeMirror-dragcursors {
-  visibility: visible;
-}
-.CodeMirror-focused div.CodeMirror-cursors {
-  visibility: visible;
-}
-.CodeMirror-selected {
-  background: #d9d9d9;
-}
-.CodeMirror-focused .CodeMirror-selected {
-  background: #d7d4f0;
-}
-.CodeMirror-crosshair {
-  cursor: crosshair;
-}
-.CodeMirror-line::selection,
-.CodeMirror-line > span::selection,
-.CodeMirror-line > span > span::selection {
-  background: #d7d4f0;
-}
-.CodeMirror-line::-moz-selection,
-.CodeMirror-line > span::-moz-selection,
-.CodeMirror-line > span > span::-moz-selection {
-  background: #d7d4f0;
-}
-.cm-searching {
-  background: #ffa;
-  background: rgba(255, 255, 0, 0.4);
-}
-/* IE7 hack to prevent it from returning funny offsetTops on the spans */
-.CodeMirror span {
-  *vertical-align: text-bottom;
-}
-/* Used to force a border model for a node */
-.cm-force-border {
-  padding-right: 0.1px;
-}
-@media print {
-  /* Hide the cursor when printing */
-  .CodeMirror div.CodeMirror-cursors {
-    visibility: hidden;
-  }
-}
-/* See issue #2901 */
-.cm-tab-wrap-hack:after {
-  content: '';
-}
-/* Help users use markselection to safely style text background */
-span.CodeMirror-selectedtext {
-  background: none;
 }

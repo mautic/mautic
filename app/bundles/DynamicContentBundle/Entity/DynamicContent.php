@@ -12,6 +12,8 @@ use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -20,11 +22,32 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "dynamicContent:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "translationChildren"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "dynamicContent:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use FiltersEntityTrait;
+    use UuidTrait;
 
     /**
      * @var int
@@ -166,6 +189,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 ->columnName('slot_name')
                 ->nullable()
                 ->build();
+
+        static::addUuidField($builder);
     }
 
     /**
