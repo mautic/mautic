@@ -925,17 +925,18 @@ class MailHelper
     }
 
     /**
-     * Set CC address(es).
+     * Helper method to set CC or BCC recipients.
      *
+     * @param string                    $type      Type of recipient (cc or bcc)
      * @param array<string|int,?string> $addresses Array of emails as values or keys
      * @param ?string                   $name      Default name for addresses without specified names
      */
-    public function setCc($addresses, $name = null): bool
+    private function setRecipients(string $type, $addresses, $name = null): bool
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'cc');
+        $this->checkBatchMaxRecipients(count($addresses), $type);
 
         try {
-            $ccAddresses = [];
+            $recipientAddresses = [];
 
             foreach ($addresses as $key => $value) {
                 // Check if we have an indexed array (numeric keys)
@@ -948,17 +949,32 @@ class MailHelper
                     $addressName = $value ?: $name; // Use provided name or default
                 }
 
-                $ccAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
+                $recipientAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
             }
 
-            $this->message->cc(...$ccAddresses);
+            if ('cc' === $type) {
+                $this->message->cc(...$recipientAddresses);
+            } else {
+                $this->message->bcc(...$recipientAddresses);
+            }
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e, 'cc');
+            $this->logError($e, $type);
 
             return false;
         }
+    }
+
+    /**
+     * Set CC address(es).
+     *
+     * @param array<string|int,?string> $addresses Array of emails as values or keys
+     * @param ?string                   $name      Default name for addresses without specified names
+     */
+    public function setCc($addresses, $name = null): bool
+    {
+        return $this->setRecipients('cc', $addresses, $name);
     }
 
     /**
@@ -990,33 +1006,7 @@ class MailHelper
      */
     public function setBcc($addresses, $name = null): bool
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'bcc');
-
-        try {
-            $bccAddresses = [];
-
-            foreach ($addresses as $key => $value) {
-                // Check if we have an indexed array (numeric keys)
-                if (is_numeric($key)) {
-                    $address     = $value;
-                    $addressName = $name;
-                } else {
-                    // We have an associative array (email => name)
-                    $address     = $key;
-                    $addressName = $value ?: $name; // Use provided name or default
-                }
-
-                $bccAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
-            }
-
-            $this->message->bcc(...$bccAddresses);
-
-            return true;
-        } catch (\Exception $e) {
-            $this->logError($e, 'bcc');
-
-            return false;
-        }
+        return $this->setRecipients('bcc', $addresses, $name);
     }
 
     /**
