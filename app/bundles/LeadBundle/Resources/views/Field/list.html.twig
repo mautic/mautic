@@ -49,13 +49,18 @@
   {% if items|length > 0 %}
       {# Group items by object #}
       {% set groupedItems = {} %}
+      {% set objectTotals = {} %}
       {% for item in items %}
           {% set objectKey = item.object %}
           {% if groupedItems[objectKey] is not defined %}
               {% set groupedItems = groupedItems|merge({(objectKey): []}) %}
+              {% set objectTotals = objectTotals|merge({(objectKey): 0}) %}
           {% endif %}
           {% set groupedItems = groupedItems|merge({
               (objectKey): groupedItems[objectKey]|merge([item])
+          }) %}
+          {% set objectTotals = objectTotals|merge({
+              (objectKey): objectTotals[objectKey] + 1
           }) %}
       {% endfor %}
 
@@ -141,6 +146,16 @@
                       </tbody>
                   </table>
               </div>
+              <div class="panel-footer">
+                  {{ include('@MauticCore/Helper/pagination.html.twig', {
+                          'totalItems': objectTotals[objectKey],
+                          'page': page,
+                          'limit': limit,
+                          'baseUrl': path('mautic_contactfield_index', {'object': objectKey}),
+                          'sessionVar': 'leadfield.' ~ objectKey,
+                          'queryString': 'object=' ~ objectKey
+                  }) }}
+              </div>
           {% endset %}
 
           {% set tabsContent = tabsContent|merge([{
@@ -154,15 +169,6 @@
           'style': 'contained'
       }) }}
 
-      <div class="panel-footer">
-          {{ include('@MauticCore/Helper/pagination.html.twig', {
-                  'totalItems': totalItems,
-                  'page': page,
-                  'limit': limit,
-                  'baseUrl': path('mautic_contactfield_index'),
-                  'sessionVar': 'leadfield',
-          }) }}
-      </div>
   {% else %}
       {{ include('@MauticCore/Helper/noresults.html.twig') }}
   {% endif %}
