@@ -174,31 +174,35 @@
 
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
                 <div id="campaign-share-container" style="position: relative">
-                    <table id="campaign-share-table" class="table table-hover mb-0">
-                        <thead>
-                        <tr>
-                            <th>{{ 'mautic.campaign.campaign'|trans }}</th>
-                            <th>{{ 'mautic.lead.share'|trans }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for stat in campaignStats %}
-                            {% if stat.share is not empty %}
+                    {% if campaignStats|filter(stat => stat.share is not empty)|length > 0 %}
+                        <table id="campaign-share-table" class="table table-hover mb-0">
+                            <thead>
                             <tr>
-                                <td>
-                                    <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': stat.id}) }}" data-toggle="ajax">
-                                        {{- stat.name -}}
-                                    </a>
-                                </td>
-                                <td width="20%">
-                                    <span class="campaign-share-stat" data-value="{{ stat.id }}"
-                                          id="campaign-share-stat-{{ stat.id }}">{{ stat.share }}</span> %
-                                </td>
+                                <th>{{ 'mautic.campaign.campaign'|trans }}</th>
+                                <th>{{ 'mautic.lead.share'|trans }}</th>
                             </tr>
-                            {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for stat in campaignStats %}
+                                {% if stat.share is not empty %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': stat.id}) }}" data-toggle="ajax">
+                                            {{- stat.name -}}
+                                        </a>
+                                    </td>
+                                    <td width="20%">
+                                        <span class="campaign-share-stat" data-value="{{ stat.id }}"
+                                              id="campaign-share-stat-{{ stat.id }}">{{ stat.share }}</span> %
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.lead.campaign.share.no_results'|trans}) }}
+                    {% endif %}
                 </div>
             </div>
         </div>
