@@ -88,7 +88,6 @@
                   <table class="table table-hover leadfield-list" id="leadFieldTable_{{ objectKey }}" class="overflow:auto">
                       <thead>
                       <tr>
-                          <th class="col-leadfield-orderhandle"></th>
                           {{ include('@MauticCore/Helper/tableheader.html.twig', {
                               'checkall': 'true',
                               'target': '#leadFieldTable_' ~ objectKey,
@@ -104,7 +103,6 @@
                       <tbody>
                       {% for item in groupedItems[objectKey] %}
                           <tr id="field_{{ item.id }}">
-                              <td><i class="ri-xl ri-draggable text-secondary"></i></td>
                               <td>
                                   {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                           'item': item,
