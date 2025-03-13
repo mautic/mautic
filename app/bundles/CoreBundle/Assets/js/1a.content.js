@@ -337,6 +337,19 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateLiveSearch(mQuery(this), "lastSearchStr", "liveCache");
     });
 
+    // Re-focus whichever live-search field was active
+    if (MauticVars.lastUsedLiveSearch) {
+        const el = document.getElementById(MauticVars.lastUsedLiveSearch);
+        if (el) {
+            el.focus();
+            // put the cursor at the end
+            const val = el.value;
+            el.value = '';
+            el.value = val;
+        }
+        MauticVars.lastUsedLiveSearch = null;
+    }
+
     //initialize tooltips
     var pageTooltips = mQuery(container + " *[data-toggle='tooltip']");
     pageTooltips.tooltip({html: true, container: 'body'});
@@ -1351,6 +1364,12 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
     mQuery(el).on('focus', function () {
         Mautic.currentSearchString = mQuery(this).val().trim();
     });
+
+    // Add keydown handler to track last used live search
+    mQuery(el).on('keydown', function() {
+        MauticVars.lastUsedLiveSearch = mQuery(this).attr('id');
+    });
+
     mQuery(el).on('change keyup paste', {}, function (event) {
         var searchStr = mQuery(el).val().trim();
 
