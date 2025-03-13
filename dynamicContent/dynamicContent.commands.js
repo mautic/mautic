@@ -35,6 +35,22 @@ export default class DynamicContentCommands {
       });
     }
 
+    // empty the listeners, these are created when reopening
+    // otherwise the listeners are compounded and we get multiple CKEditors 
+    // for 1 textarea
+    if (
+      Mautic.internalDynamicContentItemCreateListeners &&
+      Mautic.internalDynamicContentItemCreateListeners.length
+    ) {
+      Mautic.internalDynamicContentItemCreateListeners = [];
+    }
+    if (
+      Mautic.internalDynamicContentFilterCreateListeners &&
+      Mautic.internalDynamicContentFilterCreateListeners.length
+    ) {
+      Mautic.internalDynamicContentFilterCreateListeners = [];
+    }
+
     this.dcService.updateDcStoreItem();
   }
 
