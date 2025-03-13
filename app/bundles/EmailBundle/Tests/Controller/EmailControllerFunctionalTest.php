@@ -98,7 +98,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // Get all optgroup labels
         $labels = $crawler->filterXPath('//select[@id="filters"]/optgroup')->each(
-            fn(Crawler $node) => $node->attr('label')
+            fn (Crawler $node) => $node->attr('label')
         );
 
         $translator = $this->getContainer()->get('translator');
@@ -108,11 +108,12 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertContains($translator->trans('mautic.core.filter.categories'), $labels);
 
         // Get options inside the "Category" optgroup
-        $optionGroup = $crawler->filter('optgroup[label="Category"] option');
+        $label = $translator->trans('mautic.core.filter.categories');
+        $optionGroup = $crawler->filter('optgroup[label="'.$label.'"] option');
         $this->assertCount(2, $optionGroup);
 
         $options     = $optionGroup->each(
-            fn(Crawler $node) => $node->text()
+            fn (Crawler $node) => $node->text()
         );
 
         // Assert that "Uncategorized" exists in the category options
