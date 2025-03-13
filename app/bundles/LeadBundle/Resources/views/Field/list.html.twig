@@ -23,52 +23,68 @@
 {% block headerTitle %}{{ 'mautic.lead.field.header.index'|trans }}{% endblock %}
 
 {% block content %}
-  {% if isIndex %}
-    <div id="page-list-wrapper" class="panel panel-default">
-        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-            'searchValue': searchValue,
-            'action': currentRoute,
-            'page_actions': {
-                'templateButtons': {
-                    'new': true,
-                },
-                'routeBase': 'contactfield',
-                'langVar': 'lead.field',
-            },
-            'bulk_actions': {
-                'langVar': 'lead.field',
-                'routeBase': 'contactfield',
-                'templateButtons': {
-                    'delete': permissions['lead:fields:full'],
-                },
-            },
-        }) }}
-        <div class="page-list">
-  {% endif %}
+{% if isIndex %}
+<div id="page-list-wrapper">
+    <div class="page-list">
+{% endif %}
 
-  {% if items|length > 0 %}
-      {# Group items by object #}
-      {% set groupedItems = {} %}
-      {% set objectTotals = {} %}
-      {% for item in items %}
-          {% set objectKey = item.object %}
-          {% if groupedItems[objectKey] is not defined %}
-              {% set groupedItems = groupedItems|merge({(objectKey): []}) %}
-              {% set objectTotals = objectTotals|merge({(objectKey): 0}) %}
-          {% endif %}
-          {% set groupedItems = groupedItems|merge({
-              (objectKey): groupedItems[objectKey]|merge([item])
-          }) %}
-          {% set objectTotals = objectTotals|merge({
-              (objectKey): objectTotals[objectKey] + 1
-          }) %}
-      {% endfor %}
+  {# Group items by object #}
+  {% set groupedItems = {} %}
+  {% set objectTotals = {} %}
+  {% set objects = ['lead', 'company'] %}
 
-      {# Prepare tabs array #}
-      {% set tabsContent = [] %}
-      {% for objectKey, objectItems in groupedItems %}
-          {% set tableContent %}
-              <div class="table-responsive">
+  {% for item in items %}
+      {% set objectKey = item.object %}
+      {% if objectKey not in objects %}
+          {% set objects = objects|merge([objectKey]) %}
+      {% endif %}
+      {% if groupedItems[objectKey] is not defined %}
+          {% set groupedItems = groupedItems|merge({(objectKey): []}) %}
+          {% set objectTotals = objectTotals|merge({(objectKey): 0}) %}
+      {% endif %}
+      {% set groupedItems = groupedItems|merge({
+          (objectKey): groupedItems[objectKey]|merge([item])
+      }) %}
+      {% set objectTotals = objectTotals|merge({
+          (objectKey): objectTotals[objectKey] + 1
+      }) %}
+  {% endfor %}
+
+  {# Prepare tabs array #}
+  {% set tabsContent = [] %}
+  {% for objectKey in objects %}
+      {% if groupedItems[objectKey] is not defined %}
+          {% set groupedItems = groupedItems|merge({(objectKey): []}) %}
+          {% set objectTotals = objectTotals|merge({(objectKey): 0}) %}
+      {% endif %}
+
+      {% set tableContent %}
+      <div class="panel panel-default mt-lg">
+          {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+              'searchValue': searchValue,
+              'overlayTarget': '.table-responsive',
+              'action': path('mautic_contactfield_index', {'object': objectKey}),
+              'searchHelp': 'mautic.lead.field.help.searchcommands',
+              'page_actions': {
+                  'templateButtons': {
+                      'new': true,
+                  },
+                  'routeBase': 'contactfield',
+                  'langVar': 'lead.field',
+                  'routeParameters': {'object': objectKey},
+              },
+              'bulk_actions': {
+                  'langVar': 'lead.field',
+                  'routeBase': 'contactfield',
+                  'templateButtons': {
+                      'delete': permissions['lead:fields:full'],
+                  },
+              },
+          }) }}
+
+          {% if groupedItems[objectKey]|length > 0 %}
+
+              <div class="table-responsive pos-relative">
                   <table class="table table-hover leadfield-list" id="leadFieldTable_{{ objectKey }}" class="overflow:auto">
                       <thead>
                       <tr>
@@ -86,7 +102,7 @@
                       </tr>
                       </thead>
                       <tbody>
-                      {% for item in objectItems %}
+                      {% for item in groupedItems[objectKey] %}
                           <tr id="field_{{ item.id }}">
                               <td><i class="ri-xl ri-draggable text-secondary"></i></td>
                               <td>
@@ -100,6 +116,7 @@
                                           'routeBase': 'contactfield',
                                           'langVar': 'lead.field',
                                           'pull': 'left',
+                                          'routeParameters': {'object': objectKey},
                                   }) }}
                               </td>
                               <td>
@@ -110,7 +127,7 @@
                                               'disableToggle': item.disablePublishChange,
                                               'aditionalLabel': (item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : '') ~ (item.getColumnIsNotRemoved() ? 'mautic.lead.field.being_removed_in_background'|trans : ''),
                                   }) }}
-                                  <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}">{{ item.label }}</a>
+                                  <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id, 'object': objectKey}) }}">{{ item.label }}</a>
                                   {{ customContent('lead.field.name', _context) }}
                               </span>
                               </td>
@@ -156,22 +173,26 @@
                           'queryString': 'object=' ~ objectKey
                   }) }}
               </div>
-          {% endset %}
+          {% else %}
+              {{ include('@MauticCore/Helper/noresults.html.twig', {
+                  'message': 'mautic.core.noresults.tip'|trans({
+                      '%searchValue%': searchValue
+                  })
+              }) }}
+          {% endif %}
+      </div>
+      {% endset %}
 
-          {% set tabsContent = tabsContent|merge([{
-              'title': 'mautic.' ~ objectKey ~ '.' ~ objectKey,
-              'content': tableContent
-          }]) %}
-      {% endfor %}
+      {% set tabsContent = tabsContent|merge([{
+          'title': 'mautic.' ~ objectKey ~ '.' ~ objectKey,
+          'content': tableContent
+      }]) %}
+  {% endfor %}
 
-      {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
-          'tabs': tabsContent,
-          'style': 'contained'
-      }) }}
-
-  {% else %}
-      {{ include('@MauticCore/Helper/noresults.html.twig') }}
-  {% endif %}
+  {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
+      'tabs': tabsContent,
+      'style': 'line'
+  }) }}
 
   {% if isIndex %}
         </div>
