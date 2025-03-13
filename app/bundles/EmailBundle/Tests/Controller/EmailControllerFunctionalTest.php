@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -15,7 +16,9 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -72,7 +75,53 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful('Return code must be 200.');
     }
 
-    /**
+    public function testIndexActionForCategoryFilterOptions(): void
+    {
+        $categoryName = 'FilterTest';
+
+        $category = new Category();
+        $category->setTitle($categoryName);
+        $category->setAlias(strtolower($categoryName));
+        $category->setBundle('global');
+
+        $this->em->persist($category);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Request the emails page
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $this->assertResponseIsSuccessful();
+
+        // Extract data-content from the quick filters button
+        $dataContent = $crawler->filter('#core-quick-filters')->extract(['data-content'])[0] ?? '';
+        $crawler     = new Crawler($dataContent, $this->client->getInternalRequest()->getUri());
+
+        // Get all optgroup labels
+        $labels = $crawler->filterXPath('//select[@id="filters"]/optgroup')->each(
+            fn(Crawler $node) => $node->attr('label')
+        );
+
+        $translator = $this->getContainer()->get('translator');
+        \assert($translator instanceof TranslatorInterface);
+
+        // Assert that "Categories" filter exists
+        $this->assertContains($translator->trans('mautic.core.filter.categories'), $labels);
+
+        // Get options inside the "Category" optgroup
+        $optionGroup = $crawler->filter('optgroup[label="Category"] option');
+        $this->assertCount(2, $optionGroup);
+
+        $options     = $optionGroup->each(
+            fn(Crawler $node) => $node->text()
+        );
+
+        // Assert that "Uncategorized" exists in the category options
+        $this->assertContains($translator->trans('mautic.core.form.uncategorized'), $options);
+        // Assert that "FilterTest" exists in the category options
+        $this->assertContains($categoryName, $options);
+    }
+
+    /**z
      * Ensure there is no query for DNC reasons if there are no contacts who received the email
      * because it loads the whole DNC table if no contact IDs are provided. It can lead to
      * memory limit error if the DNC table is big.

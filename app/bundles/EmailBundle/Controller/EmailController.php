@@ -3,6 +3,9 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
@@ -46,7 +49,7 @@ class EmailController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1)
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, CategoryModel $categoryModel, $page = 1)
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -73,16 +76,6 @@ class EmailController extends FormController
 
         $session = $request->getSession();
 
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.email.filter.placeholder'),
-                'multiple'    => true,
-            ],
-        ];
-
-        // Reset available groups
-        $listFilters['filters']['groups'] = [];
-
         // set limits
         $limit = $session->get('mautic.email.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
@@ -105,12 +98,32 @@ class EmailController extends FormController
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->translator->trans('mautic.email.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [], // Reset available groups
+            ],
+        ];
+
         // retrieve a list of Lead Lists
         $leadListModel = $this->getModel('lead.list');
         \assert($leadListModel instanceof ListModel);
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => $leadListModel->getUserLists(),
             'prefix'  => 'list',
+        ];
+
+        // retrieve a list of categories
+        $categories      = $categoryModel->getLookupResults('email', '', 0);
+        $categoryOptions = [$this->translator->trans('mautic.core.searchcommand.isuncategorized') => $this->translator->trans('mautic.core.form.uncategorized')];
+        if ($categories) {
+            $categoryOptions += array_column($categories, 'title', 'alias');
+        }
+
+        $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
+            'options' => $categoryOptions,
+            'prefix'  => 'category',
         ];
 
         // retrieve a list of themes
