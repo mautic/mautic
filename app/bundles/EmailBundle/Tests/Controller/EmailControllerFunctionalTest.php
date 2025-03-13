@@ -108,7 +108,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertContains($translator->trans('mautic.core.filter.categories'), $labels);
 
         // Get options inside the "Category" optgroup
-        $label = $translator->trans('mautic.core.filter.categories');
+        $label       = $translator->trans('mautic.core.filter.categories');
         $optionGroup = $crawler->filter('optgroup[label="'.$label.'"] option');
         $this->assertCount(2, $optionGroup);
 
