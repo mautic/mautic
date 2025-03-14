@@ -159,7 +159,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
 
         Assert::assertStringContainsString('1 total events(s) to be processed', $commandResult->getDisplay());
-        Assert::assertStringContainsString('0 total events were executed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('0 total events were ran', $commandResult->getDisplay());
         Assert::assertStringContainsString('0 total events were scheduled', $commandResult->getDisplay());
     }
 
@@ -193,6 +193,6 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         Assert::assertStringContainsString('1 total events(s) to be processed', $commandResult->getDisplay());
         Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
-        Assert::assertStringContainsString('0 total events were executed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('0 total events were ran', $commandResult->getDisplay());
     }
 }

@@ -214,7 +214,7 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
         $commandTester->assertCommandIsSuccessful();
         // 2 events were executed for each of the 2 contacts (= 4). The third event is waiting for the decision interval.
-        Assert::assertStringContainsString('4 total events were executed', $commandTester->getDisplay());
+        Assert::assertStringContainsString('4 total events were run', $commandTester->getDisplay());
 
         $this->assertQueuedEmailCount(2);
 
