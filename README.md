@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-158-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-159-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -269,6 +269,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://linktr.ee/Jaishree2310"><img src="https://avatars.githubusercontent.com/u/73012522?v=4?s=100" width="100px;" alt="Jaishree Singh"/><br /><sub><b>Jaishree Singh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Jaishree2310" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kingsedem"><img src="https://avatars.githubusercontent.com/u/47061881?v=4?s=100" width="100px;" alt="Kingsley_E_"/><br /><sub><b>Kingsley_E_</b></sub></a><br /><a href="#userTesting-kingsedem" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Hugo-Prossaird"><img src="https://avatars.githubusercontent.com/u/176997845?v=4?s=100" width="100px;" alt="Hugo-Prossaird"/><br /><sub><b>Hugo-Prossaird</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Hugo-Prossaird" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/farzammadani"><img src="https://avatars.githubusercontent.com/u/69846004?v=4?s=100" width="100px;" alt="Farzam Madani"/><br /><sub><b>Farzam Madani</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=farzammadani" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
