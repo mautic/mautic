@@ -191,8 +191,12 @@
                                         </a>
                                     </td>
                                     <td width="20%">
-                                        <span class="campaign-share-stat" data-value="{{ stat.id }}"
-                                              id="campaign-share-stat-{{ stat.id }}">{{ stat.share }}</span> %
+                                        {% if stat.share is defined %}
+                                            <span>{{ stat.share }}</span> %
+                                            {% else %}
+                                            <span class="campaign-share-stat" data-value="{{ stat.id }}"
+                                                  id="campaign-share-stat-{{ stat.id }}"></span> %
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endif %}

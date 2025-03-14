@@ -6,7 +6,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Symfony\Contracts\Cache\ItemInterface;
 
 class SegmentCampaignShare
 {
@@ -27,7 +26,10 @@ class SegmentCampaignShare
     {
         $campaigns = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, $campaignIds);
         foreach ($campaigns as $campaign) {
-            $this->cacheProvider->getSimpleCache()->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['segmentCampaignShare']);
+            $cacheItem = $this->cacheProvider->getCacheAdapter()->getItem($this->getCachedKey($segmentId, $campaign['id']));
+            $cacheItem->set($campaign['segmentCampaignShare']);
+            $cacheItem->expiresAfter(3600);
+            $this->cacheProvider->getCacheAdapter()->save($cacheItem);
         }
 
         return $campaigns;
@@ -39,7 +41,7 @@ class SegmentCampaignShare
     public function getCampaignList(int $segmentId): array
     {
         $q = $this->entityManager->getConnection()->createQueryBuilder();
-        $q->select('c.id, c.name, null as share')
+        $q->select('c.id, c.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
@@ -48,19 +50,14 @@ class SegmentCampaignShare
 
         foreach ($campaigns as $key=>$campaign) {
             $cacheKey = $this->getCachedKey($segmentId, $campaign['id']);
-            
+
             // Only check if the item exists in cache
-            if ($this->cacheProvider->getCacheAdapter()->hasItem($cacheKey)) {
-                // Get the value from cache if it exists
-                $item = $this->cacheProvider->getCacheAdapter()->getItem($cacheKey);
-                $campaigns[$key]['share'] = $item->get();
-            } else {
-                // Use default value if not in cache
-                $campaigns[$key]['share'] = '0';
+            if ($this->cacheProvider->hasItem($cacheKey)) {
+                $campaigns[$key]['share'] = $this->cacheProvider->getItem($cacheKey)->get();
             }
         }
 
-        usort($campaigns, function ($a, $b) { return floatval($b['share']) <=> floatval($a['share']); });
+        usort($campaigns, function ($a, $b) { return floatval($b['share'] ?? 0) <=> floatval($a['share'] ?? 0); });
 
         return $campaigns;
     }
