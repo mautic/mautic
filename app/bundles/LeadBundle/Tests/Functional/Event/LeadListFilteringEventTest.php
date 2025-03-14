@@ -40,10 +40,10 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
 
         $segmentModel = self::getContainer()->get('mautic.lead.model.list');
 
+        $segmentModel->saveEntity($segment);
+
         // Manually add the contact to segment
         $segmentModel->addLead($contact, $segment);
-
-        $segmentModel->saveEntity($segment);
 
         // Process segment
         $segmentModel->rebuildListLeads($segment);
@@ -55,8 +55,8 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // Check for filter icon
-        $segmentHeader = $crawler->filter('h3.panel-title');
-        $this->assertStringContainsString('fa-filter', $segmentHeader->html(), 'Filter icon should be present when contacts are manually added to segment');
+        $segmentHeader = $crawler->filter('.panel-segments h5');
+        $this->assertStringContainsString('ri-filter-2-line', $segmentHeader->html(), 'Filter icon should be present when contacts are manually added to segment');
 
         // Now remove all manually added contacts
         $segmentModel->removeLead($contact, $segment, true);
@@ -68,7 +68,7 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // Check that filter icon is no longer present
-        $segmentHeader = $crawler->filter('h3.panel-title');
-        $this->assertStringNotContainsString('fa-filter', $segmentHeader->html(), 'Filter icon should not be present when no contacts are manually added');
+        $segmentHeader = $crawler->filter('.panel-segments h5');
+        $this->assertStringNotContainsString('ri-filter-2-line', $segmentHeader->html(), 'Filter icon should not be present when no contacts are manually added');
     }
 }
