@@ -134,7 +134,7 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', 's/contacts/new/');
 
         $fbLink  = 'https://fb.com/john_doe_test';
-        $form    = $crawler->selectButton('Save & Close')->form();
+        $form    = $crawler->selectButton('Save changes')->form();
         $form->setValues(
             [
                 'lead[firstname]' => 'John',

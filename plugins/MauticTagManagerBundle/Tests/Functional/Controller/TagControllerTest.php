@@ -118,7 +118,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
         $this->assertStringContainsString('Edit tag: '.$tag->getTag(), $clientResponseContent, 'The return must contain \'Edit tag\' text');
 
-        $form = $crawler->selectButton('Save & Close')->form();
+        $form = $crawler->selectButton('Save changes')->form();
         $form['tag_entity[tag]']->setValue($TagName);
         $this->client->submit($form);
 
@@ -178,7 +178,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $buttonCrawler  = $crawler->selectButton('Save changes');
         $form           = $buttonCrawler->form();
         $form->setValues(['tag_entity[tag]' => '']);
         $this->client->submit($form);

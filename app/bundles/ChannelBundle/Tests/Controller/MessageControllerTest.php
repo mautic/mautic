@@ -14,7 +14,7 @@ final class MessageControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/messages/new');
         $this->assertResponseIsSuccessful();
 
-        $form = $crawler->selectButton('Save & Close')->form([
+        $form = $crawler->selectButton('Save changes')->form([
             'message[name]'        => 'Test message',
             'message[description]' => 'Test message description',
         ]);

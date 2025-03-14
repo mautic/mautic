@@ -41,7 +41,7 @@ class TweetControllerTest extends MauticMysqlTestCase
     public function testCreateTweet(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/tweets/new');
-        $saveButton = $crawler->selectButton('Save & Close');
+        $saveButton = $crawler->selectButton('Save changes');
         $form       = $saveButton->form();
         $name       = 'The first tweet';
         $form['twitter_tweet[name]']->setValue($name);
@@ -64,7 +64,7 @@ class TweetControllerTest extends MauticMysqlTestCase
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
         $this->assertStringContainsString('Edit tweet '.$tweet->getName(), $clientResponseContent, 'The return must contain \'Edit tweet\' text');
 
-        $form = $crawler->selectButton('Save & Close')->form();
+        $form = $crawler->selectButton('Save changes')->form();
         $form['twitter_tweet[name]']->setValue('Updated tweet name');
         $this->client->submit($form);
 

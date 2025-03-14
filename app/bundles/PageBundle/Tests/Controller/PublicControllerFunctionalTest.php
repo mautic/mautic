@@ -132,7 +132,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
 
-        $buttonCrawlerNode = $crawler->selectButton('Save & Close');
+        $buttonCrawlerNode = $crawler->selectButton('Save changes');
         Assert::assertCount(1, $buttonCrawlerNode, $crawler->html());
         $form = $buttonCrawlerNode->form();
         $this->client->submit($form);
