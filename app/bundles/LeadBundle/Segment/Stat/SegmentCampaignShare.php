@@ -2,15 +2,17 @@
 
 namespace Mautic\LeadBundle\Segment\Stat;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class SegmentCampaignShare
 {
     public function __construct(
         private CampaignModel $campaignModel,
-        private CacheStorageHelper $cacheStorageHelper,
+        private CacheProvider $cacheProvider,
         private EntityManager $entityManager,
     ) {
     }
@@ -25,18 +27,16 @@ class SegmentCampaignShare
     {
         $campaigns = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, $campaignIds);
         foreach ($campaigns as $campaign) {
-            $this->cacheStorageHelper->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['segmentCampaignShare']);
+            $this->cacheProvider->getSimpleCache()->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['segmentCampaignShare']);
         }
 
         return $campaigns;
     }
 
     /**
-     * @param int $segmentId
-     *
-     * @return array
+     * @throws Exception
      */
-    public function getCampaignList($segmentId)
+    public function getCampaignList(int $segmentId): array
     {
         $q = $this->entityManager->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, null as share')
@@ -46,12 +46,18 @@ class SegmentCampaignShare
 
         $campaigns = $q->executeQuery()->fetchAllAssociative();
 
-        foreach ($campaigns as &$campaign) {
-            // just load from cache If exists
-            if ($share  = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {
-                $campaign['share'] = $share;
-            }
+        foreach ($campaigns as $key=>$campaign) {
+            $campaigns[$key]['share'] = $this->cacheProvider->getCacheAdapter()->get(
+                $this->getCachedKey($segmentId, $campaign['id']),
+                function (ItemInterface $item) use ($segmentId, $campaign): string {
+                    $item->expiresAfter(new \DateInterval('PT1H'));
+
+                    return $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, [$campaign['id']])[0]['segmentCampaignShare'];
+                }
+            );
         }
+
+        usort($campaigns, function ($a, $b) { return floatval($b['share']) <=> floatval($a['share']); });
 
         return $campaigns;
     }

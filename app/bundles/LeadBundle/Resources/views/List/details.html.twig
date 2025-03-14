@@ -16,7 +16,7 @@
 #}
 {% extends '@MauticCore/Default/content.html.twig' %}
 
-{% block mauticContent %}list{% endblock %}
+{% block mauticContent %}leadlist{% endblock %}
 
 {% block indexButton %}
 {{- include('@MauticCore/Helper/page_actions.html.twig', {
@@ -183,17 +183,19 @@
                         </thead>
                         <tbody>
                         {% for stat in campaignStats %}
-                            <tr>
-                                <td>
-                                    <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': stat.id}) }}" data-toggle="ajax">
-                                        {{- stat.name -}}
-                                    </a>
-                                </td>
-                                <td width="20%">
-                                    <span class="campaign-share-stat" data-value="{{ stat.id }}"
-                                          id="campaign-share-stat-{{ stat.id }}">{{ stat.share }}</span> %
-                                </td>
-                            </tr>
+                            {% if campaignStats > 0 %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': stat.id}) }}" data-toggle="ajax">
+                                            {{- stat.name -}}
+                                        </a>
+                                    </td>
+                                    <td width="20%">
+                                        <span class="campaign-share-stat" data-value="{{ stat.id }}"
+                                              id="campaign-share-stat-{{ stat.id }}">{{ stat.share }}</span> %
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                         </tbody>
                     </table>

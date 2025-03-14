@@ -151,7 +151,7 @@ Mautic.loadAjaxColumn = function(elementName, route, callback){
 Mautic.sortTableByColumn = function(tableId, sortElement, removeZero){
     var tbody = mQuery(tableId).find('tbody');
     tbody.find('tr').each(function () {
-        if(parseInt(mQuery(this).find(sortElement).text()) == 0) {
+        if(parseFloat(mQuery(this).find(sortElement).text()) == 0) {
             mQuery(this).remove();
         }
     })

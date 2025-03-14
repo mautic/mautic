@@ -485,7 +485,7 @@ return [
                 'class'     => Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare::class,
                 'arguments' => [
                     'mautic.campaign.model.campaign',
-                    'mautic.helper.cache_storage',
+                    'mautic.cache.provider',
                     '@doctrine.orm.entity_manager',
                 ],
             ],
