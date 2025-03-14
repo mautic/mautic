@@ -43,7 +43,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
 
-        $form = $crawler->selectButton('Save')->form([
+        $form = $crawler->selectButton('Apply')->form([
             'user[firstName]'               => '',
             'user[lastName]'                => '',
             'user[email]'                   => 'invalid-email',
@@ -71,7 +71,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
             'user[email]'     => 'john.doe@example.com',
         ];
 
-        $form = $crawler->selectButton('Save')->form($formData + $data);
+        $form = $crawler->selectButton('Apply')->form($formData + $data);
 
         $this->client->submit($form);
 
@@ -125,7 +125,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
 
-        $form = $crawler->selectButton('Save')->form($data);
+        $form = $crawler->selectButton('Apply')->form($data);
 
         $this->client->submit($form);
 

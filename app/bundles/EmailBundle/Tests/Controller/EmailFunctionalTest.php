@@ -34,7 +34,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         $this->assertResponseOk();
 
-        $form = $crawler->selectButton('Save')
+        $form = $crawler->selectButton('Apply')
             ->form();
 
         // change lists/excludedLists and submit the form
@@ -64,7 +64,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         $this->assertResponseOk();
 
-        $form = $crawler->selectButton('Save')
+        $form = $crawler->selectButton('Apply')
             ->form();
 
         /** @var ChoiceFormField $listsField */

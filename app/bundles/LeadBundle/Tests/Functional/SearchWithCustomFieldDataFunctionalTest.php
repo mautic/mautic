@@ -26,7 +26,7 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
         $this->assertResponseIsSuccessful('Failed to load the form: '.$this->client->getResponse()->getContent());
 
-        $form = $crawler->selectButton('Save')->form();
+        $form = $crawler->selectButton('Apply')->form();
 
         $defaultValues = [
             'leadfield[label]'   => 'Custom field',

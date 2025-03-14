@@ -18,7 +18,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
     public function testValidationRedirectWithoutUrl(string $redirectUrl, string $expectedMessage): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/new');
-        $saveButton = $crawler->selectButton('Save');
+        $saveButton = $crawler->selectButton('Apply');
         $form       = $saveButton->form();
         $form['page[title]']->setValue('Redirect test');
         $form['page[redirectType]']->setValue((string) Response::HTTP_MOVED_PERMANENTLY);

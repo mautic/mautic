@@ -49,7 +49,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/points/triggers/clone/'.$trigger->getId());
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $form    = $crawler->selectButton('Save')->form();
+        $form    = $crawler->selectButton('Apply')->form();
         $this->client->submit($form);
 
         $this->assertCount(2, $triggerRepo->findAll());

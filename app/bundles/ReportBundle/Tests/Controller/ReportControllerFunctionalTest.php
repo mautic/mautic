@@ -96,7 +96,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $saveButton = $crawler->selectButton('Save');
+        $saveButton = $crawler->selectButton('Apply');
         $form       = $saveButton->form();
         $form['report[name]']->setValue('Report ABC');
 
@@ -107,7 +107,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $saveButton = $crawler->selectButton('Save');
+        $saveButton = $crawler->selectButton('Apply');
         $form       = $saveButton->form();
         $form['report[name]']->setValue('Report ABC - cloned');
 

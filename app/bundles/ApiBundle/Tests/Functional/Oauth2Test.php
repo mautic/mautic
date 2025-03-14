@@ -112,7 +112,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
         // Create OAuth2 credentials.
         $crawler    = $this->client->request(Request::METHOD_GET, 's/credentials/new');
-        $saveButton = $crawler->selectButton('Save');
+        $saveButton = $crawler->selectButton('Apply');
         $form       = $saveButton->form();
         $form['client[name]']->setValue('Auth Test');
         $form['client[redirectUris]']->setValue('https://test.org');

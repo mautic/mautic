@@ -82,7 +82,7 @@ class CampaignOptimisticLockTest extends MauticMysqlTestCase
      */
     private function submitForm(Crawler $crawler, Campaign $campaign, int $expectedVersion, array $formValues = []): Crawler
     {
-        $form = $crawler->selectButton('Save')->form();
+        $form = $crawler->selectButton('Apply')->form();
         $form->setValues($formValues);
         $newCrawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());

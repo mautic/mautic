@@ -143,7 +143,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
 
-        $form = $crawler->selectButton('Save')->form();
+        $form = $crawler->selectButton('Apply')->form();
         $form['tag_entity[tag]']->setValue($TagName);
         $this->client->submit($form);
 
@@ -157,7 +157,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
 
-        $form = $crawler->selectButton('Save')->form();
+        $form = $crawler->selectButton('Apply')->form();
         $form['tag_entity[tag]']->setValue($TagName);
         $crawler = $this->client->submit($form);
 

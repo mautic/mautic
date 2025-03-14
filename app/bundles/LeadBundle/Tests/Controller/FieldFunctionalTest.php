@@ -46,7 +46,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $form = $crawler->selectButton('Save')->form();
+        $form = $crawler->selectButton('Apply')->form();
 
         $form['leadfield[label]']->setValue('Best Date Ever');
         $form['leadfield[type]']->setValue('date');
@@ -76,7 +76,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $inputValue->setAttribute('type', 'text');
         $inputValue->setAttribute('name', 'leadfield[properties][list][0][value]');
 
-        $form        = $crawler->selectButton('Save')->form();
+        $form        = $crawler->selectButton('Apply')->form();
         $form->set(new InputFormField($inputLabel));
         $form->set(new InputFormField($inputValue));
 
@@ -115,7 +115,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $noLabel->setAttribute('type', 'text');
         $noLabel->setAttribute('name', 'leadfield[properties][no]');
 
-        $form = $crawler->selectButton('Save')->form();
+        $form = $crawler->selectButton('Apply')->form();
         $form->set(new InputFormField($yesLabel));
         $form->set(new InputFormField($noLabel));
 
