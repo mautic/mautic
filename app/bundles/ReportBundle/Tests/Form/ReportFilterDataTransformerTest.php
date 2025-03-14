@@ -13,7 +13,7 @@ class ReportFilterDataTransformerTest extends TestCase
     {
         $columns = [
             'date_only' => ['type' => DateType::class],
-            'datetime' => ['type' => DateTimeType::class],
+            'datetime'  => ['type' => DateTimeType::class],
         ];
 
         $transformer = new ReportFilterDataTransformer($columns);
@@ -33,19 +33,19 @@ class ReportFilterDataTransformerTest extends TestCase
     }
 
     /**
-     * Test that this change also works correctly in the reverseTransform method
+     * Test that this change also works correctly in the reverseTransform method.
      */
     public function testReverseTransformWithDateType(): void
     {
         $columns = [
-            'date_column' => ['type' => DateType::class],
+            'date_column'     => ['type' => DateType::class],
             'datetime_column' => ['type' => 'datetime'],
         ];
 
         $transformer = new ReportFilterDataTransformer($columns);
 
         $dateValue = '2023-05-15';
-        $filters = [
+        $filters   = [
             ['column' => 'date_column', 'value' => $dateValue],
             ['column' => 'datetime_column', 'value' => $dateValue],
         ];
