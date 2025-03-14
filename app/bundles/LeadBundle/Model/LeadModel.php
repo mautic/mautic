@@ -1177,7 +1177,7 @@ class LeadModel extends FormModel
 
         // Extract company data and import separately
         // Modifies the data array
-        $company = null;
+        $company                       = null;
         [$companyFields, $companyData] = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
         if (true === $skipIfExists && empty($lead->getCompany()) || false === $skipIfExists) {
