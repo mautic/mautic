@@ -130,7 +130,7 @@ final class EventLogApiControllerTest extends MauticMysqlTestCase
             $response['errors']
         );
 
-        Assert::assertContains("The event {$event1->getId()} in the campaign {$campaign->getId()} has already been executed at 2016-01-10T00:00:00+00:00 for the contact {$contact2->getId()}.", $errorMessages);
+        Assert::assertContains("The event {$event1->getId()} in the campaign {$campaign->getId()} has already ran at 2016-01-10T00:00:00+00:00 for the contact {$contact2->getId()}.", $errorMessages);
         Assert::assertContains("The contact {$contact3->getId()} is not in the campaign {$campaign->getId()}.", $errorMessages);
         Assert::assertContains("A decision type event cannot be scheduled. Event: {$event3->getId()}, campaign: {$campaign->getId()}, contact: {$contact1->getId()}.", $errorMessages);
     }
