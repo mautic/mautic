@@ -3,8 +3,6 @@
 namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadList;
 
 class LeadListFilteringEventTest extends MauticMysqlTestCase
 {
