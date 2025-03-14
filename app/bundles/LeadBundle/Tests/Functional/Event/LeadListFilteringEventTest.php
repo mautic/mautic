@@ -49,7 +49,7 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
         $segmentModel->rebuildListLeads($segment);
 
         // Check the segment detail page to verify the filter icon is present
-        $crawler = $this->client->request('GET', '/s/segments/view/' . $segment->getId());
+        $crawler = $this->client->request('GET', '/s/segments/view/'.$segment->getId());
 
         // Ensure request was successful
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
@@ -62,7 +62,7 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
         $segmentModel->removeLead($contact, $segment, true);
 
         // Check the segment detail page again
-        $crawler = $this->client->request('GET', '/s/segments/view/' . $segment->getId());
+        $crawler = $this->client->request('GET', '/s/segments/view/'.$segment->getId());
 
         // Ensure request was successful
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
