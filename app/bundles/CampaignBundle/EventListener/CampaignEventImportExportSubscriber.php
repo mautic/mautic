@@ -10,6 +10,8 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
@@ -24,6 +26,8 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     public function __construct(
         private CampaignModel $campaignModel,
         private EntityManagerInterface $entityManager,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
     ) {
@@ -63,6 +67,16 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $this->handleChannelExport($campaignEvent, $data, $event);
 
             $event->addEntity(Event::ENTITY_NAME, $eventData);
+
+            $log = [
+                'bundle'    => 'campaign',
+                'object'    => 'campaignEvent',
+                'objectId'  => $campaignEvent->getId(),
+                'action'    => 'export',
+                'details'   => $eventData,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
 
         foreach ($data as $entityName => $entities) {
@@ -224,6 +238,16 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $this->entityManager->persist($campaignEvent);
             $this->entityManager->flush();
 
+            $log = [
+                'bundle'    => 'campaign',
+                'object'    => 'campaignEvent',
+                'objectId'  => $campaignEvent->getId(),
+                'action'    => 'import',
+                'details'   => $campaignEvent,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+
+            $this->auditLogModel->writeToLog($log);
             $event->addEntityIdMap((int) $element['id'], (int) $campaignEvent->getId());
             $output->writeln('<info>Imported campaign event: '.$campaignEvent->getName().' with ID: '.$campaignEvent->getId().'</info>');
         }
