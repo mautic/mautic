@@ -48,18 +48,16 @@ class SegmentCampaignShare
 
         foreach ($campaigns as $key=>$campaign) {
             $cacheKey = $this->getCachedKey($segmentId, $campaign['id']);
-            $shareValue = $this->cacheProvider->getSimpleCache()->get($cacheKey);
             
-            if (null === $shareValue) {
-                // Value not in cache, fetch it and store it
-                $campaignShare = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, [$campaign['id']]);
-                $shareValue = $campaignShare[0]['segmentCampaignShare'] ?? '0';
-                
-                // Cache for 1 hour
-                $this->cacheProvider->getSimpleCache()->set($cacheKey, $shareValue, new \DateInterval('PT1H'));
+            // Only check if the item exists in cache
+            if ($this->cacheProvider->getCacheAdapter()->hasItem($cacheKey)) {
+                // Get the value from cache if it exists
+                $item = $this->cacheProvider->getCacheAdapter()->getItem($cacheKey);
+                $campaigns[$key]['share'] = $item->get();
+            } else {
+                // Use default value if not in cache
+                $campaigns[$key]['share'] = '0';
             }
-            
-            $campaigns[$key]['share'] = $shareValue;
         }
 
         usort($campaigns, function ($a, $b) { return floatval($b['share']) <=> floatval($a['share']); });
