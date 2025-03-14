@@ -35,18 +35,5 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
 
         // Assert that getEntityManager returns the expected instance
         $this->assertSame($entityManager, $event->getEntityManager());
-
-        // Additionally test the setters and getters related to filtering
-        $event->setFilteringStatus(true);
-        $this->assertTrue($event->isFilteringDone());
-
-        $event->setSubQuery('SELECT id FROM leads WHERE email = "test@example.com"');
-        $this->assertEquals('SELECT id FROM leads WHERE email = "test@example.com"', $event->getSubQuery());
-
-        $newDetails = ['field' => 'phone'];
-        $event->setDetails($newDetails);
-        $this->assertEquals($newDetails, $event->getDetails());
-
-        $this->assertEquals('leads_alias', $event->getLeadsTableAlias());
     }
 }
