@@ -1,4 +1,3 @@
-/** DynamicContentBundle **/
 Mautic.toggleDwcFilters = function () {
     mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide");
     if (mQuery("#dwcFiltersTab").hasClass('hide')) {
@@ -400,16 +399,3 @@ Mautic.disabledDynamicContentAction = function(opener) {
 
     opener.mQuery('#campaignevent_properties_editDynamicContentButton').prop('disabled', disabled);
 };
-
-if (typeof MauticIsDwcReady === 'undefined') {
-    var MauticIsDwcReady = true;
-
-    if (
-        document.readyState === "complete" ||
-        !(document.readyState === "loading" || document.documentElement.doScroll)
-    ) {
-        Mautic.dynamicContentOnLoad();
-    } else {
-        document.addEventListener("DOMContentLoaded", Mautic.dynamicContentOnLoad);
-    }
-}

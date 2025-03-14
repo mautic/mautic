@@ -51,7 +51,7 @@
 @font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
 @font-family-base:        @font-family-sans-serif;
 
-@font-size-base:          13px;
+@font-size-base:          14px;
 @font-size-large:         ceil((@font-size-base * 1.20)); // ~16px
 @font-size-small:         12px;
 
@@ -555,12 +555,12 @@
 //** Popover arrow width
 @popover-arrow-width:                 10px;
 //** Popover arrow color
-@popover-arrow-color:                 @popover-bg;
+@popover-arrow-color:                 var(--layer-02);
 
 //** Popover outer arrow width
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
 //** Popover outer arrow color
-@popover-arrow-outer-color:           fadein(@popover-border-color, 5%);
+@popover-arrow-outer-color:           @popover-border-color;
 //** Popover outer arrow fallback color
 @popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
 
@@ -601,7 +601,7 @@
 @modal-title-line-height:     @line-height-base;
 
 //** Background color of modal content area
-@modal-content-bg:                             var(--layer);
+@modal-content-bg:                             var(--background);
 //** Modal content border color
 @modal-content-border-color:                   transparent;
 //** Modal content border color **for IE8**
@@ -678,20 +678,20 @@
 
 @list-group-disabled-text-color: @list-group-disabled-color;
 //** `.list-group-item` border color
-@list-group-border:             transparent;
+@list-group-border:             @hr-border;
 //** List group border radius
-@list-group-border-radius:      0px;
+@list-group-border-radius:      @border-radius-small;
 
 //** Background color of single list items on hover
 @list-group-hover-bg:           var(--layer-hover);
 //** Text color of active list items
-@list-group-active-color:       var(--text-inverse);
+@list-group-active-color:       var(--text-primary);
 //** Background color of active list items
-@list-group-active-bg:          var(--layer-selected-inverse);
+@list-group-active-bg:          @list-group-hover-bg;
 //** Border color of active list elements
 @list-group-active-border:      @hr-border;
 //** Text color for content within active list items
-@list-group-active-text-color:  var(--text-inverse);
+@list-group-active-text-color:  var(--text-primary);
 
 //** Text color of disabled list items
 @list-group-disabled-color:      var(--text-disabled);
@@ -721,7 +721,7 @@
 
 @panel-default-text:          inherit;
 @panel-default-border:        @panel-inner-border;
-@panel-default-heading-bg:    inherit;
+@panel-default-heading-bg:    @panel-footer-bg;
 
 @panel-primary-text:          var(--text-on-color);
 @panel-primary-border:        transparent;

@@ -45,12 +45,45 @@ mQuery.ajaxSetup({
     cache: false
 });
 
-mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+// Attach document click handler once
+mQuery(document).on('click', function (e) {
+    var target = mQuery(e.target);
+    // Check if the click is outside the popover and its trigger
+    if (!target.closest('.popover').length && !target.closest('[data-toggle="popover"]').length) {
+        mQuery('[data-toggle="popover"]').each(function () {
+            var $this = mQuery(this);
+            var popover = $this.data('bs.popover');
+            if (popover && popover.tip().hasClass('in')) {
+                $this.popover('hide');
+                popover.inState.click = false; // Reset the internal click state
+            }
+        });
+    }
+});
+
+mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.stopPageLoadingBar();
     if (xhr.responseJSON && xhr.responseJSON.flashes) {
         Mautic.setFlashes(xhr.responseJSON.flashes);
     }
     Mautic.attachDismissHandlers();
+
+    // Initialize Bootstrap Popovers
+    mQuery('[data-toggle="popover"]').popover({
+        sanitize: false
+    });
+
+    // Handle popover insertion
+    mQuery('[data-toggle="popover"]').on('inserted.bs.popover', function () {
+        // Initialize Chosen on select elements inside popover
+        mQuery('.popover-content select').chosen({
+            allow_single_deselect: true,
+            disable_search_threshold: 10
+        });
+
+        // Initialize tooltips inside popovers
+        mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
+    });
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -215,23 +248,29 @@ var Mautic = {
         }
 
         // Show all dismissible elements
-        mQuery('[data-dismiss]').each(function () {
+        mQuery('[user-dismiss]').each(function () {
             var dismissButton = mQuery(this);
-            var dismissType = dismissButton.data('dismiss');
+            var dismissType = dismissButton.attr('user-dismiss');
             var dismissibleElement = dismissButton.closest('.' + dismissType);
 
             // Remove any inline display styles and show the element
             dismissibleElement.css('display', '');
         });
+
+        // Create the flash message
+        const flashMessage = Mautic.addInfoFlashMessage(
+            Mautic.translate('mautic.user.config.title.experience_and_learning.reset_confirmation')
+        );
+        Mautic.setFlashes(flashMessage);
     },
 
     /**
      * Attaches event handlers to dismiss buttons.
      */
     attachDismissHandlers: function() {
-        mQuery('[data-dismiss]').each(function () {
+        mQuery('[user-dismiss]').each(function () {
             var dismissButton = mQuery(this);
-            var dismissType = dismissButton.data('dismiss');
+            var dismissType = dismissButton.attr('user-dismiss');
             var dismissibleElement = dismissButton.closest('.' + dismissType);
             var elementId = dismissibleElement.attr('id');
 
@@ -306,7 +345,7 @@ var Mautic = {
         });
 
         Mautic.addKeyboardShortcut('f /', 'Global Search', function (e) {
-            mQuery('#globalSearchContainer .search-button').click();
+            mQuery('.search-button').click();
         });
 
         Mautic.addKeyboardShortcut('/', 'Search current list', function (e) {
@@ -355,7 +394,7 @@ var Mautic = {
         mQuery('code').each(function() {
             var $codeBlock = mQuery(this);
             if (!$codeBlock.find('.copy-icon').length) {
-                $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
+                $codeBlock.append('<i class="ri-clipboard-fill copy-icon"></i>');
             }
         });
     },

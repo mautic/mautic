@@ -11,7 +11,6 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
-use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
@@ -20,6 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -46,6 +46,7 @@ class MailHelperTest extends TestCase
     private $defaultParams = [
         ['mailer_from_email', null, 'nobody@nowhere.com'],
         ['mailer_from_name', null, 'No Body'],
+        ['mailer_address_length_limit', null, 320],
     ];
 
     private FromEmailHelper $fromEmailHelper;
@@ -140,6 +141,7 @@ class MailHelperTest extends TestCase
                     [
                         ['mailer_return_path', false, null],
                         ['mailer_spool_type', false, 'memory'],
+                        ['mailer_address_length_limit', false, 320],
                     ]
                 )
             );
@@ -1069,9 +1071,9 @@ class MailHelperTest extends TestCase
             );
 
         $this->router->method('generate')->willReturn('http://tracking.url');
-
-        $mailer = new MailHelper($this->mockFactory, new Mailer(new BatchTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
-        $email  = new Email();
+        $transport = new BatchTransport();
+        $mailer    = new MailHelper($this->mockFactory, new Mailer($transport), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email     = new Email();
 
         // We should use a local image to avoid network requests.
         $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.png';
@@ -1084,19 +1086,19 @@ class MailHelperTest extends TestCase
         foreach ($this->contacts as $contact) {
             $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
-            $mailer->send();
         }
 
         $mailer->send();
-        $reflectionMailerObject = new \ReflectionObject($mailer);
-        $messageProperty        = $reflectionMailerObject->getProperty('message');
-        $mauticMessage          = $messageProperty->getValue($mailer);
-        \assert($mauticMessage instanceof MauticMessage);
 
-        $body = $mauticMessage->getHtmlBody();
+        $body = $transport->getMessage()->getHtmlBody();
 
-        $this->assertStringContainsString('<img height="1" width="1" src="http://tracking.url" alt="" />', $body);
+        $this->assertStringContainsString('<img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
         $this->assertSame(2, substr_count($body, 'cid:'));
+
+        $metadata = $transport->getMessage()->getMetadata();
+        foreach ($this->contacts as $contact) {
+            Assert::assertSame($metadata[$contact['email']]['tokens']['{tracking_pixel}'], 'http://tracking.url');
+        }
     }
 
     public function testThatWeDontEmbedAlreadyEmbeddedImages(): void
@@ -1117,8 +1119,9 @@ class MailHelperTest extends TestCase
 
         $this->router->method('generate')->willReturn('http://tracking.url');
 
-        $mailer = new MailHelper($this->mockFactory, new Mailer(new BatchTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
-        $email  = new Email();
+        $transport = new BatchTransport();
+        $mailer    = new MailHelper($this->mockFactory, new Mailer($transport), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email     = new Email();
 
         $email->setUseOwnerAsMailer(false);
         $email->setFromName('Test');
@@ -1129,17 +1132,64 @@ class MailHelperTest extends TestCase
         foreach ($this->contacts as $contact) {
             $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
-            $mailer->send();
         }
 
         $mailer->send();
-        $reflectionMailerObject = new \ReflectionObject($mailer);
-        $messageProperty        = $reflectionMailerObject->getProperty('message');
-        $mauticMessage          = $messageProperty->getValue($mailer);
-        \assert($mauticMessage instanceof MauticMessage);
 
-        $body = $mauticMessage->getHtmlBody();
+        $body = $transport->getMessage()->getHtmlBody();
 
-        $this->assertStringContainsString('<img src="cid:abcdefg">', $body);
+        $this->assertSame('<img src="cid:abcdefg"><img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
+    }
+
+    public function testAddToWithLongAddress(): void
+    {
+        $params = [
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, 30], // Set a small address length limit for testing
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $longName = 'This is a very long name that exceeds the length limit';
+        $email    = 'test@example.com';
+
+        $result = $mailer->addTo($email, $longName);
+
+        $this->assertTrue($result);
+
+        $to = $mailer->message->getTo();
+        $this->assertCount(1, $to);
+        $this->assertEquals($email, $to[0]->getAddress());
+        $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
+
+        // Test with a short name
+        $shortName = 'Short Name';
+        $mailer->reset();
+        $result = $mailer->addTo($email, $shortName);
+
+        $this->assertTrue($result);
+
+        $to = $mailer->message->getTo();
+        $this->assertCount(1, $to);
+        $this->assertEquals($email, $to[0]->getAddress());
+        $this->assertEquals($shortName, $to[0]->getName()); // Short name should be used
+
+        // Test with long encoded name
+        $longName = 'อดุลย์ ';
+        $mailer->reset();
+        $email = 'test@example.com';
+
+        $result = $mailer->addTo($email, $longName);
+
+        $this->assertTrue($result);
+
+        $to = $mailer->message->getTo();
+        $this->assertCount(1, $to);
+        $this->assertEquals($email, $to[0]->getAddress());
+        $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
     }
 }

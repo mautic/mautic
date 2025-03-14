@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Mautic is released under the GPL v3.
 
-Mautic is a registered trademark of David Hurley.
+Mautic is a trademark of the Mautic project of the Open Source Collective.
 
 Mautic includes works under other copyright notices and distributed
 according to the terms of the GNU General Public License or a compatible

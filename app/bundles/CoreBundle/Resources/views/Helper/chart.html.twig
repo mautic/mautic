@@ -1,4 +1,4 @@
-{% if chartType is defined and chartData is defined %}
+{% if chartType is defined and chartData is defined and chartData.datasets is defined %}
     {% set dataValues = chartData.datasets[0].data %}
     {% if dataValues|reduce((carry, v) => carry + v) > 0 %}
         <div class="chart-wrapper">

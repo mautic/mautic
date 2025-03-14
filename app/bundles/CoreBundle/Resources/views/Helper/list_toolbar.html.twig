@@ -9,45 +9,23 @@
 {# Workaround to get variables from action_button_helper here #}
 {{ restore('action_button_helper') }}
 
-<div class="panel-body">
-    <div class="box-layout">
-        <div class="col-xs-6 col-lg-8 va-m form-inline">
-            <div class="d-flex gap-sm ai-center">
-                {% if searchValue is defined %}
-            {{- include('@MauticCore/Helper/search.html.twig', {
-                searchId: searchId|default(null),
-                searchValue: searchValue,
-                action: action|default(''),
-                searchHelp: searchHelp|default(''),
-                target: target|default(null),
-                tmpl: tmpl|default(null),
-                overlayDisabled: overlayDisabled is defined ? overlayDisabled : null
-            }) -}}
-            {% endif %}
-            {% if quickFilters is defined and quickFilters is not empty %}
-            {{ include('@MauticCore/Helper/list_quickfilters.html.twig', {
-                'quickFilters': quickFilters
-            }) }}
-            {% endif %}
-            {% if filters is defined and filters is not empty %}
-            {{- include('@MauticCore/Helper/list_filters.html.twig', {
-                filters: filters,
-                target: target|default(null),
-                tmpl: tmpl|default(null)
-            }) -}}
-            {% endif %}
-            </div>
-        </div>
+<div class="panel-heading pa-0">
+    <div class="d-flex ai-center list-toolbar">
+        {% if searchValue is defined %}
+    {{- include('@MauticCore/Helper/search.html.twig', {
+        searchId: searchId|default(null),
+        searchValue: searchValue,
+        action: action|default(''),
+        searchHelp: searchHelp|default(''),
+        target: target|default(null),
+        tmpl: tmpl|default(null),
+        overlayDisabled: overlayDisabled is defined ? overlayDisabled : null
+    }) -}}
+    {% endif %}
 
-        <div class="col-xs-12 col-lg-4 va-m text-right">
-            {% if buttonHelp is defined and buttonHelp is not empty %}
-                <div class="input-group-btn">
-                    <button class="btn btn-ghost btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help">
-                        <i class="ri-question-line"></i>
-                    </button>
-                </div>
-            {% endif %}
-            {{ buttonsRender() }}
-        </div>
+    {{ buttonsRender() }}
+    {% if list_actions is defined %}
+    {{ list_actions|raw }}
+    {% endif %}
     </div>
 </div>

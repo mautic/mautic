@@ -114,6 +114,26 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
+     * eventAwareRenderView.
+     *
+     * @param array<string, string> $parameters
+     */
+    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, Request $request = null): string
+    {
+        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
+            $event = $this->dispatcher->dispatch(
+                new CustomTemplateEvent($request, $contentTemplate, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
+            );
+
+            $contentTemplate   = $event->getTemplate();
+            $parameters        = $event->getVars();
+        }
+
+        return $this->renderView($contentTemplate, $parameters);
+    }
+
+    /**
      * Determines if ajax content should be returned or direct content (page refresh).
      *
      * @param array $args
@@ -330,8 +350,11 @@ class CommonController extends AbstractController implements MauticController
                     $newContent = $newContentResponse->getContent();
                 }
             } else {
+                $parameters['mauticTemplate']     = $contentTemplate;
+                $parameters['mauticTemplateVars'] = $parameters;
+
                 $GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'] = 1; // for error handling
-                $newContent                           = $this->renderView($contentTemplate, $parameters);
+                $newContent                           = $this->eventAwareRenderView($contentTemplate, $parameters, $request);
 
                 unset($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER']);
             }
@@ -466,16 +489,22 @@ class CommonController extends AbstractController implements MauticController
     public function notFound($msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
-
-        $page_404 = $this->coreParametersHelper->get('404_page');
-        if (!empty($page_404)) {
+        $page404 = $this->coreParametersHelper->get('404_page');
+        if (!empty($page404)) {
             $pageModel = $this->getModel('page');
             \assert($pageModel instanceof PageModel);
-            $page = $pageModel->getEntity($page_404);
+            $page = $pageModel->getEntity($page404);
             if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
-                $slug = $pageModel->generateSlug($page);
+                $slug     = $pageModel->generateSlug($page);
+                $response = $this->forward(
+                    'Mautic\PageBundle\Controller\PublicController::indexAction',
+                    [
+                        'slug'            => $slug,
+                        'ignore_mismatch' => true,
+                    ]
+                );
 
-                return $this->redirectToRoute('mautic_page_public', ['slug' => $slug]);
+                return new Response($response->getContent(), Response::HTTP_NOT_FOUND, $response->headers->all());
             }
         }
 

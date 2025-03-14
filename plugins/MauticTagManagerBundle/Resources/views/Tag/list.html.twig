@@ -12,27 +12,20 @@
 
 {% set listCommand = 'mautic.tagmanager.tag.searchcommand.list'|trans %}
 
-{% block actions %}
-    {{- include(
-        '@MauticCore/Helper/page_actions.html.twig',
-        {
-            'templateButtons': {
-            'new': security.isGranted('tagManager:tagManager:create')
-        },
-            'routeBase': 'tagmanager',
-            'langVar': 'tag.list'
-        }
-    ) -}}
-{% endblock %}
-
 {% block content %}
-    <div id="page-list-wrapper">
-        <div class="page-list">
+    <div id="page-list-wrapper" class="panel panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-            'searchValue' : searchValue,
-            'searchHelp'  : 'mautic.lead.list.help.searchcommands',
-            'action'      : currentRoute,
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                'templateButtons': {
+                    'new': security.isGranted('tagManager:tagManager:create')
+                },
+                'routeBase': 'tagmanager',
+                'langVar': 'tag.list'
+            })
         }) -}}
+        <div class="page-list">
             {% if items is defined and items is not empty %}
                 <div class="table-responsive">
                     <table class="table table-hover" id="tagsTable">

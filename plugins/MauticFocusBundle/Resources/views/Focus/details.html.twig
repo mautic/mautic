@@ -8,19 +8,32 @@
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
 {% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : item,
+        'templateButtons' : {
+            'close' : securityIsGranted('focus:items:view'),
+        },
+        'routeBase' : 'focus',
+        'targetLabel': 'mautic.focus.focus_items'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item': item,
             'templateButtons': {
                 'edit': securityHasEntityAccess(permissions['focus:items:editown'], permissions['focus:items:editother'], item.createdBy),
                 'clone': permissions['focus:items:create'],
                 'delete': securityHasEntityAccess(permissions['focus:items:deleteown'], permissions['focus:items:deleteother'], item.createdBy),
-                'close': securityIsGranted('focus:items:view'),
             },
             'routeBase': 'focus',
             'langVar': 'focus',
-    }) }}
+    }) -}}
 {% endblock %}
+
 
 {% block content %}
   {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
@@ -30,13 +43,7 @@
       <div class="col-md-9 height-auto">
           <div class="bg-auto">
               <!-- form detail header -->
-              <div class="pr-md pl-md pt-lg pb-lg">
-                  <div class="box-layout">
-                      <div class="col-xs-10">
-                          <div class="text-muted">{{ item.description|purify }}</div>
-                      </div>
-                  </div>
-              </div>
+              {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
               <!--/ form detail header -->
 
               <!-- form detail collapseable -->

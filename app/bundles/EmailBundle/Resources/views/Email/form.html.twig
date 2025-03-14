@@ -21,7 +21,7 @@
 } %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
-
+{% set draftPreviewUrl = draftPreviewUrl|default('') %}
 {% block headerTitle %}
   {% if email.id is not empty %}
     {{ 'mautic.email.header.edit'|trans({'%name%': email.name}) }}
@@ -125,7 +125,21 @@
                                         <div class="col-xs-3 dynamicContentFilterContainer">
                                           <ul class="nav nav-tabs nav-tabs-contained tabs-left" id="dynamicContentTabs">
                                             <li>
-                                              <a href="javascript:void(0);" role="tab" class="btn btn-primary" id="addNewDynamicContent"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
+                                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                                    buttons: [
+                                                        {
+                                                            label: 'mautic.core.form.new',
+                                                            variant: 'primary',
+                                                            icon: 'ri-add-line',
+                                                            attributes: {
+                                                                'id': 'addNewDynamicContent',
+                                                                'role': 'tab',
+                                                                'class': 'mr-xs',
+                                                                'type': 'button'
+                                                            }
+                                                        }
+                                                    ]
+                                                } %}
                                             </li>
                                             {% for dynamicContent in form.dynamicContent %}
                                               {% set name = dynamicContent.tokenName.vars.value %}
@@ -178,12 +192,19 @@
                 {% endif %}
 
                 {% if not isVariant %}
-                    {{ form_row(form.isPublished) }}
+                    {{ form_row(form.isPublished, {
+                        'attr': {
+                            'data-none': 'mautic.core.form.sending_paused',
+                            'data-start': 'mautic.core.form.sending_on_scheduled_start',
+                            'data-both': 'mautic.core.form.sending_during_scheduled_period',
+                            'data-end': 'mautic.core.form.available_until_scheduled_end'
+                        }
+                    }) }}
                     <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
                         {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
                         {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
                     </div>
-                    
+
                 {% endif %}
 
                 {{ form_row(form.unsubscribeForm) }}
@@ -234,14 +255,15 @@
         {% endfor %}
     </div>
     {{- include('@MauticCore/Helper/builder.html.twig', {
-        'type'          : 'email',
-        'isCodeMode'    : isCodeMode,
-        'sectionForm'   : sectionForm,
-        'builderAssets' : builderAssets,
-        'slots'         : slots,
-        'sections'      : sections,
-        'objectId'      : email.sessionId,
-        'previewUrl'    : previewUrl,
+        'type'            : 'email',
+        'isCodeMode'      : isCodeMode,
+        'sectionForm'     : sectionForm,
+        'builderAssets'   : builderAssets,
+        'slots'           : slots,
+        'sections'        : sections,
+        'objectId'        : email.sessionId,
+        'previewUrl'      : previewUrl,
+        'draftPreviewUrl' : draftPreviewUrl,
     }, with_context=false) -}}
 
     {% set typeTwoDifferences = ['mautic.email.type.segment.differences.1st', 'mautic.email.type.segment.differences.2nd', 'mautic.email.type.segment.differences.3rd', 'mautic.email.type.segment.differences.4th'] %}

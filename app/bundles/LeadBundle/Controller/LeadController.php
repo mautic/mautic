@@ -287,6 +287,16 @@ class LeadController extends FormController
                             'value'  => 'lead',
                         ],
                     ],
+                    'order' => [
+                        [
+                            'col' => 'f.isFixed',
+                            'dir' => 'DESC',
+                        ],
+                        [
+                            'col' => 'f.order',
+                            'dir' => 'ASC',
+                        ],
+                    ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
                 'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),

@@ -62,7 +62,28 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         Assert::assertTrue($response->isOk(), $response->getContent());
         $content = \json_decode($response->getContent(), true);
         Assert::assertArrayHasKey('newContent', $content);
-        Assert::assertSame("<div class=\"panel-group\" id=\"globalSearchPanel\"></div>\n", $content['newContent']);
+        Assert::assertMatchesRegularExpression(
+            '/<div.*?>\s*'.
+            '<div.*?>\n'.
+            '\s*<span class="fs-16">Navigate<\/span>\n'.
+            '\s*<kbd><i class="ri-arrow-up-line"><\/i><\/kbd>\n'.
+            '\s*<kbd><i class="ri-arrow-down-line"><\/i><\/kbd>\n'.
+            '\s*<span class="fs-16">or<\/span>\n'.
+            '\s*<kbd>tab<\/kbd>\n'.
+            '\s*<\/div>\n'.
+            '\s*<div.*?>\n'.
+            '\s*<span class="fs-16">Close<\/span>\n'.
+            '\s*<kbd>esc<\/kbd>\n'.
+            '\s*<\/div>\n'.
+            '\s*<\/div>\n\n'.
+            '<div class="pa-sm" id="globalSearchPanel">\n'. // Matches the search panel div
+            '\s*<!-- No results message -->\n'. // Matches the "No results message" comment
+            '\s*<div class="text-center text-secondary mt-sm">\n'. // Matches the no-results div
+            '\s*.*?\n'. // Matches random text inside the no-results div
+            '\s*<\/div>\n'.
+            '\s*<\/div>/s',
+            $content['newContent']
+        );
 
         // Searching for a string that match 2 entities.
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search=John8888&tmp=list', [], [], $this->createAjaxHeaders());

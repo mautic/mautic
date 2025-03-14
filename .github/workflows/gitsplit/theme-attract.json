@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-attract",
+            "directory": "themes/attract",
+            "target": "git@github.com:mautic/theme-attract.git"
+        }
+    ]
+}

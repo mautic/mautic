@@ -16,16 +16,49 @@
 
 {% if update is not defined or update is empty %}
   <div class="campaign-event-buttons hide">
-    <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal"
-       href="{{ path('mautic_campaignsource_action', {'objectAction': 'edit', 'objectId': campaignId, 'sourceType': sourceType}) }}"
-       class="btn btn-secondary btn-icon btn-xs btn-edit"><i class="ri-edit-line"></i></a>
-    <a data-toggle="ajax"
-       data-target="CampaignEvent_{{ sourceType }}"
-       data-ignore-formexit="true"
-       data-method="POST"
-       data-hide-loadingbar="true"
-       href="{{ path('mautic_campaignsource_action', {'objectAction': 'delete', 'objectId': campaignId, 'sourceType': sourceType}) }}"
-       class="btn btn-delete btn-icon btn-danger btn-xs"><i class="ri-close-line"></i></a>
+    {% include '@MauticCore/Helper/button.html.twig' with {
+      buttons: [
+          {
+              href: path('mautic_campaignsource_action', {
+                  'objectAction': 'edit',
+                  'objectId': campaignId,
+                  'sourceType': sourceType
+              }),
+              variant: 'secondary',
+              icon: 'ri-edit-line',
+              size: 'xs',
+              icon_only: true,
+              label: 'mautic.campaign.event.edit.btn.tooltip'|trans,
+              attributes: {
+                  'data-toggle': 'ajaxmodal',
+                  'data-prevent-dismiss': 'true',
+                  'data-target': '#CampaignEventModal',
+                  'class': 'btn-edit'
+              }
+          },
+          {
+              href: path('mautic_campaignsource_action', {
+                  'objectAction': 'delete',
+                  'objectId': campaignId,
+                  'sourceType': sourceType
+              }),
+              variant: 'primary',
+              danger: true,
+              icon: 'ri-close-line',
+              size: 'xs',
+              icon_only: true,
+              label: 'mautic.campaign.event.remove.btn.tooltip'|trans,
+              attributes: {
+                  'data-toggle': 'ajax',
+                  'data-target': 'CampaignEvent_' ~ sourceType,
+                  'data-ignore-formexit': 'true',
+                  'data-method': 'POST',
+                  'data-hide-loadingbar': 'true',
+                  'class': 'btn-delete'
+              }
+          }
+      ]
+  } %}
   </div>
 </div>
 {% endif %}

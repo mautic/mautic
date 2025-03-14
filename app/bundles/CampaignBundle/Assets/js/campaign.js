@@ -1129,27 +1129,23 @@ Mautic.campaignHoverCallback = function(sourceEndpoint, endpoint, event) {
  * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
  */
 Mautic.campaignToggleTimeframes = function() {
-    if (mQuery('#campaignevent_triggerMode_2').length) {
-        var immediateChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
-        var intervalChecked = mQuery('#campaignevent_triggerMode_1').prop('checked');
-        var dateChecked = mQuery('#campaignevent_triggerMode_2').prop('checked');
-    } else {
-        var immediateChecked = false;
-        var intervalChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
-        var dateChecked = mQuery('#campaignevent_triggerMode_1').prop('checked');
+    const triggerModes = {
+        immediate: mQuery('#campaignevent_triggerMode_0').prop('checked'),
+        interval: mQuery('#campaignevent_triggerMode_1').prop('checked'),
+        date: mQuery('#campaignevent_triggerMode_2').prop('checked'),
+        optimal: mQuery('#campaignevent_triggerMode_3').prop('checked')
+    };
+
+    if (!mQuery('#campaignevent_triggerMode_2').length) {
+        triggerModes.date = triggerModes.interval;
+        triggerModes.interval = triggerModes.immediate;
+        triggerModes.immediate = false;
     }
 
     if (mQuery('#campaignevent_triggerInterval').length) {
-        if (immediateChecked) {
-            mQuery('#triggerInterval').addClass('hide');
-            mQuery('#triggerDate').addClass('hide');
-        } else if (intervalChecked) {
-            mQuery('#triggerInterval').removeClass('hide');
-            mQuery('#triggerDate').addClass('hide');
-        } else if (dateChecked) {
-            mQuery('#triggerInterval').addClass('hide');
-            mQuery('#triggerDate').removeClass('hide');
-        }
+        mQuery('#triggerInterval').toggleClass('hide', !triggerModes.interval);
+        mQuery('#triggerDate').toggleClass('hide', !triggerModes.date);
+        mQuery('#triggerOptimized').toggleClass('hide', !triggerModes.optimal);
     }
 };
 

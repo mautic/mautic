@@ -28,7 +28,19 @@
             </div>
             {%- if not failed %}
                 <div class="text-center">
-                    <a class="btn btn-primary" href="{{ path('mautic_dashboard_index') }}" data-toggle="ajax">{{ 'mautic.core.go_to_dashboard'|trans }}</a>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: 'mautic.core.go_to_dashboard',
+                                variant: 'primary',
+                                href: path('mautic_dashboard_index'),
+                                icon: 'ri-funds-fill',
+                                attributes: {
+                                    'data-toggle': 'ajax'
+                                }
+                            }
+                        ]
+                    } %}
                 </div>
             {%- endif %}
         </div>
