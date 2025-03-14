@@ -934,7 +934,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/contacts/batchDnc');
         Assert::assertTrue($this->client->getResponse()->isOk());
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
-        $form    = $crawler->selectButton('Apply')->form();
+        $form    = $crawler->selectButton('Save changes')->form();
         $form->setValues(
             [
                 'lead_batch_dnc[reason]' => 'Test Reason',

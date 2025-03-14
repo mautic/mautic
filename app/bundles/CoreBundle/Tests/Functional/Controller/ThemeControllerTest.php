@@ -50,7 +50,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_POST, 's/themes/batchDelete?ids=[%22aurora%22]');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('aurora is the default theme and therefore cannot be deleted.', $this->client->getResponse()->getContent());
     }
 
     public function testThemeVisibility(): void

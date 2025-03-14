@@ -17,7 +17,7 @@ class CampaignOptimisticLockTest extends MauticMysqlTestCase
     /**
      * @var string
      */
-    private const OPTIMISTIC_LOCK_ERROR = 'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.';
+    private const OPTIMISTIC_LOCK_ERROR = 'The record you are trying to update has been updated by another user. Please refresh the page and reapply your changes.';
 
     public function testOptimisticLock(): void
     {

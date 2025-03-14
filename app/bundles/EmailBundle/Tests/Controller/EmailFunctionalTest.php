@@ -42,7 +42,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertResponseOk();
-        Assert::assertStringContainsString('The same segment cannot be excluded and included in the same time.', $crawler->html());
+        Assert::assertStringContainsString('The same segment cannot be removed and added at the same time.', $crawler->html());
     }
 
     public function testExcludedSegmentsFieldIsUpdated(): void

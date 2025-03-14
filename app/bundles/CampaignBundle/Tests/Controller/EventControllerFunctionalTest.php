@@ -228,7 +228,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
         $this->assertSame('campaignEventClone', $responseData['mauticContent']);
-        $this->assertSame('Adjust contact points', $responseData['eventName']);
+        $this->assertSame('Update contact points', $responseData['eventName']);
         $this->assertSame('New campaign', $responseData['campaignName']);
 
         // INSERT EVENT

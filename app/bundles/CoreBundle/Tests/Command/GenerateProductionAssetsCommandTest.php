@@ -30,7 +30,7 @@ class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
     public function testAssetGenerateCommand(): void
     {
         $commandTester = $this->testSymfonyCommand('mautic:assets:generate');
-        $this->assertStringContainsString('Production assets have been regenerated.', $commandTester->getDisplay());
+        $this->assertStringContainsString('Production assets have been recreated.', $commandTester->getDisplay());
         $this->assertEquals(0, $commandTester->getStatusCode());
     }
 

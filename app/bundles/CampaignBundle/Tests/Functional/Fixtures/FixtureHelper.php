@@ -59,7 +59,7 @@ final class FixtureHelper
 
         $event = new Event();
         $event->setCampaign($campaign);
-        $event->setName('Adjust contact points');
+        $event->setName('Update contact points');
         $event->setType('lead.changepoints');
         $event->setEventType('action');
         $event->setTriggerInterval($interval);
