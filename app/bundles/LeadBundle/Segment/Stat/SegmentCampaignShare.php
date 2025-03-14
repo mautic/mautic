@@ -46,19 +46,23 @@ class SegmentCampaignShare
 
         $campaigns = $q->executeQuery()->fetchAllAssociative();
 
-        // rewrite this only to get from cache if exist. Without not make call getCampaignsSegmentShare AI!
         foreach ($campaigns as $key=>$campaign) {
-            $campaigns[$key]['share'] = $this->cacheProvider->getCacheAdapter()->get(
-                $this->getCachedKey($segmentId, $campaign['id']),
-                function (ItemInterface $item) use ($segmentId, $campaign): string {
-                    $item->expiresAfter(new \DateInterval('PT1H'));
-
-                    return $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, [$campaign['id']])[0]['segmentCampaignShare'];
-                }
-            );
+            $cacheKey = $this->getCachedKey($segmentId, $campaign['id']);
+            $shareValue = $this->cacheProvider->getSimpleCache()->get($cacheKey);
+            
+            if (null === $shareValue) {
+                // Value not in cache, fetch it and store it
+                $campaignShare = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, [$campaign['id']]);
+                $shareValue = $campaignShare[0]['segmentCampaignShare'] ?? '0';
+                
+                // Cache for 1 hour
+                $this->cacheProvider->getSimpleCache()->set($cacheKey, $shareValue, new \DateInterval('PT1H'));
+            }
+            
+            $campaigns[$key]['share'] = $shareValue;
         }
 
-        usort($campaigns, function ($a, $b) { return floatval($b['share']) <=> floatval($a['share']); });*/
+        usort($campaigns, function ($a, $b) { return floatval($b['share']) <=> floatval($a['share']); });
 
         return $campaigns;
     }
