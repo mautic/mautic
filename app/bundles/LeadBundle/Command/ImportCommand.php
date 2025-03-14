@@ -74,7 +74,13 @@ EOT
             }
         }
 
-        $this->userTokenSetter->setUser($import->getCreatedBy());
+        $user = $import->getModifiedBy();
+
+        if (!$user) {
+            throw new \RuntimeException('Import does not have "modifiedBy" property set.');
+        }
+
+        $this->userTokenSetter->setUser($user);
 
         $output->writeln('<info>'.$this->translator->trans(
             'mautic.lead.import.is.starting',

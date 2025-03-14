@@ -48,6 +48,13 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
+    public function testAssetSizes(): void
+    {
+        $this->client->request('GET', '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
+    }
+
     /**
      * Preview action should return the file content.
      */

@@ -247,6 +247,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         $import->setProperties($properties);
+        $this->getContainer()->get('mautic.security.user_token_setter')->setUser($import->getCreatedBy());
 
         /** @var ImportModel $importModel */
         $importModel = static::getContainer()->get('mautic.lead.model.import');
