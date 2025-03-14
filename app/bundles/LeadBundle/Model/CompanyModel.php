@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -857,7 +858,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['modifiedByUser']);
 
         if (null !== $owner) {
-            $company->setOwner($this->em->getReference(\Mautic\UserBundle\Entity\User::class, $owner));
+            $company->setOwner($this->em->getReference(User::class, $owner));
         }
 
         $fieldData = $this->getFieldData($fields, $data);

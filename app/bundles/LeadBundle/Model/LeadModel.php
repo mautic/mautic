@@ -1161,15 +1161,6 @@ class LeadModel extends FormModel
         $fields    = array_flip($fields);
         $fieldData = [];
 
-        // Extract company data and import separately
-        // Modifies the data array
-        $company                           = null;
-        [$companyFields, $companyData]     = $this->companyModel->extractCompanyDataFromImport($fields, $data);
-
-        if (!empty($companyData)) {
-            $company       = $this->companyModel->importCompany(array_flip($companyFields), $companyData);
-        }
-
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
@@ -1183,6 +1174,27 @@ class LeadModel extends FormModel
 
         $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
+
+        // Extract company data and import separately
+        // Modifies the data array
+        $company = null;
+        [$companyFields, $companyData] = $this->companyModel->extractCompanyDataFromImport($fields, $data);
+
+        if (true === $skipIfExists && empty($lead->getCompany()) || false === $skipIfExists) {
+            if (!empty($companyData)) {
+                $company = $this->companyModel->importCompany(
+                    array_flip($companyFields),
+                    $companyData,
+                    null,
+                    true,
+                    $skipIfExists
+                );
+            }
+        }
+
+        foreach (array_keys($companyFields) as $companyField) { // Remove company fields from lead fields import data
+            unset($fieldData[$companyField]);
+        }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
