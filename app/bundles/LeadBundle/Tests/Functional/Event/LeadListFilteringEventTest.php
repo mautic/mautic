@@ -10,7 +10,7 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
 {
     public function testIconIfManuallyAdded(): void
     {
-        $em = self::getContainer()->get('doctrine')->getManager();
+        $em           = self::getContainer()->get('doctrine')->getManager();
         $contactModel = self::getContainer()->get('mautic.lead.model.lead');
         $segmentModel = self::getContainer()->get('mautic.lead.model.list');
 
@@ -59,14 +59,14 @@ class LeadListFilteringEventTest extends MauticMysqlTestCase
         // Configure segment with filter to match our second contact dynamically
         $segment->setFilters([
             [
-                'glue' => 'and',
-                'field' => 'email',
-                'object' => 'lead',
-                'type' => 'email',
-                'filter' => 'jane.smith@test.com',
-                'display' => null,
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'jane.smith@test.com',
+                'display'  => null,
                 'operator' => '=',
-            ]
+            ],
         ]);
         $segmentModel->saveEntity($segment);
         $em->flush();
