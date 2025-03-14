@@ -434,10 +434,7 @@ class FormModel extends CommonFormModel
         }
 
         // Determine pages
-        $fields = $entity->getFields()->toArray();
-
-        // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
+        $fields = $entity->getOrderedFields()->toArray();
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);

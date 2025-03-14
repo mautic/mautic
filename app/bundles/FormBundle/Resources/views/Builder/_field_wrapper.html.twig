@@ -36,8 +36,7 @@
             <!-- end: "{{ template }}" -->
         </div>
 
-        {% if ((field.showWhenValueExists is defined and false is same as field.showWhenValueExists) or field.showAfterXSubmissions is not empty)
-            or (true is same as field.alwaysDisplay|default(null))
+    {% if ((field.showWhenValueExists is defined and false is same as field.showWhenValueExists) or (field.showAfterXSubmissions is defined and field.showAfterXSubmissions is not empty))            or (true is same as field.alwaysDisplay|default(null))
             or (field.mappedField|default(null) is not empty)
             or (field.conditions|default(null) is not empty)
         %}

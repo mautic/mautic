@@ -4,8 +4,10 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -101,7 +103,7 @@ class Form extends FormEntity
      * @var Collection<int, Submission>
      */
     #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
+    #[ORM\OrderBy(['dateSubmitted' => Criteria::DESC])]
     private Collection $submissions;
 
     /**
@@ -531,6 +533,14 @@ class Form extends FormEntity
      */
     public function getFields()
     {
+        return $this->fields;
+    }
+
+    public function getOrderedFields(): ArrayCollection|array|PersistentCollection
+    {
+        $criteria = Criteria::create()
+            ->orderBy(['field_order', 'ASC']);
+
         return $this->fields;
     }
 
