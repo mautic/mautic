@@ -178,10 +178,11 @@
 
 .campaign-source-title {
     position: absolute;
-    top: -20px;
+    top: -32px;
     color: var(--text-primary);
     left: 50%;
     transform: translateX(-50%);
+    white-space: nowrap;
 }
 
 .live .list-campaign-event:hover, .live .list-campaign-source:hover, .live .list-campaign-event:active {
