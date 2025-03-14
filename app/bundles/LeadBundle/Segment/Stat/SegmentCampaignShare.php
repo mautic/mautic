@@ -46,6 +46,7 @@ class SegmentCampaignShare
 
         $campaigns = $q->executeQuery()->fetchAllAssociative();
 
+        // rewrite this only to get from cache if exist. Do not make call getCampaignsSegmentShare AI!
         foreach ($campaigns as $key=>$campaign) {
             $campaigns[$key]['share'] = $this->cacheProvider->getCacheAdapter()->get(
                 $this->getCachedKey($segmentId, $campaign['id']),
@@ -57,7 +58,7 @@ class SegmentCampaignShare
             );
         }
 
-        usort($campaigns, function ($a, $b) { return floatval($b['share']) <=> floatval($a['share']); });
+        usort($campaigns, function ($a, $b) { return floatval($b['share']) <=> floatval($a['share']); });*/
 
         return $campaigns;
     }
