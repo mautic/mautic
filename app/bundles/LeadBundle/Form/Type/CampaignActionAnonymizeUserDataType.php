@@ -34,7 +34,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
                 ],
             ]
         );
-        $choicesAnonymize = $this->getFieldChoices(false);
+        $choicesAnonymize = $this->getFieldChoices(false, true);
         $builder->add(
             'fieldsToAnonymize',
             FieldListType::class,
@@ -59,7 +59,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
     /**
      * @return array<string, int>
      */
-    private function getFieldChoices(bool $checkIsUniqueField=true): array
+    private function getFieldChoices(bool $checkIsUniqueField=true, bool $validLessThan64Char = false): array
     {
         $findBy['type'] = self::FIELD_TYPE_ALLOWED;
         if ($checkIsUniqueField) {
@@ -68,6 +68,9 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
         $leadFields = $this->fieldModel->getRepository()->findBy($findBy);
         $choices    = [];
         foreach ($leadFields as $field) {
+            if ($validLessThan64Char && $field->getCharLengthLimit() < 64) {
+                continue;
+            }
             $choices[$field->getLabel()] = $field->getId();
         }
 
@@ -85,6 +88,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
             function ($validateMe, ExecutionContextInterface $context): void {
                 /** @var Integration $data */
                 $data = $context->getRoot()->getData();
+
                 if (
                     !isset($data['properties']['fieldsToDelete'], $data['properties']['fieldsToAnonymize'])
                     || (empty($data['properties']['fieldsToDelete']) && empty($data['properties']['fieldsToAnonymize']))

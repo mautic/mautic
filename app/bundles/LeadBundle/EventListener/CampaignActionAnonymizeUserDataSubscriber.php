@@ -172,6 +172,17 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
             if (false === $leadField) {
                 continue;
             }
+
+            $field     = $this->fieldModel->getRepository()->find($leadField['id']);
+
+            if (null === $field) {
+                continue;
+            }
+
+            if ($field->getCharLengthLimit() < 64) {
+                continue;
+            }
+
             $leadsCompanies[$key] = $this->setHash($leadCompany, $leadField, $field);
         }
 
