@@ -1,0 +1,203 @@
+{% set footerContent %}
+    {% set typeIcons = {
+        'button': 'ri-rectangle-fill',
+        'captcha': 'ri-shield-check-line',
+        'checkboxgrp': 'ri-checkbox-multiple-line',
+        'freetext': 'ri-text',
+        'freehtml': 'ri-code-line',
+        'hidden': 'ri-eye-off-line',
+        'lookup': 'ri-search-line',
+        'password': 'ri-lock-password-line',
+        'pagebreak': 'ri-separator',
+        'radiogrp': 'ri-radio-button-line',
+        'textarea': 'ri-text-wrap',
+        'url': 'ri-link',
+        'text': 'ri-input-field',
+        'select': 'ri-list-check',
+        'country': 'ri-map-pin-line',
+        'number': 'ri-increase-decrease-line',
+        'tel': 'ri-phone-line',
+        'email': 'ri-mail-line',
+        'date': 'ri-calendar-line',
+        'datetime': 'ri-calendar-schedule-line',
+        'companyLookup': 'ri-building-line',
+        'file': 'ri-file-upload-line'
+    } %}
+
+    {% if field.type is defined %}
+    <!-- Field type -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.type.' ~ field.type,
+                    icon: typeIcons[field.type] ?? 'ri-input-field',
+                    color: isConditional ? 'warm-gray' : 'high-contrast',
+                    attributes: {
+                        'data-toggle': 'tooltip',
+                        'data-original-title': 'mautic.form.field.type'|trans
+                    }
+                }
+            ]
+        } %}
+    {% endif %}
+
+    {% if field.mappedObject is not empty and field.mappedField is not empty and mappedFields[field.mappedObject] is defined %}
+    <!-- Mapped field -->
+    {% set objectLabel = field.mappedObject == 'company' ? 'mautic.company.company'|trans|lower : (field.mappedObject == 'contact' ? 'mautic.lead.contact'|trans|lower : field.mappedObject|lower) %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        'tags': [{
+            'color': 'green',
+            'icon': field.mappedObject == 'company' ? 'ri-building-3-line' : (field.mappedObject == 'contact' ? 'ri-contacts-book-line' : 'ri-shape-line'),
+            'label': fieldCollection[field.mappedField] is defined ? fieldCollection[field.mappedField].name :
+                    (field.mappedObject == 'contact' ? ('mautic.lead.field.' ~ field.mappedField) :
+                    (field.mappedObject == 'company' ? ('mautic.lead.field.' ~ field.mappedField) : field.mappedField)),
+            'attributes': {
+                'data-toggle': 'tooltip',
+                'title': 'mautic.core.field.mapped.to'|trans({'%object%': objectLabel})
+            }
+        }]
+    } %}
+    {% endif %}
+
+    {% if field.properties.multiple is defined and field.properties.multiple == 1 %}
+    <!-- Multiple -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.form.multiple',
+                    icon: 'ri-list-check-2',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
+    {% if field.alwaysDisplay is defined and field.alwaysDisplay %}
+    {% if field.alwaysDisplay == 1 %}
+    <!-- Always display -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.form.always_display',
+                    icon: 'ri-eye-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+        {% endif %}
+    {% else %}
+        {% if field.showWhenValueExists is defined and field.showWhenValueExists == 0 and (field.type is not defined or (field.type not in ['button', 'captcha', 'freehtml', 'freetext', 'pagebreak', 'file'])) and not isConditional %}
+        <!-- Show when value exists -->
+            {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.form.hide_when_value_exists',
+                    icon: 'ri-eye-close-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+            } %}
+        {% endif %}
+
+        {% if field.showAfterXSubmissions is defined and field.showAfterXSubmissions is not empty %}
+        <!-- Show after X submissions -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: field.showAfterXSubmissions,
+                    icon: 'ri-forward-end-mini-fill',
+                    color: 'blue',
+                    'attributes': {
+                        'data-toggle': 'tooltip',
+                        'title': 'mautic.form.field.hide.if.submission.count'|trans({'%count%': field.showAfterXSubmissions})
+                    }
+                }
+            ]
+        } %}
+        {% endif %}
+    {% endif %}
+
+    {% if field.isAutoFill is defined and field.isAutoFill == 1 %}
+    <!-- Auto fill -->
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [
+            {
+                label: 'mautic.form.field.form.auto_fill',
+                icon: 'ri-sparkling-fill',
+                icon_only: true,
+                color: 'blue'
+            }
+        ]
+    } %}
+    {% endif %}
+
+    {% if field.properties.public is defined and field.properties.public == 1 %}
+    <!-- Public -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.file.public',
+                    icon: 'ri-global-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
+    {% if field.properties.profile_image is defined and field.properties.profile_image == 1 %}
+    <!-- Set as profile image -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.file.set_as_profile_image',
+                    icon: 'ri-user-smile-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
+    {% if field.validation.international is defined and field.validation.international == 1 %}
+    <!-- International phone number -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.type.tel.international',
+                    icon: 'ri-earth-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
+    {% if field.isRequired is defined and field.isRequired == 1 %}
+    <!-- Required -->
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [
+            {
+                label: 'mautic.core.required',
+                icon: 'ri-asterisk',
+                color: 'red',
+                icon_only: true,
+                attributes: {
+                    'class': 'ml-a'
+                }
+            }
+        ]
+    } %}
+    {% endif %}
+
+{% endset %}
+
+{% if footerContent|trim is not empty %}
+    <div class="d-flex ml-sm mr-sm mt-xs as-stretch gap-3 ai-center">
+        {{ footerContent|raw }}
+    </div>
+{% endif %}

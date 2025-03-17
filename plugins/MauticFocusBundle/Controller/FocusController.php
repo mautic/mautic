@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -35,7 +34,6 @@ class FocusController extends AbstractStandardFormController
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -45,7 +43,7 @@ class FocusController extends AbstractStandardFormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     protected function getTemplateBase(): string

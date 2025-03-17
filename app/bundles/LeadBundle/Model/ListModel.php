@@ -1233,9 +1233,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
                     continue;
                 }
 
-                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
                 $bcFilterValue     = $eachFilter['filter'] ?? [];
                 $filterValue       = $eachFilter['properties']['filter'] ?? $bcFilterValue;
+                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $filterValue));
                 foreach ($filterValue as $val) {
                     if (!empty($dependency[$val])) {
                         $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);

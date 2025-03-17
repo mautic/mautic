@@ -4,7 +4,6 @@
   "authorUrl": "https://www.sendwithus.com/resources/templates/oxygen",
   "features": [
     "page",
-    "email",
-    "form"
+    "email"
   ]
 }

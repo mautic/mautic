@@ -86,11 +86,6 @@
             "target": "git@github.com:mautic/theme-cards.git"
         },
         {
-            "name": "theme-coffee",
-            "directory": "themes/coffee",
-            "target": "git@github.com:mautic/theme-coffee.git"
-        },
-        {
             "name": "theme-confirmme",
             "directory": "themes/confirmme",
             "target": "git@github.com:mautic/theme-confirmme.git"
@@ -119,16 +114,6 @@
             "name": "theme-goldstar",
             "directory": "themes/goldstar",
             "target": "git@github.com:mautic/theme-goldstar.git"
-        },
-        {
-            "name": "theme-mauve",
-            "directory": "themes/Mauve",
-            "target": "git@github.com:mautic/theme-mauve.git"
-        },
-        {
-            "name": "theme-nature",
-            "directory": "themes/nature",
-            "target": "git@github.com:mautic/theme-nature.git"
         },
         {
             "name": "theme-neopolitan",
@@ -244,7 +229,41 @@
             "name": "theme-creative",
             "directory": "themes/creative",
             "target": "git@github.com:mautic/theme-creative.git"
+        },
+        {
+            "name": "theme-eclipse",
+            "directory": "themes/eclipse",
+            "target": "git@github.com:mautic/theme-eclipse.git"
+        },
+        {
+            "name": "theme-chord",
+            "directory": "themes/chord",
+            "target": "git@github.com:mautic/theme-chord.git"
+        },
+        {
+            "name": "theme-formscape",
+            "directory": "themes/formscape",
+            "target": "git@github.com:mautic/theme-formscape.git"
+        },
+        {
+            "name": "theme-reachout",
+            "directory": "themes/reachout",
+            "target": "git@github.com:mautic/theme-reachout.git"
+        },
+        {
+            "name": "theme-blend",
+            "directory": "themes/blend",
+            "target": "git@github.com:mautic/theme-blend.git"
+        },
+        {
+            "name": "theme-mono",
+            "directory": "themes/mono",
+            "target": "git@github.com:mautic/theme-mono.git"
+        },
+        {
+            "name": "theme-capture",
+            "directory": "themes/capture",
+            "target": "git@github.com:mautic/theme-capture.git"
         }
-
     ]
 }

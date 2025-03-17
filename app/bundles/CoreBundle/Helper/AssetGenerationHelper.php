@@ -17,12 +17,6 @@ class AssetGenerationHelper
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'moment/min/moment.min.js', // Needed for date/time formatting.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
-        'codemirror/lib/codemirror.js', // Needed for the legacy code-mode editor.
-        'codemirror/addon/hint/show-hint.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/xml/xml.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/javascript/javascript.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/htmlmixed/htmlmixed.js', // Needed for the legacy code-mode editor.
-        'codemirror/mode/css/css.js', // Needed for the legacy code-mode editor.
         'jquery.cookie/jquery.cookie.js', // A simple, lightweight jQuery plugin for reading, writing and deleting cookies.
         'jsplumb/dist/js/jsplumb.js', // Needed for the campaign builder.
         'typeahead.js/dist/typeahead.bundle.js', // Needed for the Twitter-like mentions (tokens).
@@ -35,7 +29,6 @@ class AssetGenerationHelper
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
-        'modernizr/modernizr-mautic-dist.js',
         'jquery.quicksearch/src/jquery.quicksearch.js',
         'jquery-ui/ui/version.js',
         'jquery-ui/ui/widget.js',
@@ -52,7 +45,6 @@ class AssetGenerationHelper
         'jquery-ui/ui/tabbable.js',
         'jquery-ui/ui/unique-id.js',
         'jquery-ui/ui/effect.js',
-        'jquery-ui/ui/safe-blur.js', // needed for the legacy builder
         'jquery-ui/ui/widgets/mouse.js',
         'jquery-ui/ui/widgets/draggable.js',
         'jquery-ui/ui/widgets/droppable.js',

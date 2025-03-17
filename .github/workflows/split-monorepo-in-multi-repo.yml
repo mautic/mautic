@@ -11,7 +11,7 @@ on:
             - plugins/**
             - themes/**
             # also run when actions are being modified for testing purposes.
-            - .github/** 
+            - .github/**
         # Tag push events should be ignored, they will be handled with the create event below.
         tags-ignore:
             - '*'
@@ -84,6 +84,14 @@ jobs:
                     - theme-welcome
                     - theme-attract
                     - theme-creative
+                    - theme-eclipse
+                    - theme-chord
+                    - theme-formscape
+                    - theme-reachout
+                    - theme-blend
+                    - theme-mono
+                    - theme-capture
+
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
             -   uses: actions/checkout@v4

@@ -10,13 +10,13 @@
 {% set footerButtonClass = footerButtonClass is defined ? footerButtonClass : 'modal-form-buttons' %}
 {% set dismissable = dismissable is defined ? dismissable : true %}
 
-<div class="modal fade{{ containerClass }}" id="{{ id }}" data-backdrop="static" role="dialog" aria-labelledby="{{ id }}-label" aria-hidden="true"{{ containerAttr }}>
+<div class="modal fade{{ containerClass }}" id="{{ id }}" data-backdrop="static" role="dialog" aria-labelledby="{{ id }}-label" {{ containerAttr }}>
     <div class="modal-dialog{{ size }}">
         <div class="modal-content{{ class }}">
             {% if header is not same as(false) %}
             <div class="modal-header">
                 {% if dismissable %}
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 {% endif %}
 
                 <h4 class="modal-title" id="{{ id }}-label">

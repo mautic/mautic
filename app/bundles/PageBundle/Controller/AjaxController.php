@@ -46,47 +46,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function setBuilderContentAction(Request $request): JsonResponse
-    {
-        $dataArray = ['success' => 0];
-        $entityId  = InputHelper::clean($request->request->get('entity'));
-        $session   = $request->getSession();
-
-        if (!empty($entityId)) {
-            $sessionVar = 'mautic.pagebuilder.'.$entityId.'.content';
-
-            // Check for an array of slots
-            $slots   = InputHelper::_($request->request->all()['slots'] ?? [], 'html');
-            $content = $session->get($sessionVar, []);
-
-            if (!is_array($content)) {
-                $content = [];
-            }
-
-            if (!empty($slots)) {
-                // Builder was closed so save each content
-                foreach ($slots as $slot => $newContent) {
-                    $content[$slot] = $newContent;
-                }
-
-                $session->set($sessionVar, $content);
-                $dataArray['success'] = 1;
-            } else {
-                // Check for a single slot
-                $newContent = InputHelper::html($request->request->get('content'));
-                $slot       = InputHelper::clean($request->request->get('slot'));
-
-                if (!empty($slot)) {
-                    $content[$slot] = $newContent;
-                    $session->set($sessionVar, $content);
-                    $dataArray['success'] = 1;
-                }
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
     /**
      * Called by parent::getBuilderTokensAction().
      *

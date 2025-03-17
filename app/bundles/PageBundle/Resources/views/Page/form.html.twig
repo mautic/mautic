@@ -5,10 +5,6 @@
     - tokens
     - activePage
     - themes
-    - slots
-    - sections
-    - builderAssets
-    - sectionForm
     - permissions
     - previewUrl (optional)
     - security (optional)
@@ -147,10 +143,6 @@
   {{ include('@MauticCore/Helper/builder.html.twig', {
       'type': 'page',
       'isCodeMode': ('mautic_code_mode' is same as activePage.template),
-      'sectionForm': sectionForm,
-      'builderAssets': builderAssets,
-      'slots': slots,
-      'sections': sections,
       'objectId': activePage.sessionId,
       'previewUrl': previewUrl,
   }, with_context=false) }}

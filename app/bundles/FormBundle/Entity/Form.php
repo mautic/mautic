@@ -9,12 +9,36 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Form extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "form:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "fields", "actions"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "form:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Form extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
@@ -223,6 +247,8 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

@@ -5,6 +5,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
@@ -17,6 +18,7 @@ class UploadSubscriber implements EventSubscriberInterface
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
         private AssetModel $assetModel,
+        protected Translator $translator,
         private FileUploadValidator $fileUploadValidator,
     ) {
     }
@@ -37,7 +39,7 @@ class UploadSubscriber implements EventSubscriberInterface
     {
         $request   = $event->getRequest()->request;
         $response  = $event->getResponse();
-        $tempId    = $request->get('tempId');
+        $tempId    = basename($request->get('tempId'));
         $file      = $event->getFile();
         $config    = $event->getConfig();
         $uploadDir = $config['storage']['directory'];
@@ -59,7 +61,8 @@ class UploadSubscriber implements EventSubscriberInterface
     public function onUploadValidation(ValidationEvent $event): void
     {
         $file       = $event->getFile();
-        $extensions = $this->coreParametersHelper->get('allowed_extensions');
+        $mimetypes  = $this->coreParametersHelper->get('allowed_mimetypes');
+        $extensions = array_keys($mimetypes);
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
         if (null === $file) {
@@ -76,6 +79,27 @@ class UploadSubscriber implements EventSubscriberInterface
             $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions, 'mautic.asset.asset.error.file.extension');
         } catch (FileInvalidException $e) {
             throw new ValidationException($e->getMessage());
+        }
+
+        try {
+            $this->checkMimeType($file->getMimeType(), $mimetypes, 'mautic.asset.asset.error.file.mimetype');
+        } catch (FileInvalidException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string,string> $allowedMimeTypes
+     */
+    private function checkMimeType(string $mimeType, array $allowedMimeTypes, string $extensionErrorMsg): void
+    {
+        if (!in_array(strtolower($mimeType), array_map('strtolower', $allowedMimeTypes), true)) {
+            $error = $this->translator->trans($extensionErrorMsg, [
+                '%fileMimetype%' => $mimeType,
+                '%mimetypes%'    => implode(', ', $allowedMimeTypes),
+            ], 'validators');
+
+            throw new FileInvalidException($error);
         }
     }
 }
