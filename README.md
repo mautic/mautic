@@ -2,9 +2,6 @@
   <p align="center">
    <img width="150" height="150" src="(.github/readme_logo.png)" alt="Logo">
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-159-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
   </p>
 	<h1 align="center"><b>Mautic</b></h1>
@@ -17,20 +14,26 @@
     <a href="https://m.mautic.org/mautic-start-your-trial">Request a trial</a> · <a href="https://www.mautic.org/download">Self-host/download</a> · <a href="https://www.mautic.org/community">Community channels</a>
 </p>
 
-<p align="center">
+<p style="text-align: center;">
   <a href="https://codecov.io/gh/mautic/mautic"><img alt="Codecov" src="https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg"></a>
-  <a href="#contributors-#contributors-"><img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-141-orange.svg?style=flat-square"></a>
+<a href="https://www.bestpractices.dev/projects/9527"><img src="https://www.bestpractices.dev/projects/9527/badge"></a>
+[![All Contributors](https://img.shields.io/github/all-contributors/projectOwner/projectName?color=ee8449&style=flat-square)](#contributors)
 </p>
-<br/>
-<br/>
 
-🗒️ About Mautic
-============
-Mautic is the world’s largest open source marketing automation project. With over 200,000 organisations using Mautic and over 1,000 community volunteers, we empower businesses by making it easy to manage their marketing across a range of channels.
+<h2 align="center">⭐ Like what we're doing? Give us a star ⬆️</h2>
+
+
+## 🗒️ About Mautic
+
+Mautic is the world’s largest open source marketing automation project. We empower businesses and organizations to deliver fully integrated marketing campaigns by providing powerful, world-class open source marketing automation software supported by a thriving, worldwide community of passionate contributors.
+
+Our vision is to be the most privacy-focused, accessible and extendable marketing automation product on the market, giving everyone the power to understand, manage and grow their business or organization while respecting and safeguarding the privacy of their end users.
+
+In short: Mautic is the most privacy-focused, accessible and extendable marketing automation product on the market.
 
 ### ✨ Benefits over regular marketing automation tools
 
-- 🌐 It's open-source - use it for free, no strings attached
+- 🌐 It's open source - use it for free, no strings attached
 - 🏠 Don't rely on third-party SaaS, run your own marketing automation
 - 🗄️ Use your own database and own your data
 - 🔓 No vendor lock-in - switch or modify at will
@@ -49,8 +52,8 @@ Open source means more than open code. Open source provides equality for all and
 
 ![Mautic](.github/readme_image.png "Mautic Open Source Marketing Automation")
 
-Get Involved Quickly
-=============
+## Get Involved Quickly
+
 Calling all devs, testers and writers! Get started quickly and show us what you’re made of.
 
 - 🐛 [Easy-to-fix bugs][t1-issues]
@@ -58,8 +61,7 @@ Calling all devs, testers and writers! Get started quickly and show us what you�
 
 If you have questions, [check how to contribute](#-contribution).
 
-Using Mautic
-============
+## Using Mautic
 
 ### ☁️ Deploy instantly with our Trials
 
@@ -73,17 +75,17 @@ The GitHub version is recommended for both development and testing. The producti
 
 ### Installation
 > [!WARNING]
-> <sub>*Install from source only if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and keep it working. If the source/database schema gets out of sync with Mautic releases, the release updater may not work and will require manual updates. For production, we recommend the pre-packaged Mautic which is available at [mautic.org/download][download-mautic].*
+> <sub>*Install from GitHub only if you are comfortable using the command line and are working locally. You'll be required to use various CLI commands to get Mautic working and keep it working. If the source/database schema gets out of sync with Mautic releases, the release updater may not work and will require manual updates. For production, we recommend installing with Composer, or using the pre-packaged Mautic which is available at [mautic.org/download][download-mautic].*
 *Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*</sub>
 
 ### How to install Mautic
 You must already have [Composer][composer] available on your computer because this is a development release and you'll need Composer to download the vendor packages.
 
-Also note that if you have DDEV installed, you can just run 'ddev start' as a DDEV project’s configuration is present in the repo. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
+Also note that if you have DDEV installed, you can run 'ddev start' as a DDEV project’s configuration is present in the repo. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
 
-Installing Mautic is a simple three-step process:
+Installing Mautic is a three-step process:
 
-1. [Download the repository zip][download-zip] then extract the zip to your web root.
+1. [Download the repository zip][download-zip] then extract the zip to your web root, or pull it in through Composer at the [command line][install-mautic-composer].
 2. Run the `composer install` command to install the required packages.
 3. Open your browser and complete the installation through the web installer.
 
@@ -106,7 +108,7 @@ There are lots of good conversations and resources in our Forums. If you're stru
 
 Thank you for your desire to develop Mautic together!
 
-❤️ This project and everyone involved in it is governed by the [Code of Conduct](https://github.com/mautic/mautic/blob/5.x/.github/CODE_OF_CONDUCT.md).
+❤️ This project and everyone involved in it is governed by the [Code of Conduct](https://github.com/mautic/mautic/blob/6.x/.github/CODE_OF_CONDUCT.md).
 
 🧑‍💻 Check out our [contributing guide][contributing-md] and [Contributing Code][contribute-developer] to learn about asking questions, creating issues, or submitting pull requests.
 
@@ -336,21 +338,19 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 This project follows the [all-contributors][all-contributors] specification. Contributions of any kind welcome!
 
-### ⭐ Like what we're doing? Give us a star
-
 [mautic-blog]: <https://www.mautic.org/blog>
 [get-involved]: <https://www.mautic.org/community/get-involved>
 [twitter]: <https://twitter.com/MauticCommunity>
 [facebook]: <https://www.facebook.com/MauticCommunity/>
 [slack]: <https://www.mautic.org/community/get-involved/communication-channels>
 [contributing]: <https://contribute.mautic.org/contributing-to-mautic>
-[contributing-md]: <https://github.com/mautic/mautic/blob/5.x/.github/CONTRIBUTING.md>
+[contributing-md]: <https://github.com/mautic/mautic/blob/6.x/.github/CONTRIBUTING.md>
 [contribute-developer]: <https://contribute.mautic.org/contributing-to-mautic/developer>
 [t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
 [download-mautic]: <https://www.mautic.org/download>
 [tagged-release]: <https://github.com/mautic/mautic/releases>
 [composer]: <http://getcomposer.org/>
-[download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
+[download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/5.2.zip>
 [ddev-mautic]: <https://kb.mautic.org/article/how-to-set-up-a-mautic-instance-for-testing-locally-with-ddev.html>
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
 [community]: <https://www.mautic.org/community>
@@ -358,5 +358,6 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [dev-docs]: <https://devdocs.mautic.org>
 [all-contributors]: <https://github.com/all-contributors/all-contributors>
 [best-pulls]: <https://github.com/mautic/mautic/pulls?q=is%3Aopen+is%3Apr+-label%3Ablocked+-label%3Awip+-is%3Adraft+-label%3Aready-to-commit+-label%3Apending-feedback+label%3Aready-to-test+status%3Asuccess>
-[mautic-trials]: <https://m.mautic.org/mautic-start-your-trial>
+[mautic-trials]: <https://mautic.org/start-using-mautic/try-mautic/>
 [mautic-releases]: <https://www.mautic.org/mautic-releases>
+[install-mautic-composer]: <https://docs.mautic.org/en/5.2/getting_started/how_to_install_mautic.html#installing-with-composer>
