@@ -76,6 +76,8 @@ Please check the latest supported versions on the [Mautic Releases][mautic-relea
 
 The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download][download-mautic].
 
+Check out the [requirements for installation][requirements] and [supported versions][supported-versions].
+
 ### Installation
 > [!WARNING]
 > <sub>*Install from GitHub only if you are comfortable using the command line and are working locally. You'll be required to use various CLI commands to get Mautic working and keep it working. If the source/database schema gets out of sync with Mautic releases, the release updater may not work and will require manual updates. For production, we recommend installing with Composer, or using the pre-packaged Mautic which is available at [mautic.org/download][download-mautic].*
@@ -86,9 +88,11 @@ You must already have [Composer][composer] available on your computer because th
 
 Also note that if you have DDEV installed, you can run 'ddev start' as a DDEV project’s configuration is present in the repo. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
 
-Installing Mautic is a three-step process:
+We recommend installing via Composer following the documentation at the [command line][install-mautic-composer].
 
-1. [Download the repository zip][download-zip] then extract the zip to your web root, or pull it in through Composer at the [command line][install-mautic-composer].
+If you must install from the zip file, it's a three-step process:
+
+1. [Download the repository zip][download-zip] then extract the zip to your web root, or pull it in through Composer at the .
 2. Run the `composer install` command to install the required packages.
 3. Open your browser and complete the installation through the web installer.
 
@@ -364,3 +368,5 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [mautic-trials]: <https://mautic.org/start-using-mautic/try-mautic/>
 [mautic-releases]: <https://www.mautic.org/mautic-releases>
 [install-mautic-composer]: <https://docs.mautic.org/en/5.2/getting_started/how_to_install_mautic.html#installing-with-composer>
+[requirements]: <https://mautic.org/mautic-requirements/>
+[supported-versions]: <https://mautic.org/releases/>
