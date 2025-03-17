@@ -11,7 +11,7 @@
     <a href="https://mautic.org"><strong>mautic.org 🡥</strong></a>
     <br />
     <br />
-    <a href="https://m.mautic.org/mautic-start-your-trial">Request a trial</a> · <a href="https://www.mautic.org/download">Self-host/download</a> · <a href="https://www.mautic.org/community">Community channels</a>
+    <a href="https://mautic.org/start-using-mautic/try-mautic/">Request a trial</a> · <a href="https://www.mautic.org/download">Self-host/download</a> · <a href="https://www.mautic.org/community">Community channels</a>
 </p>
 
 <p style="text-align: center;">
