@@ -199,8 +199,10 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             $event->addEntityIdMap($campaignData['id'], $campaign->getId());
 
-            // Update import summary dynamically
-            $importSummary[Campaign::ENTITY_NAME] = ($importSummary[Campaign::ENTITY_NAME] ?? 0) + 1;
+            // Update import summary
+            $importSummary[Campaign::ENTITY_NAME]['count']  = ($importSummary[Campaign::ENTITY_NAME]['count'] ?? 0) + 1;
+            $importSummary[Campaign::ENTITY_NAME]['name'][] = $campaign->getName();
+            $importSummary[Campaign::ENTITY_NAME]['id'][]   = $campaign->getId();
 
             $log = [
                 'bundle'    => 'campaign',
@@ -242,8 +244,11 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
             $subEvent = $this->dispatcher->dispatch($subEvent);
             $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
-            $importSummary[$entity] = ($importSummary[$entity] ?? 0) + count($entityData[$entity]);
-
+            $importSummary[$entity]['count'] = ($importSummary[$entity]['count'] ?? 0) + count($entityData[$entity]);
+            foreach ($entityData[$entity] as $data) {
+                $importSummary[$entity]['name'][] = $data['name'] ?? 'Unknown';
+                $importSummary[$entity]['id'][]   = $data['id'] ?? null;
+            }
             $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
         }
 
@@ -253,8 +258,11 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $emailEvent = new EntityImportEvent(Email::ENTITY_NAME, $entityData[Email::ENTITY_NAME], $userId);
             $emailEvent = $this->dispatcher->dispatch($emailEvent);
             $this->logger->info('Imported dependent entity: '.Email::ENTITY_NAME, ['entityIdMap' => $emailEvent->getEntityIdMap()]);
-            $importSummary[Email::ENTITY_NAME] = ($importSummary[Email::ENTITY_NAME] ?? 0) + count($entityData[Email::ENTITY_NAME]);
-
+            $importSummary[Email::ENTITY_NAME]['count'] = ($importSummary[Email::ENTITY_NAME]['count'] ?? 0) + count($entityData[Email::ENTITY_NAME]);
+            foreach ($entityData[Email::ENTITY_NAME] as $data) {
+                $importSummary[Email::ENTITY_NAME]['name'][] = $data['name'] ?? 'Unknown';
+                $importSummary[Email::ENTITY_NAME]['id'][]   = $data['id'] ?? null;
+            }
             $this->updateDependencies($entityData['dependencies'], $emailEvent->getEntityIdMap(), Email::ENTITY_NAME);
         }
 
@@ -262,9 +270,13 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         if (isset($entityData[Event::ENTITY_NAME])) {
             $this->updateEvents($entityData, $entityData['dependencies']);
 
-            $campaignEvent                     = new EntityImportEvent(Event::ENTITY_NAME, $entityData[Event::ENTITY_NAME], $userId);
-            $campaignEvent                     = $this->dispatcher->dispatch($campaignEvent);
-            $importSummary[Event::ENTITY_NAME] = ($importSummary[Event::ENTITY_NAME] ?? 0) + count($entityData[Event::ENTITY_NAME]);
+            $campaignEvent                              = new EntityImportEvent(Event::ENTITY_NAME, $entityData[Event::ENTITY_NAME], $userId);
+            $campaignEvent                              = $this->dispatcher->dispatch($campaignEvent);
+            $importSummary[Event::ENTITY_NAME]['count'] = ($importSummary[Event::ENTITY_NAME]['count'] ?? 0) + count($entityData[Event::ENTITY_NAME]);
+            foreach ($entityData[Event::ENTITY_NAME] as $data) {
+                $importSummary[Event::ENTITY_NAME]['name'][] = $data['name'] ?? 'Unknown';
+                $importSummary[Event::ENTITY_NAME]['id'][]   = $data['id'] ?? null;
+            }
 
             $this->updateCampaignCanvasSettings($entityData, $campaignEvent->getEntityIdMap(), $event->getEntityIdMap());
         }

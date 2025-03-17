@@ -6,51 +6,102 @@
     {{ 'mautic.campaign.campaign.import.title'|trans }}
 {% endblock %}
 
-{% block actions %}
-    {{- include('@MauticCore/Helper/page_actions.html.twig', {
-            'routeBase': 'campaign',
-            'templateButtons': {'close': true},
-            'routeVars': {
-                'close': {
-                    'object': app.request.get('object', 'campaigns'),
-                },
-            },
-    }) -}}
-{% endblock %}
-
 {% block content %}
-    {% set hasErrors = importSummary.errors is not empty %}
+    {% set progress = importProgress.progress ?? 0 %}
+    {% set isComplete = progress >= 100 %}
+    {% set hasErrors = (importSummary.errors|default([])) is not empty %}
     {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}
     {% set header = hasErrors ? 'mautic.campaign.campaign.import.error' : 'mautic.campaign.campaign.import.success' %}
 
+    {% if not isComplete %}
+        <meta http-equiv="refresh" content="5;url={{ path('mautic_campaign_import_action', {'objectAction': 'progress'}) }}">
+    {% endif %}
+
     <div class="row ma-lg" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6 text-center">
-            <div class="panel panel-{% if hasErrors %}danger{% else %}success{% endif %}">
+            <div class="panel panel-{% if hasErrors %}danger{% elseif isComplete %}success{% else %}info{% endif %}">
                 <div class="panel-heading">
-                    <h4 class="panel-title">{{ header|trans }}</h4>
+                    <h4 class="panel-title">
+                        {{ hasErrors ? 'mautic.campaign.campaign.import.error'|trans : (isComplete ? 'mautic.campaign.campaign.import.success'|trans : 'mautic.campaign.campaign.import.inprogress'|trans) }}
+                    </h4>
                 </div>
                 <div class="panel-body">
                     {% if hasErrors %}
-                        <h4>{{ 'mautic.campaign.campaign.import.failed'|trans }}</h4>
+                        <h4 class="text-danger">{{ 'mautic.campaign.campaign.import.failed'|trans }}</h4>
                         <ul class="text-danger">
-                            {% for error in importSummary.errors %}
+                            {% for error in importSummary.errors|default([]) %}
                                 <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
+                    {% elseif not isComplete %}
+                        <div class="progress mt-md" style="height: 50px;">
+                            <div class="progress-bar progress-bar-primary progress-bar-striped active"
+                                 role="progressbar"
+                                 style="width: {{ progress }}%; height: 50px;"
+                                 aria-valuenow="{{ progress }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                                <span class="sr-only">{{ progress }}%</span>
+                            </div>
+                        </div>
+                        <p class="mt-md">{{ 'mautic.campaign.campaign.import.progress.status'|trans({'%progress%': progress}) }}</p>
                     {% else %}
-                        <h4>{{ 'mautic.campaign.campaign.notice.import.finished'|trans }}</h4>
-                        <div class="pa-lg">
-                            <ul class="list-unstyled text-left import-summary">
-                                <li><i class="fa fa-bullhorn"></i> <strong>{{ importSummary.summary.campaign }}</strong> Campaign(s)</li>
-                                <li><i class="fa fa-list-alt"></i> <strong>{{ importSummary.summary.forms }}</strong> Form(s)</li>
-                                <li><i class="fa fa-users"></i> <strong>{{ importSummary.summary.lists }}</strong> List(s)</li>
-                                <li><i class="fa fa-file"></i> <strong>{{ importSummary.summary.asset }}</strong> Asset(s)</li>
-                                <li><i class="fa fa-globe"></i> <strong>{{ importSummary.summary.page }}</strong> Page(s)</li>
-                                <li><i class="fa fa-random"></i> <strong>{{ importSummary.summary.dynamicContent }}</strong> Dynamic Content(s)</li>
-                                <li><i class="fa fa-star"></i> <strong>{{ importSummary.summary.pointGroup }}</strong> Point Group(s)</li>
-                                <li><i class="fa fa-envelope"></i> <strong>{{ importSummary.summary.email }}</strong> Email(s)</li>
-                                <li><i class="fa fa-tasks"></i> <strong>{{ importSummary.summary.campaign_event }}</strong> Campaign Event(s)</li>
-                            </ul>
+                        <h4 class="text-success">{{ 'mautic.campaign.campaign.notice.import.finished'|trans }}</h4>
+
+                        <div class="table-responsive pa-md">
+                            <table class="table table-hover table-striped" id="importSummaryTable">
+                                <thead>
+                                    <tr>
+                                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                            'text': 'mautic.campaign.campaign.import.entity',
+                                            'class': 'col-entity'
+                                        }) }}
+                                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                            'text': 'mautic.campaign.campaign.import.name',
+                                            'class': 'col-name'
+                                        }) }}
+                                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                            'text': 'mautic.campaign.campaign.import.count',
+                                            'class': 'col-count',
+                                            'default': true
+                                        }) }}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entity, details in importSummary.summary|default([]) %}
+                                        <tr>
+                                            <td><strong>{{ entity|capitalize }}</strong></td>
+                                            <td>
+                                                {% if details.name is iterable %}
+                                                    {{ details.name|join(', ') }}
+                                                {% else %}
+                                                    {{ details.name }}
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center"><strong>{{ details.count }}</strong></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pa-md">
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        href: path('mautic_campaign_index'),
+                                        variant: 'primary',
+                                        icon: 'ri-list-check-2', 
+                                        label: 'mautic.campaign.campaigns'|trans
+                                    },
+                                    {
+                                        href: path('mautic_campaign_import_action', {'objectAction': 'new'}),
+                                        variant: 'secondary',
+                                        icon: 'ri-upload-line',
+                                        label: 'mautic.campaign.campaign.import'|trans
+                                    }
+                                ]
+                            } %}
                         </div>
                     {% endif %}
                 </div>

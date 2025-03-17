@@ -7,9 +7,8 @@ namespace Mautic\CampaignBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Form\Type\CampaignImportType;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -18,7 +17,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -31,7 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-final class ImportController extends FormController
+final class ImportController extends AbstractFormController
 {
     // Steps of the import
     public const STEP_UPLOAD_ZIP      = 1;
@@ -41,11 +39,8 @@ final class ImportController extends FormController
     public const STEP_IMPORT_FROM_ZIP = 3;
 
     public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        CoreParametersHelper $coreParametersHelper,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
+        CoreParametersHelper $coreParametersHelper,
         ModelFactory $modelFactory,
         private UserHelper $userHelper,
         EventDispatcherInterface $dispatcher,
@@ -55,11 +50,12 @@ final class ImportController extends FormController
         CorePermissions $security,
         private LoggerInterface $logger,
         private PathsHelper $pathsHelper,
+        private FormFactoryInterface $formFactory,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function newAction(Request $request, $ignorePost = false): Response
+    public function newAction(Request $request): Response
     {
         if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:create')) {
             return $this->accessDenied();
@@ -68,40 +64,8 @@ final class ImportController extends FormController
         $fullPath = $this->getFullZipPath();
         $step     = $this->getImportStep($request, $fullPath);
 
-        if (!$ignorePost && $request->isMethod('POST')) {
-            $response = $this->handleFileUpload($request, $this->getImportFileName(), $fullPath);
-            if ($response) {
-                return $response;
-            }
-        }
-
-        if (self::STEP_IMPORT_FROM_ZIP === $step) {
-            $importSummary = $this->processImport($fullPath);
-
-            if (empty($importSummary['errors'])) {
-                $this->addFlashMessage('mautic.campaign.notice.import.finished', [], FlashBag::LEVEL_NOTICE);
-            }
-
-            $this->resetImport();
-            $this->removeImportFile($fullPath);
-
-            return $this->delegateView([
-                'viewParameters'  => [
-                    'importSummary' => $importSummary,
-                    'mauticContent' => 'campaignImport',
-                    'step'          => $step,
-                ],
-                'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
-                'passthroughVars' => [
-                    'mauticContent' => 'campaignImport',
-                    'route'         => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'new']),
-                    'step'          => $step,
-                ],
-            ]);
-        }
-
         $form = $this->formFactory->create(CampaignImportType::class, [], [
-            'action' => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'new']),
+            'action' => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'upload']),
         ]);
 
         return $this->delegateView([
@@ -115,6 +79,109 @@ final class ImportController extends FormController
                 'mauticContent' => 'campaignImport',
                 'route'         => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'new']),
                 'step'          => $step,
+            ],
+        ]);
+    }
+
+    public function uploadAction(Request $request): ?Response
+    {
+        $fullPath = $this->getFullZipPath();
+        $fileName = $this->getImportFileName();
+
+        $importDir = $this->pathsHelper->getImportCampaignsPath();
+        $form      = $this->formFactory->create(CampaignImportType::class, [], [
+            'action' => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'upload']),
+        ]);
+
+        // Handle cancel action
+        if ($this->isFormCancelled($form)) {
+            $this->resetImport();
+            $this->removeImportFile($fullPath);
+            $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was canceled.");
+
+            return $this->newAction($request, true);
+        }
+
+        // Validate form before processing
+        if (!$this->isFormValid($form)) {
+            $this->logger->error('No file uploaded.');
+            $form->addError(new FormError($this->translator->trans('mautic.campaign.import.incorrectfile', [], 'validators')));
+
+            return $this->delegateView([
+                'viewParameters'  => [
+                    'mauticContent' => 'campaignImport',
+                    'form'          => $form->createView(),
+                ],
+                'contentTemplate' => '@MauticCampaign/Import/import.html.twig',
+                'passthroughVars' => [
+                    'mauticContent' => 'campaignImport',
+                    'route'         => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'new']),
+                ],
+            ]);
+        }
+
+        // Retrieve uploaded file
+        $fileData = $request->files->get('campaign_import')['campaignFile'] ?? null;
+
+        if (!$fileData) {
+            $this->logger->error('No file uploaded.');
+            $form->addError(new FormError($this->translator->trans('mautic.campaign.import.nofile', [], 'validators')));
+            // $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
+
+            return $this->delegateView([
+                'viewParameters'  => [
+                    'mauticContent' => 'campaignImport',
+                    'form'          => $form->createView(),
+                ],
+                'contentTemplate' => '@MauticCampaign/Import/import.html.twig',
+                'passthroughVars' => [
+                    'mauticContent' => 'campaignImport',
+                    'route'         => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'new']),
+                ],
+            ]);
+        }
+        // Set progress to 0 before import starts
+        $this->requestStack->getSession()->set('mautic.campaign.import.progress', 0);
+        $this->requestStack->getSession()->remove('mautic.campaign.import.summary');
+        try {
+            // Ensure the import directory exists
+            (new Filesystem())->mkdir($importDir, 0755);
+
+            // Remove existing file if it exists
+            if (file_exists($fullPath)) {
+                if (!unlink($fullPath)) {
+                    $this->logger->error("Failed to delete existing file before new upload: {$fullPath}");
+                }
+            }
+
+            // Move uploaded file
+            $fileData->move($importDir, $fileName);
+
+            // Update session with the new file and progress reset
+            $this->requestStack->getSession()->set('mautic.campaign.import.file', $fullPath);
+            $this->logger->info("File successfully uploaded: {$fullPath}");
+
+            return $this->redirectToRoute('mautic_campaign_import_action', ['objectAction' => 'progress']);
+        } catch (FileException $e) {
+            $this->logger->error('File upload failed: '.$e->getMessage());
+
+            $form->addError(new FormError(
+                $this->translator->trans(
+                    str_contains($e->getMessage(), 'upload_max_filesize')
+                        ? 'mautic.lead.import.filetoolarge'
+                        : 'mautic.lead.import.filenotreadable',
+                    [],
+                    'validators'
+                )
+            ));
+        }
+
+        return $this->delegateView([
+            'viewParameters'  => ['mauticContent' => 'campaignImport'],
+            'contentTemplate' => '@MauticCampaign/Import/import.html.twig',
+            'passthroughVars' => [
+                'mauticContent' => 'campaignImport',
+                'route'         => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'new']),
             ],
         ]);
     }
@@ -238,7 +305,7 @@ final class ImportController extends FormController
 
         if (!file_exists($fullPath) && self::STEP_UPLOAD_ZIP !== $step) {
             $this->logger->log(LogLevel::WARNING, "File {$fullPath} does not exist. Resetting import to STEP_UPLOAD_ZIP.");
-            $this->addFlashMessage('mautic.campaign.import.file.missing=', ['%file%' => $fullPath], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.campaign.import.file.missing', ['%file%' => $fullPath], FlashBag::LEVEL_ERROR);
             $this->requestStack->getSession()->set('mautic.campaign.import.step', self::STEP_UPLOAD_ZIP);
 
             return self::STEP_UPLOAD_ZIP;
@@ -247,56 +314,99 @@ final class ImportController extends FormController
         return $step;
     }
 
-    private function handleFileUpload(Request $request, string $fileName, string $fullPath): ?Response
+    public function progressAction(): Response
     {
-        $importDir = $this->pathsHelper->getImportCampaignsPath();
-        $form      = $this->formFactory->create(CampaignImportType::class, [], ['action' => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'new'])]);
+        $session       = $this->requestStack->getSession();
+        $progress      = $session->get('mautic.campaign.import.progress', 0);
+        $importSummary = $session->get('mautic.campaign.import.summary', []);
 
-        if ($this->isFormCancelled($form)) {
-            $this->resetImport();
-            $this->removeImportFile($fullPath);
-            $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was canceled.");
+        // If the import is already complete, return the final view
+        if ($progress >= 100) {
+            $campaignSummary = $importSummary['summary']['campaign'] ?? null;
+            $campaignName    = $campaignSummary['name'][0] ?? 'Unknown';
+            $campaignId      = $campaignSummary['id'][0] ?? 0;
 
-            return $this->newAction($request, true);
+            $this->addFlashMessage(
+                'mautic.campaign.notice.import.finished',
+                ['%id%' => $campaignId, '%name%' => $campaignName]
+            );
+
+            return $this->delegateView([
+                'viewParameters' => [
+                    'importProgress' => ['progress' => 100],
+                    'importSummary'  => $importSummary,
+                    'mauticContent'  => 'campaignImport',
+                ],
+                'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
+            ]);
         }
 
-        if (!$this->isFormValid($form)) {
-            return null;
+        // Get the import file path from the session
+        $fullPath = $session->get('mautic.campaign.import.file');
+
+        // If there's no valid file, show an error
+        if (!$fullPath || !file_exists($fullPath)) {
+            $this->logger->error("Import file missing: {$fullPath}");
+            $session->set('mautic.campaign.import.progress', 100);
+
+            return $this->delegateView([
+                'viewParameters' => [
+                    'importProgress' => ['progress' => 100],
+                    'importSummary'  => ['error' => 'File not found.'],
+                    'mauticContent'  => 'campaignImport',
+                ],
+                'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
+            ]);
         }
 
-        if (file_exists($fullPath)) {
-            unlink($fullPath);
-        }
+        // Process import and update progress
+        $importSummary = $this->processImport($fullPath);
 
-        $fileData = $request->files->get('campaign_import')['campaignFile'] ?? null;
-
-        if ($fileData) {
-            try {
-                (new Filesystem())->mkdir($importDir);
-                $fileData->move($importDir, $fileName);
-                $this->requestStack->getSession()->set('mautic.campaign.import.step', self::STEP_IMPORT_FROM_ZIP);
-
-                return $this->newAction($request, true);
-            } catch (FileException $e) {
-                $form->addError(new FormError(
-                    $this->translator->trans(
-                        str_contains($e->getMessage(), 'upload_max_filesize') ? 'mautic.lead.import.filetoolarge' : 'mautic.lead.import.filenotreadable', [], 'validators'
-                    )
-                ));
-            }
-        }
-
-        return null;
+        return $this->delegateView([
+            'viewParameters' => [
+                'importProgress' => ['progress' => 100],
+                'importSummary'  => $importSummary,
+                'mauticContent'  => 'campaignImport',
+            ],
+            'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
+        ]);
     }
 
     private function processImport(string $fullPath): array
     {
+        $session = $this->requestStack->getSession();
+        $session->set('mautic.campaign.import.progress', 25);
+
         $fileData = $this->readFile($fullPath);
-        $userId   = $this->userHelper->getUser()->getId();
-        $event    = new EntityImportEvent(Campaign::ENTITY_NAME, $fileData, $userId);
+        if (empty($fileData)) {
+            $this->logger->error('Import failed: No data found in file.');
+
+            return ['error' => 'Invalid file data.'];
+        }
+
+        $session->set('mautic.campaign.import.progress', 50);
+
+        $userId = $this->userHelper->getUser()->getId();
+        $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $fileData, $userId);
+
+        $session->set('mautic.campaign.import.progress', 75);
 
         $this->dispatcher->dispatch($event);
 
-        return $event->getArgument('import_status') ?? ['error' => 'Unknown status'];
+        $session->set('mautic.campaign.import.progress', 100);
+        $importSummary = $event->getArgument('import_status') ?? ['error' => 'Unknown status'];
+
+        $session->set('mautic.campaign.import.summary', $importSummary);
+
+        $campaignSummary = $importSummary['summary']['campaign'] ?? null;
+        $campaignName    = $campaignSummary['name'][0] ?? 'Unknown';
+        $campaignId      = $campaignSummary['id'][0] ?? 0;
+
+        $this->addFlashMessage(
+            'mautic.campaign.notice.import.finished',
+            ['%id%' => $campaignId, '%name%' => $campaignName]
+        );
+
+        return $importSummary;
     }
 }

@@ -243,7 +243,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 'object'    => 'campaignEvent',
                 'objectId'  => $campaignEvent->getId(),
                 'action'    => 'import',
-                'details'   => $campaignEvent,
+                'details'   => $element,
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
 
