@@ -1,18 +1,15 @@
-<p align="center">
-  <p align="center">
-   <img width="150" height="150" src="(.github/readme_logo.png)" alt="Mautic Open Source Marketing Automation">
-
-
-  </p>
+<div align="center">
+	
+<img src=".github/readme_logo.png" alt="Mautic Open Source Marketing Automation" width="150" height="150">
 	<h1 align="center"><b>Mautic</b></h1>
 	<p align="center">
 		Open Source Marketing Automation Software.
     <br />
-    <a href="https://mautic.org"><strong>mautic.org 🡥</strong></a>
+    <a href="https://mautic.org"><strong>🌐 mautic.org</strong></a>
     <br />
     <br />
     <a href="https://mautic.org/start-using-mautic/try-mautic/">Request a trial</a> · <a href="https://www.mautic.org/download">Self-host/download</a> · <a href="https://www.mautic.org/community">Community channels</a>
-</p>
+</div>
 
 <div align="center">
 
@@ -52,8 +49,11 @@ Marketing automation has historically been difficult to implement within organis
 
 Open source means more than open code. Open source provides equality for all and a chance for everyone to improve.
 
+<div align="center">
+	
+<img src=".github/readme_image.png" alt="Mautic Open Source Marketing Automation">
 
-![Mautic](.github/readme_image.png "Mautic Open Source Marketing Automation")
+</div>
 
 ## Get Involved Quickly
 
