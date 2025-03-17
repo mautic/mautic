@@ -23,10 +23,6 @@ Mautic includes works under other copyright notices and distributed
 according to the terms of the GNU General Public License or a compatible
 license, including:
 
-CSS
-
-    Font Awesome - MIT - by Dave Gandy - http://fontawesome.io
-
 Javascript
 
     Bootstrap - MIT - Copyright (c) 2011-2014 Twitter, Inc
@@ -48,8 +44,6 @@ Javascript
     jQuery UI Touchpoint - MIT & GPLv2 - Copyright 2011–2014, Dave Furfero
 
     JQVMap - MIT - Copyright 2012, Peter Schmalfeldt; Copyright 2011-2012, Kirill Lebedev
-
-    Modernizr - MIT & BSD
 
     Moment.js - MIT - Tim Wood, Iskren Chernev, Moment.js contributors
 

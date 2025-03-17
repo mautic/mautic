@@ -128,7 +128,7 @@ class MonitoringController extends FormController
 
         // get the network type from the request on submit. helpful for validation error
         // rebuilds structure of the form when it gets updated on submit
-        $monitoring  = $request->request->get('monitoring') ?? [];
+        $monitoring  = $request->request->all()['monitoring'] ?? [];
         $networkType = 'POST' === $method ? ($monitoring['networkType'] ?? '') : '';
 
         // build the form
@@ -285,7 +285,7 @@ class MonitoringController extends FormController
         // get the network type from the request on submit. helpful for validation error
         // rebuilds structure of the form when it gets updated on submit
         $method      = $request->getMethod();
-        $monitoring  = $request->request->get('monitoring') ?? [];
+        $monitoring  = $request->request->all()['monitoring'] ?? [];
         $networkType = 'POST' === $method ? ($monitoring['networkType'] ?? '') : $entity->getNetworkType();
 
         // build the form
@@ -641,7 +641,7 @@ class MonitoringController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1
+        $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,

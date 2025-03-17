@@ -46,7 +46,7 @@ class PageType extends AbstractType
         private PageModel $model,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
-        private ThemeHelperInterface $themeHelper
+        private ThemeHelperInterface $themeHelper,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
@@ -271,11 +271,13 @@ class PageType extends AbstractType
                     'class'        => 'form-control',
                     'maxlength'    => 200,
                     'tooltip'      => 'mautic.page.form.redirecturl.help',
+                    'data-hide-on' => '{"page_redirectType":""}',
                     'data-toggle'  => 'field-lookup',
                     'data-action'  => 'page:fieldList',
                     'data-target'  => 'redirectUrl',
                     'data-options' => $redirectUrlDataOptions,
                 ],
+                'default_protocol' => null,
             ]
         );
 
@@ -322,7 +324,7 @@ class PageType extends AbstractType
                     'name'  => 'builder',
                     'label' => 'mautic.core.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-primary',
+                        'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-interactive',
                         'icon'    => 'ri-layout-line',
                         'onclick' => "Mautic.launchBuilder('page');",
                     ],

@@ -26,7 +26,7 @@ class ExportHelper
     public function __construct(
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
-        private FilePathResolver $filePathResolver
+        private FilePathResolver $filePathResolver,
     ) {
     }
 

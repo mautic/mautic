@@ -79,7 +79,7 @@ return [
         'webhook_disable_limit'                => 100, // How many times the webhook response can fail until the webhook will be unpublished
         'webhook_timeout'                      => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
         'queue_mode'                           => Mautic\WebhookBundle\Model\WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
-        'events_orderby_dir'                   => Doctrine\Common\Collections\Criteria::ASC, // Order the queued events chronologically or the other way around
+        'events_orderby_dir'                   => Doctrine\Common\Collections\Order::Ascending->value, // Order the queued events chronologically or the other way around
         'webhook_email_details'                => true, // If enabled, email related webhooks send detailed data
     ],
 ];

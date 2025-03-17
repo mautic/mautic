@@ -11,7 +11,7 @@ final class AddColumnEvent extends Event
 {
     public function __construct(
         private LeadField $leadField,
-        private bool $shouldProcessInBackground
+        private bool $shouldProcessInBackground,
     ) {
     }
 

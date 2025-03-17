@@ -26,18 +26,18 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddOrEditEntityWithoutMatchingEntityAndNoRequestQuery(): void
     {
-        $requestStack = new class() extends RequestStack {
+        $requestStack = new class extends RequestStack {
             public function __construct()
             {
             }
 
-            public function getCurrentRequest()
+            public function getCurrentRequest(): Request
             {
                 return new Request();
             }
         };
 
-        $emailRepository = new class() extends EmailRepository {
+        $emailRepository = new class extends EmailRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()
@@ -52,7 +52,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
         $emailModel = $this->getEmailModel($emailRepository);
 
-        $grapesJsBuilderRepository = new class() extends GrapesJsBuilderRepository {
+        $grapesJsBuilderRepository = new class extends GrapesJsBuilderRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()
@@ -72,7 +72,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
-                private GrapesJsBuilderRepository $grapesJsBuilderRepository
+                private GrapesJsBuilderRepository $grapesJsBuilderRepository,
             ) {
             }
 
@@ -108,12 +108,12 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
     public function testAddOrEditEntityWithoutMatchingEntityAndGrapeRequestQuery(): void
     {
-        $requestStack = new class() extends RequestStack {
+        $requestStack = new class extends RequestStack {
             public function __construct()
             {
             }
 
-            public function getCurrentRequest()
+            public function getCurrentRequest(): Request
             {
                 return new Request(
                     [],
@@ -129,7 +129,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $emailRepository           = new class() extends EmailRepository {
+        $emailRepository           = new class extends EmailRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()
@@ -149,7 +149,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
         $emailModel = $this->getEmailModel($emailRepository);
 
-        $grapesJsBuilderRepository = new class() extends GrapesJsBuilderRepository {
+        $grapesJsBuilderRepository = new class extends GrapesJsBuilderRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()
@@ -174,7 +174,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
-                private GrapesJsBuilderRepository $grapesJsBuilderRepository
+                private GrapesJsBuilderRepository $grapesJsBuilderRepository,
             ) {
             }
 
@@ -212,7 +212,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
     {
         return new class($emailRepository) extends EmailModel {
             public function __construct(
-                private EmailRepository $emailRepository
+                private EmailRepository $emailRepository,
             ) {
             }
 
@@ -225,7 +225,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
     private function getTranslator(): Translator
     {
-        return new class() extends Translator {
+        return new class extends Translator {
             public function __construct()
             {
             }

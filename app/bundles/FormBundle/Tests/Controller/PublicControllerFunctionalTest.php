@@ -19,7 +19,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->makeRequest(['string' => 'Company']);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
         Assert::assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
     }
 
@@ -28,7 +28,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->makeRequest(['string' => 'Company', 'formId' => 3]);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
         Assert::assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
     }
 
@@ -39,7 +39,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->makeRequest(['string' => 'Co', 'formId' => $form->getId()]);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
         Assert::assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
     }
 

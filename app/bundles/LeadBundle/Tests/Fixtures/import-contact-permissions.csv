@@ -1,0 +1,4 @@
+email,firstname,company
+new@email.tld,New,Company One
+existing-other@email.tld,Existing-other-after,Company One
+existing-owned@email.tld,Existing-owned-after,Company One

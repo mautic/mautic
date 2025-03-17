@@ -19,7 +19,6 @@ final class OutlookIntegrationTest extends AbstractIntegrationTestCase
             $this->dispatcher,
             $this->cache,
             $this->em,
-            $this->session,
             $this->request,
             $this->router,
             $this->translator,
@@ -32,6 +31,7 @@ final class OutlookIntegrationTest extends AbstractIntegrationTestCase
             $this->fieldModel,
             $this->integrationEntityModel,
             $this->doNotContact,
+            $this->fieldsWithUniqueIdentifier,
         );
     }
 

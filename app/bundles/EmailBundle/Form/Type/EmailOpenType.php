@@ -41,10 +41,7 @@ class EmailOpenType extends AbstractType
         $resolver->setDefined(['list_options']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'emailopen_list';
     }

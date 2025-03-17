@@ -17,7 +17,7 @@ class DateTimeTokenSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private DateTimeToken $dateTokenHelper,
         private CorePermissions $security,
-        private ContactTracker $contactTracker
+        private ContactTracker $contactTracker,
     ) {
     }
 

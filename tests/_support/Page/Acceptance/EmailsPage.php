@@ -12,7 +12,7 @@ class EmailsPage
     public static $NEW_CATEGORY_OPTION       = '#email_batch_newCategory_chosen > div > ul > li.active-result:nth-child(1)';
     public static $NEW_CATEGORY_DROPDOWN     = '#email_batch_newCategory_chosen';
     public static $CHANGE_CATEGORY_ACTION    = "a[href='/s/emails/batch/categories/view']";
-    public static $SELECTED_ACTIONS_DROPDOWN = '#page-list-wrapper > div.page-list > div.table-responsive > table > thead > tr > th.col-actions > div > div > button > i';
+    public static $SELECTED_ACTIONS_DROPDOWN = 'div.toolbar--action-list > div > button#core-options';
     public static $SAVE_BUTTON               = 'div.modal-form-buttons > button.btn.btn-primary.btn-save.btn-copy';
     public static $SELECT_ALL_CHECKBOX       = '#customcheckbox-one0';
     public static $SELECT_SEGMENT_EMAIL      = '#app-content > div > div.modal.fade.in.email-type-modal > div > div > div.modal-body.form-select-modal > div > div:nth-child(2) > div > div.hidden-xs.panel-footer.text-center > button';

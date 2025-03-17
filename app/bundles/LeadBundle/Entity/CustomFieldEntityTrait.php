@@ -216,9 +216,7 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * Get profile values.
-     *
-     * @return array
+     * @return mixed[]
      */
     public function getProfileFields()
     {

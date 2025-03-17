@@ -16,7 +16,7 @@ class ApiSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
-        private Translator $translator
+        private Translator $translator,
     ) {
     }
 

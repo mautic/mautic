@@ -12,7 +12,7 @@ use Monolog\Logger;
 class DoctrineSubscriber implements EventSubscriber
 {
     public function __construct(
-        private Logger $logger
+        private Logger $logger,
     ) {
     }
 

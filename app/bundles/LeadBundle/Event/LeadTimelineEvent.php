@@ -96,7 +96,7 @@ class LeadTimelineEvent extends Event
         protected $page = 1,
         protected $limit = 25,
         protected $forTimeline = true,
-        protected $siteDomain = null
+        protected $siteDomain = null,
     ) {
         $this->filters = !empty($filters)
             ? $filters

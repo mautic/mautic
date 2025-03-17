@@ -6,7 +6,7 @@ return [
             // OAuth2
             'fos_oauth_server_token' => [
                 'path'       => '/oauth/v2/token',
-                'controller' => 'fos_oauth_server.controller.token:tokenAction',
+                'controller' => 'fos_oauth_server.controller.token::tokenAction',
                 'method'     => 'GET|POST',
             ],
             'fos_oauth_server_authorize' => [

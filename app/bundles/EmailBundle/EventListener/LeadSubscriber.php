@@ -17,7 +17,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private EmailReplyRepository $emailReplyRepository,
         private StatRepository $statRepository,
         private TranslatorInterface $translator,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 

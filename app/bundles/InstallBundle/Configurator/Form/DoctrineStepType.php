@@ -170,7 +170,7 @@ class DoctrineStepType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'install_doctrine_step';
     }

@@ -10,7 +10,15 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins')
     ->in(__DIR__.'/.github/workflows/mautic-asset-upload')
-    ->append([__DIR__.'/rector.php', __DIR__.'/rector-older-symfony.php', __DIR__.'/.php-cs-fixer.php', __DIR__.'/ecs.php']);
+    ->append([
+        __DIR__.'/app/AppCache.php',
+        __DIR__.'/app/AppKernel.php',
+        __DIR__.'/app/AppTestKernel.php',
+        __DIR__.'/rector.php',
+        __DIR__.'/rector-older-symfony.php',
+        __DIR__.'/.php-cs-fixer.php',
+        __DIR__.'/ecs.php',
+    ]);
 
 return (new PhpCsFixer\Config())
     ->setRules([

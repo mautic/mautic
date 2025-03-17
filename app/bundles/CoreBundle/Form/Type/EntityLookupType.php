@@ -34,7 +34,7 @@ class EntityLookupType extends AbstractType
         private ModelFactory $modelFactory,
         private TranslatorInterface $translator,
         private Connection $connection,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
@@ -93,10 +93,7 @@ class EntityLookupType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

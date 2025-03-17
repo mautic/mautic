@@ -27,7 +27,7 @@ class MauticSyncProcess
 
     public function __construct(
         private SyncDateHelper $syncDateHelper,
-        private ObjectChangeGenerator $objectChangeGenerator
+        private ObjectChangeGenerator $objectChangeGenerator,
     ) {
     }
 

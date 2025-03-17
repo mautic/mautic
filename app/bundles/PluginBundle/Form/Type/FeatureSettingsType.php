@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -19,12 +19,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FeatureSettingsType extends AbstractType
 {
     public function __construct(
-        protected SessionInterface $session,
+        protected RequestStack $requestStack,
         protected CoreParametersHelper $coreParametersHelper,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObject = $options['integration_object'];
@@ -36,7 +40,7 @@ class FeatureSettingsType extends AbstractType
 
         $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields): void {
             $integrationName = $integrationObject->getName();
-            $session         = $this->session;
+            $session         = $this->requestStack->getSession();
             $limit           = $session->get(
                 'mautic.plugin.'.$integrationName.'.lead.limit',
                 $this->coreParametersHelper->get('default_pagelimit')
@@ -145,7 +149,7 @@ class FeatureSettingsType extends AbstractType
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'integration_featuresettings';
     }

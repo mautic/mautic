@@ -2,11 +2,15 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 
 class PointEventHelper
 {
+    public function __construct(private EmailModel $emailModel)
+    {
+    }
+
     public static function validateEmail($eventDetails, $action): bool
     {
         if (null === $eventDetails) {
@@ -27,14 +31,12 @@ class PointEventHelper
         return true;
     }
 
-    public static function sendEmail($event, Lead $lead, MauticFactory $factory): bool
+    public function sendEmail($event, Lead $lead): bool
     {
         $properties = $event['properties'];
         $emailId    = (int) $properties['email'];
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $factory->getModel('email');
-        $email = $model->getEntity($emailId);
+        $email = $this->emailModel->getEntity($emailId);
 
         // make sure the email still exists and is published
         if (null != $email && $email->isPublished()) {
@@ -44,7 +46,7 @@ class PointEventHelper
                 $leadCredentials['id'] = $lead->getId();
 
                 $options   = ['source' => ['trigger', $event['id']]];
-                $emailSent = $model->sendEmail($email, $leadCredentials, $options);
+                $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
 
                 return is_array($emailSent) ? false : true;
             }

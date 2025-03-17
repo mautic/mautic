@@ -181,7 +181,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
      */
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
 
         // Create a lead field.
         $selectField = new LeadField();
@@ -197,7 +197,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($selectField);
         $this->em->clear();
 
-        $leadModel  = self::$container->get('mautic.lead.model.lead');
+        $leadModel  = self::getContainer()->get('mautic.lead.model.lead');
 
         $fields = [
             'core' => [

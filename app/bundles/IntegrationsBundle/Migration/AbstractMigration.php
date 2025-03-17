@@ -16,7 +16,7 @@ abstract class AbstractMigration implements MigrationInterface
 
     public function __construct(
         protected EntityManager $entityManager,
-        protected string $tablePrefix
+        protected string $tablePrefix,
     ) {
     }
 
@@ -56,7 +56,7 @@ abstract class AbstractMigration implements MigrationInterface
         array $columns,
         string $referenceTable,
         array $referenceColumns,
-        string $suffix = ''
+        string $suffix = '',
     ): string {
         return "ALTER TABLE {$this->concatPrefix($table)} 
             ADD CONSTRAINT {$this->generatePropertyName($table, 'fk', $columns)} 

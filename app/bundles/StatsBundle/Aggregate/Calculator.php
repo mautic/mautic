@@ -11,7 +11,7 @@ class Calculator
     public function __construct(
         private StatsDAO $statsDAO,
         private ?\DateTimeInterface $fromDateTime = null,
-        private ?\DateTimeInterface $toDateTime = null
+        private ?\DateTimeInterface $toDateTime = null,
     ) {
     }
 

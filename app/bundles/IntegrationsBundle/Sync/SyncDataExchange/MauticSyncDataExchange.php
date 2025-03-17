@@ -38,7 +38,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         private FullObjectReportBuilder $fullObjectReportBuilder,
         private PartialObjectReportBuilder $partialObjectReportBuilder,
         private OrderExecutioner $orderExecutioner,
-        private SyncDateHelper $syncDateHelper
+        private SyncDateHelper $syncDateHelper,
     ) {
     }
 

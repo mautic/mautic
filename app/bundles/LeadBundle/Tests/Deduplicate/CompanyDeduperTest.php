@@ -5,23 +5,34 @@ namespace Mautic\LeadBundle\Tests\Deduplicate;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FieldModel
+     * @var MockObject&FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $fieldModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CompanyRepository
+     * @var MockObject&CompanyRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
+    private MockObject $companyRepository;
+
+    /**
+     * @var MockObject&FieldsWithUniqueIdentifier
+     */
+    private MockObject $fieldsWithUniqueIdentifier;
 
     protected function setUp(): void
     {
         $this->fieldModel = $this->getMockBuilder(FieldModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->fieldsWithUniqueIdentifier = $this->getMockBuilder(FieldsWithUniqueIdentifier::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -37,13 +48,11 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
         $this->getDeduper()->checkForDuplicateCompanies([]);
     }
 
-    /**
-     * @return CompanyDeduper
-     */
-    private function getDeduper()
+    private function getDeduper(): CompanyDeduper
     {
         return new CompanyDeduper(
             $this->fieldModel,
+            $this->fieldsWithUniqueIdentifier,
             $this->companyRepository
         );
     }

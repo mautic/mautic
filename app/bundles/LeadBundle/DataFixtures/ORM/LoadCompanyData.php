@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private CompanyModel $companyModel
+        private CompanyModel $companyModel,
     ) {
     }
 

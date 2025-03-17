@@ -3,10 +3,11 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
@@ -91,7 +92,7 @@ class PublicController extends CommonFormController
         Request $request,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
-        string $idHash
+        string $idHash,
     ): Response {
         try {
             $messageBus->dispatch(new EmailHitNotification($idHash, $request));
@@ -112,7 +113,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, $idHash, string $urlEmail = null, string $secretHash = null)
     {
         $stat                   = $model->getEmailStatus($idHash);
         $message                = '';
@@ -163,11 +164,11 @@ class PublicController extends CommonFormController
             $template = $formTemplate;
         }
 
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
-        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+        $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
         if (!empty($stat) || $isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
 
@@ -176,8 +177,8 @@ class PublicController extends CommonFormController
                 $contactTracker->setTrackedContact($lead);
 
                 // Set lead lang
-                if ($lead->getPreferredLocale()) {
-                    $this->translator->setLocale($lead->getPreferredLocale());
+                if ($language = $lead->getPreferredLocale()) {
+                    $this->translator->setLocale($language);
                 }
 
                 // Add contact ID to the session name in case more contacts
@@ -242,12 +243,17 @@ class PublicController extends CommonFormController
                 $formView = $form->createView();
                 /** @var Page $prefCenter */
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
+                    // Set the page language if there is no lead preferred locale
+                    if (empty($language) && $language = $prefCenter->getLanguage()) {
+                        $this->translator->setLocale($language);
+                    }
+
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
-                    if (str_contains($html, 'data-slot="saveprefsbutton"') || str_contains($html, BuilderSubscriber::saveprefsRegex)) {
+                    if (str_contains($html, BuilderSubscriber::saveprefsRegex)) {
                         // set custom tag to inject end form
-                        // update show pref center slots by looking for their presence in the html
-                        $showParameters  = $this->buildSlotShowParametersBasedOnContent($html, $viewParameters);
+                        // update show pref center tokens by looking for their presence in the html
+                        $showParameters  = $this->buildShowParametersBasedOnContent($html, $viewParameters);
                         $eventParameters = array_merge(
                             $viewParameters,
                             $showParameters,
@@ -265,17 +271,14 @@ class PublicController extends CommonFormController
                         $html = $event->getContent();
 
                         if (!$session->has($successSessionName)) {
-                            $successMessageDataSlots       = [
-                                'data-slot="successmessage"',
-                                'class="pref-successmessage"',
-                            ];
-                            $successMessageDataSlotsHidden = [];
-                            foreach ($successMessageDataSlots as $successMessageDataSlot) {
-                                $successMessageDataSlotsHidden[] = $successMessageDataSlot.' style=display:none';
+                            $successMessageData       = ['class="pref-successmessage"'];
+                            $successMessageDataHidden = [];
+                            foreach ($successMessageData as $successMessageData) {
+                                $successMessageDataHidden[] = $successMessageData.' style=display:none';
                             }
                             $html = str_replace(
-                                $successMessageDataSlots,
-                                $successMessageDataSlotsHidden,
+                                $successMessageData,
+                                $successMessageDataHidden,
                                 $html
                             );
                         } else {
@@ -328,7 +331,7 @@ class PublicController extends CommonFormController
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
-                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+                $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
             } else {
                 $viewParams['content'] = '';
                 $viewParams['message'] = $message.$formContent;
@@ -354,7 +357,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, MailHashHelper $mailHash, $idHash): Response
+    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
         $stat = $model->getEmailStatus($idHash);
 
@@ -409,25 +412,25 @@ class PublicController extends CommonFormController
 
         $template = (!empty($email) && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
 
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
 
         // Ensure template still exists
-        $theme = $this->factory->getTheme($template);
+        $theme = $themeHelper->getTheme($template);
         if (empty($theme) || $theme->getTheme() !== $template) {
             $template = $this->coreParametersHelper->get('theme');
         }
 
-        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
+        $analytics = $analyticsHelper->getCode();
 
         if (!empty($analytics)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            $assetsHelper->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
 
         return $this->render(
             $logicalName,
@@ -457,7 +460,7 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
+    public function previewAction(AnalyticsHelper $analyticsHelper, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
     {
         $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
@@ -472,7 +475,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->security->isAnonymous() && (!$emailEntity->isPublished() || !$publicPreview))
+            ($this->security->isAnonymous() && !$publicPreview)
             || (!$this->security->isAnonymous()
                 && !$this->security->hasEntityAccess(
                     'email:emails:viewown',
@@ -486,7 +489,7 @@ class PublicController extends CommonFormController
         // bogus ID
         if ($contactId && (
             !$this->security->isAdmin()
-            || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+            && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
         )
         ) {
             // disallow displaying contact information
@@ -505,21 +508,15 @@ class PublicController extends CommonFormController
 
         if (empty($content) && !empty($BCcontent)) {
             $template = $emailEntity->getTemplate();
-            $slots    = $this->factory->getTheme($template)->getSlots('email');
-
-            $assetsHelper = $this->factory->getHelper('template.assets');
 
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
 
-            $this->processSlots($slots, $emailEntity);
-
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $response = $this->render(
                 $logicalName,
                 [
                     'inBrowser' => true,
-                    'slots'     => $slots,
                     'content'   => $emailEntity->getContent(),
                     'email'     => $emailEntity,
                     'lead'      => null,
@@ -577,27 +574,6 @@ class PublicController extends CommonFormController
         }
 
         return new Response($content);
-    }
-
-    /**
-     * @param Email $entity
-     */
-    public function processSlots($slots, $entity): void
-    {
-        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-
-        $content = $entity->getContent();
-
-        foreach ($slots as $slot => $slotConfig) {
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            $value = $content[$slot] ?? '';
-            $slotsHelper->set($slot, $value);
-        }
     }
 
     /**
@@ -727,7 +703,7 @@ class PublicController extends CommonFormController
             $mailer->setFrom($from, '');
 
             // Set Content
-            $body = filter_var($query['body'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+            $body = htmlspecialchars(filter_var($query['body'], FILTER_FLAG_STRIP_HIGH));
             $mailer->setBody($body);
             $mailer->parsePlainText($body);
 
@@ -735,7 +711,7 @@ class PublicController extends CommonFormController
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 
-            $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+            $subject = htmlspecialchars(filter_var($query['subject'], FILTER_FLAG_STRIP_HIGH));
             $mailer->setSubject($subject);
 
             return $mailer->createEmailStat();
@@ -802,7 +778,7 @@ class PublicController extends CommonFormController
     /**
      * The $viewParameters here have already been used to build the $form.
      * Fields that are set to show based on the app configuration are part
-     * of the form. If the field is not configured to show, but a slot exists
+     * of the form. If the field is not configured to show, but a token exists
      * for that field in the content, then we need to keep the configuration
      * value instead of letting the content determine if it should show. This
      * is because of what was stated above - fields that are not configured to
@@ -813,19 +789,19 @@ class PublicController extends CommonFormController
      *
      * @return mixed[]
      */
-    private function buildSlotShowParametersBasedOnContent(string $content, array $viewParameters): array
+    private function buildShowParametersBasedOnContent(string $content, array $viewParameters): array
     {
         /*
          * Since we're going to be merging this with the $viewParameters, filter out `true` values. We do not
          * want to change a configured value from `false` to `true` because a value of `false` in the $viewParameters
          * means that the field is not configured to show and therefore is not part of the form. Attempting to
-         * render that field just because a slot for it exists will result in an error.
+         * render that field just because a token for it exists will result in an error.
          */
         $showParamsBasedOnContent = array_filter([
-            'showContactFrequency'         => str_contains($content, 'data-slot="channelfrequency"') || str_contains($content, BuilderSubscriber::channelfrequency),
-            'showContactSegments'          => str_contains($content, 'data-slot="segmentlist"') || str_contains($content, BuilderSubscriber::segmentListRegex),
-            'showContactCategories'        => str_contains($content, 'data-slot="categorylist"') || str_contains($content, BuilderSubscriber::categoryListRegex),
-            'showContactPreferredChannels' => str_contains($content, 'data-slot="preferredchannel"') || str_contains($content, BuilderSubscriber::preferredchannel),
+            'showContactFrequency'         => str_contains($content, BuilderSubscriber::channelfrequency),
+            'showContactSegments'          => str_contains($content, BuilderSubscriber::segmentListRegex),
+            'showContactCategories'        => str_contains($content, BuilderSubscriber::categoryListRegex),
+            'showContactPreferredChannels' => str_contains($content, BuilderSubscriber::preferredchannel),
         ], fn (bool $value) =>!$value);
 
         $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);

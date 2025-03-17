@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SchedulerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SendSchedule $sendSchedule
+        private SendSchedule $sendSchedule,
     ) {
     }
 

@@ -11,7 +11,7 @@ class FrequencyActionModel
 {
     public function __construct(
         private LeadModel $contactModel,
-        private FrequencyRuleRepository $frequencyRuleRepository
+        private FrequencyRuleRepository $frequencyRuleRepository,
     ) {
     }
 

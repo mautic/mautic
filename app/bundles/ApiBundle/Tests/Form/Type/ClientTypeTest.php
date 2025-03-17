@@ -8,11 +8,11 @@ use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -22,39 +22,34 @@ class ClientTypeTest extends TestCase
     private ClientType $clientType;
 
     /**
-     * @var RequestStack
+     * @var MockObject&RequestStack
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
+    private MockObject $requestStack;
 
     /**
-     * @var TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
-     * @var ValidatorInterface
+     * @var MockObject&ValidatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $validator;
+    private MockObject $validator;
 
     /**
-     * @var Session
+     * @var MockObject&RouterInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private MockObject $router;
 
     /**
-     * @var RouterInterface
+     * @var MockObject&FormBuilderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
+    private MockObject $builder;
 
     /**
-     * @var FormBuilderInterface
+     * @var MockObject&Request
      */
-    private \PHPUnit\Framework\MockObject\MockObject $builder;
-
-    /**
-     * @var Request
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $request;
+    private MockObject $request;
 
     private Client $client;
 
@@ -63,7 +58,6 @@ class ClientTypeTest extends TestCase
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->translator   = $this->createMock(TranslatorInterface::class);
         $this->validator    = $this->createMock(ValidatorInterface::class);
-        $this->session      = $this->createMock(Session::class);
         $this->router       = $this->createMock(RouterInterface::class);
         $this->builder      = $this->createMock(FormBuilderInterface::class);
         $this->request      = $this->createMock(Request::class);
@@ -81,7 +75,6 @@ class ClientTypeTest extends TestCase
             $this->requestStack,
             $this->translator,
             $this->validator,
-            $this->session,
             $this->router
         );
     }

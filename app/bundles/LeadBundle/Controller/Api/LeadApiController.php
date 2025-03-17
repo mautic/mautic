@@ -6,7 +6,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -27,8 +26,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,7 +67,6 @@ class LeadApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
@@ -80,7 +78,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameMulti  = 'contacts';
         $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
@@ -166,7 +164,7 @@ class LeadApiController extends CommonApiController
 
         $results = $this->getModel('lead.note')->getEntities(
             [
-                'start'  => $request->query->get('start', 0),
+                'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
@@ -218,7 +216,7 @@ class LeadApiController extends CommonApiController
 
         $results = $this->getModel('lead.device')->getEntities(
             [
-                'start'  => $request->query->get('start', 0),
+                'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
@@ -398,7 +396,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($request->get('filters', [])));
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($request->query->all()['filters'] ?? $request->request->all()['filters'] ?? []));
         $limit   = (int) $request->get('limit', 25);
         $page    = (int) $request->get('page', 1);
         $order   = InputHelper::clean($request->get('order', ['timestamp', 'DESC']));
@@ -597,7 +595,9 @@ class LeadApiController extends CommonApiController
             // Merge existing duplicate contact based on unique fields if exist
             // new endpoints will leverage getNewEntity in order to return the correct status codes
             $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
-            $contactMerger  = $this->contactMerger;
+            \assert($existingEntity instanceof Lead);
+
+            $contactMerger = $this->contactMerger;
 
             if ($entity->getId() && $existingEntity->getId()) {
                 try {
@@ -708,10 +708,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Helper method to be used in FrequencyRuleTrait.
-     *
-     * @param Form $form
      */
-    protected function isFormCancelled($form = null): bool
+    protected function isFormCancelled(FormInterface $form = null): bool
     {
         return false;
     }
@@ -719,7 +717,7 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      */
-    protected function isFormValid(Form $form, array $data = null): bool
+    protected function isFormValid(FormInterface $form, array $data = null): bool
     {
         $form->submit($data, 'PATCH' !== $this->requestStack->getCurrentRequest()->getMethod());
 

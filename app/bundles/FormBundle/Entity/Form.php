@@ -9,12 +9,36 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Form extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "form:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "fields", "actions"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "form:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Form extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
@@ -73,12 +97,12 @@ class Form extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
+     * @var ArrayCollection<int, Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
+     * @var ArrayCollection<string, Action>
      */
     private $actions;
 
@@ -100,8 +124,6 @@ class Form extends FormEntity
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
     private Collection $submissions;
 
     /**
@@ -225,6 +247,8 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -527,7 +551,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
+     * @return ArrayCollection<int, Field>
      */
     public function getFields()
     {
@@ -660,7 +684,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
+     * @return ArrayCollection<string, Action>
      */
     public function getActions()
     {

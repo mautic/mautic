@@ -39,7 +39,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
         private FormModel $formModel,
         private FieldModel $formFieldModel,
         private ActionModel $actionModel,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ) {
         // this will load the data before fixtures are loaded
         $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event): void {

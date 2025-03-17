@@ -10,7 +10,7 @@ class LeadListAccess extends Constraint
     public string $message  = 'mautic.lead.lists.failed';
     public bool $allowEmpty = false;
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'leadlist_access';
     }

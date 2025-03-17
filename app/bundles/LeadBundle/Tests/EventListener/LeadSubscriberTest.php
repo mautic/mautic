@@ -21,6 +21,7 @@ use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
@@ -128,6 +129,8 @@ class LeadSubscriberTest extends CommonMocks
             ],
         ];
 
+        $lead->setChanges($changes);
+
         // This method will be called exactly once
         // even though the onLeadPostSave was called twice for the same lead
         $this->auditLogModel->expects($this->once())
@@ -146,18 +149,9 @@ class LeadSubscriberTest extends CommonMocks
             $this->companyLeadRepository
         );
 
-        $leadEvent = $this->createMock(LeadEvent::class);
+        $subscriber->onLeadPostSave(new LeadEvent($lead));
 
-        $leadEvent->expects($this->exactly(2))
-            ->method('getLead')
-            ->will($this->returnValue($lead));
-
-        $leadEvent->expects($this->exactly(2))
-            ->method('getChanges')
-            ->will($this->returnValue($changes));
-
-        $subscriber->onLeadPostSave($leadEvent);
-        $subscriber->onLeadPostSave($leadEvent);
+        Assert::assertEmpty($lead->getChanges()); // changes were reset after they were processed.
     }
 
     /**
@@ -336,36 +330,12 @@ class LeadSubscriberTest extends CommonMocks
             true
         );
 
-        $leadEvent = $this->createMock(LeadEvent::class);
-
-        $leadEvent->expects($this->exactly(6))
-            ->method('getLead')
-            ->willReturnOnConsecutiveCalls(
-                $lead,
-                $lead,
-                $lead2,
-                $lead2,
-                $lead3,
-                $lead3
-            );
-
-        $leadEvent->expects($this->exactly(6))
-            ->method('getChanges')
-            ->willReturnOnConsecutiveCalls(
-                $lead->getChanges(),
-                $lead->getChanges(),
-                $lead2->getChanges(),
-                $lead2->getChanges(),
-                $lead3->getChanges(),
-                $lead3->getChanges()
-            );
-
-        $subscriber->onLeadPostSave($leadEvent);
-        $subscriber->onLeadPostSave($leadEvent);
-        $subscriber->onLeadPostSave($leadEvent);
-        $subscriber->onLeadPostSave($leadEvent);
-        $subscriber->onLeadPostSave($leadEvent);
-        $subscriber->onLeadPostSave($leadEvent);
+        $subscriber->onLeadPostSave(new LeadEvent($lead));
+        $subscriber->onLeadPostSave(new LeadEvent($lead));
+        $subscriber->onLeadPostSave(new LeadEvent($lead2));
+        $subscriber->onLeadPostSave(new LeadEvent($lead2));
+        $subscriber->onLeadPostSave(new LeadEvent($lead3));
+        $subscriber->onLeadPostSave(new LeadEvent($lead3));
     }
 
     public function testManipulatorLogged(): void
@@ -421,16 +391,6 @@ class LeadSubscriberTest extends CommonMocks
             true
         );
 
-        $leadEvent = $this->createMock(LeadEvent::class);
-
-        $leadEvent->expects($this->once())
-            ->method('getLead')
-            ->will($this->returnValue($lead));
-
-        $leadEvent->expects($this->once())
-            ->method('getChanges')
-            ->will($this->returnValue($lead->getChanges()));
-
-        $subscriber->onLeadPostSave($leadEvent);
+        $subscriber->onLeadPostSave(new LeadEvent($lead));
     }
 }

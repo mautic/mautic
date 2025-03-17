@@ -10,7 +10,7 @@ class EmailToUserAccessor
     private ArrayStringTransformer $transformer;
 
     public function __construct(
-        private array $config
+        private array $config,
     ) {
         $this->transformer = new ArrayStringTransformer();
     }

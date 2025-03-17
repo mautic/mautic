@@ -24,7 +24,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         private EventExecutioner $eventExecutioner,
         private TranslatorInterface $translator,
         private LeadRepository $leadRepository,
-        private EventScheduler $eventScheduler
+        private EventScheduler $eventScheduler,
     ) {
     }
 

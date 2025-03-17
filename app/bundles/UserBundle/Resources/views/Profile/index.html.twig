@@ -19,7 +19,7 @@
                 </div>
                 <div class="media-body">
                     <h3 class="fw-sb">{{ me.getName() }}</h3>
-                    <span class="text-muted">{{ me.getPosition() }}</span>
+                    <span class="text-secondary">{{ me.getPosition() }}</span>
                 </div>
             </div>
             <hr />
@@ -27,26 +27,26 @@
 
             <ul class="list-group list-group-tabs">
                 <li class="list-group-item active">
-                    <a href="#profile" class="list-group-item-text steps" data-toggle="tab">
+                    <a href="#profile" class="list-group-item-heading steps" data-toggle="tab">
                         {{ 'mautic.user.account.header.details'|trans }}
                     </a>
                 </li>
 
                 {% if permissions['apiAccess'] %}
                 <li class="list-group-item">
-                    <a href="#clients" class="list-group-item-text steps" data-toggle="tab">
+                    <a href="#clients" class="list-group-item-heading steps" data-toggle="tab">
                         {{ 'mautic.user.account.header.authorizedclients'|trans }}
                     </a>
                 </li>
                 {% endif %}
 
                 <li class="list-group-item">
-                    <a href="#appearance" class="list-group-item-text steps" data-toggle="tab">{{
+                    <a href="#appearance" class="list-group-item-heading steps" data-toggle="tab">{{
                         'mautic.user.account.appearance'|trans }}</a>
                 </li>
 
                 <li class="list-group-item">
-                    <a href="#accessibility" class="list-group-item-text steps" data-toggle="tab">{{
+                    <a href="#accessibility" class="list-group-item-heading steps" data-toggle="tab">{{
                         'mautic.user.account.accessibility'|trans }}</a>
                 </li>
             </ul>
@@ -65,26 +65,26 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h3 id="personal-info" class="pt-20 mb-xs">{{ 'mautic.user.config.title.get_to_know_you'|trans }}</h3>
-                            <div class="text-muted small pb-20">{{ 'mautic.user.config.personalize.interface.helper'|trans }}</div>
+                            <div class="text-secondary small pb-20">{{ 'mautic.user.config.personalize.interface.helper'|trans }}</div>
                             {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
                             {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
                             {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
                             {{ form_row(userForm.signature) }}
 
                             <h3 id="locale" class="pt-20 mb-xs">{{ 'mautic.user.config.title.locale'|trans }}</h3>
-                            <div class="text-muted small pb-20">{{ 'mautic.user.config.region.preferences.helper'|trans }}</div>
+                            <div class="text-secondary small pb-20">{{ 'mautic.user.config.region.preferences.helper'|trans }}</div>
                             {{ form_row(userForm.timezone) }}
                             {{ form_row(userForm.locale) }}
                         </div>
                         <div class="col-md-6">
                             <h3 id="security" class="pt-20 mb-xs">{{ 'mautic.user.config.title.account_data_security'|trans }}</h3>
-                            <div class="text-muted small pb-20">{{ 'mautic.user.config.account.security.helper'|trans }}</div>
+                            <div class="text-secondary small pb-20">{{ 'mautic.user.config.account.security.helper'|trans }}</div>
                             {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
                             {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
                             {{ form_row(userForm.plainPassword.password) }}
                             {{ form_row(userForm.plainPassword.confirm) }}
                             <h3 id="learning" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
-                            <div class="text-muted small pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
+                            <div class="text-secondary small pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
                                     {
@@ -99,6 +99,7 @@
                             } %}
                         </div>
                     </div>
+                    {{ form_row(userForm.preferences) }}
                     {{ form_end(userForm) }}
                 </div>
 
@@ -119,45 +120,7 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-lg">
-                            <h3 class="pt-20">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
-                            <div class="help-block mb-lg">
-                                {{ 'mautic.user.account.appearance.accent_help'|trans }}
-                                {% include '@MauticCore/Helper/toggletip.html.twig' with {
-                                    title: 'mautic.user.account.appearance.accent_toggletip.title',
-                                    content: 'mautic.user.account.appearance.accent_toggletip.content',
-                                } %}
-                            </div>
-                            <div class="d-flex fw-wrap gap-lg mb-lg">
-                                {{ include('@MauticUser/Helper/accent.html.twig', {
-                                    accents: [
-                                        { id: '01' },
-                                        { id: '02' },
-                                        { id: '03' },
-                                        { id: '04' },
-                                        { id: '05' },
-                                        { id: '06' },
-                                        { id: '07' },
-                                        { id: '08' },
-                                        { id: '09' },
-                                        { id: '10' },
-                                        { id: '11' },
-                                        { id: '12' },
-                                        { id: '13' },
-                                        { id: '14' },
-                                        { id: '15' },
-                                        { id: '16' },
-                                        { id: '17' },
-                                        { id: '18' },
-                                        { id: '19' },
-                                        { id: '20' },
-                                        { id: '21' },
-                                        { id: '22' },
-                                        { id: '23' },
-                                        { id: '24' },
-                                        { id: '25' }
-                                    ]
-                                }) }}
-                            </div>
+
                             <h3 class="pt-20">
                                 {{ 'mautic.user.account.appearance.theme_preferences'|trans }}
                                 {% include '@MauticCore/Helper/toggletip.html.twig' with {
@@ -195,7 +158,7 @@
                                             preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_solarized_dark_preview.svg'
                                         },
                                         {
-                                            id: 'freire',
+                                            id: 'dark-freire',
                                             name: 'mautic.user.account.appearance.theme_freire',
                                             description: 'mautic.user.account.appearance.theme_freire_description',
                                             preview: 'app/bundles/UserBundle/Resources/views/Profile/images/_freire_preview.svg'

@@ -23,7 +23,7 @@ Variables
                 {% endif %}
             {% endfor %}
             {% if not hasDependences %}
-                <p class="text-muted mb-0">
+                <p class="text-secondary mb-0">
                     {{ noUsages|default('mautic.core.usage.not_found'|trans) }}
                 </p>
             {% endif %}

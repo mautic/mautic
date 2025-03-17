@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class ReportWidgetType extends AbstractType
 {
     public function __construct(
-        protected ReportModel $model
+        protected ReportModel $model,
     ) {
     }
 

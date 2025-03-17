@@ -20,7 +20,7 @@ final class PackageBase
          * E.g. mautic-plugin.
          */
         public ?string $type,
-        public ?string $displayName = null
+        public ?string $displayName = null,
     ) {
     }
 

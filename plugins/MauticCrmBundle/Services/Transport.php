@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 class Transport implements TransportInterface
 {
     public function __construct(
-        private Client $client
+        private Client $client,
     ) {
     }
 

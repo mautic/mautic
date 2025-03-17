@@ -17,7 +17,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $tagId          = $response['tag']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
         $this->assertGreaterThan(0, $tagId);
         $this->assertEquals($tag1Payload['tag'], $response['tag']['tag']);
 
@@ -25,7 +25,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/tags/new', $tag1Payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         // The same tag id should be returned
         $this->assertEquals($tagId, $response['tag']['id'], 'ID of created tag with the same name does not match. Possible duplicates.');
         $this->assertEquals($tag1Payload['tag'], $response['tag']['tag']);
@@ -35,7 +35,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/tags/{$tagId}/edit", $tag1RenamePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         $this->assertSame($tagId, $response['tag']['id'], 'ID of the created tag does not match with the edited one.');
         $this->assertEquals($tag1RenamePayload['tag'], $response['tag']['tag']);
 
@@ -43,21 +43,21 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/api/tags/{$tagId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($tagId, $response['tag']['id'], 'ID of the created tag does not match with the fetched one.');
         $this->assertEquals($tag1RenamePayload['tag'], $response['tag']['tag']);
 
         // Delete:
         $this->client->request('DELETE', "/api/tags/{$tagId}/delete");
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
 
         // Get (ensure it's deleted):
         $this->client->request('GET', "/api/tags/{$tagId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(404, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(404);
         $this->assertSame(404, $response['errors'][0]['code']);
     }
 
@@ -112,6 +112,6 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/tags/new', []);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(500, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(500);
     }
 }

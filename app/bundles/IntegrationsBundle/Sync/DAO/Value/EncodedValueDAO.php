@@ -24,7 +24,7 @@ class EncodedValueDAO
      */
     public function __construct(
         private $type,
-        private $value
+        private $value,
     ) {
     }
 

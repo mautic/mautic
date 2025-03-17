@@ -45,11 +45,17 @@
 {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
     'searchValue': searchValue,
     'action': currentRoute,
-    'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+    'page_actions': {
         'templateButtons': {'new': permissions['lead:leads:create']},
         'routeBase': 'company',
         'customButtons': pageButtons,
-    }),
+    },
+    'bulk_actions': {
+        'routeBase': 'company',
+        'templateButtons': {
+            'delete': permissions['lead:leads:deleteother']
+        },
+    },
     'quickFilters': [
         {
             'search': 'mautic.core.searchcommand.ismine',
@@ -67,12 +73,10 @@
           <table class="table table-hover company-list" id="companyTable">
               <thead>
               <tr>
-                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                          'checkall': 'true',
-                          'target': '#companyTable',
-                          'routeBase': 'company',
-                          'templateButtons': {'delete': permissions['lead:leads:deleteother']},
-                  }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#companyTable',
+                }) }}
                   {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.company.name',

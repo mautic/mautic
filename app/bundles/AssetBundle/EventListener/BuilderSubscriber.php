@@ -21,7 +21,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private TokenHelper $tokenHelper,
         private ContactTracker $contactTracker,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
 

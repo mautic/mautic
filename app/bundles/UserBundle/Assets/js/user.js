@@ -11,65 +11,52 @@ Mautic.userOnLoad = function (container) {
     }
 
     /**
-     * Initializes radio button states for UI settings based on localStorage settings.
-     * Saves settings to localStorage only when the Save button is clicked.
-     *
-     * @constant {string} prefix - Prefix for localStorage keys.
+     * Initializes radio button states for UI settings and updates hidden inputs
+     * when settings are changed.
      */
-    const prefix = 'm-toggle-setting-';
-    let temporarySettings = {};
-
-    // Load settings from localStorage on page load or use the checked attribute if not set
+    // Initialize radio buttons based on hidden input values
     document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
         const attributeName = radio.dataset.attributeToggle;
-        const settingKey = `${prefix}${attributeName}`;
-        const savedValue = localStorage.getItem(settingKey);
+        const hiddenInput = document.getElementById(`user_preferences_${attributeName.replace('-', '_')}`);
 
-        if (savedValue) {
-            // If a saved value exists in localStorage, apply it
-            const correspondingRadio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${savedValue}"]`);
+        if (hiddenInput && hiddenInput.value) {
+            // If hidden input has a value, set the corresponding radio
+            const correspondingRadio = document.querySelector(
+                `input[name="${attributeName}"][data-attribute-value="${hiddenInput.value}"]`
+            );
             if (correspondingRadio) correspondingRadio.checked = true;
         } else if (radio.checked) {
-            // Use the checked state from the HTML as the default if nothing is saved
-            localStorage.setItem(settingKey, radio.dataset.attributeValue); // Persist default value to localStorage
+            // Use the checked state from the HTML as the default
+            if (hiddenInput) {
+                hiddenInput.value = radio.dataset.attributeValue;
+            }
         }
     });
 
-    // Handle radio button changes - just store in temporary settings
+    // Handle radio button changes - update hidden inputs and HTML attributes
     document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
-        radio.addEventListener('change', function () {
+        radio.addEventListener('change', function() {
             if (this.checked) {
                 const attributeName = this.dataset.attributeToggle;
-                temporarySettings[attributeName] = this.dataset.attributeValue;
+                const hiddenInput = document.getElementById(`user_preferences_${attributeName.replace('-', '_')}`);
+
+                // Update hidden input value
+                if (hiddenInput) {
+                    hiddenInput.value = this.dataset.attributeValue;
+                }
             }
         });
     });
 
-    // Save button functionality - persist the settings in localStorage
-    document.getElementById('user_buttons_save_toolbar').addEventListener('click', () => {
-        Object.entries(temporarySettings).forEach(([attributeName, value]) => {
-            localStorage.setItem(`${prefix}${attributeName}`, value);
-            document.documentElement.setAttribute(attributeName, value);
+    document.querySelector('[id^="user_buttons_save_toolbar"]').addEventListener('click', function() {
+        // Re-apply all current preferences after clicking save
+        document.querySelectorAll('input[type="radio"][data-attribute-toggle]:checked').forEach(radio => {
+            const attributeToggle = radio.dataset.attributeToggle;
+            const attributeValue = radio.dataset.attributeValue;
+            document.documentElement.setAttribute(attributeToggle, attributeValue);
         });
-        temporarySettings = {};
     });
 
-    // Cancel button functionality - discard temporary settings and revert changes
-    document.getElementById('user_buttons_cancel_toolbar').addEventListener('click', () => {
-        Object.keys(temporarySettings).forEach(attributeName => {
-            const storedValue = localStorage.getItem(`${prefix}${attributeName}`);
-            if (storedValue) {
-                document.documentElement.setAttribute(attributeName, storedValue);
-                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${storedValue}"]`);
-                if (radio) radio.checked = true;
-            } else {
-                document.documentElement.removeAttribute(attributeName);
-                const radios = document.querySelectorAll(`input[name="${attributeName}"]`);
-                radios.forEach(radio => radio.checked = false);
-            }
-        });
-        temporarySettings = {};
-    });
 };
 
 Mautic.roleOnLoad = function (container, response) {

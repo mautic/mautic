@@ -32,7 +32,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
         private TranslatorInterface $translator,
         private LeadFieldRepository $leadFieldRepository,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }

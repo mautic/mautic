@@ -31,8 +31,8 @@ class TimelineController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
         } else {
@@ -78,8 +78,8 @@ class TimelineController extends CommonController
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.plugin.timeline.filters', $filters);
         } else {
@@ -142,8 +142,8 @@ class TimelineController extends CommonController
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.plugin.timeline.'.$leadId.'.filters', $filters);
         } else {
@@ -208,8 +208,8 @@ class TimelineController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
+                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->all()['excludeEvents'] ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
         } else {

@@ -9,11 +9,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ContactExportEvent extends Event
 {
     /**
-     * @param array<string|int, string|array<string, mixed>> $args
+     * @param array<string|int, int|string|array<string, mixed>> $args
      */
     public function __construct(
         private array $args,
-        private string $object
+        private string $object,
     ) {
     }
 

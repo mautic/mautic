@@ -13,7 +13,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class EventsToArrayTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private Webhook $webhook
+        private Webhook $webhook,
     ) {
     }
 

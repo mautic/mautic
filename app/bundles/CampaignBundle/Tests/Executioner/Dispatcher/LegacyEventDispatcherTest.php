@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -38,11 +37,6 @@ class LegacyEventDispatcherTest extends TestCase
     private MockObject $scheduler;
 
     /**
-     * @var MockObject|MauticFactory
-     */
-    private MockObject $mauticFactory;
-
-    /**
      * @var MockObject|ContactTracker
      */
     private MockObject $contactTracker;
@@ -61,12 +55,11 @@ class LegacyEventDispatcherTest extends TestCase
     {
         parent::setUp();
 
-        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $this->scheduler          = $this->createMock(EventScheduler::class);
-        $this->mauticFactory      = $this->createMock(MauticFactory::class);
-        $this->contactTracker     = $this->createMock(ContactTracker::class);
-        $this->config             = $this->createMock(AbstractEventAccessor::class);
-        $this->pendingEvent       = $this->createMock(PendingEvent::class);
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $this->scheduler      = $this->createMock(EventScheduler::class);
+        $this->contactTracker = $this->createMock(ContactTracker::class);
+        $this->config         = $this->createMock(AbstractEventAccessor::class);
+        $this->pendingEvent   = $this->createMock(PendingEvent::class);
     }
 
     public function testAllEventsAreFailedWithBadConfig(): void
@@ -110,7 +103,7 @@ class LegacyEventDispatcherTest extends TestCase
                 // Legacy custom event should dispatch
                 [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
                 // Legacy execution event should dispatch
-                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION], // @phpstan-ignore classConstant.deprecated
                 [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
                 [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
             );
@@ -143,7 +136,7 @@ class LegacyEventDispatcherTest extends TestCase
         $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION], // @phpstan-ignore classConstant.deprecated
                 [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
                 [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
             );
@@ -179,7 +172,7 @@ class LegacyEventDispatcherTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
-                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION], // @phpstan-ignore classConstant.deprecated
                 [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
                 [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
             )
@@ -230,7 +223,7 @@ class LegacyEventDispatcherTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
-                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION], // @phpstan-ignore classConstant.deprecated
                 [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
             )
             ->willReturnOnConsecutiveCalls(
@@ -278,7 +271,7 @@ class LegacyEventDispatcherTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
-                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION], // @phpstan-ignore classConstant.deprecated
                 [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
             )
             ->willReturnOnConsecutiveCalls(
@@ -426,7 +419,6 @@ class LegacyEventDispatcherTest extends TestCase
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
-            $this->mauticFactory,
             $this->contactTracker
         );
     }

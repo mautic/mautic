@@ -28,7 +28,7 @@ class SysinfoModel
         private TranslatorInterface $translator,
         protected Connection $connection,
         private InstallService $installService,
-        private CheckStep $checkStep
+        private CheckStep $checkStep,
     ) {
     }
 

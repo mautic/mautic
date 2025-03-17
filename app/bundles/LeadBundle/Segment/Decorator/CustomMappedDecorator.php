@@ -11,7 +11,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
 {
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
-        protected ContactSegmentFilterDictionary $dictionary
+        protected ContactSegmentFilterDictionary $dictionary,
     ) {
         parent::__construct($contactSegmentFilterOperator);
     }

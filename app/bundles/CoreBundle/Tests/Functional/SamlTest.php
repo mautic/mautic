@@ -99,12 +99,8 @@ class SamlTest extends MauticMysqlTestCase
         // Login with username user1 and password password
         $this->client->request(Request::METHOD_GET, '/s/dashboard');
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame('https://localhost/s/saml/login', $clientResponse->headers->get('Location'));
-        $this->client->followRedirect();
-
-        $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        // The request is going straight to discovery, thus sparing one redirect, that otherwise would be done anyway.
+        // @see \LightSaml\SpBundle\Controller\DefaultController::loginAction if 'idp' is empty.
         Assert::assertSame('/saml/discovery', $clientResponse->headers->get('Location'));
         $this->client->followRedirect();
 

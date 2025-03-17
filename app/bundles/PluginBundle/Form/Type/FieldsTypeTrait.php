@@ -25,7 +25,7 @@ trait FieldsTypeTrait
         array $mauticFields,
         $fieldObject,
         $limit,
-        $start
+        $start,
     ) {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,

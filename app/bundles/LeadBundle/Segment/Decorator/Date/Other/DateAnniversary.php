@@ -11,7 +11,7 @@ class DateAnniversary implements FilterDecoratorInterface
 {
     public function __construct(
         private DateDecorator $dateDecorator,
-        private DateOptionParameters $dateOptionParameters
+        private DateOptionParameters $dateOptionParameters,
     ) {
     }
 

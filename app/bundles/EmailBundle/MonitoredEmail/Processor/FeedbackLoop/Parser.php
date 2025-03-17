@@ -9,7 +9,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 class Parser
 {
     public function __construct(
-        private Message $message
+        private Message $message,
     ) {
     }
 
@@ -35,18 +35,14 @@ class Parser
         throw new FeedbackLoopNotFound();
     }
 
-    /**
-     * @param string $content
-     * @param string $pattern
-     *
-     * @return string|null
-     */
-    protected function searchMessage($pattern, $content)
+    protected function searchMessage(string $pattern, string $content): ?string
     {
         if (preg_match('/'.$pattern.'/i', $content, $match)) {
             if ($parsedAddressList = Address::parseList($match[1])) {
                 return key($parsedAddressList);
             }
         }
+
+        return null;
     }
 }

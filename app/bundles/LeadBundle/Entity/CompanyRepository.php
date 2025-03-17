@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -142,13 +143,21 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     protected function addCatchAllWhereClause($q, $filter): array
     {
-        return $this->addStandardCatchAllWhereClause(
-            $q,
-            $filter,
+        $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'company');
+        $availableForSearch = array_map(fn ($alias) => 'comp.'.$alias, $customFields);
+
+        $columns = array_merge(
             [
                 'comp.companyname',
                 'comp.companyemail',
-            ]
+            ],
+            $availableForSearch,
+        );
+
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            $columns
         );
     }
 
@@ -366,7 +375,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)
             ->andWhere(
-                $query->expr()->andX(
+                $query->expr()->and(
                     $query->expr()->isNotNull($column),
                     $query->expr()->neq($column, $query->expr()->literal(''))
                 )
@@ -521,8 +530,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->expr()->in('c.id', ':ids')
         )
             ->setParameter('ids', array_keys($companies))
-            ->orderBy('c.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
-            ->addOrderBy('c.id', \Doctrine\Common\Collections\Criteria::DESC);
+            ->orderBy('c.dateAdded', Order::Descending->value)
+            ->addOrderBy('c.id', Order::Descending->value);
 
         $entities = $q->getQuery()
             ->getResult();

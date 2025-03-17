@@ -24,7 +24,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         private FieldList $fieldList,
         private CorePermissions $corePermissions,
         private CompanyModel $companyModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -80,7 +80,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
                 $event->import->getMatchedFields(),
                 $event->rowData,
                 $event->import->getDefault('owner'),
-                $event->import->getDefault('skip_if_exists')
+                (bool) $event->import->getDefault('skip_if_exists')
             );
             $event->setWasMerged((bool) $merged);
             $event->stopPropagation();

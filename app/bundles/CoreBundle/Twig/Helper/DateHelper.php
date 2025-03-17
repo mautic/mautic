@@ -27,7 +27,7 @@ final class DateHelper
         $dateOnlyFormat,
         $timeOnlyFormat,
         private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,

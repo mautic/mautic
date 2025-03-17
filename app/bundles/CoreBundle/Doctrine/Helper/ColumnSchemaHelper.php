@@ -39,7 +39,7 @@ class ColumnSchemaHelper
      */
     public function __construct(
         protected Connection $db,
-        protected $prefix
+        protected $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }
@@ -209,11 +209,9 @@ class ColumnSchemaHelper
      *
      * @param bool|false $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function checkTableExists($table, $throwException = false)
+    public function checkTableExists($table, $throwException = false): bool
     {
         if (!$this->sm->tablesExist($table)) {
             if ($throwException) {

@@ -13,7 +13,7 @@ final class EmailStatEvent extends Event
      * @param Stat[] $stats
      */
     public function __construct(
-        private array $stats
+        private array $stats,
     ) {
     }
 

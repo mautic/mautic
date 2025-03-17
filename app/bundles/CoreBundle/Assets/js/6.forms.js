@@ -353,7 +353,7 @@ Mautic.switchFormFieldState = function (formName) {
         });
     };
 
-    var resetField = function (field) {
+    var toggleFieldOff = function (field) {
         // Set Yes/No toggle to No.
         if (field.attr('onchange')?.includes('Mautic.toggleYesNo(this)')
             && field.val() === "1"
@@ -396,7 +396,7 @@ Mautic.switchFormFieldState = function (formName) {
         if (show) {
             fieldContainer.fadeIn();
         } else {
-            resetField(field);
+            toggleFieldOff(field);
             fieldContainer.fadeOut();
         }
     });
@@ -410,10 +410,12 @@ Mautic.switchFormFieldState = function (formName) {
     mQuery.each(disabledFields, function(fieldId, disable) {
         var field = mQuery('#' + fieldId)
         if (disable) {
-            resetField(field);
+            toggleFieldOff(field);
             field.addClass('disabled', disable);
+            field.attr('disabled', 'disabled');
         } else {
             field.removeClass('disabled', disable);
+            field.removeAttr('disabled');
         }
 
     });
@@ -536,14 +538,15 @@ Mautic.toggleYesNo = function(element) {
         $yesInput = mQuery('#' + yesId),
         $noInput = mQuery('#' + noId),
         $switchEl = $toggle.find('.toggle__switch'),
+        $toggleLabel = $toggle.find('.toggle__label'),
         $textEl = $toggle.find('.toggle__text'),
         isYes = $yesInput.is(':checked');
 
-    $yesInput.prop('checked', !isYes).trigger('change');
     $noInput.prop('checked', isYes);
+    $yesInput.prop('checked', !isYes).trigger('change');
     $switchEl.toggleClass('toggle__switch--checked', !isYes);
     $textEl.text($toggle.data(isYes ? 'no' : 'yes'));
-    $label.attr('aria-checked', !isYes);
+    $toggleLabel.attr('aria-checked', !isYes);
 
     Mautic.updatePublishingToggle(element);
 };

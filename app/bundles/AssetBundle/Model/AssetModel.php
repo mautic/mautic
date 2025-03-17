@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
@@ -40,7 +41,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Asset>
  */
-class AssetModel extends FormModel
+class AssetModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var int
@@ -63,7 +64,7 @@ class AssetModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -107,13 +108,12 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param string $code
-     * @param array  $systemEntry
+     * @param array $systemEntry
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = []): void
+    public function trackDownload($asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -601,10 +601,8 @@ class AssetModel extends FormModel
      * @param int   $limit
      * @param array $filters
      * @param array $options
-     *
-     * @return array
      */
-    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = [])
+    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')

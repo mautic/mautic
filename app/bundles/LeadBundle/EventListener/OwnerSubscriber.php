@@ -22,7 +22,7 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private LeadModel $leadModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

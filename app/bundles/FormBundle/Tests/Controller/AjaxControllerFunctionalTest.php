@@ -7,22 +7,18 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetFieldsForObjectAction(): void
     {
-        $this->client->request(
+        $this->client->xmlHttpRequest(
             Request::METHOD_GET,
-            '/s/ajax?action=form:getFieldsForObject&mappedObject=company&mappedField=&formId=10',
-            [],
-            [],
-            $this->createAjaxHeaders()
+            '/s/ajax?action=form:getFieldsForObject&mappedObject=company&mappedField=&formId=10'
         );
         $clientResponse = $this->client->getResponse();
         $payload        = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         // Assert some random fields exist.
         Assert::assertSame(

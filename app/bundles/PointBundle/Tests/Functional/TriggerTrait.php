@@ -12,7 +12,7 @@ trait TriggerTrait
         string $name,
         int $points = 0,
         Group $group = null,
-        bool $triggerExistingLeads = false
+        bool $triggerExistingLeads = false,
     ): Trigger {
         $trigger = new Trigger();
         $trigger->setName($name);
@@ -31,7 +31,7 @@ trait TriggerTrait
 
     private function createAddTagEvent(
         string $tag,
-        Trigger $trigger
+        Trigger $trigger,
     ): TriggerEvent {
         $triggerEvent = new TriggerEvent();
         $triggerEvent->setTrigger($trigger);

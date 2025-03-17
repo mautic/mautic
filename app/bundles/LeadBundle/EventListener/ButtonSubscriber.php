@@ -15,7 +15,7 @@ class ButtonSubscriber implements EventSubscriberInterface
     public function __construct(
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private CorePermissions $security
+        private CorePermissions $security,
     ) {
     }
 
@@ -77,7 +77,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                 'btnText'   => $this->translator->trans('mautic.core.export.csv'),
                 'iconClass' => 'ri-file-text-line',
             ],
-            ButtonHelper::LOCATION_BULK_ACTIONS
+            ButtonHelper::LOCATION_TOOLBAR_BULK_ACTIONS
         );
 
         $event->addButton(

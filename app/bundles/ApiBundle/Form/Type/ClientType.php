@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -31,8 +30,7 @@ class ClientType extends AbstractType
         private RequestStack $requestStack,
         private TranslatorInterface $translator,
         private ValidatorInterface $validator,
-        private SessionInterface $session,
-        private RouterInterface $router
+        private RouterInterface $router,
     ) {
     }
 
@@ -43,7 +41,7 @@ class ClientType extends AbstractType
     {
         return $this->requestStack->getCurrentRequest()->get(
             'api_mode',
-            $this->session->get('mautic.client.filter.api_mode', 'oauth2')
+            $this->requestStack->getSession()->get('mautic.client.filter.api_mode', 'oauth2')
         );
     }
 
@@ -145,10 +143,8 @@ class ClientType extends AbstractType
 
                         $errors = $this->validator->validate($uri, $urlConstraint);
 
-                        if (!empty($errors)) {
-                            foreach ($errors as $error) {
-                                $form['redirectUris']->addError(new FormError($error->getMessage()));
-                            }
+                        foreach ($errors as $error) {
+                            $form['redirectUris']->addError(new FormError($error->getMessage()));
                         }
                     }
                 }

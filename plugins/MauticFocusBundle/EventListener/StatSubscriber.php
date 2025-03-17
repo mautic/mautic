@@ -15,7 +15,7 @@ class StatSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FocusModel $model,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -48,7 +48,7 @@ class StatSubscriber implements EventSubscriberInterface
     public function onFormSubmit(SubmissionEvent $event): void
     {
         // Check the request for a focus field
-        $mauticform = $this->requestStack->getCurrentRequest()->request->get('mauticform') ?? [];
+        $mauticform = $this->requestStack->getCurrentRequest()->request->all()['mauticform'] ?? [];
         $id         = $mauticform['focusId'] ?? false;
 
         if (!empty($id)) {

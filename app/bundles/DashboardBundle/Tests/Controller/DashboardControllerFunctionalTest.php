@@ -6,11 +6,14 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -39,7 +42,10 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
         $this->assertResponseIsSuccessful();
 
-        $content = $this->client->getResponse()->getContent();
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $content = $response->getContent();
         Assert::assertJson($content);
 
         $data = json_decode($content, true);
@@ -115,7 +121,10 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()));
         $this->assertResponseIsSuccessful();
 
-        $content = $this->client->getResponse()->getContent();
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $content = $response->getContent();
         Assert::assertJson($content);
 
         $data = json_decode($content, true);
@@ -131,6 +140,31 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
             ['A', 'Admin User', '3 seconds'],
             ['D', 'Admin User', 'Less than 1 second'],
         ], $tableArray);
+    }
+
+    public function testAuditLogWidgetWithDeletedContact(): void
+    {
+        $user   = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $widget = new Widget();
+        $widget->setName('Recent activity');
+        $widget->setType('recent.activity');
+        $widget->setWidth(100);
+        $widget->setHeight(300);
+        $widget->setCreatedBy($user);
+        $this->em->persist($widget);
+        $this->em->flush();
+        $contact = new Lead();
+        $contact->setFirstName('John');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        \assert($contactModel instanceof LeadModel);
+        $contactModel->saveEntity($contact);
+        $contactModel->deleteEntity($contact);
+        $this->em->clear();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}");
+        $this->assertResponseIsSuccessful();
+        $printResponse = fn () => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
+        Assert::assertStringContainsString('created', $printResponse());
+        Assert::assertStringContainsString('deleted', $printResponse());
     }
 
     private function createSegment(string $name, string $alias, float $lastBuildTime = 0, ?User $user = null): LeadList

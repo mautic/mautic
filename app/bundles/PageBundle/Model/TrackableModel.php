@@ -64,7 +64,7 @@ class TrackableModel extends AbstractCommonModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -596,13 +596,11 @@ class TrackableModel extends AbstractCommonModel
 
             parse_str($query, $queryParts);
 
-            if (is_array($queryParts)) {
-                foreach ($queryParts as $key => $value) {
-                    if (preg_match('/(\{\S+?\})/', $key) || preg_match('/(\{\S+?\})/', $value)) {
-                        $tokenizedParams[$key] = $value;
-                    } else {
-                        $untokenizedParams[$key] = $value;
-                    }
+            foreach ($queryParts as $key => $value) {
+                if (preg_match('/(\{\S+?\})/', $key) || preg_match('/(\{\S+?\})/', $value)) {
+                    $tokenizedParams[$key] = $value;
+                } else {
+                    $untokenizedParams[$key] = $value;
                 }
             }
         }
@@ -791,7 +789,7 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param array<int, Redirect|Trackable> $trackableTokens
+     * @param array<int|string, Redirect|Trackable> $trackableTokens
      *
      * @return string
      */

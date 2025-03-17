@@ -8,20 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ChannelBroadcastEvent extends Event
 {
     /**
-     * Specific channel.
-     *
-     * @var null
-     */
-    protected $channel;
-
-    /**
-     * Specific ID of a specific channel.
-     *
-     * @var null
-     */
-    protected $id;
-
-    /**
      * Number of contacts successfully processed and/or failed per channel.
      *
      * @var array
@@ -57,12 +43,16 @@ class ChannelBroadcastEvent extends Event
     private ?int $threadId = null;
 
     public function __construct(
-        $channel,
-        $channelId,
-        protected OutputInterface $output
+        /**
+         * Specific channel.
+         */
+        protected ?string $channel,
+        /**
+         * Specific ID of a specific channel.
+         */
+        protected string|int|null $id,
+        protected OutputInterface $output,
     ) {
-        $this->channel = $channel;
-        $this->id      = $channelId;
     }
 
     /**

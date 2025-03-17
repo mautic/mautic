@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class FocusShowType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router
+        protected RouterInterface $router,
     ) {
     }
 
@@ -100,10 +100,7 @@ class FocusShowType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'focusshow_list';
     }

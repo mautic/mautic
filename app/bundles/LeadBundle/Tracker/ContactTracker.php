@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactTracker
@@ -44,7 +45,7 @@ class ContactTracker
         private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         private EventDispatcherInterface $dispatcher,
-        FieldModel $leadFieldModel
+        FieldModel $leadFieldModel,
     ) {
         $this->leadFieldModel         = $leadFieldModel;
     }
@@ -54,7 +55,9 @@ class ContactTracker
      */
     public function getContact()
     {
-        $request = $this->requestStack->getCurrentRequest();
+        if (null !== $this->getRequest() && $this->getRequest()->cookies->get('Blocked-Tracking')) {
+            return null;
+        }
 
         if ($systemContact = $this->getSystemContact()) {
             return $systemContact;
@@ -67,7 +70,7 @@ class ContactTracker
             $this->generateTrackingCookies();
         }
 
-        if ($request) {
+        if ($request = $this->getRequest()) {
             $this->logger->debug('CONTACT: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$request->getMethod().' '.$request->getRequestUri());
         }
 
@@ -248,10 +251,8 @@ class ContactTracker
 
     /**
      * @param bool $persist
-     *
-     * @return Lead
      */
-    private function createNewContact(IpAddress $ip = null, $persist = true)
+    private function createNewContact(IpAddress $ip = null, $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();
@@ -319,5 +320,10 @@ class ContactTracker
         if ($leadId = $this->trackedContact->getId() && null !== $request) {
             $this->deviceTracker->createDeviceFromUserAgent($this->trackedContact, $request->server->get('HTTP_USER_AGENT'));
         }
+    }
+
+    private function getRequest(): ?Request
+    {
+        return $this->requestStack->getCurrentRequest();
     }
 }

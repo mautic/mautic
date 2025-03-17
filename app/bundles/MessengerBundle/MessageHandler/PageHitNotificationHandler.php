@@ -13,10 +13,11 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\Acknowledger;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class PageHitNotificationHandler implements MessageHandlerInterface
+#[AsMessageHandler]
+class PageHitNotificationHandler
 {
     public function __construct(
         private PageRepository $pageRepository,
@@ -24,7 +25,7 @@ class PageHitNotificationHandler implements MessageHandlerInterface
         private LeadRepository $leadRepository,
         private LoggerInterface $logger,
         private RedirectRepository $redirectRepository,
-        private PageModel $pageModel
+        private PageModel $pageModel,
     ) {
     }
 

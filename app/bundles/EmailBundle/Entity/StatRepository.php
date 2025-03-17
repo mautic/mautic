@@ -77,7 +77,7 @@ class StatRepository extends CommonRepository
         $createdByUserId = null,
         $companyId = null,
         $campaignId = null,
-        $segmentId = null
+        $segmentId = null,
     ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
@@ -628,6 +628,8 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @deprecated to be removed as it is not used anywhere
+     *
      * @return mixed
      */
     public function checkContactsSentEmail($contacts, $emailId)
@@ -642,6 +644,21 @@ class StatRepository extends CommonRepository
             ->setParameter('contacts', $contacts);
 
         return $query->executeQuery()->fetchAssociative();
+    }
+
+    public function checkContactSentEmail(int $contactId, int $emailId): bool
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('1')
+            ->where('s.email_id = :emailId')
+            ->andWhere('s.lead_id = :contactId')
+            ->andWhere('is_failed = 0')
+            ->setParameter('emailId', $emailId)
+            ->setParameter('contactId', $contactId)
+            ->setMaxResults(1);
+
+        return (bool) $query->executeQuery()->fetchOne();
     }
 
     /**
