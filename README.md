@@ -14,11 +14,14 @@
     <a href="https://mautic.org/start-using-mautic/try-mautic/">Request a trial</a> · <a href="https://www.mautic.org/download">Self-host/download</a> · <a href="https://www.mautic.org/community">Community channels</a>
 </p>
 
-<p style="text-align: center;">
-  <a href="https://codecov.io/gh/mautic/mautic"><img alt="Codecov" src="https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg"></a>
-<a href="https://www.bestpractices.dev/projects/9527"><img src="https://www.bestpractices.dev/projects/9527/badge"></a>
-[![All Contributors](https://img.shields.io/github/all-contributors/projectOwner/projectName?color=ee8449&style=flat-square)](#contributors)
-</p>
+<div align="center">
+
+[![Codecov](https://codecov.io/gh/mautic/mautic/branch/6.x/graph/badge.svg)](https://codecov.io/gh/mautic/mautic) 
+[![Best Practices](https://www.bestpractices.dev/projects/9527/badge)](https://www.bestpractices.dev/projects/9527)
+[![All Contributors](https://img.shields.io/github/all-contributors/mautic/mautic?color=ee8449&style=flat-square)](#contributors)
+
+</div>
+
 
 <h2 align="center">⭐ Like what we're doing? Give us a star ⬆️</h2>
 
