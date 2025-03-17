@@ -1,6 +1,6 @@
 <p align="center">
   <p align="center">
-   <img width="150" height="150" src="(.github/readme_logo.png)" alt="Logo">
+   <img width="150" height="150" src="(.github/readme_logo.png)" alt="Mautic Open Source Marketing Automation">
 
 
   </p>
@@ -57,10 +57,11 @@ Open source means more than open code. Open source provides equality for all and
 
 ## Get Involved Quickly
 
-Calling all devs, testers and writers! Get started quickly and show us what you’re made of.
+Calling all potential contributors to open source! Get started quickly and show us what you’re made of.
 
 - 🐛 [Easy-to-fix bugs][t1-issues]
 - 🧪 [Best pull requests for testing][best-pulls]
+- 🌟[Low and no-code tasks][low-no-code]
 
 If you have questions, [check how to contribute](#-contribution).
 
@@ -370,3 +371,4 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [install-mautic-composer]: <https://docs.mautic.org/en/5.2/getting_started/how_to_install_mautic.html#installing-with-composer>
 [requirements]: <https://mautic.org/mautic-requirements/>
 [supported-versions]: <https://mautic.org/releases/>
+[low-no-code]: <https://mau.tc/no-code>
