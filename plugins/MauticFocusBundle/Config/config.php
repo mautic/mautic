@@ -66,7 +66,7 @@ return [
             'mautic.focus' => [
                 'route'    => 'mautic_focus_index',
                 'access'   => 'focus:items:view',
-                'parent'   => 'mautic.core.channels',
+                'parent'   => 'mautic.core.components',
                 'priority' => 10,
             ],
         ],
