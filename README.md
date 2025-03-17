@@ -112,7 +112,7 @@ There are lots of good conversations and resources in our Forums. If you're stru
 - [Developer documentation](https://devdocs.mautic.org), including API reference docs
 
 ## 🙋 Contribution
-![Alt](https://repobeats.axiom.co/api/embed/f6c25e6584bc96119422057cbe069ce08e5a4bfd.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/b1bd91074fcb68f71b056079b889798446a5577e.svg "Repobeats analytics image")
 
 Thank you for your desire to develop Mautic together!
 
