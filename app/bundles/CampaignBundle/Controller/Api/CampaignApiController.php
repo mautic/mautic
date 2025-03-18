@@ -387,7 +387,7 @@ class CampaignApiController extends CommonApiController
         // Check if there is data to export
         if (empty($data)) {
             return $this->handleView(
-                $this->view(['error' => $this->translator->trans('mautic.campaign.export.no_data', [], 'flashes')], Response::HTTP_BAD_REQUEST)
+                $this->view(['error' => $this->translator->trans('mautic.campaign.error.export.no_data', [], 'flashes')], Response::HTTP_BAD_REQUEST)
             );
         }
 

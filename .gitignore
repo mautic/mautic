@@ -25,6 +25,7 @@
 /app/phpunit.xml
 
 /var/bootstrap*
+/var/import/*
 
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/pictograms/

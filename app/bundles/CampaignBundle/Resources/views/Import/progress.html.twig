@@ -20,7 +20,7 @@
     <div class="row ma-lg" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6 text-center">
             <div class="panel panel-{% if hasErrors %}danger{% elseif isComplete %}success{% else %}info{% endif %}">
-                <div class="panel-heading">
+                <div class="panel-heading text-center">
                     <h4 class="panel-title">
                         {{ hasErrors ? 'mautic.campaign.campaign.import.error'|trans : (isComplete ? 'mautic.campaign.campaign.import.success'|trans : 'mautic.campaign.campaign.import.inprogress'|trans) }}
                     </h4>
@@ -54,15 +54,15 @@
                                     <tr>
                                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                             'text': 'mautic.campaign.campaign.import.entity',
-                                            'class': 'col-entity'
+                                            'class': 'col-entity text-center'
                                         }) }}
                                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                             'text': 'mautic.campaign.campaign.import.name',
-                                            'class': 'col-name'
+                                            'class': 'col-name text-center'
                                         }) }}
                                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                             'text': 'mautic.campaign.campaign.import.count',
-                                            'class': 'col-count',
+                                            'class': 'col-count text-center',
                                             'default': true
                                         }) }}
                                     </tr>
@@ -102,6 +102,15 @@
                                     }
                                 ]
                             } %}
+                            
+                            {{- include('@MauticCore/Helper/confirm.html.twig', {
+                                'btnClass'      : 'btn btn-danger btn-nospin',
+                                'message'       : 'mautic.campaign.campaign.import.undoconfirm'|trans,
+                                'confirmText'   : 'mautic.campaign.campaign.import.undo'|trans,
+                                'confirmAction' : path('mautic_campaign_import_action', {'objectAction' : 'undo'}),
+                                'iconClass'     : 'ri-delete-bin-line',
+                                'btnText'       : 'mautic.campaign.campaign.import.undo'|trans,
+                            }) -}}
                         </div>
                     {% endif %}
                 </div>

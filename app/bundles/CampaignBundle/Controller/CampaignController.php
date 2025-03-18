@@ -178,10 +178,10 @@ class CampaignController extends AbstractStandardFormController
 
         if (empty($data)) {
             $this->logger->warning('No data found for campaign export', ['objectId' => $objectId]);
-            $this->addFlashMessage('mautic.campaign.export.no_data', ['%objectId%' => $objectId], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], FlashBag::LEVEL_ERROR);
 
             return new JsonResponse([
-                'error'   => $this->translator->trans('mautic.campaign.export.no_data', ['%objectId%' => $objectId], 'flashes'),
+                'error'   => $this->translator->trans('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], 'flashes'),
                 'flashes' => $this->getFlashContent(),
             ], 400);
         }
@@ -191,10 +191,10 @@ class CampaignController extends AbstractStandardFormController
 
         if (!file_exists($filePath)) {
             $this->logger->error('Export file could not be created', ['filePath' => $filePath]);
-            $this->addFlashMessage('mautic.campaign.export.file_not_found', ['%path%' => $filePath], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], FlashBag::LEVEL_ERROR);
 
             return new JsonResponse([
-                'error'   => $this->translator->trans('mautic.campaign.export.file_not_found', ['%path%' => $filePath], 'flashes'),
+                'error'   => $this->translator->trans('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], 'flashes'),
                 'flashes' => $this->getFlashContent(),
             ], 400);
         }

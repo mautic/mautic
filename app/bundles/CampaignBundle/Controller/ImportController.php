@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Form\Type\CampaignImportType;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -141,6 +142,7 @@ final class ImportController extends AbstractFormController
             ]);
         }
         // Set progress to 0 before import starts
+        $this->requestStack->getSession()->set('mautic.campaign.import.step', self::STEP_PROGRESS_BAR);
         $this->requestStack->getSession()->set('mautic.campaign.import.progress', 0);
         $this->requestStack->getSession()->remove('mautic.campaign.import.summary');
         try {
@@ -305,7 +307,7 @@ final class ImportController extends AbstractFormController
 
         if (!file_exists($fullPath) && self::STEP_UPLOAD_ZIP !== $step) {
             $this->logger->log(LogLevel::WARNING, "File {$fullPath} does not exist. Resetting import to STEP_UPLOAD_ZIP.");
-            $this->addFlashMessage('mautic.campaign.import.file.missing', ['%file%' => $fullPath], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.campaign.error.import.file.missing', ['%file%' => $fullPath], FlashBag::LEVEL_ERROR);
             $this->requestStack->getSession()->set('mautic.campaign.import.step', self::STEP_UPLOAD_ZIP);
 
             return self::STEP_UPLOAD_ZIP;
@@ -319,6 +321,7 @@ final class ImportController extends AbstractFormController
         $session       = $this->requestStack->getSession();
         $progress      = $session->get('mautic.campaign.import.progress', 0);
         $importSummary = $session->get('mautic.campaign.import.summary', []);
+        $this->requestStack->getSession()->set('mautic.campaign.import.step', self::STEP_IMPORT_FROM_ZIP);
 
         // If the import is already complete, return the final view
         if ($progress >= 100) {
@@ -361,6 +364,7 @@ final class ImportController extends AbstractFormController
 
         // Process import and update progress
         $importSummary = $this->processImport($fullPath);
+        $this->resetImport();
 
         return $this->delegateView([
             'viewParameters' => [
@@ -408,5 +412,29 @@ final class ImportController extends AbstractFormController
         );
 
         return $importSummary;
+    }
+
+    public function undoAction(): JsonResponse
+    {
+        if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:delete')) {
+            return $this->accessDenied();
+        }
+        $session       = $this->requestStack->getSession();
+        $importSummary = $session->get('mautic.campaign.import.summary', []);
+
+        if (!isset($importSummary['summary'])) {
+            $this->addFlashMessage('mautic.campaign.notice.import.undo_no_data');
+
+            return new JsonResponse(['flashes'    => $this->getFlashContent()]);
+        }
+        // Dispatch the undo import event
+        $undoEvent = new EntityImportUndoEvent($importSummary['summary']);
+        $undoEvent = $this->dispatcher->dispatch($undoEvent);
+
+        $this->logger->info('Undo import triggered for Campaign.');
+
+        $this->addFlashMessage('mautic.campaign.notice.import.undo');
+
+        return new JsonResponse(['flashes'    => $this->getFlashContent()]);
     }
 }
