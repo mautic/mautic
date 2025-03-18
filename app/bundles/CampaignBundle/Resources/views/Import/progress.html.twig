@@ -46,7 +46,14 @@
                         </div>
                         <p class="mt-md">{{ 'mautic.campaign.campaign.import.progress.status'|trans({'%progress%': progress}) }}</p>
                     {% else %}
-                        <h4 class="text-success">{{ 'mautic.campaign.campaign.notice.import.finished'|trans }}</h4>
+                        <h4 class="text-success">{{ 'mautic.campaign.campaign.import.finished'|trans }}</h4>
+
+                        {% if 'email' in importSummary.summary|keys %}
+                            {% set emailName = importSummary.summary['email'].name[0] %}
+                            <h4 class="text-info pa-sm">
+                                {{ 'mautic.campaign.campaign.import.email_notice'|trans({'%emailName%': emailName}) }}
+                            </h4>
+                        {% endif %}
 
                         <div class="table-responsive pa-md">
                             <table class="table table-hover table-striped" id="importSummaryTable">
