@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EntityImportUndoSubscriber implements EventSubscriberInterface
+final class EntityImportUndoSubscriber implements EventSubscriberInterface
 {
     private EntityManagerInterface $entityManager;
     private AuditLogModel $auditLogModel;

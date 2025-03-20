@@ -36,6 +36,7 @@ class Field implements UuidInterface
     use UuidTrait;
 
     public const TABLE_NAME = 'form_fields';
+    public const ENTITY_NAME = 'form_fields';
 
     /**
      * @var int

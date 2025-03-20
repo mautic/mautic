@@ -13,10 +13,6 @@
     {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}
     {% set header = hasErrors ? 'mautic.campaign.campaign.import.error' : 'mautic.campaign.campaign.import.success' %}
 
-    {% if not isComplete %}
-        <meta http-equiv="refresh" content="5;url={{ path('mautic_campaign_import_action', {'objectAction': 'progress'}) }}">
-    {% endif %}
-
     <div class="row ma-lg" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6 text-center">
             <div class="panel panel-{% if hasErrors %}danger{% elseif isComplete %}success{% else %}info{% endif %}">
@@ -44,7 +40,83 @@
                                 <span class="sr-only">{{ progress }}%</span>
                             </div>
                         </div>
-                        <p class="mt-md">{{ 'mautic.campaign.campaign.import.progress.status'|trans({'%progress%': progress}) }}</p>
+
+                        <div class="table-responsive pa-md">
+                            <h4>{{ 'Updated Objects'|trans }}</h4>
+                            <table class="table table-hover table-striped" id="updatedObjectsSummaryTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">{{ 'Entity'|trans }}</th>
+                                        <th class="text-center">{{ 'Name'|trans }}</th>
+                                        <th class="text-center">{{ 'Count'|trans }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entity, details in analyzeSummary.updatedObjects|default([]) %}
+                                        <tr>
+                                            <td><strong>{{ entity|capitalize }}</strong></td>
+                                            <td>
+                                                {% if details.names is iterable %}
+                                                    {{ details.names|join(', ') }}
+                                                {% else %}
+                                                    {{ details.names }}
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center"><strong>{{ details.count }}</strong></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-responsive pa-md mt-md">
+                            <h4>{{ 'New Objects'|trans }}</h4>
+                            <table class="table table-hover table-striped" id="newObjectsSummaryTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">{{ 'Entity'|trans }}</th>
+                                        <th class="text-center">{{ 'Name'|trans }}</th>
+                                        <th class="text-center">{{ 'Count'|trans }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entity, details in analyzeSummary.newObjects|default([]) %}
+                                        <tr>
+                                            <td><strong>{{ entity|capitalize }}</strong></td>
+                                            <td>
+                                                {% if details.names is iterable %}
+                                                    {{ details.names|join(', ') }}
+                                                {% else %}
+                                                    {{ details.names }}
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center"><strong>{{ details.count }}</strong></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    href: path('mautic_campaign_import_action', {'objectAction': 'progress'}),
+                                    variant: 'secondary',
+                                    icon: 'ri-import-line',
+                                    label: 'mautic.campaign.campaign.import'|trans
+                                }
+                            ]
+                        } %}
+
+                        {{- include('@MauticCore/Helper/confirm.html.twig', {
+                            'btnClass'      : 'btn btn-danger btn-nospin',
+                            'message'       : 'mautic.campaign.campaign.import.cancelmessage'|trans,
+                            'confirmText'   : 'mautic.campaign.campaign.import.cancelconfirm'|trans,
+                            'confirmAction' : path('mautic_campaign_import_action', {'objectAction' : 'cancel'}),
+                            'iconClass'     : 'ri-delete-bin-line',
+                            'btnText'       : 'mautic.campaign.campaign.import.cancel'|trans,
+                        }) -}}
+
                     {% else %}
                         <h4 class="text-success">{{ 'mautic.campaign.campaign.import.finished'|trans }}</h4>
 
@@ -104,12 +176,12 @@
                                     {
                                         href: path('mautic_campaign_import_action', {'objectAction': 'new'}),
                                         variant: 'secondary',
-                                        icon: 'ri-upload-line',
+                                        icon: 'ri-import-line',
                                         label: 'mautic.campaign.campaign.import'|trans
                                     }
                                 ]
                             } %}
-                            
+
                             {{- include('@MauticCore/Helper/confirm.html.twig', {
                                 'btnClass'      : 'btn btn-danger btn-nospin',
                                 'message'       : 'mautic.campaign.campaign.import.undoconfirm'|trans,
