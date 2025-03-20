@@ -107,6 +107,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             'channel'               => $campaignEvent->getChannel(),
             'channel_id'            => $campaignEvent->getChannelId(),
             'parent_id'             => $parentId,
+            'uuid'                  => $campaignEvent->getUuid(),
         ];
     }
 

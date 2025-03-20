@@ -67,6 +67,7 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
             'properties'                  => $leadField->getProperties(),
             'column_is_not_created'       => $leadField->getColumnIsNotCreated(),
             'original_is_published_value' => $leadField->getOriginalIsPublishedValue(),
+            'uuid'                        => $leadField->getUuid(),
         ];
 
         $event->addEntity(LeadField::ENTITY_NAME, $leadFieldData);

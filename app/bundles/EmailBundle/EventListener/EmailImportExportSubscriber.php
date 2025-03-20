@@ -77,6 +77,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             'dynamic_content'      => $email->getDynamicContent(),
             'headers'              => $email->getHeaders(),
             'public_preview'       => $email->getPublicPreview(),
+            'uuid'                 => $email->getUuid(),
         ];
 
         $event->addEntity(Email::ENTITY_NAME, $emailData);

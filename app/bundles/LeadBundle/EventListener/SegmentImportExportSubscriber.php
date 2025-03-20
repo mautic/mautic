@@ -59,6 +59,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             'filters'              => $leadList->getFilters(),
             'is_global'            => $leadList->getIsGlobal(),
             'is_preference_center' => $leadList->getIsPreferenceCenter(),
+            'uuid'                 => $leadList->getUuid(),
         ];
         $customFields   = $this->fieldModel->getLeadFieldCustomFields();
         $filters        = $leadList->getFilters();

@@ -129,6 +129,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             'description'     => $campaign->getDescription(),
             'is_published'    => $campaign->getIsPublished(),
             'canvas_settings' => $campaign->getCanvasSettings(),
+            'uuid'            => $campaign->getUuid(),
         ];
     }
 

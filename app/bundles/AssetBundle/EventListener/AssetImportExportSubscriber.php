@@ -62,6 +62,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             'mime'                   => $asset->getMime(),
             'size'                   => $asset->getSize(),
             'disallow'               => $asset->getDisallow(),
+            'uuid'                   => $asset->getUuid(),
         ];
 
         $event->addEntity(Asset::ENTITY_NAME, $assetData);

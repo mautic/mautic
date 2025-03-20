@@ -61,6 +61,7 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             'filters'                => $object->getFilters(),
             'is_campaign_based'      => $object->getIsCampaignBased(),
             'slot_name'              => $object->getSlotName(),
+            'uuid'                   => $object->getUuid(),
         ];
         $event->addEntity(DynamicContent::ENTITY_NAME, $data);
 

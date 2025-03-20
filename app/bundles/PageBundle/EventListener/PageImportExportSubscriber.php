@@ -47,7 +47,6 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
 
         $pageData = [
             'id'                   => $page->getId(),
-            // 'category_id'          => $page->getCategory() ? $page->getCategory()->getId() : null,
             'is_published'         => $page->isPublished(),
             'title'                => $page->getTitle(),
             'alias'                => $page->getAlias(),
@@ -69,6 +68,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             'no_index'             => $page->getNoIndex(),
             'lang'                 => $page->getLanguage(),
             'variant_settings'     => $page->getVariantSettings(),
+            'uuid'                 => $page->getUuid(),
         ];
 
         $event->addEntity(Page::ENTITY_NAME, $pageData);

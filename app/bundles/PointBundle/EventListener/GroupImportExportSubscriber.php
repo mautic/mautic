@@ -50,6 +50,7 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
             'name'        => $pointGroup->getName(),
             'description' => $pointGroup->getDescription(),
             'is_published'=> $pointGroup->isPublished(),
+            'uuid'        => $pointGroup->getUuid(),
         ];
 
         $event->addEntity(Group::ENTITY_NAME, $pointGroupData);

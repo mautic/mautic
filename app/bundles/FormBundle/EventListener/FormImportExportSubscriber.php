@@ -53,7 +53,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         }
 
         $formActions = $queryBuilder
-            ->select('action.name, action.description, action.type, action.action_order, action.properties')
+            ->select('action.name, action.description, action.type, action.action_order, action.properties, action.uuid')
             ->from('form_actions', 'action')
             ->where('action.form_id = :formId')
             ->setParameter('formId', $formId, \Doctrine\DBAL\ParameterType::INTEGER)
@@ -63,7 +63,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
         $formFields = $queryBuilder
-            ->select('field.id, field.label, field.show_label, field.alias, field.type, field.is_custom, field.custom_parameters, field.default_value, field.is_required, field.validation_message, field.help_message, field.field_order, field.properties, field.validation, field.parent_id, field.conditions, field.label_attr, field.input_attr, field.container_attr, field.lead_field, field.save_result, field.is_auto_fill, field.is_read_only, field.show_when_value_exists, field.show_after_x_submissions, field.always_display, field.mapped_object, field.mapped_field')
+            ->select('field.id, field.label, field.show_label, field.alias, field.type, field.is_custom, field.custom_parameters, field.default_value, field.is_required, field.validation_message, field.help_message, field.field_order, field.properties, field.validation, field.parent_id, field.conditions, field.label_attr, field.input_attr, field.container_attr, field.lead_field, field.save_result, field.is_auto_fill, field.is_read_only, field.show_when_value_exists, field.show_after_x_submissions, field.always_display, field.mapped_object, field.mapped_field, field.uuid')
             ->from('form_fields', 'field')
             ->where('field.form_id = :formId')
             ->setParameter('formId', $formId, \Doctrine\DBAL\ParameterType::INTEGER)
@@ -84,6 +84,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             'render_style'         => $form->getRenderStyle(),
             'post_action_property' => $form->getPostActionProperty(),
             'form_attr'            => $form->getFormAttributes(),
+            'uuid'                 => $form->getUuid(),
             'form_actions'         => $formActions,
             'form_fields'          => $formFields,
         ];
