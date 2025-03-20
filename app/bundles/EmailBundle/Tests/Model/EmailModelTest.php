@@ -642,6 +642,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('setEmail')
             ->will($this->returnValue($sendToContactModelMock));
 
+        $emailModel->setEntityManager($this->entityManager);
+        $emailModel->setDispatcher($this->createMock(EventDispatcher::class));
+
         $this->companyRepository->method('getCompaniesForContacts')
             ->will($this->returnValue([]));
 
@@ -787,6 +790,10 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->emailEntity->method('getId')
             ->will($this->returnValue(1));
+
+        $emailModel->setTranslator($this->translator);
+        $emailModel->setEntityManager($this->entityManager);
+        $emailModel->setDispatcher($this->createMock(EventDispatcher::class));
 
         $result = $emailModel->sendEmail(
             $this->emailEntity,
