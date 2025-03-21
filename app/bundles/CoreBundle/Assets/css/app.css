@@ -5491,7 +5491,7 @@ ul.dropdown-menu-form {
   outline: 2px var(--outline-style) var(--focus);
 }
 .dropdown-header {
-  margin: 32px 16px 8px 16px;
+  margin: 16px 16px 8px 16px;
   border-bottom: 1px solid var(--border-strong);
   padding: 0 0 4px;
   color: var(--text-secondary);
