@@ -134,64 +134,110 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach ($elements as $element) {
-            $email = new Email();
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
 
-            $email->setTranslationParent($element['translation_parent_id'] ?? null);
-            $email->setVariantParent($element['variant_parent_id'] ?? null);
+        foreach ($elements as $element) {
+            $existingObject = $this->entityManager->getRepository(Email::class)->findOneBy(['uuid' => $element['uuid']]);
+            if ($existingObject) {
+                // Update existing object
+                $object = $existingObject;
+                $object->setModifiedByUser($userName);
+                $status = EntityImportEvent::UPDATE;
+            } else {
+                // Create a new object
+                $object = new Email();
+                $object->setDateAdded(new \DateTime());
+                $object->setCreatedByUser($userName);
+                $status = EntityImportEvent::NEW;
+            }
+
+            $object->setTranslationParent($element['translation_parent_id'] ?? null);
+            $object->setVariantParent($element['variant_parent_id'] ?? null);
 
             if (!empty($element['unsubscribeform_id'])) {
                 $unsubscribeForm = $this->entityManager->getRepository(Form::class)->find($element['unsubscribeform_id']);
                 if ($unsubscribeForm) {
-                    $email->setUnsubscribeForm($unsubscribeForm);
+                    $object->setUnsubscribeForm($unsubscribeForm);
                 }
             }
 
             if (!empty($element['preference_center_id'])) {
                 $preferenceCenter = $this->entityManager->getRepository(Page::class)->find($element['preference_center_id']);
                 if ($preferenceCenter) {
-                    $email->setPreferenceCenter($preferenceCenter);
+                    $object->setPreferenceCenter($preferenceCenter);
                 }
             }
 
-            $email->setIsPublished((bool) ($element['is_published'] ?? false));
-            $email->setName($element['name'] ?? '');
-            $email->setDescription($element['description'] ?? '');
-            $email->setSubject($element['subject'] ?? '');
-            $email->setPreheaderText($element['preheader_text'] ?? '');
-            $email->setFromName($element['from_name'] ?? '');
-            $email->setUseOwnerAsMailer((bool) ($element['use_owner_as_mailer'] ?? false));
-            $email->setTemplate($element['template'] ?? '');
-            $email->setContent($element['content'] ?? '');
-            $email->setUtmTags($element['utm_tags'] ?? '');
-            $email->setPlainText($element['plain_text'] ?? '');
-            $email->setCustomHtml($element['custom_html'] ?? '');
-            $email->setEmailType($element['email_type'] ?? '');
-            $email->setPublishUp($element['publish_up'] ?? null);
-            $email->setPublishDown($element['publish_down'] ?? null);
-            $email->setRevision((int) ($element['revision'] ?? 0));
-            $email->setLanguage($element['lang'] ?? '');
-            $email->setVariantSettings($element['variant_settings'] ?? []);
-            $email->setVariantStartDate($element['variant_start_date'] ?? null);
-            $email->setDynamicContent($element['dynamic_content'] ?? '');
-            $email->setHeaders($element['headers'] ?? '');
-            $email->setPublicPreview($element['public_preview'] ?? '');
-            $email->setDateAdded(new \DateTime());
-            $email->setDateModified(new \DateTime());
-            $email->setCreatedByUser($userName);
-            $this->entityManager->persist($email);
+            $object->setIsPublished((bool) ($element['is_published'] ?? false));
+            $object->setName($element['name'] ?? '');
+            $object->setDescription($element['description'] ?? '');
+            $object->setSubject($element['subject'] ?? '');
+            $object->setPreheaderText($element['preheader_text'] ?? '');
+            $object->setFromName($element['from_name'] ?? '');
+            $object->setUseOwnerAsMailer((bool) ($element['use_owner_as_mailer'] ?? false));
+            $object->setTemplate($element['template'] ?? '');
+            $object->setContent($element['content'] ?? '');
+            $object->setUtmTags($element['utm_tags'] ?? '');
+            $object->setPlainText($element['plain_text'] ?? '');
+            $object->setCustomHtml($element['custom_html'] ?? '');
+            $object->setEmailType($element['email_type'] ?? '');
+            $object->setPublishUp($element['publish_up'] ?? null);
+            $object->setPublishDown($element['publish_down'] ?? null);
+            $object->setRevision((int) ($element['revision'] ?? 0));
+            $object->setLanguage($element['lang'] ?? '');
+            $object->setVariantSettings($element['variant_settings'] ?? []);
+            $object->setVariantStartDate($element['variant_start_date'] ?? null);
+            $object->setDynamicContent($element['dynamic_content'] ?? '');
+            $object->setHeaders($element['headers'] ?? '');
+            $object->setPublicPreview($element['public_preview'] ?? '');
+            $object->setDateModified(new \DateTime());
+            $this->entityManager->persist($object);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $email->getId());
+            $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $object->getName();
+                $updateIds[]   = $object->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $object->getName();
+                $newIds[]   = $object->getId();
+                ++$newCount;
+            }
+
             $log = [
                 'bundle'    => 'email',
                 'object'    => 'email',
-                'objectId'  => $email->getId(),
+                'objectId'  => $object->getId(),
                 'action'    => 'import',
                 'details'   => $element,
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                Email::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
+        }
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                Email::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
         }
     }
 }

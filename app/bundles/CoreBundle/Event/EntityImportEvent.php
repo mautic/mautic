@@ -21,6 +21,32 @@ class EntityImportEvent extends Event
      */
     private array $arguments = [];
 
+    public const UPDATE = 'update';
+    public const NEW    = 'new';
+    public const ERRORS = 'errors';
+
+    private array $status = [
+        self::UPDATE => [
+            // "email" => [
+            //     "names" => [
+            //       "test email 1"
+            //     ]
+            //     "count" => 1
+            //     "ids" => [1]
+            //   ]
+        ],
+        self::NEW   => [
+            // "email" => [
+            //     "names" => [
+            //       "test email 1"
+            //     ]
+            //     "count" => 1
+            //     "ids" => [1]
+            //   ]
+        ],
+        self::ERRORS => [],
+    ];
+
     public function __construct(private string $entityName, private array $data, private ?int $userId)
     {
     }
@@ -89,11 +115,11 @@ class EntityImportEvent extends Event
     }
 
     /**
-     * Set an argument dynamically (e.g., import status, counts, errors).
+     * Set an argument dynamically.
      */
-    public function setArgument(string $key, mixed $value): void
+    public function setStatus(string $key, array $value): void
     {
-        $this->arguments[$key] = $value;
+        $this->status[$key] = $value;
     }
 
     /**
@@ -101,8 +127,8 @@ class EntityImportEvent extends Event
      *
      * @return mixed|null
      */
-    public function getArgument(string $key): mixed
+    public function getStatus(): mixed
     {
-        return $this->arguments[$key] ?? null;
+        return $this->status ?? null;
     }
 }

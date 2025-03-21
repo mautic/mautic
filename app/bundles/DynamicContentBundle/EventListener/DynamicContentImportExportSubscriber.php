@@ -96,8 +96,29 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
                 $userName = $user->getFirstName().' '.$user->getLastName();
             }
         }
+
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
+
         foreach ($elements as $element) {
-            $object = new DynamicContent();
+            $existingObject = $this->entityManager->getRepository(DynamicContent::class)->findOneBy(['uuid' => $element['uuid']]);
+            if ($existingObject) {
+                // Update existing object
+                $object = $existingObject;
+                $object->setModifiedByUser($userName);
+                $status = EntityImportEvent::UPDATE;
+            } else {
+                // Create a new object
+                $object = new DynamicContent();
+                $object->setDateAdded(new \DateTime());
+                $object->setCreatedByUser($userName);
+                $status = EntityImportEvent::NEW;
+            }
+
             $object->setTranslationParent($element['translation_parent_id'] ?? null);
             $object->setVariantParent($element['variant_parent_id'] ?? null);
             $object->setIsPublished((bool) ($element['is_published'] ?? false));
@@ -115,14 +136,23 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             $object->setIsCampaignBased((bool) ($element['is_campaign_based'] ?? false));
             $object->setSlotName($element['slot_name'] ?? '');
 
-            $object->setDateAdded(new \DateTime());
             $object->setDateModified(new \DateTime());
-            $object->setCreatedByUser($userName);
 
             $this->entityManager->persist($object);
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
+
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $object->getName();
+                $updateIds[]   = $object->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $object->getName();
+                $newIds[]   = $object->getId();
+                ++$newCount;
+            }
+
             $log = [
                 'bundle'    => 'dynamicContent',
                 'object'    => 'dynamicContent',
@@ -132,6 +162,25 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                DynamicContent::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
+        }
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                DynamicContent::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
         }
     }
 }

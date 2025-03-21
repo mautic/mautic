@@ -103,9 +103,27 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         if (!$elements) {
             return;
         }
-
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
         foreach ($elements as $element) {
-            $object = new Page();
+            $existingObject = $this->entityManager->getRepository(Page::class)->findOneBy(['uuid' => $element['uuid']]);
+            if ($existingObject) {
+                // Update existing object
+                $object = $existingObject;
+                $object->setModifiedByUser($userName);
+                $status = EntityImportEvent::UPDATE;
+            } else {
+                // Create a new object
+                $object = new Page();
+                $object->setDateAdded(new \DateTime());
+                $object->setCreatedByUser($userName);
+                $status = EntityImportEvent::NEW;
+            }
+
             $object->setTitle($element['title']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setAlias($element['alias'] ?? '');
@@ -127,14 +145,21 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             $object->setIsPreferenceCenter($element['is_preference_center'] ?? false);
             $object->setNoIndex($element['no_index'] ?? false);
             $object->setVariantSettings($element['variant_settings'] ?? []);
-            $object->setDateAdded(new \DateTime());
             $object->setDateModified(new \DateTime());
-            $object->setCreatedByUser($userName);
 
             $this->entityManager->persist($object);
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $object->getTitle();
+                $updateIds[]   = $object->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $object->getTitle();
+                $newIds[]   = $object->getId();
+                ++$newCount;
+            }
             $log = [
                 'bundle'    => 'page',
                 'object'    => 'page',
@@ -144,6 +169,24 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                Page::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
+        }
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                Page::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
         }
     }
 }

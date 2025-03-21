@@ -8,9 +8,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Form\Type\CampaignImportType;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
-use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -268,13 +268,13 @@ final class ImportController extends AbstractFormController
     public function progressAction(): Response
     {
         $session       = $this->requestStack->getSession();
-        $progress      = $session->get('mautic.campaign.import.progress', 0);
+        $session->get('mautic.campaign.import.progress', 0);
         $step          = $session->get('mautic.campaign.import.step', self::STEP_PROGRESS_BAR);
         $fullPath      = $session->get('mautic.campaign.import.file');
 
         // If there's no valid file, show an error
         if (!$fullPath || !file_exists($fullPath)) {
-            if ($step !== self::STEP_UPLOAD_ZIP) {
+            if (self::STEP_UPLOAD_ZIP !== $step) {
                 $this->logger->error("Import file missing: {$fullPath}");
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
             }
@@ -283,71 +283,90 @@ final class ImportController extends AbstractFormController
             return $this->redirectToRoute('mautic_campaign_import_action', ['objectAction' => 'new']);
         }
 
-        if ($step === self::STEP_PROGRESS_BAR) {
+        if (self::STEP_PROGRESS_BAR === $step) {
             $analyzeSummary = $this->analyzeData($fullPath);
             $session->set('mautic.campaign.import.step', self::STEP_IMPORT_FROM_ZIP);
             $session->set('mautic.campaign.import.progress', 50);
+            $session->set('mautic.campaign.import.analyzeSummary', $analyzeSummary);
+
+            // Calculate update_count
+            $updateCount = 0;
+            foreach ($analyzeSummary['updatedObjects'] as $entity => $details) {
+                $updateCount += $details['count'];
+            }
+
+            // Calculate create_count
+            $createCount = 0;
+            foreach ($analyzeSummary['newObjects'] as $details) {
+                $createCount += $details['count'];
+            }
 
             return $this->delegateView([
                 'viewParameters' => [
-                    'importProgress' => ['progress' => 50],
+                    'importProgress'  => ['progress' => 50],
                     'analyzeSummary'  => $analyzeSummary,
-                    'mauticContent'  => 'campaignImport',
+                    'updateCount'     => $updateCount,
+                    'createCount'     => $createCount,
+                    'mauticContent'   => 'campaignImport',
                 ],
                 'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
             ]);
         } else {
             // Process import and update progress
-            $importSummary = $this->processImport($fullPath);
-            $session->set('mautic.campaign.import.summary', $importSummary);
-            $session->set('mautic.campaign.import.progress', 100);
-            $this->resetImport();
+            $fileData = $this->readFile($fullPath);
+            if (empty($fileData)) {
+                $this->logger->error('Import failed: No data found in file.');
+                $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
+
+                $importSummary = [
+                    EntityImportEvent::ERRORS => ['Invalid file data.'],
+                ];
+            } else {
+                $userId = $this->userHelper->getUser()->getId();
+                $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $fileData, $userId);
+                $this->dispatcher->dispatch($event);
+                $importSummary = $event->getStatus();
+
+                if (isset($importSummary[EntityImportEvent::NEW][Campaign::ENTITY_NAME])) {
+                    $campaignData    = $importSummary[EntityImportEvent::NEW][Campaign::ENTITY_NAME];
+                    $campaignName    = $campaignData['names'][0] ?? 'Unknown';
+                    $campaignId      = $campaignData['ids'][0] ?? 0;
+
+                    $this->addFlashMessage(
+                        'mautic.campaign.notice.import.finished',
+                        ['%id%' => $campaignId, '%name%' => $campaignName]
+                    );
+                }
+
+                if (isset($importSummary[EntityImportEvent::UPDATE][Campaign::ENTITY_NAME])) {
+                    $campaignData    = $importSummary[EntityImportEvent::UPDATE][Campaign::ENTITY_NAME];
+                    $campaignName    = $campaignData['names'][0] ?? 'Unknown';
+                    $campaignId      = $campaignData['ids'][0] ?? 0;
+
+                    $this->addFlashMessage(
+                        'mautic.campaign.notice.import.finished',
+                        ['%id%' => $campaignId, '%name%' => $campaignName]
+                    );
+                }
+
+                $session->set('mautic.campaign.import.summary', $importSummary);
+                $session->set('mautic.campaign.import.progress', 100);
+                $this->resetImport();
+            }
 
             return $this->delegateView([
                 'viewParameters' => [
-                    'importProgress' => ['progress' => 100],
-                    'importSummary'  => $importSummary,
-                    'mauticContent'  => 'campaignImport',
+                    'importProgress'  => ['progress' => 100],
+                    'importSummary'   => $importSummary,
+                    'mauticContent'   => 'campaignImport',
                 ],
                 'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
             ]);
         }
     }
 
-    private function processImport(string $fullPath): array
-    {
-        $session = $this->requestStack->getSession();
-        $fileData = $this->readFile($fullPath);
-        if (empty($fileData)) {
-            $this->logger->error('Import failed: No data found in file.');
-
-            return ['errors' => 'Invalid file data.'];
-        }
-
-        $userId = $this->userHelper->getUser()->getId();
-        $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $fileData, $userId);
-        $this->dispatcher->dispatch($event);
-
-        $importSummary = $event->getArgument('import_status') ?? ['error' => 'Unknown status'];
-
-        $session->set('mautic.campaign.import.summary', $importSummary);
-
-        $campaignSummary = $importSummary['summary']['campaign'] ?? null;
-        $campaignName    = $campaignSummary['name'][0] ?? 'Unknown';
-        $campaignId      = $campaignSummary['id'][0] ?? 0;
-
-        $this->addFlashMessage(
-            'mautic.campaign.notice.import.finished',
-            ['%id%' => $campaignId, '%name%' => $campaignName]
-        );
-
-        return $importSummary;
-    }
-
     private function analyzeData(string $fullPath): array
     {
-        $session = $this->requestStack->getSession();
-
         $fileData = $this->readFile($fullPath);
         if (empty($fileData)) {
             $this->logger->error('Import failed: No data found in file.');
@@ -357,10 +376,8 @@ final class ImportController extends AbstractFormController
 
         $event  = new EntityImportAnalyzeEvent($fileData);
         $this->dispatcher->dispatch($event);
-        $summary = $event->getSummary() ?? ['errors' => 'Unknown status'];
-        $session->set('mautic.campaign.import.analyzeSummary', $summary);
 
-        return $summary;
+        return $event->getSummary() ?? ['errors' => 'Unknown status'];
     }
 
     public function undoAction(): JsonResponse
@@ -368,17 +385,17 @@ final class ImportController extends AbstractFormController
         if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:delete')) {
             return $this->accessDenied();
         }
-        $session       = $this->requestStack->getSession();
-        $importSummary = $session->get('mautic.campaign.import.summary', []);
+        $session        = $this->requestStack->getSession();
+        $analyzeSummary = $session->get('mautic.campaign.import.analyzeSummary', []);
 
-        if (!isset($importSummary['summary'])) {
+        if (!isset($analyzeSummary['newObjects'])) {
             $this->addFlashMessage('mautic.campaign.notice.import.undo_no_data');
 
             return new JsonResponse(['flashes'    => $this->getFlashContent()]);
         }
         // Dispatch the undo import event
-        $undoEvent = new EntityImportUndoEvent($importSummary['summary']);
-        $undoEvent = $this->dispatcher->dispatch($undoEvent);
+        $undoEvent = new EntityImportUndoEvent($analyzeSummary['newObjects']);
+        $this->dispatcher->dispatch($undoEvent);
 
         $this->logger->info('Undo import triggered for Campaign.');
 

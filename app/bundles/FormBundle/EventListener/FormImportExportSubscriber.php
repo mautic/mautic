@@ -162,9 +162,27 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         if (!$forms) {
             return;
         }
-
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
         foreach ($forms as $formData) {
-            $form = new Form();
+            $existingObject = $this->entityManager->getRepository(Form::class)->findOneBy(['uuid' => $formData['uuid']]);
+            if ($existingObject) {
+                // Update existing object
+                $form = $existingObject;
+                $form->setModifiedByUser($userName);
+                $status = EntityImportEvent::UPDATE;
+            } else {
+                // Create a new object
+                $form = new Form();
+                $form->setDateAdded(new \DateTime());
+                $form->setCreatedByUser($userName);
+                $status = EntityImportEvent::NEW;
+            }
+
             $form->setName($formData['name']);
             $form->setIsPublished((bool) $formData['is_published']);
             $form->setDescription($formData['description'] ?? '');
@@ -177,9 +195,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $form->setFormType($formData['form_type'] ?? '');
             $form->setRenderStyle($formData['render_style'] ?? '');
             $form->setFormAttributes($formData['form_attr'] ?? '');
-            $form->setDateAdded(new \DateTime());
             $form->setDateModified(new \DateTime());
-            $form->setCreatedByUser($userName);
 
             $this->entityManager->persist($form);
             $this->entityManager->flush();
@@ -258,6 +274,15 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             }
 
             $event->addEntityIdMap((int) $formData['id'], (int) $form->getId());
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $form->getName();
+                $updateIds[]   = $form->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $form->getName();
+                $newIds[]   = $form->getId();
+                ++$newCount;
+            }
             $log = [
                 'bundle'    => 'form',
                 'object'    => 'form',
@@ -267,6 +292,25 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                Form::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
+        }
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                Form::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
         }
     }
 }

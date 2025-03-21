@@ -98,8 +98,28 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
+
         foreach ($elements as $element) {
-            $object = new Asset();
+            $existingAsset = $this->entityManager->getRepository(Asset::class)->findOneBy(['uuid' => $element['uuid']]);
+            if ($existingAsset) {
+                // Update existing asset
+                $object = $existingAsset;
+                $object->setModifiedByUser($userName);
+                $status = EntityImportEvent::UPDATE;
+            } else {
+                // Create a new asset
+                $object = new Asset();
+                $object->setDateAdded(new \DateTime());
+                $object->setCreatedByUser($userName);
+                $status = EntityImportEvent::NEW;
+            }
+
             $object->setTitle($element['title']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setDescription($element['description'] ?? '');
@@ -115,14 +135,23 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             $object->setLanguage($element['lang'] ?? '');
             $object->setPublishUp($element['publish_up']);
             $object->setPublishDown($element['publish_down']);
-            $object->setDateAdded(new \DateTime());
             $object->setDateModified(new \DateTime());
-            $object->setCreatedByUser($userName);
 
             $this->entityManager->persist($object);
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
+
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $object->getTitle();
+                $updateIds[]   = $object->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $object->getTitle();
+                $newIds[]   = $object->getId();
+                ++$newCount;
+            }
+
             $log = [
                 'bundle'    => 'asset',
                 'object'    => 'asset',
@@ -132,6 +161,24 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                Asset::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
+        }
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                Asset::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
         }
     }
 }

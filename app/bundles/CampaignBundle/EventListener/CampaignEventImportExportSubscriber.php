@@ -29,7 +29,6 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
-        private LoggerInterface $logger,
     ) {
     }
 
@@ -230,14 +229,62 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             return;
         }
 
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
+
         foreach ($elements as $element) {
             if (!is_array($element)) {
                 continue;
             }
 
-            $campaignEvent = $this->createCampaignEvent($element);
+            $existingObject = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+
+            if ($existingObject) {
+                // Update existing object
+                $campaignEvent = $existingObject;
+                $status        = EntityImportEvent::UPDATE;
+            } else {
+                // Create new
+                $campaignEvent = new Event();
+                $status        = EntityImportEvent::NEW;
+            }
+
+            $campaignEvent->setName($element['name'] ?? '');
+            $campaignEvent->setDescription($element['description'] ?? '');
+            $campaignEvent->setType($element['type'] ?? '');
+            $campaignEvent->setEventType($element['event_type'] ?? '');
+            $campaignEvent->setOrder($element['event_order'] ?? 0);
+            $campaignEvent->setProperties($element['properties'] ?? []);
+            $campaignEvent->setTriggerInterval($element['trigger_interval'] ?? 0);
+            $campaignEvent->setTriggerIntervalUnit($element['trigger_interval_unit'] ?? '');
+            $campaignEvent->setTriggerMode($element['trigger_mode'] ?? '');
+            $campaignEvent->setTriggerDate(isset($element['triggerDate']) ? new \DateTime($element['triggerDate']) : null);
+            $campaignEvent->setChannel($element['channel'] ?? '');
+            $campaignEvent->setChannelId($element['channel_id'] ?? 0);
+
+            $campaign = $this->campaignModel->getEntity($element['campaign_id']);
+            if ($campaign instanceof Campaign) {
+                $campaignEvent->setCampaign($campaign);
+            }
+
             $this->entityManager->persist($campaignEvent);
             $this->entityManager->flush();
+
+            $event->addEntityIdMap((int) $element['id'], (int) $campaignEvent->getId());
+
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $campaignEvent->getName();
+                $updateIds[]   = $campaignEvent->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $campaignEvent->getName();
+                $newIds[]   = $campaignEvent->getId();
+                ++$newCount;
+            }
 
             $log = [
                 'bundle'    => 'campaign',
@@ -247,40 +294,32 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 'details'   => $element,
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
-
             $this->auditLogModel->writeToLog($log);
-            $event->addEntityIdMap((int) $element['id'], (int) $campaignEvent->getId());
+
             $output->writeln('<info>Imported campaign event: '.$campaignEvent->getName().' with ID: '.$campaignEvent->getId().'</info>');
         }
 
-        $this->updateParentEvents($event);
-    }
-
-    /**
-     * @param array<string, mixed> $element
-     */
-    private function createCampaignEvent(array $element): Event
-    {
-        $campaignEvent = new Event();
-        $campaignEvent->setName($element['name'] ?? '');
-        $campaignEvent->setDescription($element['description'] ?? '');
-        $campaignEvent->setType($element['type'] ?? '');
-        $campaignEvent->setEventType($element['event_type'] ?? '');
-        $campaignEvent->setOrder($element['event_order'] ?? 0);
-        $campaignEvent->setProperties($element['properties'] ?? []);
-        $campaignEvent->setTriggerInterval($element['trigger_interval'] ?? 0);
-        $campaignEvent->setTriggerIntervalUnit($element['trigger_interval_unit'] ?? '');
-        $campaignEvent->setTriggerMode($element['trigger_mode'] ?? '');
-        $campaignEvent->setTriggerDate(isset($element['triggerDate']) ? new \DateTime($element['triggerDate']) : null);
-        $campaignEvent->setChannel($element['channel'] ?? '');
-        $campaignEvent->setChannelId($element['channel_id'] ?? 0);
-
-        $campaign = $this->campaignModel->getEntity($element['campaign_id']);
-        if ($campaign instanceof Campaign) {
-            $campaignEvent->setCampaign($campaign);
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                Event::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
         }
 
-        return $campaignEvent;
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                Event::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
+        }
+
+        $this->updateParentEvents($event);
     }
 
     private function updateParentEvents(EntityImportEvent $event): void

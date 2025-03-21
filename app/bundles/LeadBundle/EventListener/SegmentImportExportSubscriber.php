@@ -135,9 +135,27 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         if (!$elements) {
             return;
         }
-
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
         foreach ($elements as $element) {
-            $object = new LeadList();
+            $existingObject = $this->entityManager->getRepository(LeadList::class)->findOneBy(['uuid' => $element['uuid']]);
+            if ($existingObject) {
+                // Update existing object
+                $object = $existingObject;
+                $object->setModifiedByUser($userName);
+                $status = EntityImportEvent::UPDATE;
+            } else {
+                // Create a new object
+                $object = new LeadList();
+                $object->setDateAdded(new \DateTime());
+                $object->setCreatedByUser($userName);
+                $status = EntityImportEvent::NEW;
+            }
+
             $object->setName($element['name']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setDescription($element['description'] ?? '');
@@ -146,14 +164,22 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             $object->setFilters($element['filters'] ?? '');
             $object->setIsGlobal($element['is_global'] ?? false);
             $object->setIsPreferenceCenter($element['is_preference_center'] ?? false);
-            $object->setDateAdded(new \DateTime());
             $object->setDateModified(new \DateTime());
-            $object->setCreatedByUser($userName);
 
             $this->entityManager->persist($object);
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $object->getName();
+                $updateIds[]   = $object->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $object->getName();
+                $newIds[]   = $object->getId();
+                ++$newCount;
+            }
+
             $log = [
                 'bundle'    => 'lead',
                 'object'    => 'segment',
@@ -163,6 +189,24 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                LeadList::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
+        }
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                LeadList::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
         }
     }
 }
