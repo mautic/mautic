@@ -128,6 +128,11 @@
             |merge(email.isTranslation(true)
                 ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
                 : [])
+            |merge(email.isSegmentEmail()
+                ? [{ color: 'default', label: 'mautic.email.stat.leadcount'|trans({'%count%': email.getPendingCount()}), icon: 'ri-more-fill', attributes: {'data-toggle': 'tooltip', 'title': 'mautic.email.stat.leadcount.tooltip'|trans} }]
+                : [])
+            |merge([{ color: 'blue', label: 'mautic.email.stat.sentcount'|trans({'%count%': email.getSentCount()}), icon: 'ri-mail-unread-line', attributes: {'data-toggle': 'tooltip', 'title': 'mautic.email.stat.tooltip'|trans} }])
+            |merge([{ color: 'teal', label: 'mautic.email.stat.readcount'|trans({'%count%': email.getReadCount()}), icon: 'ri-mail-open-line', attributes: {'data-toggle': 'tooltip', 'title': 'mautic.email.stat.tooltip'|trans} }])
         %}
 
         {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
