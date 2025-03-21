@@ -1,8 +1,4 @@
 {% set footerContent %}
-
-
-
-    <!-- Field type -->
     {% set typeIcons = {
         'button': 'ri-rectangle-fill',
         'captcha': 'ri-shield-check-line',
@@ -19,6 +15,7 @@
         'text': 'ri-input-field',
         'select': 'ri-list-check',
         'country': 'ri-map-pin-line',
+        'number': 'ri-increase-decrease-line',
         'tel': 'ri-phone-line',
         'email': 'ri-mail-line',
         'date': 'ri-calendar-line',
@@ -28,12 +25,13 @@
     } %}
 
     {% if field.type is defined %}
+    <!-- Field type -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
                     label: 'mautic.form.field.type.' ~ field.type,
                     icon: typeIcons[field.type] ?? 'ri-input-field',
-                    color: 'high-contrast',
+                    color: isConditional ? 'warm-gray' : 'high-contrast',
                     attributes: {
                         'data-toggle': 'tooltip',
                         'data-original-title': 'mautic.form.field.type'|trans
@@ -43,8 +41,8 @@
         } %}
     {% endif %}
 
-    <!-- Mapped field -->
     {% if field.mappedObject is not empty and field.mappedField is not empty and mappedFields[field.mappedObject] is defined %}
+    <!-- Mapped field -->
     {% set objectLabel = field.mappedObject == 'company' ? 'mautic.company.company'|trans|lower : (field.mappedObject == 'contact' ? 'mautic.lead.contact'|trans|lower : field.mappedObject|lower) %}
 
     {% include '@MauticCore/Helper/_tag.html.twig' with {
@@ -62,8 +60,8 @@
     } %}
     {% endif %}
 
-    <!-- Multiple -->
     {% if field.properties.multiple is defined and field.properties.multiple == 1 %}
+    <!-- Multiple -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
@@ -77,8 +75,8 @@
     {% endif %}
 
     {% if field.alwaysDisplay is defined and field.alwaysDisplay %}
-        <!-- Always display -->
-        {% if field.alwaysDisplay == 1 %}
+    {% if field.alwaysDisplay == 1 %}
+    <!-- Always display -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
@@ -91,22 +89,22 @@
         } %}
         {% endif %}
     {% else %}
+        {% if field.showWhenValueExists is defined and field.showWhenValueExists == 0 and (field.type is not defined or (field.type not in ['button', 'captcha', 'freehtml', 'freetext', 'pagebreak', 'file'])) and not isConditional %}
         <!-- Show when value exists -->
-        {% if field.showWhenValueExists is defined and field.showWhenValueExists == 0 %}
             {% include '@MauticCore/Helper/_tag.html.twig' with {
-                tags: [
-                    {
-                        label: 'mautic.form.field.form.hide_when_value_exists',
-                        icon: 'ri-eye-close-fill',
-                        icon_only: true,
-                        color: 'blue'
-                    }
-                ]
+            tags: [
+                {
+                    label: 'mautic.form.field.form.hide_when_value_exists',
+                    icon: 'ri-eye-close-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
             } %}
         {% endif %}
 
-        <!-- Show after X submissions -->
         {% if field.showAfterXSubmissions is defined and field.showAfterXSubmissions is not empty %}
+        <!-- Show after X submissions -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
@@ -123,8 +121,8 @@
         {% endif %}
     {% endif %}
 
+    {% if field.isAutoFill is defined and field.isAutoFill == 1 %}
     <!-- Auto fill -->
-    {% if field.isAutoFill == 1 %}
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [
             {
@@ -137,8 +135,8 @@
     } %}
     {% endif %}
 
-    <!-- Public -->
     {% if field.properties.public is defined and field.properties.public == 1 %}
+    <!-- Public -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
@@ -151,8 +149,8 @@
         } %}
     {% endif %}
 
-    <!-- Set as profile image -->
     {% if field.properties.profile_image is defined and field.properties.profile_image == 1 %}
+    <!-- Set as profile image -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
@@ -165,8 +163,8 @@
         } %}
     {% endif %}
 
-    <!-- International phone number -->
     {% if field.validation.international is defined and field.validation.international == 1 %}
+    <!-- International phone number -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
@@ -179,8 +177,8 @@
         } %}
     {% endif %}
 
-    <!-- Required -->
     {% if field.isRequired is defined and field.isRequired == 1 %}
+    <!-- Required -->
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [
             {

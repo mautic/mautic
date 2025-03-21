@@ -351,7 +351,7 @@ Mautic.formActionOnLoad = function (container, response) {
 Mautic.initHideItemButton = function(container) {
     mQuery(container).find('[data-hide-panel]').click(function(e) {
         e.preventDefault();
-        mQuery(this).closest('.panel,.panel2').hide('fast');
+        mQuery(this).closest('.form-field-wrapper,.form-field-wrapper').hide('fast');
     });
 }
 

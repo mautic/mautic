@@ -916,7 +916,7 @@ class EmailController extends FormController
             || !$this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
-                $entity->getCreatedBy()
+                $emailEntity->getCreatedBy()
             )
         ) {
             return $this->accessDenied();

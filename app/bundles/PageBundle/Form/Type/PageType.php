@@ -271,11 +271,13 @@ class PageType extends AbstractType
                     'class'        => 'form-control',
                     'maxlength'    => 200,
                     'tooltip'      => 'mautic.page.form.redirecturl.help',
+                    'data-hide-on' => '{"page_redirectType":""}',
                     'data-toggle'  => 'field-lookup',
                     'data-action'  => 'page:fieldList',
                     'data-target'  => 'redirectUrl',
                     'data-options' => $redirectUrlDataOptions,
                 ],
+                'default_protocol' => null,
             ]
         );
 

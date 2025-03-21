@@ -3,7 +3,9 @@
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -24,6 +26,8 @@ use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -134,6 +138,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->twig                 = $this->createMock(Environment::class);
+
+        $this->fromEmaiHelper->method('getFrom')
+            ->willReturn(new AddressDTO('someone@somewhere.com'));
     }
 
     /**
@@ -239,8 +246,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $transport = new BatchTransport(false, 1);
         $mailer    = new Mailer($transport);
 
-        // Mock factory to remove when factory is completely gone.
-        $factoryMock = $this->createMock(MauticFactory::class);
         $routerMock  = $this->createMock(Router::class);
 
         $requestStack = new RequestStack();
@@ -260,8 +265,30 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+            ->method('getReference');
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig, $themeHelper, $this->createMock(PathsHelper::class), $this->createMock(EventDispatcherInterface::class), $requestStack])
+            ->setConstructorArgs([
+                $mailer,
+                $this->fromEmaiHelper,
+                $this->coreParametersHelper,
+                $this->mailbox,
+                $this->loggerMock,
+                $this->mailHashHelper,
+                $routerMock,
+                $this->twig,
+                $themeHelper,
+                $this->createMock(PathsHelper::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $requestStack,
+                $entityManager,
+                $this->createMock(ModelFactory::class),
+                $this->createMock(AssetModel::class),
+                $this->createMock(TrackableModel::class),
+                $this->createMock(RedirectModel::class),
+            ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -333,17 +360,12 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $mailer    = new Mailer($transport);
 
         // Mock factory to remove when factory is completely gone.
-        $factoryMock = $this->createMock(MauticFactory::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn ($param) => match ($param) {
                     default => '',
                 }
             );
-
-        $mockEm = $this->createMock(EntityManager::class);
-        $factoryMock->method('getEntityManager')
-            ->willReturn($mockEm);
 
         $mockDispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->getMock();
@@ -363,14 +385,15 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     return $event;
                 }
             );
-        $routerMock = $this->createMock(Router::class);
 
         $copyRepoMock   = $this->createMock(CopyRepository::class);
         $emailModelMock = $this->createMock(EmailModel::class);
         $emailModelMock->method('getCopyRepository')
             ->willReturn($copyRepoMock);
 
-        $factoryMock->method('getModel')
+        $modelFactory = $this->createMock(ModelFactory::class);
+        $modelFactory->method('getModel')
+            ->with(EmailModel::class)
             ->willReturn($emailModelMock);
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
@@ -380,10 +403,26 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
-        $requestStack = new RequestStack();
-
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig, $themeHelper, $this->createMock(PathsHelper::class), $mockDispatcher, $requestStack])
+            ->setConstructorArgs([
+                $mailer,
+                $this->fromEmaiHelper,
+                $this->coreParametersHelper,
+                $this->mailbox,
+                $this->loggerMock,
+                $this->mailHashHelper,
+                $this->createMock(Router::class),
+                $this->twig,
+                $themeHelper,
+                $this->createMock(PathsHelper::class),
+                $mockDispatcher,
+                new RequestStack(),
+                $this->createMock(EntityManager::class),
+                $modelFactory,
+                $this->createMock(AssetModel::class),
+                $this->createMock(TrackableModel::class),
+                $this->createMock(RedirectModel::class),
+            ])
             ->onlyMethods([])
             ->getMock();
 
@@ -433,8 +472,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $transport = new BatchTransport(false, 1);
         $mailer    = new Mailer($transport);
 
-        // Mock factory to remove when factory is completely gone.
-        $factoryMock = $this->createMock(MauticFactory::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn ($param) => match ($param) {
@@ -450,10 +487,32 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+            ->method('getReference');
+
         $requestStack = new RequestStack();
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $this->twig, $themeHelper, $this->createMock(PathsHelper::class), $this->createMock(EventDispatcherInterface::class), $requestStack])
+            ->setConstructorArgs([
+                $mailer,
+                $this->fromEmaiHelper,
+                $this->coreParametersHelper,
+                $this->mailbox,
+                $this->loggerMock,
+                $this->mailHashHelper,
+                $routerMock,
+                $this->twig,
+                $themeHelper,
+                $this->createMock(PathsHelper::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $requestStack,
+                $entityManager,
+                $this->createMock(ModelFactory::class),
+                $this->createMock(AssetModel::class),
+                $this->createMock(TrackableModel::class),
+                $this->createMock(RedirectModel::class),
+            ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -535,8 +594,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $transport = new BatchTransport(true, 1);
         $mailer    = new Mailer($transport);
 
-        // Mock factory to remove when factory is completely gone.
-        $factoryMock = $this->createMock(MauticFactory::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn ($param) => match ($param) {
@@ -552,11 +609,33 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+            ->method('getReference');
+
         $requestStack = new RequestStack();
 
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $twig, $themeHelper, $this->createMock(PathsHelper::class), $this->createMock(EventDispatcherInterface::class), $requestStack])
+            ->setConstructorArgs([
+                $mailer,
+                $this->fromEmaiHelper,
+                $this->coreParametersHelper,
+                $this->mailbox,
+                $this->loggerMock,
+                $this->mailHashHelper,
+                $routerMock,
+                $this->twig,
+                $themeHelper,
+                $this->createMock(PathsHelper::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $requestStack,
+                $entityManager,
+                $this->createMock(ModelFactory::class),
+                $this->createMock(AssetModel::class),
+                $this->createMock(TrackableModel::class),
+                $this->createMock(RedirectModel::class),
+            ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -614,9 +693,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        /** @var MockObject&MauticFactory $mockFactory */
-        $mockFactory = $this->createMock(MauticFactory::class);
-
         /** @var MockObject&FromEmailHelper $fromEmailHelper */
         $fromEmailHelper = $this->createMock(FromEmailHelper::class);
 
@@ -648,10 +724,32 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+            ->method('getReference');
+
         $requestStack = new RequestStack();
 
         $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $twig, $themeHelper, $this->createMock(PathsHelper::class), $this->createMock(EventDispatcherInterface::class), $requestStack);
+        $mailHelper     = new MailHelper(
+            $mailer,
+            $fromEmailHelper,
+            $coreParametersHelper,
+            $mailbox,
+            $logger,
+            $this->mailHashHelper,
+            $router,
+            $twig,
+            $themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $requestStack,
+            $entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+        );
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(TranslatorInterface::class);
         $model          = new SendEmailToContact($mailHelper, $this->statHelper, $dncModel, $translator);

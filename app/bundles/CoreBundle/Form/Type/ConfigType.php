@@ -602,19 +602,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'load_froala_assets',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.core.config.load.froala.assets',
-                'data'  => (array_key_exists('load_froala_assets', $options['data']) && !empty($options['data']['load_froala_assets'])),
-                'attr'  => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.load.froala.assets.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add(
             'cors_restrict_domains',
             YesNoButtonGroupType::class,
             [

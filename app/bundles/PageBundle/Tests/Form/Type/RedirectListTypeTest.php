@@ -11,7 +11,7 @@ class RedirectListTypeTest extends TestCase
 {
     private RedirectListType $form;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->form = new RedirectListType();
     }

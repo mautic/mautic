@@ -233,6 +233,93 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $page;
     }
 
+    public function testUnsubscribeFormActionWithUsingLandingPageWithoutContactLocale(): void
+    {
+        $lead = $this->createLead();
+        $page = $this->createPage();
+
+        $stat = $this->getStat(null, $lead, $page);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('Save preferences', $crawler->html());
+    }
+
+    /**
+     * @return iterable<string, array{contactLocale: string|null, pageLocale: string|null, expectedLocale: string}>
+     */
+    public function dataForTestUnsubscribeFormActionWithUsingLandingPage(): iterable
+    {
+        yield 'No page or contact locale, default to "en"' => [
+            'contactLocale'  => null,
+            'pageLocale'     => null,
+            'expectedLocale' => 'en',
+        ];
+
+        yield 'Page locale is set, default to page locale' => [
+            'contactLocale'  => null,
+            'pageLocale'     => 'de',
+            'expectedLocale' => 'de',
+        ];
+
+        yield 'Contact locale is set, default to contact locale' => [
+            'contactLocale'  => 'de',
+            'pageLocale'     => null,
+            'expectedLocale' => 'de',
+        ];
+
+        yield 'Contact locale overrides page locale' => [
+            'contactLocale'  => 'fr',
+            'pageLocale'     => 'de',
+            'expectedLocale' => 'fr',
+        ];
+
+        yield 'Both locales same, use shared locale' => [
+            'contactLocale'  => 'fr',
+            'pageLocale'     => 'fr',
+            'expectedLocale' => 'fr',
+        ];
+
+        yield 'Invalid page locale, fallback to contact locale' => [
+            'contactLocale'  => 'de',
+            'pageLocale'     => 'xx', // Assume 'xx' is not a valid locale
+            'expectedLocale' => 'de',
+        ];
+
+        yield 'Invalid contact locale, fallback to page locale' => [
+            'contactLocale'  => 'yy', // Assume 'yy' is not a valid locale
+            'pageLocale'     => 'fr',
+            'expectedLocale' => 'fr',
+        ];
+
+        yield 'Both locales invalid, fallback to default "en"' => [
+            'contactLocale'  => 'zz', // Assume 'zz' is not a valid locale
+            'pageLocale'     => 'xx', // Assume 'xx' is not a valid locale
+            'expectedLocale' => 'en',
+        ];
+    }
+
+    /**
+     * @dataProvider dataForTestUnsubscribeFormActionWithUsingLandingPage
+     */
+    public function testUnsubscribeFormActionWithUsingLandingPage(?string $contactLocale, ?string $pageLocale, string $expectedLocale): void
+    {
+        $lead = $this->createLead($contactLocale);
+        $page = $this->createPage($pageLocale);
+
+        $stat = $this->getStat(null, $lead, $page);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $translator = static::getContainer()->get('translator');
+        $needle     = $translator->trans('mautic.page.form.saveprefs', [], null, $expectedLocale);
+
+        $this->assertStringContainsString($needle, $crawler->html());
+    }
+
     /**
      * @throws ORMException
      */
@@ -277,10 +364,11 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $form;
     }
 
-    protected function createLead(): Lead
+    protected function createLead(?string $locale = null): Lead
     {
         $lead = new Lead();
         $lead->setEmail('john@doe.email');
+        $lead->addUpdatedField('preferred_locale', $locale);
         $this->em->persist($lead);
 
         return $lead;
@@ -295,6 +383,25 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $page->setIsPreferenceCenter(true);
         $page->setIsPublished(true);
         $page->setCustomHtml($html);
+        $this->em->persist($page);
+
+        return $page;
+    }
+
+    protected function createPage(?string $locale = ''): Page
+    {
+        $page = new Page();
+        $page->setTitle('Page:Page:LandingPagePrefCenter');
+        $page->setAlias('page-page-landingPagePrefCenter');
+        $page->setIsPublished(true);
+        $page->setTemplate('blank');
+        $page->setCustomHtml('<h1>Preference center page</h1><br>{saveprefsbutton}');
+        $page->setIsPreferenceCenter(true);
+
+        if ($locale) {
+            $page->setLanguage($locale);
+        }
+
         $this->em->persist($page);
 
         return $page;
@@ -341,7 +448,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $this->client->request('GET', '/email/preview/'.$email->getId());
-        $this->assertFalse($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
     }
 
     /**

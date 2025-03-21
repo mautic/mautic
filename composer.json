@@ -95,7 +95,13 @@
     "mautic/theme-simple-text": "self.version",
     "mautic/theme-survey": "self.version",
     "mautic/theme-trulypersonal": "self.version",
-    "mautic/theme-welcome": "self.version"
+    "mautic/theme-welcome": "self.version",
+    "mautic/theme-mono": "self.version",
+    "mautic/theme-blend": "self.version",
+    "mautic/theme-capture": "self.version",
+    "mautic/theme-chord": "self.version",
+    "mautic/theme-formscape": "self.version",
+    "mautic/theme-reachout": "self.version"
   },
   "autoload": {
     "psr-4": {

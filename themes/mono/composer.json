@@ -1,0 +1,10 @@
+{
+  "name": "mautic/theme-mono",
+  "description": "Mautic Mono Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": ">=5.2.2"
+  }
+}

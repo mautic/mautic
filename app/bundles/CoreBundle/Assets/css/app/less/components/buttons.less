@@ -321,7 +321,10 @@
       }
       .btn + .btn { margin: 0; }
       &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
-      &:has(.btn:nth-child(3)) .btn { min-width: 25%; }
+      &:has(.btn:nth-child(3)) .btn {
+        min-width: 25%;
+        &:first-child { border-radius: calc(var(--border-radius-md) + 3px) 0 0 0; }
+      }
    }
 }
 

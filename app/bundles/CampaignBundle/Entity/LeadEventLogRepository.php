@@ -71,6 +71,8 @@ class LeadEventLogRepository extends CommonRepository
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,
                     e.description AS event_description,
+                    e.parent_id AS parent_id,
+                    e.decision_path AS decision_path,
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,

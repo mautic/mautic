@@ -1467,7 +1467,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/178993450?v=4",
       "profile": "https://github.com/rishithreddy89",
       "contributions": [
-        "code"
+        "code",
+        "userTesting"
       ]
     },
     {
@@ -1477,6 +1478,33 @@
       "profile": "https://linktr.ee/Jaishree2310",
       "contributions": [
         "doc"
+      ]
+    },
+    {
+      "login": "kingsedem",
+      "name": "Kingsley_E_",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47061881?v=4",
+      "profile": "https://github.com/kingsedem",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "Hugo-Prossaird",
+      "name": "Hugo-Prossaird",
+      "avatar_url": "https://avatars.githubusercontent.com/u/176997845?v=4",
+      "profile": "https://github.com/Hugo-Prossaird",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "farzammadani",
+      "name": "Farzam Madani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/69846004?v=4",
+      "profile": "https://github.com/farzammadani",
+      "contributions": [
+        "code"
       ]
     }
   ],

@@ -396,6 +396,46 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
+    public function testUnpublishedSegmentDoesNotShowRebuildingLabel(): void
+    {
+        // Create a segment that would normally show "Building" label
+        $segment = $this->saveSegment('Unpublished Segment', 'unpublished-segment', [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'operator' => '!empty',
+                'display'  => '',
+            ],
+        ]);
+
+        // Set last built date in the past to trigger "Building" label for published segments
+        $segment->setLastBuiltDate(new \DateTime('-1 year'));
+
+        // Unpublish the segment - this should prevent "Building" label
+        $segment->setIsPublished(false);
+        $this->listModel->saveEntity($segment);
+        $this->em->clear();
+
+        $segmentId = $segment->getId();
+
+        // Check segment count UI - should show "No Contacts" rather than "Building"
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $segmentId);
+        self::assertSame('No Contacts', $html);
+        self::assertSame('label label-gray col-count', $spClass);
+
+        // Check segment count AJAX - should also show "No Contacts"
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('No Contacts', $response['content']['html']);
+        self::assertSame('label label-gray col-count', $response['content']['className']);
+        self::assertSame(0, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
+    }
+
     public function testSegmentWarningIcon(): void
     {
         $segmentWithOldLastRebuildDate            = $this->saveSegment('Lead List 1', 'lead-list-1');
