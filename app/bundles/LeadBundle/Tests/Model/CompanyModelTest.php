@@ -247,7 +247,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             }
 
             // Override fetchCompanyFields with test data
-            public function fetchCompanyFields()
+            public function fetchCompanyFields(): array
             {
                 return [
                     [
@@ -259,7 +259,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             }
 
             // Override getFieldData with test data
-            public function getFieldData($fields, $data): array
+            public function getFieldData(array $fields, array $data): array
             {
                 return ['companyfield' => 'xxx'];
             }
