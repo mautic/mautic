@@ -247,7 +247,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             }
 
             /**
-             * @return array<int, array>
+             * @return array<int, array<string, string>>
              */
             public function fetchCompanyFields(): array
             {
