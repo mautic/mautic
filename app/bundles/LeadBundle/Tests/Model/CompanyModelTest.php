@@ -246,8 +246,9 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
                 return $this->em->getRepository(Company::class);
             }
 
-            // Override fetchCompanyFields with test data
-            public function fetchCompanyFields(): array
+            /**
+             * @return array<int, array>
+             */            public function fetchCompanyFields(): array
             {
                 return [
                     [
@@ -257,14 +258,18 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
                     ],
                 ];
             }
-
+            /**
+             * @param array<string, mixed> $fields
+             * @param array<string, mixed> $data
+             * @return array<string, string>
+             */
             public function getFieldData(array $fields, array $data): array
             {
                 return ['companyfield' => 'xxx'];
             }
 
             // Add getter for the entity to verify in test
-            public function getEntity($id = null): ?Company
+            public function getEntity(?int $id = null): ?Company
             {
                 return $this->entity;
             }
