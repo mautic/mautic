@@ -758,6 +758,67 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->modifyCompanies($lead, $companies);
     }
 
+    public function testImportLeadWithCompanyDataAndSkipIfExists(): void
+    {
+        $lead = new Lead();
+        $lead->setId(1);
+
+        $mockUserModel = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockUserModel->method('getUser')
+            ->willReturn(new User());
+
+        $mockEmailValidator = $this->getMockBuilder(EmailValidator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockLeadModel = $this->getMockBuilder(LeadModelStub::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->getMock();
+
+        $mockLeadModel->setUserHelper($mockUserModel);
+
+        $this->setProperty($mockLeadModel, LeadModel::class, 'emailValidator', $mockEmailValidator);
+
+        $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['extractCompanyDataFromImport', 'importCompany'])
+            ->getMock();
+
+        // Set up expectations for extractCompanyDataFromImport
+        $companyFields = ['company' => 'company', 'companyemail' => 'companyemail'];
+        $companyData   = ['company' => 'Acme Inc', 'companyemail' => 'info@acme.com'];
+        $mockCompanyModel->expects($this->once())
+            ->method('extractCompanyDataFromImport')
+            ->willReturn([$companyFields, $companyData]);
+
+        // Set up expectation for importCompany with skipIfExists=true
+        $mockCompanyModel->expects($this->once())
+            ->method('importCompany')
+            ->with(
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+                true,
+                $this->anything()
+            );
+
+        $this->setProperty($mockLeadModel, LeadModel::class, 'companyModel', $mockCompanyModel);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
+
+        $mockLeadModel->expects($this->once())
+            ->method('checkForDuplicateContact')
+            ->willReturn($lead);
+
+        $fields = ['email' => 'email', 'company' => 'company', 'companyemail' => 'companyemail'];
+        $data   = ['email' => 'john@doe.com', 'company' => 'Acme Inc', 'companyemail' => 'info@acme.com'];
+
+        $mockLeadModel->import($fields, $data, null, null, null, true);
+    }
+
     private function getLead(int $id): Lead
     {
         return new class($id) extends Lead {
