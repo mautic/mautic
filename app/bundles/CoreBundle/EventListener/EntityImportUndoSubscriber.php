@@ -87,7 +87,7 @@ final class EntityImportUndoSubscriber implements EventSubscriberInterface
         $summary = $event->getSummary();
 
         foreach ($summary as $key => $data) {
-            if (!isset($data['id'])) {
+            if (!isset($data['ids'])) {
                 continue;
             }
 
@@ -95,7 +95,7 @@ final class EntityImportUndoSubscriber implements EventSubscriberInterface
             if (isset($this->entityMappings[$key])) {
                 $entityInfo = $this->entityMappings[$key];
 
-                foreach ($data['id'] as $id) {
+                foreach ($data['ids'] as $id) {
                     $entity = $this->entityManager->getRepository($entityInfo['entity'])->find($id);
 
                     if ($entity) {
