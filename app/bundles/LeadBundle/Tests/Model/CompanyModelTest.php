@@ -258,7 +258,6 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
                 ];
             }
 
-            // Override getFieldData with test data
             public function getFieldData(array $fields, array $data): array
             {
                 return ['companyfield' => 'xxx'];
