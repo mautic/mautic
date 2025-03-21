@@ -268,8 +268,10 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
                 return ['companyfield' => 'xxx'];
             }
 
-            // Add getter for the entity to verify in test
-            public function getEntity(?int $id = null): ?Company
+            /**
+             * @param int|null $id
+             */
+            public function getEntity($id = null): ?Company
             {
                 return $this->entity;
             }
