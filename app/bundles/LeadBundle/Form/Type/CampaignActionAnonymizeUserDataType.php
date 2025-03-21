@@ -2,7 +2,11 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\Form\AbstractType;
@@ -17,7 +21,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
         'email',
     ];
 
-    public function __construct(private FieldModel $fieldModel)
+    public function __construct(private FieldModel $fieldModel, private EntityManager $entityManager)
     {
     }
 
@@ -65,16 +69,55 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
         if ($checkIsUniqueField) {
             $findBy['isUniqueIdentifer'] = false;
         }
-        $leadFields = $this->fieldModel->getRepository()->findBy($findBy);
-        $choices    = [];
+        $leadFields    = $this->fieldModel->getRepository()->findBy($findBy);
+        $choices       = [];
+        $columnsLength = $this->getLeadCompanyColumnsLenght();
+
         foreach ($leadFields as $field) {
-            if ($validLessThan64Char && $field->getCharLengthLimit() < 64) {
+            if ($validLessThan64Char && $this->getCharLengthLimit($field, $columnsLength) < 64) {
                 continue;
             }
             $choices[$field->getLabel()] = $field->getId();
         }
 
         return $choices;
+    }
+
+    private function getCharLengthLimit(LeadField $leadField, array $leadsCompanyColumnsLength): int
+    {
+        $alias = $leadField->getAlias();
+        $key   = 'companies';
+        if ('lead' === $leadField->getObject()) {
+            $key = 'leads';
+        }
+        if (isset($leadsCompanyColumnsLength[$key][$alias])) {
+            return $leadsCompanyColumnsLength[$key][$alias];
+        }
+
+        return $leadField->getCharLengthLimit();
+    }
+
+    private function getLeadCompanyColumnsLenght(): array
+    {
+        $leadMetadata    = $this->entityManager->getClassMetadata(Lead::class);
+        $companyMetadata = $this->entityManager->getClassMetadata(Company::class);
+        $columnsLength   = [
+            'leads'     => [],
+            'companies' => [],
+        ];
+        foreach ($leadMetadata->fieldMappings as $fieldName => $fieldMapping) {
+            if (isset($fieldMapping['length'])) {
+                $columnsLength['leads'][$fieldName] = $fieldMapping['length'];
+            }
+        }
+
+        foreach ($companyMetadata->fieldMappings as $fieldName => $fieldMapping) {
+            if (isset($fieldMapping['length'])) {
+                $columnsLength['companies'][$fieldName] = $fieldMapping['length'];
+            }
+        }
+
+        return $columnsLength;
     }
 
     public function getBlockPrefix(): string

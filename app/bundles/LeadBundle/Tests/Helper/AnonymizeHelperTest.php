@@ -10,7 +10,7 @@ class AnonymizeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $pureEmail = 'teste@gmail.com';
         $newDomain = 'ano.nym';
-        $newEmail  = AnonymizeHelper::email($pureEmail, $newDomain);
+        $newEmail  = AnonymizeHelper::email($pureEmail, false, $newDomain);
         $this->assertNotSame($pureEmail, $newEmail);
         $this->assertStringContainsString($newDomain, $newEmail);
     }
