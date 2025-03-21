@@ -1403,4 +1403,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         return $keys;
     }
+
+    public function isSegmentEmail(): bool
+    {
+        return 'list' === $this->emailType;
+    }
 }
