@@ -248,7 +248,8 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
             /**
              * @return array<int, array>
-             */            public function fetchCompanyFields(): array
+             */
+            public function fetchCompanyFields(): array
             {
                 return [
                     [
@@ -258,9 +259,11 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
                     ],
                 ];
             }
+
             /**
              * @param array<string, mixed> $fields
              * @param array<string, mixed> $data
+             *
              * @return array<string, string>
              */
             public function getFieldData(array $fields, array $data): array
