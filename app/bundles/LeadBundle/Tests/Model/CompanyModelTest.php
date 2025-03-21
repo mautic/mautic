@@ -230,7 +230,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             private Company $entity;
 
             // Override constructor to accept only what we need
-            public function __construct($em, $leadFieldModel, $companyDeduper, $userHelper, $dispatcher)
+            public function __construct(\Doctrine\ORM\EntityManager $em, FieldModel $leadFieldModel, CompanyDeduper $companyDeduper, UserHelper $userHelper, \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher)
             {
                 $this->em             = $em;
                 $this->leadFieldModel = $leadFieldModel;
