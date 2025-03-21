@@ -227,7 +227,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         // Create the CompanyModel with constructor injection
         $companyModel = new class($entityManager, $this->leadFieldModel, $this->companyDeduper, $userHelper, $dispatcher) extends CompanyModel {
-            private $entity;
+            private Company $entity;
 
             // Override constructor to accept only what we need
             public function __construct($em, $leadFieldModel, $companyDeduper, $userHelper, $dispatcher)
