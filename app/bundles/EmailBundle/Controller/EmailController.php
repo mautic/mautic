@@ -1127,12 +1127,16 @@ class EmailController extends FormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
-    {
+    public function builderAction(
+        Request $request,
+        SlotsHelper $slotsHelper,
+        $objectId,
+        \MauticPlugin\LeuchtfeuerThemeSwitchingBundle\Service\ThemeSwitchingService $themeSwitcher
+    ) {
         /** @var EmailModel $model */
         $model = $this->getModel('email');
 
-        // permission check
+        // Permission check
         if (str_contains($objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
@@ -1143,46 +1147,391 @@ class EmailController extends FormController
         } else {
             $isNew  = false;
             $entity = $model->getEntity($objectId);
-            if (null == $entity
-                || !$this->security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
-                    $entity->getCreatedBy()
-                )
-            ) {
+
+            if (null === $entity || !$this->security->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $entity->getCreatedBy()
+            )) {
                 return $this->accessDenied();
             }
         }
 
-        $template = InputHelper::clean($request->query->get('template'));
-        $slots    = $this->factory->getTheme($template)->getSlots('email');
+        $template         = InputHelper::clean($request->query->get('template'));
+        $originalEmailId  = $request->query->get('original');
+        $translationMode  = $request->query->getBoolean('translationMode', false);
+        $usePluginMerge   = $request->query->getBoolean('usePluginMerge', false);
 
-        // merge any existing changes
+        // Direct plugin logic call
+        if ($usePluginMerge && $originalEmailId && $template) {
+            $result = $themeSwitcher->mergeAndSaveEmail(
+                $model,
+                $objectId,
+                $originalEmailId,
+                $template,
+                $translationMode
+            );
+
+            if ($result) {
+                $this->addFlash('notice', 'Plugin: Theme content merged and saved (via builderAction).');
+
+                return $this->redirectToRoute('mautic_email_action', [
+                    'objectAction' => 'edit',
+                    'objectId'     => $objectId,
+                ]);
+            } else {
+                $this->addFlash('error', 'Plugin: Failed to merge and save email.');
+            }
+        }
+
+        // Standard builder logic
+        $slots = $this->factory->getTheme($template)->getSlots('email');
+
         $newContent = $request->getSession()->get('mautic.emailbuilder.'.$objectId.'.content', []);
         $content    = $entity->getContent();
 
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
-            // Update the content for processSlots
             $entity->setContent($content);
         }
 
         $this->processSlots($slotsHelper, $slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
-
-        return $this->render(
-            $logicalName,
-            [
-                'isNew'    => $isNew,
-                'slots'    => $slots,
-                'content'  => $content,
-                'email'    => $entity,
-                'template' => $template,
-                'basePath' => $request->getBasePath(),
-            ]
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(
+            '@themes/'.$template.'/html/email.html.twig'
         );
+
+        return $this->render($logicalName, [
+            'isNew'    => $isNew,
+            'slots'    => $slots,
+            'content'  => $content,
+            'email'    => $entity,
+            'template' => $template,
+            'basePath' => $request->getBasePath(),
+        ]);
     }
+
+    //
+    //    public function builderAction(
+    //        Request $request,
+    //        SlotsHelper $slotsHelper,
+    //        $objectId,
+    //        \MauticPlugin\LeuchtfeuerThemeSwitchingBundle\Service\ThemeSwitchingService $themeSwitcher
+    //    ) {
+    //        /** @var EmailModel $model */
+    //        $model = $this->getModel('email');
+    //
+    //        // Permission check
+    //        if (str_contains($objectId, 'new')) {
+    //            $isNew = true;
+    //            if (!$this->security->isGranted('email:emails:create')) {
+    //                return $this->accessDenied();
+    //            }
+    //            $entity = $model->getEntity();
+    //            $entity->setSessionId($objectId);
+    //        } else {
+    //            $isNew = false;
+    //            $entity = $model->getEntity($objectId);
+    //
+    //            if (null === $entity || !$this->security->hasEntityAccess(
+    //                    'email:emails:viewown',
+    //                    'email:emails:viewother',
+    //                    $entity->getCreatedBy()
+    //                )) {
+    //                return $this->accessDenied();
+    //            }
+    //        }
+    //
+    //        $template         = InputHelper::clean($request->query->get('template'));
+    //        $originalEmailId  = $request->query->get('original');
+    //        $translationMode  = $request->query->getBoolean('translationMode', false);
+    //        $usePluginMerge   = $request->query->getBoolean('usePluginMerge', false);
+    //
+    //        // 🔧 Plugin merge + DB save logic
+    //        if ($usePluginMerge && $originalEmailId && $template) {
+    //            /** @var \Mautic\EmailBundle\Entity\Email $originalEmail */
+    //            $originalEmail = $model->getEntity($originalEmailId);
+    //
+    //            if ($originalEmail && $originalEmail->getCustomHtml()) {
+    //                $themePath = $this->factory->getParameter('themes_path') . '/' . $template . '/html/email.html';
+    //                $newThemeHtml = file_exists($themePath)
+    //                    ? file_get_contents($themePath)
+    //                    : '<mjml><mj-body><mj-section><mj-column><mj-text>⚠ Theme file not found</mj-text></mj-column></mj-section></mj-body></mjml>';
+    //
+    //                $mergedHtml = $themeSwitcher->mergeMjmlTemplates(
+    //                    $originalEmail->getCustomHtml(),
+    //                    $newThemeHtml,
+    //                    $translationMode
+    //                );
+    //
+    //                $entity->setCustomHtml($mergedHtml);
+    //                $entity->setTemplate($template);
+    //
+    //                // ✅ Save changes directly (persist to DB)
+    //                $model->saveEntity($entity);
+    //
+    //                // Optional: flash message
+    //                $this->addFlash(
+    //                    'notice',
+    //                    $this->translator->trans('Plugin: Theme content merged and saved.')
+    //                );
+    //
+    //                // ✅ Redirect back to email edit page
+    //                return $this->redirectToRoute('mautic_email_action', [
+    //                    'objectAction' => 'edit',
+    //                    'objectId'     => $entity->getId(),
+    //                ]);
+    //            }
+    //        }
+    //
+    //        // ✨ Normal builder behavior
+    //        $slots = $this->factory->getTheme($template)->getSlots('email');
+    //
+    //        $newContent = $request->getSession()->get('mautic.emailbuilder.' . $objectId . '.content', []);
+    //        $content = $entity->getContent();
+    //
+    //        if (is_array($newContent)) {
+    //            $content = array_merge($content, $newContent);
+    //            $entity->setContent($content);
+    //        }
+    //
+    //        $this->processSlots($slotsHelper, $slots, $entity);
+    //
+    //        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(
+    //            '@themes/' . $template . '/html/email.html.twig'
+    //        );
+    //
+    //    //        return new Response($entity->getCustomHtml());
+    //
+    //        return $this->render(
+    //            $logicalName,
+    //            [
+    //                'isNew'    => $isNew,
+    //                'slots'    => $slots,
+    //                'content'  => $content,
+    //                'email'    => $entity,
+    //                'template' => $template,
+    //                'basePath' => $request->getBasePath(),
+    //            ]
+    //        );
+    //    }
+
+    //
+    //
+    //    public function builderAction(
+    //        Request $request,
+    //        SlotsHelper $slotsHelper,
+    //        $objectId,
+    //        \MauticPlugin\LeuchtfeuerThemeSwitchingBundle\Service\ThemeSwitchingService $themeSwitcher
+    //    ) {
+    //        /** @var EmailModel $model */
+    //        $model = $this->getModel('email');
+    //
+    //        // permission check
+    //        if (str_contains($objectId, 'new')) {
+    //            $isNew = true;
+    //            if (!$this->security->isGranted('email:emails:create')) {
+    //                return $this->accessDenied();
+    //            }
+    //            $entity = $model->getEntity();
+    //            $entity->setSessionId($objectId);
+    //        } else {
+    //            $isNew = false;
+    //            $entity = $model->getEntity($objectId);
+    //
+    //            if (null === $entity || !$this->security->hasEntityAccess(
+    //                    'email:emails:viewown',
+    //                    'email:emails:viewother',
+    //                    $entity->getCreatedBy()
+    //                )) {
+    //                return $this->accessDenied();
+    //            }
+    //        }
+    //
+    //        $template         = InputHelper::clean($request->query->get('template'));
+    //        $originalEmailId  = $request->query->get('original');
+    //        $translationMode  = $request->query->getBoolean('translationMode', false);
+    //
+    //        // 🔧 Theme switching logic via plugin
+    //        if ($originalEmailId && $template) {
+    //            /** @var \Mautic\EmailBundle\Entity\Email $originalEmail */
+    //            $originalEmail = $model->getEntity($originalEmailId);
+    //
+    //            if ($originalEmail && $originalEmail->getCustomHtml()) {
+    //                $themePath = $this->factory->getParameter('themes_path') . '/' . $template . '/html/email.html';
+    //                $newThemeHtml = file_exists($themePath)
+    //                    ? file_get_contents($themePath)
+    //                    : '<mjml><mj-body><mj-section><mj-column><mj-text>⚠ Theme file not found</mj-text></mj-column></mj-section></mj-body></mjml>';
+    //
+    //                // Call plugin service to merge content
+    //                $mergedHtml = $themeSwitcher->mergeMjmlTemplates(
+    //                    $originalEmail->getCustomHtml(),
+    //                    $newThemeHtml,
+    //                    $translationMode
+    //                );
+    //
+    //                // Prepend plugin content to original content
+    //                $existingHtml = $entity->getCustomHtml();
+    //                $combinedHtml = $mergedHtml . "\n\n<!-- ORIGINAL CONTENT BELOW -->\n\n" . $existingHtml;
+    //
+    //                $entity->setCustomHtml($combinedHtml);
+    //                $entity->setTemplate($template);
+    //            }
+    //        }
+    //
+    //        // Get slot config from template
+    //        $slots = $this->factory->getTheme($template)->getSlots('email');
+    //
+    //        // Merge with session content
+    //        $newContent = $request->getSession()->get('mautic.emailbuilder.' . $objectId . '.content', []);
+    //        $content = $entity->getContent();
+    //
+    //        if (is_array($newContent)) {
+    //            $content = array_merge($content, $newContent);
+    //            $entity->setContent($content);
+    //        }
+    //
+    //        $this->processSlots($slotsHelper, $slots, $entity);
+    //
+    //        // Find the theme's Twig template
+    //        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(
+    //            '@themes/' . $template . '/html/email.html.twig'
+    //        );
+    //
+    //        return new Response($entity->getCustomHtml());
+    //
+    //        // Standard builder response
+    //        return $this->render(
+    //            $logicalName,
+    //            [
+    //                'isNew'    => $isNew,
+    //                'slots'    => $slots,
+    //                'content'  => $content,
+    //                'email'    => $entity,
+    //                'template' => $template,
+    //                'basePath' => $request->getBasePath(),
+    //            ]
+    //        );
+    //    }
+    //
+
+    // #######################################################################################
+
+    //    /**
+    //     * Activate the builder.
+    //     *
+    //     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    //     *
+    //     * @throws \Exception
+    //     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+    //     */
+    //    public function builderAction(
+    //        Request $request,
+    //        SlotsHelper $slotsHelper,
+    //        $objectId,
+    //        \MauticPlugin\LeuchtfeuerThemeSwitchingBundle\Service\ThemeSwitchingService $themeSwitcher
+    //    )
+    //    {
+    //        /** @var EmailModel $model */
+    //        $model = $this->getModel('email');
+    //
+    //        // permission check
+    //        if (str_contains($objectId, 'new')) {
+    //            $isNew = true;
+    //            if (!$this->security->isGranted('email:emails:create')) {
+    //                return $this->accessDenied();
+    //            }
+    //            $entity = $model->getEntity();
+    //            $entity->setSessionId($objectId);
+    //        } else {
+    //            $isNew  = false;
+    //            $entity = $model->getEntity($objectId);
+    //            if (null == $entity
+    //                || !$this->security->hasEntityAccess(
+    //                    'email:emails:viewown',
+    //                    'email:emails:viewother',
+    //                    $entity->getCreatedBy()
+    //                )
+    //            ) {
+    //                return $this->accessDenied();
+    //            }
+    //        }
+    //
+    //        $template = InputHelper::clean($request->query->get('template'));
+    //        $originalEmailId = $request->query->get('original');
+    //        $translationMode = $request->query->getBoolean('translationMode', false);
+    //
+    //        // 🔧 Hook: Theme switching via plugin
+    //        if ($originalEmailId && $template) {
+    //            /** @var \Mautic\EmailBundle\Entity\Email $originalEmail */
+    //            $originalEmail = $model->getEntity($originalEmailId);
+    //
+    //            if ($originalEmail && $originalEmail->getCustomHtml()) {
+    //
+    //                $themePath = $this->factory->getParameter('themes_path') . '/' . $template . '/html/email.html';
+    //                if (file_exists($themePath)) {
+    //                    $newThemeHtml = file_get_contents($themePath);
+    //                } else {
+    //                    $newThemeHtml = '<mjml><mj-body><mj-section><mj-column><mj-text>⚠ Theme file not found</mj-text></mj-column></mj-section></mj-body></mjml>';
+    //                }
+    //
+    //
+    //                /** @var \MauticPlugin\LeuchtfeuerThemeSwitchingBundle\Service\ThemeSwitchingService $themeSwitcher */
+    // //                $themeSwitcher = $this->container->get('leuchtfeuer.themeswitching.service');
+    //
+    // //                $themeSwitcher = $this->get('leuchtfeuer.themeswitching.service');
+    //
+    //                $mergedHtml = $themeSwitcher->mergeMjmlTemplates(
+    //                    $originalEmail->getCustomHtml(),
+    //                    $newThemeHtml,
+    //                    $translationMode
+    //                );
+    //                // ✅ Override content with result from plugin
+    // //                $entity->setCustomHtml($mergedHtml);
+    //
+    //                $existingHtml = $entity->getCustomHtml();
+    //
+    // // Append plugin output at the beginning
+    //                $combinedHtml = $mergedHtml . "\n\n<!-- ORIGINAL CONTENT BELOW -->\n\n" . $existingHtml;
+    //
+    // // Set as final output
+    //                $entity->setCustomHtml($combinedHtml);
+    //
+    //
+    //                $entity->setTemplate($template);
+    //            }
+    //        }
+    //
+    //        $slots = $this->factory->getTheme($template)->getSlots('email');
+    //
+    //        // merge any existing changes
+    //        $newContent = $request->getSession()->get('mautic.emailbuilder.'.$objectId.'.content', []);
+    //        $content    = $entity->getContent();
+    //
+    //        if (is_array($newContent)) {
+    //            $content = array_merge($content, $newContent);
+    //            // Update the content for processSlots
+    //            $entity->setContent($content);
+    //        }
+    //
+    //        $this->processSlots($slotsHelper, $slots, $entity);
+    //
+    //        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+    //
+    //        return new Response($entity->getCustomHtml());
+    //
+    //        return $this->render(
+    //            $logicalName,
+    //            [
+    //                'isNew'    => $isNew,
+    //                'slots'    => $slots,
+    //                'content'  => $content,
+    //                'email'    => $entity,
+    //                'template' => $template,
+    //                'basePath' => $request->getBasePath(),
+    //            ]
+    //        );
+    //    }
 
     /**
      * Create an AB test.
