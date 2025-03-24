@@ -1506,6 +1506,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "SaraCRM",
+      "name": "Sara Matos",
+      "avatar_url": "https://avatars.githubusercontent.com/u/121267071?v=4",
+      "profile": "https://github.com/SaraCRM",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
