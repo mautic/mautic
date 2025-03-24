@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -60,6 +61,11 @@ final class EntityImportUndoSubscriber implements EventSubscriberInterface
             'entity' => Email::class,
             'bundle' => 'email',
             'object' => 'email',
+        ],
+        DynamicContent::ENTITY_NAME => [
+            'entity' => DynamicContent::class,
+            'bundle' => 'dynamicContent',
+            'object' => 'dynamicContent',
         ],
         Event::ENTITY_NAME => [
             'entity' => Event::class,

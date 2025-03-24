@@ -193,6 +193,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 $object = new Campaign();
                 $object->setDateAdded(new \DateTime());
                 $object->setCreatedByUser($user);
+                $object->setUuid($campaignData['uuid']);
                 $status = EntityImportEvent::NEW;
             }
 

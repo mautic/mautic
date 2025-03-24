@@ -153,6 +153,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
                 $object = new LeadList();
                 $object->setDateAdded(new \DateTime());
                 $object->setCreatedByUser($userName);
+                $object->setUuid($element['uuid']);
                 $status = EntityImportEvent::NEW;
             }
 

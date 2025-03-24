@@ -104,13 +104,38 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
             return;
         }
 
-        foreach ($elements as $element) {
-            $alias = $this->fieldModel->generateUniqueFieldAlias($element['alias']);
+        $updateNames = [];
+        $updateIds   = [];
+        $newNames    = [];
+        $newIds      = [];
+        $updateCount = 0;
+        $newCount    = 0;
 
-            $field = new LeadField();
+        foreach ($elements as $element) {
+            $existingObject = $this->entityManager->getRepository(LeadField::class)->findOneBy(['uuid' => $element['uuid']]);
+            if ($existingObject) {
+                // Update existing object
+                $field = $existingObject;
+                $field->setDateModified(new \DateTime());
+                $status = EntityImportEvent::UPDATE;
+            } else {
+                // Create a new object
+                $field = new LeadField();
+
+                if ($userId) {
+                    $field->setCreatedBy($userId);
+                    $field->setCreatedByUser($userName);
+                }
+
+                $alias = $this->fieldModel->generateUniqueFieldAlias($element['alias']);
+                $field->setAlias($alias);
+                $field->setDateAdded(new \DateTime());
+                $field->setUuid($element['uuid']);
+                $status = EntityImportEvent::NEW;
+            }
+
             $field->setIsPublished((bool) $element['is_published']);
             $field->setLabel($element['label']);
-            $field->setAlias($alias);
             $field->setType($element['type']);
             $field->setGroup($element['field_group']);
             $field->setDefaultValue($element['default_value'] ?? null);
@@ -130,19 +155,19 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
                 $field->setColumnIsNotCreated((bool) $element['column_is_not_created']);
             }
 
-            if ($userId) {
-                $field->setCreatedBy($userId);
-                $field->setCreatedByUser($userName);
-            }
-
-            $field->setDateAdded(new \DateTime());
-            $field->setDateModified(new \DateTime());
-
             $this->entityManager->persist($field);
             $this->entityManager->flush();
 
             $event->addEntityIdMap((int) $element['id'], (int) $field->getId());
-
+            if (EntityImportEvent::UPDATE === $status) {
+                $updateNames[] = $field->getName();
+                $updateIds[]   = $field->getId();
+                ++$updateCount;
+            } else {
+                $newNames[] = $field->getName();
+                $newIds[]   = $field->getId();
+                ++$newCount;
+            }
             $log = [
                 'bundle'    => 'lead',
                 'object'    => 'leadField',
@@ -152,6 +177,24 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+        if ($newCount > 0) {
+            $event->setStatus(EntityImportEvent::NEW, [
+                LeadField::ENTITY_NAME => [
+                    'names' => $newNames,
+                    'ids'   => $newIds,
+                    'count' => $newCount,
+                ],
+            ]);
+        }
+        if ($updateCount > 0) {
+            $event->setStatus(EntityImportEvent::UPDATE, [
+                LeadField::ENTITY_NAME => [
+                    'names' => $updateNames,
+                    'ids'   => $updateIds,
+                    'count' => $updateCount,
+                ],
+            ]);
         }
     }
 }

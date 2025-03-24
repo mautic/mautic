@@ -117,6 +117,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
                 $object = new Asset();
                 $object->setDateAdded(new \DateTime());
                 $object->setCreatedByUser($userName);
+                $object->setUuid($element['uuid']);
                 $status = EntityImportEvent::NEW;
             }
 

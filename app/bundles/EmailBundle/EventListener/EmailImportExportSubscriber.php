@@ -153,6 +153,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
                 $object = new Email();
                 $object->setDateAdded(new \DateTime());
                 $object->setCreatedByUser($userName);
+                $object->setUuid($element['uuid']);
                 $status = EntityImportEvent::NEW;
             }
 

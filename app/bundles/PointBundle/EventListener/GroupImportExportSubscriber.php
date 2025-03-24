@@ -102,6 +102,7 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
                 // Create a new object
                 $object = new Group();
                 $object->setDateAdded(new \DateTime());
+                $object->setUuid($element['uuid']);
                 $object->setCreatedByUser($userName);
                 $status = EntityImportEvent::NEW;
             }

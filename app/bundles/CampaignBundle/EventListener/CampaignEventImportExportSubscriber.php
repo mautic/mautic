@@ -16,7 +16,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -250,6 +249,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             } else {
                 // Create new
                 $campaignEvent = new Event();
+                $campaignEvent->setUuid($element['uuid']);
                 $status        = EntityImportEvent::NEW;
             }
 

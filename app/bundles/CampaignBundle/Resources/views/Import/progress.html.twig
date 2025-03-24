@@ -41,6 +41,7 @@
                             </div>
                         </div>
 
+                        {% if updateCount %}
                         <div class="table-responsive pa-sm">
                             <h4 class="pa-sm">{{ 'mautic.campaign.campaign.import.updatemessage'|trans({'%update_count%': updateCount}) }}</h4>
                             <table class="table table-hover table-striped" id="updatedObjectsSummaryTable">
@@ -68,7 +69,9 @@
                                 </tbody>
                             </table>
                         </div>
+                        {% endif %}
 
+                        {% if createCount %}
                         <div class="table-responsive pa-sm mt-md">
                             <h4 class="pa-sm">{{ 'mautic.campaign.campaign.import.newmessage'|trans({'%create_count%': createCount}) }}</h4>
                             <table class="table table-hover table-striped" id="newObjectsSummaryTable">
@@ -96,6 +99,7 @@
                                 </tbody>
                             </table>
                         </div>
+                        {% endif %}
 
                         {{- include('@MauticCore/Helper/confirm.html.twig', {
                             'btnClass'      : 'btn btn-danger btn-nospin',
@@ -222,7 +226,7 @@
                                 ]
                             } %}
 
-                            {% if analyzeSummary.updatedObjects|default([]) is empty and analyzeSummary.newObjects|default([]) is not empty %}
+                            {% if importSummary.update|default([]) is empty and importSummary.new|default([]) is not empty %}
                                 {{- include('@MauticCore/Helper/confirm.html.twig', {
                                     'btnClass'      : 'btn btn-danger btn-nospin',
                                     'message'       : 'mautic.campaign.campaign.import.undoconfirm'|trans,

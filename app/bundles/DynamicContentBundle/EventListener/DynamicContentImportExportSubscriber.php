@@ -116,6 +116,7 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
                 $object = new DynamicContent();
                 $object->setDateAdded(new \DateTime());
                 $object->setCreatedByUser($userName);
+                $object->setUuid($element['uuid']);
                 $status = EntityImportEvent::NEW;
             }
 

@@ -386,16 +386,19 @@ final class ImportController extends AbstractFormController
             return $this->accessDenied();
         }
         $session        = $this->requestStack->getSession();
-        $importSummary = $session->get('mautic.campaign.import.summary', []);
+        $importSummary  = $session->get('mautic.campaign.import.summary', []);
 
-        if (!isset($importSummary[EntityImportEvent::UPDATE]) && isset($importSummary[EntityImportEvent::NEW])) {
+        if (
+            (!isset($importSummary[EntityImportEvent::UPDATE]) || empty($importSummary[EntityImportEvent::UPDATE]))
+            && !empty($importSummary[EntityImportEvent::NEW])
+        ) {
             $undoEvent = new EntityImportUndoEvent($importSummary[EntityImportEvent::NEW]);
             $this->dispatcher->dispatch($undoEvent);
-    
+
             $this->logger->info('Undo import triggered for Campaign.');
-    
+
             $this->addFlashMessage('mautic.campaign.notice.import.undo');
-    
+
             return new JsonResponse(['flashes'    => $this->getFlashContent()]);
         } else {
             $this->addFlashMessage('mautic.campaign.notice.import.undo_no_data');

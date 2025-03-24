@@ -121,6 +121,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
                 $object = new Page();
                 $object->setDateAdded(new \DateTime());
                 $object->setCreatedByUser($userName);
+                $object->setUuid($element['uuid']);
                 $status = EntityImportEvent::NEW;
             }
 

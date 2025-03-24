@@ -180,6 +180,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                 $form = new Form();
                 $form->setDateAdded(new \DateTime());
                 $form->setCreatedByUser($userName);
+                $form->setUuid($formData['uuid']);
                 $status = EntityImportEvent::NEW;
             }
 
