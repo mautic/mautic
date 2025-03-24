@@ -34,6 +34,8 @@ class Group extends FormEntity implements UuidInterface
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(GroupRepository::class);
 
+        static::addUuidField($builder);
+
         $builder->addIdColumns();
     }
 
