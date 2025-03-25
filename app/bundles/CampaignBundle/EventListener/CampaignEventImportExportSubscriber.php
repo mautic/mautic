@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Form;
@@ -34,8 +35,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class => ['onExport', 0],
-            EntityImportEvent::class => ['onImport', 0],
+            EntityExportEvent::class     => ['onExport', 0],
+            EntityImportEvent::class     => ['onImport', 0],
+            EntityImportUndoEvent::class => ['onUndoImport', 0],
         ];
     }
 
@@ -337,6 +339,50 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                         $this->entityManager->persist($campaignEvent);
                     }
                 }
+            }
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function onUndoImport(EntityImportUndoEvent $event): void
+    {
+        if (Event::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
+
+        $summary  = $event->getSummary();
+
+        if (!isset($summary['ids']) || empty($summary['ids'])) {
+            return;
+        }
+        foreach ($summary['ids'] as $id) {
+            $entity = $this->entityManager->getRepository(Event::class)->find($id);
+
+            if ($entity) {
+                $dependentEvents = $this->entityManager->getRepository(Event::class)->findBy(['parent' => $id]);
+
+                foreach ($dependentEvents as $dependentEvent) {
+                    // Set parent_id to null
+                    $dependentEvent->setParent(null);
+                    $this->entityManager->persist($dependentEvent);
+                }
+
+                // Make sure changes are saved
+                $this->entityManager->flush();
+
+                $this->entityManager->remove($entity);
+                // Log the deletion
+                $log = [
+                    'bundle'    => 'campaign',
+                    'object'    => 'campaignEvent',
+                    'objectId'  => $id,
+                    'action'    => 'undo_import',
+                    'details'   => ['deletedEntity' => Event::class],
+                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                ];
+
+                $this->auditLogModel->writeToLog($log);
             }
         }
 

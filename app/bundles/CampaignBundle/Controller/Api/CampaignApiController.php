@@ -375,7 +375,7 @@ class CampaignApiController extends CommonApiController
         }
 
         // Check if user has permission to export campaigns
-        if (!$this->security->isAdmin() && !$this->security->hasEntityAccess('campaign:campaigns:viewown', 'campaign:campaigns:viewother', $campaign->getOwner())) {
+        if (!$this->security->isAdmin() && !$this->security->hasEntityAccess('campaign:campaigns:viewown', 'campaign:campaigns:viewother')) {
             return $this->accessDenied();
         }
 

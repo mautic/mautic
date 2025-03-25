@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -41,8 +42,9 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class => ['onCampaignExport', 0],
-            EntityImportEvent::class => ['onCampaignImport', 0],
+            EntityExportEvent::class     => ['onCampaignExport', 0],
+            EntityImportEvent::class     => ['onCampaignImport', 0],
+            EntityImportUndoEvent::class => ['onUndoImport', 0],
         ];
     }
 
@@ -740,5 +742,38 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         return [];
+    }
+
+    public function onUndoImport(EntityImportUndoEvent $event): void
+    {
+        if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
+
+        $summary  = $event->getSummary();
+
+        if (!isset($summary['ids']) || empty($summary['ids'])) {
+            return;
+        }
+        foreach ($summary['ids'] as $id) {
+            $entity = $this->entityManager->getRepository(Campaign::class)->find($id);
+
+            if ($entity) {
+                $this->entityManager->remove($entity);
+                // Log the deletion
+                $log = [
+                    'bundle'    => 'campaign',
+                    'object'    => 'campaign',
+                    'objectId'  => $id,
+                    'action'    => 'undo_import',
+                    'details'   => ['deletedEntity' => Campaign::class],
+                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                ];
+
+                $this->auditLogModel->writeToLog($log);
+            }
+        }
+
+        $this->entityManager->flush();
     }
 }

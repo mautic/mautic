@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PageBundle\Entity\Page;
@@ -28,8 +29,9 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class => ['onPageExport', 0],
-            EntityImportEvent::class => ['onPageImport', 0],
+            EntityExportEvent::class     => ['onPageExport', 0],
+            EntityImportEvent::class     => ['onPageImport', 0],
+            EntityImportUndoEvent::class => ['onUndoImport', 0],
         ];
     }
 
@@ -189,5 +191,38 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
                 ],
             ]);
         }
+    }
+
+    public function onUndoImport(EntityImportUndoEvent $event): void
+    {
+        if (Page::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
+
+        $summary  = $event->getSummary();
+
+        if (!isset($summary['ids']) || empty($summary['ids'])) {
+            return;
+        }
+        foreach ($summary['ids'] as $id) {
+            $entity = $this->entityManager->getRepository(Page::class)->find($id);
+
+            if ($entity) {
+                $this->entityManager->remove($entity);
+                // Log the deletion
+                $log = [
+                    'bundle'    => 'page',
+                    'object'    => 'page',
+                    'objectId'  => $id,
+                    'action'    => 'undo_import',
+                    'details'   => ['deletedEntity' => Page::class],
+                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                ];
+
+                $this->auditLogModel->writeToLog($log);
+            }
+        }
+
+        $this->entityManager->flush();
     }
 }

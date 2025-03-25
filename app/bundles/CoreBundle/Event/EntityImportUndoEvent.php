@@ -9,8 +9,13 @@ class EntityImportUndoEvent extends Event
     /**
      * @param array<string, mixed> $summary
      */
-    public function __construct(private array $summary)
+    public function __construct(private string $entityName, private array $summary)
     {
+    }
+
+    public function getEntityName(): string
+    {
+        return $this->entityName;
     }
 
     /**

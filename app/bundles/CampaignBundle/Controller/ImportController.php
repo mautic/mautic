@@ -398,9 +398,12 @@ final class ImportController extends AbstractFormController
             (!isset($importSummary[EntityImportEvent::UPDATE]) || empty($importSummary[EntityImportEvent::UPDATE]))
             && !empty($importSummary[EntityImportEvent::NEW])
         ) {
-            $undoEvent = new EntityImportUndoEvent($importSummary[EntityImportEvent::NEW]);
-            $this->dispatcher->dispatch($undoEvent);
-
+            foreach ($importSummary[EntityImportEvent::NEW] as $key => $data) {
+                if (isset($data) && !empty($data)) {
+                    $undoEvent = new EntityImportUndoEvent($key, $data);
+                    $this->dispatcher->dispatch($undoEvent);
+                }
+            }
             $this->logger->info('Undo import triggered for Campaign.');
 
             $this->addFlashMessage('mautic.campaign.notice.import.undo');

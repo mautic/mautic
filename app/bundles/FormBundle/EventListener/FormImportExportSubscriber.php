@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Form;
@@ -33,8 +34,9 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class  => ['onFormExport', 0],
-            EntityImportEvent::class  => ['onFormImport', 0],
+            EntityExportEvent::class     => ['onFormExport', 0],
+            EntityImportEvent::class     => ['onFormImport', 0],
+            EntityImportUndoEvent::class => ['onUndoImport', 0],
         ];
     }
 
@@ -249,9 +251,8 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                     $field->setLabelAttributes($fieldData['label_attr']);
                     $field->setInputAttributes($fieldData['input_attr']);
                     $field->setContainerAttributes($fieldData['container_attr']);
-                    // $field->setLeadField($fieldData['lead_field'] ?? '');
                     $field->setSaveResult((bool) $fieldData['save_result']);
-                    $field->setIsAutoFill((bool) $fieldData['is_auto_fill'] ?? false);
+                    $field->setIsAutoFill((bool) $fieldData['is_auto_fill']);
                     $field->setIsReadOnly((bool) $fieldData['is_read_only']);
                     $field->setShowWhenValueExists((bool) $fieldData['show_when_value_exists']);
                     $field->setShowAfterXSubmissions($fieldData['show_after_x_submissions']);
@@ -313,5 +314,38 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                 ],
             ]);
         }
+    }
+
+    public function onUndoImport(EntityImportUndoEvent $event): void
+    {
+        if (Form::ENTITY_NAME !== $event->getEntityName()) {
+            return;
+        }
+
+        $summary  = $event->getSummary();
+
+        if (!isset($summary['ids']) || empty($summary['ids'])) {
+            return;
+        }
+        foreach ($summary['ids'] as $id) {
+            $entity = $this->entityManager->getRepository(Form::class)->find($id);
+
+            if ($entity) {
+                $this->entityManager->remove($entity);
+                // Log the deletion
+                $log = [
+                    'bundle'    => 'form',
+                    'object'    => 'form',
+                    'objectId'  => $id,
+                    'action'    => 'undo_import',
+                    'details'   => ['deletedEntity' => Form::class],
+                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                ];
+
+                $this->auditLogModel->writeToLog($log);
+            }
+        }
+
+        $this->entityManager->flush();
     }
 }
