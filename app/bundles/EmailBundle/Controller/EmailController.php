@@ -3,9 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
