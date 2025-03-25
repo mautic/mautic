@@ -114,9 +114,9 @@ class EmailController extends FormController
 
         // retrieve a list of categories
         $categories      = $categoryModel->getLookupResults('email', '', 0);
-        $categoryOptions = [$this->translator->trans('mautic.core.searchcommand.isuncategorized') => $this->translator->trans('mautic.core.form.uncategorized')];
+        $categoryOptions = [];
         if ($categories) {
-            $categoryOptions += array_column($categories, 'title', 'alias');
+            $categoryOptions = array_column($categories, 'title', 'alias');
         }
 
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
