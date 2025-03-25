@@ -11,8 +11,8 @@ class CampaignPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addExtendedPermissions('campaigns');
-        $this->addStandardPermissions('categories');
-        $this->addStandardPermissions('imports');
+        $this->addStandardPermissions(['categories']);
+        $this->addStandardPermissions(['imports']);
         $this->addCustomPermission('export', ['enable' => 1024]);
     }
 

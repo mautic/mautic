@@ -99,7 +99,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
     /**
      * Merge exported data avoiding duplicate entries.
      *
-     * @param array<string, array> $data
+     * @param array<string, array<mixed>> $data
      */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {

@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
@@ -19,17 +20,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translatorInterfaceMock;
+    private MockObject&TranslatorInterface $translatorInterfaceMock;
 
-    /**
-     * @var MockObject|CoreParametersHelper
-     */
-    private MockObject $coreParametersHelperMock;
+    private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
     private ExportHelper $exportHelper;
+
+    private MockObject&PathsHelper $pathsHelper;
 
     /**
      * @var array<array<string, int|string>>
@@ -54,10 +51,7 @@ class ExportHelperTest extends TestCase
      */
     private array $filePaths = [];
 
-    /**
-     * @var FilePathResolver|MockObject
-     */
-    private MockObject $filePathResolver;
+    private MockObject&FilePathResolver $filePathResolver;
 
     /**
      * @var ProcessSignalService|MockObject
@@ -70,11 +64,14 @@ class ExportHelperTest extends TestCase
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
         $this->processSignalService     = $this->createMock(ProcessSignalService::class);
+        $this->pathsHelper              = $this->createMock(PathsHelper::class);
+
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
             $this->processSignalService
+            $this->pathsHelper,
         );
     }
 

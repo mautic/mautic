@@ -7,6 +7,8 @@ namespace Mautic\PageBundle\Tests\Functional\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\EventListener\PageImportExportSubscriber;
 use Mautic\PageBundle\Model\PageModel;
@@ -22,6 +24,8 @@ class PageImportExportSubscriberTest extends TestCase
     private MockObject&PageModel $pageModel;
     private MockObject&UserModel $userModel;
     private EventDispatcher $eventDispatcher;
+    private AuditLogModel $auditLogModel;
+    private IpLookupHelper $ipLookupHelper;
 
     protected function setUp(): void
     {
@@ -32,7 +36,9 @@ class PageImportExportSubscriberTest extends TestCase
         $this->subscriber = new PageImportExportSubscriber(
             $this->pageModel,
             $this->userModel,
-            $this->entityManager
+            $this->entityManager,
+            $this->auditLogModel,
+            $this->ipLookupHelper,
         );
 
         $this->eventDispatcher = new EventDispatcher();

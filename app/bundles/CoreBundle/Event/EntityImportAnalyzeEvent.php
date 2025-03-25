@@ -6,14 +6,21 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityImportAnalyzeEvent extends Event
 {
-    private array $data;
+    /**
+     * @var array<string, mixed>
+     */
     private array $summary;
 
-    public function __construct(array $data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __construct(private array $data)
     {
-        $this->data = $data;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getEntityData(): array
     {
         return $this->data;

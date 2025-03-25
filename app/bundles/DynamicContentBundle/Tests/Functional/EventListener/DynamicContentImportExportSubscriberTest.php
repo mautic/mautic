@@ -7,6 +7,8 @@ namespace Mautic\DynamicContentBundle\Tests\Functional\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\EventListener\DynamicContentImportExportSubscriber;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -15,13 +17,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DynamicContentImportExportSubscriberTest extends TestCase
+final class DynamicContentImportExportSubscriberTest extends TestCase
 {
     private DynamicContentImportExportSubscriber $subscriber;
     private MockObject&EntityManager $entityManager;
     private MockObject&DynamicContentModel $dynamicContentModel;
     private MockObject&UserModel $userModel;
     private EventDispatcher $eventDispatcher;
+    private MockObject&AuditLogModel $auditLogModel;
+    private MockObject&IpLookupHelper $ipLookupHelper;
 
     protected function setUp(): void
     {
@@ -32,7 +36,9 @@ class DynamicContentImportExportSubscriberTest extends TestCase
         $this->subscriber = new DynamicContentImportExportSubscriber(
             $this->dynamicContentModel,
             $this->userModel,
-            $this->entityManager
+            $this->entityManager,
+            $this->auditLogModel,
+            $this->ipLookupHelper,
         );
 
         $this->eventDispatcher = new EventDispatcher();

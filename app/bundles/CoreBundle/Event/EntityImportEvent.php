@@ -16,37 +16,19 @@ class EntityImportEvent extends Event
      */
     private array $dependencies = [];
 
-    /**
-     * @var array<string, mixed> stores additional arguments such as import status
-     */
-    private array $arguments = [];
-
     public const UPDATE = 'update';
     public const NEW    = 'new';
     public const ERRORS = 'errors';
 
     private array $status = [
-        self::UPDATE => [
-            // "email" => [
-            //     "names" => [
-            //       "test email 1"
-            //     ]
-            //     "count" => 1
-            //     "ids" => [1]
-            //   ]
-        ],
-        self::NEW   => [
-            // "email" => [
-            //     "names" => [
-            //       "test email 1"
-            //     ]
-            //     "count" => 1
-            //     "ids" => [1]
-            //   ]
-        ],
+        self::UPDATE => [],
+        self::NEW    => [],
         self::ERRORS => [],
     ];
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(private string $entityName, private array $data, private ?int $userId)
     {
     }
@@ -56,6 +38,9 @@ class EntityImportEvent extends Event
         return $this->entityName;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getEntityData(): array
     {
         return $this->data;
@@ -116,6 +101,8 @@ class EntityImportEvent extends Event
 
     /**
      * Set an argument dynamically.
+     *
+     * @param array<string, mixed> $value
      */
     public function setStatus(string $key, array $value): void
     {

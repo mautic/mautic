@@ -10,15 +10,19 @@ use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\EventListener\FormImportExportSubscriber;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FormImportExportSubscriberTest extends TestCase
+final class FormImportExportSubscriberTest extends TestCase
 {
     private FormImportExportSubscriber $subscriber;
     private MockObject&EntityManager $entityManager;
@@ -28,6 +32,10 @@ class FormImportExportSubscriberTest extends TestCase
     private MockObject&QueryBuilder $queryBuilder;
     private MockObject&Result $result;
     private EventDispatcher $eventDispatcher;
+    private MockObject&AuditLogModel $auditLogModel;
+    private MockObject&IpLookupHelper $ipLookupHelper;
+    private MockObject&FieldModel $fieldModel;
+    private MockObject&EventDispatcherInterface $dispatcher;
 
     protected function setUp(): void
     {
@@ -37,6 +45,7 @@ class FormImportExportSubscriberTest extends TestCase
         $this->connection    = $this->createMock(Connection::class);
         $this->queryBuilder  = $this->createMock(QueryBuilder::class);
         $this->result        = $this->createMock(Result::class);
+        $this->dispatcher    = new EventDispatcher();
 
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
@@ -50,7 +59,11 @@ class FormImportExportSubscriberTest extends TestCase
         $this->subscriber = new FormImportExportSubscriber(
             $this->entityManager,
             $this->formModel,
-            $this->userModel
+            $this->userModel,
+            $this->auditLogModel,
+            $this->ipLookupHelper,
+            $this->fieldModel,
+            $this->dispatcher,
         );
 
         $this->eventDispatcher = new EventDispatcher();

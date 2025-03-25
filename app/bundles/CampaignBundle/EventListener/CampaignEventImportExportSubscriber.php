@@ -110,7 +110,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @param array<array<string, mixed>> $data
+     * @param-out array<string, array> $data
      */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
@@ -182,8 +182,6 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * Merge exported data avoiding duplicate entries.
-     *
      * @param array<string, array> $data
      */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
@@ -201,8 +199,6 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * Handle exporting an entity based on its ID.
-     *
      * @param array<string, array> $data
      */
     private function exportEntity(string $entityName, ?int $entityId, array &$data, EntityExportEvent $event): void

@@ -126,7 +126,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
     /**
      * Merge exported data avoiding duplicate entries.
      *
-     * @param array<string, array> $data
+     * @param array<string, array<mixed>> $data
      */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {
@@ -233,13 +233,13 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                     $field = new \Mautic\FormBundle\Entity\Field();
                     $field->setForm($form);
                     $field->setLabel($fieldData['label'] ?? '');
-                    $field->setShowLabel((bool) $fieldData['show_label'] ?? true);
+                    $field->setShowLabel((bool) $fieldData['show_label']);
                     $field->setAlias($fieldData['alias'] ?? '');
                     $field->setType($fieldData['type'] ?? '');
-                    $field->setIsCustom((bool) $fieldData['is_custom'] ?? false);
+                    $field->setIsCustom((bool) $fieldData['is_custom']);
                     $field->setCustomParameters($fieldData['custom_parameters']);
                     $field->setDefaultValue($fieldData['default_value'] ?? '');
-                    $field->setIsRequired((bool) $fieldData['is_required'] ?? false);
+                    $field->setIsRequired((bool) $fieldData['is_required']);
                     $field->setValidationMessage($fieldData['validation_message'] ?? '');
                     $field->setHelpMessage($fieldData['help_message'] ?? '');
                     $field->setOrder($fieldData['field_order'] ?? 0);
@@ -250,12 +250,12 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
                     $field->setInputAttributes($fieldData['input_attr']);
                     $field->setContainerAttributes($fieldData['container_attr']);
                     // $field->setLeadField($fieldData['lead_field'] ?? '');
-                    $field->setSaveResult((bool) $fieldData['save_result'] ?? false);
+                    $field->setSaveResult((bool) $fieldData['save_result']);
                     $field->setIsAutoFill((bool) $fieldData['is_auto_fill'] ?? false);
-                    $field->setIsReadOnly((bool) $fieldData['is_read_only'] ?? false);
-                    $field->setShowWhenValueExists((bool) $fieldData['show_when_value_exists'] ?? false);
+                    $field->setIsReadOnly((bool) $fieldData['is_read_only']);
+                    $field->setShowWhenValueExists((bool) $fieldData['show_when_value_exists']);
                     $field->setShowAfterXSubmissions($fieldData['show_after_x_submissions']);
-                    $field->setAlwaysDisplay((bool) $fieldData['always_display'] ?? false);
+                    $field->setAlwaysDisplay((bool) $fieldData['always_display']);
                     $field->setMappedObject($fieldData['mapped_object']);
                     $field->setMappedField($fieldData['mapped_field']);
 

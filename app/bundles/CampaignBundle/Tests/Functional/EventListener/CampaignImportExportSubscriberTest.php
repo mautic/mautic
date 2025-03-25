@@ -9,6 +9,8 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\EventListener\CampaignImportExportSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +25,8 @@ class CampaignImportExportSubscriberTest extends TestCase
     private MockObject&UserModel $userModel;
     private EventDispatcher $dispatcher;
     private MockObject&LoggerInterface $logger;
+    private AuditLogModel $auditLogModel;
+    private IpLookupHelper $ipLookupHelper;
 
     protected function setUp(): void
     {
@@ -38,7 +42,9 @@ class CampaignImportExportSubscriberTest extends TestCase
             $this->userModel,
             $this->entityManager,
             $this->dispatcher,
-            $this->logger
+            $this->logger,
+            $this->auditLogModel,
+            $this->ipLookupHelper
         );
 
         $this->dispatcher->addSubscriber($this->subscriber);
@@ -63,6 +69,9 @@ class CampaignImportExportSubscriberTest extends TestCase
         $exportedData = $event->getEntities();
 
         $this->assertArrayHasKey(Campaign::ENTITY_NAME, $exportedData, 'Exported data must contain the campaign entity.');
+        // Ensure the array is not empty
+        $this->assertNotEmpty($exportedData[Campaign::ENTITY_NAME], 'Exported campaign data should not be empty');
+
         $this->assertSame(1, $exportedData[Campaign::ENTITY_NAME][0]['id']);
         $this->assertSame('Test Campaign', $exportedData[Campaign::ENTITY_NAME][0]['name']);
     }

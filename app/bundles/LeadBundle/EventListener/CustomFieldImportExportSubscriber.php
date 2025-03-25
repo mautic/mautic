@@ -151,9 +151,7 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
             $field->setOrder($element['field_order'] ?? 0);
             $field->setObject($element['object']);
             $field->setProperties($element['properties'] ?? []);
-            if ($element['column_is_not_created']) {
-                $field->setColumnIsNotCreated((bool) $element['column_is_not_created']);
-            }
+            $field->setColumnIsNotCreated();
 
             $this->entityManager->persist($field);
             $this->entityManager->flush();

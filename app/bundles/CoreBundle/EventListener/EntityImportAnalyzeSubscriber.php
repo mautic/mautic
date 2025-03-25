@@ -20,11 +20,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class EntityImportAnalyzeSubscriber implements EventSubscriberInterface
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private EntityManagerInterface $entityManager)
     {
-        $this->entityManager  = $entityManager;
     }
 
     public static function getSubscribedEvents(): array
@@ -64,6 +61,7 @@ final class EntityImportAnalyzeSubscriber implements EventSubscriberInterface
 
                     if ($uuid) {
                         // Query the database to check if the entity with this UUID exists
+                        /** @var \Doctrine\ORM\EntityRepository<Campaign|Event|Asset|DynamicContent|LeadField|Form|Page|LeadList|Email|Group> */
                         $repository     = $this->entityManager->getRepository($this->getEntityClass($entityName));
                         $existingEntity = $repository->findOneBy(['uuid' => $uuid]);
 
@@ -103,29 +101,18 @@ final class EntityImportAnalyzeSubscriber implements EventSubscriberInterface
 
     private function getEntityClass(string $entityName): string
     {
-        switch ($entityName) {
-            case Campaign::ENTITY_NAME:
-                return Campaign::class;
-            case Event::ENTITY_NAME:
-                return Event::class;
-            case Asset::ENTITY_NAME:
-                return Asset::class;
-            case DynamicContent::ENTITY_NAME:
-                return DynamicContent::class;
-            case LeadField::ENTITY_NAME:
-                return LeadField::class;
-            case Form::ENTITY_NAME:
-                return Form::class;
-            case Page::ENTITY_NAME:
-                return Page::class;
-            case LeadList::ENTITY_NAME:
-                return LeadList::class;
-            case Email::ENTITY_NAME:
-                return Email::class;
-            case Group::ENTITY_NAME:
-                return Group::class;
-            default:
-                throw new \InvalidArgumentException("Unknown entity name: $entityName");
-        }
+        return match ($entityName) {
+            Campaign::ENTITY_NAME       => Campaign::class,
+            Event::ENTITY_NAME          => Event::class,
+            Asset::ENTITY_NAME          => Asset::class,
+            DynamicContent::ENTITY_NAME => DynamicContent::class,
+            LeadField::ENTITY_NAME      => LeadField::class,
+            Form::ENTITY_NAME           => Form::class,
+            Page::ENTITY_NAME           => Page::class,
+            LeadList::ENTITY_NAME       => LeadList::class,
+            Email::ENTITY_NAME          => Email::class,
+            Group::ENTITY_NAME          => Group::class,
+            default                     => throw new \InvalidArgumentException("Unknown entity name: $entityName"),
+        };
     }
 }

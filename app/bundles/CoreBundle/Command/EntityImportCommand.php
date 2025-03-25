@@ -83,6 +83,9 @@ final class EntityImportCommand extends ModeratedCommand
         return self::SUCCESS;
     }
 
+    /**
+     * @return ?array<string, mixed>
+     */
     private function readFile(string $filePath): ?array
     {
         if ('zip' === pathinfo($filePath, PATHINFO_EXTENSION)) {
@@ -128,6 +131,9 @@ final class EntityImportCommand extends ModeratedCommand
         return json_decode($fileContents, true);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function validateData(array $data, string $entityName): array
     {
         if (!isset($data[$entityName]) || !isset($data['dependencies'])) {

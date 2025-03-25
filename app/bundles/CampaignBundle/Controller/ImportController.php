@@ -76,7 +76,7 @@ final class ImportController extends AbstractFormController
         ]);
     }
 
-    public function uploadAction(Request $request): ?Response
+    public function uploadAction(Request $request): Response
     {
         $fullPath = $this->getFullZipPath();
         $fileName = $this->getImportFileName();
@@ -216,6 +216,9 @@ final class ImportController extends AbstractFormController
         return $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
     }
 
+    /**
+     * @return ?array<string, mixed>
+     */
     private function readFile(string $filePath): ?array
     {
         if ('zip' === pathinfo($filePath, PATHINFO_EXTENSION)) {
@@ -291,7 +294,7 @@ final class ImportController extends AbstractFormController
 
             // Calculate update_count
             $updateCount = 0;
-            foreach ($analyzeSummary['updatedObjects'] as $entity => $details) {
+            foreach ($analyzeSummary['updatedObjects'] as $details) {
                 $updateCount += $details['count'];
             }
 
@@ -365,6 +368,9 @@ final class ImportController extends AbstractFormController
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function analyzeData(string $fullPath): array
     {
         $fileData = $this->readFile($fullPath);

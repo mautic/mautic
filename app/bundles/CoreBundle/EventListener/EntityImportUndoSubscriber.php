@@ -21,10 +21,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class EntityImportUndoSubscriber implements EventSubscriberInterface
 {
-    private EntityManagerInterface $entityManager;
-    private AuditLogModel $auditLogModel;
-    private IpLookupHelper $ipLookupHelper;
-
     // Mapping of key to corresponding entity and bundle information
     private array $entityMappings = [
         Campaign::ENTITY_NAME => [
@@ -74,7 +70,7 @@ final class EntityImportUndoSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    public function __construct(EntityManagerInterface $entityManager, AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
+    public function __construct(private EntityManagerInterface $entityManager, private AuditLogModel $auditLogModel, private IpLookupHelper $ipLookupHelper)
     {
         $this->entityManager  = $entityManager;
         $this->auditLogModel  = $auditLogModel;
@@ -115,7 +111,7 @@ final class EntityImportUndoSubscriber implements EventSubscriberInterface
                             'object'    => $entityInfo['object'],
                             'objectId'  => $id,
                             'action'    => 'undo_import',
-                            'details'   => ['deletedEntity' => get_class($entity)],
+                            'details'   => ['deletedEntity' => $entity::class],
                             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
                         ];
 

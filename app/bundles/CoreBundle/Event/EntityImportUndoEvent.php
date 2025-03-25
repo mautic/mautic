@@ -6,13 +6,16 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityImportUndoEvent extends Event
 {
-    private array $summary;
-
-    public function __construct(array $summary)
+    /**
+     * @param array<string, mixed> $summary
+     */
+    public function __construct(private array $summary)
     {
-        $this->summary = $summary;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSummary(): array
     {
         return $this->summary;

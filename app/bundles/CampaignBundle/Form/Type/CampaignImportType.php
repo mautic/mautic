@@ -17,7 +17,7 @@ class CampaignImportType extends AbstractType
      * Build the form fields for importing campaign data.
      *
      * @param FormBuilderInterface $builder The form builder
-     * @param array                $options The form options
+     * @param array<string, mixed> $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -7,14 +7,18 @@ namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\EventListener\SegmentImportExportSubscriber;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class SegmentImportExportSubscriberTest extends TestCase
 {
@@ -22,22 +26,32 @@ final class SegmentImportExportSubscriberTest extends TestCase
     private MockObject&ListModel $leadListModel;
     private MockObject&UserModel $userModel;
     private MockObject&EntityManagerInterface $entityManager;
-    private EventDispatcher $dispatcher;
+    private MockObject&EventDispatcherInterface $dispatcher;
+    private EventDispatcher $eventDispatcher;
+    private AuditLogModel $auditLogModel;
+    private IpLookupHelper $ipLookupHelper;
+    private MockObject&FieldModel $fieldModel;
 
     protected function setUp(): void
     {
-        $this->leadListModel = $this->createMock(ListModel::class);
-        $this->userModel     = $this->createMock(UserModel::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->leadListModel  = $this->createMock(ListModel::class);
+        $this->userModel      = $this->createMock(UserModel::class);
+        $this->fieldModel     = $this->createMock(FieldModel::class);
+        $this->entityManager  = $this->createMock(EntityManagerInterface::class);
+        $this->dispatcher     = new EventDispatcher();
 
         $this->subscriber = new SegmentImportExportSubscriber(
             $this->leadListModel,
             $this->userModel,
-            $this->entityManager
+            $this->entityManager,
+            $this->auditLogModel,
+            $this->dispatcher,
+            $this->fieldModel,
+            $this->ipLookupHelper,
         );
 
-        $this->dispatcher = new EventDispatcher();
-        $this->dispatcher->addSubscriber($this->subscriber);
+        $this->eventDispatcher = new EventDispatcher();
+        $this->eventDispatcher->addSubscriber($this->subscriber);
     }
 
     public function testSegmentExport(): void

@@ -11,6 +11,8 @@ use Mautic\CampaignBundle\EventListener\CampaignEventImportExportSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -23,17 +25,21 @@ class CampaignEventImportExportSubscriberTest extends TestCase
     private MockObject&EntityManagerInterface $entityManager;
     private MockObject&EventDispatcherInterface $dispatcher;
     private EventDispatcher $eventDispatcher;
+    private MockObject&AuditLogModel $auditLogModel;
+    private MockObject&IpLookupHelper $ipLookupHelper;
 
     protected function setUp(): void
     {
         $this->campaignModel = $this->createMock(CampaignModel::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->dispatcher    = $this->createMock(EventDispatcherInterface::class);
+        $this->dispatcher    = new EventDispatcher();
 
         $this->subscriber = new CampaignEventImportExportSubscriber(
             $this->campaignModel,
             $this->entityManager,
-            $this->dispatcher
+            $this->auditLogModel,
+            $this->ipLookupHelper,
+            $this->dispatcher,
         );
 
         $this->eventDispatcher = new EventDispatcher();
