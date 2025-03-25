@@ -107,8 +107,10 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param string $code
-     * @param array  $systemEntry
+     * @param Asset               $asset
+     * @param ?Request            $request
+     * @param string              $code
+     * @param array<string,mixed> $systemEntry
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
@@ -251,7 +253,7 @@ class AssetModel extends FormModel
 
         $download->setTrackingId($trackingId);
 
-        if (!empty($asset) && empty($systemEntry)) {
+        if (empty($systemEntry)) {
             $download->setAsset($asset);
 
             $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);

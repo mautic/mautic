@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -19,8 +20,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -55,9 +58,12 @@ class AssetType extends AbstractType
             'tempName',
             HiddenType::class,
             [
-                'label'      => $this->translator->trans('mautic.asset.asset.form.file.upload', ['%max%' => $maxUploadSize]),
-                'label_attr' => ['class' => 'control-label'],
-                'required'   => false,
+                'label'       => $this->translator->trans('mautic.asset.asset.form.file.upload', ['%max%' => $maxUploadSize]),
+                'label_attr'  => ['class' => 'control-label'],
+                'required'    => false,
+                'constraints' => [
+                    new Callback([$this, 'validateExtension']),
+                ],
             ]
         );
 
@@ -65,8 +71,11 @@ class AssetType extends AbstractType
             'originalFileName',
             HiddenType::class,
             [
-                'required' => false,
-            ]
+                'required'    => false,
+                'constraints' => [
+                    new Callback([$this, 'validateExtension']),
+                ],
+            ],
         );
         $builder->add(
             'disallow',
@@ -177,6 +186,33 @@ class AssetType extends AbstractType
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
+        }
+    }
+
+    /**
+     * @param Asset|string|null $object
+     */
+    public function validateExtension($object, ExecutionContextInterface $context): void
+    {
+        if (empty($object)) {
+            return;
+        }
+        $parameters       = (new ParameterLoader())->getParameterBag();
+        $mimeTypesAllowed = $parameters->get('allowed_mimetypes');
+        $extensions       = array_keys($mimeTypesAllowed);
+        $fileName         = $object;
+        if (!is_string($object) && $object instanceof Asset) {
+            $fileName = $object->getOriginalFileName();
+        }
+        $fileExtension    = pathinfo($fileName, PATHINFO_EXTENSION);
+        if (!in_array($fileExtension, $extensions, true)) {
+            $context->buildViolation('mautic.asset.asset.error.file.extension', [
+                '%fileExtension%'=> $fileExtension,
+                '%extensions%'   => implode(', ', $extensions),
+            ])
+                ->atPath('file')
+                ->setTranslationDomain('validators')
+                ->addViolation();
         }
     }
 
