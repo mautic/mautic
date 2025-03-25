@@ -161,12 +161,67 @@
         padding: 12px 0;
         border: none;
         border-bottom: 1px solid var(--form-border-subtle);
-        background: var(--form-field);
+        background-color: var(--form-field);
         box-shadow: none;
         border-radius: 0px;
         box-sizing: border-box;
         transition: var(--form-transition-all-productive);
     }
+
+    .mauticform-selectbox {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 15.6315L20.9679 10.8838L20.0321 9.11619L12 13.3685L3.9679 9.11619L3.03212 10.8838L12 15.6315Z'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-size: 20px;
+        background-position-y: center;
+        background-position-x: calc(100% - 10px);
+        appearance: none;
+        font-size: 24px;
+    }
+
+    .mauticform-selectbox[multiple] {
+        text-wrap: wrap;
+        background-image: none;
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+
+    .mauticform-selectbox[multiple]::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .mauticform-selectbox[multiple]::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+
+    .mauticform-selectbox[multiple]::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 4px;
+    }
+
+    .mauticform-selectbox[multiple] option {
+        background-color: var(--form-layer);
+        margin-bottom: 8px;
+        margin-right: 8px;
+        padding: .2em .9em;
+        border-radius: 32px;
+        cursor: pointer;
+        display: inline-flex;
+        width: fit-content;
+    }
+
+    .mauticform-selectbox[multiple] option:hover {
+        background-color: var(--form-layer-hover);
+        transition: background-color var(--form-duration-productive) var(--form-easing-standard-productive);
+    }
+
+    .mauticform-selectbox[multiple] option:checked {
+        background-color: var(--form-layer-selected-inverse);
+        color: var(--form-text-inverse);
+    }
+
+    .mauticform-selectbox[multiple]:focus option:checked {
+        background: transparent linear-gradient(0deg, var(--form-layer-selected-inverse) 0%, var(--form-layer-selected-inverse) 100%);
+}
 
     .mauticform-textarea {
         height: 8em;
@@ -178,7 +233,7 @@
     .mauticform-selectbox:active,
     .mauticform-input:active,
     .mauticform-textarea:active {
-        background: var(--form-field-hover);
+        background-color: var(--form-field-hover);
         border-color: var(--form-border-strong);
         outline: none;
     }
