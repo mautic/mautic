@@ -14,6 +14,12 @@
   }
 }
 
+// Fit the right menu to the screen no matter the viewport size
+.dropdown-menu-right {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
 // Contact image
 form[name="lead"] {
   .media-body, .contact-avatar {
@@ -69,18 +75,21 @@ form[name="lead"] {
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--background);
   text-align: center;
 }
 
 .content-overlay {
   position: absolute;
-  background: #fbfbfb;
+  background: var(--background);
   z-index: 50;
   width: 100%;
   height: 100%;
-  padding-left: 15px;
-  font-weight: bold;
+  padding: 15px;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
 }
 
 .stat-boxes {
@@ -257,10 +266,6 @@ ul.media-list.media-list-feed div.media-body
   content: "\f27b";
 }
 
-#globalSearchDropdown .list-group-item>a{
-  padding-top: 10px;
-}
-
 .characters-count {
   z-index: 100;
   float: right;
@@ -287,9 +292,8 @@ ul.media-list.media-list-feed div.media-body
 }
 
 .disabled-row {
-  opacity: 0.6;
   pointer-events: none;
-  background-color: #f2f2f2;
+  color: var(--text-disabled);
 }
 
 .publishstatus_pulse {
@@ -434,14 +438,3 @@ code:hover > .copy-icon {
   .transition(all 1.5s var(--easing-standard-expressive));
 }
 .description-content { width: 388px; }
-.dropup.quick-help {
-  position: fixed;
-  z-index: 9999;
-  bottom: 15px;
-  right: 15px;
-}
-.dropdown-toggle.quick-help {
-    background-color: var(--background);
-    border: 1px solid var(--border-subtle);
-    box-shadow: rgba(0, 0, 0, 0.07) 0px -1px 1px, rgba(0, 0, 0, 0.07) 0px 2px 2px, rgba(0, 0, 0, 0.07) 0px 4px 4px, rgba(0, 0, 0, 0.07) 0px 8px 8px, rgba(0, 0, 0, 0.07) 0px 16px 16px;
-}

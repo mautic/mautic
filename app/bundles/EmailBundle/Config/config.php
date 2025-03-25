@@ -261,6 +261,7 @@ return [
         'mailer_from_email'              => 'email@yoursite.com',
         'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
+        'mailer_address_length_limit'    => 320,
         'mailer_append_tracking_pixel'   => true,
         'mailer_convert_embed_images'    => false,
         'mailer_custom_headers'          => [],

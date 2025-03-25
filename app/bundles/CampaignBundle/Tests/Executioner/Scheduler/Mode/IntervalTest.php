@@ -224,53 +224,37 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         $interval = $this->getInterval();
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->method('getId')
-            ->willReturn(1);
-        $contact1->method('getTimezone')
-            ->willReturn('America/Los_Angeles');
+        $contact1 = new Lead();
+        $contact1->setId(1);
+        $contact1->setTimezone('America/Los_Angeles');
 
-        $contact2 = $this->createMock(Lead::class);
-        $contact2->method('getId')
-            ->willReturn(2);
-        $contact2->method('getTimezone')
-            ->willReturn('America/Los_Angeles');
+        $contact2 = new Lead();
+        $contact2->setId(2);
+        $contact2->setTimezone('America/Los_Angeles');
 
-        $contact3 = $this->createMock(Lead::class);
-        $contact3->method('getId')
-            ->willReturn(3);
-        $contact3->method('getTimezone')
-            ->willReturn('America/North_Dakota/Center');
+        $contact3 = new Lead();
+        $contact3->setId(3);
+        $contact3->setTimezone('America/North_Dakota/Center');
 
-        $contact4 = $this->createMock(Lead::class);
-        $contact4->method('getId')
-            ->willReturn(4);
-        $contact4->method('getTimezone')
-            ->willReturn('America/North_Dakota/Center');
+        $contact4 = new Lead();
+        $contact4->setId(4);
+        $contact4->setTimezone('America/North_Dakota/Center');
 
-        $contact5 = $this->createMock(Lead::class);
-        $contact5->method('getId')
-            ->willReturn(5);
-        $contact5->method('getTimezone')
-            ->willReturn(''); // use default of New_York
+        $contact5 = new Lead();
+        $contact5->setId(5);
+        $contact5->setTimezone(''); // use default of New_York
 
-        $contact6 = $this->createMock(Lead::class);
-        $contact6->method('getId')
-            ->willReturn(6);
-        $contact6->method('getTimezone')
-            ->willReturn(''); // use default of New_York
+        $contact6 = new Lead();
+        $contact6->setId(6);
+        $contact6->setTimezone(''); // use default of New_York
 
-        $contact7 = $this->createMock(Lead::class);
-        $contact7->method('getId')
-            ->willReturn(7);
-        $contact7->method('getTimezone')
-            ->willReturn('Bad/Timezone'); // use default of New_York
+        $contact7 = new Lead();
+        $contact7->setId(7);
+        $contact7->setTimezone('Bad/Timezone'); // use default of New_York
 
-        $contact8 = $this->createMock(Lead::class);
-        $contact8->method('getId')
-            ->willReturn(8);
-        $contact8->method('getTimezone')
-            ->willReturn('Bad/Timezone'); // use default of New_York
+        $contact8 = new Lead();
+        $contact8->setId(8);
+        $contact8->setTimezone('Bad/Timezone'); // use default of New_York
 
         $contacts = new ArrayCollection([
             1 => $contact1,
@@ -299,12 +283,12 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
                 case 'America/North_Dakota/Center':
                     $this->assertCount(2, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([3, 4], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-19 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertEquals('2018-10-18 08:00', $executionDate->format('Y-m-d H:i'));
                     break;
                 case 'America/New_York':
                     $this->assertCount(4, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([5, 6, 7, 8], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-19 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertEquals('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
                     break;
             }
         }

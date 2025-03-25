@@ -30,7 +30,7 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => isset($options['data']['anonymize_ip']) && (bool) $options['data']['anonymize_ip'],
                 'attr'  => [
                     'tooltip'  => 'mautic.page.config.form.anonymize_ip.tooltip',
-                    'onchange' => 'Mautic.showAnonymizeWarningMessage(this.value)',
+                    'onchange' => 'Mautic.showAnonymizeWarningMessage(this)',
                 ],
             ]
         );
@@ -42,8 +42,8 @@ class ConfigTrackingPageType extends AbstractType
                 'label' => 'mautic.page.config.form.track_contact_by_ip',
                 'data'  => isset($options['data']['track_contact_by_ip']) && (bool) $options['data']['track_contact_by_ip'],
                 'attr'  => [
-                    'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_0":"checked"}',
+                    'tooltip'        => 'mautic.page.config.form.track_contact_by_ip.tooltip',
+                    'data-enable-on' => '{"config_trackingconfig_anonymize_ip_0":"checked"}',
                 ],
             ]
         );

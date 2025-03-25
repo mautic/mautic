@@ -2,10 +2,39 @@
 // List groups
 // --------------------------------------------------
 
-.list-group {
+/// List group nav
+
+.list-group.list-group-tabs {
   border: 1px solid var(--border-inverse);
   border-radius: clamp(4px, var(--border-radius-md), 12px);
   overflow: hidden;
+
+  .list-group-item {
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    vertical-align: middle;
+
+    &:first-child > a {
+      border-top-left-radius: clamp(4px, var(--border-radius-md), 12px);
+      border-top-right-radius: clamp(4px, var(--border-radius-md), 12px);
+    }
+
+    &:last-child > a {
+      border-bottom-left-radius: clamp(4px, var(--border-radius-md), 12px);
+      border-bottom-right-radius: clamp(4px, var(--border-radius-md), 12px);
+    }
+
+    &.active {
+      background-color: var(--layer-selected-inverse);
+      .list-group-item-text { color: var(--text-inverse); }
+    }
+
+    > a, > label, .list-group-item-text {
+      padding: 10px 15px;
+      .outline();
+    }
+  }
 }
 
 .nav-justified {
@@ -27,30 +56,18 @@
 
 .list-group-item {
   transition: var(--transition-all-productive);
-  border: 0;
-  padding: 0;
-  vertical-align: middle;
+  outline: 2px solid transparent;
 
-  &:first-child > a {
-    border-top-left-radius: clamp(4px, var(--border-radius-md), 12px);
-    border-top-right-radius: clamp(4px, var(--border-radius-md), 12px);
+  &:has(a:focus) {
+    outline: 2px solid var(--focus);
   }
-
-  &:last-child > a {
-    border-bottom-left-radius: clamp(4px, var(--border-radius-md), 12px);
-    border-bottom-right-radius: clamp(4px, var(--border-radius-md), 12px);
-  }
-
-
 
   > a, > label, .list-group-item-text {
     position: relative;
     z-index: 1;
     display: block;
-    padding: 10px 15px;
     cursor: pointer;
     color: @list-group-link-color;
-    .outline();
 
     input {
       position: absolute;
