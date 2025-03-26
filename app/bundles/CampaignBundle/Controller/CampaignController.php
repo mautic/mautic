@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -103,8 +104,9 @@ class CampaignController extends AbstractStandardFormController
         private LoggerInterface $logger,
         private RequestStack $requestStack,
         CorePermissions $security,
+        private EntityManager $em,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $em);
     }
 
     protected function getPermissions(): array
@@ -199,7 +201,98 @@ class CampaignController extends AbstractStandardFormController
             ], 400);
         }
 
-        return $exportHelper->exportAsZip($filePath, $exportFileName);
+        return $exportHelper->downloadAsZip($filePath, $exportFileName);
+    }
+
+    /**
+     * Bulk export contacts.
+     *
+     * @return JsonResponse|BinaryFileResponse|Response
+     */
+    public function batchExportAction(Request $request, ExportHelper $exportHelper)
+    {
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+                'campaign:campaigns:viewown',
+                'campaign:campaigns:viewother',
+                'campaign:campaigns:create',
+                'campaign:campaigns:editown',
+                'campaign:campaigns:editother',
+                'campaign:campaigns:deleteown',
+                'campaign:campaigns:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['campaign:campaigns:viewown'] && !$permissions['campaign:campaigns:viewother']) {
+            return $this->accessDenied();
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
+        $session     = $request->getSession();
+        $filter      = $session->get('mautic.campaign.filter', '');
+        $orderByDir  = $session->get('mautic.campaign.orderbydir', 'ASC');
+
+        $ids            = $request->get('ids');
+        $date           = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
+        $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
+        $objectIds      = json_decode($ids, true);
+
+        if (empty($ids)) {
+            // Get the repository
+            /** @var CampaignRepository $repo */
+            $repo = $this->em->getRepository(Campaign::class);
+            $repo->setTranslator($this->translator);
+
+            $args = [
+                'filter'           => $filter,
+                'orderBy'          => 'c.id',
+                'orderByDir'       => $orderByDir,
+                'ignore_paginator' => true, // to get full result, not paginated
+            ];
+
+            // Query campaigns
+            $campaigns = $repo->getEntities($args);
+
+            // Get campaign IDs
+            $objectIds = array_map(fn ($c) => $c->getId(), $campaigns);
+        }
+        $allData = [];
+
+        foreach ($objectIds as $objectId) {
+            $event = new EntityExportEvent(Campaign::ENTITY_NAME, (int) $objectId);
+            $event = $this->dispatcher->dispatch($event);
+            $data  = $event->getEntities();
+
+            if (!empty($data)) {
+                $allData[] = $data;
+            } else {
+                $this->logger->warning('No data found for campaign export', ['objectId' => $objectId]);
+                $this->addFlashMessage('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], FlashBag::LEVEL_ERROR);
+
+                return new JsonResponse([
+                    'error'   => $this->translator->trans('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], 'flashes'),
+                    'flashes' => $this->getFlashContent(),
+                ], 400);
+            }
+        }
+
+        $jsonOutput = json_encode($allData, JSON_PRETTY_PRINT);
+        $filePath   = $exportHelper->writeToZipFile($jsonOutput);
+
+        if (!file_exists($filePath)) {
+            $this->logger->error('Export file could not be created', ['filePath' => $filePath]);
+            $this->addFlashMessage('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], FlashBag::LEVEL_ERROR);
+
+            return new JsonResponse([
+                'error'   => $this->translator->trans('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ], 400);
+        }
+
+        return $exportHelper->downloadAsZip($filePath, $exportFileName);
     }
 
     /**

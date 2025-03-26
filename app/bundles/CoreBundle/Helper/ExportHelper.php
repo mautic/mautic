@@ -230,7 +230,7 @@ class ExportHelper
         return $leadExport;
     }
 
-    public function exportAsZip(string $filePath, string $fileName): BinaryFileResponse
+    public function downloadAsZip(string $filePath, string $fileName): BinaryFileResponse
     {
         return new BinaryFileResponse(
             $filePath,
@@ -248,20 +248,39 @@ class ExportHelper
     public function writeToZipFile(string $jsonOutput): string
     {
         $tempDir      = sys_get_temp_dir();
-        $jsonFilePath = sprintf('%s/campaign_data.json', $tempDir);
-        $zipFilePath  = sprintf('%s/campaign_data.zip', $tempDir);
+        $jsonFilePath = sprintf('%s/entity_data.json', $tempDir);
+        $zipFilePath  = sprintf('%s/entity_data.zip', $tempDir);
+        if (file_exists($jsonFilePath)) {
+            unlink($jsonFilePath);
+        }
+
+        if (file_exists($zipFilePath)) {
+            unlink($zipFilePath);
+        }
 
         file_put_contents($jsonFilePath, $jsonOutput);
 
         $zip = new \ZipArchive();
         if (true === $zip->open($zipFilePath, \ZipArchive::CREATE)) {
-            $zip->addFile($jsonFilePath, 'campaign_data.json');
+            $zip->addFile($jsonFilePath, 'entity_data.json');
 
             $data = json_decode($jsonOutput, true);
-            if (isset($data[Asset::ENTITY_NAME])) {
-                foreach ($data[Asset::ENTITY_NAME] as $asset) {
-                    if ('local' === $asset['storage_location'] && !empty($asset['path'])) {
-                        $assetPath = $this->pathsHelper->getSystemPath('media').'/files/'.$asset['path'];
+
+            foreach ($data as $section) {
+                if (!is_array($section)) {
+                    continue;
+                }
+
+                if (!isset($section[Asset::ENTITY_NAME]) || !is_array($section[Asset::ENTITY_NAME])) {
+                    continue;
+                }
+
+                foreach ($section[Asset::ENTITY_NAME] as $asset) {
+                    $location = $asset['storage_location'] ?? null;
+                    $path     = $asset['path'] ?? null;
+
+                    if ('local' === $location && !empty($path)) {
+                        $assetPath = $this->pathsHelper->getSystemPath('media').'/files/'.$path;
                         if (file_exists($assetPath)) {
                             $zip->addFile($assetPath, 'assets/'.basename($assetPath));
                         }
@@ -269,6 +288,7 @@ class ExportHelper
                 }
             }
             $zip->close();
+            @unlink($jsonFilePath);
         }
 
         return $zipFilePath;

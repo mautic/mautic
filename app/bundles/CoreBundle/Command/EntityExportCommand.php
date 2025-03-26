@@ -30,7 +30,7 @@ final class EntityExportCommand extends ModeratedCommand
             ->setName('mautic:entity:export')
             ->setDescription('Export entity data as JSON.')
             ->addOption('entity', null, InputOption::VALUE_REQUIRED, 'The name of the entity to export (e.g., campaign, email)')
-            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'ID of entities to export.')
+            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Comma-separated list of entity IDs to export (e.g., --id=1,2,3)')
             ->addOption('json-only', null, InputOption::VALUE_NONE, 'Output only JSON data.')
             ->addOption('json-file', null, InputOption::VALUE_NONE, 'Save JSON data to a file.')
             ->addOption('zip-file', null, InputOption::VALUE_NONE, 'Save JSON data to a zip file.');
@@ -41,29 +41,36 @@ final class EntityExportCommand extends ModeratedCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $entityName = $input->getOption('entity');
-        $entityId   = (int) $input->getOption('id');
+        $idOption   = $input->getOption('id');
 
-        if (empty($entityId) || empty($entityName)) {
+        $entityIds = array_filter(array_map('intval', explode(',', (string) $idOption)));
+
+        if (empty($entityName) || empty($entityIds)) {
             $output->writeln('<error>You must specify the entity and at least one valid entity ID.</error>');
 
             return self::FAILURE;
         }
 
-        $event = $this->dispatchEntityExportEvent($entityName, $entityId);
-        $data  = $event->getEntities();
+        $allData = [];
 
-        if (empty($data)) {
+        foreach ($entityIds as $entityId) {
+            $event = $this->dispatchEntityExportEvent($entityName, $entityId);
+            $data  = $event->getEntities();
+
+            if (!empty($data)) {
+                $allData[] = $data;
+            }
+        }
+
+        if (empty($allData)) {
             $output->writeln('<error>No data found for export.</error>');
 
             return self::FAILURE;
         }
 
-        return $this->outputData($data, $input, $output);
+        return $this->outputData($allData, $input, $output);
     }
 
-    /**
-     * Dispatch the EntityExportEvent.
-     */
     private function dispatchEntityExportEvent(string $entityName, int $entityId): EntityExportEvent
     {
         $event = new EntityExportEvent($entityName, $entityId);
@@ -72,7 +79,7 @@ final class EntityExportCommand extends ModeratedCommand
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<array<string, mixed>> $data
      */
     private function outputData(array $data, InputInterface $input, OutputInterface $output): int
     {
@@ -85,7 +92,7 @@ final class EntityExportCommand extends ModeratedCommand
             $output->writeln('<info>JSON file created at:</info> '.$filePath);
         } elseif ($input->getOption('zip-file')) {
             $zipPath = $this->exportHelper->writeToZipFile($jsonOutput);
-            $output->writeln(''.$zipPath);
+            $output->writeln('<info>ZIP file created at:</info> '.$zipPath);
         } else {
             $output->writeln('<error>You must specify one of --json-only, --json-file, or --zip-file options.</error>');
 
@@ -97,7 +104,7 @@ final class EntityExportCommand extends ModeratedCommand
 
     private function writeToFile(string $jsonOutput): string
     {
-        $filePath = sprintf('%s/campaign_data.json', sys_get_temp_dir());
+        $filePath = sprintf('%s/entity_data.json', sys_get_temp_dir());
         file_put_contents($filePath, $jsonOutput);
 
         return $filePath;
