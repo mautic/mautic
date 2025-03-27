@@ -1,4 +1,6 @@
 const ckEditors = new Map();
+MauticVars.maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'TokenPlugin', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
+
 /**
  * Takes a given route, retrieves the HTML, and then updates the content
  *
@@ -580,8 +582,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
     if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             const textarea = mQuery(this);
-
-            const maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'TokenPlugin', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
             let minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
@@ -590,7 +590,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
             let ckEditorToolbar = minButtons;
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                ckEditorToolbar = maxButtons;
+                ckEditorToolbar = MauticVars.maxButtons;
             }
 
             Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
