@@ -143,13 +143,21 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     protected function addCatchAllWhereClause($q, $filter): array
     {
-        return $this->addStandardCatchAllWhereClause(
-            $q,
-            $filter,
+        $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'company');
+        $availableForSearch = array_map(fn ($alias) => 'comp.'.$alias, $customFields);
+
+        $columns = array_merge(
             [
                 'comp.companyname',
                 'comp.companyemail',
-            ]
+            ],
+            $availableForSearch,
+        );
+
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            $columns
         );
     }
 
@@ -393,8 +401,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param string $valueColumn
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
-    {
+    public function getAjaxSimpleList(
+        CompositeExpression $expr = null,
+        array $parameters = [],
+        $labelColumn = null,
+        $valueColumn = 'id',
+        int $limit = 10,
+        int $start = 0,
+    ): array {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $alias = $prefix = $this->getTableAlias();
@@ -447,6 +461,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
                 ->setParameter('true', true, 'boolean');
+        }
+
+        if ($limit > 0) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
         }
 
         return $q->executeQuery()->fetchAllAssociative();

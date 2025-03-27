@@ -75,6 +75,23 @@
                 'stats': usageStats,
                 'noUsages': 'mautic.tagmanager.tag.no_usages'|trans,
             }) }}
+
+            <div class="mt-lg mb-lg">
+                {% if security.isGranted('lead:leads:viewown') %}
+                {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
+                    title: 'mautic.core.useful_links',
+                    items: [
+                        {
+                            label: 'mautic.lead.segments.contacts.tag'|trans,
+                            link: path('mautic_contact_index', {
+                                'search': ('mautic.lead.lead.searchcommand.tag'|trans) ~ ':' ~ ('"' ~ tag.tag ~ '"')
+                            }),
+                            icon: 'ri-user-6-line'
+                        }
+                    ]
+                } %}
+                {% endif %}
+            </div>
         </div>
         <!--/ right section -->
 

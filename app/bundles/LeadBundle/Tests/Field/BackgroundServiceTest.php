@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
+use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -23,27 +24,32 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
     private BackgroundService $backgroundService;
 
     /**
-     * @var MockObject|FieldModel
+     * @var MockObject&FieldModel
      */
     private MockObject $fieldModel;
 
     /**
-     * @var MockObject|CustomFieldColumn
+     * @var MockObject&CustomFieldColumn
      */
     private MockObject $customFieldColumn;
 
     /**
-     * @var MockObject|LeadFieldSaver
+     * @var MockObject&LeadFieldSaver
      */
     private MockObject $leadFieldSaver;
 
     /**
-     * @var MockObject|FieldColumnBackgroundJobDispatcher
+     * @var MockObject&LeadFieldDeleter
+     */
+    private $leadFieldDeleter;
+
+    /**
+     * @var MockObject&FieldColumnBackgroundJobDispatcher
      */
     private MockObject $fieldColumnBackgroundJobDispatcher;
 
     /**
-     * @var MockObject|CustomFieldNotification
+     * @var MockObject&CustomFieldNotification
      */
     private MockObject $customFieldNotification;
 
@@ -52,6 +58,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->fieldModel                         = $this->createMock(FieldModel::class);
         $this->customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
         $this->leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
+        $this->leadFieldDeleter                   = $this->createMock(LeadFieldDeleter::class);
         $this->fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
         $this->customFieldNotification            = $this->createMock(CustomFieldNotification::class);
 
@@ -59,6 +66,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             $this->fieldModel,
             $this->customFieldColumn,
             $this->leadFieldSaver,
+            $this->leadFieldDeleter,
             $this->fieldColumnBackgroundJobDispatcher,
             $this->customFieldNotification
         );
@@ -221,5 +229,29 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             ->with($leadField, $userId);
 
         $this->backgroundService->updateColumn(1, $userId);
+    }
+
+    public function testDeleteColumnWithNoError(): void
+    {
+        $leadField = new LeadField();
+
+        $this->fieldModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($leadField);
+
+        $this->fieldColumnBackgroundJobDispatcher->expects($this->once())
+            ->method('dispatchPreDeleteColumnEvent')
+            ->with($leadField);
+
+        $this->customFieldColumn->expects($this->once())
+            ->method('processDeleteLeadColumn')
+            ->with($leadField);
+
+        $userId = 3;
+        $this->customFieldNotification->expects($this->once())
+            ->method('customFieldWasDeleted')
+            ->with($leadField, $userId);
+
+        $this->backgroundService->deleteColumn(1, $userId);
     }
 }

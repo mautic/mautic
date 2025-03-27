@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -18,17 +19,21 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
+use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,10 +42,12 @@ use Symfony\Component\Routing\RouterInterface;
 class PublicController extends AbstractFormController
 {
     /**
+     * @param string $slug
+     *
      * @return Response
      *
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function indexAction(
         Request $request,
@@ -70,7 +77,11 @@ class PublicController extends AbstractFormController
                 if (null != $entity->getRedirectType()) {
                     $model->hitPage($entity, $request, $entity->getRedirectType());
 
-                    return $this->redirect($entity->getRedirectUrl(), (int) $entity->getRedirectType());
+                    if ($entity->getRedirectUrl()) {
+                        return $this->redirect($entity->getRedirectUrl(), (int) $entity->getRedirectType());
+                    } else {
+                        return $this->notFound();
+                    }
                 } else {
                     $model->hitPage($entity, $request, 401);
 
@@ -283,13 +294,20 @@ class PublicController extends AbstractFormController
                 'mautic_js'
             );
 
-            $event = new PageDisplayEvent($content, $entity);
+            $event = new PageDisplayEvent((string) $content, $entity);
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 
-            $model->hitPage($entity, $request, 200, $lead, $query);
+            $model->hitPage($entity, $request, Response::HTTP_OK, $lead, $query);
 
-            return new Response($content);
+            $response = new Response($content);
+            if ($request->cookies->has('Blocked-Tracking')) {
+                /* @var DeviceTrackingService $deviceTrackingService */
+                $deviceTrackingService = $this->container->get('mautic.lead.service.device_tracking_service');
+                $deviceTrackingService->clearTrackingCookies();
+            }
+
+            return $response;
         }
 
         if (false !== $entity && $tracking404Model->isTrackable()) {
@@ -300,53 +318,53 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return mixed[]|JsonResponse|RedirectResponse|Response
      *
-     * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
-    public function previewAction(Request $request, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id)
+    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id, string $objectType = null)
     {
-        $contactId = (int) $request->query->get('contactId');
-
-        if ($contactId) {
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead.lead');
-            /** @var Lead $contact */
-            $contact = $leadModel->getEntity($contactId);
-        }
-
         /** @var PageModel $model */
         $model = $this->getModel('page');
         /** @var Page $page */
         $page = $model->getEntity($id);
 
-        if (!$page->getId()) {
+        if (!$page || !$page->getId()) {
             return $this->notFound();
         }
 
-        $analytics = $analyticsHelper->getCode();
+        $contactId = (int) $request->query->get('contactId');
+        if ($contactId) {
+            /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead.lead');
+            $contact   = $leadModel->getEntity($contactId);
+        }
+        $draftEnabled = $pageConfig->isDraftEnabled();
+        $analytics    = $analyticsHelper->getCode();
 
-        $BCcontent = $page->getContent();
-        $content   = $page->getCustomHtml();
+        $BCcontent     = $page->getContent();
+        $content       = $page->getCustomHtml();
+        $publicPreview = $page->isPublicPreview();
 
-        if (!$security->isAdmin()
-            && (
-                (!$page->isPublished())
-                || (!$security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
-                    $page->getCreatedBy()
-                )))
-        ) {
+        if ('draft' === $objectType && $draftEnabled && $page->hasDraft()) {
+            $content       = $page->getDraftContent();
+            $publicPreview = $page->getDraft()->isPublicPreview();
+        }
+
+        if (($security->isAnonymous() && (!$page->isPublished() || !$publicPreview)) || (!$security->isAnonymous(
+        ) && !$security->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $page->getCreatedBy()
+        ))) {
             return $this->accessDenied();
         }
 
-        if ($contactId && (
-            !$security->isAdmin()
-            || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-        )
-        ) {
+        if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother'
+        ))) {
+            // disallow displaying contact information
             return $this->accessDenied();
         }
 
@@ -463,7 +481,7 @@ class PublicController extends AbstractFormController
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
         $redirectId,
-    ): \Symfony\Component\HttpFoundation\RedirectResponse {
+    ): RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -497,16 +515,19 @@ class PublicController extends AbstractFormController
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $ipLookupHelper->getIpAddress();
 
+        $isHitTrackable = false;
         if ($ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
+                /** @var LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
+
                 /** @var PageModel $pageModel */
                 $pageModel = $this->getModel('page');
 
                 try {
-                    $lead = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
-
-                    $pageModel->hitPage($redirect, $request, 200, $lead);
+                    $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it
                     // and process the request without it
@@ -515,11 +536,11 @@ class PublicController extends AbstractFormController
 
                     $request->request->set('ct', '');
                     $request->query->set('ct', '');
-                    $lead = $contactRequestHelper->getContactFromQuery();
-                    $pageModel->hitPage($redirect, $request, 200, $lead);
+                    $lead           = $contactRequestHelper->getContactFromQuery();
+                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
 
-                $leadArray = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+                $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
                 $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
@@ -539,7 +560,10 @@ class PublicController extends AbstractFormController
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
-        return $this->redirect($url);
+        $response =  $this->redirect($url);
+        $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) !$isHitTrackable, strtotime('now + 15 seconds')));
+
+        return $response;
     }
 
     /**

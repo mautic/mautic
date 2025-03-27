@@ -229,7 +229,41 @@
             "name": "theme-creative",
             "directory": "themes/creative",
             "target": "git@github.com:mautic/theme-creative.git"
+        },
+        {
+            "name": "theme-eclipse",
+            "directory": "themes/eclipse",
+            "target": "git@github.com:mautic/theme-eclipse.git"
+        },
+        {
+            "name": "theme-chord",
+            "directory": "themes/chord",
+            "target": "git@github.com:mautic/theme-chord.git"
+        },
+        {
+            "name": "theme-formscape",
+            "directory": "themes/formscape",
+            "target": "git@github.com:mautic/theme-formscape.git"
+        },
+        {
+            "name": "theme-reachout",
+            "directory": "themes/reachout",
+            "target": "git@github.com:mautic/theme-reachout.git"
+        },
+        {
+            "name": "theme-blend",
+            "directory": "themes/blend",
+            "target": "git@github.com:mautic/theme-blend.git"
+        },
+        {
+            "name": "theme-mono",
+            "directory": "themes/mono",
+            "target": "git@github.com:mautic/theme-mono.git"
+        },
+        {
+            "name": "theme-capture",
+            "directory": "themes/capture",
+            "target": "git@github.com:mautic/theme-capture.git"
         }
-
     ]
 }

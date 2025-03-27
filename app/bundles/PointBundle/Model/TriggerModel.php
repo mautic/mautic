@@ -3,7 +3,6 @@
 namespace Mautic\PointBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -46,10 +45,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         protected TriggerEventModel $pointTriggerEventModel,
-        /**
-         * @deprecated https://github.com/mautic/mautic/issues/8229
-         */
-        protected MauticFactory $mauticFactory,
         private ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
@@ -364,10 +359,9 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     private function invokeCallback($event, Lead $lead, array $settings): mixed
     {
         $args = [
-            'event'   => $event,
-            'lead'    => $lead,
-            'factory' => $this->mauticFactory,
-            'config'  => $event['properties'],
+            'event'  => $event,
+            'lead'   => $lead,
+            'config' => $event['properties'],
         ];
 
         if (is_array($settings['callback'])) {
@@ -381,10 +375,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         $pass = [];
         foreach ($reflection->getParameters() as $param) {
-            if ('factory' === $param->getName()) {
-                @\trigger_error('Using "factory" parameter is deprecated. Use dependency injection instead. Usage of "factory" parameter will be removed in 6.0.', \E_USER_DEPRECATED);
-            }
-
             if (isset($args[$param->getName()])) {
                 $pass[] = $args[$param->getName()];
             } else {

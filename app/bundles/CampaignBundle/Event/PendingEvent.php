@@ -104,6 +104,20 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
+     * Fail all that have not passed or failed yet.
+     *
+     * @param string $reason
+     */
+    public function failRemainingPending($reason): void
+    {
+        foreach ($this->logs as $log) {
+            if (!$this->failures->contains($log) && !$this->successful->contains($log)) {
+                $this->fail($log, $reason);
+            }
+        }
+    }
+
+    /**
      * @param LeadEventLog[]|ArrayCollection $logs
      * @param string                         $reason
      */

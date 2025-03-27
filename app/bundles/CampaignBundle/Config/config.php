@@ -300,7 +300,6 @@ return [
                     'event_dispatcher',
                     'mautic.campaign.scheduler',
                     'monolog.logger.mautic',
-                    'mautic.factory',
                     'mautic.tracker.contact',
                 ],
             ],

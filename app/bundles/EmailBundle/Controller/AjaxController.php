@@ -116,7 +116,7 @@ class AjaxController extends CommonAjaxController
 
     public function getAttachmentsSizeAction(Request $request, AssetModel $assetModel): JsonResponse
     {
-        $assets = $request->query->get('assets') ?? [];
+        $assets = $request->query->all()['assets'] ?? [];
         $size   = 0;
         if ($assets) {
             $size = $assetModel->getTotalFilesize($assets);

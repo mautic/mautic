@@ -41,6 +41,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Form\Type\EmailType;
+use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -118,6 +119,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private EmailStatModel $emailStatModel,
+        private BotRatioHelper $botRatioHelper,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -385,6 +387,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
+        if (!$ipAddress->isTrackable()) {
+            return;
+        }
+
+        $readDateTime = new DateTimeHelper($hitDateTime);
+        $userAgent    = $request->server->get('HTTP_USER_AGENT');
+        if ($this->botRatioHelper->isHitByBot($stat, $readDateTime->getDateTime(), $ipAddress, (string) $userAgent)) {
+            return;
+        }
+
         $email = $stat->getEmail();
 
         if ((int) $stat->isRead()) {
@@ -394,7 +407,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
         }
 
-        $readDateTime = new DateTimeHelper($hitDateTime ?? '');
         $stat->setLastOpened($readDateTime->getDateTime());
 
         $lead = $stat->getLead();
@@ -421,13 +433,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $stat->addOpenDetails(
             [
                 'datetime'  => $readDateTime->toUtcString(),
-                'useragent' => $request->server->get('HTTP_USER_AGENT'),
+                'useragent' => $userAgent,
                 'inBrowser' => $viaBrowser,
             ]
         );
 
-        // check for existing IP
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
         $stat->setIpAddress($ipAddress);
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
@@ -459,7 +469,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         if ($lead) {
             $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent(
                 $lead,
-                $request->server->get('HTTP_USER_AGENT')
+                $userAgent
             );
 
             // As the entity might be cached, present in EM, but not attached, we need to reload it
@@ -1428,6 +1438,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
                 foreach ($contacts as $contact) {
                     try {
+                        if ('list' === $email->getEmailType()
+                            && $this->getStatRepository()->checkContactSentEmail(
+                                $contact['id'],
+                                $email->getId(),
+                            )) {
+                            // This segment email is already sent to this contact
+                            continue;
+                        }
+
                         $this->sendModel->setContact($contact, $tokens)
                             ->send();
 
@@ -2181,7 +2200,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         );
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
-        $mailer = $this->mailHelper->getSampleMailer();
+        $mailer = $this->mailHelper->getMailer(true);
         $mailer->setLead($leadFields, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $assetAttachments, !$saveStat);

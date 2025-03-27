@@ -9,7 +9,6 @@ use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CacheProviderTest extends TestCase
@@ -48,11 +47,6 @@ class CacheProviderTest extends TestCase
             ->willReturn('foo.bar');
 
         $this->container->expects($this->once())
-            ->method('has')
-            ->with('foo.bar')
-            ->willReturn(true);
-
-        $this->container->expects($this->once())
             ->method('get')
             ->with('foo.bar')
             ->willReturn($this->adapter);
@@ -68,75 +62,10 @@ class CacheProviderTest extends TestCase
             ->willReturn('foo.bar');
 
         $this->container->expects($this->once())
-            ->method('has')
-            ->with('foo.bar')
-            ->willReturn(true);
-
-        $this->container->expects($this->once())
             ->method('get')
             ->with('foo.bar')
             ->willReturn($this->adapter);
 
         $this->cacheProvider->getSimpleCache();
-    }
-
-    public function testExceptionThrownIfAdaptorNotFoundInContainer(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->with('cache_adapter')
-            ->willReturn('bar.foo');
-
-        $this->container->expects($this->once())
-            ->method('has')
-            ->with('bar.foo')
-            ->willReturn(false);
-
-        $this->container->expects($this->never())
-            ->method('get');
-
-        $this->cacheProvider->getCacheAdapter();
-    }
-
-    public function testExceptionThrownIfAdaptorEmpty(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->with('cache_adapter')
-            ->willReturn(null);
-
-        $this->container->expects($this->never())
-            ->method('has');
-
-        $this->container->expects($this->never())
-            ->method('get');
-
-        $this->cacheProvider->getCacheAdapter();
-    }
-
-    public function testExceptionThrownIfAdaptorNotInstanceOfTagAwareAdapterInterface(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->with('cache_adapter')
-            ->willReturn('foo.bar');
-
-        $this->container->expects($this->once())
-            ->method('has')
-            ->with('foo.bar')
-            ->willReturn(true);
-
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('foo.bar')
-            ->willReturn(new \stdClass());
-
-        $this->cacheProvider->getCacheAdapter();
     }
 }

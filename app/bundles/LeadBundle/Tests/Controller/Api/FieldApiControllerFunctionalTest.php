@@ -87,7 +87,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias);
+        $this->assertDeleteResponse($payload, $id, $alias, true);
     }
 
     /**
@@ -110,7 +110,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias);
+        $this->assertDeleteResponse($payload, $id, $alias, false);
     }
 
     /**
@@ -234,7 +234,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    private function assertDeleteResponse(array $payload, int $id, string $alias): void
+    private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
         $this->client->request('DELETE', sprintf('/api/fields/contact/%s/delete', $id));
@@ -248,7 +248,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey($key, $response['field']);
 
             match ($key) {
-                'id'     => $this->assertNull($response['field'][$key]),
+                'id'     => $isBackground ? $this->assertEquals($value, $response['field'][$key]) : $this->assertNull($response['field'][$key]),
                 'alias'  => $this->assertEquals($alias, $response['field'][$key]),
                 'object' => $this->assertEquals('lead', $response['field'][$key]),
                 'type'   => $this->assertEquals('text', $response['field'][$key]),

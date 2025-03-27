@@ -1467,7 +1467,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/178993450?v=4",
       "profile": "https://github.com/rishithreddy89",
       "contributions": [
-        "code"
+        "code",
+        "userTesting"
       ]
     },
     {
@@ -1477,6 +1478,61 @@
       "profile": "https://linktr.ee/Jaishree2310",
       "contributions": [
         "doc"
+      ]
+    },
+    {
+      "login": "kingsedem",
+      "name": "Kingsley_E_",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47061881?v=4",
+      "profile": "https://github.com/kingsedem",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "Hugo-Prossaird",
+      "name": "Hugo-Prossaird",
+      "avatar_url": "https://avatars.githubusercontent.com/u/176997845?v=4",
+      "profile": "https://github.com/Hugo-Prossaird",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "farzammadani",
+      "name": "Farzam Madani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/69846004?v=4",
+      "profile": "https://github.com/farzammadani",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "SaraCRM",
+      "name": "Sara Matos",
+      "avatar_url": "https://avatars.githubusercontent.com/u/121267071?v=4",
+      "profile": "https://github.com/SaraCRM",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "VishnuGurrapu",
+      "name": "Vishnu Gurrapu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/169230642?v=4",
+      "profile": "https://github.com/VishnuGurrapu",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "1792826181",
+      "name": "Jun",
+      "avatar_url": "https://avatars.githubusercontent.com/u/105675530?v=4",
+      "profile": "https://github.com/1792826181",
+      "contributions": [
+        "code"
       ]
     }
   ],

@@ -8,6 +8,8 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
@@ -15,8 +17,29 @@ use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class LeadList extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "segment:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "segment:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class LeadList extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+
     public const TABLE_NAME = 'lead_lists';
 
     /**
@@ -127,6 +150,8 @@ class LeadList extends FormEntity
             ->columnName('last_built_time')
             ->nullable()
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -281,8 +306,8 @@ class LeadList extends FormEntity
 
     public function needsRebuild(): bool
     {
-        // Manual segments never require rebuild
-        if (empty($this->getFilters())) {
+        // Manual or unpublished segments never require rebuild
+        if (empty($this->getFilters()) || !$this->isPublished()) {
             return false;
         }
 

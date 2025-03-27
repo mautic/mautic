@@ -461,19 +461,6 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
-            'mautic.lead.helper.contact_request_helper' => [
-                'class'     => Mautic\LeadBundle\Helper\ContactRequestHelper::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.tracker.contact',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.ip_lookup',
-                    'request_stack',
-                    'monolog.logger.mautic',
-                    'event_dispatcher',
-                    'mautic.lead.merger',
-                ],
-            ],
             'mautic.lead.validator.length' => [
                 'class' => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
                 'tag'   => 'validator.constraint_validator',
@@ -517,21 +504,6 @@ return [
                     '@service_container',
                     'mautic.lead.model.lead_segment_decorator_factory',
                     'event_dispatcher',
-                ],
-            ],
-            'mautic.tracker.contact' => [
-                'class'     => Mautic\LeadBundle\Tracker\ContactTracker::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead',
-                    'mautic.lead.service.contact_tracking_service',
-                    'mautic.tracker.device',
-                    'mautic.security',
-                    'monolog.logger.mautic',
-                    'mautic.helper.ip_lookup',
-                    'request_stack',
-                    'mautic.helper.core_parameters',
-                    'event_dispatcher',
-                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.tracker.device' => [
@@ -790,16 +762,6 @@ return [
                 'class'     => Mautic\LeadBundle\Field\Settings\BackgroundSettings::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.lead.field.settings.background_service' => [
-                'class'     => Mautic\LeadBundle\Field\BackgroundService::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.field.custom_field_column',
-                    'mautic.lead.field.lead_field_saver',
-                    'mautic.lead.field.dispatcher.field_column_background_dispatcher',
-                    'mautic.lead.field.notification.custom_field',
                 ],
             ],
             'mautic.lead.field.notification.custom_field' => [

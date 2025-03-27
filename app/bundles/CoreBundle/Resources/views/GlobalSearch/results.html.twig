@@ -13,14 +13,14 @@
     </div>
 </div>
 
-<div class="pa-sm" id="globalSearchPanel">
+<div id="globalSearchPanel">
     {% if results is not empty %}
         {%- for header, result in results %}
             {% if not loop.first %}
-                <hr class="mr-sm ml-sm">
+                <hr>
             {% endif %}
 
-            <div class="text-secondary pl-sm pr-sm ml-2 mr-2 mb-xs d-flex gap-xs{% if loop.first %} mt-md{% endif %}">
+            <div class="text-secondary pl-md pr-md ml-2 mr-2 mb-xs d-flex gap-xs{% if loop.first %} mt-md{% endif %}">
                 {{ header }}
                 {% if result.count is defined and result.count is not empty %}
                     <span class="label label-gray fs-10 gs-count-badge" size="sm">{{ result.count }}</span>

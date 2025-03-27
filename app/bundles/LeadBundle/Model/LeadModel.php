@@ -49,6 +49,7 @@ use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\LeadType;
@@ -359,6 +360,65 @@ class LeadModel extends FormModel
         } else {
             return null;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, Event $event = null): ?Event
+    {
+        if (empty($event)) {
+            $event = new LeadEvent($entity, $isNew);
+            $event->setAlreadyProcessedInBatch(true);
+            $event->setEntityManager($this->em);
+        }
+
+        return $this->dispatchEvent($action, $entity, $isNew, $event);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, Event $event = null): ?Event
+    {
+        if (count($entitiesBatchParams) < 1) {
+            throw new MethodNotAllowedHttpException(['Lead'], 'For the batch operation the array must be used');
+        }
+        foreach ($entitiesBatchParams as $entityParam) {
+            if (!$entityParam['entity'] instanceof Lead) {
+                throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
+            }
+        }
+
+        switch ($action) {
+            case 'pre_batch_save':
+                $name = LeadEvents::LEAD_PRE_BATCH_SAVE;
+                break;
+            case 'post_batch_save':
+                $name = LeadEvents::LEAD_POST_BATCH_SAVE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            $leadEvents = [];
+            if (empty($event)) {
+                foreach ($entitiesBatchParams as $entityParam) {
+                    if (!$leadEvent = $entityParam['event']) {
+                        $leadEvent = new LeadEvent($entityParam['entity'], $entityParam['isNew']);
+                    }
+                    $leadEvent->setEntityManager($this->em);
+                    $leadEvents[] = $leadEvent;
+                }
+                $event = new SaveBatchLeadsEvent($leadEvents);
+            }
+            $this->dispatcher->dispatch($event, $name);
+
+            return $event;
+        }
+
+        return null;
     }
 
     /**
@@ -1182,6 +1242,20 @@ class LeadModel extends FormModel
 
         $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
+
+        if ($merged) {
+            $granted = $this->security->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getPermissionUser()
+            );
+        } else {
+            $granted = $this->security->isGranted('lead:leads:create');
+        }
+
+        if (!$granted) {
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+        }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);

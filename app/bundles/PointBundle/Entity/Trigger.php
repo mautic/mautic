@@ -7,11 +7,36 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Trigger extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "trigger:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "events"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "trigger:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Trigger extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
@@ -110,6 +135,8 @@ class Trigger extends FormEntity
         $builder->createManyToOne('group', Group::class)
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

@@ -267,6 +267,7 @@
                                 {
                                     label: 'mautic.core.open_link',
                                     variant: 'ghost',
+                                    size: 'sm',
                                     icon_only: true,
                                     icon: 'ri-external-link-line',
                                     onclick: 'window.open("' ~ pageUrl ~ '", "_blank");',
@@ -305,7 +306,7 @@
                   {% if previewSettingsForm.contact is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
-                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              <div class="control-label">{{ 'mautic.page.preview.show.contact'|trans }}</div>
                               {{ form_widget(previewSettingsForm.contact) }}
                           </div>
                       </div>
@@ -313,6 +314,13 @@
                   <div class="row">
                       <div class="form-group col-xs-12 ">
                           <div class="input-group">
+                              <div class="input-group-addon">
+                                  {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                      'item'  : activePage,
+                                      'model' : 'page',
+                                      'query' : 'customToggle=publicPreview'
+                                  }) -}}
+                              </div>
                               <input id="content_preview_url"
                                      data-route="page/preview"
                                      onclick="this.setSelectionRange(0, this.value.length);"
@@ -326,6 +334,7 @@
                                         {
                                             label: 'mautic.core.open_link',
                                             variant: 'ghost',
+                                            size: 'sm',
                                             icon_only: true,
                                             icon: 'ri-external-link-line',
                                             onclick: 'window.open("' ~ previewUrl ~ '", "_blank");',
@@ -344,6 +353,26 @@
                   </div>
               </div>
           </div>
+          {% if draftPreviewUrl is not empty %}
+              <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+                  <div class="panel-heading">
+                      <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
+                  </div>
+                  <div class="panel-body pt-xs">
+                      <div class="input-group">
+                          <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                                 readonly
+                                 value="{{ draftPreviewUrl|e }}"/>
+                          <span class="input-group-btn">
+                    <button class="btn btn-default btn-nospin"
+                            onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
+                        <i class="fa fa-external-link"></i>
+                    </button>
+                </span>
+                      </div>
+                  </div>
+              </div>
+          {% endif %}
           <!--/ preview URL -->
           <hr class="hr-w-2" style="width:50%">
           <!-- recent activity -->

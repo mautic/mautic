@@ -20,6 +20,37 @@
   overflow-y: auto;
 }
 
+// Color input fields
+.minicolors-swatch::after,
+.minicolors-theme-bootstrap .minicolors-swatch { border-radius: var(--swatch-size); }
+
+.minicolors-theme-bootstrap .minicolors-swatch {
+  --swatch-size: 20px;
+  height: var(--swatch-size);
+  width: var(--swatch-size);
+  top: 50%;
+  transform: translateY(-50%);
+  left: 6px;
+}
+
+.minicolors-swatch::after { box-shadow: none; }
+
+.minicolors .minicolors-grid {
+  border-radius: 10px;
+}
+
+.minicolors-slider, .minicolors-opacity-slider {
+  border-radius: 5px;
+}
+
+.minicolors-panel {
+  border-radius: 10px;
+}
+
+.minicolors-picker {
+  height: 5px;
+}
+
 // Contact image
 form[name="lead"] {
   .media-body, .contact-avatar {
@@ -75,7 +106,7 @@ form[name="lead"] {
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--background);
   text-align: center;
 }
 
@@ -182,11 +213,6 @@ body.noscroll {
 }
 .modal-body-content iframe.fr-iframe {
   min-height:300px;
-}
-
-.CodeMirror {
-  border: 1px solid #d5d5d5;
-  border-radius: 3px;
 }
 
 table.table > tbody > tr > td.long-text {
@@ -409,17 +435,6 @@ code:hover > .copy-icon {
   .transition(all 1.5s var(--easing-standard-expressive));
 }
 .description-content { width: 388px; }
-.dropup.quick-help {
-  position: fixed;
-  z-index: 9999;
-  bottom: 15px;
-  right: 15px;
-}
-.dropdown-toggle.quick-help {
-    background-color: var(--background);
-    border: 1px solid var(--border-subtle);
-    box-shadow: rgba(0, 0, 0, 0.07) 0px -1px 1px, rgba(0, 0, 0, 0.07) 0px 2px 2px, rgba(0, 0, 0, 0.07) 0px 4px 4px, rgba(0, 0, 0, 0.07) 0px 8px 8px, rgba(0, 0, 0, 0.07) 0px 16px 16px;
-}
 
 .builder-active {
   background-color: var(--background);
@@ -483,4 +498,28 @@ code:hover > .copy-icon {
   .builder .builder-tokens {
     margin-top: 10px;
   }
+}
+
+.rounded-corners-preview {
+  --preview-width: 28px;
+  width: var(--preview-width);
+  height: calc(var(--preview-width) / 1.4);
+  background-color: var(--text-placeholder);
+  margin: 3px 4px;
+}
+
+.rounded-corners-preview--0 {
+  border-radius: 0;
+}
+
+.rounded-corners-preview--8 {
+  border-radius: 3px;
+}
+
+.rounded-corners-preview--16 {
+  border-radius: 6px;
+}
+
+.rounded-corners-preview--32 {
+  border-radius: 32px;
 }

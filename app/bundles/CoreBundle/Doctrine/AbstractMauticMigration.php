@@ -13,6 +13,16 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected const TABLE_NAME = null;
 
     /**
+     * @var string
+     */
+    public const COLUMN_TYPE_SIGNED = 'SIGNED';
+
+    /**
+     * @var string
+     */
+    public const COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
+
+    /**
      * @var ContainerInterface
      */
     protected $container;
@@ -198,5 +208,18 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         }
 
         return $this->prefix.$tableName;
+    }
+
+    protected function getColumnTypeSignedOrUnsigned(Schema $schema, string $tableName, string $columnName): string
+    {
+        $pagesTable  = $schema->getTable($this->getPrefixedTableName($tableName));
+        $idColumn    = $pagesTable->getColumn($columnName);
+        $idDataType  = self::COLUMN_TYPE_SIGNED;
+
+        if (true === $idColumn->getUnsigned()) {
+            $idDataType = self::COLUMN_TYPE_UNSIGNED;
+        }
+
+        return $idDataType;
     }
 }

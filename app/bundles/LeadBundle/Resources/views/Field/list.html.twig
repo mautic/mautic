@@ -73,9 +73,9 @@
                           {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                   'item': item,
                                   'templateButtons': {
-                                      'edit': permissions['lead:fields:full'],
-                                      'clone': permissions['lead:fields:full'],
-                                      'delete': item.isFixed ? false : permissions['lead:fields:full'],
+                                      'edit': item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
+                                      'clone': item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
+                                      'delete': item.isFixed or item.getColumnIsNotRemoved() ? false : permissions['lead:fields:full'],
                                   },
                                   'routeBase': 'contactfield',
                                   'langVar': 'lead.field',
@@ -88,7 +88,7 @@
                                       'item': item,
                                       'model': 'lead.field',
                                       'disableToggle': item.disablePublishChange,
-                                      'aditionalLabel': item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : null,
+                                      'aditionalLabel': (item.columnIsNotCreated ? 'mautic.lead.field.being_created_in_background'|trans : '') ~ (item.getColumnIsNotRemoved() ? 'mautic.lead.field.being_removed_in_background'|trans : ''),
                           }) }}
                           <a href="{{ path('mautic_contactfield_action', {'objectAction': 'edit', 'objectId': item.id}) }}">{{ item.label }}</a>
                           {{ customContent('lead.field.name', _context) }}

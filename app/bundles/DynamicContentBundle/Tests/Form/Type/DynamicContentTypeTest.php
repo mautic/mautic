@@ -7,6 +7,7 @@ namespace Mautic\DynamicContentBundle\Tests\Form\Type;
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
+use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentListType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
@@ -17,6 +18,8 @@ use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentTypeTest extends TestCase
@@ -52,7 +55,8 @@ class DynamicContentTypeTest extends TestCase
             $entityManagerMock,
             $listModelMock,
             $translatorInterfaceMock,
-            $leadModelMock
+            $leadModelMock,
+            new TypeList(),
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
@@ -113,6 +117,43 @@ class DynamicContentTypeTest extends TestCase
                     ],
                 ],
             )->willReturn($formBuilderInterfaceMock);
+
+        $formBuilderInterfaceMock->expects($this->exactly(3))
+            ->method('addEventListener')
+            ->withConsecutive(
+                [
+                    FormEvents::PRE_SUBMIT,
+                    $this->callback(function ($listener) {
+                        $reflection = new \ReflectionFunction($listener);
+                        $parameters = $reflection->getParameters();
+
+                        return FormEvent::class === (string) $parameters[0]->getType();
+                    }),
+                ],
+                [
+                    FormEvents::PRE_SET_DATA,
+                    $this->callback(function ($listener) {
+                        $reflection = new \ReflectionFunction($listener);
+                        $parameters = $reflection->getParameters();
+
+                        return FormEvent::class === (string) $parameters[0]->getType();
+                    }),
+                ],
+                [
+                    FormEvents::POST_SUBMIT,
+                    $this->callback(function ($listener) {
+                        $reflection = new \ReflectionFunction($listener);
+                        $parameters = $reflection->getParameters();
+
+                        return FormEvent::class === (string) $parameters[0]->getType();
+                    }),
+                ]
+            );
+
+        $formBuilderInterfaceMock->expects($this->once())
+            ->method('get')
+            ->with('type')
+            ->willReturn($formBuilderInterfaceMock);
 
         $dynamicContentType->buildForm($formBuilderInterfaceMock, $options);
     }

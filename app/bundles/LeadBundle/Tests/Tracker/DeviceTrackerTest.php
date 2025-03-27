@@ -68,11 +68,6 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $container = $this->createMock(ContainerInterface::class);
         $container
           ->expects($this->once())
-          ->method('has')
-          ->with($this->equalTo('mautic.cache.adapter.filesystem'))
-          ->willReturn(true);
-        $container
-          ->expects($this->once())
           ->method('get')
           ->with($this->equalTo('mautic.cache.adapter.filesystem'))
           ->willReturn($cacheAdapter);

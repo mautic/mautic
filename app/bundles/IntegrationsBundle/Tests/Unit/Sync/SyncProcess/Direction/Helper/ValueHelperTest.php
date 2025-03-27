@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Helper;
 
-use Mautic\IntegrationsBundle\Exception\InvalidValueException;
+use Mautic\IntegrationsBundle\Exception\RequiredValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -15,7 +15,7 @@ class ValueHelperTest extends TestCase
 {
     public function testExceptionForMissingRequiredIntegrationValue(): void
     {
-        $this->expectException(InvalidValueException::class);
+        $this->expectException(RequiredValueException::class);
 
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -60,7 +60,7 @@ class ValueHelperTest extends TestCase
 
     public function testExceptionForMissingRequiredMauticValue(): void
     {
-        $this->expectException(InvalidValueException::class);
+        $this->expectException(RequiredValueException::class);
 
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 

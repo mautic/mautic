@@ -33,20 +33,14 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private RouterInterface $router;
 
     /**
      * @var string[]
      */
     private array $preventLoop = [];
 
-    /**
-     * @var int|null
-     */
-    private $lastContactId;
+    private ?int $lastContactId = null;
 
     /**
      * @param ModelFactory<object> $modelFactory

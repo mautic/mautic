@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.1', '8.2', '8.3']
+        php-versions: ['8.2', '8.3']
         db-types: ['mysql', 'mariadb']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -58,7 +58,7 @@ jobs:
         fetch-depth: 0
 
     - name: PHPUnit cache
-      if: ${{matrix.php-versions == '8.1' && matrix.db-types == 'mariadb'}}
+      if: ${{matrix.php-versions == '8.2' && matrix.db-types == 'mariadb'}}
       uses: actions/cache@v4
       with:
         path: ./var/cache/phpunit
@@ -97,14 +97,14 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
-        if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
+        if [[ "${{ matrix.php-versions }}" == "8.2" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v4
       with:
         files: ./coverage.xml
@@ -113,7 +113,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Save test results for future steps
-      if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-results
@@ -170,7 +170,7 @@ jobs:
       fail-fast: false
       matrix:
         commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install', 'composer lock check']
-        php-versions: ['8.1']
+        php-versions: ['8.2']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
@@ -210,7 +210,7 @@ jobs:
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v42
+      uses: tj-actions/changed-files@v46
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
