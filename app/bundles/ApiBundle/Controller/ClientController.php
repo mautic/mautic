@@ -5,7 +5,6 @@ namespace Mautic\ApiBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -32,7 +31,6 @@ class ClientController extends AbstractStandardFormController
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -42,7 +40,7 @@ class ClientController extends AbstractStandardFormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -66,7 +64,7 @@ class ClientController extends AbstractStandardFormController
         $orderBy   = $request->getSession()->get('mautic.api.client.orderby', 'c.name');
         $orderByDir= $request->getSession()->get('mautic.api.client.orderbydir', 'ASC');
         $filter    = $request->get('search', $request->getSession()->get('mautic.api.client.filter', ''));
-        $apiMode   = $this->factory->getRequest()->get('api_mode', $request->getSession()->get('mautic.api.client.filter.api_mode', 'oauth2'));
+        $apiMode   = $request->get('api_mode', $request->getSession()->get('mautic.api.client.filter.api_mode', 'oauth2'));
         $request->getSession()->set('mautic.api.client.filter.api_mode', $apiMode);
         $request->getSession()->set('mautic.api.client.filter', $filter);
 

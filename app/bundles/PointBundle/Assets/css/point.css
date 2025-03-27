@@ -11,6 +11,7 @@
     padding: 20px;
     margin-bottom: 0 !important;
     border: 1px solid #ecf0f1;
+    position: relative;
 }
 
 #triggerEvents .trigger-event-row .event-label {
@@ -34,6 +35,10 @@
 
 #triggerEvents .form-buttons {
     float: right;
+    position: absolute; 
+    top: 50%;             
+    right: 20px;          
+    transform: translateY(-50%);
 }
 
 .col-pointtrigger-color {

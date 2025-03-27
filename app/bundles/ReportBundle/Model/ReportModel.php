@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -44,7 +45,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<Report>
  */
-class ReportModel extends FormModel
+class ReportModel extends FormModel implements GlobalSearchInterface
 {
     public const CHANNEL_FEATURE = 'reporting';
 
@@ -610,7 +611,8 @@ class ReportModel extends FormModel
             // Allow plugin to manipulate the data
             $event = new ReportDataEvent($entity, $data, $totalResults, $dataOptions);
             $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_DISPLAY);
-            $data = $event->getData();
+            $data        = $event->getData();
+            $dataOptions = $event->getOptions();
         }
 
         if ($this->isDebugMode()) {
@@ -639,7 +641,7 @@ class ReportModel extends FormModel
             'dataColumns'       => $dataColumns,
             'graphs'            => $graphs,
             'contentTemplate'   => $contentTemplate,
-            'columns'           => $tableDetails['columns'],
+            'columns'           => $dataOptions['columns'],
             'limit'             => ($paginate) ? $limit : 0,
             'page'              => ($paginate) ? $reportPage : 1,
             'dateFrom'          => $dataOptions['dateFrom'],

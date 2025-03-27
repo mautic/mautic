@@ -277,7 +277,7 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
-    const segmentCountElem = mQuery('a.col-count');
+    const segmentCountElem = mQuery('span.col-count');
 
     if (segmentCountElem.length) {
         segmentCountElem.each(function() {
@@ -288,7 +288,8 @@ Mautic.leadlistOnLoad = function(container, response) {
                 'lead:getLeadCount',
                 {id: id},
                 function (response) {
-                    elem.html(response.html);
+                    elem.className = response.className;
+                    elem.children('a').html(response.html);
                 },
                 false,
                 true,
@@ -334,7 +335,7 @@ Mautic.leadlistOnLoad = function(container, response) {
 
         var bodyOverflow = {};
         mQuery('#' + prefix + '_filters').sortable({
-            items: '.panel',
+            items: '.filter--row',
             helper: function(e, ui) {
                 ui.children().each(function() {
                     if (mQuery(this).is(":visible")) {
@@ -463,7 +464,7 @@ Mautic.reorderSegmentFilters = function() {
         prefix = parent.attr('id');
     }
 
-    const $filters = mQuery('#' + prefix + '_filters .panel');
+    const $filters = mQuery('#' + prefix + '_filters .filter--row');
 
     $filters.each(function() {
         const $filter = mQuery(this);
@@ -700,7 +701,7 @@ Mautic.segmentFilter = function() {
     };
 
     const getFilterCount = function() {
-        return mQuery('.selected-filters').children('.segment-filter').length;
+        return mQuery('.selected-filters').children('.filter--row').length;
     };
 
     const showCopyBasedOnGlue = function($filter) {
@@ -731,6 +732,8 @@ Mautic.segmentFilter = function() {
                     {'opacity': 0},
                     'fast',
                     function () {
+                        // Remove existing tooltip
+                        mQuery('*[role="tooltip"]').tooltip('destroy');
                         mQuery(this).remove();
                         Mautic.reorderSegmentFilters();
                     }
@@ -779,6 +782,9 @@ Mautic.segmentFilter = function() {
             $glueWrapper.find('select').val('or');
             $glueWrapper.removeClass('hide');
         }
+
+        // Hide the "When" text in the cloned filter
+        $clone.find('.filter--condition-when').addClass('hide');
 
         const $filters = $origin.closest('.selected-filters');
 
@@ -1395,11 +1401,7 @@ Mautic.getLeadEmailContent = function (el) {
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
 
-        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
-            mQuery(bodyEl).froalaEditor('html.set', response.body);
-        } else {
-            ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
-        }
+        ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
 
         mQuery(bodyEl).val(response.body);
         mQuery('#'+idPrefix+'subject').val(response.subject);
@@ -1610,8 +1612,8 @@ Mautic.initUniqueIdentifierFields = function() {
 
 Mautic.updateFilterPositioning = function (el) {
     var $el       = mQuery(el);
-    var $parentEl = $el.closest('.panel');
-    var list      = $parentEl.parent().children('.panel');
+    var $parentEl = $el.closest('.filter--row');
+    var list      = $parentEl.parent().children('.filter--row');
     const isFirst = list.index($parentEl) === 0;
 
     if (isFirst) {

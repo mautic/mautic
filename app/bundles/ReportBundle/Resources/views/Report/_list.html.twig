@@ -4,13 +4,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#reportTable',
-                        'langVar': 'report.report',
-                        'routeBase': 'report',
-                        'templateButtons': {
-                            'delete': permissions['report:reports:deleteown'] or permissions['report:reports:deleteother'],
-                        },
+                    'checkall': 'true',
+                    'target': '#reportTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {

@@ -4,24 +4,31 @@ declare(strict_types=1);
 
 namespace Mautic\CacheBundle\Cache\Adapter;
 
-use Mautic\CacheBundle\Exceptions\InvalidArgumentException;
-use Mautic\CoreBundle\Helper\PRedisConnectionHelper;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class RedisTagAwareAdapter extends TagAwareAdapter
 {
-    public function __construct(array $servers, string $namespace, int $lifetime, bool $primaryOnly)
+    use RedisAdapterTrait;
+
+    /**
+     * @param mixed[] $servers
+     */
+    public function __construct(
+        #[Autowire(env: 'json:MAUTIC_CACHE_ADAPTER_REDIS')]
+        array $servers,
+
+        #[Autowire(env: 'string:MAUTIC_CACHE_PREFIX')]
+        string $namespace,
+
+        #[Autowire(env: 'int:MAUTIC_CACHE_LIFETIME')]
+        int $lifetime,
+
+        #[Autowire(env: 'bool:MAUTIC_REDIS_PRIMARY_ONLY')]
+        bool $primaryOnly)
     {
-        if (!isset($servers['dsn'])) {
-            throw new InvalidArgumentException('Invalid redis configuration. No server specified.');
-        }
-
-        $options = array_key_exists('options', $servers) ? $servers['options'] : [];
-
-        $options['primaryOnly'] = $primaryOnly;
-
-        $client = PRedisConnectionHelper::createClient(PRedisConnectionHelper::getRedisEndpoints($servers['dsn']), $options);
+        $client = $this->createClient($servers, $primaryOnly);
 
         parent::__construct(
             new RedisAdapter($client, $namespace, $lifetime),

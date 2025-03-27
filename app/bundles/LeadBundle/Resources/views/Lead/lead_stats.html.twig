@@ -1,6 +1,7 @@
 {% if emailStats is defined %}
+<div class="row">
     <div class="lead-stats-title">{{ 'mautic.lead.stats.email_title'|trans }}</div>
-    <div class="lead-stats row-no-gutters jc-space-between gap-sm fw-nowrap-md">
+    <div class="lead-stats row-no-gutters jc-space-between gap-sm fw-nowrap-md mb-sm">
         {% set stats = [
             {'name': 'mautic.lead.stats.sent_count', 'value': emailStats['sent_count'], 'icon': 'ri-mail-send-line'},
             {'name': 'mautic.lead.stats.open_rate', 'value': emailStats['open_rate'] * 100, 'suffix': '%', 'icon': 'ri-mail-open-line'},
@@ -9,10 +10,18 @@
         ] %}
 
         {% for stat in stats %}
-        <div class="lead-stats-el tile h-144 jc-space-between col-lg-3 col-xs-12">
-            <i class="tile-icon {{ stat.icon }}"></i>
-            <span class="lead-stats-name fw-b ellipsis">{{ stat.name|trans }}</span>
-            <span class="lead-stats-val lh-1 fs-40">{{ stat.value }}{{ stat.suffix|default('') }}</span>
+        <div class="col-lg-3 col-xs-12">
+            {% set tileContent %}
+                <div class="d-flex fd-column lead-stats-el h-144 jc-space-between">
+                    <i class="tile-icon {{ stat.icon }}" aria-hidden="true"></i>
+                    <span class="lead-stats-name fw-b ellipsis">{{ stat.name|trans }}</span>
+                    <span class="lead-stats-val lh-1 fs-40">{{ stat.value }}{{ stat.suffix|default('') }}</span>
+                </div>
+            {% endset %}
+
+            {% include '@MauticCore/Components/tile--base.html.twig' with {
+                'tiles': [{'content': tileContent}]
+            } %}
         </div>
         {% endfor %}
     </div>
@@ -23,4 +32,5 @@
     %}
         {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.statistics'}) }}
     {% endif %}
+</div>
 {% endif %}

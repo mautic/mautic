@@ -16,7 +16,7 @@ class ReloadFacade
     }
 
     /**
-     * This method finds all plguins that needs to be enabled, disabled, installed and updated
+     * This method finds all plugins that needs to be enabled, disabled, installed and updated
      * and do all those actions.
      *
      * Returns humanly understandable message about its doings.

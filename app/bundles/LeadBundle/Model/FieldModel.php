@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -26,6 +27,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
@@ -483,6 +485,7 @@ class FieldModel extends FormModel
         private LeadFieldRepository $leadFieldRepository,
         private FieldList $fieldList,
         private LeadFieldSaver $leadFieldSaver,
+        private LeadFieldDeleter $leadFieldDeleter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -522,10 +525,7 @@ class FieldModel extends FormModel
      */
     public function getEntities(array $args = [])
     {
-        $repository = $this->em->getRepository(LeadField::class);
-        \assert($repository instanceof LeadFieldRepository);
-
-        return $repository->getEntities($args);
+        return $this->getRepository()->getEntities($args);
     }
 
     /**
@@ -615,7 +615,7 @@ class FieldModel extends FormModel
      * @throws AbortColumnUpdateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function saveEntity($entity, $unlock = true): void
@@ -656,7 +656,7 @@ class FieldModel extends FormModel
      * @throws AbortColumnCreateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function saveEntities($entities, $unlock = true): void
@@ -667,22 +667,20 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param object $entity
+     * @param LeadField $entity
      *
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws AbortColumnUpdateException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws DriverException
+     * @throws SchemaException
      */
     public function deleteEntity($entity): void
     {
-        parent::deleteEntity($entity);
-
-        switch ($entity->getObject()) {
-            case 'lead':
-                $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
-                break;
-            case 'company':
-                $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
-                break;
+        if (!$entity instanceof LeadField) {
+            throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
+        $this->customFieldColumn->deleteLeadColumn($entity);
+        $this->leadFieldDeleter->deleteLeadFieldEntity($entity);
     }
 
     /**

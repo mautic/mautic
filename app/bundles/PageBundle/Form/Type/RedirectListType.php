@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -14,11 +15,11 @@ class RedirectListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $choices = [
-            'mautic.page.form.redirecttype.permanent'     => 301,
-            'mautic.page.form.redirecttype.temporary'     => 302,
-            'mautic.page.form.redirecttype.303_temporary' => 303,
-            'mautic.page.form.redirecttype.307_temporary' => 307,
-            'mautic.page.form.redirecttype.308_permanent' => 308,
+            'mautic.page.form.redirecttype.permanent'     => Response::HTTP_MOVED_PERMANENTLY,
+            'mautic.page.form.redirecttype.temporary'     => Response::HTTP_FOUND,
+            'mautic.page.form.redirecttype.303_temporary' => Response::HTTP_SEE_OTHER,
+            'mautic.page.form.redirecttype.307_temporary' => Response::HTTP_TEMPORARY_REDIRECT,
+            'mautic.page.form.redirecttype.308_permanent' => Response::HTTP_PERMANENTLY_REDIRECT,
         ];
 
         $resolver->setDefaults([
@@ -29,10 +30,8 @@ class RedirectListType extends AbstractType
             'label_attr'  => ['class' => 'control-label'],
             'placeholder' => false,
             'required'    => false,
-            'attr'        => [
-                'class' => 'form-control',
-            ],
-            'feature'           => 'all',
+            'attr'        => ['class' => 'form-control'],
+            'feature'     => 'all',
         ]);
 
         $resolver->setDefined(['feature']);

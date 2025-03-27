@@ -54,6 +54,23 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
+    public function customFieldWasDeleted(LeadField $leadField, int $userId): void
+    {
+        try {
+            $user = $this->getUser($userId);
+        } catch (NoUserException) {
+            return;
+        }
+
+        $message = $this->translator->trans(
+            'mautic.lead.field.notification.deleted_message',
+            ['%label%' => $leadField->getLabel()]
+        );
+        $header  = $this->translator->trans('mautic.lead.field.notification.deleted_header');
+
+        $this->addToNotificationCenter($user, $message, $header);
+    }
+
     public function customFieldLimitWasHit(LeadField $leadField, ?int $userId): void
     {
         try {

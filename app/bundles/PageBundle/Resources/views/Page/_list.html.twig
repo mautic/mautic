@@ -16,12 +16,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#pageTable',
-                        'routeBase': 'page',
-                        'templateButtons': {
-                            'delete': permissions['page:pages:deleteown'] or permissions['page:pages:deleteother'],
-                        },
+                    'checkall': 'true',
+                    'target': '#pageTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -102,7 +98,7 @@
                         {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'page.page'}) }}
                         <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                             {{ item.title }} ({{ item.alias }})
-                            {% if item.isVariant or item.isTranslation or item.isPreferenceCenter %}
+                            {% if item.isVariant or item.isTranslation or item.isPreferenceCenter or pageConfig.isDraftEnabled %}
                                 <span>
                                     {% if item.isVariant %}
                                         <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
@@ -119,9 +115,15 @@
                                             <i class="ri-settings-5-line"></i>
                                         </span>
                                     {% endif %}
+                                    {% if pageConfig.isDraftEnabled and item.hasDraft %}
+                                        <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                    <i class="fa fa-fw fa-file"></i>
+                                </span>
+                                    {% endif %}
                                 </span>
                             {% endif %}
                         </a>
+                        {{ customContent('page.name', _context) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {% set category = item.category %}

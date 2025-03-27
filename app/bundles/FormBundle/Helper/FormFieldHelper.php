@@ -95,26 +95,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $this->getChoiceList($customFields);
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->types;
     }
 
-    /**
-     * Get fields input filter.
-     *
-     * @return string
-     */
-    public function getFieldFilter($type)
+    public function getFieldFilter(string $type): string
     {
-        if (array_key_exists($type, $this->types)) {
-            return $this->types[$type]['filter'] ?? 'clean';
-        }
-
-        return 'alphanum';
+        return $this->types[$type]['filter'] ?? 'string';
     }
 
     /**
@@ -172,6 +160,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $alias = $field->getAlias();
 
+        // Adds the "readonly" attribute to a field if it is configured as read-only with auto-fill enabled and a sanitized value exists.
+        $fieldAttributeReadOnly = fn ($field, $sanitizedValue) => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
+
         switch ($field->getType()) {
             case 'text':
             case 'number':
@@ -188,13 +179,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$sanitizedValue.'"'
-                        .$match[4].'/>';
+                        .$match[4].$fieldAttributeReadOnly($field, $sanitizedValue).'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'textarea':
                 if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
-                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.$this->sanitizeValue($value).'</textarea>';
+                    $value    = $this->sanitizeValue($value);
+                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].$fieldAttributeReadOnly($field, $value).'>'.$value.'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;

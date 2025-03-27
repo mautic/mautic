@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
@@ -195,5 +196,68 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days', $dateOptionParameters);
 
         $this->assertEquals('2018-03-07%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getWhere
+     */
+    public function testGetWhereReturnsCompositeExpression(): void
+    {
+        $dateDecorator        = $this->createMock(DateDecorator::class);
+        $timezoneResolver     = $this->createMock(TimezoneResolver::class);
+        $filterCrate          = new ContactSegmentFilterCrate(['operator' => '=']);
+        $dateOptionParameters = new DateOptionParameters($filterCrate, [], $timezoneResolver);
+
+        // Mock CompositeExpression return
+        $composite = CompositeExpression::and('field = 1', 'field = 2');
+        $dateDecorator->expects($this->once())
+            ->method('getWhere')
+            ->with($filterCrate)
+            ->willReturn($composite);
+
+        $decorator = new DateRelativeInterval($dateDecorator, '+5 days', $dateOptionParameters);
+        $result    = $decorator->getWhere($filterCrate);
+
+        $this->assertInstanceOf(CompositeExpression::class, $result);
+        $this->assertSame($composite, $result);
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getWhere
+     */
+    public function testGetWhereReturnsString(): void
+    {
+        $dateDecorator        = $this->createMock(DateDecorator::class);
+        $timezoneResolver     = $this->createMock(TimezoneResolver::class);
+        $filterCrate          = new ContactSegmentFilterCrate(['operator' => '=']);
+        $dateOptionParameters = new DateOptionParameters($filterCrate, [], $timezoneResolver);
+
+        // Mock string return
+        $expectedWhere = "date_field > '2023-01-01'";
+        $dateDecorator->expects($this->once())
+            ->method('getWhere')
+            ->willReturn($expectedWhere);
+
+        $decorator = new DateRelativeInterval($dateDecorator, '+5 days', $dateOptionParameters);
+        $this->assertSame($expectedWhere, $decorator->getWhere($filterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getWhere
+     */
+    public function testGetWhereReturnsNull(): void
+    {
+        $dateDecorator        = $this->createMock(DateDecorator::class);
+        $timezoneResolver     = $this->createMock(TimezoneResolver::class);
+        $filterCrate          = new ContactSegmentFilterCrate(['operator' => '=']);
+        $dateOptionParameters = new DateOptionParameters($filterCrate, [], $timezoneResolver);
+
+        // Mock null return
+        $dateDecorator->expects($this->once())
+            ->method('getWhere')
+            ->willReturn(null);
+
+        $decorator = new DateRelativeInterval($dateDecorator, '+5 days', $dateOptionParameters);
+        $this->assertNull($decorator->getWhere($filterCrate));
     }
 }

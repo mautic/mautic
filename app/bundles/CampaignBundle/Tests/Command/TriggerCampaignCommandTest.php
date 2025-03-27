@@ -535,7 +535,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $campaign2 = $this->createCampaign('Campaign 2');
         $lead      = $this->createLead('Lead');
         $this->createCampaignLead($campaign1, $lead);
-        $this->createCampaignLead($campaign2, $lead);
         $this->em->flush();
         $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
         $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
@@ -551,6 +550,39 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
         Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
         Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+    }
+
+    public function testCampaignActionChangeMembershipRestartRotation(): void
+    {
+        $campaign1 = $this->createCampaign('Campaign 1');
+        // create campaign with restart allowed
+        $campaign2 = $this->createCampaign('Campaign 2');
+        $campaign2->setAllowRestart(true);
+        $this->em->persist($campaign2);
+
+        $lead      = $this->createLead('Lead');
+
+        // add lead to both campaigns
+        $this->createCampaignLead($campaign1, $lead);
+        $this->createCampaignLead($campaign2, $lead);
+        $this->em->flush();
+
+        // add action changeCampaigns to add the lead again to campaign2
+        $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
+        $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+
+        Assert::assertCount(2, $campaignLeads);
+        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+        Assert::assertSame(2, $campaignLeads[1]->getRotation()); // assert it's the second rotation
     }
 
     public function testCampaignActionAfterChangeMembership(): void

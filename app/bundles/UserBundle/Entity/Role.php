@@ -2,46 +2,82 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Role extends FormEntity implements CacheInvalidateInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "role:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"permissions"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "role:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
+    use UuidTrait;
     public const CACHE_NAMESPACE = 'Role';
-
     /**
      * @var int
+     *
+     * @Groups({"role:read"})
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $name;
 
     /**
      * @var string|null
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $description;
 
     /**
      * @var bool
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $isAdmin = false;
 
     /**
      * @var ArrayCollection<int, Permission>
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $permissions;
 
     /**
      * @var array
+     *
+     * @Groups({"role:read", "role:write"})
      */
     private $rawPermissions;
 
@@ -85,6 +121,8 @@ class Role extends FormEntity implements CacheInvalidateInterface
             ->mappedBy('role')
             ->fetchExtraLazy()
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

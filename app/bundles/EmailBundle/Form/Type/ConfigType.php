@@ -266,6 +266,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'mailer_address_length_limit',
+            NumberType::class,
+            [
+                'scale'      => 0,
+                'label'      => 'mautic.email.config.mailer.address.length.limit',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.config.mailer.address.length.limit.tooltip',
+                ],
+                'required'   => true,
+            ]
+        );
+
+        $builder->add(
             'mailer_dsn',
             DsnType::class,
             [

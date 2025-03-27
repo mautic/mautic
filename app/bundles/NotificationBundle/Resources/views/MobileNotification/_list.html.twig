@@ -16,11 +16,7 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'routeBase': 'mobile_notification',
-                        'templateButtons': {
-                            'delete': permissions['notification:mobile_notifications:deleteown'] or permissions['notification:mobile_notifications:deleteother'],
-                        },
+                    'checkall': 'true',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {

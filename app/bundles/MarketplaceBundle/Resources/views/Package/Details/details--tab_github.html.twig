@@ -1,0 +1,27 @@
+<!-- GitHub -->
+<table class="table table-hover mb-0">
+    <tr>
+        <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+        <td>
+            <a href="{{ packageDetail.packageBase.repository|escape }}" target="_blank" rel="noopener noreferrer" >
+                {{ packageDetail.packageBase.name|escape }}
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.github.stars{% endtrans %}</th>
+        <td>{{ packageDetail.githubInfo.stars|escape }}</td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.github.watchers{% endtrans %}</th>
+        <td>{{ packageDetail.githubInfo.watchers|escape }}</td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.github.forks{% endtrans %}</th>
+        <td>{{ packageDetail.githubInfo.forks|escape }}</td>
+    </tr>
+    <tr>
+        <th>{% trans %}marketplace.package.github.open.issues{% endtrans %}</th>
+        <td>{{ packageDetail.githubInfo.openIssues|escape }}</td>
+    </tr>
+</table>

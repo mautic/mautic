@@ -1,20 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\GlobalSearch;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CampaignModel $campaignModel,
         private CorePermissions $security,
-        private Environment $twig,
+        private GlobalSearch $globalSearch,
     ) {
     }
 
@@ -28,41 +31,15 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
-        if ($this->security->isGranted('campaign:campaigns:view')) {
-            $str = $event->getSearchString();
-            if (empty($str)) {
-                return;
-            }
+        $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
+        $results   = $this->globalSearch->performSearch(
+            $filterDTO,
+            $this->campaignModel,
+            '@MauticCampaign/SubscribedEvents/Search/global.html.twig'
+        );
 
-            $campaigns = $this->campaignModel->getEntities(
-                [
-                    'limit'  => 5,
-                    'filter' => $str,
-                ]);
-
-            if (count($campaigns) > 0) {
-                $campaignResults = [];
-                foreach ($campaigns as $campaign) {
-                    $campaignResults[] = $this->twig->render(
-                        '@MauticCampaign/SubscribedEvents/Search/global.html.twig',
-                        [
-                            'campaign' => $campaign,
-                        ]
-                    );
-                }
-                if (count($campaigns) > 5) {
-                    $campaignResults[] = $this->twig->render(
-                        '@MauticCampaign/SubscribedEvents/Search/global.html.twig',
-                        [
-                            'showMore'     => true,
-                            'searchString' => $str,
-                            'remaining'    => (count($campaigns) - 5),
-                        ]
-                    );
-                }
-                $campaignResults['count'] = count($campaigns);
-                $event->addResults('mautic.campaign.campaigns', $campaignResults);
-            }
+        if (!empty($results)) {
+            $event->addResults('mautic.campaign.campaigns', $results);
         }
     }
 

@@ -298,16 +298,6 @@
                     } %}
 
                 </div>
-
-                {% if form.load_froala_assets is defined %}
-                    <div class="col-xs-12 mt-lg">
-                        {{ form_row(form.load_froala_assets) }}
-                        <div class="alert alert-danger" role="alert">
-                            {{ 'mautic.core.config.load.froala.assets.warning'|trans }}
-                        </div>
-                    </div>
-                {% endif %}
-
             </div>
         </div>
     </div>

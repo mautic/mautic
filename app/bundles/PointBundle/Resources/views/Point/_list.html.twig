@@ -4,12 +4,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#pointTable',
-                        'routeBase': 'point',
-                        'templateButtons': {
-                            'delete': permissions['point:points:delete'],
-                        },
+                    'checkall': 'true',
+                    'target': '#pointTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -75,6 +71,7 @@
                             {% else %}
                                 {{ item.name }}
                             {% endif %}
+                            {{ customContent('point.name', _context) }}
                         </div>
                         {% if item.description is not empty %}
                             <div class="text-secondary mt-4">

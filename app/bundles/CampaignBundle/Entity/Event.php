@@ -8,12 +8,35 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Event implements ChannelInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "event:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "event:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Event implements ChannelInterface, UuidInterface
 {
+    use UuidTrait;
+
     public const TABLE_NAME = 'campaign_events';
 
     public const TYPE_DECISION  = 'decision';
@@ -307,6 +330,8 @@ class Event implements ChannelInterface
         $builder->createField('failedCount', 'integer')
             ->columnName('failed_count')
             ->build();
+
+        static::addUuidField($builder);
     }
 
     /**

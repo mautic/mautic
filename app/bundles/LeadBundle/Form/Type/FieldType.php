@@ -542,6 +542,14 @@ class FieldType extends AbstractType
             ];
         }
 
+        if ($options['data']->getColumnIsNotRemoved()) {
+            if (array_key_exists('tooltip', $attr)) {
+                $attr['tooltip'] = $attr['tooltip'].' mautic.lead.field.being_removed_in_background';
+            } else {
+                $attr['tooltip'] = 'mautic.lead.field.being_removed_in_background';
+            }
+        }
+
         $builder->add(
             'isPublished',
             YesNoButtonGroupType::class,

@@ -16,7 +16,6 @@ use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\MauticController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -144,7 +143,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected ModelFactory $modelFactory,
         protected EventDispatcherInterface $dispatcher,
         protected CoreParametersHelper $coreParametersHelper,
-        protected MauticFactory $factory,
     ) {
         $this->translator           = $translator;
 
@@ -253,7 +251,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function getWhereFromRequest(Request $request)
     {
-        $where = InputHelper::cleanArray($request->query->all()['where'] ?? []);
+        $where = $request->query->all()['where'] ?? [];
 
         $this->sanitizeWhereClauseArrayFromRequest($where);
 

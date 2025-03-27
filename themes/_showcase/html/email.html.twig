@@ -15,7 +15,7 @@
 		</mj-text>
 		<mj-spacer>
 		</mj-spacer>
-		<mj-image src="{{ getAssetUrl('themes/\\@defaults/placeholder-logo.png', null, null, true) }}" width="70px">
+		<mj-image src="{{ getOverridableUrl('images/placeholder-logo.png') }}" width="70px">
 		</mj-image>
 	  </mj-column>
 	</mj-section>
@@ -29,7 +29,7 @@
 	</mj-section>
 	<mj-section background-color="#ffffff">
 	  <mj-column>
-		<mj-image src="{{ getAssetUrl('themes/\\@defaults/placeholder-image.png', null, null, true) }}" padding-right="0px" padding-left="0px">
+		<mj-image src="{{ getOverridableUrl('images/placeholder-image.png') }}" padding-right="0px" padding-left="0px">
 		</mj-image>
 	  </mj-column>
 	</mj-section>
@@ -48,7 +48,7 @@
 		  <p>Focus on its unique features, benefits, and why customers love it. Don't forget to mention if it's a limited edition or on sale.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#000000" inner-padding="16px 32px" border-radius="0px 0px 0px 0px" font-size="16px">
+		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">
 		  <p>Buy now
 		  </p>
 		</mj-button>
@@ -58,7 +58,7 @@
 	</mj-section>
 	<mj-section background-color="#fafafa" padding-top="30px" padding-bottom="30px">
 	  <mj-column width="275px">
-		<mj-image src="{{ getAssetUrl('themes/\\@defaults/placeholder-image.png', null, null, true) }}">
+		<mj-image src="{{ getOverridableUrl('images/placeholder-image.png') }}">
 		</mj-image>
 		<mj-text font-size="18px" font-weight="700">
 		  <p>Left column
@@ -70,7 +70,7 @@
 		</mj-text>
 	  </mj-column>
 	  <mj-column width="275px">
-		<mj-image src="{{ getAssetUrl('themes/\\@defaults/placeholder-image.png', null, null, true) }}">
+		<mj-image src="{{ getOverridableUrl('images/placeholder-image.png') }}">
 		</mj-image>
 		<mj-text font-size="18px" font-weight="700">
 		  <p>Right column
@@ -87,17 +87,17 @@
 		<mj-spacer>
 		</mj-spacer>
 		<mj-social font-size="12px" icon-size="30px" border-radius="12px" mode="horizontal">
-		  <mj-social-element name="facebook" background-color="#000000" border-radius="14px 14px 14px 14px" padding-right="10px">
+		  <mj-social-element name="facebook" background-color="#{{ getBrandPrimaryColor() }}" border-radius="14px 14px 14px 14px" padding-right="10px">
 		  </mj-social-element>
-		  <mj-social-element name="instagram" background-color="#000000" border-radius="14px 14px 14px 14px" padding-right="10px" padding-left="10px">
+		  <mj-social-element name="instagram" background-color="#{{ getBrandPrimaryColor() }}" border-radius="14px 14px 14px 14px" padding-right="10px" padding-left="10px">
 		  </mj-social-element>
-		  <mj-social-element name="youtube" background-color="#000000" border-radius="14px 14px 14px 14px" padding-left="10px">
+		  <mj-social-element name="youtube" background-color="#{{ getBrandPrimaryColor() }}" border-radius="14px 14px 14px 14px" padding-left="10px">
 		  </mj-social-element>
 		</mj-social>
 		<mj-spacer>
 		</mj-spacer>
 		<mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px">
-		  <p>Amazing Company
+		  <p>{brand=name}
 			<br/>11111 Beautiful City, 1212 Nice Street
 			<br/>Brazil
 			<br/>

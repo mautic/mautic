@@ -1,0 +1,78 @@
+<div class="panel mt-sm">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</div>
+    </div>
+    <table class="table table-hover mb-0">
+        <tr>
+            <th>{% trans %}marketplace.package.version{% endtrans %}</th>
+            <td>
+                {% if not latestVersion %}
+                    <div class="text-danger">
+                        {% trans %}marketplace.latest.version.missing{% endtrans %}
+                    </div>
+                {% else %}
+                    <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ latestVersion.version|escape }}" id="latest-version" target="_blank" rel="noopener noreferrer">
+                        <strong>{{ latestVersion.version }}</strong>
+                    </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% if latestVersion is not empty %}
+            <tr>
+                <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
+                <td title="{{ dateToText(latestVersion.time) }}">
+                    {{ dateToDate(latestVersion.time) }}
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans %}marketplace.package.license{% endtrans %}</th>
+                <td>{{ latestVersion.license|join(', ')|escape }}</td>
+            </tr>
+            {% if latestVersion.homepage %}
+                <tr>
+                    <th>{% trans %}marketplace.package.homepage{% endtrans %}</th>
+                    <td>{{ latestVersion.homepage|escape }}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <th>
+                    {% trans %}marketplace.package.required.packages{% endtrans %}
+                    ({{ latestVersion.require|length }})
+                </th>
+                <td>{{ latestVersion.require|keys|join(', ')|escape }}</td>
+            </tr>
+        {% endif %}
+    </table>
+    </div>
+
+    <div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</div>
+    </div>
+    <table class="table table-hover mb-0">
+        <tr>
+            <th>{% trans %}marketplace.package.version{% endtrans %}</th>
+            <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
+        </tr>
+        {% for version in packageDetail.versions.sortByLatest() %}
+        <tr>
+            <td>
+                {% if version.isStable() or version.isPreRelease() %}
+                    <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ version.version|escape }}" target="_blank" rel="noopener noreferrer" >
+                    {% if version.isStable() %}
+                        <b>{{ version.version|escape }}</b>
+                    {% else %}
+                        {{ version.version|escape }}
+                    {% endif %}
+                    </a>
+                {% else %}
+                    <i>{{ version.version|escape }}</i>
+                {% endif %}
+            </td>
+            <td title="{{ dateToText(version.time) }}">
+                {{ dateToFullConcat(version.time) }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
