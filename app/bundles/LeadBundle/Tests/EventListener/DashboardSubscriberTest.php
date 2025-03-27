@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\LeadBundle\EventListener\DashboardSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -12,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateHelperStub
+class DateHelperStub extends DateHelper
 {
     public function formatRange(\DateInterval $interval): string 
     {
@@ -22,12 +23,12 @@ class DateHelperStub
 
 class DashboardSubscriberTest extends TestCase
 {
-    private $leadModel;
-    private $leadListModel;
-    private $router;
-    private $translator;
-    private $dateHelper;
-    private $dashboardSubscriber;
+    private LeadModel $leadModel;
+    private ListModel $leadListModel;
+    private RouterInterface $router;
+    private TranslatorInterface $translator;
+    private DateHelperStub $dateHelper;
+    private DashboardSubscriber $dashboardSubscriber;
 
     protected function setUp(): void
     {
