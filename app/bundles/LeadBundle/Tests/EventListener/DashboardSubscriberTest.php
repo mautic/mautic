@@ -157,23 +157,26 @@ class DashboardSubscriberTest extends TestCase
         /** @var WidgetDetailEvent&MockObject */
         $event = $this->createEvent('anonymous.vs.identified.leads', $params);
 
-        $this->leadModel
-            ->method('getAnonymousVsIdentifiedPieChartData')
-            ->willReturn([
-                'datasets' => [
-                    [
-                        'data' => [60, 40],
-                    ],
+        $chartData = [
+            'datasets' => [
+                [
+                    'data' => [60, 40],
                 ],
-            ]);
+            ],
+        ];
 
-        $event
+        $this->leadModel
+            ->expects(self::once())
+            ->method('getAnonymousVsIdentifiedPieChartData')
+            ->willReturn($chartData);
+
+        $event->expects(self::once())
             ->method('setTemplate')
             ->with('@MauticCore/Helper/chart.html.twig');
 
-        $event
+        $event->expects(self::once())
             ->method('setTemplateData')
-            ->with($this->arrayHasKey('chartData'));
+            ->with(self::arrayHasKey('chartData'));
 
         $this->dashboardSubscriber->onWidgetDetailGenerate($event);
     }
