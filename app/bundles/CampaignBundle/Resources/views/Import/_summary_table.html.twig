@@ -1,0 +1,50 @@
+{% set summaryId = tableId|default('summaryTable') %}
+{% set showLinks = showLinks|default(false) %}
+{% set isAnalyzeStage = isAnalyzeStage|default(false) %}
+
+<div class="pa-sm mt-md mb-lg">
+    {% if heading is defined %}
+        <h4 class="pa-sm">{{ heading }}</h4>
+    {% endif %}
+
+    <table class="table table-hover table-striped" id="{{ summaryId }}">
+        <thead>
+            <tr>
+                <th class="text-center">{{ 'Entity'|trans }}</th>
+                <th class="text-center">{{ 'Name'|trans }}</th>
+                <th class="text-center">{{ 'Actions'|trans }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entityKey, details in summary %}
+                {% set entity = entityKey|replace({'_create':'', '_update':''}) %}
+                {% set names = details.names is iterable ? details.names : [details.names] %}
+                {% set ids = details.ids is iterable ? details.ids : [details.ids] %}
+                {% for i in 0..(names|length - 1) %}
+                    <tr>
+                        <td class="text-center"><strong>{{ entity|capitalize }}</strong></td>
+                        <td>
+                            {% if entity == 'campaign' and showLinks %}
+                                <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': ids[i]}) }}">
+                                    {{ names[i] }}
+                                </a>
+                            {% else %}
+                                {{ names[i] }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if isAnalyzeStage and entityKey ends with '_update' %}
+                                <select name="importAction[{{ entity }}][{{ ids[i] }}]" class="form-control input-sm">
+                                    <option value="update" selected>{{ 'Update entity'|trans }}</option>
+                                    <option value="create">{{ 'Create new entity'|trans }}</option>
+                                </select>
+                            {% else %}
+                                {{ details.status }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

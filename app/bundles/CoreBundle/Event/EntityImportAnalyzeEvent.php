@@ -9,12 +9,12 @@ class EntityImportAnalyzeEvent extends Event
     /**
      * @var array<string, mixed>
      */
-    private array $summary;
+    private array $summary = [];
 
     /**
      * @param array<string, mixed> $data
      */
-    public function __construct(private array $data)
+    public function __construct(private string $entityName, private array $data)
     {
     }
 
@@ -26,9 +26,19 @@ class EntityImportAnalyzeEvent extends Event
         return $this->data;
     }
 
-    public function setSummary(mixed $value): mixed
+    public function getEntityName(): string
     {
-        return $this->summary = $value;
+        return $this->entityName;
+    }
+
+    /**
+     * Set an argument dynamically.
+     *
+     * @param array<string, mixed> $value
+     */
+    public function setSummary(string $key, array $value): void
+    {
+        $this->summary[$key] = $value;
     }
 
     public function getSummary(): mixed

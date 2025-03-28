@@ -71,9 +71,10 @@ final class EntityImportCommand extends ModeratedCommand
             return self::FAILURE;
         }
 
-        $event = new EntityImportEvent($entityName, $fileData, $userId);
-
-        $this->dispatcher->dispatch($event);
+        foreach ($fileData as $entity) {
+            $event = new EntityImportEvent($entityName, $entity, $userId);
+            $this->dispatcher->dispatch($event);
+        }
 
         $output->writeln('<info>Campaign data imported successfully.</info>');
 
@@ -133,8 +134,10 @@ final class EntityImportCommand extends ModeratedCommand
      */
     private function validateData(array $data, string $entityName): array
     {
-        if (!isset($data[$entityName]) || !isset($data['dependencies'])) {
-            return ['isValid' => false, 'message' => 'Missing required keys.'];
+        foreach ($data as $entity) {
+            if (!isset($entity[$entityName]) || !isset($entity['dependencies'])) {
+                return ['isValid' => false, 'message' => 'Missing required keys.'];
+            }
         }
 
         return ['isValid' => true, 'message' => ''];

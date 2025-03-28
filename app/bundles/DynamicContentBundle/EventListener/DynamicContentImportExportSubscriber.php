@@ -6,6 +6,7 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -29,9 +30,10 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onExport', 0],
-            EntityImportEvent::class     => ['onImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onExport', 0],
+            EntityImportEvent::class        => ['onImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -67,60 +69,35 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         ];
         $event->addEntity(DynamicContent::ENTITY_NAME, $data);
 
-        $log = [
-            'bundle'    => 'dynamicContent',
-            'object'    => 'dynamicContent',
-            'objectId'  => $object->getId(),
-            'action'    => 'export',
-            'details'   => $data,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-        ];
-        $this->auditLogModel->writeToLog($log);
+        $this->logAction('export', $object->getId(), $data);
     }
 
     public function onImport(EntityImportEvent $event): void
     {
-        if (DynamicContent::ENTITY_NAME !== $event->getEntityName()) {
+        if (DynamicContent::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $elements = $event->getEntityData();
-        if (!$elements) {
-            return;
-        }
-
-        $userId   = $event->getUserId();
         $userName = '';
-
-        if ($userId) {
-            $user = $this->userModel->getEntity($userId);
-            if ($user) {
-                $userName = $user->getFirstName().' '.$user->getLastName();
-            }
+        if ($event->getUserId()) {
+            $user     = $this->userModel->getEntity($event->getUserId());
+            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
         }
 
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
-        foreach ($elements as $element) {
-            $existingObject = $this->entityManager->getRepository(DynamicContent::class)->findOneBy(['uuid' => $element['uuid']]);
-            if ($existingObject) {
-                // Update existing object
-                $object = $existingObject;
-                $object->setModifiedByUser($userName);
-                $status = EntityImportEvent::UPDATE;
-            } else {
-                // Create a new object
-                $object = new DynamicContent();
-                $object->setDateAdded(new \DateTime());
-                $object->setCreatedByUser($userName);
-                $object->setUuid($element['uuid']);
-                $status = EntityImportEvent::NEW;
-            }
+        foreach ($event->getEntityData() as $element) {
+            $object = $this->entityManager->getRepository(DynamicContent::class)->findOneBy(['uuid' => $element['uuid']]);
+            $isNew  = !$object;
+
+            $object ??= new DynamicContent();
+            $isNew && $object->setDateAdded(new \DateTime());
+            $object->setDateModified(new \DateTime());
+            $object->setUuid($element['uuid']);
+            $isNew ? $object->setCreatedByUser($userName) : $object->setModifiedByUser($userName);
 
             $object->setTranslationParent($element['translation_parent_id'] ?? null);
             $object->setVariantParent($element['variant_parent_id'] ?? null);
@@ -139,51 +116,23 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             $object->setIsCampaignBased((bool) ($element['is_campaign_based'] ?? false));
             $object->setSlotName($element['slot_name'] ?? '');
 
-            $object->setDateModified(new \DateTime());
-
             $this->entityManager->persist($object);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
+            $event->addEntityIdMap((int) $element['id'], $object->getId());
 
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $object->getName();
-                $updateIds[]   = $object->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $object->getName();
-                $newIds[]   = $object->getId();
-                ++$newCount;
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $object->getName();
+            $stats[$status]['ids'][]   = $object->getId();
+            ++$stats[$status]['count'];
+
+            $this->logAction('import', $object->getId(), $element);
+        }
+
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [DynamicContent::ENTITY_NAME => $info]);
             }
-
-            $log = [
-                'bundle'    => 'dynamicContent',
-                'object'    => 'dynamicContent',
-                'objectId'  => $object->getId(),
-                'action'    => 'import',
-                'details'   => $element,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-        }
-
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                DynamicContent::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                DynamicContent::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
         }
     }
 
@@ -203,20 +152,52 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'dynamicContent',
-                    'object'    => 'dynamicContent',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => DynamicContent::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => DynamicContent::class]);
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (DynamicContent::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $item) {
+            $existing = $this->entityManager->getRepository(DynamicContent::class)->findOneBy(['uuid' => $item['uuid']]);
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $item['name'];
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $type => $info) {
+            if ($info['count'] > 0) {
+                $event->setSummary($type, [DynamicContent::ENTITY_NAME => $info]);
+            }
+        }
+    }
+
+    private function logAction(string $action, int $objectId, array $details): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'dynamicContent',
+            'object'    => 'dynamicContent',
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }

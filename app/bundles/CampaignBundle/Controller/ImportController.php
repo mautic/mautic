@@ -177,6 +177,7 @@ final class ImportController extends AbstractFormController
         $this->requestStack->getSession()->set('mautic.campaign.import.file', null);
         $this->requestStack->getSession()->set('mautic.campaign.import.step', self::STEP_UPLOAD_ZIP);
         $this->requestStack->getSession()->set('mautic.campaign.import.progress', 0);
+        $this->requestStack->getSession()->remove('mautic.campaign.import.analyzeSummary');
     }
 
     private function removeImportFile(string $filepath): void
@@ -292,16 +293,21 @@ final class ImportController extends AbstractFormController
             $session->set('mautic.campaign.import.progress', 50);
             $session->set('mautic.campaign.import.analyzeSummary', $analyzeSummary);
 
-            // Calculate update_count
+            // Calculate update_count create_count
             $updateCount = 0;
-            foreach ($analyzeSummary['updatedObjects'] as $details) {
-                $updateCount += $details['count'];
-            }
-
-            // Calculate create_count
             $createCount = 0;
-            foreach ($analyzeSummary['newObjects'] as $details) {
-                $createCount += $details['count'];
+
+            foreach ($analyzeSummary as $summary) {
+                if (!empty($summary[EntityImportEvent::UPDATE])) {
+                    foreach ($summary[EntityImportEvent::UPDATE] as $details) {
+                        $updateCount += $details['count'];
+                    }    
+                }
+                if (!empty($summary[EntityImportEvent::NEW])) {
+                    foreach ($summary[EntityImportEvent::NEW] as $details) {
+                        $createCount += $details['count'];
+                    }    
+                }
             }
 
             return $this->delegateView([
@@ -326,30 +332,55 @@ final class ImportController extends AbstractFormController
                 ];
             } else {
                 $userId = $this->userHelper->getUser()->getId();
-                $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $fileData, $userId);
-                $this->dispatcher->dispatch($event);
-                $importSummary = $event->getStatus();
+                $importSummary = [];
 
-                if (isset($importSummary[EntityImportEvent::NEW][Campaign::ENTITY_NAME])) {
-                    $campaignData    = $importSummary[EntityImportEvent::NEW][Campaign::ENTITY_NAME];
-                    $campaignName    = $campaignData['names'][0] ?? 'Unknown';
-                    $campaignId      = $campaignData['ids'][0] ?? 0;
+                $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
 
-                    $this->addFlashMessage(
-                        'mautic.campaign.notice.import.finished',
-                        ['%id%' => $campaignId, '%name%' => $campaignName]
-                    );
+                // Loop through importActions and clean UUIDs for 'create' actions
+                foreach ($importActions as $entityType => $entities) {
+                    foreach ($entities as $entityId => $action) {
+                        if ($action === 'create') {
+                            // Loop through each import group (each fileData block)
+                            foreach ($fileData as &$group) {
+                                if (!isset($group[$entityType])) {
+                                    continue;
+                                }
+                
+                                // Loop through each item in the entity group (e.g., each campaign)
+                                foreach ($group[$entityType] as &$item) {
+                                    if (isset($item['id']) && (int) $item['id'] === (int) $entityId) {
+                                        $item['uuid'] = '';
+                                        break 2; // Found and updated; break out of both loops
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach ($fileData as $entity) {
+                    $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
+                    $this->dispatcher->dispatch($event);
+                    $summary = $event->getStatus();
+                    if (!empty($summary)) {
+                        $importSummary[] = $summary;
+                    }
                 }
 
-                if (isset($importSummary[EntityImportEvent::UPDATE][Campaign::ENTITY_NAME])) {
-                    $campaignData    = $importSummary[EntityImportEvent::UPDATE][Campaign::ENTITY_NAME];
-                    $campaignName    = $campaignData['names'][0] ?? 'Unknown';
-                    $campaignId      = $campaignData['ids'][0] ?? 0;
-
-                    $this->addFlashMessage(
-                        'mautic.campaign.notice.import.finished',
-                        ['%id%' => $campaignId, '%name%' => $campaignName]
-                    );
+                foreach ($importSummary as $summary) {
+                    foreach ([EntityImportEvent::NEW, EntityImportEvent::UPDATE] as $status) {
+                        if (!isset($summary[$status][Campaign::ENTITY_NAME])) {
+                            continue;
+                        }
+                    
+                        $campaignData = $summary[$status][Campaign::ENTITY_NAME];
+                        $campaignName    = $campaignData['names'][0] ?? 'Unknown';
+                        $campaignId      = $campaignData['ids'][0] ?? 0;
+                    
+                        $this->addFlashMessage(
+                            'mautic.campaign.notice.import.finished',
+                            ['%id%' => $campaignId, '%name%' => $campaignName]
+                        );
+                    }
                 }
 
                 $session->set('mautic.campaign.import.summary', $importSummary);
@@ -380,10 +411,46 @@ final class ImportController extends AbstractFormController
             return ['errors' => 'Invalid file data.'];
         }
 
-        $event  = new EntityImportAnalyzeEvent($fileData);
-        $this->dispatcher->dispatch($event);
+        $allData = [];
+        foreach ($fileData as $entityData) {
+            $mergedSummary = [];
+            foreach ($entityData as $key => $data) {
+                if (empty($data)) {
+                    continue;
+                }
 
-        return $event->getSummary() ?? ['errors' => 'Unknown status'];
+                $event = new EntityImportAnalyzeEvent($key, $data);
+                $this->dispatcher->dispatch($event);
+                $summary = $event->getSummary();
+
+                foreach ($summary as $status => $entities) {
+                    foreach ($entities as $entityName => $info) {
+                        if (!isset($mergedSummary[$status][$entityName])) {
+                            $mergedSummary[$status][$entityName] = [
+                                'names' => [],
+                                'ids'   => [],
+                                'count' => 0,
+                            ];
+                        }
+    
+                        $mergedSummary[$status][$entityName]['names'] = array_merge(
+                            $mergedSummary[$status][$entityName]['names'],
+                            $info['names'] ?? []
+                        );
+                        $mergedSummary[$status][$entityName]['ids'] = array_merge(
+                            $mergedSummary[$status][$entityName]['ids'],
+                            $info['ids'] ?? []
+                        );
+                        $mergedSummary[$status][$entityName]['count'] += $info['count'] ?? 0;
+                    }
+                }
+            }
+            if (!empty($mergedSummary)) {
+                $allData[] = $mergedSummary;
+            }
+        }
+
+        return empty($allData) ? ['errors' => 'Unknown status'] : $allData;
     }
 
     public function undoAction(): JsonResponse

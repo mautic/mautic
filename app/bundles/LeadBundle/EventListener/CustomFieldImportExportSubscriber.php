@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -29,9 +30,10 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onLeadFieldExport', 0],
-            EntityImportEvent::class     => ['onLeadFieldImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onLeadFieldExport', 0],
+            EntityImportEvent::class        => ['onLeadFieldImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -73,74 +75,45 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
         ];
 
         $event->addEntity(LeadField::ENTITY_NAME, $leadFieldData);
-
-        $log = [
-            'bundle'    => 'lead',
-            'object'    => 'leadField',
-            'objectId'  => $leadField->getId(),
-            'action'    => 'export',
-            'details'   => $leadFieldData,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-        ];
-        $this->auditLogModel->writeToLog($log);
+        $this->logAction('export', $leadField->getId(), $leadFieldData);
     }
 
     public function onLeadFieldImport(EntityImportEvent $event): void
     {
-        if (LeadField::ENTITY_NAME !== $event->getEntityName()) {
+        if (LeadField::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $elements = $event->getEntityData();
-        $userId   = $event->getUserId();
         $userName = '';
-
-        if ($userId) {
-            $user = $this->userModel->getEntity($userId);
-            if ($user) {
-                $userName = $user->getFirstName().' '.$user->getLastName();
-            }
+        if ($event->getUserId()) {
+            $user     = $this->userModel->getEntity($event->getUserId());
+            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
         }
 
-        if (!$elements) {
-            return;
-        }
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
+        foreach ($event->getEntityData() as $element) {
+            $field = $this->entityManager->getRepository(LeadField::class)->findOneBy(['uuid' => $element['uuid']]);
+            $isNew = !$field;
 
-        foreach ($elements as $element) {
-            $existingObject = $this->entityManager->getRepository(LeadField::class)->findOneBy(['uuid' => $element['uuid']]);
-            if ($existingObject) {
-                // Update existing object
-                $field = $existingObject;
-                $field->setDateModified(new \DateTime());
-                $status = EntityImportEvent::UPDATE;
-            } else {
-                // Create a new object
-                $field = new LeadField();
+            $field ??= new LeadField();
+            $isNew && $field->setDateAdded(new \DateTime());
+            $field->setDateModified(new \DateTime());
 
-                if ($userId) {
-                    $field->setCreatedBy($userId);
-                    $field->setCreatedByUser($userName);
-                }
-
-                $alias = $this->fieldModel->generateUniqueFieldAlias($element['alias']);
-                $field->setAlias($alias);
-                $field->setDateAdded(new \DateTime());
-                $field->setUuid($element['uuid']);
-                $status = EntityImportEvent::NEW;
+            if ($isNew && $event->getUserId()) {
+                $field->setCreatedBy($event->getUserId());
+                $field->setCreatedByUser($userName);
             }
 
-            $field->setIsPublished((bool) $element['is_published']);
+            $field->setUuid($element['uuid']);
             $field->setLabel($element['label']);
             $field->setType($element['type']);
             $field->setGroup($element['field_group']);
             $field->setDefaultValue($element['default_value'] ?? null);
+            $field->setIsPublished((bool) $element['is_published']);
             $field->setIsRequired((bool) ($element['is_required'] ?? false));
             $field->setIsFixed((bool) ($element['is_fixed'] ?? false));
             $field->setIsVisible((bool) ($element['is_visible'] ?? true));
@@ -155,46 +128,28 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
             $field->setProperties($element['properties'] ?? []);
             $field->setColumnIsNotCreated();
 
+            if ($isNew) {
+                $alias = $this->fieldModel->generateUniqueFieldAlias($element['alias']);
+                $field->setAlias($alias);
+            }
+
             $this->entityManager->persist($field);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $field->getId());
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $field->getName();
-                $updateIds[]   = $field->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $field->getName();
-                $newIds[]   = $field->getId();
-                ++$newCount;
+            $event->addEntityIdMap((int) $element['id'], $field->getId());
+
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $field->getLabel();
+            $stats[$status]['ids'][]   = $field->getId();
+            ++$stats[$status]['count'];
+
+            $this->logAction('import', $field->getId(), $element);
+        }
+
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [LeadField::ENTITY_NAME => $info]);
             }
-            $log = [
-                'bundle'    => 'lead',
-                'object'    => 'leadField',
-                'objectId'  => $field->getId(),
-                'action'    => 'import',
-                'details'   => $element,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-        }
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                LeadField::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                LeadField::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
         }
     }
 
@@ -214,20 +169,52 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'lead',
-                    'object'    => 'leadField',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => LeadField::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => LeadField::class]);
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (LeadField::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $item) {
+            $existing = $this->entityManager->getRepository(LeadField::class)->findOneBy(['uuid' => $item['uuid']]);
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getLabel();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $item['label'];
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $type => $data) {
+            if ($data['count'] > 0) {
+                $event->setSummary($type, [LeadField::ENTITY_NAME => $data]);
+            }
+        }
+    }
+
+    private function logAction(string $action, int $objectId, array $details): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'lead',
+            'object'    => 'leadField',
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }

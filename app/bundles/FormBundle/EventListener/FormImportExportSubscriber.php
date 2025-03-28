@@ -6,6 +6,7 @@ namespace Mautic\FormBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -114,15 +115,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         }
 
         $event->addEntity(Form::ENTITY_NAME, $formData);
-        $log = [
-            'bundle'    => 'form',
-            'object'    => 'form',
-            'objectId'  => $formId,
-            'action'    => 'export',
-            'details'   => $formData,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-        ];
-        $this->auditLogModel->writeToLog($log);
+        $this->logAction('export', $formId, $formData, 'form');
     }
 
     /**
@@ -146,46 +139,29 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function onFormImport(EntityImportEvent $event): void
     {
-        if (Form::ENTITY_NAME !== $event->getEntityName()) {
+        if (Form::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $forms    = $event->getEntityData();
-        $userId   = $event->getUserId();
         $userName = '';
-
-        if ($userId) {
-            $user   = $this->userModel->getEntity($userId);
-            if ($user) {
-                $userName = $user->getFirstName().' '.$user->getLastName();
-            }
+        if ($event->getUserId()) {
+            $user     = $this->userModel->getEntity($event->getUserId());
+            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
         }
 
-        if (!$forms) {
-            return;
-        }
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
-        foreach ($forms as $formData) {
-            $existingObject = $this->entityManager->getRepository(Form::class)->findOneBy(['uuid' => $formData['uuid']]);
-            if ($existingObject) {
-                // Update existing object
-                $form = $existingObject;
-                $form->setModifiedByUser($userName);
-                $status = EntityImportEvent::UPDATE;
-            } else {
-                // Create a new object
-                $form = new Form();
-                $form->setDateAdded(new \DateTime());
-                $form->setCreatedByUser($userName);
-                $form->setUuid($formData['uuid']);
-                $status = EntityImportEvent::NEW;
-            }
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
+        foreach ($event->getEntityData() as $formData) {
+            $form  = $this->entityManager->getRepository(Form::class)->findOneBy(['uuid' => $formData['uuid']]);
+            $isNew = !$form;
+
+            $form ??= new Form();
+            $isNew && $form->setDateAdded(new \DateTime());
+            $form->setDateModified(new \DateTime());
+            $form->setUuid($formData['uuid']);
             $form->setName($formData['name']);
             $form->setIsPublished((bool) $formData['is_published']);
             $form->setDescription($formData['description'] ?? '');
@@ -198,121 +174,72 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $form->setFormType($formData['form_type'] ?? '');
             $form->setRenderStyle($formData['render_style'] ?? '');
             $form->setFormAttributes($formData['form_attr'] ?? '');
-            $form->setDateModified(new \DateTime());
+            $isNew ? $form->setCreatedByUser($userName) : $form->setModifiedByUser($userName);
 
             $this->entityManager->persist($form);
             $this->entityManager->flush();
 
-            // Import form actions
-            if (!empty($formData['form_actions'])) {
-                foreach ($formData['form_actions'] as $actionData) {
-                    $action = new \Mautic\FormBundle\Entity\Action();
-                    $action->setForm($form);
-                    $action->setName($actionData['name']);
-                    $action->setDescription($actionData['description'] ?? '');
-                    $action->setType($actionData['type']);
-                    $action->setOrder($actionData['action_order'] ?? 0);
-                    $action->setProperties($actionData['properties']);
-
-                    $this->entityManager->persist($action);
-                    $this->entityManager->flush();
-
-                    $log = [
-                        'bundle'    => 'form',
-                        'object'    => 'formAction',
-                        'objectId'  => $action->getId(),
-                        'action'    => 'import',
-                        'details'   => $actionData,
-                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                    ];
-                    $this->auditLogModel->writeToLog($log);
-                }
+            // Import actions
+            foreach ($formData['form_actions'] ?? [] as $actionData) {
+                $action = new \Mautic\FormBundle\Entity\Action();
+                $action->setForm($form);
+                $action->setName($actionData['name']);
+                $action->setDescription($actionData['description'] ?? '');
+                $action->setType($actionData['type']);
+                $action->setOrder($actionData['action_order'] ?? 0);
+                $action->setProperties($actionData['properties']);
+                $this->entityManager->persist($action);
+                $this->entityManager->flush();
+                $this->logAction('import', $action->getId(), $actionData, 'formAction');
             }
 
-            // Import form fields
-            if (!empty($formData['form_fields'])) {
-                foreach ($formData['form_fields'] as $fieldData) {
-                    $field = new \Mautic\FormBundle\Entity\Field();
-                    $field->setForm($form);
-                    $field->setLabel($fieldData['label'] ?? '');
-                    $field->setShowLabel((bool) $fieldData['show_label']);
-                    $field->setAlias($fieldData['alias'] ?? '');
-                    $field->setType($fieldData['type'] ?? '');
-                    $field->setIsCustom((bool) $fieldData['is_custom']);
-                    $field->setCustomParameters($fieldData['custom_parameters']);
-                    $field->setDefaultValue($fieldData['default_value'] ?? '');
-                    $field->setIsRequired((bool) $fieldData['is_required']);
-                    $field->setValidationMessage($fieldData['validation_message'] ?? '');
-                    $field->setHelpMessage($fieldData['help_message'] ?? '');
-                    $field->setOrder($fieldData['field_order'] ?? 0);
-                    $field->setProperties($fieldData['properties']);
-                    $field->setValidation($fieldData['validation']);
-                    $field->setConditions($fieldData['conditions']);
-                    $field->setLabelAttributes($fieldData['label_attr']);
-                    $field->setInputAttributes($fieldData['input_attr']);
-                    $field->setContainerAttributes($fieldData['container_attr']);
-                    $field->setSaveResult((bool) $fieldData['save_result']);
-                    $field->setIsAutoFill((bool) $fieldData['is_auto_fill']);
-                    $field->setIsReadOnly((bool) $fieldData['is_read_only']);
-                    $field->setShowWhenValueExists((bool) $fieldData['show_when_value_exists']);
-                    $field->setShowAfterXSubmissions($fieldData['show_after_x_submissions']);
-                    $field->setAlwaysDisplay((bool) $fieldData['always_display']);
-                    $field->setMappedObject($fieldData['mapped_object']);
-                    $field->setMappedField($fieldData['mapped_field']);
-
-                    $this->entityManager->persist($field);
-                    $this->entityManager->flush();
-
-                    $log = [
-                        'bundle'    => 'form',
-                        'object'    => 'formField',
-                        'objectId'  => $field->getId(),
-                        'action'    => 'import',
-                        'details'   => $fieldData,
-                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                    ];
-                    $this->auditLogModel->writeToLog($log);
-                }
+            // Import fields
+            foreach ($formData['form_fields'] ?? [] as $fieldData) {
+                $field = new \Mautic\FormBundle\Entity\Field();
+                $field->setForm($form);
+                $field->setLabel($fieldData['label'] ?? '');
+                $field->setShowLabel((bool) $fieldData['show_label']);
+                $field->setAlias($fieldData['alias'] ?? '');
+                $field->setType($fieldData['type'] ?? '');
+                $field->setIsCustom((bool) $fieldData['is_custom']);
+                $field->setCustomParameters($fieldData['custom_parameters']);
+                $field->setDefaultValue($fieldData['default_value'] ?? '');
+                $field->setIsRequired((bool) $fieldData['is_required']);
+                $field->setValidationMessage($fieldData['validation_message'] ?? '');
+                $field->setHelpMessage($fieldData['help_message'] ?? '');
+                $field->setOrder($fieldData['field_order'] ?? 0);
+                $field->setProperties($fieldData['properties']);
+                $field->setValidation($fieldData['validation']);
+                $field->setConditions($fieldData['conditions']);
+                $field->setLabelAttributes($fieldData['label_attr']);
+                $field->setInputAttributes($fieldData['input_attr']);
+                $field->setContainerAttributes($fieldData['container_attr']);
+                $field->setSaveResult((bool) $fieldData['save_result']);
+                $field->setIsAutoFill((bool) $fieldData['is_auto_fill']);
+                $field->setIsReadOnly((bool) $fieldData['is_read_only']);
+                $field->setShowWhenValueExists((bool) $fieldData['show_when_value_exists']);
+                $field->setShowAfterXSubmissions($fieldData['show_after_x_submissions']);
+                $field->setAlwaysDisplay((bool) $fieldData['always_display']);
+                $field->setMappedObject($fieldData['mapped_object']);
+                $field->setMappedField($fieldData['mapped_field']);
+                $this->entityManager->persist($field);
+                $this->entityManager->flush();
+                $this->logAction('import', $field->getId(), $fieldData, 'formField');
             }
 
-            $event->addEntityIdMap((int) $formData['id'], (int) $form->getId());
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $form->getName();
-                $updateIds[]   = $form->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $form->getName();
-                $newIds[]   = $form->getId();
-                ++$newCount;
-            }
-            $log = [
-                'bundle'    => 'form',
-                'object'    => 'form',
-                'objectId'  => $form->getId(),
-                'action'    => 'import',
-                'details'   => $formData,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
+            $event->addEntityIdMap((int) $formData['id'], $form->getId());
+
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $form->getName();
+            $stats[$status]['ids'][]   = $form->getId();
+            ++$stats[$status]['count'];
+            $this->logAction('import', $form->getId(), $formData, 'form');
         }
 
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                Form::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                Form::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [Form::ENTITY_NAME => $info]);
+            }
         }
     }
 
@@ -332,20 +259,52 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'form',
-                    'object'    => 'form',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => Form::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => Form::class], 'form');
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (Form::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $item) {
+            $existing = $this->entityManager->getRepository(Form::class)->findOneBy(['uuid' => $item['uuid']]);
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $item['name'];
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $type => $data) {
+            if ($data['count'] > 0) {
+                $event->setSummary($type, [Form::ENTITY_NAME => $data]);
+            }
+        }
+    }
+
+    private function logAction(string $action, int $objectId, array $details, string $object): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'form',
+            'object'    => $object,
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }

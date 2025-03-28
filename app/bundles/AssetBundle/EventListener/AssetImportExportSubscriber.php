@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -29,9 +30,10 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onAssetExport', 0],
-            EntityImportEvent::class     => ['onAssetImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onAssetExport', 0],
+            EntityImportEvent::class        => ['onAssetImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -81,48 +83,29 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
 
     public function onAssetImport(EntityImportEvent $event): void
     {
-        if (Asset::ENTITY_NAME !== $event->getEntityName()) {
+        if (Asset::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $elements  = $event->getEntityData();
-        $userId    = $event->getUserId();
-        $userName  = '';
-
-        if ($userId) {
-            $user   = $this->userModel->getEntity($userId);
-            if ($user) {
-                $userName = $user->getFirstName().' '.$user->getLastName();
-            }
+        $userName = '';
+        if ($event->getUserId()) {
+            $user     = $this->userModel->getEntity($event->getUserId());
+            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
         }
 
-        if (!$elements) {
-            return;
-        }
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
+        foreach ($event->getEntityData() as $element) {
+            $object = $this->entityManager->getRepository(Asset::class)->findOneBy(['uuid' => $element['uuid']]);
+            $isNew  = !$object;
 
-        foreach ($elements as $element) {
-            $existingAsset = $this->entityManager->getRepository(Asset::class)->findOneBy(['uuid' => $element['uuid']]);
-            if ($existingAsset) {
-                // Update existing asset
-                $object = $existingAsset;
-                $object->setModifiedByUser($userName);
-                $status = EntityImportEvent::UPDATE;
-            } else {
-                // Create a new asset
-                $object = new Asset();
-                $object->setDateAdded(new \DateTime());
-                $object->setCreatedByUser($userName);
-                $object->setUuid($element['uuid']);
-                $status = EntityImportEvent::NEW;
-            }
-
+            $object ??= new Asset();
+            $isNew && $object->setDateAdded(new \DateTime());
+            $object->setDateModified(new \DateTime());
+            $object->setUuid($element['uuid']);
             $object->setTitle($element['title']);
             $object->setIsPublished((bool) $element['is_published']);
             $object->setDescription($element['description'] ?? '');
@@ -138,50 +121,25 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             $object->setLanguage($element['lang'] ?? '');
             $object->setPublishUp($element['publish_up']);
             $object->setPublishDown($element['publish_down']);
-            $object->setDateModified(new \DateTime());
+
+            $isNew ? $object->setCreatedByUser($userName) : $object->setModifiedByUser($userName);
 
             $this->entityManager->persist($object);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
+            $event->addEntityIdMap((int) $element['id'], $object->getId());
 
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $object->getTitle();
-                $updateIds[]   = $object->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $object->getTitle();
-                $newIds[]   = $object->getId();
-                ++$newCount;
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $object->getTitle();
+            $stats[$status]['ids'][]   = $object->getId();
+            ++$stats[$status]['count'];
+
+            $this->logAction('import', $object->getId(), $element);
+        }
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [Asset::ENTITY_NAME => $info]);
             }
-
-            $log = [
-                'bundle'    => 'asset',
-                'object'    => 'asset',
-                'objectId'  => $object->getId(),
-                'action'    => 'import',
-                'details'   => $element,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-        }
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                Asset::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                Asset::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
         }
     }
 
@@ -201,20 +159,52 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'asset',
-                    'object'    => 'asset',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => Asset::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => Asset::class]);
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (Asset::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $item) {
+            $existing = $this->entityManager->getRepository(Asset::class)->findOneBy(['uuid' => $item['uuid']]);
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getTitle();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $item['title'];
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $type => $data) {
+            if ($data['count'] > 0) {
+                $event->setSummary($type, [Asset::ENTITY_NAME => $data]);
+            }
+        }
+    }
+
+    private function logAction(string $action, int $objectId, array $details): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'asset',
+            'object'    => 'asset',
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }

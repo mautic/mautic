@@ -6,6 +6,7 @@ namespace Mautic\PointBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -29,9 +30,10 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onPointGroupExport', 0],
-            EntityImportEvent::class     => ['onPointGroupImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onPointGroupExport', 0],
+            EntityImportEvent::class        => ['onPointGroupImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -56,104 +58,57 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Group::ENTITY_NAME, $pointGroupData);
-        $log = [
-            'bundle'    => 'point',
-            'object'    => 'pointGroup',
-            'objectId'  => $pointGroup->getId(),
-            'action'    => 'export',
-            'details'   => $pointGroupData,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-        ];
-        $this->auditLogModel->writeToLog($log);
+        $this->logAction('export', $pointGroup->getId(), $pointGroupData);
     }
 
     public function onPointGroupImport(EntityImportEvent $event): void
     {
-        if (Group::ENTITY_NAME !== $event->getEntityName()) {
+        if (Group::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $elements = $event->getEntityData();
-        $userId   = $event->getUserId();
         $userName = '';
-
-        if ($userId) {
-            $user = $this->userModel->getEntity($userId);
-            if ($user) {
-                $userName = $user->getFirstName().' '.$user->getLastName();
-            }
+        if ($event->getUserId()) {
+            $user     = $this->userModel->getEntity($event->getUserId());
+            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
         }
 
-        if (!$elements) {
-            return;
-        }
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
-        foreach ($elements as $element) {
-            $existingObject = $this->entityManager->getRepository(Group::class)->findOneBy(['uuid' => $element['uuid']]);
-            if ($existingObject) {
-                // Update existing object
-                $object = $existingObject;
-                $object->setModifiedByUser($userName);
-                $status = EntityImportEvent::UPDATE;
-            } else {
-                // Create a new object
-                $object = new Group();
-                $object->setDateAdded(new \DateTime());
-                $object->setUuid($element['uuid']);
-                $object->setCreatedByUser($userName);
-                $status = EntityImportEvent::NEW;
-            }
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
-            $object->setName($element['name']);
-            $object->setDescription($element['description'] ?? '');
-            $object->setIsPublished((bool) $element['is_published']);
-            $object->setDateModified(new \DateTime());
+        foreach ($event->getEntityData() as $element) {
+            $group = $this->entityManager->getRepository(Group::class)->findOneBy(['uuid' => $element['uuid']]);
+            $isNew = !$group;
 
-            $this->entityManager->persist($object);
+            $group ??= new Group();
+            $isNew && $group->setDateAdded(new \DateTime());
+            $group->setDateModified(new \DateTime());
+            $group->setUuid($element['uuid']);
+            $group->setName($element['name']);
+            $group->setDescription($element['description'] ?? '');
+            $group->setIsPublished((bool) $element['is_published']);
+
+            $isNew ? $group->setCreatedByUser($userName) : $group->setModifiedByUser($userName);
+
+            $this->entityManager->persist($group);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $object->getName();
-                $updateIds[]   = $object->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $object->getName();
-                $newIds[]   = $object->getId();
-                ++$newCount;
+            $event->addEntityIdMap((int) $element['id'], $group->getId());
+
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $group->getName();
+            $stats[$status]['ids'][]   = $group->getId();
+            ++$stats[$status]['count'];
+
+            $this->logAction('import', $group->getId(), $element);
+        }
+
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [Group::ENTITY_NAME => $info]);
             }
-            $log = [
-                'bundle'    => 'point',
-                'object'    => 'pointGroup',
-                'objectId'  => $object->getId(),
-                'action'    => 'import',
-                'details'   => $element,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-        }
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                Group::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                Group::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
         }
     }
 
@@ -173,20 +128,52 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'point',
-                    'object'    => 'group',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => Group::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => Group::class]);
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (Group::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $item) {
+            $existing = $this->entityManager->getRepository(Group::class)->findOneBy(['uuid' => $item['uuid']]);
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $item['name'];
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $type => $data) {
+            if ($data['count'] > 0) {
+                $event->setSummary($type, [Group::ENTITY_NAME => $data]);
+            }
+        }
+    }
+
+    private function logAction(string $action, int $objectId, array $details): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'point',
+            'object'    => 'pointGroup',
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }

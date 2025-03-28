@@ -1,0 +1,6 @@
+<h4 class="text-danger">{{ 'mautic.campaign.campaign.import.failed'|trans }}</h4>
+<ul class="text-danger">
+    {% for error in importSummary.errors|default([]) %}
+        <li>{{ error }}</li>
+    {% endfor %}
+</ul>

@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -29,9 +30,10 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onPageExport', 0],
-            EntityImportEvent::class     => ['onPageImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onPageExport', 0],
+            EntityImportEvent::class        => ['onPageImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -74,122 +76,75 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Page::ENTITY_NAME, $pageData);
-        $log = [
-            'bundle'    => 'page',
-            'object'    => 'page',
-            'objectId'  => $page->getId(),
-            'action'    => 'export',
-            'details'   => $pageData,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-        ];
-        $this->auditLogModel->writeToLog($log);
+        $this->logAction('export', $page->getId(), $pageData);
     }
 
     public function onPageImport(EntityImportEvent $event): void
     {
-        if (Page::ENTITY_NAME !== $event->getEntityName()) {
+        if (Page::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $elements  = $event->getEntityData();
-        $userId    = $event->getUserId();
-        $userName  = '';
-
-        if ($userId) {
-            $user   = $this->userModel->getEntity($userId);
-            if ($user) {
-                $userName = $user->getFirstName().' '.$user->getLastName();
-            }
+        $userName = '';
+        if ($event->getUserId()) {
+            $user     = $this->userModel->getEntity($event->getUserId());
+            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
         }
 
-        if (!$elements) {
-            return;
-        }
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
-        foreach ($elements as $element) {
-            $existingObject = $this->entityManager->getRepository(Page::class)->findOneBy(['uuid' => $element['uuid']]);
-            if ($existingObject) {
-                // Update existing object
-                $object = $existingObject;
-                $object->setModifiedByUser($userName);
-                $status = EntityImportEvent::UPDATE;
-            } else {
-                // Create a new object
-                $object = new Page();
-                $object->setDateAdded(new \DateTime());
-                $object->setCreatedByUser($userName);
-                $object->setUuid($element['uuid']);
-                $status = EntityImportEvent::NEW;
-            }
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
-            $object->setTitle($element['title']);
-            $object->setIsPublished((bool) $element['is_published']);
-            $object->setAlias($element['alias'] ?? '');
-            $object->setTemplate($element['template'] ?? '');
-            $object->setContent($element['content'] ?? '');
-            $object->setCustomHtml($element['custom_html'] ?? '');
-            $object->setPublishUp($element['publish_up']);
-            $object->setPublishDown($element['publish_down']);
-            $object->setHits($element['hits']);
-            $object->setUniqueHits($element['unique_hits']);
-            $object->setVariantHits($element['variant_hits']);
-            $object->setRevision($element['revision']);
-            $object->setLanguage($element['lang'] ?? '');
-            $object->setMetaDescription($element['meta_description'] ?? '');
-            $object->setHeadScript($element['head_script'] ?? '');
-            $object->setFooterScript($element['footer_script'] ?? '');
-            $object->setRedirectType($element['redirect_type'] ?? '');
-            $object->setRedirectUrl($element['redirect_url']);
-            $object->setIsPreferenceCenter($element['is_preference_center'] ?? false);
-            $object->setNoIndex($element['no_index'] ?? false);
-            $object->setVariantSettings($element['variant_settings'] ?? []);
-            $object->setDateModified(new \DateTime());
+        foreach ($event->getEntityData() as $element) {
+            $page  = $this->entityManager->getRepository(Page::class)->findOneBy(['uuid' => $element['uuid']]);
+            $isNew = !$page;
 
-            $this->entityManager->persist($object);
+            $page ??= new Page();
+            $isNew && $page->setDateAdded(new \DateTime());
+            $page->setDateModified(new \DateTime());
+            $page->setUuid($element['uuid']);
+            $page->setTitle($element['title']);
+            $page->setIsPublished((bool) $element['is_published']);
+            $page->setAlias($element['alias'] ?? '');
+            $page->setTemplate($element['template'] ?? '');
+            $page->setContent($element['content'] ?? '');
+            $page->setCustomHtml($element['custom_html'] ?? '');
+            $page->setPublishUp($element['publish_up']);
+            $page->setPublishDown($element['publish_down']);
+            $page->setHits($element['hits']);
+            $page->setUniqueHits($element['unique_hits']);
+            $page->setVariantHits($element['variant_hits']);
+            $page->setRevision($element['revision']);
+            $page->setLanguage($element['lang'] ?? '');
+            $page->setMetaDescription($element['meta_description'] ?? '');
+            $page->setHeadScript($element['head_script'] ?? '');
+            $page->setFooterScript($element['footer_script'] ?? '');
+            $page->setRedirectType($element['redirect_type'] ?? '');
+            $page->setRedirectUrl($element['redirect_url']);
+            $page->setIsPreferenceCenter($element['is_preference_center'] ?? false);
+            $page->setNoIndex($element['no_index'] ?? false);
+            $page->setVariantSettings($element['variant_settings'] ?? []);
+
+            $isNew ? $page->setCreatedByUser($userName) : $page->setModifiedByUser($userName);
+
+            $this->entityManager->persist($page);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $object->getTitle();
-                $updateIds[]   = $object->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $object->getTitle();
-                $newIds[]   = $object->getId();
-                ++$newCount;
+            $event->addEntityIdMap((int) $element['id'], $page->getId());
+
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $page->getTitle();
+            $stats[$status]['ids'][]   = $page->getId();
+            ++$stats[$status]['count'];
+
+            $this->logAction('import', $page->getId(), $element);
+        }
+
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [Page::ENTITY_NAME => $info]);
             }
-            $log = [
-                'bundle'    => 'page',
-                'object'    => 'page',
-                'objectId'  => $object->getId(),
-                'action'    => 'import',
-                'details'   => $element,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-        }
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                Page::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                Page::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
         }
     }
 
@@ -209,20 +164,52 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'page',
-                    'object'    => 'page',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => Page::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => Page::class]);
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (Page::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $item) {
+            $existing = $this->entityManager->getRepository(Page::class)->findOneBy(['uuid' => $item['uuid']]);
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getTitle();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $item['title'];
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $type => $data) {
+            if ($data['count'] > 0) {
+                $event->setSummary($type, [Page::ENTITY_NAME => $data]);
+            }
+        }
+    }
+
+    private function logAction(string $action, int $objectId, array $details): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'page',
+            'object'    => 'page',
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }

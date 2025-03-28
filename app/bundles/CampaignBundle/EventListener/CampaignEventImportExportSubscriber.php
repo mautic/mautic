@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -17,7 +18,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -35,9 +35,10 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onExport', 0],
-            EntityImportEvent::class     => ['onImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onExport', 0],
+            EntityImportEvent::class        => ['onImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -68,15 +69,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
             $event->addEntity(Event::ENTITY_NAME, $eventData);
 
-            $log = [
-                'bundle'    => 'campaign',
-                'object'    => 'campaignEvent',
-                'objectId'  => $campaignEvent->getId(),
-                'action'    => 'export',
-                'details'   => $eventData,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
+            $this->logAction('export', $campaignEvent->getId(), $eventData);
         }
 
         foreach ($data as $entityName => $entities) {
@@ -215,41 +208,25 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
     public function onImport(EntityImportEvent $event): void
     {
-        if (Event::ENTITY_NAME !== $event->getEntityName()) {
+        if (Event::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $output   = new ConsoleOutput();
-        $elements = $event->getEntityData();
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
-        if (empty($elements)) {
-            return;
-        }
-
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
-
-        foreach ($elements as $element) {
+        foreach ($event->getEntityData() as $element) {
             if (!is_array($element)) {
                 continue;
             }
 
-            $existingObject = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+            $campaignEvent = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+            $isNew         = !$campaignEvent;
 
-            if ($existingObject) {
-                // Update existing object
-                $campaignEvent = $existingObject;
-                $status        = EntityImportEvent::UPDATE;
-            } else {
-                // Create new
-                $campaignEvent = new Event();
-                $campaignEvent->setUuid($element['uuid']);
-                $status        = EntityImportEvent::NEW;
-            }
+            $campaignEvent ??= new Event();
+            $campaignEvent->setUuid($element['uuid'] ?? null);
 
             $campaignEvent->setName($element['name'] ?? '');
             $campaignEvent->setDescription($element['description'] ?? '');
@@ -272,52 +249,54 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $this->entityManager->persist($campaignEvent);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $campaignEvent->getId());
+            $event->addEntityIdMap((int) $element['id'], $campaignEvent->getId());
 
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $campaignEvent->getName();
-                $updateIds[]   = $campaignEvent->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $campaignEvent->getName();
-                $newIds[]   = $campaignEvent->getId();
-                ++$newCount;
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $campaignEvent->getName();
+            $stats[$status]['ids'][]   = $campaignEvent->getId();
+            ++$stats[$status]['count'];
+
+            $this->logAction('import', $campaignEvent->getId(), $element);
+        }
+
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [Event::ENTITY_NAME => $info]);
             }
-
-            $log = [
-                'bundle'    => 'campaign',
-                'object'    => 'campaignEvent',
-                'objectId'  => $campaignEvent->getId(),
-                'action'    => 'import',
-                'details'   => $element,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-
-            $output->writeln('<info>Imported campaign event: '.$campaignEvent->getName().' with ID: '.$campaignEvent->getId().'</info>');
-        }
-
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                Event::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                Event::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
         }
 
         $this->updateParentEvents($event);
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (Event::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $element) {
+            $existing = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $element['name'] ?? '';
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setSummary($status, [Event::ENTITY_NAME => $info]);
+            }
+        }
     }
 
     private function updateParentEvents(EntityImportEvent $event): void
@@ -372,20 +351,22 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 $this->entityManager->flush();
 
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'campaign',
-                    'object'    => 'campaignEvent',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => Event::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => Event::class]);
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    private function logAction(string $action, int $objectId, array $details): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'campaign',
+            'object'    => 'campaignEvent',
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }

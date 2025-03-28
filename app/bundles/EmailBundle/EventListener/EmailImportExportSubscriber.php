@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -33,9 +34,10 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onEmailExport', 0],
-            EntityImportEvent::class     => ['onEmailImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onEmailExport', 0],
+            EntityImportEvent::class        => ['onEmailImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -83,15 +85,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         ];
 
         $event->addEntity(Email::ENTITY_NAME, $emailData);
-        $log = [
-            'bundle'    => 'email',
-            'object'    => 'email',
-            'objectId'  => $email->getId(),
-            'action'    => 'export',
-            'details'   => $emailData,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-        ];
-        $this->auditLogModel->writeToLog($log);
+        $this->logAction('export', $emailId, $emailData);
 
         $form = $email->getUnsubscribeForm();
         if ($form) {
@@ -117,130 +111,88 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
     public function onEmailImport(EntityImportEvent $event): void
     {
-        if (Email::ENTITY_NAME !== $event->getEntityName()) {
+        if (Email::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
             return;
         }
 
-        $elements = $event->getEntityData();
-        $userId   = $event->getUserId();
         $userName = '';
-
-        if ($userId) {
-            $user = $this->userModel->getEntity($userId);
-            if ($user) {
-                $userName = $user->getFirstName().' '.$user->getLastName();
-            }
+        if ($event->getUserId()) {
+            $user     = $this->userModel->getEntity($event->getUserId());
+            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
         }
 
-        if (!$elements) {
-            return;
-        }
+        $stats = [
+            EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
 
-        $updateNames = [];
-        $updateIds   = [];
-        $newNames    = [];
-        $newIds      = [];
-        $updateCount = 0;
-        $newCount    = 0;
+        foreach ($event->getEntityData() as $element) {
+            $email = $this->entityManager->getRepository(Email::class)->findOneBy(['uuid' => $element['uuid']]);
+            $isNew = !$email;
 
-        foreach ($elements as $element) {
-            $existingObject = $this->entityManager->getRepository(Email::class)->findOneBy(['uuid' => $element['uuid']]);
-            if ($existingObject) {
-                // Update existing object
-                $object = $existingObject;
-                $object->setModifiedByUser($userName);
-                $status = EntityImportEvent::UPDATE;
-            } else {
-                // Create a new object
-                $object = new Email();
-                $object->setDateAdded(new \DateTime());
-                $object->setCreatedByUser($userName);
-                $object->setUuid($element['uuid']);
-                $status = EntityImportEvent::NEW;
+            $email ??= new Email();
+            $isNew && $email->setDateAdded(new \DateTime());
+            $email->setDateModified(new \DateTime());
+            $email->setUuid($element['uuid']);
+            $email->setCreatedByUser($userName);
+            if (!$isNew) {
+                $email->setModifiedByUser($userName);
             }
 
-            $object->setTranslationParent($element['translation_parent_id'] ?? null);
-            $object->setVariantParent($element['variant_parent_id'] ?? null);
+            $email->setTranslationParent($element['translation_parent_id'] ?? null);
+            $email->setVariantParent($element['variant_parent_id'] ?? null);
 
-            if (!empty($element['unsubscribeform_id'])) {
-                $unsubscribeForm = $this->entityManager->getRepository(Form::class)->find($element['unsubscribeform_id']);
-                if ($unsubscribeForm) {
-                    $object->setUnsubscribeForm($unsubscribeForm);
-                }
-            }
+            $unsubscribeForm = !empty($element['unsubscribeform_id'])
+                ? $this->entityManager->getRepository(Form::class)->find($element['unsubscribeform_id'])
+                : null;
 
-            if (!empty($element['preference_center_id'])) {
-                $preferenceCenter = $this->entityManager->getRepository(Page::class)->find($element['preference_center_id']);
-                if ($preferenceCenter) {
-                    $object->setPreferenceCenter($preferenceCenter);
-                }
-            }
+            $preferenceCenter = !empty($element['preference_center_id'])
+                ? $this->entityManager->getRepository(Page::class)->find($element['preference_center_id'])
+                : null;
 
-            $object->setIsPublished((bool) ($element['is_published'] ?? false));
-            $object->setName($element['name'] ?? '');
-            $object->setDescription($element['description'] ?? '');
-            $object->setSubject($element['subject'] ?? '');
-            $object->setPreheaderText($element['preheader_text'] ?? '');
-            $object->setFromName($element['from_name'] ?? '');
-            $object->setUseOwnerAsMailer((bool) ($element['use_owner_as_mailer'] ?? false));
-            $object->setTemplate($element['template'] ?? '');
-            $object->setContent($element['content'] ?? '');
-            $object->setUtmTags($element['utm_tags'] ?? '');
-            $object->setPlainText($element['plain_text'] ?? '');
-            $object->setCustomHtml($element['custom_html'] ?? '');
-            $object->setEmailType($element['email_type'] ?? '');
-            $object->setPublishUp($element['publish_up'] ?? null);
-            $object->setPublishDown($element['publish_down'] ?? null);
-            $object->setRevision((int) ($element['revision'] ?? 0));
-            $object->setLanguage($element['lang'] ?? '');
-            $object->setVariantSettings($element['variant_settings'] ?? []);
-            $object->setVariantStartDate($element['variant_start_date'] ?? null);
-            $object->setDynamicContent($element['dynamic_content'] ?? '');
-            $object->setHeaders($element['headers'] ?? '');
-            $object->setPublicPreview($element['public_preview'] ?? '');
-            $object->setDateModified(new \DateTime());
-            $this->entityManager->persist($object);
+            $email->setUnsubscribeForm($unsubscribeForm);
+            $email->setPreferenceCenter($preferenceCenter);
+
+            $email->setIsPublished((bool) ($element['is_published'] ?? false));
+            $email->setName($element['name'] ?? '');
+            $email->setDescription($element['description'] ?? '');
+            $email->setSubject($element['subject'] ?? '');
+            $email->setPreheaderText($element['preheader_text'] ?? '');
+            $email->setFromName($element['from_name'] ?? '');
+            $email->setUseOwnerAsMailer((bool) ($element['use_owner_as_mailer'] ?? false));
+            $email->setTemplate($element['template'] ?? '');
+            $email->setContent($element['content'] ?? '');
+            $email->setUtmTags($element['utm_tags'] ?? '');
+            $email->setPlainText($element['plain_text'] ?? '');
+            $email->setCustomHtml($element['custom_html'] ?? '');
+            $email->setEmailType($element['email_type'] ?? '');
+            $email->setPublishUp($element['publish_up'] ?? null);
+            $email->setPublishDown($element['publish_down'] ?? null);
+            $email->setRevision((int) ($element['revision'] ?? 0));
+            $email->setLanguage($element['lang'] ?? '');
+            $email->setVariantSettings($element['variant_settings'] ?? []);
+            $email->setVariantStartDate($element['variant_start_date'] ?? null);
+            $email->setDynamicContent($element['dynamic_content'] ?? '');
+            $email->setHeaders($element['headers'] ?? '');
+            $email->setPublicPreview($element['public_preview'] ?? '');
+
+            $this->entityManager->persist($email);
             $this->entityManager->flush();
 
-            $event->addEntityIdMap((int) $element['id'], (int) $object->getId());
-            if (EntityImportEvent::UPDATE === $status) {
-                $updateNames[] = $object->getName();
-                $updateIds[]   = $object->getId();
-                ++$updateCount;
-            } else {
-                $newNames[] = $object->getName();
-                $newIds[]   = $object->getId();
-                ++$newCount;
+            $event->addEntityIdMap((int) $element['id'], $email->getId());
+
+            $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
+            $stats[$status]['names'][] = $email->getName();
+            $stats[$status]['ids'][]   = $email->getId();
+            ++$stats[$status]['count'];
+
+            $this->logAction('import', $email->getId(), $element);
+        }
+
+        foreach ($stats as $status => $info) {
+            if ($info['count'] > 0) {
+                $event->setStatus($status, [Email::ENTITY_NAME => $info]);
             }
-
-            $log = [
-                'bundle'    => 'email',
-                'object'    => 'email',
-                'objectId'  => $object->getId(),
-                'action'    => 'import',
-                'details'   => $element,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-        }
-
-        if ($newCount > 0) {
-            $event->setStatus(EntityImportEvent::NEW, [
-                Email::ENTITY_NAME => [
-                    'names' => $newNames,
-                    'ids'   => $newIds,
-                    'count' => $newCount,
-                ],
-            ]);
-        }
-        if ($updateCount > 0) {
-            $event->setStatus(EntityImportEvent::UPDATE, [
-                Email::ENTITY_NAME => [
-                    'names' => $updateNames,
-                    'ids'   => $updateIds,
-                    'count' => $updateCount,
-                ],
-            ]);
         }
     }
 
@@ -260,20 +212,52 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                // Log the deletion
-                $log = [
-                    'bundle'    => 'email',
-                    'object'    => 'email',
-                    'objectId'  => $id,
-                    'action'    => 'undo_import',
-                    'details'   => ['deletedEntity' => Email::class],
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-
-                $this->auditLogModel->writeToLog($log);
+                $this->logAction('undo_import', $id, ['deletedEntity' => Email::class]);
             }
         }
 
         $this->entityManager->flush();
+    }
+
+    public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
+    {
+        if (Email::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
+            return;
+        }
+
+        $summary = [
+            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+        ];
+
+        foreach ($event->getEntityData() as $item) {
+            $existing = $this->entityManager->getRepository(Email::class)->findOneBy(['uuid' => $item['uuid']]);
+            if ($existing) {
+                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                ++$summary[EntityImportEvent::UPDATE]['count'];
+            } else {
+                $summary[EntityImportEvent::NEW]['names'][] = $item['name'];
+                ++$summary[EntityImportEvent::NEW]['count'];
+            }
+        }
+
+        foreach ($summary as $type => $data) {
+            if ($data['count'] > 0) {
+                $event->setSummary($type, [Email::ENTITY_NAME => $data]);
+            }
+        }
+    }
+
+    private function logAction(string $action, int $objectId, array $details): void
+    {
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'email',
+            'object'    => 'email',
+            'objectId'  => $objectId,
+            'action'    => $action,
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }
