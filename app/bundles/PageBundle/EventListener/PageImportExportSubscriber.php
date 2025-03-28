@@ -128,8 +128,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
 
             $isNew ? $page->setCreatedByUser($userName) : $page->setModifiedByUser($userName);
 
-            $this->entityManager->persist($page);
-            $this->entityManager->flush();
+            $this->pageModel->saveEntity($page);
 
             $event->addEntityIdMap((int) $element['id'], $page->getId());
 

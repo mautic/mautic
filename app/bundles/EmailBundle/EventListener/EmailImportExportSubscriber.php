@@ -176,8 +176,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $email->setHeaders($element['headers'] ?? '');
             $email->setPublicPreview($element['public_preview'] ?? '');
 
-            $this->entityManager->persist($email);
-            $this->entityManager->flush();
+            $this->emailModel->saveEntity($email);
 
             $event->addEntityIdMap((int) $element['id'], $email->getId());
 

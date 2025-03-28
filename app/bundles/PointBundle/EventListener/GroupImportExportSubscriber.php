@@ -92,8 +92,7 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
 
             $isNew ? $group->setCreatedByUser($userName) : $group->setModifiedByUser($userName);
 
-            $this->entityManager->persist($group);
-            $this->entityManager->flush();
+            $this->pointGroupModel->saveEntity($group);
 
             $event->addEntityIdMap((int) $element['id'], $group->getId());
 

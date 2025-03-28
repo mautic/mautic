@@ -147,8 +147,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 
             $isNew ? $segment->setCreatedByUser($userName) : $segment->setModifiedByUser($userName);
 
-            $this->entityManager->persist($segment);
-            $this->entityManager->flush();
+            $this->leadListModel->saveEntity($segment);
 
             $event->addEntityIdMap((int) $element['id'], $segment->getId());
 

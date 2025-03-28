@@ -176,8 +176,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $form->setFormAttributes($formData['form_attr'] ?? '');
             $isNew ? $form->setCreatedByUser($userName) : $form->setModifiedByUser($userName);
 
-            $this->entityManager->persist($form);
-            $this->entityManager->flush();
+            $this->formModel->saveEntity($form);
 
             // Import actions
             foreach ($formData['form_actions'] ?? [] as $actionData) {

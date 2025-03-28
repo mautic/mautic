@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
@@ -29,6 +30,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
+        private EventModel $eventModel,
     ) {
     }
 
@@ -246,8 +248,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 $campaignEvent->setCampaign($campaign);
             }
 
-            $this->entityManager->persist($campaignEvent);
-            $this->entityManager->flush();
+            $this->eventModel->saveEntity($campaignEvent);
 
             $event->addEntityIdMap((int) $element['id'], $campaignEvent->getId());
 

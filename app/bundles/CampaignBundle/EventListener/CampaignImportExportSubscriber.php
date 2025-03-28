@@ -195,8 +195,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $object->setIsPublished(false);
             $object->setCanvasSettings($campaignData['canvas_settings'] ?? '');
 
-            $this->entityManager->persist($object);
-            $this->entityManager->flush();
+            $this->campaignModel->saveEntity($object);
 
             $event->addEntityIdMap((int) $campaignData['id'], $object->getId());
             $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;

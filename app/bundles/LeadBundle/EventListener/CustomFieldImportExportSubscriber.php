@@ -133,8 +133,7 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
                 $field->setAlias($alias);
             }
 
-            $this->entityManager->persist($field);
-            $this->entityManager->flush();
+            $this->fieldModel->saveEntity($field);
 
             $event->addEntityIdMap((int) $element['id'], $field->getId());
 

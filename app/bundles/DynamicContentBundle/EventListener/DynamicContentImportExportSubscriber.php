@@ -116,8 +116,7 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             $object->setIsCampaignBased((bool) ($element['is_campaign_based'] ?? false));
             $object->setSlotName($element['slot_name'] ?? '');
 
-            $this->entityManager->persist($object);
-            $this->entityManager->flush();
+            $this->dynamicContentModel->saveEntity($object);
 
             $event->addEntityIdMap((int) $element['id'], $object->getId());
 
