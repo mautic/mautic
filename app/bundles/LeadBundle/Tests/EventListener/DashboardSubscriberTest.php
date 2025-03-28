@@ -6,34 +6,52 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\EventListener\DashboardSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @method \PHPUnit\Framework\MockObject\MockBuilder         getMockBuilder(string $className)
+ * @method \PHPUnit\Framework\MockObject\Stub\ReturnCallback returnCallback(callable $callback)
+ * @method \PHPUnit\Framework\MockObject\Stub\ReturnSelf     returnSelf()
+ */
 class DashboardSubscriberTest extends TestCase
 {
+    /** @var LeadModel&MockObject */
     private LeadModel $leadModel;
+
+    /** @var ListModel&MockObject */
     private ListModel $leadListModel;
+
+    /** @var RouterInterface&MockObject */
     private RouterInterface $router;
+
+    /** @var TranslatorInterface&MockObject */
     private TranslatorInterface $translator;
+
     private DateHelper $dateHelper;
     private DashboardSubscriber $dashboardSubscriber;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->leadModel     = $this->createMock(LeadModel::class);
         $this->leadListModel = $this->createMock(ListModel::class);
         $this->router        = $this->createMock(RouterInterface::class);
         $this->translator    = $this->createMock(TranslatorInterface::class);
 
         // Set up translator with callback for both parent class and DateHelper
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
-            ->willReturnCallback(function ($id, array $parameters = [], $domain = null) {
+            ->willReturnCallback(function (string $id, array $parameters = [], string $domain = null): string {
                 if (empty($parameters)) {
                     return $id;
                 }
@@ -64,21 +82,30 @@ class DashboardSubscriberTest extends TestCase
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return WidgetDetailEvent&MockObject
+     */
     private function createEvent(string $type, array $params = []): WidgetDetailEvent
     {
-        $event  = $this->createMock(WidgetDetailEvent::class);
-        $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
+        /** @var Widget&MockObject */
+        $widget = $this->getMockBuilder(Widget::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $widget->method('getParams')->willReturn($params);
+
+        /** @var WidgetDetailEvent&MockObject */
+        $event = $this->getMockBuilder(WidgetDetailEvent::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $event->method('getType')->willReturn($type);
         $event->method('getWidget')->willReturn($widget);
         $event->method('hasPermission')->willReturn(true);
         $event->method('isCached')->willReturn(false);
         $event->method('getTranslator')->willReturn($this->translator);
-
-        // Allow stopPropagation to be called multiple times
-        $event->expects($this->atLeastOnce())
-            ->method('stopPropagation');
 
         return $event;
     }
@@ -93,6 +120,7 @@ class DashboardSubscriberTest extends TestCase
             'filter'     => [],
         ];
 
+        /** @var WidgetDetailEvent&MockObject */
         $event = $this->createEvent('created.leads.in.time', $params);
 
         $chartData = [
@@ -104,17 +132,17 @@ class DashboardSubscriberTest extends TestCase
             ],
         ];
 
-        $this->leadModel->expects($this->exactly(2))
+        $this->leadModel
             ->method('getLeadsLineChartData')
             ->willReturn($chartData);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('setTemplate')
             ->with('@MauticLead/Widget/created_leads_in_time.html.twig');
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('setTemplateData')
-            ->with($this->arrayHasKey('chartData'));
+            ->with(self::arrayHasKey('chartData'));
 
         $this->dashboardSubscriber->onWidgetDetailGenerate($event);
     }
@@ -126,9 +154,10 @@ class DashboardSubscriberTest extends TestCase
             'dateTo'   => new \DateTime(),
         ];
 
+        /** @var WidgetDetailEvent&MockObject */
         $event = $this->createEvent('anonymous.vs.identified.leads', $params);
 
-        $this->leadModel->expects($this->once())
+        $this->leadModel
             ->method('getAnonymousVsIdentifiedPieChartData')
             ->willReturn([
                 'datasets' => [
@@ -138,11 +167,11 @@ class DashboardSubscriberTest extends TestCase
                 ],
             ]);
 
-        $event->expects($this->once())
+        $event
             ->method('setTemplate')
             ->with('@MauticCore/Helper/chart.html.twig');
 
-        $event->expects($this->once())
+        $event
             ->method('setTemplateData')
             ->with($this->arrayHasKey('chartData'));
 
@@ -346,7 +375,7 @@ class DashboardSubscriberTest extends TestCase
 
         $event = $this->createEvent('segments.build.time', $params);
 
-        $segment = $this->createMock(\Mautic\LeadBundle\Entity\LeadList::class);
+        $segment = $this->createMock(LeadList::class);
         $segment->method('getId')->willReturn(1);
         $segment->method('getName')->willReturn('Segment 1');
         $segment->method('getCreatedByUser')->willReturn('User 1');
