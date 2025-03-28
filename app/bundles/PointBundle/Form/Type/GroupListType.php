@@ -38,7 +38,7 @@ class GroupListType extends AbstractType
                 $groups  = $this->repo->getEntities();
                 $choices = [];
                 foreach ($groups as $l) {
-                    $choices[$l->getName()] = $l->getId();
+                    $choices[$l->getName().' ('.$l->getId().')'] = $l->getId();
                 }
 
                 return $choices;

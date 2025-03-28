@@ -47,4 +47,14 @@ class ReportDataEvent extends AbstractReportEvent
     {
         return $this->totalResults;
     }
+
+    public function updateColumnType(string $alias, string $type): void
+    {
+        foreach ($this->options['columns'] as &$column) {
+            if ($column['alias'] === $alias) {
+                $column['type'] = $type;
+                break;
+            }
+        }
+    }
 }
