@@ -44,21 +44,23 @@ class ContactSegmentFilterFactory
 
         foreach ($filters as $filter) {
             if (self::CUSTOM_OPERATOR === $filter['operator']) {
-                $mergedProperty      = $filter['merged_property'];
-                $factorSegmentFilter = null;
+                $mergedProperty           = $filter['merged_property'];
+                $factorSegmentFilter      = null;
+                $firstFactorSegmentFilter = null;
                 foreach ($filter['properties'] as $index => $nestedFilter) {
                     if (!in_array($nestedFilter['operator'], $this->operatorsWithEmptyValuesAllowed) && empty($nestedFilter['filter']) && !is_numeric($nestedFilter['filter'])) {
                         continue; // If no value set for the filter, don't consider it
                     }
-                    $factorSegmentFilter                    = $this->factorSegmentFilter($nestedFilter, $batchLimiters);
+                    $factorSegmentFilter      = $this->factorSegmentFilter($nestedFilter);
+                    $firstFactorSegmentFilter ??= $factorSegmentFilter;
                     $mergedProperty[$index]['filter_value'] = $factorSegmentFilter->getParameterValue();
                     $mergedProperty[$index]['operator']     = $factorSegmentFilter->getOperator();
                     $mergedProperty[$index]['field']        = $factorSegmentFilter->getField();
                     $mergedProperty[$index]['type']         = $factorSegmentFilter->getType();
                 }
-                if ($factorSegmentFilter) {
-                    $factorSegmentFilter->contactSegmentFilterCrate->setMergedProperty($mergedProperty);
-                    $contactSegmentFilters->addContactSegmentFilter($factorSegmentFilter);
+                if ($firstFactorSegmentFilter) {
+                    $firstFactorSegmentFilter->contactSegmentFilterCrate->setMergedProperty($mergedProperty);
+                    $contactSegmentFilters->addContactSegmentFilter($firstFactorSegmentFilter);
                 }
             } else {
                 $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter, $batchLimiters));
