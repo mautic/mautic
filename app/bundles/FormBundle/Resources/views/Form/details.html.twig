@@ -73,7 +73,10 @@
     tags: [
         {
             type: 'read-only',
-            color: 'warm-gray',
+            icon: activeForm.formType == 'campaign'
+            ? 'ri-megaphone-line'
+            : 'ri-survey-line',
+            color: 'high-contrast',
             label: activeForm.formType == 'campaign'
                 ? 'mautic.form.type.campaign.header'
                 : 'mautic.form.type.standalone.header'
@@ -81,6 +84,43 @@
     ]
 } %}
 
+{% if activeForm.noIndex is defined and activeForm.noIndex == 1 %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: 'mautic.form.tag.search_index.disabled'|trans,
+            icon: 'ri-eye-off-fill',
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{% if activeForm.inKioskMode is defined and activeForm.inKioskMode == 1 %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: 'mautic.form.tag.kioskmode.label'|trans,
+            icon: 'ri-spy-fill',
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{# Language #}
+{% if activeForm.language is defined and activeForm.language is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: activeForm.language()|language_name,
+            icon: 'ri-translate-2',
+            color: 'warm-gray',
+            attributes: {
+                'data-toggle': 'tooltip',
+                'data-placement': 'top',
+                'title': 'mautic.core.language'|trans
+            }
+        }]
+    } %}
+{% endif %}
 {% endblock %}
 
 {% block content %}

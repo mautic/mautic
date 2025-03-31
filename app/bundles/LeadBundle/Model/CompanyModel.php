@@ -611,7 +611,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     );
                 }
 
-                $results = $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+                $results = $this->getRepository()->getAjaxSimpleList(
+                    $composite,
+                    ['filterVar' => $filterVal.'%'],
+                    $column,
+                    'id',
+                    $limit,
+                    $start
+                );
 
                 break;
         }

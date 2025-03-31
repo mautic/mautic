@@ -118,19 +118,11 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->executioner->expects($this->exactly(1))
-            ->method('executeEventsForContacts')
-            ->withConsecutive(
-                [
-                    $this->countOf(2),
-                    $this->isInstanceOf(ArrayCollection::class),
-                    $this->isInstanceOf(Counter::class),
-                ],
-                [
-                    $this->countOf(1),
-                    $this->isInstanceOf(ArrayCollection::class),
-                    $this->isInstanceOf(Counter::class),
-                ]
-            );
+            ->method('executeEventsForContacts')->willReturnCallback(function (...$parameters) {
+                $this->assertCount(2, $parameters[0]);
+                $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
+                $this->assertInstanceOf(Counter::class, $parameters[2]);
+            });
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 

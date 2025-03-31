@@ -24,13 +24,17 @@ final class IntegrationSubscriberTest extends TestCase
         $authorization = ['Authorization: Bearer [REDACTED]'];
         $authorization = var_export($authorization, true);
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->exactly(4))
-            ->method('debug')
-            ->withConsecutive(
-                ['INTEGRATION REQUEST URL: POST https://mautic.org'],
-                ["INTEGRATION REQUEST HEADERS: \n".$authorization.PHP_EOL],
-            );
+        $logger  = $this->createMock(LoggerInterface::class);
+        $matcher = $this->exactly(4);
+        $logger->expects($matcher)
+            ->method('debug')->willReturnCallback(function (...$parameters) use ($matcher, $authorization) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('INTEGRATION REQUEST URL: POST https://mautic.org', $parameters[0]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame("INTEGRATION REQUEST HEADERS: \n".$authorization.PHP_EOL, $parameters[0]);
+                }
+            });
 
         $subscriber = new IntegrationSubscriber($logger);
         $subscriber->onRequest($event);

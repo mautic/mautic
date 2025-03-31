@@ -63,29 +63,29 @@ class CampaignAuditServiceTest extends TestCase
                '/s/emails/edit/1',
                '/s/emails/edit/2'
            );
+        $matcher = $this->exactly(2);
 
-        $this->flashBag->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'mautic.core.notice.campaign.unpublished.email',
-                    [
+        $this->flashBag->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.core.notice.campaign.unpublished.email', $parameters[0]);
+                    $this->assertSame([
                         '%name%'      => null,
                         '%menu_link%' => 'mautic_email_index',
                         '%url%'       => '/s/emails/edit/1',
-                    ],
-                    FlashBag::LEVEL_WARNING,
-                ],
-                [
-                    'mautic.core.notice.campaign.unpublished.email',
-                    [
+                    ], $parameters[1]);
+                    $this->assertSame(FlashBag::LEVEL_WARNING, $parameters[2]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.core.notice.campaign.unpublished.email', $parameters[0]);
+                    $this->assertSame([
                         '%name%'      => null,
                         '%menu_link%' => 'mautic_email_index',
                         '%url%'       => '/s/emails/edit/2',
-                    ],
-                    FlashBag::LEVEL_WARNING,
-                ]
-            );
+                    ], $parameters[1]);
+                    $this->assertSame(FlashBag::LEVEL_WARNING, $parameters[2]);
+                }
+            });
 
         $this->campaignAuditService->addWarningForUnpublishedEmails($campaign);
     }

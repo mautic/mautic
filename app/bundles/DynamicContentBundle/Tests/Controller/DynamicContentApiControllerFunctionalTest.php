@@ -72,9 +72,8 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testCreateDwc(): void
     {
         $payload = [
-            'name'            => 'API test',
-            'content'         => 'API test',
-            'isCampaignBased' => true,
+            'name'    => 'API test',
+            'content' => 'API test',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/dynamiccontents/new', $payload);

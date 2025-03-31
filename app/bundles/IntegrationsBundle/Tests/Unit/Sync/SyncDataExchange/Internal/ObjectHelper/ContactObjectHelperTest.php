@@ -232,13 +232,19 @@ class ContactObjectHelperTest extends TestCase
                     $contact2,
                 ]
             );
+        $matcher = $this->exactly(2);
 
-        $contact1->expects($this->exactly(2))
-            ->method('addUpdatedField')
-            ->withConsecutive(
-                ['email', 'john@doe.com'],
-                [MauticSyncDataExchange::OBJECT_COMPANY, 'Company A']
-            );
+        $contact1->expects($matcher)
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('email', $parameters[0]);
+                    $this->assertSame('john@doe.com', $parameters[1]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame(MauticSyncDataExchange::OBJECT_COMPANY, $parameters[0]);
+                    $this->assertSame('Company A', $parameters[1]);
+                }
+            });
 
         $objectMappings = $this->getObjectHelper()->update([3, 4], $objects);
 

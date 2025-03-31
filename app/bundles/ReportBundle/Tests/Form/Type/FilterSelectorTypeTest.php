@@ -42,15 +42,16 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+        $matcher1 = $this->exactly(2);
 
-        $this->formBuilder
+        $this->formBuilder->expects($matcher1)
             ->method('addEventListener')
-            ->withConsecutive(
-                [
-                    FormEvents::PRE_SET_DATA,
-                    $this->callback(
-                        function (callable $formModifier) {
-                            /** @var FormInterface<FormBuilderInterface>|MockObject $form */
+            ->willReturnCallback(
+                function (...$parameters) use ($matcher1) {
+                    if (1 === $matcher1->getInvocationCount()) {
+                        $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
+                        $callback = function (callable $formModifier) {
+                            /** @var FormInterface<FormBuilderInterface>&MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [
                                 'column'    => 'tag',
@@ -59,45 +60,53 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                                 'condition' => 'in',
                                 'value'     => ['1', '2'],
                             ];
+                            $matcher2 = $this->exactly(2);
 
-                            $form->expects($this->exactly(2))
-                                ->method('add')
-                                ->withConsecutive([
-                                    'condition',
-                                    ChoiceType::class,
-                                    [
-                                        'choices'           => [
-                                            'including' => 'in',
-                                            'excluding' => 'notIn',
-                                        ],
-                                        'expanded'          => false,
-                                        'multiple'          => false,
-                                        'label'             => 'mautic.report.report.label.filtercondition',
-                                        'label_attr'        => ['class' => 'control-label filter-condition'],
-                                        'placeholder'       => false,
-                                        'required'          => false,
-                                        'attr'              => [
-                                            'class' => 'form-control not-chosen',
-                                        ],
-                                    ],
-                                ], [
-                                    'value', CollectionType::class, [
-                                        'entry_type'    => TextType::class,
-                                        'allow_add'     => true,
-                                        'allow_delete'  => true,
-                                        'label'         => 'mautic.report.report.label.filtervalue',
-                                        'label_attr'    => ['class' => 'control-label'],
-                                        'attr'          => ['class' => 'form-control filter-value'],
-                                        'required'      => false,
-                                    ],
-                                ]);
+                            $form->expects($matcher2)
+                                ->method('add')->willReturnCallback(function (...$parameters) use ($matcher2, $form) {
+                                    if (1 === $matcher2->getInvocationCount()) {
+                                        $this->assertSame('condition', $parameters[0]);
+                                        $this->assertSame(ChoiceType::class, $parameters[1]);
+                                        $this->assertSame([
+                                            'choices'           => [
+                                                'including' => 'in',
+                                                'excluding' => 'notIn',
+                                            ],
+                                            'expanded'          => false,
+                                            'multiple'          => false,
+                                            'label'             => 'mautic.report.report.label.filtercondition',
+                                            'label_attr'        => ['class' => 'control-label filter-condition'],
+                                            'placeholder'       => false,
+                                            'required'          => false,
+                                            'attr'              => [
+                                                'class' => 'form-control not-chosen',
+                                            ],
+                                        ], $parameters[2]);
+                                    }
+                                    if (2 === $matcher2->getInvocationCount()) {
+                                        $this->assertSame('value', $parameters[0]);
+                                        $this->assertSame(CollectionType::class, $parameters[1]);
+                                        $this->assertSame([
+                                            'entry_type'    => TextType::class,
+                                            'allow_add'     => true,
+                                            'allow_delete'  => true,
+                                            'label'         => 'mautic.report.report.label.filtervalue',
+                                            'label_attr'    => ['class' => 'control-label'],
+                                            'attr'          => ['class' => 'form-control filter-value'],
+                                            'required'      => false,
+                                        ], $parameters[2]);
+                                    }
+
+                                    return $form;
+                                });
 
                             $formModifier(new FormEvent($form, $data));
+                        };
+                        $callback($parameters[1]);
+                    }
 
-                            return true;
-                        }
-                    ),
-                ],
+                    return $this->formBuilder;
+                },
             );
 
         $this->FilterSelectorType->buildForm($this->formBuilder, $options);

@@ -466,11 +466,19 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->method('setName')
             ->with('leads')
             ->willReturnSelf();
+        $matcher = $this->exactly(2);
 
-        $columnSchemaHelper->expects($this->exactly(2))
-            ->method('dropColumn')
-            ->withConsecutive(['IamAlias'], ['leads'])
-            ->willReturnSelf();
+        $columnSchemaHelper->expects($matcher)
+            ->method('dropColumn')->willReturnCallback(function (...$parameters) use ($matcher, $columnSchemaHelper) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('IamAlias', $parameters[0]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('leads', $parameters[0]);
+                }
+
+                return $columnSchemaHelper;
+            });
 
         $columnSchemaHelper->expects($this->once())
             ->method('executeChanges');

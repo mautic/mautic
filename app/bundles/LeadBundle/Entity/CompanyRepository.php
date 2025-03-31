@@ -401,8 +401,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param string $valueColumn
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
-    {
+    public function getAjaxSimpleList(
+        CompositeExpression $expr = null,
+        array $parameters = [],
+        $labelColumn = null,
+        $valueColumn = 'id',
+        int $limit = 10,
+        int $start = 0,
+    ): array {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $alias = $prefix = $this->getTableAlias();
@@ -455,6 +461,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
                 ->setParameter('true', true, 'boolean');
+        }
+
+        if ($limit > 0) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
         }
 
         return $q->executeQuery()->fetchAllAssociative();

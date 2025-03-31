@@ -51,22 +51,19 @@ final class ThemesExtension extends AbstractExtension
 
     public function getRoundedCorners(string $size = 'lg'): int
     {
-        $roundedCorners = [
-            'lg' => (int) $this->coreParametersHelper->get('rounded_corners', 0),
-            'md' => 0,
-            'sm' => 0,
+        $baseRadius = (int) $this->coreParametersHelper->get('rounded_corners', 0);
+
+        $radiusMapping = [
+            8  => ['md' => 4, 'sm' => 3],
+            16 => ['md' => 6, 'sm' => 4],
+            32 => ['md' => 8, 'sm' => 5],
         ];
 
-        if (8 === $roundedCorners['lg']) {
-            $roundedCorners['md'] = 4;
-            $roundedCorners['sm'] = 3;
-        } elseif (16 === $roundedCorners['lg']) {
-            $roundedCorners['md'] = 6;
-            $roundedCorners['sm'] = 4;
-        } elseif (32 === $roundedCorners['lg']) {
-            $roundedCorners['md'] = 8;
-            $roundedCorners['sm'] = 5;
-        }
+        $roundedCorners = [
+            'lg' => $baseRadius,
+            'md' => $radiusMapping[$baseRadius]['md'] ?? 0,
+            'sm' => $radiusMapping[$baseRadius]['sm'] ?? 0,
+        ];
 
         return $roundedCorners[$size] ?? 0;
     }

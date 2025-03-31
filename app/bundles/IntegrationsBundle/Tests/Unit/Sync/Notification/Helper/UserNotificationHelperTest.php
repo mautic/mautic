@@ -69,14 +69,19 @@ class UserNotificationHelperTest extends TestCase
 
         $this->userHelper->expects($this->never())
             ->method('getAdminUsers');
+        $matcher = $this->exactly(2);
 
-        $this->translator->expects($this->exactly(2))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.integration.sync.user_notification.header', $this->anything()],
-                ['mautic.integration.sync.user_notification.sync_error', $this->anything()]
-            )
-            ->willReturn('test');
+        $this->translator->expects($matcher)
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.sync_error', $parameters[0]);
+                }
+
+                return 'test';
+            });
 
         $this->writer->expects($this->once())
             ->method('writeUserNotification');
@@ -97,14 +102,19 @@ class UserNotificationHelperTest extends TestCase
         $this->userHelper->expects($this->once())
             ->method('getAdminUsers')
             ->willReturn([1]);
+        $matcher = $this->exactly(2);
 
-        $this->translator->expects($this->exactly(2))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.integration.sync.user_notification.header', $this->anything()],
-                ['mautic.integration.sync.user_notification.sync_error', $this->anything()]
-            )
-            ->willReturn('test');
+        $this->translator->expects($matcher)
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.integration.sync.user_notification.sync_error', $parameters[0]);
+                }
+
+                return 'test';
+            });
 
         $this->writer->expects($this->once())
             ->method('writeUserNotification');

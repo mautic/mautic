@@ -41,7 +41,7 @@
   <div class="box-layout">
       <!-- left section -->
       <div class="col-md-9 height-auto">
-          <div class="bg-auto">
+          <div>
               <!-- form detail header -->
               {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
               <!--/ form detail header -->
@@ -77,7 +77,7 @@
               <!--/ form detail collapseable -->
           </div>
 
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- form detail collapseable toggler -->
               <div class="hr-expand nm">
                   <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
