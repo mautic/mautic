@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -21,7 +20,6 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AssetModel $assetModel,
-        private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -217,59 +218,7 @@ final class ImportController extends AbstractFormController
         return $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
     }
 
-    /**
-     * @return ?array<string, mixed>
-     */
-    private function readFile(string $filePath): ?array
-    {
-        if ('zip' === pathinfo($filePath, PATHINFO_EXTENSION)) {
-            $tempDir = sys_get_temp_dir();
-            $zip     = new \ZipArchive();
-
-            if (true === $zip->open($filePath)) {
-                $zip->extractTo($tempDir);
-                $jsonFilePath = null;
-                $mediaPath    = $this->pathsHelper->getSystemPath('media').'/files/';
-
-                for ($i = 0; $i < $zip->numFiles; ++$i) {
-                    $filename        = $zip->getNameIndex($i);
-                    $sourcePath      = $tempDir.'/'.$filename;
-                    $destinationPath = $mediaPath.substr($filename, strlen('assets/'));
-
-                    if (str_starts_with($filename, 'assets/')) {
-                        if (is_dir($sourcePath)) {
-                            if (!is_dir($destinationPath)) {
-                                mkdir($destinationPath, 0755, true);
-                            }
-                        } else {
-                            $dirPath = dirname($destinationPath);
-                            if (!is_dir($dirPath)) {
-                                mkdir($dirPath, 0755, true);
-                            }
-                            copy($sourcePath, $destinationPath);
-                        }
-                    } elseif ('json' === pathinfo($filename, PATHINFO_EXTENSION)) {
-                        $jsonFilePath = $tempDir.'/'.$filename;
-                    }
-                }
-
-                $zip->close();
-                if ($jsonFilePath) {
-                    $filePath = $jsonFilePath;
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-
-        $fileContents = file_get_contents($filePath);
-
-        return json_decode($fileContents, true);
-    }
-
-    public function progressAction(): Response
+    public function progressAction(ImportHelper $importHelper): Response
     {
         $session       = $this->requestStack->getSession();
         $session->get('mautic.campaign.import.progress', 0);
@@ -288,7 +237,7 @@ final class ImportController extends AbstractFormController
         }
 
         if (self::STEP_PROGRESS_BAR === $step) {
-            $analyzeSummary = $this->analyzeData($fullPath);
+            $analyzeSummary = $this->analyzeData($importHelper, $fullPath);
             $session->set('mautic.campaign.import.step', self::STEP_IMPORT_FROM_ZIP);
             $session->set('mautic.campaign.import.progress', 50);
             $session->set('mautic.campaign.import.analyzeSummary', $analyzeSummary);
@@ -322,7 +271,7 @@ final class ImportController extends AbstractFormController
             ]);
         } else {
             // Process import and update progress
-            $fileData = $this->readFile($fullPath);
+            $fileData = $importHelper->readZipFile($fullPath);
             if (empty($fileData)) {
                 $this->logger->error('Import failed: No data found in file.');
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
@@ -335,6 +284,8 @@ final class ImportController extends AbstractFormController
                 $importSummary = [];
 
                 $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
+
+                $importHelper->recursiveRemoveEmailaddress($fileData);
 
                 // Loop through importActions and clean UUIDs for 'create' actions
                 foreach ($fileData as &$group) {
@@ -411,9 +362,9 @@ final class ImportController extends AbstractFormController
     /**
      * @return array<string, mixed>
      */
-    private function analyzeData(string $fullPath): array
+    private function analyzeData(ImportHelper $importHelper, string $fullPath): array
     {
-        $fileData = $this->readFile($fullPath);
+        $fileData = $importHelper->readZipFile($fullPath);
         if (empty($fileData)) {
             $this->logger->error('Import failed: No data found in file.');
 

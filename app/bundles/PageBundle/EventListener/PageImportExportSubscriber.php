@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -21,7 +20,6 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private PageModel $pageModel,
-        private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,

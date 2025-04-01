@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -398,7 +399,7 @@ class CampaignApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    public function importCampaignAction(Request $request, UserHelper $userHelper): Response
+    public function importCampaignAction(Request $request, UserHelper $userHelper, ImportHelper $importHelper): Response
     {
         // Check if user has permission to import campaigns
         if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:create')) {
@@ -408,20 +409,54 @@ class CampaignApiController extends CommonApiController
         // Decode request JSON
         $data = json_decode($request->getContent(), true);
 
-        // if (!$data || !isset($data['name']) || empty($data['name'])) {
         if (!$data || !isset($data[Campaign::ENTITY_NAME])) {
-            return $this->handleView(
-                $this->view(['error' => $this->translator->trans('mautic.campaign.import.error.name_required', [], 'flashes')], Response::HTTP_BAD_REQUEST)
-            );
+            $files = $request->files->all();
+
+            if (1 !== count($files)) {
+                return $this->handleView(
+                    $this->view(['error' => 'No JSON content found and exactly one ZIP file must be uploaded.'], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            $uploadedFile = array_values($files)[0];
+
+            if (!$uploadedFile->isValid()) {
+                return $this->handleView(
+                    $this->view(['error' => 'File upload failed or exceeded server size limit'], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            if ('zip' !== $uploadedFile->getClientOriginalExtension()) {
+                return $this->handleView(
+                    $this->view(['error' => 'Unsupported file type. Only ZIP archives are supported.'], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            $zipPath = $uploadedFile->getPathname();
+
+            if (!file_exists($zipPath)) {
+                return $this->handleView(
+                    $this->view(['error' => 'Uploaded file path does not exist on disk.'], Response::HTTP_INTERNAL_SERVER_ERROR)
+                );
+            }
+
+            $data = $importHelper->readZipFile($zipPath);
+            file_put_contents('/tmp/debug_campaign_upload.log', print_r($data, true));
+
+            if (!$data) {
+                return $this->handleView(
+                    $this->view(['error' => 'Malformed campaign JSON file - unable to parse JSON.'], Response::HTTP_BAD_REQUEST)
+                );
+            }
         }
-
+        $importHelper->recursiveRemoveEmailaddress($data);
         $userId = $userHelper->getUser()->getId();
-        $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $data, $userId);
 
-        $this->dispatcher->dispatch($event);
-
-        // Prepare response
-        $view = $this->view(['campaign' => $data[Campaign::ENTITY_NAME][0]['name']], Response::HTTP_CREATED);
+        foreach ($data as $entity) {
+            $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
+            $this->dispatcher->dispatch($event);
+        }
+        $view = $this->view(['Campaign imported successfully.'], Response::HTTP_CREATED);
         $this->setSerializationContext($view);
 
         return $this->handleView($view);

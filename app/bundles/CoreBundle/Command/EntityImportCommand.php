@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,6 +19,7 @@ final class EntityImportCommand extends ModeratedCommand
         private EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
+        private ImportHelper $importHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -56,7 +58,7 @@ final class EntityImportCommand extends ModeratedCommand
             return self::FAILURE;
         }
 
-        $fileData = $this->readFile($filePath);
+        $fileData = $this->importHelper->readZipFile($filePath);
 
         if (null === $fileData) {
             $output->writeln('<error>Failed to read or decode the file data.</error>');
@@ -79,54 +81,6 @@ final class EntityImportCommand extends ModeratedCommand
         $output->writeln('<info>Campaign data imported successfully.</info>');
 
         return self::SUCCESS;
-    }
-
-    /**
-     * @return ?array<string, mixed>
-     */
-    private function readFile(string $filePath): ?array
-    {
-        if ('zip' === pathinfo($filePath, PATHINFO_EXTENSION)) {
-            $tempDir = sys_get_temp_dir();
-            $zip     = new \ZipArchive();
-
-            if (true === $zip->open($filePath)) {
-                $zip->extractTo($tempDir);
-                $jsonFilePath = null;
-                $mediaPath    = $this->pathsHelper->getSystemPath('media').'/files/';
-
-                for ($i = 0; $i < $zip->numFiles; ++$i) {
-                    $filename = $zip->getNameIndex($i);
-
-                    if (str_starts_with($filename, 'assets/')) {
-                        $sourcePath      = $tempDir.'/'.$filename;
-                        $destinationPath = $mediaPath.substr($filename, strlen('assets/'));
-
-                        if (is_dir($sourcePath)) {
-                            @mkdir($destinationPath, 0755, true);
-                        } else {
-                            @mkdir(dirname($destinationPath), 0755, true);
-                            copy($sourcePath, $destinationPath);
-                        }
-                    } elseif ('json' === pathinfo($filename, PATHINFO_EXTENSION)) {
-                        $jsonFilePath = $tempDir.'/'.$filename;
-                    }
-                }
-
-                $zip->close();
-                if ($jsonFilePath) {
-                    $filePath = $jsonFilePath;
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-
-        $fileContents = file_get_contents($filePath);
-
-        return json_decode($fileContents, true);
     }
 
     /**

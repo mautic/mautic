@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -21,7 +20,6 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
 {
     public function __construct(
         private DynamicContentModel $dynamicContentModel,
-        private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,

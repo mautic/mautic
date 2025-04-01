@@ -17,7 +17,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -27,7 +26,6 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private FormModel $formModel,
-        private UserModel $userModel,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private FieldModel $fieldModel,

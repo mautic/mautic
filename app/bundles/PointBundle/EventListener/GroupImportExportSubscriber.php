@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
-use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -21,7 +20,6 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private PointGroupModel $pointGroupModel,
-        private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,

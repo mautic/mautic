@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -24,7 +23,6 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ListModel $leadListModel,
-        private UserModel $userModel,
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private EventDispatcherInterface $dispatcher,
