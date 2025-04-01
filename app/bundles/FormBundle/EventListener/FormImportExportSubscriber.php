@@ -11,6 +11,8 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -18,6 +20,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class FormImportExportSubscriber implements EventSubscriberInterface
 {
@@ -29,15 +32,17 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         private IpLookupHelper $ipLookupHelper,
         private FieldModel $fieldModel,
         private EventDispatcherInterface $dispatcher,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            EntityExportEvent::class     => ['onFormExport', 0],
-            EntityImportEvent::class     => ['onFormImport', 0],
-            EntityImportUndoEvent::class => ['onUndoImport', 0],
+            EntityExportEvent::class        => ['onFormExport', 0],
+            EntityImportEvent::class        => ['onFormImport', 0],
+            EntityImportUndoEvent::class    => ['onUndoImport', 0],
+            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
         ];
     }
 
@@ -143,12 +148,6 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $userName = '';
-        if ($event->getUserId()) {
-            $user     = $this->userModel->getEntity($event->getUserId());
-            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
-        }
-
         $stats = [
             EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
@@ -159,28 +158,23 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $isNew = !$form;
 
             $form ??= new Form();
-            $isNew && $form->setDateAdded(new \DateTime());
-            $form->setDateModified(new \DateTime());
-            $form->setUuid($formData['uuid']);
-            $form->setName($formData['name']);
-            $form->setIsPublished((bool) $formData['is_published']);
-            $form->setDescription($formData['description'] ?? '');
-            $form->setAlias($formData['alias'] ?? '');
-            $form->setLanguage($formData['lang'] ?? null);
-            $form->setCachedHtml($formData['cached_html'] ?? '');
-            $form->setPostAction($formData['post_action'] ?? '');
-            $form->setPostActionProperty($formData['post_action_property'] ?? '');
-            $form->setTemplate($formData['template'] ?? '');
-            $form->setFormType($formData['form_type'] ?? '');
-            $form->setRenderStyle($formData['render_style'] ?? '');
-            $form->setFormAttributes($formData['form_attr'] ?? '');
-            $isNew ? $form->setCreatedByUser($userName) : $form->setModifiedByUser($userName);
+            $this->serializer->denormalize(
+                $formData,
+                Form::class,
+                null,
+                ['object_to_populate' => $form]
+            );
+            $this->entityManager->persist($form);
+            $this->entityManager->flush();
 
-            $this->formModel->saveEntity($form);
+            if (!$isNew) {
+                $this->removeExistingFormActions($form);
+                $this->removeExistingFormFields($form);
+            }
 
             // Import actions
             foreach ($formData['form_actions'] ?? [] as $actionData) {
-                $action = new \Mautic\FormBundle\Entity\Action();
+                $action = new Action();
                 $action->setForm($form);
                 $action->setName($actionData['name']);
                 $action->setDescription($actionData['description'] ?? '');
@@ -194,7 +188,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
             // Import fields
             foreach ($formData['form_fields'] ?? [] as $fieldData) {
-                $field = new \Mautic\FormBundle\Entity\Field();
+                $field = new Field();
                 $field->setForm($form);
                 $field->setLabel($fieldData['label'] ?? '');
                 $field->setShowLabel((bool) $fieldData['show_label']);
@@ -242,6 +236,32 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         }
     }
 
+    private function removeExistingFormActions(Form $form): void
+    {
+        $actions = $this->entityManager
+            ->getRepository(Action::class)
+            ->findBy(['form' => $form]);
+
+        foreach ($actions as $action) {
+            $this->entityManager->remove($action);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    private function removeExistingFormFields(Form $form): void
+    {
+        $fields = $this->entityManager
+            ->getRepository(Field::class)
+            ->findBy(['form' => $form]);
+
+        foreach ($fields as $field) {
+            $this->entityManager->remove($field);
+        }
+
+        $this->entityManager->flush();
+    }
+
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Form::ENTITY_NAME !== $event->getEntityName()) {
@@ -273,14 +293,14 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $item) {
             $existing = $this->entityManager->getRepository(Form::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['name'];

@@ -15,6 +15,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class GroupImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,6 +25,7 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
@@ -67,12 +69,6 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $userName = '';
-        if ($event->getUserId()) {
-            $user     = $this->userModel->getEntity($event->getUserId());
-            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
-        }
-
         $stats = [
             EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
@@ -83,15 +79,12 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
             $isNew = !$group;
 
             $group ??= new Group();
-            $isNew && $group->setDateAdded(new \DateTime());
-            $group->setDateModified(new \DateTime());
-            $group->setUuid($element['uuid']);
-            $group->setName($element['name']);
-            $group->setDescription($element['description'] ?? '');
-            $group->setIsPublished((bool) $element['is_published']);
-
-            $isNew ? $group->setCreatedByUser($userName) : $group->setModifiedByUser($userName);
-
+            $this->serializer->denormalize(
+                $element,
+                Group::class,
+                null,
+                ['object_to_populate' => $group]
+            );
             $this->pointGroupModel->saveEntity($group);
 
             $event->addEntityIdMap((int) $element['id'], $group->getId());
@@ -142,14 +135,14 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $item) {
             $existing = $this->entityManager->getRepository(Group::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['name'];

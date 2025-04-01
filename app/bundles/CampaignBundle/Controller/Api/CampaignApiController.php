@@ -375,7 +375,7 @@ class CampaignApiController extends CommonApiController
         }
 
         // Check if user has permission to export campaigns
-        if (!$this->security->isAdmin() && !$this->security->hasEntityAccess('campaign:campaigns:viewown', 'campaign:campaigns:viewother')) {
+        if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
@@ -401,7 +401,7 @@ class CampaignApiController extends CommonApiController
     public function importCampaignAction(Request $request, UserHelper $userHelper): Response
     {
         // Check if user has permission to import campaigns
-        if (!$this->security->isAdmin() && !$this->security->hasEntityAccess('campaign:campaigns:create', 'campaign:campaigns:editown')) {
+        if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:create')) {
             return $this->accessDenied();
         }
 

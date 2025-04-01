@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class SegmentImportExportSubscriber implements EventSubscriberInterface
 {
@@ -29,6 +30,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         private EventDispatcherInterface $dispatcher,
         private FieldModel $fieldModel,
         private IpLookupHelper $ipLookupHelper,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
@@ -117,12 +119,6 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $userName = '';
-        if ($event->getUserId()) {
-            $user     = $this->userModel->getEntity($event->getUserId());
-            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
-        }
-
         $stats = [
             EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
@@ -133,20 +129,13 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             $isNew   = !$segment;
 
             $segment ??= new LeadList();
-            $isNew && $segment->setDateAdded(new \DateTime());
-            $segment->setDateModified(new \DateTime());
-            $segment->setUuid($element['uuid']);
-            $segment->setName($element['name']);
-            $segment->setIsPublished((bool) $element['is_published']);
-            $segment->setDescription($element['description'] ?? '');
-            $segment->setAlias($element['alias'] ?? '');
-            $segment->setPublicName($element['public_name'] ?? '');
-            $segment->setFilters($element['filters'] ?? '');
-            $segment->setIsGlobal($element['is_global'] ?? false);
-            $segment->setIsPreferenceCenter($element['is_preference_center'] ?? false);
 
-            $isNew ? $segment->setCreatedByUser($userName) : $segment->setModifiedByUser($userName);
-
+            $this->serializer->denormalize(
+                $element,
+                LeadList::class,
+                null,
+                ['object_to_populate' => $segment]
+            );
             $this->leadListModel->saveEntity($segment);
 
             $event->addEntityIdMap((int) $element['id'], $segment->getId());
@@ -197,14 +186,14 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $item) {
             $existing = $this->entityManager->getRepository(LeadList::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['name'];

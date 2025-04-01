@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class CustomFieldImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,6 +25,7 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
@@ -100,37 +102,17 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
             $isNew = !$field;
 
             $field ??= new LeadField();
-            $isNew && $field->setDateAdded(new \DateTime());
-            $field->setDateModified(new \DateTime());
 
-            if ($isNew && $event->getUserId()) {
-                $field->setCreatedBy($event->getUserId());
-                $field->setCreatedByUser($userName);
-            }
-
-            $field->setUuid($element['uuid']);
-            $field->setLabel($element['label']);
-            $field->setType($element['type']);
-            $field->setGroup($element['field_group']);
-            $field->setDefaultValue($element['default_value'] ?? null);
-            $field->setIsPublished((bool) $element['is_published']);
-            $field->setIsRequired((bool) ($element['is_required'] ?? false));
-            $field->setIsFixed((bool) ($element['is_fixed'] ?? false));
-            $field->setIsVisible((bool) ($element['is_visible'] ?? true));
-            $field->setIsShortVisible((bool) ($element['is_short_visible'] ?? false));
-            $field->setIsListable((bool) ($element['is_listable'] ?? false));
-            $field->setIsPubliclyUpdatable((bool) ($element['is_publicly_updatable'] ?? false));
-            $field->setIsUniqueIdentifier((bool) ($element['is_unique_identifier'] ?? false));
-            $field->setIsIndex((bool) ($element['is_index'] ?? false));
-            $field->setCharLengthLimit($element['char_length_limit'] ?? null);
-            $field->setOrder($element['field_order'] ?? 0);
-            $field->setObject($element['object']);
-            $field->setProperties($element['properties'] ?? []);
-            $field->setColumnIsNotCreated();
-
+            $this->serializer->denormalize(
+                $element,
+                LeadField::class,
+                null,
+                ['object_to_populate' => $field]
+            );
             if ($isNew) {
-                $alias = $this->fieldModel->generateUniqueFieldAlias($element['alias']);
-                $field->setAlias($alias);
+                $alias       = $element['alias'] ?? $field->getAlias() ?? '';
+                $uniqueAlias = $this->fieldModel->generateUniqueFieldAlias($alias);
+                $field->setAlias($uniqueAlias);
             }
 
             $this->fieldModel->saveEntity($field);
@@ -183,14 +165,14 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $item) {
             $existing = $this->entityManager->getRepository(LeadField::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getLabel();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getLabel();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['label'];

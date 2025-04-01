@@ -216,20 +216,20 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
-                return;
+            return;
         }
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $element) {
             $existing = $this->entityManager->getRepository(Campaign::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
 
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $element['name'] ?? '';

@@ -15,6 +15,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class DynamicContentImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,6 +25,7 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
@@ -78,12 +80,6 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             return;
         }
 
-        $userName = '';
-        if ($event->getUserId()) {
-            $user     = $this->userModel->getEntity($event->getUserId());
-            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
-        }
-
         $stats = [
             EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
@@ -94,27 +90,12 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             $isNew  = !$object;
 
             $object ??= new DynamicContent();
-            $isNew && $object->setDateAdded(new \DateTime());
-            $object->setDateModified(new \DateTime());
-            $object->setUuid($element['uuid']);
-            $isNew ? $object->setCreatedByUser($userName) : $object->setModifiedByUser($userName);
-
-            $object->setTranslationParent($element['translation_parent_id'] ?? null);
-            $object->setVariantParent($element['variant_parent_id'] ?? null);
-            $object->setIsPublished((bool) ($element['is_published'] ?? false));
-            $object->setName($element['name'] ?? '');
-            $object->setDescription($element['description'] ?? '');
-            $object->setPublishUp($element['publish_up'] ?? null);
-            $object->setPublishDown($element['publish_down'] ?? null);
-            $object->setSentCount($element['sent_count'] ?? 0);
-            $object->setContent($element['content'] ?? '');
-            $object->setUtmTags($element['utm_tags'] ?? '');
-            $object->setLanguage($element['lang'] ?? '');
-            $object->setVariantSettings($element['variant_settings'] ?? '');
-            $object->setVariantStartDate($element['variant_start_date'] ?? null);
-            $object->setFilters($element['filters'] ?? '');
-            $object->setIsCampaignBased((bool) ($element['is_campaign_based'] ?? false));
-            $object->setSlotName($element['slot_name'] ?? '');
+            $this->serializer->denormalize(
+                $element,
+                DynamicContent::class,
+                null,
+                ['object_to_populate' => $object]
+            );
 
             $this->dynamicContentModel->saveEntity($object);
 
@@ -166,14 +147,14 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $item) {
             $existing = $this->entityManager->getRepository(DynamicContent::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['name'];

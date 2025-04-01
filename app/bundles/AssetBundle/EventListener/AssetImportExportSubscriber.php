@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class AssetImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,6 +25,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
@@ -64,7 +66,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             'publish_down'           => $asset->getPublishDown() ? $asset->getPublishDown()->format(DATE_ATOM) : null,
             'extension'              => $asset->getExtension(),
             'mime'                   => $asset->getMime(),
-            'size'                   => $asset->getSize(),
+            'size'                   => (int) $asset->getSize(),
             'disallow'               => $asset->getDisallow(),
             'uuid'                   => $asset->getUuid(),
         ];
@@ -87,12 +89,6 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $userName = '';
-        if ($event->getUserId()) {
-            $user     = $this->userModel->getEntity($event->getUserId());
-            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
-        }
-
         $stats = [
             EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
@@ -103,29 +99,16 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             $isNew  = !$object;
 
             $object ??= new Asset();
-            $isNew && $object->setDateAdded(new \DateTime());
-            $object->setDateModified(new \DateTime());
-            $object->setUuid($element['uuid']);
-            $object->setTitle($element['title']);
-            $object->setIsPublished((bool) $element['is_published']);
-            $object->setDescription($element['description'] ?? '');
-            $object->setAlias($element['alias'] ?? '');
-            $object->setStorageLocation($element['storage_location'] ?? '');
-            $object->setPath($element['path'] ?? '');
-            $object->setRemotePath($element['remote_path'] ?? '');
-            $object->setOriginalFileName($element['original_file_name'] ?? '');
-            $object->setMime($element['mime'] ?? '');
-            $object->setSize($element['size'] ?? '');
-            $object->setDisallow($element['disallow'] ?? true);
-            $object->setExtension($element['extension'] ?? '');
-            $object->setLanguage($element['lang'] ?? '');
-            $object->setPublishUp($element['publish_up']);
-            $object->setPublishDown($element['publish_down']);
-
-            $isNew ? $object->setCreatedByUser($userName) : $object->setModifiedByUser($userName);
-
-            $this->entityManager->persist($object);
-            $this->entityManager->flush();
+            if (isset($element['size'])) {
+                $element['size'] = (int) $element['size'];
+            }
+            $this->serializer->denormalize(
+                $element,
+                Asset::class,
+                null,
+                ['object_to_populate' => $object]
+            );
+            $this->assetModel->saveEntity($object);
 
             $event->addEntityIdMap((int) $element['id'], $object->getId());
 
@@ -174,14 +157,14 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $item) {
             $existing = $this->entityManager->getRepository(Asset::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getTitle();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getTitle();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['title'];

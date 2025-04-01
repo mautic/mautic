@@ -15,6 +15,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class PageImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,6 +25,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
@@ -85,12 +87,6 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $userName = '';
-        if ($event->getUserId()) {
-            $user     = $this->userModel->getEntity($event->getUserId());
-            $userName = $user ? $user->getFirstName().' '.$user->getLastName() : '';
-        }
-
         $stats = [
             EntityImportEvent::NEW    => ['names' => [], 'ids' => [], 'count' => 0],
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
@@ -101,33 +97,13 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             $isNew = !$page;
 
             $page ??= new Page();
-            $isNew && $page->setDateAdded(new \DateTime());
-            $page->setDateModified(new \DateTime());
-            $page->setUuid($element['uuid']);
-            $page->setTitle($element['title']);
-            $page->setIsPublished((bool) $element['is_published']);
-            $page->setAlias($element['alias'] ?? '');
-            $page->setTemplate($element['template'] ?? '');
-            $page->setContent($element['content'] ?? '');
-            $page->setCustomHtml($element['custom_html'] ?? '');
-            $page->setPublishUp($element['publish_up']);
-            $page->setPublishDown($element['publish_down']);
-            $page->setHits($element['hits']);
-            $page->setUniqueHits($element['unique_hits']);
-            $page->setVariantHits($element['variant_hits']);
-            $page->setRevision($element['revision']);
-            $page->setLanguage($element['lang'] ?? '');
-            $page->setMetaDescription($element['meta_description'] ?? '');
-            $page->setHeadScript($element['head_script'] ?? '');
-            $page->setFooterScript($element['footer_script'] ?? '');
-            $page->setRedirectType($element['redirect_type'] ?? '');
-            $page->setRedirectUrl($element['redirect_url']);
-            $page->setIsPreferenceCenter($element['is_preference_center'] ?? false);
-            $page->setNoIndex($element['no_index'] ?? false);
-            $page->setVariantSettings($element['variant_settings'] ?? []);
 
-            $isNew ? $page->setCreatedByUser($userName) : $page->setModifiedByUser($userName);
-
+            $this->serializer->denormalize(
+                $element,
+                Page::class,
+                null,
+                ['object_to_populate' => $page]
+            );
             $this->pageModel->saveEntity($page);
 
             $event->addEntityIdMap((int) $element['id'], $page->getId());
@@ -178,14 +154,14 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
 
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
         ];
 
         foreach ($event->getEntityData() as $item) {
             $existing = $this->entityManager->getRepository(Page::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
-                $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getTitle();
-                $summary[EntityImportEvent::UPDATE]['ids'][]   = $existing->getId();
+                $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getTitle();
+                $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
                 ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['title'];

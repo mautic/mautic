@@ -301,12 +301,12 @@ final class ImportController extends AbstractFormController
                 if (!empty($summary[EntityImportEvent::UPDATE])) {
                     foreach ($summary[EntityImportEvent::UPDATE] as $details) {
                         $updateCount += $details['count'];
-                    }    
+                    }
                 }
                 if (!empty($summary[EntityImportEvent::NEW])) {
                     foreach ($summary[EntityImportEvent::NEW] as $details) {
                         $createCount += $details['count'];
-                    }    
+                    }
                 }
             }
 
@@ -331,32 +331,41 @@ final class ImportController extends AbstractFormController
                     EntityImportEvent::ERRORS => ['Invalid file data.'],
                 ];
             } else {
-                $userId = $this->userHelper->getUser()->getId();
+                $userId        = $this->userHelper->getUser()->getId();
                 $importSummary = [];
 
                 $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
 
                 // Loop through importActions and clean UUIDs for 'create' actions
-                foreach ($importActions as $entityType => $entities) {
-                    foreach ($entities as $entityId => $action) {
-                        if ($action === 'create') {
-                            // Loop through each import group (each fileData block)
-                            foreach ($fileData as &$group) {
-                                if (!isset($group[$entityType])) {
-                                    continue;
-                                }
-                
-                                // Loop through each item in the entity group (e.g., each campaign)
-                                foreach ($group[$entityType] as &$item) {
-                                    if (isset($item['id']) && (int) $item['id'] === (int) $entityId) {
-                                        $item['uuid'] = '';
-                                        break 2; // Found and updated; break out of both loops
+                foreach ($fileData as &$group) {
+                    foreach ($importActions as $entityType => $entities) {
+                        if ('campaign_event' == $entityType) {
+                            continue;
+                        }
+                        if (!isset($group[$entityType])) {
+                            continue;
+                        }
+
+                        foreach ($entities as $entityUuid => $action) {
+                            if ('create' !== $action) {
+                                continue;
+                            }
+
+                            foreach ($group[$entityType] as &$item) {
+                                if (isset($item['uuid']) && (int) $item['uuid'] === (int) $entityUuid) {
+                                    if ('campaign' == $entityType) {
+                                        foreach ($group['campaign_event'] as &$eventItem) {
+                                            $eventItem['uuid'] = '';
+                                        }
                                     }
+                                    $item['uuid'] = '';
+                                    break;
                                 }
                             }
                         }
                     }
                 }
+
                 foreach ($fileData as $entity) {
                     $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
                     $this->dispatcher->dispatch($event);
@@ -371,11 +380,11 @@ final class ImportController extends AbstractFormController
                         if (!isset($summary[$status][Campaign::ENTITY_NAME])) {
                             continue;
                         }
-                    
-                        $campaignData = $summary[$status][Campaign::ENTITY_NAME];
+
+                        $campaignData    = $summary[$status][Campaign::ENTITY_NAME];
                         $campaignName    = $campaignData['names'][0] ?? 'Unknown';
                         $campaignId      = $campaignData['ids'][0] ?? 0;
-                    
+
                         $this->addFlashMessage(
                             'mautic.campaign.notice.import.finished',
                             ['%id%' => $campaignId, '%name%' => $campaignName]
@@ -427,19 +436,19 @@ final class ImportController extends AbstractFormController
                     foreach ($entities as $entityName => $info) {
                         if (!isset($mergedSummary[$status][$entityName])) {
                             $mergedSummary[$status][$entityName] = [
-                                'names' => [],
-                                'ids'   => [],
-                                'count' => 0,
+                                'names'   => [],
+                                'uuids'   => [],
+                                'count'   => 0,
                             ];
                         }
-    
+
                         $mergedSummary[$status][$entityName]['names'] = array_merge(
                             $mergedSummary[$status][$entityName]['names'],
                             $info['names'] ?? []
                         );
-                        $mergedSummary[$status][$entityName]['ids'] = array_merge(
-                            $mergedSummary[$status][$entityName]['ids'],
-                            $info['ids'] ?? []
+                        $mergedSummary[$status][$entityName]['uuids'] = array_merge(
+                            $mergedSummary[$status][$entityName]['uuids'],
+                            $info['uuids'] ?? []
                         );
                         $mergedSummary[$status][$entityName]['count'] += $info['count'] ?? 0;
                     }
