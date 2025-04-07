@@ -5,7 +5,6 @@ namespace Mautic\InstallBundle\Tests\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -57,7 +56,6 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->configurator   = $this->createMock(Configurator::class);
         $this->installer      = $this->createMock(InstallService::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
-        $factory              = $this->createMock(MauticFactory::class);
         $modelFactory         = $this->createMock(ModelFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -71,7 +69,6 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
             $this->configurator,
             $this->installer,
             $doctrine,
-            $factory,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,

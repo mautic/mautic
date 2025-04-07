@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -15,6 +16,8 @@ use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -24,40 +27,72 @@ use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "email:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category", "asset", "page", "translationChildren", "unsubscribeForm", "fields", "actions", "lists", "preferenceCenter", "assetAttachments"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "email:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use VariantEntityTrait;
     use TranslationEntityTrait;
     use DynamicContentEntityTrait;
+    use UuidTrait;
 
     /**
      * @var int
+     *
+     * @Groups({"email:read", "download:read"})
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $name;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $description;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $subject;
 
     /**
      * @var bool|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $useOwnerAsMailer;
 
@@ -65,91 +100,127 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $fromAddress;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $fromName;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $replyToAddress;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $bccAddress;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $template;
 
     /**
      * @var array
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $content = [];
 
     /**
      * @var array
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $utmTags = [];
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $plainText;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $customHtml;
 
     /**
      * @var string|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $emailType = 'template';
 
     /**
      * @var \DateTimeInterface|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $publishDown;
 
     /**
      * @var bool|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $publicPreview = false;
 
     /**
      * @var int
+     *
+     * @Groups({"email:read", "download:read"})
      */
     private $readCount = 0;
 
     /**
      * @var int
+     *
+     * @Groups({"email:read", "download:read"})
      */
     private $sentCount = 0;
 
     /**
      * @var int
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $revision = 1;
 
     /**
      * @var Category|null
+     *
+     * @Groups({"email:read", "email:write"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection<LeadList>
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $lists;
 
@@ -165,26 +236,36 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var int
+     *
+     * @Groups({"email:read", "download:read"})
      */
     private $variantSentCount = 0;
 
     /**
      * @var int
+     *
+     * @Groups({"email:read", "download:read"})
      */
     private $variantReadCount = 0;
 
     /**
      * @var Form|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $unsubscribeForm;
 
     /**
      * @var Page|null
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $preferenceCenter;
 
     /**
      * @var ArrayCollection<Asset>
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $assetAttachments;
 
@@ -195,6 +276,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var array
+     *
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $headers = [];
 
@@ -205,6 +288,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var int
+     *
+     * @Groups({"email:read", "download:read"})
      */
     private $queuedCount = 0;
 
@@ -342,6 +427,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->fetchExtraLazy()
             ->cascadeAll()
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

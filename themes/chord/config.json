@@ -1,0 +1,7 @@
+{
+  "name": "Chord",
+  "author": "Dropsolid",
+  "authorUrl": "https://dropsolid.io",
+  "builder": ["legacy"],
+  "features": ["form"]
+}

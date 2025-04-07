@@ -17,7 +17,7 @@ $gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
 require_once dirname(__DIR__).'/vendor/autoload.php';
 require_once dirname(__DIR__).'/app/AppKernel.php';
 
-$releaseMetadata = \Mautic\CoreBundle\Release\ThisRelease::getMetadata();
+$releaseMetadata = Mautic\CoreBundle\Release\ThisRelease::getMetadata();
 $appVersion      = $releaseMetadata->getVersion();
 $minimalVersion  = $releaseMetadata->getMinSupportedMauticVersion();
 
@@ -146,6 +146,74 @@ if (!isset($args['repackage'])) {
 
     $deletedFiles = array_keys($deletedFiles);
     sort($deletedFiles);
+
+    // Paths to vendor directories
+    $oldVendorPath = __DIR__.'/mautic-minimum-version/vendor';
+    $newVendorPath = __DIR__.'/packaging/vendor';
+
+    // Verify both vendor directories exist
+    if (!is_dir($oldVendorPath) || !is_dir($newVendorPath)) {
+        echo "Error: Missing vendor directories\n";
+        exit(1);
+    }
+
+    // Create temp files
+    $oldVendorFiles = tempnam(sys_get_temp_dir(), 'old_vendor');
+    $newVendorFiles = tempnam(sys_get_temp_dir(), 'new_vendor');
+
+    // Generate file lists from parent directories
+    $result = null;
+
+    system(sprintf(
+        'cd %s && find vendor -type f -print0 | sort -z | xargs -0 -I{} echo "{}" > %s',
+        escapeshellarg(dirname($oldVendorPath)),
+        escapeshellarg($oldVendorFiles)
+    ), $result);
+
+    if (0 !== $result) {
+        echo "Failed to generate vendor file list\n";
+        exit(1);
+    }
+
+    $result = null;
+
+    system(sprintf(
+        'cd %s && find vendor -type f -print0 | sort -z | xargs -0 -I{} echo "{}" > %s',
+        escapeshellarg(dirname($newVendorPath)),
+        escapeshellarg($newVendorFiles)
+    ), $result);
+
+    if (0 !== $result) {
+        echo "Failed to generate vendor file list\n";
+        exit(1);
+    }
+
+    // Compare the lists
+    $result = null;
+
+    exec(sprintf('comm -23 %s %s 2>&1',
+        escapeshellarg($oldVendorFiles),
+        escapeshellarg($newVendorFiles)
+    ), $vendorDeletedFiles, $result);
+
+    // Cleanup temp files
+    if (file_exists($oldVendorFiles)) {
+        unlink($oldVendorFiles);
+    }
+    if (file_exists($newVendorFiles)) {
+        unlink($newVendorFiles);
+    }
+
+    // Merge results with existing deletions
+    if (0 === $result) {
+        $deletedFiles = array_unique(array_merge(
+            $deletedFiles,
+            array_filter($vendorDeletedFiles, function ($path) {
+                return str_starts_with($path, 'vendor/');
+            })
+        ));
+        sort($deletedFiles);
+    }
 
     // Write our files arrays into text files
     file_put_contents(__DIR__.'/packaging/deleted_files.txt', json_encode($deletedFiles));

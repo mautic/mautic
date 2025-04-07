@@ -11,6 +11,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -150,7 +152,9 @@ class PageTestAbstract extends TestCase
                 ->with('transliterate_page_title')
                 ->willReturn($transliterationEnabled);
 
-        $deviceTrackerMock = $this->createMock(DeviceTracker::class);
+        $deviceTrackerMock           = $this->createMock(DeviceTracker::class);
+        $statRepositoryMock          = $this->createMock(StatRepository::class);
+        $botRatioHelperMock          = $this->createMock(BotRatioHelper::class);
 
         $pageModel = new PageModel(
             $cookieHelper,
@@ -171,7 +175,9 @@ class PageTestAbstract extends TestCase
             $this->router,
             $translator,
             $userHelper,
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $statRepositoryMock,
+            $botRatioHelperMock
         );
 
         return $pageModel;

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -29,7 +30,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
@@ -823,6 +823,30 @@ class LeadControllerTest extends MauticMysqlTestCase
         $leadCompanies = $form['lead[companies]']->getValue();
 
         Assert::assertCount($companyLimit, $leadCompanies);
+    }
+
+    public function testMax100CompaniesShouldBeFetchedOnContactEditAction(): void
+    {
+        $companyLimit = 123;
+        $counter      = 1;
+        while ($companyLimit >= $counter) {
+            $company = new Company();
+            $company->setName('TestCompany'.$counter);
+            $this->em->persist($company);
+            ++$counter;
+        }
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+
+        // Get the select element for companies
+        $companySelect = $crawler->filter('select[name="lead[companies][]"]');
+
+        // Count the number of option elements within the select (- one option that is not a company)
+        $availableOptions = $companySelect->filter('option')->count() - 1;
+
+        // Assert that the number of available options is 100 (or your expected limit)
+        Assert::assertEquals(100, $availableOptions, 'The number of available company options should be limited to 100');
     }
 
     public function testNonExitingContactIsRedirected(): void

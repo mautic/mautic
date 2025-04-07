@@ -33,7 +33,7 @@ class WidgetType extends AbstractType
             [
                 'label'      => 'mautic.dashboard.widget.form.name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control form-control-widget'],
                 'required'   => false,
             ]
         );
@@ -53,7 +53,7 @@ class WidgetType extends AbstractType
                 'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => 'mautic.core.select',
                 'attr'              => [
-                    'class'    => 'form-control',
+                    'class'    => 'form-control form-control-widget',
                     'onchange' => 'Mautic.updateWidgetForm(this)',
                 ],
             ]
@@ -72,7 +72,7 @@ class WidgetType extends AbstractType
                 ],
                 'empty_data'        => '100',
                 'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
+                'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]
         );
@@ -91,7 +91,7 @@ class WidgetType extends AbstractType
                 ],
                 'empty_data'        => '330',
                 'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
+                'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]
         );

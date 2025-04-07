@@ -111,7 +111,9 @@ return [
     ],
 
     'categories' => [
-        'campaign' => null,
+        'campaign' => [
+            'class' => Mautic\CampaignBundle\Entity\Campaign::class,
+        ],
     ],
 
     'services' => [
@@ -298,7 +300,6 @@ return [
                     'event_dispatcher',
                     'mautic.campaign.scheduler',
                     'monolog.logger.mautic',
-                    'mautic.factory',
                     'mautic.tracker.contact',
                 ],
             ],

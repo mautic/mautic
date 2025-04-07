@@ -73,7 +73,10 @@ return [
     ],
 
     'categories' => [
-        'plugin:focus' => 'mautic.focus',
+        'plugin:focus' => [
+            'label' => 'mautic.focus',
+            'class' => MauticPlugin\MauticFocusBundle\Entity\Focus::class,
+        ],
     ],
 
     'parameters' => [

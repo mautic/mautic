@@ -1,0 +1,10 @@
+{
+  "name": "mautic/theme-blend",
+  "description": "Mautic Blend Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": ">=6.0"
+  }
+}

@@ -1,0 +1,352 @@
+<style type="text/css" scoped>
+    :root {
+        --form-primary-60: #f4f0ec;
+        --form-primary-70: hsl(30, 27%, 90%);
+        --form-primary-80: hsl(30, 27%, 86%);
+        --form-font-family: Arial, Helvetica, sans-serif;
+
+        --form-field: #ffffff;
+        --form-field-hover: #ffffff;
+
+        --form-border-interactive: var(--form-primary-60);
+        --form-border-subtle: #d1d1d1;
+        --form-border-strong: rgb(29, 29, 27);
+        --form-border-inverse: #161616;
+        --form-border-disabled: #c6c6c6;
+
+        --form-text-primary: #303030;
+        --form-text-secondary: #525252;
+        --form-text-placeholder: #a8a8a8;
+        --form-text-on-color: #ffffff;
+        --form-text-on-color-disabled: #8d8d8d;
+        --form-text-helper: #6f6f6f;
+        --form-text-error: #da1e28;
+        --form-text-inverse: #ffffff;
+        --form-text-disabled: #16161640;
+
+        --form-link-primary: var(--form-primary-60);
+        --form-link-primary-hover: var(--form-primary-70);
+        --form-link-secondary: var(--form-primary-70);
+        --form-link-inverse: var(--form-primary-40);
+        --form-link-visited: #8a3ffc;
+
+        --form-button-primary: #1d1d1b;
+        --form-button-primary-hover: #ffffff;
+        --form-button-primary-active: #ffffff;
+        --form-button-secondary: #393939;
+        --form-button-secondary-hover: #4c4c4c;
+        --form-button-secondary-active: #6f6f6f;
+        --form-button-tertiary: var(--form-primary-60);
+        --form-button-tertiary-hover: var(--form-primary-70);
+        --form-button-tertiary-active: var(--form-primary-80);
+        --form-button-danger-primary: #da1e28;
+        --form-button-danger-secondary: #da1e28;
+        --form-button-danger-hover: #ba1b23;
+        --form-button-danger-active: #750e13;
+        --form-button-separator: #e0e0e0;
+        --form-button-disabled: #c6c6c6;
+
+        --form-support-error: #da1e28;
+        --form-support-success: #24a148;
+        --form-support-warning: #f1c21b;
+        --form-support-info: #0043ce;
+        --form-support-error-inverse: #ff787f;
+        --form-support-success-inverse: #42be65;
+        --form-support-warning-inverse: #f1c21b;
+        --form-support-info-inverse: #6da2ff;
+
+        --form-focus: var(--form-primary-60);
+        --form-focus-inset: #ffffff;
+        --form-focus-inverse: #ffffff;
+
+        --form-interactive: var(--form-button-primary);
+        --form-highlight: var(--form-primary-20);
+
+        --form-duration-productive: 150ms;
+        --form-duration-expressive: 300ms;
+
+        --form-easing-standard-productive: cubic-bezier(0.2, 0, 0.38, 0.9);
+        --form-easing-standard-expressive: cubic-bezier(0.4, 0.14, 0.3, 1);
+
+        --form-transition-all-productive: all var(--form-duration-productive) var(--form-easing-standard-productive);
+        --form-transition-all-expressive: all var(--form-duration-expressive) var(--form-easing-standard-expressive);
+    }
+
+    .mauticform_wrapper {
+        max-width: 600px;
+        margin: 10px auto;
+        font-family: var(--form-font-family);
+    }
+
+    .mauticform-innerform {}
+
+    .mauticform-post-success {}
+
+    .mauticform-name {
+        font-weight: bold;
+        font-size: 1.5em;
+        margin-bottom: 3px;
+    }
+
+    .mauticform-description {
+        margin-top: 2px;
+        margin-bottom: 10px;
+    }
+
+    .mauticform-error {
+        margin-bottom: 10px;
+        color: var(--form-support-error);
+    }
+
+    .mauticform-message {
+        margin-bottom: 10px;
+        color: var(--form-support-success);
+    }
+
+    .mauticform-row {
+        display: block;
+        margin-bottom: 45px;
+    }
+
+    .mauticform-label {
+        font-size: 13px;
+        display: block;
+        font-weight: normal;
+        margin-bottom: 5px;
+        color: var(--form-text-primary);
+        text-transform: uppercase;
+    }
+
+    .mauticform-row.mauticform-required .mauticform-label:after {
+        color: var(--form-support-error);
+        content: " *";
+        display: inline;
+    }
+
+    .mauticform-helpmessage {
+        display: block;
+        font-size: 0.9em;
+        margin-bottom: 3px;
+    }
+
+    .mauticform-errormsg {
+        display: block;
+        color: var(--form-support-error);
+        margin-top: 2px;
+    }
+
+    .mauticform-selectbox,
+    .mauticform-input,
+    .mauticform-textarea {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px;
+        border: none;
+        border-bottom: 1px solid var(--form-border-subtle);
+        background: var(--form-field);
+        box-shadow: none;
+        border-radius: 0px;
+        box-sizing: border-box;
+        transition: var(--form-transition-all-productive);
+    }
+
+    .mauticform-selectbox:focus,
+    .mauticform-input:focus,
+    .mauticform-textarea:focus,
+    .mauticform-selectbox:active,
+    .mauticform-input:active,
+    .mauticform-textarea:active {
+        background: var(--form-field-hover);
+        border-color: var(--form-border-strong);
+        outline: none;
+    }
+
+    .mauticform-input::placeholder {
+        text-transform: uppercase;
+    }
+
+
+    .mauticform-checkboxgrp-row {
+        margin-bottom: 3px;
+    }
+
+    .mauticform-checkboxgrp-label {
+        font-weight: normal;
+    }
+
+    .mauticform-checkboxgrp-checkbox {
+        aspect-ratio: 1 / 1;
+        height: 16px;
+        vertical-align: -3px;
+        background-color: var(--form-field);
+        appearance: none;
+        border: 1px solid var(--form-border-strong);
+        border-radius: 0px;
+        margin: 0;
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        -webkit-transition: var(--form-transition-all-productive);
+        -o-transition: var(--form-transition-all-productive);
+        transition: var(--form-transition-all-productive);
+        outline: 2px solid transparent;
+        outline-offset: 1px;
+        margin-right: 4px;
+    }
+
+    .mauticform-checkboxgrp-checkbox:checked {
+        background-color: var(--form-interactive);
+        border: 1px solid var(--form-interactive);
+    }
+
+    .mauticform-checkboxgrp-checkbox:checked:before {
+        content: "";
+        width: 14px;
+        height: 14px;
+        background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23FFFFFF%22%3E%3Cpath%20d%3D%22M9.9997%2015.1709L19.1921%205.97852L20.6063%207.39273L9.9997%2017.9993L3.63574%2011.6354L5.04996%2010.2212L9.9997%2015.1709Z%22/%3E%3C/svg%3E');
+        position: absolute;
+    }
+
+    .mauticform-radiogrp-row {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    .mauticform-radiogrp-label {
+        font-weight: normal;
+    }
+
+    .mauticform-radiogrp-radio {
+        width: 16px;
+        aspect-ratio: 1 / 1;
+        accent-color: black;
+    }
+
+    .mauticform-button-wrapper .mauticform-button.btn-ghost,
+    .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost {
+        color: #5d6c7c;
+        background-color: #ffffff;
+        border-color: #dddddd;
+    }
+
+    .mauticform-button-wrapper .mauticform-button,
+    .mauticform-pagebreak-wrapper .mauticform-pagebreak {
+        display: inline-block;
+        margin-bottom: 0;
+        font-weight: normal;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        background-image: none;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        padding: 16px 30px;
+        font-size: 13px;
+        line-height: 1.3856;
+        border-radius: 0px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-color: var(--form-button-primary);
+        color: var(--form-text-on-color);
+        transition: var(--form-transition-all-expressive);
+        text-transform: uppercase;
+    }
+
+    .mauticform-button-wrapper .mauticform-button:hover,
+    .mauticform-pagebreak-wrapper .mauticform-pagebreak:hover {
+        background-color: var(--form-button-primary-hover);
+        color: var(--text-primary);
+        border-color: var(--form-button-primary);
+    }
+
+    .mauticform-button-wrapper .mauticform-button.btn-ghost[disabled],
+    .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost[disabled] {
+        background-color: #ffffff;
+        border-color: #dddddd;
+        opacity: 0.75;
+        cursor: not-allowed;
+    }
+
+    .mauticform-pagebreak-wrapper .mauticform-button-wrapper {
+        display: inline;
+    }
+
+    /**
+        * @see https://github.com/TarekRaafat/autoComplete.js/blob/master/dist/css/autoComplete.02.css.
+        */
+    .autoComplete_wrapper {
+        position: relative;
+    }
+
+    .autoComplete_wrapper>input::placeholder {
+        transition: all 0.3s ease;
+    }
+
+    .autoComplete_wrapper>ul {
+        position: absolute;
+        max-height: 226px;
+        overflow-y: scroll;
+        top: 100%;
+        left: 0;
+        right: 0;
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+        border-radius: 4px;
+        background-color: #fff;
+        border: 1px solid rgba(33, 33, 33, 0.1);
+        z-index: 1000;
+        outline: none;
+    }
+
+    .autoComplete_wrapper>ul>li {
+        padding: 10px 20px;
+        list-style: none;
+        text-align: left;
+        font-size: 16px;
+        color: #212121;
+        transition: all 0.1s ease-in-out;
+        border-radius: 3px;
+        background-color: rgba(255, 255, 255, 1);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.2s ease;
+    }
+
+    .autoComplete_wrapper>ul>li>span {
+        float: right;
+    }
+
+    .autoComplete_wrapper>ul>li::selection {
+        color: rgba(#ffffff, 0);
+        background-color: rgba(#ffffff, 0);
+    }
+
+    .autoComplete_wrapper>ul>li:hover {
+        cursor: pointer;
+        background-color: rgba(123, 123, 123, 0.1);
+    }
+
+    .autoComplete_wrapper>ul>li mark {
+        background-color: transparent;
+        font-weight: bold;
+    }
+
+    .autoComplete_wrapper>ul>li mark::selection {
+        background-color: rgba(#ffffff, 0);
+    }
+
+    .autoComplete_wrapper>ul>li[aria-selected="true"] {
+        background-color: rgba(123, 123, 123, 0.1);
+    }
+
+    @media only screen and (max-width: 600px) {
+        .autoComplete_wrapper>input {
+            width: 18rem;
+        }
+    }
+</style>

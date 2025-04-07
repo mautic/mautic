@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -114,7 +113,6 @@ class EmailControllerTest extends TestCase
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $formFieldHelper            = $this->createMock(FormFieldHelper::class);
         $doctrine                   = $this->createMock(ManagerRegistry::class);
-        $factory                    = $this->createMock(MauticFactory::class);
         $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
         $helperUserMock             = $this->createMock(UserHelper::class);
         $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
@@ -131,7 +129,6 @@ class EmailControllerTest extends TestCase
             $this->formFactoryMock,
             $formFieldHelper,
             $doctrine,
-            $factory,
             $this->modelFactoryMock,
             $helperUserMock,
             $coreParametersHelper,

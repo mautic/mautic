@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -80,7 +79,6 @@ class FieldApiControllerTest extends TestCase
             $modelFactory,
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(CoreParametersHelper::class),
-            $this->createMock(MauticFactory::class),
         );
 
         $controllerReflection = new \ReflectionClass(FieldApiController::class);

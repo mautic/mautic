@@ -71,6 +71,8 @@ class LeadEventLogRepository extends CommonRepository
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,
                     e.description AS event_description,
+                    e.parent_id AS parent_id,
+                    e.decision_path AS decision_path,
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
@@ -641,5 +643,22 @@ SQL;
         while ($deleteEntries) {
             $deleteEntries = $conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount();
         }
+    }
+
+    /**
+     * Check if last lead/event failed.
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function isLastFailed(int $leadId, int $eventId): bool
+    {
+        /** @var LeadEventLog $log */
+        $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
+
+        if (null !== $log && null !== $log->getFailedLog()) {
+            return true;
+        }
+
+        return false;
     }
 }

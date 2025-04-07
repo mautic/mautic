@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Builder\Metadata;
 
+use Illuminate\Support\Collection;
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
-use Tightenco\Collect\Support\Collection;
 
 class ConfigMetadata
 {

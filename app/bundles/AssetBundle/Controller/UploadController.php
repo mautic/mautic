@@ -17,6 +17,7 @@ class UploadController extends DropzoneController
         $request  = $this->getRequest();
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
+        $this->setTranslator($this->container->get('translator'));
 
         if (!empty($files)) {
             foreach ($files as $file) {
@@ -26,7 +27,6 @@ class UploadController extends DropzoneController
                     $this->errorHandler->addException($response, $e);
                 } catch (\Exception $e) {
                     error_log($e);
-
                     $error = new UploadException($this->translator->trans('mautic.asset.error.file.failed'));
                     $this->errorHandler->addException($response, $error);
                 }

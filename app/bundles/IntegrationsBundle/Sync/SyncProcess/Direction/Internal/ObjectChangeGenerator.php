@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal;
 
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
+use Mautic\IntegrationsBundle\Exception\RequiredValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
@@ -17,7 +18,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectSyncSkippedException;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
+use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
@@ -35,6 +38,7 @@ class ObjectChangeGenerator
         private SyncJudgeInterface $syncJudge,
         private ValueHelper $valueHelper,
         private FieldHelper $fieldHelper,
+        private BulkNotification $bulkNotification,
     ) {
     }
 
@@ -96,6 +100,7 @@ class ObjectChangeGenerator
 
     /**
      * @throws ObjectNotFoundException
+     * @throws ObjectSyncSkippedException
      */
     private function addFieldToObjectChange(
         FieldMappingDAO $fieldMappingDAO,
@@ -137,19 +142,30 @@ class ObjectChangeGenerator
             return;
         }
 
-        // If syncing bidirectional, let the sync judge determine what value should be used for the field
-        if (ObjectMappingDAO::SYNC_BIDIRECTIONALLY === $fieldMappingDAO->getSyncDirection()) {
-            $this->judgeThenAddFieldToObjectChange($mappingManual, $internalObject, $fieldMappingDAO, $integrationInformationChangeRequest, $objectChange, $internalFieldState);
-
-            return;
-        }
-
         try {
+            // If syncing bidirectional, let the sync judge determine what value should be used for the field
+            if (ObjectMappingDAO::SYNC_BIDIRECTIONALLY === $fieldMappingDAO->getSyncDirection()) {
+                $this->judgeThenAddFieldToObjectChange($mappingManual, $internalObject, $fieldMappingDAO, $integrationInformationChangeRequest, $objectChange, $internalFieldState);
+
+                return;
+            }
+
             $newValue = $this->valueHelper->getValueForMautic(
                 $integrationInformationChangeRequest->getNewValue(),
                 $internalFieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
+        } catch (RequiredValueException $e) {
+            $isNewObject = (null === $internalObject->getObjectId());
+
+            $this->notifyAboutInvalidValue($e, $fieldMappingDAO, $integrationInformationChangeRequest, $isNewObject);
+
+            if ($isNewObject) {
+                // Empty required field for new contact means completely rejected contact from sync
+                throw new ObjectSyncSkippedException(sprintf("Skipping creating lead '%s' because required value for internal field '%s' is empty", $integrationInformationChangeRequest->getObjectId(), $fieldMappingDAO->getInternalField()));
+            }
+
+            return; // Empty required field for existing contact is skipped
         } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
@@ -315,5 +331,39 @@ class ObjectChangeGenerator
         }
 
         return $integrationFieldState;
+    }
+
+    private function notifyAboutInvalidValue(
+        InvalidValueException $e,
+        FieldMappingDAO $fieldMappingDAO,
+        InformationChangeRequestDAO $integrationInformationChangeRequest,
+        bool $isNewObject,
+    ): void {
+        $newObjectSkippedMessagePart = ($isNewObject) ? ' New object sync skipped.' : '';
+
+        $message = sprintf(
+            "Field '%s' for object ID '%s' mapped to internal '%s' with value '%s'",
+            $integrationInformationChangeRequest->getField(),
+            $integrationInformationChangeRequest->getObjectId(),
+            $fieldMappingDAO->getIntegrationField(),
+            $integrationInformationChangeRequest->getNewValue()->getOriginalValue()
+        );
+
+        $deduplicateValue = static::class.'-'.
+            $integrationInformationChangeRequest->getIntegration().'-'.
+            $fieldMappingDAO->getInternalObject().'-'.
+            $integrationInformationChangeRequest->getField();
+
+        $this->bulkNotification->addNotification(
+            $deduplicateValue,
+            $e->getMessage().$newObjectSkippedMessagePart,
+            $integrationInformationChangeRequest->getIntegration(),
+            $fieldMappingDAO->getIntegrationObject(),
+            $fieldMappingDAO->getInternalObject(),
+            0,
+            $message
+        );
+
+        $this->bulkNotification->flush();
     }
 }

@@ -368,7 +368,7 @@ class CompanyController extends FormController
         } elseif (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
-            $entity->getOwner())) {
+            $entity->getPermissionUser())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked

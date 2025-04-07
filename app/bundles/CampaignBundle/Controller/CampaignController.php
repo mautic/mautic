@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -91,7 +90,6 @@ class CampaignController extends AbstractStandardFormController
         private EventCollector $eventCollector,
         private DateHelper $dateHelper,
         ManagerRegistry $managerRegistry,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -101,7 +99,7 @@ class CampaignController extends AbstractStandardFormController
         private RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     protected function getPermissions(): array
@@ -164,12 +162,18 @@ class CampaignController extends AbstractStandardFormController
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
+        $permissions = [
+            'campaign:campaigns:view',
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+        ];
+
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,
             $objectId,
             $page,
-            'campaign:campaigns:view',
+            $permissions,
             'campaign',
             'campaign_leads',
             null,
