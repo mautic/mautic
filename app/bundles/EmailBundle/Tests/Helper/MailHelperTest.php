@@ -270,7 +270,7 @@ class MailHelperTest extends TestCase
         $this->contactRepository->method('getLeadOwner')
             ->willReturnOnConsecutiveCalls(
                 ['email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => null, 'signature' => 'owner 1'],
-                ['email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => null, 'signature' => 'owner 2'],
+                ['email' => 'owner1@owner.com', 'first_name' => 'owner 2', 'last_name' => null, 'signature' => 'owner 2'],
             );
         $transport     = new BatchTransport(false, 8);
         $symfonyMailer = new Mailer($transport);
