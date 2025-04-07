@@ -144,10 +144,16 @@ class EmailControllerTest extends TestCase
 
     public function testSendActionWhenNoEntityFound(): void
     {
-        $this->containerMock->expects($this->once())
+        $matcher = $this->once();
+        $this->containerMock->expects($matcher)
             ->method('get')
-            ->withConsecutive(['router'])
-            ->willReturnOnConsecutiveCalls($this->routerMock);
+            ->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('router', $parameters[0]);
+
+                    return $this->routerMock;
+                }
+            });
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -177,10 +183,16 @@ class EmailControllerTest extends TestCase
 
     public function testSendActionWhenEntityFoundButNotPublished(): void
     {
-        $this->containerMock->expects($this->once())
+        $matcher = $this->once();
+        $this->containerMock->expects($matcher)
             ->method('get')
-            ->withConsecutive(['router'])
-            ->willReturnOnConsecutiveCalls($this->routerMock);
+            ->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('router', $parameters[0]);
+
+                    return $this->routerMock;
+                }
+            });
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')

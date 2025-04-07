@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -44,6 +45,11 @@ class EventLoggerTest extends TestCase
      */
     private MockObject $summaryModel;
 
+    /**
+     * @var CoreParametersHelper&MockObject
+     */
+    private MockObject $coreParametersHelper;
+
     protected function setUp(): void
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
@@ -51,6 +57,7 @@ class EventLoggerTest extends TestCase
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->summaryModel           = $this->createMock(SummaryModel::class);
+        $this->coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testAllLogsAreReturnedWithFinalPersist(): void
@@ -119,7 +126,8 @@ class EventLoggerTest extends TestCase
             $this->contactTracker,
             $this->leadEventLogRepository,
             $this->leadRepository,
-            $this->summaryModel
+            $this->summaryModel,
+            $this->coreParametersHelper
         );
     }
 }

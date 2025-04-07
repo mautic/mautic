@@ -361,19 +361,24 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextBuilder(): void
     {
-        $this->reportBuilderEventMock->method('checkContext')
-            ->withConsecutive(
-                [
-                    [
-                        'leads',
-                        'lead.pointlog',
-                        'contact.attribution.multi',
-                        'contact.attribution.first',
-                        'contact.attribution.last',
-                        'contact.frequencyrules',
-                    ],
-                ]
-            )->willReturn(false);
+        $matcher = $this->any();
+        $this->reportBuilderEventMock->expects($matcher)->method('checkContext')
+            ->willReturnCallback(
+                function (...$parameters) use ($matcher) {
+                    if (1 === $matcher->getInvocationCount()) {
+                        $this->assertSame([
+                            'leads',
+                            'lead.pointlog',
+                            'contact.attribution.multi',
+                            'contact.attribution.first',
+                            'contact.attribution.last',
+                            'contact.frequencyrules',
+                        ], $parameters[0]);
+                    }
+
+                    return false;
+                }
+            );
 
         $this->reportBuilderEventMock->expects($this->never())
             ->method('addTable');
@@ -383,22 +388,24 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextGenerate(): void
     {
-        $this->reportGeneratorEventMock->method('checkContext')
-            ->withConsecutive(
-                [
-                    [
-                        'leads',
-                        'lead.pointlog',
-                        'contact.attribution.multi',
-                        'contact.attribution.first',
-                        'contact.attribution.last',
-                        'contact.frequencyrules',
-                    ],
-                ],
-                [
-                    ['companies'],
-                ]
-            )->willReturn(false);
+        $matcher = $this->exactly(2);
+        $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+            if (1 === $matcher->getInvocationCount()) {
+                $this->assertSame([
+                    'leads',
+                    'lead.pointlog',
+                    'contact.attribution.multi',
+                    'contact.attribution.first',
+                    'contact.attribution.last',
+                    'contact.frequencyrules',
+                ], $parameters[0]);
+            }
+            if (2 === $matcher->getInvocationCount()) {
+                $this->assertSame(['companies'], $parameters[0]);
+            }
+
+            return false;
+        });
 
         $this->reportGeneratorEventMock->expects($this->never())
             ->method('getQueryBuilder');
@@ -884,19 +891,24 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testReportGenerate(string $context): void
     {
-        $this->reportGeneratorEventMock->method('checkContext')
-            ->withConsecutive(
-                [
-                    [
-                        'leads',
-                        'lead.pointlog',
-                        'contact.attribution.multi',
-                        'contact.attribution.first',
-                        'contact.attribution.last',
-                        'contact.frequencyrules',
-                    ],
-                ]
-            )->willReturn(true);
+        $matcher = $this->any();
+        $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')
+            ->willReturnCallback(
+                function (...$parameters) use ($matcher) {
+                    if (1 === $matcher->getInvocationCount()) {
+                        $this->assertSame([
+                            'leads',
+                            'lead.pointlog',
+                            'contact.attribution.multi',
+                            'contact.attribution.first',
+                            'contact.attribution.last',
+                            'contact.frequencyrules',
+                        ], $parameters[0]);
+                    }
+
+                    return true;
+                }
+            );
 
         $this->reportGeneratorEventMock->expects($this->once())
             ->method('getContext')

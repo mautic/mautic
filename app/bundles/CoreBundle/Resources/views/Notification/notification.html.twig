@@ -7,7 +7,7 @@
             {% endif %}
         </div>
         {% if n.header %}
-            <div class="notification-header fs-b-e fw-b mb-3 mt-sm">{{ format(n.header)|trans }}</div>
+           <div class="notification-header fs-b-e fw-b mb-3 mt-sm">{{ n.header|trans|purify }}</div>
         {% endif %}
         <div class="text-secondary">{{ format(n.message, 'html') }}</div>
     </div>

@@ -5,7 +5,8 @@
 	<p align="center">
 		Open Source Marketing Automation Software.
     <br />
-    <a href="https://mautic.org"><strong>🌐 mautic.org</strong></a>
+    <a href="https://mautic.org"><strong>🌐 mautic.org</strong></a><br /><br />
+<a href="https://digitalpublicgoods.net/r/mautic"><img src="https://img.shields.io/badge/Verified-DPG%20(Since%20%202024)-3333AB?logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iMzEiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMSAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0LjIwMDggMjEuMzY3OEwxMC4xNzM2IDE4LjAxMjRMMTEuNTIxOSAxNi40MDAzTDEzLjk5MjggMTguNDU5TDE5LjYyNjkgMTIuMjExMUwyMS4xOTA5IDEzLjYxNkwxNC4yMDA4IDIxLjM2NzhaTTI0LjYyNDEgOS4zNTEyN0wyNC44MDcxIDMuMDcyOTdMMTguODgxIDUuMTg2NjJMMTUuMzMxNCAtMi4zMzA4MmUtMDVMMTEuNzgyMSA1LjE4NjYyTDUuODU2MDEgMy4wNzI5N0w2LjAzOTA2IDkuMzUxMjdMMCAxMS4xMTc3TDMuODQ1MjEgMTYuMDg5NUwwIDIxLjA2MTJMNi4wMzkwNiAyMi44Mjc3TDUuODU2MDEgMjkuMTA2TDExLjc4MjEgMjYuOTkyM0wxNS4zMzE0IDMyLjE3OUwxOC44ODEgMjYuOTkyM0wyNC44MDcxIDI5LjEwNkwyNC42MjQxIDIyLjgyNzdMMzAuNjYzMSAyMS4wNjEyTDI2LjgxNzYgMTYuMDg5NUwzMC42NjMxIDExLjExNzdMMjQuNjI0MSA5LjM1MTI3WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==" alt="DPG Badge"></a>
     <br />
     <br />
     <a href="https://mautic.org/start-using-mautic/try-mautic/">Request a trial</a> · <a href="https://www.mautic.org/download">Self-host/download</a> · <a href="https://www.mautic.org/community">Community channels</a>
@@ -335,6 +336,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kingsedem"><img src="https://avatars.githubusercontent.com/u/47061881?v=4?s=100" width="100px;" alt="Kingsley_E_"/><br /><sub><b>Kingsley_E_</b></sub></a><br /><a href="#userTesting-kingsedem" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Hugo-Prossaird"><img src="https://avatars.githubusercontent.com/u/176997845?v=4?s=100" width="100px;" alt="Hugo-Prossaird"/><br /><sub><b>Hugo-Prossaird</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Hugo-Prossaird" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/farzammadani"><img src="https://avatars.githubusercontent.com/u/69846004?v=4?s=100" width="100px;" alt="Farzam Madani"/><br /><sub><b>Farzam Madani</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=farzammadani" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/SaraCRM"><img src="https://avatars.githubusercontent.com/u/121267071?v=4?s=100" width="100px;" alt="Sara Matos"/><br /><sub><b>Sara Matos</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=SaraCRM" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=SaraCRM" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/VishnuGurrapu"><img src="https://avatars.githubusercontent.com/u/169230642?v=4?s=100" width="100px;" alt="Vishnu Gurrapu"/><br /><sub><b>Vishnu Gurrapu</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=VishnuGurrapu" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/1792826181"><img src="https://avatars.githubusercontent.com/u/105675530?v=4?s=100" width="100px;" alt="Jun"/><br /><sub><b>Jun</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=1792826181" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/goma101"><img src="https://avatars.githubusercontent.com/u/104629384?v=4?s=100" width="100px;" alt="Guilherme Gomes"/><br /><sub><b>Guilherme Gomes</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=goma101" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=goma101" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>

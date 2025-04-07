@@ -126,7 +126,7 @@
         max-width: 100%;
         height: 100%;
         background-color: #fafafa;
-        border-radius: 12px;
+        border-radius: {{ getRoundedCorners('lg') }}px;
         padding: 25px 15px;
         display: flex;
         flex-direction: column;
@@ -200,7 +200,7 @@
         transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
         flex-grow: 1;
         padding: 12px 10px;
-        border-radius: 8px;
+        border-radius: {{ getRoundedCorners('md') }}px;
         max-width: 100%;
         margin-bottom: 2px;
     }

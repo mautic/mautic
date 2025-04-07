@@ -22,7 +22,7 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^6.0"
+    "mautic/core-lib": "^7.0"
   },
   "require-dev": {
     "codeception/codeception": "^5.1",
@@ -114,7 +114,7 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "6.0.0-dev"
+            "mautic/core-lib": "7.0.0-dev"
         }
       }
     },

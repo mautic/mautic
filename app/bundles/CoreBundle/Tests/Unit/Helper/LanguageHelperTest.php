@@ -89,12 +89,19 @@ class LanguageHelperTest extends TestCase
     public function testLanguageListIsFetchedAndWritten(): void
     {
         $langFile = $this->tmpPath.'/../languageList.txt';
-        $this->coreParametersHelper->method('get')
-            ->withConsecutive(['language_list_file'], ['translations_list_url'])
-            ->willReturnOnConsecutiveCalls(
-                '',
-                'https://languages.test'
-            );
+        $matcher  = $this->exactly(2);
+        $this->coreParametersHelper->expects($matcher)->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            if (1 === $matcher->getInvocationCount()) {
+                $this->assertSame('language_list_file', $parameters[0]);
+
+                return '';
+            }
+            if (2 === $matcher->getInvocationCount()) {
+                $this->assertSame('translations_list_url', $parameters[0]);
+
+                return 'https://languages.test';
+            }
+        });
 
         $languages = ['languages' => [['name' => 'Spanish', 'locale' => 'es']]];
         $response  = new Response(200, [], json_encode($languages));

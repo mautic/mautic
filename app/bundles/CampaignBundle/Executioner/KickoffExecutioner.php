@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
@@ -37,6 +38,7 @@ class KickoffExecutioner implements ExecutionerInterface
         private TranslatorInterface $translator,
         private EventExecutioner $executioner,
         private EventScheduler $scheduler,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -66,7 +68,9 @@ class KickoffExecutioner implements ExecutionerInterface
             if ($this->progressBar) {
                 $this->progressBar->finish();
             }
-            $this->executioner->persistSummaries();
+            if ($this->coreParametersHelper->get('campaign_use_summary')) {
+                $this->executioner->persistSummaries();
+            }
         }
 
         return $this->counter;

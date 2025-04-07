@@ -129,19 +129,26 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->modelMock->expects($this->never())
             ->method('sendEmailToLists');
+        $matcher = $this->exactly(3);
 
-        $this->sessionMock->expects($this->exactly(3))
-            ->method('get')
-            ->withConsecutive(
-                ['mautic.email.send.progress'],
-                ['mautic.email.send.stats'],
-                ['mautic.email.send.active']
-            )
-            ->willReturnOnConsecutiveCalls(
-                [0, 100],
-                ['sent' => 0, 'failed' => 0, 'failedRecipients' => []],
-                false
-            );
+        $this->sessionMock->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.email.send.progress', $parameters[0]);
+
+                    return [0, 100];
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.email.send.stats', $parameters[0]);
+
+                    return ['sent' => 0, 'failed' => 0, 'failedRecipients' => []];
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.email.send.active', $parameters[0]);
+
+                    return false;
+                }
+            });
 
         $this->emailMock->expects($this->once())
             ->method('isPublished')
@@ -170,19 +177,26 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
             ->method('sendEmailToLists')
             ->with($this->emailMock, null, 50)
             ->willReturn([50, 0, []]);
+        $matcher = $this->exactly(3);
 
-        $this->sessionMock->expects($this->exactly(3))
-            ->method('get')
-            ->withConsecutive(
-                ['mautic.email.send.progress'],
-                ['mautic.email.send.stats'],
-                ['mautic.email.send.active']
-            )
-            ->willReturn(
-                [0, 100],
-                ['sent' => 0, 'failed' => 0, 'failedRecipients' => []],
-                false
-            );
+        $this->sessionMock->expects($matcher)
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.email.send.progress', $parameters[0]);
+
+                    return [0, 100];
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.email.send.stats', $parameters[0]);
+
+                    return ['sent' => 0, 'failed' => 0, 'failedRecipients' => []];
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.email.send.active', $parameters[0]);
+
+                    return false;
+                }
+            });
 
         $this->emailMock->expects($this->once())
             ->method('isPublished')

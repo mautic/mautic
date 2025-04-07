@@ -430,10 +430,14 @@ class LeadSubscriberTest extends TestCase
             $valueDAOs[]  = new EncodedValueDAO($objectType, (string) $newValue);
             $fieldNames[] = $fieldName;
         }
+        $matcher = $this->exactly(1);
 
-        $this->variableExpresserHelper->method('encodeVariable')
-                ->withConsecutive(...$values)
-                ->willReturn(...$valueDAOs);
+        $this->variableExpresserHelper->expects($matcher)->method('encodeVariable')
+                ->willReturnCallback(function (...$parameters) use ($matcher, $values, $valueDAOs) {
+                    $this->assertSame($values[$matcher->getInvocationCount() - 1], $parameters);
+
+                    return $valueDAOs[0];
+                });
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObjectByColumnName')

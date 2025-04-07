@@ -66,12 +66,18 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilderMock->expects($this->once())
             ->method('update')
             ->with(MAUTIC_TABLE_PREFIX.'emails');
+        $matcher = $this->exactly(2);
 
-        $this->queryBuilderMock->method('set')
-            ->withConsecutive(
-                ['read_count', 'read_count + 2'],
-                ['variant_read_count', 'variant_read_count + 2']
-            );
+        $this->queryBuilderMock->expects($matcher)->method('set')->willReturnCallback(function (...$parameters) use ($matcher) {
+            if (1 === $matcher->getInvocationCount()) {
+                $this->assertSame('read_count', $parameters[0]);
+                $this->assertSame('read_count + 2', $parameters[1]);
+            }
+            if (2 === $matcher->getInvocationCount()) {
+                $this->assertSame('variant_read_count', $parameters[0]);
+                $this->assertSame('variant_read_count + 2', $parameters[1]);
+            }
+        });
 
         $this->queryBuilderMock->expects($this->once())
             ->method('where')

@@ -321,11 +321,26 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
+        $matcher = self::exactly(3);
 
-        $this->modelFactory->expects(self::exactly(3))
-            ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['lead'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
+        $this->modelFactory->expects($matcher)
+            ->method('getModel')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('page.redirect', $parameters[0]);
+
+                    return $this->redirectModel;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('lead', $parameters[0]);
+
+                    return $this->leadModel;
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('page', $parameters[0]);
+
+                    return $this->pageModel;
+                }
+            });
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -417,11 +432,26 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
+        $matcher = self::exactly(3);
 
-        $this->modelFactory->expects(self::exactly(3))
-            ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['lead'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
+        $this->modelFactory->expects($matcher)
+            ->method('getModel')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('page.redirect', $parameters[0]);
+
+                    return $this->redirectModel;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('lead', $parameters[0]);
+
+                    return $this->leadModel;
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('page', $parameters[0]);
+
+                    return $this->pageModel;
+                }
+            });
 
         $this->redirect->expects(self::once())
             ->method('isPublished')

@@ -16,8 +16,12 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
+use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Validator\Constraints\NoNesting;
+use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -59,6 +63,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var string
      */
     private $name;
+
+    /**
+     * @Groups({"dynamicContent:read", "dynamicContent:write"})
+     */
+    private string $type = TypeList::HTML;
 
     /**
      * @var string|null
@@ -103,7 +112,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * @var bool
      */
-    private $isCampaignBased = false;
+    private $isCampaignBased = true;
 
     /**
      * @var string|null
@@ -153,6 +162,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $builder->addIdColumns();
 
         $builder->addCategory();
+
+        $builder->addField(
+            'type',
+            Types::STRING,
+            [
+                'length'  => 10,
+                'default' => TypeList::HTML,
+            ]
+        );
 
         $builder->addPublishDates();
 
@@ -204,6 +222,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
         $metadata->addPropertyConstraint('content', new NoNesting());
 
+        $metadata->addPropertyConstraint('type', new NotBlank(['message' => 'mautic.core.type.required']));
+        $metadata->addPropertyConstraint('type', new Choice(['choices' => (new TypeList())->getChoices()]));
+
+        $metadata->addConstraint(new SlotNameType());
+
         $metadata->addConstraint(new Callback([
             'callback' => function (self $dwc, ExecutionContextInterface $context): void {
                 if (!$dwc->getIsCampaignBased()) {
@@ -251,6 +274,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'id',
                 'name',
                 'category',
+                'type',
             ])
             ->addProperties([
                 'publishUp',
@@ -332,6 +356,18 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $this->description = $description;
 
         return $this;
+    }
+
+    public function setType(string $type): void
+    {
+        $type = strtolower($type);
+        $this->isChanged('type', $type);
+        $this->type = $type;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     /**

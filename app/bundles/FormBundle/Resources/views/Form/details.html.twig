@@ -17,7 +17,7 @@
 
 {% block mauticContent %}form{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{ include('@MauticCore/Helper/page_actions.html.twig', {
     'item': activeForm,
     'templateButtons': {
@@ -27,6 +27,7 @@
     'langVar': 'form',
     'targetLabel': 'mautic.form.forms'|trans
 }) }}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeForm.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activeForm.name }}{% endblock %}

@@ -359,13 +359,20 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $mockValidation->expects($this->once())
             ->method('getMessage')
             ->willReturn('password');
+        $matcher = $this->exactly(2);
 
-        $this->validator->method('validate')
-            ->withConsecutive([$data['email']], [$data['password']])
-            ->willReturnOnConsecutiveCalls(
-                new ConstraintViolationList([]),
-                new ConstraintViolationList([$mockValidation])
-            );
+        $this->validator->expects($matcher)->method('validate')->willReturnCallback(function (...$parameters) use ($matcher, $data, $mockValidation) {
+            if (1 === $matcher->getInvocationCount()) {
+                $this->assertSame($data['email'], $parameters[0]);
+
+                return new ConstraintViolationList([]);
+            }
+            if (2 === $matcher->getInvocationCount()) {
+                $this->assertSame($data['password'], $parameters[0]);
+
+                return new ConstraintViolationList([$mockValidation]);
+            }
+        });
 
         $this->assertEquals([0 => 'password'], $this->installer->createAdminUserStep($data));
     }

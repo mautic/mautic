@@ -105,6 +105,23 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
+    public function customFieldCannotBeUpdated(LeadField $leadField, ?int $userId): void
+    {
+        try {
+            $user = $this->getUser($userId);
+        } catch (NoUserException) {
+            return;
+        }
+
+        $message = $this->translator->trans(
+            'mautic.lead.field.notification.cannot_be_updated_message',
+            ['%label%' => $leadField->getLabel()]
+        );
+        $header  = $this->translator->trans('mautic.lead.field.notification.cannot_be_updated_header');
+
+        $this->addToNotificationCenter($user, $message, $header);
+    }
+
     private function addToNotificationCenter(User $user, string $message, string $header): void
     {
         $this->notificationModel->addNotification(

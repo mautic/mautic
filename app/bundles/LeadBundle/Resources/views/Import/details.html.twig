@@ -15,7 +15,7 @@
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'routeBase': 'import',
             'langVar': 'lead.import',

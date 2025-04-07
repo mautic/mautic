@@ -15,7 +15,7 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : notification,
@@ -26,6 +26,7 @@
         'targetLabel'     : 'mautic.notification.notifications'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': notification.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -138,6 +139,21 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
+
+        {% if security.isGranted('lead:leads:viewown') %}
+        {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
+            title: 'mautic.core.useful_links',
+            items: [
+                {
+                    label: 'mautic.lead.lead.contacts.web_sent'|trans,
+                    link: path('mautic_contact_index', {
+                        'search': ('mautic.lead.lead.searchcommand.web_sent'|trans) ~ ':' ~ notification.id
+                    }),
+                    icon: 'ri-notification-3-line'
+                }
+            ]
+        } %}
+        {% endif %}
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ notification.id|e }}" />
