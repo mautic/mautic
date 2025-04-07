@@ -188,7 +188,7 @@ class CampaignController extends AbstractStandardFormController
             ], 400);
         }
 
-        $jsonOutput = json_encode($data, JSON_PRETTY_PRINT);
+        $jsonOutput = json_encode([$data], JSON_PRETTY_PRINT);
         $filePath   = $exportHelper->writeToZipFile($jsonOutput);
 
         if (!file_exists($filePath)) {

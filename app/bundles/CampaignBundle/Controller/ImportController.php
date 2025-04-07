@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Form\Type\CampaignImportType;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -20,6 +21,9 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -58,11 +62,21 @@ final class ImportController extends AbstractFormController
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function newAction(Request $request): Response
+    public function newAction(): Response
     {
         if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:create')) {
             return $this->accessDenied();
         }
+
+        $session  = $this->requestStack->getSession();
+        $filePath = $session->get('mautic.campaign.import.file');
+
+        if ($filePath && file_exists($filePath)) {
+            @unlink($filePath);
+            $this->logger->info("Removed leftover import file on refresh: {$filePath}");
+        }
+
+        $this->resetImport();
 
         $form = $this->formFactory->create(CampaignImportType::class, [], [
             'action' => $this->generateUrl('mautic_campaign_import_action', ['objectAction' => 'upload']),
@@ -238,6 +252,13 @@ final class ImportController extends AbstractFormController
 
         if (self::STEP_PROGRESS_BAR === $step) {
             $analyzeSummary = $this->analyzeData($importHelper, $fullPath);
+
+            if (!$analyzeSummary || !empty($analyzeSummary['errors'])) {
+                $this->logger->error('Import failed: No data found in file.');
+                $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
+
+                return $this->redirectToRoute('mautic_campaign_import_action', ['objectAction' => 'new']);
+            }
             $session->set('mautic.campaign.import.step', self::STEP_IMPORT_FROM_ZIP);
             $session->set('mautic.campaign.import.progress', 50);
             $session->set('mautic.campaign.import.analyzeSummary', $analyzeSummary);
@@ -290,7 +311,7 @@ final class ImportController extends AbstractFormController
                 // Loop through importActions and clean UUIDs for 'create' actions
                 foreach ($fileData as &$group) {
                     foreach ($importActions as $entityType => $entities) {
-                        if ('campaign_event' == $entityType) {
+                        if (in_array($entityType, [Event::ENTITY_NAME, Field::ENTITY_NAME, Action::ENTITY_NAME], true)) {
                             continue;
                         }
                         if (!isset($group[$entityType])) {
@@ -304,9 +325,17 @@ final class ImportController extends AbstractFormController
 
                             foreach ($group[$entityType] as &$item) {
                                 if (isset($item['uuid']) && (int) $item['uuid'] === (int) $entityUuid) {
-                                    if ('campaign' == $entityType) {
-                                        foreach ($group['campaign_event'] as &$eventItem) {
+                                    if (Campaign::ENTITY_NAME == $entityType) {
+                                        foreach ($group[Event::ENTITY_NAME] as &$eventItem) {
                                             $eventItem['uuid'] = '';
+                                        }
+                                    }
+                                    if (Form::ENTITY_NAME == $entityType) {
+                                        foreach ($group[Field::ENTITY_NAME] as &$fieldItem) {
+                                            $fieldItem['uuid'] = '';
+                                        }
+                                        foreach ($group[Action::ENTITY_NAME] as &$actionItem) {
+                                            $actionItem['uuid'] = '';
                                         }
                                     }
                                     $item['uuid'] = '';

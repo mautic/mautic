@@ -16,12 +16,13 @@ class ImportHelper
      */
     public function readZipFile(string $filePath): ?array
     {
-        $tempDir = sys_get_temp_dir();
-        $zip     = new \ZipArchive();
+        $tempDir      = sys_get_temp_dir();
+        $zip          = new \ZipArchive();
+        $jsonFilePath = null;
 
-        if (true === $zip->open($filePath)) {
+        $result = $zip->open($filePath);
+        if (true === $result) {
             $zip->extractTo($tempDir);
-            $jsonFilePath = null;
             $mediaPath    = $this->pathsHelper->getSystemPath('media').'/files/';
 
             for ($i = 0; $i < $zip->numFiles; ++$i) {
@@ -47,18 +48,17 @@ class ImportHelper
             }
 
             $zip->close();
-            if ($jsonFilePath) {
-                $filePath = $jsonFilePath;
-            } else {
-                return null;
-            }
         } else {
-            return null;
+            dump($result);
         }
 
-        $fileContents = file_get_contents($filePath);
+        if ($jsonFilePath) {
+            $fileContents = file_get_contents($jsonFilePath);
 
-        return json_decode($fileContents, true);
+            return json_decode($fileContents, true);
+        } else {
+            return $jsonFilePath;
+        }
     }
 
     public function recursiveRemoveEmailaddress(array &$input): void

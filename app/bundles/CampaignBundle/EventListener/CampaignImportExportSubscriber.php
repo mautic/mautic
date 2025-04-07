@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -15,10 +14,10 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
@@ -125,7 +124,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $campaignSources = $this->campaignModel->getLeadSources($campaignId);
 
         foreach ($campaignSources as $entityName => $entities) {
-            foreach ($entities as $entityId => $entityLabel) {
+            foreach ($entities as $entityId) {
                 $this->dispatchAndAddEntity($event, $entityName, (int) $entityId, [
                     Campaign::ENTITY_NAME => $campaignId,
                     $entityName           => (int) $entityId,
@@ -253,20 +252,24 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         $this->updateDependencies($entityData['dependencies'], $event->getEntityIdMap(), Campaign::ENTITY_NAME);
 
-        $dependentEntities = [
-            Form::ENTITY_NAME,
-            LeadList::ENTITY_NAME,
-            Asset::ENTITY_NAME,
-            Page::ENTITY_NAME,
-            DynamicContent::ENTITY_NAME,
-            Group::ENTITY_NAME,
-            LeadField::ENTITY_NAME,
-        ];
+        foreach ($entityData as $entity => $data) {
+            if (in_array($entity, ['dependencies', Campaign::ENTITY_NAME, Email::ENTITY_NAME, Event::ENTITY_NAME, Action::ENTITY_NAME, Field::ENTITY_NAME], true)) {
+                continue;
+            }
+            $subEvent = new EntityImportEvent($entity, $data, $userId);
+            $subEvent = $this->dispatcher->dispatch($subEvent);
+            $this->mergeStatus($event, $subEvent);
 
-        foreach ($dependentEntities as $entity) {
+            $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
+
+            $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
+        }
+
+        foreach ([Field::ENTITY_NAME, Action::ENTITY_NAME] as $entity) {
             if (!isset($entityData[$entity])) {
                 continue;
             }
+
             $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
             $subEvent = $this->dispatcher->dispatch($subEvent);
             $this->mergeStatus($event, $subEvent);

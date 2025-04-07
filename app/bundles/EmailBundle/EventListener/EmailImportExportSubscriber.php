@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
@@ -18,6 +19,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class EmailImportExportSubscriber implements EventSubscriberInterface
 {
@@ -28,6 +30,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         private EventDispatcherInterface $dispatcher,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
+        private DenormalizerInterface $serializer,
     ) {
     }
 
@@ -87,6 +90,17 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         $event->addEntity(Email::ENTITY_NAME, $emailData);
         $this->logAction('export', $emailId, $emailData);
 
+        $assets = $email->getAssetAttachments();
+        foreach ($assets as $asset) {
+            $subEvent = new EntityExportEvent(Asset::ENTITY_NAME, (int) $asset->getId());
+            $this->dispatcher->dispatch($subEvent);
+            $event->addEntities($subEvent->getEntities());
+            $event->addDependencyEntity(Email::ENTITY_NAME, [
+                Email::ENTITY_NAME  => (int) $emailId,
+                Asset::ENTITY_NAME  => (int) $asset->getId(),
+            ]);
+        }
+
         $form = $email->getUnsubscribeForm();
         if ($form) {
             $subEvent = new EntityExportEvent(Form::ENTITY_NAME, (int) $form->getId());
@@ -131,17 +145,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $isNew = !$email;
 
             $email ??= new Email();
-            $isNew && $email->setDateAdded(new \DateTime());
-            $email->setDateModified(new \DateTime());
-            $email->setUuid($element['uuid']);
-            $email->setCreatedByUser($userName);
-            if (!$isNew) {
-                $email->setModifiedByUser($userName);
-            }
-
-            $email->setTranslationParent($element['translation_parent_id'] ?? null);
-            $email->setVariantParent($element['variant_parent_id'] ?? null);
-
             $unsubscribeForm = !empty($element['unsubscribeform_id'])
                 ? $this->entityManager->getRepository(Form::class)->find($element['unsubscribeform_id'])
                 : null;
@@ -153,29 +156,12 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $email->setUnsubscribeForm($unsubscribeForm);
             $email->setPreferenceCenter($preferenceCenter);
 
-            $email->setIsPublished((bool) ($element['is_published'] ?? false));
-            $email->setName($element['name'] ?? '');
-            $email->setDescription($element['description'] ?? '');
-            $email->setSubject($element['subject'] ?? '');
-            $email->setPreheaderText($element['preheader_text'] ?? '');
-            $email->setFromName($element['from_name'] ?? '');
-            $email->setUseOwnerAsMailer((bool) ($element['use_owner_as_mailer'] ?? false));
-            $email->setTemplate($element['template'] ?? '');
-            $email->setContent($element['content'] ?? '');
-            $email->setUtmTags($element['utm_tags'] ?? '');
-            $email->setPlainText($element['plain_text'] ?? '');
-            $email->setCustomHtml($element['custom_html'] ?? '');
-            $email->setEmailType($element['email_type'] ?? '');
-            $email->setPublishUp($element['publish_up'] ?? null);
-            $email->setPublishDown($element['publish_down'] ?? null);
-            $email->setRevision((int) ($element['revision'] ?? 0));
-            $email->setLanguage($element['lang'] ?? '');
-            $email->setVariantSettings($element['variant_settings'] ?? []);
-            $email->setVariantStartDate($element['variant_start_date'] ?? null);
-            $email->setDynamicContent($element['dynamic_content'] ?? '');
-            $email->setHeaders($element['headers'] ?? '');
-            $email->setPublicPreview($element['public_preview'] ?? '');
-
+            $this->serializer->denormalize(
+                $element,
+                Email::class,
+                null,
+                ['object_to_populate' => $email]
+            );
             $this->emailModel->saveEntity($email);
 
             $event->addEntityIdMap((int) $element['id'], $email->getId());

@@ -34,16 +34,41 @@
                         {% include '@MauticCampaign/Import/_progress_bar.html.twig' %}
 
                         <form method="post" action="{{ path('mautic_campaign_import_action', {'objectAction': 'progress'}) }}">
+                            {% set processedUuids = [] %}
                             {% for group in analyzeSummary %}
                                 {% set merged = {} %}
                                 {% if group.update is defined %}
                                     {% for entity, details in group.update %}
-                                        {% set merged = merged|merge({ (entity ~ '_update'): details|merge({'status': 'Update'}) }) %}
+                                        {% set skip = false %}
+                                        {% for uuid in details.uuids %}
+                                            {% if uuid in processedUuids %}
+                                                {% set skip = true %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% if not skip %}
+                                            {% for uuid in details.uuids %}
+                                                {% set processedUuids = processedUuids|merge([uuid]) %}
+                                            {% endfor %}
+                                            {% set merged = merged|merge({ (entity ~ '_update'): details|merge({'status': 'Update'}) }) %}
+                                        {% endif %}
                                     {% endfor %}
                                 {% endif %}
                                 {% if group.new is defined %}
                                     {% for entity, details in group.new %}
-                                        {% set merged = merged|merge({ (entity ~ '_create'): details|merge({'status': 'Create'}) }) %}
+                                        {% set skip = false %}
+                                        {% for uuid in details.uuids %}
+                                            {% if uuid in processedUuids %}
+                                                {% set skip = true %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% if not skip %}
+                                            {% for uuid in details.uuids %}
+                                                {% set processedUuids = processedUuids|merge([uuid]) %}
+                                            {% endfor %}
+                                            {% set merged = merged|merge({ (entity ~ '_create'): details|merge({'status': 'Create'}) }) %}
+                                        {% endif %}
                                     {% endfor %}
                                 {% endif %}
                                 {% if merged is not empty %}
@@ -66,6 +91,7 @@
                                 }) }}
 
                                 <button type="submit" class="btn btn-primary">
+                                    <i class="ri-play-line me-1"></i>
                                     {{ 'mautic.campaign.campaign.import.proceed'|trans }}
                                 </button>
                             </div>

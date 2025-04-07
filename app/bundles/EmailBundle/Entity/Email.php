@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -35,26 +34,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "email:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "asset", "page", "translationChildren", "unsubscribeForm", "fields", "actions", "lists", "preferenceCenter", "assetAttachments"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "email:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use VariantEntityTrait;

@@ -40,6 +40,10 @@
                             {% if isAnalyzeStage %}
                                 {% if entity == 'campaign_event' %}
                                     {{ 'Will follow campaign action'|trans }}
+                                {% elseif entity == 'form_fields' %}
+                                    {{ 'Will follow form'|trans }}
+                                {% elseif entity == 'form_actions' %}
+                                    {{ 'Will follow form'|trans }}
                                  {% elseif entityKey ends with '_update' %}
                                     <select name="importAction[{{ entity }}][{{ ids[i] }}]" class="form-control input-sm">
                                         <option value="update" selected>{{ 'Update entity'|trans }}</option>

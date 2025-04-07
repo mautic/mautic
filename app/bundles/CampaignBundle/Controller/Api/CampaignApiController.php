@@ -441,7 +441,6 @@ class CampaignApiController extends CommonApiController
             }
 
             $data = $importHelper->readZipFile($zipPath);
-            file_put_contents('/tmp/debug_campaign_upload.log', print_r($data, true));
 
             if (!$data) {
                 return $this->handleView(
