@@ -67,7 +67,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $event->addEntity(Campaign::ENTITY_NAME, $campaignData);
         $this->logAction('export', $campaignId, $campaignData);
 
-        $campaignEvent = new EntityExportEvent('campaign_event', $campaignId);
+        $campaignEvent = new EntityExportEvent(Event::ENTITY_NAME, $campaignId);
         $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
         $event->addEntities($campaignEvent->getEntities());
         $event->addDependencies($campaignEvent->getDependencies());
@@ -124,7 +124,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $campaignSources = $this->campaignModel->getLeadSources($campaignId);
 
         foreach ($campaignSources as $entityName => $entities) {
-            foreach ($entities as $entityId) {
+            foreach ($entities as $entityId => $label) {
                 $this->dispatchAndAddEntity($event, $entityName, (int) $entityId, [
                     Campaign::ENTITY_NAME => $campaignId,
                     $entityName           => (int) $entityId,

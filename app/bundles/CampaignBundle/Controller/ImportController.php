@@ -331,11 +331,15 @@ final class ImportController extends AbstractFormController
                                         }
                                     }
                                     if (Form::ENTITY_NAME == $entityType) {
-                                        foreach ($group[Field::ENTITY_NAME] as &$fieldItem) {
-                                            $fieldItem['uuid'] = '';
+                                        if (isset($group[Field::ENTITY_NAME])) {
+                                            foreach ($group[Field::ENTITY_NAME] as &$fieldItem) {
+                                                $fieldItem['uuid'] = '';
+                                            }
                                         }
-                                        foreach ($group[Action::ENTITY_NAME] as &$actionItem) {
-                                            $actionItem['uuid'] = '';
+                                        if (isset($group[Action::ENTITY_NAME])) {
+                                            foreach ($group[Action::ENTITY_NAME] as &$actionItem) {
+                                                $actionItem['uuid'] = '';
+                                            }
                                         }
                                     }
                                     $item['uuid'] = '';
@@ -447,28 +451,35 @@ final class ImportController extends AbstractFormController
         if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:delete')) {
             return $this->accessDenied();
         }
-        $session        = $this->requestStack->getSession();
-        $importSummary  = $session->get('mautic.campaign.import.summary', []);
 
-        if (
-            (!isset($importSummary[EntityImportEvent::UPDATE]) || empty($importSummary[EntityImportEvent::UPDATE]))
-            && !empty($importSummary[EntityImportEvent::NEW])
-        ) {
-            foreach ($importSummary[EntityImportEvent::NEW] as $key => $data) {
-                if (isset($data) && !empty($data)) {
-                    $undoEvent = new EntityImportUndoEvent($key, $data);
-                    $this->dispatcher->dispatch($undoEvent);
+        $session         = $this->requestStack->getSession();
+        $importSummaries = $session->get('mautic.campaign.import.summary', []);
+
+        $hasUndoData = false;
+
+        foreach ($importSummaries as $summary) {
+            $updates  = $summary[EntityImportEvent::UPDATE] ?? [];
+            $newItems = $summary[EntityImportEvent::NEW] ?? [];
+
+            // Only trigger undo if there are no updates and we have new items
+            if (empty($updates) && !empty($newItems)) {
+                foreach ($newItems as $entityType => $data) {
+                    if (!empty($data['ids'])) {
+                        $undoEvent = new EntityImportUndoEvent($entityType, $data);
+                        $this->dispatcher->dispatch($undoEvent);
+                        $hasUndoData = true;
+                    }
                 }
             }
+        }
+
+        if ($hasUndoData) {
             $this->logger->info('Undo import triggered for Campaign.');
-
             $this->addFlashMessage('mautic.campaign.notice.import.undo');
-
-            return new JsonResponse(['flashes'    => $this->getFlashContent()]);
         } else {
             $this->addFlashMessage('mautic.campaign.notice.import.undo_no_data');
-
-            return new JsonResponse(['flashes'    => $this->getFlashContent()]);
         }
+
+        return new JsonResponse(['flashes' => $this->getFlashContent()]);
     }
 }
