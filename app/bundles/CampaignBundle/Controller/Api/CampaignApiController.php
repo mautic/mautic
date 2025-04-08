@@ -364,8 +364,6 @@ class CampaignApiController extends CommonApiController
 
     /**
      * Get a list of events.
-     *
-     * @return Response
      */
     public function exportCampaignAction(Request $request, int $campaignId)
     {
@@ -376,7 +374,7 @@ class CampaignApiController extends CommonApiController
         }
 
         // Check if user has permission to export campaigns
-        if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+        if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 

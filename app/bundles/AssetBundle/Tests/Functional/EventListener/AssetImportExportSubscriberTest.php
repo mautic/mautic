@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -20,12 +19,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class AssetImportExportSubscriberTest extends TestCase
 {
     private AssetImportExportSubscriber $subscriber;
-    /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
+    private MockObject&EntityManager $entityManager;
     private MockObject&AssetModel $assetModel;
-    private MockObject&UserModel $userModel;
     private EventDispatcher $eventDispatcher;
     private MockObject&AuditLogModel $auditLogModel;
     private MockObject&IpLookupHelper $ipLookupHelper;
@@ -34,12 +29,10 @@ class AssetImportExportSubscriberTest extends TestCase
     {
         $this->entityManager   = $this->createMock(EntityManager::class);
         $this->assetModel      = $this->createMock(AssetModel::class);
-        $this->userModel       = $this->createMock(UserModel::class);
         $this->auditLogModel   = $this->createMock(AuditLogModel::class);
         $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
         $this->subscriber      = new AssetImportExportSubscriber(
             $this->assetModel,
-            $this->userModel,
             $this->entityManager,
             $this->auditLogModel,
             $this->ipLookupHelper
