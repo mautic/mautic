@@ -23,6 +23,10 @@ return [
                 'path'       => '/points/groups/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\GroupController::executeAction',
             ],
+            'mautic_point.insights_index' => [
+                'path'       => '/points/insights/{page}',
+                'controller' => 'MauticPlugin\LeuchtfeuerPointComparisonBundle\Controller\PointInsightController::indexAction',
+            ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
                 'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
@@ -104,6 +108,10 @@ return [
                     'mautic.point.group.menu.index' => [
                         'route'  => 'mautic_point.group_index',
                         'access' => 'point:groups:view',
+                    ],
+                    'mautic.point.insights.menu' => [
+                        'route'  => 'mautic_point.insights_index',
+                        'access' => 'point:points:view',
                     ],
                 ],
             ],
