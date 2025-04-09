@@ -417,6 +417,14 @@ final class ImportController extends AbstractFormController
                 $summary = $event->getSummary();
 
                 foreach ($summary as $status => $entities) {
+                    if ('errors' === $status) {
+                        // Accumulate errors into a flat array
+                        $mergedSummary['errors'] = array_merge(
+                            $mergedSummary['errors'] ?? [],
+                            is_array($entities) ? $entities : [$entities]
+                        );
+                        continue;
+                    }
                     foreach ($entities as $entityName => $info) {
                         if (!isset($mergedSummary[$status][$entityName])) {
                             $mergedSummary[$status][$entityName] = [

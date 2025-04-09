@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -25,6 +26,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         private ListModel $leadListModel,
         private EntityManagerInterface $entityManager,
         private AuditLogModel $auditLogModel,
+        private PluginModel $pluginModel,
         private EventDispatcherInterface $dispatcher,
         private FieldModel $fieldModel,
         private IpLookupHelper $ipLookupHelper,
@@ -185,9 +187,20 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         $summary = [
             EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
             EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
+            'errors'                  => [],
         ];
 
         foreach ($event->getEntityData() as $item) {
+            if (!empty($item['filters'])) {
+                foreach ($item['filters'] as $filter) {
+                    if (isset($filter['object']) && 'custom_object' === $filter['object']) {
+                        $plugins = $this->pluginModel->getAllPluginsConfig();
+                        if (!isset($plugins['CustomObjectsBundle'])) {
+                            $summary['errors'][] = 'Segment filter uses Custom Objects but the plugin CustomObjectBundle is not installed.';
+                        }
+                    }
+                }
+            }
             $existing = $this->entityManager->getRepository(LeadList::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
@@ -200,8 +213,11 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($summary as $type => $data) {
-            if ($data['count'] > 0) {
+            if ('errors' !== $type && $data['count'] > 0) {
                 $event->setSummary($type, [LeadList::ENTITY_NAME => $data]);
+            }
+            if ('errors' === $type && !empty($summary['errors'])) {
+                $event->setSummary('errors', $summary['errors']);
             }
         }
     }

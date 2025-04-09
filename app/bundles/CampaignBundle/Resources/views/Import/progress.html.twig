@@ -9,7 +9,15 @@
 {% block content %}
     {% set progress = importProgress.progress ?? 0 %}
     {% set isComplete = progress >= 100 %}
-    {% set hasErrors = (importSummary|default([]))|filter(s => s.update is defined and s.update.errors is defined and s.update.errors is not empty) is not empty %}
+    {% set hasErrors = (
+        (importSummary|default([]))|filter(s =>
+            s.update is defined and s.update.errors is defined and s.update.errors is not empty
+        ) is not empty
+        or
+        (analyzeSummary|default([]))|filter(group =>
+            group.errors is defined and group.errors is not empty
+        ) is not empty
+    ) %}
     {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}
 
     <div class="row ma-lg" id="{{ id }}">
@@ -31,8 +39,6 @@
                         {% include '@MauticCampaign/Import/_import_error_block.html.twig' %}
 
                     {% elseif not isComplete %}
-                        {% include '@MauticCampaign/Import/_progress_bar.html.twig' %}
-
                         <form method="post" action="{{ path('mautic_campaign_import_action', {'objectAction': 'progress'}) }}">
                             {% set processedUuids = [] %}
                             {% for group in analyzeSummary %}
