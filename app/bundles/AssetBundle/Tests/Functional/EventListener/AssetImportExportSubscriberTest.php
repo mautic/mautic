@@ -35,6 +35,14 @@ class AssetImportExportSubscriberTest extends TestCase
         $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
         $this->serializer      = $this->createMock(DenormalizerInterface::class);
 
+        $assetRepository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
+        $assetRepository->method('findOneBy')->willReturn(null); // Simulate new entity
+
+        $this->entityManager
+            ->method('getRepository')
+            ->with(Asset::class)
+            ->willReturn($assetRepository);
+
         $this->subscriber      = new AssetImportExportSubscriber(
             $this->assetModel,
             $this->entityManager,
@@ -74,26 +82,24 @@ class AssetImportExportSubscriberTest extends TestCase
     public function testAssetImport(): void
     {
         $eventData = [
-            Asset::ENTITY_NAME => [
-                [
-                    'id'                 => 1,
-                    'title'              => 'New Asset',
-                    'is_published'       => true,
-                    'description'        => 'Imported description',
-                    'alias'              => 'new-alias',
-                    'storage_location'   => 'local',
-                    'path'               => 'path/to/asset',
-                    'remote_path'        => '',
-                    'original_file_name' => 'file.pdf',
-                    'mime'               => 'application/pdf',
-                    'size'               => '1024',
-                    'disallow'           => false,
-                    'extension'          => 'pdf',
-                    'lang'               => 'en',
-                    'publish_up'         => null,
-                    'publish_down'       => null,
-                    'uuid'               => 'some-uuid',
-                ],
+            [
+                'id'                 => 1,
+                'title'              => 'New Asset',
+                'is_published'       => true,
+                'description'        => 'Imported description',
+                'alias'              => 'new-alias',
+                'storage_location'   => 'local',
+                'path'               => 'path/to/asset',
+                'remote_path'        => '',
+                'original_file_name' => 'file.pdf',
+                'mime'               => 'application/pdf',
+                'size'               => '1024',
+                'disallow'           => false,
+                'extension'          => 'pdf',
+                'lang'               => 'en',
+                'publish_up'         => null,
+                'publish_down'       => null,
+                'uuid'               => 'some-uuid',
             ],
         ];
 

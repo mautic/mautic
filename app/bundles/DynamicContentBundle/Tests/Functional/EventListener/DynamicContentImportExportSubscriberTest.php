@@ -35,6 +35,14 @@ final class DynamicContentImportExportSubscriberTest extends TestCase
         $this->ipLookupHelper      = $this->createMock(IpLookupHelper::class);
         $this->serializer          = $this->createMock(DenormalizerInterface::class);
 
+        $dynamicRepository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
+        $dynamicRepository->method('findOneBy')->willReturn(null); // Simulate new entity
+
+        $this->entityManager
+            ->method('getRepository')
+            ->with(DynamicContent::class)
+            ->willReturn($dynamicRepository);
+
         $this->subscriber = new DynamicContentImportExportSubscriber(
             $this->dynamicContentModel,
             $this->entityManager,
@@ -79,16 +87,15 @@ final class DynamicContentImportExportSubscriberTest extends TestCase
     public function testDynamicContentImport(): void
     {
         $eventData = [
-            DynamicContent::ENTITY_NAME => [
-                [
-                    'id'           => 1,
-                    'name'         => 'New Dynamic Content',
-                    'is_published' => true,
-                    'content'      => '<p>Imported content</p>',
-                    'publish_up'   => null,
-                    'publish_down' => null,
-                    'utm_tags'     => [],
-                ],
+            [
+                'id'           => 1,
+                'name'         => 'New Dynamic Content',
+                'is_published' => true,
+                'content'      => '<p>Imported content</p>',
+                'publish_up'   => null,
+                'publish_down' => null,
+                'utm_tags'     => [],
+                'uuid'         => 'uuid-123',
             ],
         ];
 

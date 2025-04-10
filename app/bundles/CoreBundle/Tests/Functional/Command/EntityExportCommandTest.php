@@ -23,11 +23,17 @@ final class EntityExportCommandTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
-        $pathsHelper          = $container->get(PathsHelper::class);
-        $coreParametersHelper = $container->get(CoreParametersHelper::class);
+        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
+        $exportHelper             = $container->get(\Mautic\CoreBundle\Helper\ExportHelper::class);
+        $pathsHelper              = $container->get(PathsHelper::class);
+        $coreParametersHelper     = $container->get(CoreParametersHelper::class);
 
-        $command = new EntityExportCommand($this->dispatcher, $pathsHelper, $coreParametersHelper);
+        $command = new EntityExportCommand(
+            $this->dispatcher,
+            $exportHelper,
+            $pathsHelper,
+            $coreParametersHelper
+        );
 
         $this->commandTester = new CommandTester($command);
     }

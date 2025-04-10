@@ -35,6 +35,14 @@ class PageImportExportSubscriberTest extends TestCase
         $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
         $this->serializer      = $this->createMock(DenormalizerInterface::class);
 
+        $repository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
+        $repository->method('findOneBy')->willReturn(null); // Simulate new entity
+
+        $this->entityManager
+            ->method('getRepository')
+            ->with(Page::class)
+            ->willReturn($repository);
+
         $this->subscriber = new PageImportExportSubscriber(
             $this->pageModel,
             $this->entityManager,

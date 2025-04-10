@@ -38,6 +38,14 @@ final class FormImportExportSubscriberTest extends TestCase
         $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
         $this->serializer      = $this->createMock(DenormalizerInterface::class);
 
+        $repository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
+        $repository->method('findOneBy')->willReturn(null); // Simulate new entity
+
+        $this->entityManager
+            ->method('getRepository')
+            ->with(Form::class)
+            ->willReturn($repository);
+
         $this->subscriber = new FormImportExportSubscriber(
             $this->entityManager,
             $this->formModel,

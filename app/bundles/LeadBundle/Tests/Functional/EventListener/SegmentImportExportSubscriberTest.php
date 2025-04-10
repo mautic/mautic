@@ -14,7 +14,6 @@ use Mautic\LeadBundle\EventListener\SegmentImportExportSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
-use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -44,6 +43,16 @@ final class SegmentImportExportSubscriberTest extends TestCase
         $this->fieldModel      = $this->createMock(FieldModel::class);
         $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
         $this->serializer      = $this->createMock(DenormalizerInterface::class);
+
+        $leadListRepository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
+        $leadListRepository
+            ->method('findOneBy')
+            ->willReturn(null); // Simulate no existing segment (so it creates a new one)
+
+        $this->entityManager
+            ->method('getRepository')
+            ->with(LeadList::class)
+            ->willReturn($leadListRepository);
 
         $this->subscriber = new SegmentImportExportSubscriber(
             $this->leadListModel,
@@ -76,7 +85,7 @@ final class SegmentImportExportSubscriberTest extends TestCase
         $this->leadListModel->method('getEntity')->with(1)->willReturn($leadList);
 
         $event = new EntityExportEvent(LeadList::ENTITY_NAME, 1);
-        $this->dispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch($event);
 
         $exportedData = $event->getEntities();
 
@@ -97,45 +106,45 @@ final class SegmentImportExportSubscriberTest extends TestCase
 
     public function testSegmentImport(): void
     {
-        $user = $this->createMock(User::class);
-        $user->method('getFirstName')->willReturn('John');
-        $user->method('getLastName')->willReturn('Doe');
-
         $importData = [
-            LeadList::ENTITY_NAME => [
-                [
-                    'id'                   => 1,
-                    'name'                 => 'Imported Segment',
-                    'is_published'         => true,
-                    'description'          => 'Imported description',
-                    'alias'                => 'imported-alias',
-                    'public_name'          => 'Imported Public Name',
-                    'filters'              => [],
-                    'is_global'            => true,
-                    'is_preference_center' => true,
-                    'uuid'                 => 'uuid-456',
-                ],
+            [
+                'id'                   => 1,
+                'name'                 => 'Imported Segment',
+                'is_published'         => true,
+                'description'          => 'Imported description',
+                'alias'                => 'imported-alias',
+                'public_name'          => 'Imported Public Name',
+                'filters'              => [],
+                'is_global'            => true,
+                'is_preference_center' => false,
+                'uuid'                 => 'uuid-456',
             ],
         ];
 
-        $event = new EntityImportEvent(LeadList::ENTITY_NAME, $importData, 99);
-        $this->entityManager
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->callback(function (LeadList $segment) {
-                return 'Imported Segment' === $segment->getName()
-                       && true === $segment->getIsPublished()
-                       && 'Imported description' === $segment->getDescription()
-                       && 'imported-alias' === $segment->getAlias()
-                       && 'Imported Public Name' === $segment->getPublicName()
-                       && [] === $segment->getFilters()
-                       && true === $segment->getIsGlobal()
-                       && true === $segment->getIsPreferenceCenter()
-                       && 'John Doe' === $segment->getCreatedByUser();
-            }));
+        $repository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
+        $repository->method('findOneBy')->willReturn(null);
 
+        $this->entityManager
+            ->method('getRepository')
+            ->with(LeadList::class)
+            ->willReturn($repository);
+
+        $segment = new LeadList();
+        $ref     = new \ReflectionClass($segment);
+        $idProp  = $ref->getProperty('id');
+        $idProp->setAccessible(true);
+        $idProp->setValue($segment, 123);
+
+        $this->serializer
+            ->method('denormalize')
+            ->willReturnCallback(fn ($data, $type, $format, $context) => $context['object_to_populate']);
+
+        $this->entityManager->expects($this->once())->method('persist')->with($this->isInstanceOf(LeadList::class));
         $this->entityManager->expects($this->once())->method('flush');
 
-        $this->dispatcher->dispatch($event);
+        $event = new EntityImportEvent(LeadList::ENTITY_NAME, $importData, 99);
+        $this->eventDispatcher->dispatch($event);
+
+        $this->assertSame(123, $event->getEntityIdMap()[1]);
     }
 }

@@ -109,7 +109,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @param-out array<string, list<array<string, mixed>>> $data
+     * @param array<string, list<array<string, mixed>>> $data
      */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
