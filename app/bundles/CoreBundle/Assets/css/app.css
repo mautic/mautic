@@ -9391,9 +9391,9 @@ lesshat-selector { -lh-property: 0 ;
   box-shadow: rgba(100, 100, 111, 0.24) 0px 7px 20px 0px;
 }
 .form-type-modal-backdrop {
-  background-color: var(--background) !important;
+  background-color: var(--overlay) !important;
   opacity: 1 !important;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
 }
 .modal-backdrop {
   backdrop-filter: blur(4px);
