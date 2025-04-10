@@ -5317,43 +5317,49 @@ label.list-group-item:focus {
   color: var(--text-primary);
   background-color: var(--layer-hover);
 }
-.ds-list-group {
+.list {
   counter-reset: item;
   list-style-type: none;
   padding-inline-start: 35px;
 }
-.ds-list-group > li {
+.list > li {
   counter-increment: item;
   position: relative;
   padding: 10px 0px;
 }
-.ds-list-group > li:not(:first-child) {
+.list > li:not(:first-child) {
   border-top: 1px solid var(--border-subtle);
 }
-.ds-list-group > li:before {
+.list > li .list__item__marker {
+  --list-marker-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
-  background: var(--layer);
   border-radius: 50%;
-  left: -35px;
-  width: 16px;
-  height: 16px;
+  left: -30px;
+  width: var(--list-marker-size);
+  height: var(--list-marker-size);
   text-align: center;
-  line-height: 16px;
-  font-size: calc(16px - 5px);
-  color: var(--icon-secondary);
+  line-height: var(--list-marker-size);
+  font-size: calc(var(--list-marker-size) - 6px);
   transition: var(--transition-all-productive);
-  top: 11.8px;
+  top: 11px;
   vertical-align: middle;
 }
-.ds-list-group > li:hover:before {
+.list > li .list__item__marker.list__item__marker--neutral {
+  background: var(--layer);
+  color: var(--icon-secondary);
+}
+.list > li .list__item__marker.list__item__marker--brand {
+  background: var(--primary-20);
+  color: var(--primary-50);
+}
+.list > li:hover .list__item__marker {
   transform: scale(1.2);
 }
 .ds-list-alphabet > li:before {
   content: counter(item, upper-alpha);
-}
-.ds-list-check > li:before {
-  content: "\EB7B";
-  font-family: 'remixicon';
 }
 .ds-list-none {
   padding-inline-start: 0;
