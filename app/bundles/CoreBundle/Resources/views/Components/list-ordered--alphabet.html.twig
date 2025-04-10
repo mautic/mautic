@@ -1,0 +1,8 @@
+<ol class="list list--ordered list--alphabet">
+    {% for item in items %}
+        <li class="list__item">
+            <span class="list__item__marker list__item__marker--{{ color|default('neutral') }}" aria-hidden="true">{{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'|slice(loop.index0 % 26, 1) }}</span>
+            <span class="list__item__label">{{ item|trans }}</span>
+        </li>
+    {% endfor %}
+</ol>
