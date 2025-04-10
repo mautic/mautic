@@ -1,0 +1,7 @@
+<ul class="list list--unordered list--none">
+    {% for item in items %}
+        <li class="list__item">
+            <span class="list__item__label">{{ item|trans }}</span>
+        </li>
+    {% endfor %}
+</ul>

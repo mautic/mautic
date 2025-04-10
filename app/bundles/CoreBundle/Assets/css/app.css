@@ -5357,10 +5357,7 @@ label.list-group-item:focus {
 .list > li:hover .list__item__marker {
   transform: scale(1.2);
 }
-.ds-list-alphabet > li:before {
-  content: counter(item, upper-alpha);
-}
-.ds-list-none {
+.list--none {
   padding-inline-start: 0;
 }
 .ds-list-bullet {
@@ -9667,6 +9664,7 @@ lesshat-selector { -lh-property: 0 ;
   transition: var(--transition-all-productive);
   outline: 2px solid transparent;
   outline-offset: -2px;
+  text-align: unset;
 }
 .tile.tile--clickable:hover,
 .tile.tile--selectable:hover,
