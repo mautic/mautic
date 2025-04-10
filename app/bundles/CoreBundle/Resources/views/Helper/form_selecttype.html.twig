@@ -45,11 +45,9 @@
                                 {% if typeOneDescription is defined and typeOneDescription is not empty %}
                                     {{ typeOneDescription|trans }}
                                 {% endif %}
-                                <ul class="ds-list-group ds-list-check">
-                                    {% for difference in typeOneDifferences %}
-                                        <li>{{ difference|trans }}</li>
-                                    {% endfor %}
-                                </ul>
+                                {% include '@MauticCore/Components/list-unordered--checkmark.html.twig' with {
+                                    'items': typeOneDifferences
+                                } %}
                             </div>
                             <div class="hidden-xs panel-footer text-center">
                                 {% include '@MauticCore/Helper/button.html.twig' with {
@@ -97,11 +95,9 @@
                                 {% if typeTwoDescription is defined and typeTwoDescription is not empty %}
                                     {{ typeTwoDescription|trans }}
                                 {% endif %}
-                                <ul class="ds-list-group ds-list-check">
-                                    {% for difference in typeTwoDifferences %}
-                                        <li>{{ difference|trans }}</li>
-                                    {% endfor %}
-                                </ul>
+                                {% include '@MauticCore/Components/list-unordered--checkmark.html.twig' with {
+                                    'items': typeTwoDifferences
+                                } %}
                             </div>
                             <div class="hidden-xs panel-footer text-center">
                                 {% include '@MauticCore/Helper/button.html.twig' with {
