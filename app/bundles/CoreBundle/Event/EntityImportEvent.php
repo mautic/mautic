@@ -30,10 +30,19 @@ class EntityImportEvent extends Event
     ];
 
     /**
-     * @param array<string, mixed> $data
+     * @var array<int, array<string, array|bool|int|string|null>>
      */
-    public function __construct(private string $entityName, private array $data, private ?int $userId)
-    {
+    private array $data;
+
+    /**
+     * @param array<int, array<string, array|bool|int|string|mixed|null>> $data
+     */
+    public function __construct(
+        private string $entityName,
+        array $data,
+        private ?int $userId,
+    ) {
+        $this->data = $data;
     }
 
     public function getEntityName(): string
@@ -42,7 +51,7 @@ class EntityImportEvent extends Event
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, array|bool|int|string|null>>
      */
     public function getEntityData(): array
     {

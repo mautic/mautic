@@ -214,7 +214,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
 
         foreach ($summary as $type => $data) {
             if ('errors' === $type) {
-                if (is_array($data) && count($data) > 0) {
+                if (count($data) > 0) {
                     $event->setSummary('errors', ['messages' => $data]);
                 }
                 continue;

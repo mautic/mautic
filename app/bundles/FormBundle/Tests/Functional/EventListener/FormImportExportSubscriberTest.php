@@ -87,19 +87,17 @@ final class FormImportExportSubscriberTest extends TestCase
     public function testFormImport(): void
     {
         $eventData = [
-            Form::ENTITY_NAME => [
-                [
-                    'id'           => 1,
-                    'name'         => 'New Form',
-                    'is_published' => true,
-                    'description'  => 'Imported description',
-                    'alias'        => 'new-alias',
-                    'cached_html'  => '<div>Form HTML</div>',
-                    'post_action'  => 'redirect',
-                    'template'     => 'default',
-                    'form_type'    => 'standard',
-                    'render_style' => 'normal',
-                ],
+            [
+                'id'           => 1,
+                'name'         => 'New Form',
+                'is_published' => true,
+                'description'  => 'Imported description',
+                'alias'        => 'new-alias',
+                'cached_html'  => '<div>Form HTML</div>',
+                'post_action'  => 'redirect',
+                'template'     => 'default',
+                'form_type'    => 'standard',
+                'render_style' => 'normal',
             ],
         ];
 

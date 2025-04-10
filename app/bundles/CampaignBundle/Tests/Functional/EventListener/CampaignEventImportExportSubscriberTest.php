@@ -98,7 +98,8 @@ class CampaignEventImportExportSubscriberTest extends TestCase
         $entities = $exportEvent->getEntities();
         $this->assertArrayHasKey(Event::ENTITY_NAME, $entities);
         $this->assertNotEmpty($entities[Event::ENTITY_NAME]);
-        $this->assertSame(1, $entities[Event::ENTITY_NAME][0]['id']);
+        $firstEntity = array_values($entities[Event::ENTITY_NAME])[0];
+        $this->assertSame(1, $firstEntity['id']);
     }
 
     public function testCampaignEventImport(): void

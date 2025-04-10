@@ -89,22 +89,21 @@ class PageImportExportSubscriberTest extends TestCase
     public function testPageImport(): void
     {
         $eventData = [
-            Page::ENTITY_NAME => [
-                [
-                    'id'            => 1,
-                    'title'         => 'New Page',
-                    'is_published'  => true,
-                    'alias'         => 'new-alias',
-                    'content'       => '<p>Sample content</p>',
-                    'publish_up'    => null,
-                    'hits'          => 0,
-                    'unique_hits'   => 0,
-                    'variant_hits'  => 0,
-                    'revision'      => 1,
-                    'redirect_type' => '',
-                    'redirect_url'  => '',
-                    'publish_down'  => null,
-                ],
+            [
+                'id'            => 1,
+                'title'         => 'New Page',
+                'is_published'  => true,
+                'alias'         => 'new-alias',
+                'content'       => '<p>Sample content</p>',
+                'publish_up'    => null,
+                'hits'          => 0,
+                'unique_hits'   => 0,
+                'variant_hits'  => 0,
+                'revision'      => 1,
+                'redirect_type' => '',
+                'redirect_url'  => '',
+                'publish_down'  => null,
+                'uuid'          => 'test-uuid',
             ],
         ];
 
