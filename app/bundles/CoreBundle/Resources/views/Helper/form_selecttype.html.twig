@@ -16,22 +16,36 @@
                 <div class="modal-loading-bar"></div>
             </div>
             <div class="modal-body form-select-modal">
-                <div class="d-flex fw-nowrap-lg gap-md">
+                <div class="d-flex row-no-gutters fw-nowrap-lg gap-md">
+                    <div class="col-md-6">
+
                         {% set typeOneContent %}
                         <h3 class="mb-48">{{ typeOneHeader|trans }}</h3>
                         {% if typeOneIllustration is defined and typeOneIllustration is not empty %}
-                            {% include '@MauticCore/Helper/_illustration.html.twig' with {
-                                'illustration': typeOneIllustration,
-                                'size': '64',
-                                'color': 'var(--icon-interactive)'
-                            } %}
+                            <div class="mb-md">
+                                {% include '@MauticCore/Helper/_illustration.html.twig' with {
+                                    'illustration': typeOneIllustration,
+                                    'size': '64',
+                                    'color': 'var(--icon-interactive)'
+                                } %}
+                            </div>
                         {% endif %}
                         {% if typeOneDescription is defined and typeOneDescription is not empty %}
-                            <div class='tile-description'>{{ typeOneDescription|trans }}</div>
+                            <div class="mb-md">{{ typeOneDescription|trans }}</div>
                         {% endif %}
-                        
+
+                        {% if typeOneTag is defined and typeOneTag is not empty %}
+                            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                'tags': [{
+                                    'label': typeOneTag,
+                                    'color': 'brand'
+                                }]
+                            } %}
+                        {% endif %}
+                    
+
                         {% if typeOneDifferences is defined and typeOneDifferences is not empty %}
-                            <div class="layer-two mt-md text-secondary">
+                            <div class="layer-two mt-sm text-secondary">
                                 {% include '@MauticCore/Components/list-unordered--none.html.twig' with {
                                     'items': typeOneDifferences
                                 } %}
@@ -46,21 +60,34 @@
                                 'icon': typeOneIconClass|default('')
                             }]
                         } %}
-
+                    </div>
+                    <div class="col-md-6">
                         {% set typeTwoContent %}
                         <h3 class="mb-48">{{ typeTwoHeader|trans }}</h3>
                         {% if typeTwoIllustration is defined and typeTwoIllustration is not empty %}
+                        <div class="mb-md">
                             {% include '@MauticCore/Helper/_illustration.html.twig' with {
                                 'illustration': typeTwoIllustration,
                                 'size': '64',
                                 'color': 'var(--icon-interactive)'
                             } %}
+                        </div>
                         {% endif %}
                         {% if typeTwoDescription is defined and typeTwoDescription is not empty %}
-                            <div class='tile-description'>{{ typeTwoDescription|trans }}</div>
+                            <div class="mb-md">{{ typeTwoDescription|trans }}</div>
                         {% endif %}
+
+                        {% if typeTwoTag is defined and typeTwoTag is not empty %}
+                            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                'tags': [{
+                                    'label': typeTwoTag,
+                                    'color': 'brand'
+                                }]
+                            } %}
+                        {% endif %}
+
                         {% if typeTwoDifferences is defined and typeTwoDifferences is not empty %}
-                            <div class="layer-two mt-md text-secondary">
+                            <div class="layer-two mt-sm text-secondary">
                                 {% include '@MauticCore/Components/list-unordered--none.html.twig' with {
                                     'items': typeTwoDifferences
                                 } %}
@@ -75,6 +102,7 @@
                                 'icon': typeTwoIconClass|default('')
                             }]
                         } %}
+                    </div>
                 </div>
             </div>
         </div>
