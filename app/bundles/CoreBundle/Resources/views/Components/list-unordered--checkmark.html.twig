@@ -1,0 +1,10 @@
+<ul class="list list--unordered list--check">
+    {% for item in items %}
+        <li class="list__item">
+            <div class="list__item__marker list__item__marker--{{ color|default('neutral') }}">
+                <i class="ri-check-line" aria-hidden="true"></i>
+            </div>
+            <span class="list__item__label">{{ item|trans }}</span>
+        </li>
+    {% endfor %}
+</ul>
