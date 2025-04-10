@@ -16,107 +16,65 @@
                 <div class="modal-loading-bar"></div>
             </div>
             <div class="modal-body form-select-modal">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="panel panel-success">
-                            <div class="panel-heading row-no-gutters">
-                                <div class="col-xs-8 col-sm-10 np jc-center">
-                                    <h3 class="panel-title">{{ typeOneHeader|trans }}</h3>
-                                </div>
-                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 ai-end jc-center">
-                                    <i class="hidden-xs {{ typeOneIconClass }} ri-lg"></i>
-                                    {% include '@MauticCore/Helper/button.html.twig' with {
-                                        buttons: [
-                                            {
-                                                label: 'mautic.core.select',
-                                                size: 'sm',
-                                                variant: 'ghost',
-                                                spin: false,
-                                                onclick: typeOneOnClick,
-                                                attributes: {
-                                                    'class': 'visible-xs pull-right text-interactive'
-                                                }
-                                            }
-                                        ]
-                                    } %}
-                                </div>
-                            </div>
-                            <div class="panel-body">
-                                {% if typeOneDescription is defined and typeOneDescription is not empty %}
-                                    {{ typeOneDescription|trans }}
-                                {% endif %}
-                                {% include '@MauticCore/Components/list-unordered--checkmark.html.twig' with {
+                <div class="d-flex fw-nowrap-lg gap-md">
+                        {% set typeOneContent %}
+                        <h3 class="mb-48">{{ typeOneHeader|trans }}</h3>
+                        {% if typeOneIllustration is defined and typeOneIllustration is not empty %}
+                            {% include '@MauticCore/Helper/_illustration.html.twig' with {
+                                'illustration': typeOneIllustration,
+                                'size': '64',
+                                'color': 'var(--icon-interactive)'
+                            } %}
+                        {% endif %}
+                        {% if typeOneDescription is defined and typeOneDescription is not empty %}
+                            <div class='tile-description'>{{ typeOneDescription|trans }}</div>
+                        {% endif %}
+                        
+                        {% if typeOneDifferences is defined and typeOneDifferences is not empty %}
+                            <div class="layer-two mt-md text-secondary">
+                                {% include '@MauticCore/Components/list-unordered--none.html.twig' with {
                                     'items': typeOneDifferences
                                 } %}
                             </div>
-                            <div class="hidden-xs panel-footer text-center">
-                                {% include '@MauticCore/Helper/button.html.twig' with {
-                                    buttons: [
-                                        {
-                                            label: 'mautic.core.select',
-                                            size: 'lg',
-                                            variant: 'ghost',
-                                            spin: false,
-                                            onclick: typeOneOnClick,
-                                            attributes: {
-                                                'class': 'text-success'
-                                            }
-                                        }
-                                    ]
-                                } %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading row-no-gutters">
-                                <div class="col-xs-8 col-sm-10 np jc-center">
-                                    <h3 class="panel-title">{{ typeTwoHeader|trans }}</h3>
-                                </div>
-                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 ai-end jc-center">
-                                    <i class="hidden-xs {{ typeTwoIconClass }} ri-lg"></i>
-                                    {% include '@MauticCore/Helper/button.html.twig' with {
-                                        buttons: [
-                                            {
-                                                label: 'mautic.core.select',
-                                                size: 'sm',
-                                                variant: 'ghost',
-                                                spin: false,
-                                                onclick: typeTwoOnClick,
-                                                attributes: {
-                                                    'class': 'visible-xs pull-right text-interactive'
-                                                }
-                                            }
-                                        ]
-                                    } %}
-                                </div>
-                            </div>
-                            <div class="panel-body">
-                                {% if typeTwoDescription is defined and typeTwoDescription is not empty %}
-                                    {{ typeTwoDescription|trans }}
-                                {% endif %}
-                                {% include '@MauticCore/Components/list-unordered--checkmark.html.twig' with {
+                        {% endif %}
+                        {% endset %}
+
+                        {% include '@MauticCore/Components/tile--clickable.html.twig' with {
+                            'tiles': [{
+                                'onclick': typeOneOnClick,
+                                'content': typeOneContent,
+                                'icon': typeOneIconClass|default('')
+                            }]
+                        } %}
+
+                        {% set typeTwoContent %}
+                        <h3 class="mb-48">{{ typeTwoHeader|trans }}</h3>
+                        {% if typeTwoIllustration is defined and typeTwoIllustration is not empty %}
+                            {% include '@MauticCore/Helper/_illustration.html.twig' with {
+                                'illustration': typeTwoIllustration,
+                                'size': '64',
+                                'color': 'var(--icon-interactive)'
+                            } %}
+                        {% endif %}
+                        {% if typeTwoDescription is defined and typeTwoDescription is not empty %}
+                            <div class='tile-description'>{{ typeTwoDescription|trans }}</div>
+                        {% endif %}
+                        {% if typeTwoDifferences is defined and typeTwoDifferences is not empty %}
+                            <div class="layer-two mt-md text-secondary">
+                                {% include '@MauticCore/Components/list-unordered--none.html.twig' with {
                                     'items': typeTwoDifferences
                                 } %}
                             </div>
-                            <div class="hidden-xs panel-footer text-center">
-                                {% include '@MauticCore/Helper/button.html.twig' with {
-                                    buttons: [
-                                        {
-                                            label: 'mautic.core.select',
-                                            size: 'lg',
-                                            variant: 'ghost',
-                                            spin: false,
-                                            onclick: typeTwoOnClick,
-                                            attributes: {
-                                                'class': 'text-interactive'
-                                            }
-                                        }
-                                    ]
-                                } %}
-                            </div>
-                        </div>
-                    </div>
+                        {% endif %}
+                        {% endset %}
+
+                        {% include '@MauticCore/Components/tile--clickable.html.twig' with {
+                            'tiles': [{
+                                'onclick': typeTwoOnClick,
+                                'content': typeTwoContent,
+                                'icon': typeTwoIconClass|default('')
+                            }]
+                        } %}
                 </div>
             </div>
         </div>
