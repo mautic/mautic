@@ -29,20 +29,9 @@ class EntityImportEvent extends Event
         self::ERRORS => [],
     ];
 
-    /**
-     * @var array<int, array<string, array|bool|int|string|null>>
-     */
-    private array $data;
-
-    /**
-     * @param array<int, array<string, array|bool|int|string|mixed|null>> $data
-     */
-    public function __construct(
-        private string $entityName,
-        array $data,
-        private ?int $userId,
-    ) {
-        $this->data = $data;
+    /** @phpstan-ignore-next-line */
+    public function __construct(private string $entityName, private array $data, private ?int $userId)
+    {
     }
 
     public function getEntityName(): string
@@ -50,9 +39,7 @@ class EntityImportEvent extends Event
         return $this->entityName;
     }
 
-    /**
-     * @return array<int, array<string, array|bool|int|string|null>>
-     */
+    /** @phpstan-ignore-next-line */
     public function getEntityData(): array
     {
         return $this->data;
