@@ -213,15 +213,22 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($summary as $type => $data) {
-            if ('errors' !== $type && $data['count'] > 0) {
-                $event->setSummary($type, [LeadList::ENTITY_NAME => $data]);
+            if ('errors' === $type) {
+                if (is_array($data) && count($data) > 0) {
+                    $event->setSummary('errors', ['messages' => $data]);
+                }
+                continue;
             }
-            if ('errors' === $type && !empty($summary['errors'])) {
-                $event->setSummary('errors', $summary['errors']);
+
+            if (isset($data['count']) && is_int($data['count']) && $data['count'] > 0) {
+                $event->setSummary($type, [LeadList::ENTITY_NAME => $data]);
             }
         }
     }
 
+    /**
+     * @param array<string, mixed> $details
+     */
     private function logAction(string $action, int $objectId, array $details): void
     {
         $this->auditLogModel->writeToLog([

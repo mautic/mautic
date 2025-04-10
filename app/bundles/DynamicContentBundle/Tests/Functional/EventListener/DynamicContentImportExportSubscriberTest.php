@@ -12,33 +12,35 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\EventListener\DynamicContentImportExportSubscriber;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class DynamicContentImportExportSubscriberTest extends TestCase
 {
     private DynamicContentImportExportSubscriber $subscriber;
     private MockObject&EntityManager $entityManager;
     private MockObject&DynamicContentModel $dynamicContentModel;
-    private MockObject&UserModel $userModel;
-    private EventDispatcher $eventDispatcher;
     private MockObject&AuditLogModel $auditLogModel;
     private MockObject&IpLookupHelper $ipLookupHelper;
+    private MockObject&DenormalizerInterface $serializer;
+    private EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->dynamicContentModel = $this->createMock(DynamicContentModel::class);
-        $this->userModel           = $this->createMock(UserModel::class);
+        $this->auditLogModel       = $this->createMock(AuditLogModel::class);
+        $this->ipLookupHelper      = $this->createMock(IpLookupHelper::class);
+        $this->serializer          = $this->createMock(DenormalizerInterface::class);
 
         $this->subscriber = new DynamicContentImportExportSubscriber(
             $this->dynamicContentModel,
-            $this->userModel,
             $this->entityManager,
             $this->auditLogModel,
             $this->ipLookupHelper,
+            $this->serializer
         );
 
         $this->eventDispatcher = new EventDispatcher();
@@ -51,6 +53,7 @@ final class DynamicContentImportExportSubscriberTest extends TestCase
         $content->method('getId')->willReturn(1);
         $content->method('getName')->willReturn('Test Dynamic Content');
         $content->method('getContent')->willReturn('<p>Test Content</p>');
+        $content->method('getUuid')->willReturn('uuid-123');
 
         return $content;
     }
@@ -65,25 +68,27 @@ final class DynamicContentImportExportSubscriberTest extends TestCase
 
         $exportedData = $event->getEntities();
 
-        $this->assertArrayHasKey(DynamicContent::ENTITY_NAME, $exportedData, 'Exported data must contain dynamic content entity.');
-        $this->assertNotEmpty($exportedData[DynamicContent::ENTITY_NAME], 'Exported data for dynamic content should not be empty.');
+        $this->assertArrayHasKey(DynamicContent::ENTITY_NAME, $exportedData);
+        $this->assertNotEmpty($exportedData[DynamicContent::ENTITY_NAME]);
 
-        $exportedContent = $exportedData[DynamicContent::ENTITY_NAME][0];
-        $this->assertSame(1, $exportedContent['id'], 'Dynamic content ID mismatch.');
-        $this->assertSame('Test Dynamic Content', $exportedContent['name'], 'Dynamic content name mismatch.');
+        $exportedContent = reset($exportedData[DynamicContent::ENTITY_NAME]);
+        $this->assertSame(1, $exportedContent['id']);
+        $this->assertSame('Test Dynamic Content', $exportedContent['name']);
     }
 
     public function testDynamicContentImport(): void
     {
         $eventData = [
-            [
-                'id'           => 1,
-                'name'         => 'New Dynamic Content',
-                'is_published' => true,
-                'content'      => '<p>Imported content</p>',
-                'publish_up'   => null,
-                'publish_down' => null,
-                'utm_tags'     => [],
+            DynamicContent::ENTITY_NAME => [
+                [
+                    'id'           => 1,
+                    'name'         => 'New Dynamic Content',
+                    'is_published' => true,
+                    'content'      => '<p>Imported content</p>',
+                    'publish_up'   => null,
+                    'publish_down' => null,
+                    'utm_tags'     => [],
+                ],
             ],
         ];
 

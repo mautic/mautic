@@ -231,6 +231,9 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $details
+     */
     private function logAction(string $action, int $objectId, array $details, string $object): void
     {
         $this->auditLogModel->writeToLog([

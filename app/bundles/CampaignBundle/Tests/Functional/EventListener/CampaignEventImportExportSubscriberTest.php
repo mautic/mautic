@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventListener\CampaignEventImportExportSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -22,17 +23,21 @@ class CampaignEventImportExportSubscriberTest extends TestCase
 {
     private CampaignEventImportExportSubscriber $subscriber;
     private MockObject&CampaignModel $campaignModel;
+    private MockObject&EventModel $eventModel;
     private MockObject&EntityManagerInterface $entityManager;
     private MockObject&EventDispatcherInterface $dispatcher;
-    private EventDispatcher $eventDispatcher;
     private MockObject&AuditLogModel $auditLogModel;
     private MockObject&IpLookupHelper $ipLookupHelper;
+    private EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
-        $this->campaignModel = $this->createMock(CampaignModel::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->dispatcher    = new EventDispatcher();
+        $this->campaignModel   = $this->createMock(CampaignModel::class);
+        $this->eventModel      = $this->createMock(EventModel::class);
+        $this->entityManager   = $this->createMock(EntityManagerInterface::class);
+        $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
+        $this->auditLogModel   = $this->createMock(AuditLogModel::class);
+        $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
 
         $this->subscriber = new CampaignEventImportExportSubscriber(
             $this->campaignModel,
@@ -40,6 +45,7 @@ class CampaignEventImportExportSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->ipLookupHelper,
             $this->dispatcher,
+            $this->eventModel
         );
 
         $this->eventDispatcher = new EventDispatcher();
@@ -93,22 +99,24 @@ class CampaignEventImportExportSubscriberTest extends TestCase
     public function testCampaignEventImport(): void
     {
         $eventData = [
-            [
-                'id'                   => 1,
-                'campaign_id'          => 1,
-                'name'                 => 'Imported Event',
-                'description'          => 'Imported Description',
-                'type'                 => 'imported_type',
-                'event_type'           => 'imported_event_type',
-                'event_order'          => 2,
-                'properties'           => [],
-                'trigger_interval'     => 5,
-                'trigger_interval_unit'=> 'hours',
-                'trigger_mode'         => 'delayed',
-                'triggerDate'          => null,
-                'channel'              => 'sms',
-                'channel_id'           => 101,
-                'parent_id'            => null,
+            Event::ENTITY_NAME => [
+                [
+                    'id'                   => 1,
+                    'campaign_id'          => 1,
+                    'name'                 => 'Imported Event',
+                    'description'          => 'Imported Description',
+                    'type'                 => 'imported_type',
+                    'event_type'           => 'imported_event_type',
+                    'event_order'          => 2,
+                    'properties'           => [],
+                    'trigger_interval'     => 5,
+                    'trigger_interval_unit'=> 'hours',
+                    'trigger_mode'         => 'delayed',
+                    'triggerDate'          => null,
+                    'channel'              => 'sms',
+                    'channel_id'           => 101,
+                    'parent_id'            => null,
+                ],
             ],
         ];
 

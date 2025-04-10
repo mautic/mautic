@@ -88,7 +88,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $entityData = $event->getEntityData();
         if (!$entityData) {
             $this->logger->warning('No entity data provided for import.');
-            $event->setStatus(EntityImportEvent::ERRORS, ['No entity data provided.']);
+            $event->setStatus(EntityImportEvent::ERRORS, ['message' => 'No entity data provided.']);
 
             return;
         }
@@ -763,6 +763,9 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $this->entityManager->flush();
     }
 
+    /**
+     * @param array<string, mixed> $details
+     */
     private function logAction(string $action, int $objectId, array $details): void
     {
         $this->auditLogModel->writeToLog([

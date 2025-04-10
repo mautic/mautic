@@ -106,7 +106,7 @@ class CampaignController extends AbstractStandardFormController
         CorePermissions $security,
         private EntityManager $em,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $em);
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     protected function getPermissions(): array
@@ -242,7 +242,7 @@ class CampaignController extends AbstractStandardFormController
 
         if (empty($ids)) {
             // Get the repository
-            /** @var CampaignRepository $repo */
+            /** @var \Mautic\CampaignBundle\Repository\CampaignRepository $repo */
             $repo = $this->em->getRepository(Campaign::class);
             $repo->setTranslator($this->translator);
 

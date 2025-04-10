@@ -61,9 +61,12 @@ class ImportHelper
         }
     }
 
+    /**
+     * @param array<string, string|array<mixed, mixed>> &$input
+     */
     public function recursiveRemoveEmailaddress(array &$input): void
     {
-        foreach ($input as $key => &$value) {
+        foreach ($input as &$value) {
             if (is_string($value)) {
                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
                     $value = '';

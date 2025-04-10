@@ -20,6 +20,9 @@ class EntityImportEvent extends Event
     public const NEW    = 'new';
     public const ERRORS = 'errors';
 
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $status = [
         self::UPDATE => [],
         self::NEW    => [],

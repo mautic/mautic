@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class AssetImportExportSubscriberTest extends TestCase
 {
@@ -24,6 +25,7 @@ class AssetImportExportSubscriberTest extends TestCase
     private EventDispatcher $eventDispatcher;
     private MockObject&AuditLogModel $auditLogModel;
     private MockObject&IpLookupHelper $ipLookupHelper;
+    private MockObject&DenormalizerInterface $serializer;
 
     protected function setUp(): void
     {
@@ -31,11 +33,14 @@ class AssetImportExportSubscriberTest extends TestCase
         $this->assetModel      = $this->createMock(AssetModel::class);
         $this->auditLogModel   = $this->createMock(AuditLogModel::class);
         $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
+        $this->serializer      = $this->createMock(DenormalizerInterface::class);
+
         $this->subscriber      = new AssetImportExportSubscriber(
             $this->assetModel,
             $this->entityManager,
             $this->auditLogModel,
-            $this->ipLookupHelper
+            $this->ipLookupHelper,
+            $this->serializer
         );
         $this->eventDispatcher = new EventDispatcher();
         $this->eventDispatcher->addSubscriber($this->subscriber);
@@ -58,32 +63,37 @@ class AssetImportExportSubscriberTest extends TestCase
         $exportedData = $event->getEntities();
 
         $this->assertArrayHasKey(Asset::ENTITY_NAME, $exportedData);
+        $exportedAsset = reset($exportedData[Asset::ENTITY_NAME]);
+
         if (isset($exportedData[Asset::ENTITY_NAME]) && count($exportedData[Asset::ENTITY_NAME]) > 0) {
-            $this->assertSame(1, $exportedData[Asset::ENTITY_NAME][0]['id']);
-            $this->assertSame('Test Asset', $exportedData[Asset::ENTITY_NAME][0]['title']);
+            $this->assertSame(1, $exportedAsset['id']);
+            $this->assertSame('Test Asset', $exportedAsset['title']);
         }
     }
 
     public function testAssetImport(): void
     {
         $eventData = [
-            [
-                'id'                 => 1,
-                'title'              => 'New Asset',
-                'is_published'       => true,
-                'description'        => 'Imported description',
-                'alias'              => 'new-alias',
-                'storage_location'   => 'local',
-                'path'               => 'path/to/asset',
-                'remote_path'        => '',
-                'original_file_name' => 'file.pdf',
-                'mime'               => 'application/pdf',
-                'size'               => '1024',
-                'disallow'           => false,
-                'extension'          => 'pdf',
-                'lang'               => 'en',
-                'publish_up'         => null,
-                'publish_down'       => null,
+            Asset::ENTITY_NAME => [
+                [
+                    'id'                 => 1,
+                    'title'              => 'New Asset',
+                    'is_published'       => true,
+                    'description'        => 'Imported description',
+                    'alias'              => 'new-alias',
+                    'storage_location'   => 'local',
+                    'path'               => 'path/to/asset',
+                    'remote_path'        => '',
+                    'original_file_name' => 'file.pdf',
+                    'mime'               => 'application/pdf',
+                    'size'               => '1024',
+                    'disallow'           => false,
+                    'extension'          => 'pdf',
+                    'lang'               => 'en',
+                    'publish_up'         => null,
+                    'publish_down'       => null,
+                    'uuid'               => 'some-uuid',
+                ],
             ],
         ];
 

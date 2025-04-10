@@ -107,7 +107,7 @@ final class ImportController extends AbstractFormController
             $this->removeImportFile($fullPath);
             $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was canceled.");
 
-            return $this->newAction($request);
+            return $this->newAction();
         }
 
         // Validate form before processing

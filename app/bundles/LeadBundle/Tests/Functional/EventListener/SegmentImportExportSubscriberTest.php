@@ -13,41 +13,47 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\EventListener\SegmentImportExportSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class SegmentImportExportSubscriberTest extends TestCase
 {
     private SegmentImportExportSubscriber $subscriber;
     private MockObject&ListModel $leadListModel;
-    private MockObject&UserModel $userModel;
     private MockObject&EntityManagerInterface $entityManager;
+    private MockObject&AuditLogModel $auditLogModel;
+    private MockObject&PluginModel $pluginModel;
     private MockObject&EventDispatcherInterface $dispatcher;
-    private EventDispatcher $eventDispatcher;
-    private AuditLogModel $auditLogModel;
-    private IpLookupHelper $ipLookupHelper;
     private MockObject&FieldModel $fieldModel;
+    private MockObject&IpLookupHelper $ipLookupHelper;
+    private MockObject&DenormalizerInterface $serializer;
+    private EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
-        $this->leadListModel  = $this->createMock(ListModel::class);
-        $this->userModel      = $this->createMock(UserModel::class);
-        $this->fieldModel     = $this->createMock(FieldModel::class);
-        $this->entityManager  = $this->createMock(EntityManagerInterface::class);
-        $this->dispatcher     = new EventDispatcher();
+        $this->leadListModel   = $this->createMock(ListModel::class);
+        $this->entityManager   = $this->createMock(EntityManagerInterface::class);
+        $this->auditLogModel   = $this->createMock(AuditLogModel::class);
+        $this->pluginModel     = $this->createMock(PluginModel::class);
+        $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
+        $this->fieldModel      = $this->createMock(FieldModel::class);
+        $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
+        $this->serializer      = $this->createMock(DenormalizerInterface::class);
 
         $this->subscriber = new SegmentImportExportSubscriber(
             $this->leadListModel,
-            $this->userModel,
             $this->entityManager,
             $this->auditLogModel,
+            $this->pluginModel,
             $this->dispatcher,
             $this->fieldModel,
             $this->ipLookupHelper,
+            $this->serializer
         );
 
         $this->eventDispatcher = new EventDispatcher();
@@ -77,7 +83,7 @@ final class SegmentImportExportSubscriberTest extends TestCase
         $this->assertArrayHasKey(LeadList::ENTITY_NAME, $exportedData);
         $this->assertNotEmpty($exportedData[LeadList::ENTITY_NAME]);
 
-        $exportedSegment = $exportedData[LeadList::ENTITY_NAME][0];
+        $exportedSegment = reset($exportedData[LeadList::ENTITY_NAME]);
         $this->assertSame(1, $exportedSegment['id']);
         $this->assertSame('Test Segment', $exportedSegment['name']);
         $this->assertTrue($exportedSegment['is_published']);
@@ -95,19 +101,20 @@ final class SegmentImportExportSubscriberTest extends TestCase
         $user->method('getFirstName')->willReturn('John');
         $user->method('getLastName')->willReturn('Doe');
 
-        $this->userModel->method('getEntity')->with(99)->willReturn($user);
-
         $importData = [
-            [
-                'id'                   => 1,
-                'name'                 => 'Imported Segment',
-                'is_published'         => true,
-                'description'          => 'Imported description',
-                'alias'                => 'imported-alias',
-                'public_name'          => 'Imported Public Name',
-                'filters'              => [],
-                'is_global'            => true,
-                'is_preference_center' => true,
+            LeadList::ENTITY_NAME => [
+                [
+                    'id'                   => 1,
+                    'name'                 => 'Imported Segment',
+                    'is_published'         => true,
+                    'description'          => 'Imported description',
+                    'alias'                => 'imported-alias',
+                    'public_name'          => 'Imported Public Name',
+                    'filters'              => [],
+                    'is_global'            => true,
+                    'is_preference_center' => true,
+                    'uuid'                 => 'uuid-456',
+                ],
             ],
         ];
 

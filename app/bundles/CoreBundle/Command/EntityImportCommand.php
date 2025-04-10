@@ -85,6 +85,8 @@ final class EntityImportCommand extends ModeratedCommand
 
     /**
      * @param array<string, mixed> $data
+     *
+     * @return array{isValid: bool, message: string}
      */
     private function validateData(array $data, string $entityName): array
     {

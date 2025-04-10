@@ -25,17 +25,18 @@ class CampaignImportExportSubscriberTest extends TestCase
     private MockObject&UserModel $userModel;
     private EventDispatcher $dispatcher;
     private MockObject&LoggerInterface $logger;
-    private AuditLogModel $auditLogModel;
-    private IpLookupHelper $ipLookupHelper;
+    private MockObject&AuditLogModel $auditLogModel;
+    private MockObject&IpLookupHelper $ipLookupHelper;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->campaignModel = $this->createMock(CampaignModel::class);
-        $this->userModel     = $this->createMock(UserModel::class);
-        $this->logger        = $this->createMock(LoggerInterface::class);
-
-        $this->dispatcher = new EventDispatcher();
+        $this->entityManager  = $this->createMock(EntityManager::class);
+        $this->campaignModel  = $this->createMock(CampaignModel::class);
+        $this->userModel      = $this->createMock(UserModel::class);
+        $this->logger         = $this->createMock(LoggerInterface::class);
+        $this->auditLogModel  = $this->createMock(AuditLogModel::class);
+        $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->dispatcher     = new EventDispatcher();
 
         $this->subscriber = new CampaignImportExportSubscriber(
             $this->campaignModel,
@@ -72,7 +73,8 @@ class CampaignImportExportSubscriberTest extends TestCase
         // Ensure the array is not empty
         $this->assertNotEmpty($exportedData[Campaign::ENTITY_NAME], 'Exported campaign data should not be empty');
 
-        $this->assertSame(1, $exportedData[Campaign::ENTITY_NAME][0]['id']);
-        $this->assertSame('Test Campaign', $exportedData[Campaign::ENTITY_NAME][0]['name']);
+        $exportedCampaign = reset($exportedData[Campaign::ENTITY_NAME]);
+        $this->assertSame(1, $exportedCampaign['id']);
+        $this->assertSame('Test Campaign', $exportedCampaign['name']);
     }
 }

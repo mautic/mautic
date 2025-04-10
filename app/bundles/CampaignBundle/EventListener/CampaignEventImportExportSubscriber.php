@@ -74,7 +74,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             $this->logAction('export', $campaignEvent->getId(), $eventData);
         }
 
+        /** @var array<string, array<int, array<string, mixed>>> $data */
         foreach ($data as $entityName => $entities) {
+            /** @var array<string, mixed> $entities */
             $event->addEntities([$entityName => $entities]);
         }
     }
@@ -107,7 +109,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @param-out array<string, array> $data
+     * @param-out array<string, list<array<string, mixed>>> $data
      */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
@@ -179,7 +181,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @param array<string, array> $data
+     * @param array<string, list<array<string, mixed>>> $data
      */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {
@@ -196,7 +198,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
     }
 
     /**
-     * @param array<string, array> $data
+     * @param array<string, list<array<string, mixed>>> $data
      */
     private function exportEntity(string $entityName, ?int $entityId, array &$data, EntityExportEvent $event): void
     {
@@ -359,6 +361,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $this->entityManager->flush();
     }
 
+    /**
+     * @param array<string, mixed> $details
+     */
     private function logAction(string $action, int $objectId, array $details): void
     {
         $this->auditLogModel->writeToLog([
