@@ -835,7 +835,8 @@ class StatRepository extends CommonRepository
                     ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
         }
 
-        $queryBuilder->groupBy("{$leadAlias}.country");
+        $queryBuilder->groupBy("{$leadAlias}.country")
+                    ->orderBy("{$leadAlias}.country", 'ASC');
         $queryBuilder->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo");
         $queryBuilder->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB));
         $queryBuilder->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));

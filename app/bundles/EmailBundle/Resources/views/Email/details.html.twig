@@ -106,32 +106,65 @@
         'status': email.getPublishUp() is not null ? 'sending' : 'available'
     }) -}}
 
-        {% set tags = [
+        {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
             {
-                color: 'warm-gray',
+                color: 'high-contrast',
                 label: emailType == 'list'
                     ? 'mautic.email.type.list.header'
                     : (emailType == 'template' ? 'mautic.email.type.template.header' : type)
             }
-        ] %}
+        ] } %}
 
-        {# Additional tags based on conditions #}
-        {% set tags = tags
-            |merge(email.isVariant and not email.isVariant(true)
-                ? [{ color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]
-                : [])
-            |merge(email.isVariant(true)
-                ? [{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]
-                : [])
-            |merge(email.isTranslation and not email.isTranslation(true)
-                ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
-                : [])
-            |merge(email.isTranslation(true)
-                ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
-                : [])
-        %}
+        {% if email.isVariant and not email.isVariant(true) %}
+            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+                { color: 'blue', label: 'mautic.email.icon_tooltip.abtest', icon: 'ri-a-b', icon_only: true }
+            ] } %}
+        {% endif %}
+        {% if email.isVariant(true) %}
+            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+                {
+                    color: 'warm-gray',
+                    label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}),
+                    icon: 'ri-organization-chart',
+                    attributes: {
+                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id})
+                    }
+                }
+            ] } %}
+        {% endif %}
 
-        {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+        {% if email.isTranslation and not email.isTranslation(true) %}
+            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+                { color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon: 'ri-translate', icon_only: true }
+            ] } %}
+        {% endif %}
+        {% if email.isTranslation(true) %}
+            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+                {
+                    color: 'warm-gray',
+                    label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}),
+                    icon: 'ri-translate',
+                    attributes: {
+                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id})
+                    }
+                }
+            ] } %}
+        {% endif %}
+        {# Language #}
+        {% if email.language is defined and email.language is not empty %}
+            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                tags: [{
+                    label: email.language|language_name,
+                    icon: 'ri-translate-2',
+                    color: 'warm-gray',
+                    attributes: {
+                        'data-toggle': 'tooltip',
+                        'data-placement': 'top',
+                        'title': 'mautic.core.language'|trans
+                    }
+                }]
+            } %}
+        {% endif %}
 
     {% endif %}
 {% endblock %}
@@ -172,20 +205,6 @@
                       <div class="col-xs-10">
                           <div>{{ email.subject }}</div>
                           <div class="text-secondary">{{ emailPreview }}</div>
-                          {% if email.isVariant(true) %}
-                            <div class="small">
-                              <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.variant_of'|trans ({'%parent%' : variants.parent.name}) -}}
-                              </a>
-                            </div>
-                          {% endif %}
-                          {% if email.isTranslation(true) %}
-                            <div class="small">
-                              <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}) -}}
-                              </a>
-                            </div>
-                          {% endif %}
                       </div>
                   </div>
               </div>
@@ -450,7 +469,6 @@
                                         {
                                             label: 'mautic.core.open_link',
                                             variant: 'ghost',
-                                            size: 'sm',
                                             icon_only: true,
                                             icon: 'ri-external-link-line',
                                             attributes: {

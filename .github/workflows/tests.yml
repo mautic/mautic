@@ -22,13 +22,13 @@ jobs:
     strategy:
       matrix:
         php-versions: ['8.2', '8.3']
-        db-types: ['mysql', 'mariadb']
+        db-types: ['mysql:8.4', 'mysql:9.2', 'mariadb:10.11', 'mariadb:11.4']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
     services:
       database:
-        image: ${{ matrix.db-types == 'mysql' && 'mysql:5.7' || 'mariadb:10.3' }}
+        image: ${{ matrix.db-types }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: mautictest
@@ -36,9 +36,8 @@ jobs:
           - 3306
         options: >-
           --shm-size=2gb
-          --name=${{ matrix.db-types }}
           --tmpfs=/var/lib/mysql
-          --health-cmd="mysqladmin ping"
+          --health-cmd "${{ startsWith(matrix.db-types, 'mysql:') && 'mysqladmin ping' || 'healthcheck.sh --connect --innodb_initialized' }}"
           --health-interval=10s 
           --health-timeout=5s 
           --health-retries=3
@@ -58,7 +57,7 @@ jobs:
         fetch-depth: 0
 
     - name: PHPUnit cache
-      if: ${{matrix.php-versions == '8.2' && matrix.db-types == 'mariadb'}}
+      if: ${{matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11'}}
       uses: actions/cache@v4
       with:
         path: ./var/cache/phpunit
@@ -81,6 +80,8 @@ jobs:
         mysqldump --print-defaults
         cp .github/ci-files/.my.cnf ~/.my.cnf
         mysqldump --print-defaults
+        DB_LOG_NAME="${{ matrix.db-types }}"
+        echo "DB_LOG_NAME=${DB_LOG_NAME/:/_}" >> $GITHUB_ENV
 
     - name: Set SYMFONY_ENV to test
       run: |
@@ -97,14 +98,14 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
-        if [[ "${{ matrix.php-versions }}" == "8.2" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
+        if [[ "${{ matrix.php-versions }}" == "8.2" ]] && [[ "${{ matrix.db-types }}" == "mariadb:10.11" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v4
       with:
         files: ./coverage.xml
@@ -113,7 +114,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Save test results for future steps
-      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-results
@@ -132,7 +133,7 @@ jobs:
       if: ${{ always() }}
       uses: actions/upload-artifact@v4
       with:
-        name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
         path: ./var/logs/*
 
   e2e-tests:

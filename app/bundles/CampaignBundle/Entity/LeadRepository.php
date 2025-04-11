@@ -622,6 +622,7 @@ class LeadRepository extends CommonRepository
         ->andWhere("$leadCampaignAlias.manually_removed = :false")
         ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
         ->groupBy("$leadAlias.country")
+        ->orderBy("$leadAlias.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
         ->setParameter('false', false)
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))

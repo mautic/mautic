@@ -420,3 +420,41 @@
 .campaign-event-stat-divider {
     padding: 0 4px;
 }
+
+:root {
+    --small-col-width: 120px;
+    --medium-col-width: 280px;
+}
+
+.campaign-changelog {
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 0 25px;
+}
+
+.campaign-changelog .table-responsive {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.campaign-changelog table {
+    width: 100%;
+}
+
+.campaign-changelog th:first-child {
+    width: var(--small-col-width);
+    white-space: nowrap;
+}
+
+.campaign-changelog th:nth-child(2),
+.campaign-changelog th:nth-child(3) {
+    width: var(--medium-col-width);
+}
+
+.campaign-changelog pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+}
