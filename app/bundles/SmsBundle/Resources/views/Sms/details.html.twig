@@ -5,7 +5,7 @@
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{sms.getName()}}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : sms,
@@ -20,6 +20,7 @@
         'targetLabel': 'mautic.sms.smses'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': sms.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -172,6 +173,21 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- activity feed -->
         {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
+
+        {% if security.isGranted('lead:leads:viewown') %}
+        {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
+            title: 'mautic.core.useful_links',
+            items: [
+                {
+                    label: 'mautic.lead.lead.contacts.sms_sent'|trans,
+                    link: path('mautic_contact_index', {
+                        'search': ('mautic.lead.lead.searchcommand.sms_sent'|trans) ~ ':' ~ sms.id
+                    }),
+                    icon: 'ri-message-2-line'
+                }
+            ]
+        } %}
+        {% endif %}
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ sms.getId() }}" />

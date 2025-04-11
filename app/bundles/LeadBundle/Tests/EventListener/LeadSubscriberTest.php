@@ -202,14 +202,29 @@ class LeadSubscriberTest extends CommonMocks
 
         $leadEvent = new LeadTimelineEvent($lead);
         $repo      = $this->createMock(LeadEventLogRepository::class);
+        $matcher   = $this->exactly(2);
 
-        $repo->expects($this->exactly(2))
-            ->method('getEvents')
-            ->withConsecutive(
-                [$lead, 'lead', 'api-single', null, $leadEvent->getQueryOptions()],
-                [$lead, 'lead', 'api-batch', null, $leadEvent->getQueryOptions()]
-            )
-            ->willReturnOnConsecutiveCalls($logs, ['total' => 0, 'results' => []]);
+        $repo->expects($matcher)
+            ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame($lead, $parameters[0]);
+                    $this->assertSame('lead', $parameters[1]);
+                    $this->assertSame('api-single', $parameters[2]);
+                    $this->assertNull($parameters[3]);
+                    $this->assertSame($leadEvent->getQueryOptions(), $parameters[4]);
+
+                    return $logs;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame($lead, $parameters[0]);
+                    $this->assertSame('lead', $parameters[1]);
+                    $this->assertSame('api-batch', $parameters[2]);
+                    $this->assertNull($parameters[3]);
+                    $this->assertSame($leadEvent->getQueryOptions(), $parameters[4]);
+
+                    return ['total' => 0, 'results' => []];
+                }
+            });
 
         $this->entityManager->method('getRepository')
             ->with(LeadEventLog::class)
@@ -256,13 +271,14 @@ class LeadSubscriberTest extends CommonMocks
         $lead3 = new Lead();
         $lead3->setId(58);
         $lead3->addUpdatedField('lastname', 'Somebody');
+        // This method will be called exactly once per set of changes
+        $matcher = $this->exactly(3);
 
         // This method will be called exactly once per set of changes
-        $this->auditLogModel->expects($this->exactly(3))
-            ->method('writeToLog')
-            ->withConsecutive(
-                [
-                    [
+        $this->auditLogModel->expects($matcher)
+            ->method('writeToLog')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $lead2, $lead3) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
                         'objectId'  => $lead->getId(),
@@ -278,10 +294,10 @@ class LeadSubscriberTest extends CommonMocks
                             'lastname'  => [null, 'Doe'],
                         ],
                         'ipAddress' => null,
-                    ],
-                ],
-                [
-                    [
+                    ], $parameters[0]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
                         'objectId'  => $lead2->getId(),
@@ -297,24 +313,24 @@ class LeadSubscriberTest extends CommonMocks
                             'lastname'  => [null, 'Doe'],
                         ],
                         'ipAddress' => null,
-                    ],
-                ],
-                [
-                    [
+                    ], $parameters[0]);
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
                         'objectId'  => $lead3->getId(),
                         'action'    => 'update',
                         'details'   => [
+                            'lastname' => [null, 'Somebody'],
                             'fields'   => [
                                 'lastname' => [null, 'Somebody'],
                             ],
-                            'lastname' => [null, 'Somebody'],
                         ],
                         'ipAddress' => null,
-                    ],
-                ]
-            );
+                    ], $parameters[0]);
+                }
+            });
 
         $subscriber = new LeadSubscriber(
             $this->ipLookupHelper,

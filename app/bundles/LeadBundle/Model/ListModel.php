@@ -132,13 +132,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
         // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+        $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+            $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
             $count     = count($existing);
             ++$aliasTag;
         }

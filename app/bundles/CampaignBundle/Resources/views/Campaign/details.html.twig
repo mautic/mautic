@@ -1,6 +1,6 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': campaign,
     'templateButtons': {
@@ -13,6 +13,7 @@
     'routeBase': 'campaign',
     'targetLabel': 'mautic.campaign.campaigns'|trans
   }) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': campaign.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ campaign.name }}{% endblock %}

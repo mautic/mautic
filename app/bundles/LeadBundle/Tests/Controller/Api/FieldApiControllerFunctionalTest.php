@@ -273,7 +273,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isVisible'           => false,
             'isListable'          => false,
             'isIndex'             => true, // Must be true, because if isUniqueIdentifier field is true the contact field *must* be indexed.
-            'charLengthLimit'     => 255,
+            'charLengthLimit'     => 25,
             'properties'          => [],
         ];
     }
@@ -294,7 +294,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'isVisible'           => true,
             'isListable'          => true,
             'isIndex'             => false, // Can be false, if isUniqueIdentifier the field is *not* indexed.
-            'charLengthLimit'     => 250,
+            'charLengthLimit'     => 50,
             'properties'          => [],
         ];
     }

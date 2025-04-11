@@ -106,7 +106,7 @@ form[name="lead"] {
   margin: 10% auto;
   padding: 8px;
   border-radius: 8px;
-  background: var(--background-active);
+  background: var(--background);
   text-align: center;
 }
 
@@ -498,4 +498,50 @@ code:hover > .copy-icon {
   .builder .builder-tokens {
     margin-top: 10px;
   }
+}
+
+.rounded-corners-preview {
+  --preview-width: 28px;
+  width: var(--preview-width);
+  height: calc(var(--preview-width) / 1.4);
+  background-color: var(--text-placeholder);
+  margin: 3px 4px;
+}
+
+.rounded-corners-preview--0 {
+  border-radius: 0;
+}
+
+.rounded-corners-preview--8 {
+  border-radius: 3px;
+}
+
+.rounded-corners-preview--16 {
+  border-radius: 6px;
+}
+
+.rounded-corners-preview--32 {
+  border-radius: 32px;
+}
+
+.category--inline-color {
+  width: 18px;
+  height: 8px;
+  border-radius: 10px;
+  background: var(--category-color);
+  transition: var(--transition-all-productive);
+
+  i { 
+    opacity: 0; 
+    transition: var(--transition-all-productive); 
+    filter: invert(100%) grayscale(100%) contrast(500%);
+    color: var(--category-color);
+  }
+}
+
+.category--inline:hover .category--inline-color {
+  height: 16px;
+  width: 26px;
+
+  i { opacity: 1; }
 }

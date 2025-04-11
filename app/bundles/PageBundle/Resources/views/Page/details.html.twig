@@ -21,7 +21,7 @@
 
 {% block mauticContent %}page{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{ include('@MauticCore/Helper/page_actions.html.twig', {
     'item': activePage,
     'customButtons': customButtons|default([]),
@@ -31,6 +31,7 @@
     'routeBase': 'page',
     'targetLabel': 'mautic.page.pages'|trans
 }) }}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activePage.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}
@@ -306,7 +307,7 @@
                   {% if previewSettingsForm.contact is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
-                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              <div class="control-label">{{ 'mautic.page.preview.show.contact'|trans }}</div>
                               {{ form_widget(previewSettingsForm.contact) }}
                           </div>
                       </div>
@@ -314,6 +315,13 @@
                   <div class="row">
                       <div class="form-group col-xs-12 ">
                           <div class="input-group">
+                              <div class="input-group-addon">
+                                  {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                      'item'  : activePage,
+                                      'model' : 'page',
+                                      'query' : 'customToggle=publicPreview'
+                                  }) -}}
+                              </div>
                               <input id="content_preview_url"
                                      data-route="page/preview"
                                      onclick="this.setSelectionRange(0, this.value.length);"

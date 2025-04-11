@@ -304,14 +304,14 @@ ul.tag-cloud li {
 }
 
 .building::before {
-    content: "\f1ad";
-    font-family: "FontAwesome";
+    content: "\eb08";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 
 .user::before {
-    content: "\f007";
-    font-family: "FontAwesome";
+    content: "\f25b";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 
@@ -353,6 +353,5 @@ ul.tag-cloud li {
     margin-right: 15px;
     margin-top: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
     font-size: 14px;
 }

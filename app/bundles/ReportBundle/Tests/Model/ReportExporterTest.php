@@ -16,6 +16,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -91,14 +92,24 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->expects($this->exactly(3))
             ->method('getFilePath')
             ->willReturn('my-path');
+        $matcher = $this->exactly(3);
 
-        $eventDispatcher->expects($this->exactly(3))
-            ->method('dispatch')
-            ->withConsecutive(
-                [new ReportScheduleSendEvent($scheduler1, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND],
-                [new ReportScheduleSendEvent($scheduler2, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND],
-                [new ReportScheduleSendEvent($schedulerNow, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND]
-            );
+        $eventDispatcher->expects($matcher)
+            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent $event, string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow) {
+                $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
+                Assert::assertSame($event->getFile(), 'my-path');
+                if (1 === $matcher->getInvocationCount()) {
+                    Assert::assertSame($event->getScheduler(), $scheduler1);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    Assert::assertSame($event->getScheduler(), $scheduler2);
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    Assert::assertSame($event->getScheduler(), $schedulerNow);
+                }
+
+                return $event;
+            });
 
         $schedulerModel->expects($this->exactly(4))
             ->method('reportWasScheduled');

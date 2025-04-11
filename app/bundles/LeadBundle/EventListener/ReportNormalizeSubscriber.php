@@ -31,9 +31,13 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
         $fields = $this->fieldModel->getRepository()->getFields();
         $rows   = $event->getData();
         foreach ($rows as $key => $row) {
-            foreach ($row as $key2 => $value) {
-                if (isset($fields[$key2])) {
-                    $rows[$key][$key2] = CustomFieldValueHelper::normalize($value, $fields[$key2]['type'] ?? null, $fields[$key2]['properties'] ?? []);
+            foreach ($row as $alias => $value) {
+                if (isset($fields[$alias])) {
+                    $type               = $fields[$alias]['type'] ?? null;
+                    $rows[$key][$alias] = CustomFieldValueHelper::normalize($value, $type, $fields[$alias]['properties'] ?? []);
+                    if ('boolean' === $type) {
+                        $event->updateColumnType($alias, 'normalized_bool');
+                    }
                 }
             }
         }

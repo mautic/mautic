@@ -226,16 +226,35 @@ class DashboardSubscriberTest extends TestCase
 
         $route           = $this->createMock(Route::class);
         $routeCollection = $this->createMock(RouteCollection::class);
-        $routeCollection->expects(self::exactly(5)) // no null object and  exception object
-            ->method('get')
-            ->withConsecutive(
-                ['mautic_model_action'],
-                ['mautic_model_action'],
-                ['mautic_item_action'],
-                ['mautic_lead_action'],
-                ['mautic_lead_action'],
-            )
-            ->willReturnOnConsecutiveCalls(null, $route, $route, $route, null);
+        $matcher         = self::exactly(5);
+        $routeCollection->expects($matcher) // no null object and  exception object
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic_model_action', $parameters[0]);
+
+                    return null;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic_model_action', $parameters[0]);
+
+                    return $route;
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic_item_action', $parameters[0]);
+
+                    return $route;
+                }
+                if (4 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic_lead_action', $parameters[0]);
+
+                    return $route;
+                }
+                if (5 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic_lead_action', $parameters[0]);
+
+                    return null;
+                }
+            });
 
         $this->router->expects(self::exactly(5))
             ->method('getRouteCollection')

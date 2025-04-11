@@ -825,6 +825,30 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertCount($companyLimit, $leadCompanies);
     }
 
+    public function testMax100CompaniesShouldBeFetchedOnContactEditAction(): void
+    {
+        $companyLimit = 123;
+        $counter      = 1;
+        while ($companyLimit >= $counter) {
+            $company = new Company();
+            $company->setName('TestCompany'.$counter);
+            $this->em->persist($company);
+            ++$counter;
+        }
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+
+        // Get the select element for companies
+        $companySelect = $crawler->filter('select[name="lead[companies][]"]');
+
+        // Count the number of option elements within the select (- one option that is not a company)
+        $availableOptions = $companySelect->filter('option')->count() - 1;
+
+        // Assert that the number of available options is 100 (or your expected limit)
+        Assert::assertEquals(100, $availableOptions, 'The number of available company options should be limited to 100');
+    }
+
     public function testNonExitingContactIsRedirected(): void
     {
         $this->client->followRedirects(false);

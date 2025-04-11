@@ -55,14 +55,14 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
         $field->method('isBidirectionalSyncEnabled')->willReturn(false);
         $field->method('isToIntegrationSyncEnabled')->willReturn(true);
         $field->method('isToMauticSyncEnabled')->willReturn(true);
+        $matcher = $this->exactly(2);
 
-        $this->formBuilder->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'mappedField',
-                    ChoiceType::class,
-                    [
+        $this->formBuilder->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $options) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mappedField', $parameters[0]);
+                    $this->assertSame(ChoiceType::class, $parameters[1]);
+                    $this->assertSame([
                         'label'          => false,
                         'choices'        => [
                             'Mautic Field A' => 'mautic_field_a',
@@ -78,12 +78,12 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
                             'data-integration' => $options['integration'],
                             'data-field'       => 'Integration Field A',
                         ],
-                    ],
-                ],
-                [
-                    'syncDirection',
-                    ChoiceType::class,
-                    [
+                    ], $parameters[2]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('syncDirection', $parameters[0]);
+                    $this->assertSame(ChoiceType::class, $parameters[1]);
+                    $this->assertSame([
                         'choices' => [
                             'mautic.integration.sync_direction_integration' => ObjectMappingDAO::SYNC_TO_INTEGRATION,
                             'mautic.integration.sync_direction_mautic'      => ObjectMappingDAO::SYNC_TO_MAUTIC,
@@ -96,9 +96,11 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
                             'data-integration' => 'Integration A',
                             'data-field'       => 'Integration Field A',
                         ],
-                    ],
-                ]
-            );
+                    ], $parameters[2]);
+                }
+
+                return $this->formBuilder;
+            });
 
         $this->form->buildForm($this->formBuilder, $options);
     }

@@ -230,16 +230,17 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
-        $event    = new Event();
-        $user     = $this->getMockBuilder(User::class)
-            ->getMock();
+        $event = new Event();
+        $user  = $this->getMockBuilder(User::class)->getMock();
         $this->prepareCommonMocks($event, $user);
 
         $emails = 'a@test.co, b@test.co';
-        $this->coreParametersHelper
+        $this->coreParametersHelper->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(['campaign_send_notification_to_author'], ['campaign_notification_email_addresses'])
-            ->willReturn(0, $emails);
+            ->willReturnMap([
+                ['campaign_send_notification_to_author', null, 0],
+                ['campaign_notification_email_addresses', null, $emails],
+            ]);
 
         $this->userModel->expects($this->once())
             ->method('sendMailToEmailAddresses')

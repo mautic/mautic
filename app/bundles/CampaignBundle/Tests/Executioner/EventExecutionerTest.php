@@ -205,20 +205,20 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
                     return $logs;
                 }
             );
+        $matcher = $this->exactly(2);
 
-        $this->actionExecutioner->expects($this->exactly(2))
-            ->method('execute')
-            ->withConsecutive(
-                [
-                    $otherConfig,
-                    $this->isInstanceOf(ArrayCollection::class),
-                ],
-                [
-                    $jumpConfig,
-                    $this->isInstanceOf(ArrayCollection::class),
-                ]
-            )
-            ->willReturn(new EvaluatedContacts());
+        $this->actionExecutioner->expects($matcher)
+            ->method('execute')->willReturnCallback(function (...$parameters) use ($matcher, $otherConfig, $jumpConfig) {
+                $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertEquals($otherConfig, $parameters[0]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertEquals($jumpConfig, $parameters[0]);
+                }
+
+                return new EvaluatedContacts();
+            });
 
         // This should not be called because the rotation is already incremented in the subscriber
         $this->leadRepository->expects($this->never())

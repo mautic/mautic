@@ -40,13 +40,20 @@ class FieldColumnDispatcher
 
     /**
      * @throws AbortColumnUpdateException
+     * @throws NoListenerException
      */
     public function dispatchPreUpdateColumnEvent(LeadField $leadField): void
     {
+        $action = LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN;
+
+        if (!$this->dispatcher->hasListeners($action)) {
+            throw new NoListenerException('There is no Listener for this event');
+        }
+
         $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
         $event                     = new UpdateColumnEvent($leadField, $shouldProcessInBackground);
 
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN);
+        $this->dispatcher->dispatch($event, $action);
 
         if ($event->shouldProcessInBackground()) {
             throw new AbortColumnUpdateException('Column change will be processed in background job');

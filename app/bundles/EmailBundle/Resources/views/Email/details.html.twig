@@ -4,7 +4,7 @@
 
 {% block mauticContent 'email' %}
 
-{% block indexButton %}
+{% block preHeader %}
     {% if not isEmbedded %}
         {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item'            : email,
@@ -20,6 +20,7 @@
             'customButtons' : []
         }) -}}
     {% endif %}
+    {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': email.category}) }}
 {% endblock %}
 
 {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
@@ -509,6 +510,36 @@
 
           <!-- activity feed -->
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
+
+          <div class="mt-lg mb-lg">
+            {% if securityIsGranted('lead:leads:viewown') %}
+            {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
+              title: 'mautic.core.useful_links',
+              items: [
+                  {
+                      label: 'mautic.lead.lead.contacts.email_sent'|trans,
+                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_sent'|trans) ~ ':' ~ email.id}),
+                      icon: 'ri-mail-send-line'
+                  },
+                  {
+                      label: 'mautic.lead.lead.contacts.email_read'|trans,
+                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_read'|trans) ~ ':' ~ email.id}),
+                      icon: 'ri-mail-open-line'
+                  },
+                  {
+                      label: 'mautic.lead.lead.contacts.email_queued'|trans,
+                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_queued'|trans) ~ ':' ~ email.id}),
+                      icon: 'ri-time-line'
+                  },
+                  {
+                      label: 'mautic.lead.lead.contacts.email_pending'|trans,
+                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_pending'|trans) ~ ':' ~ email.id}),
+                      icon: 'ri-mail-unread-line'
+                  }
+              ]
+          } %}
+          {% endif %}
+        </div>
 
       </div>
       <!-- right section -->

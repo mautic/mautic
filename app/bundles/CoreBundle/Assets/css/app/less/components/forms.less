@@ -427,6 +427,38 @@ input[type=file] {.outline();}
   }
 }
 
+.radio-group--inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+
+  input[type="radio"] {
+    &,
+    &:hover {
+      opacity: 0;
+      position: absolute;
+      z-index: 1;
+    }
+  }
+  label {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    display: block;
+    transition: var(--transition-all-productive);
+  }
+  input[type="radio"] {
+    &:checked,
+    &:focus {
+      + label {
+        outline: 2px solid var(--focus);
+      }
+    }
+  }
+}
+
 .radio-cards {
   svg,
   img {

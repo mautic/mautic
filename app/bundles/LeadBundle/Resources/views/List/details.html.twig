@@ -18,7 +18,7 @@
 
 {% block mauticContent %}list{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': list,
     'customButtons': customButtons|default([]),
@@ -28,6 +28,7 @@
     'routeBase': 'segment',
     'targetLabel': 'mautic.lead.lead.lists'|trans
 }) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': list.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ list.name }}{% endblock %}
@@ -214,6 +215,21 @@
 
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
+
+        <div class="mt-lg mb-lg">
+            {% if securityIsGranted('lead:leads:viewown') %}
+            {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
+                title: 'mautic.core.useful_links',
+                items: [
+                    {
+                        label: 'mautic.lead.segments.contacts.view',
+                        link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias}),
+                        icon: 'ri-user-6-line'
+                    }
+                ]
+            } %}
+            {% endif %}
+        </div>
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ list.id|e }}" />

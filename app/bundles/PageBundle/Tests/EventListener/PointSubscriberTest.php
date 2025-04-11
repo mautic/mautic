@@ -30,30 +30,31 @@ class PointSubscriberTest extends TestCase
         $pointModel        = $this->createMock(PointModel::class);
         $pointBuilderEvent = $this->createMock(PointBuilderEvent::class);
         $pointActionHelper = $this->createMock(PointActionHelper::class);
+        $matcher           = self::exactly(2);
 
-        $pointBuilderEvent->expects(self::exactly(2))->method('addAction')->withConsecutive(
-            [
-                'page.hit',
-                [
+        $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper) {
+            if (1 === $matcher->getInvocationCount()) {
+                $this->assertSame('page.hit', $parameters[0]);
+                $this->assertSame([
                     'group'       => 'mautic.page.point.action',
                     'label'       => 'mautic.page.point.action.pagehit',
                     'description' => 'mautic.page.point.action.pagehit_descr',
                     'callback'    => [PointActionHelper::class, 'validatePageHit'],
                     'formType'    => \Mautic\PageBundle\Form\Type\PointActionPageHitType::class,
-                ],
-            ],
-            [
-                'url.hit',
-                [
+                ], $parameters[1]);
+            }
+            if (2 === $matcher->getInvocationCount()) {
+                $this->assertSame('url.hit', $parameters[0]);
+                $this->assertSame([
                     'group'       => 'mautic.page.point.action',
                     'label'       => 'mautic.page.point.action.urlhit',
                     'description' => 'mautic.page.point.action.urlhit_descr',
                     'callback'    => [$pointActionHelper, 'validateUrlHit'],
                     'formType'    => \Mautic\PageBundle\Form\Type\PointActionUrlHitType::class,
                     'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
-                ],
-            ]
-        );
+                ], $parameters[1]);
+            }
+        });
 
         $pointSubscriber = new PointSubscriber($pointModel, $pointActionHelper);
         $pointSubscriber->onPointBuild($pointBuilderEvent);

@@ -69,7 +69,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private string $createdBy = 'createdBy';
 
-    private User $owner;
+    private MockObject&User $owner;
 
     private string $ownerEmail = 'toEmail';
 
@@ -142,11 +142,22 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->exactly(3))
             ->method('getModifiedBy')
             ->willReturn($this->modifiedBy);
+        $matcher = $this->exactly(2);
 
-        $this->entityManagerMock
-            ->method('getReference')
-            ->withConsecutive([User::class, $this->createdBy], [User::class, $this->modifiedBy])
-            ->willReturn($this->owner, $modifier);
+        $this->entityManagerMock->expects($matcher)
+            ->method('getReference')->willReturnCallback(function (string $entityClass, string|int $entityId) use ($matcher, $modifier) {
+                $this->assertSame(User::class, $entityClass);
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame($this->createdBy, $entityId);
+
+                    return $this->owner;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame($this->modifiedBy, $entityId);
+
+                    return $modifier;
+                }
+            });
 
         $this->notificationModelMock
             ->expects($this->once())
@@ -178,22 +189,37 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->webhookKillNotificator->send($this->webhook, $this->reason);
     }
 
-    private function mockCommonMethods(int $sentToAuther, string $emailToSend = null): void
+    private function mockCommonMethods(int $sentToAuthor): void
     {
-        $this->coreParamHelperMock
+        $this->coreParamHelperMock->expects($this->exactly(1))
             ->method('get')
-            ->withConsecutive(['webhook_send_notification_to_author'], ['webhook_notification_email_addresses'])
-            ->willReturnOnConsecutiveCalls($sentToAuther, $emailToSend);
+            ->with('webhook_send_notification_to_author')
+            ->willReturn($sentToAuthor);
 
         $this->webhookKillNotificator = new WebhookKillNotificator($this->translatorMock, $this->routerMock, $this->notificationModelMock, $this->entityManagerMock, $this->mailHelperMock, $this->coreParamHelperMock);
-
-        $this->owner          = $this->createMock(User::class);
+        $this->owner                  = $this->createMock(User::class);
 
         $htmlUrl = '<a href="'.$this->generatedRoute.'" data-toggle="ajax">'.$this->webhookName.'</a>';
-        $this->translatorMock
-            ->method('trans')
-            ->withConsecutive(['mautic.webhook.stopped'], [$this->reason], ['mautic.webhook.stopped.details', ['%reason%'  => $this->reason, '%webhook%' => $htmlUrl]])
-            ->willReturnOnConsecutiveCalls($this->subject, $this->reason, $this->details);
+        $matcher = $this->exactly(3);
+        $this->translatorMock->expects($matcher)
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $htmlUrl) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.webhook.stopped', $parameters[0]);
+
+                    return $this->subject;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame($this->reason, $parameters[0]);
+
+                    return $this->reason;
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('mautic.webhook.stopped.details', $parameters[0]);
+                    $this->assertSame(['%reason%'  => $this->reason, '%webhook%' => $htmlUrl], $parameters[1]);
+
+                    return $this->details;
+                }
+            });
 
         $this->webhook->expects($this->once())
             ->method('getId')
@@ -212,7 +238,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->generatedRoute);
 
-        if ($sentToAuther) {
+        if ($sentToAuthor) {
             $this->owner
                 ->expects($this->once())
                 ->method('getEmail')
