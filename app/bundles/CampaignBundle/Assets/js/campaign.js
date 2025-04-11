@@ -180,7 +180,10 @@ Mautic.campaignOnLoad = function (container, response) {
         if (isCampaignPreview) {
             Mautic.previewCampaignLabels();
         }
+
     }
+
+    Mautic.campaignAuditlogOnLoad(container, response);
 };
 
 Mautic.lazyLoadContactListOnCampaignDetail = function() {
@@ -2330,3 +2333,52 @@ Mautic.previewCampaignLabels = function() {
         });
     });
 }
+
+Mautic.campaignAuditlogOnLoad = function (container, response) {
+    document.querySelector("#campaign-auditlog a[data-activate-details='all']")?.addEventListener("click", function () {
+        let icon = this.querySelector("span:first-child");
+        let isExpanded = icon.classList.contains("ri-arrow-down-s-line");
+
+        document.querySelectorAll("#campaign-auditlog a[data-activate-details]:not([data-activate-details='all'])").forEach(element => {
+            const detailsId = element.getAttribute("data-activate-details");
+            const detailsElem = document.querySelector(`#auditlog-details-${detailsId}`);
+            const elementIcon = element.querySelector("span:first-child");
+
+            if (detailsElem) {
+                detailsElem.classList.toggle("hide", !isExpanded);
+                element.classList.toggle("active", isExpanded);
+                elementIcon.classList.replace(
+                    isExpanded ? "ri-arrow-down-s-line" : "ri-arrow-up-s-line",
+                    isExpanded ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"
+                );
+            }
+        });
+
+        icon.classList.replace(
+            isExpanded ? "ri-arrow-down-s-line" : "ri-arrow-up-s-line",
+            isExpanded ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"
+        );
+    });
+
+    document.querySelectorAll("#campaign-auditlog a[data-activate-details]:not([data-activate-details='all'])").forEach(anchor => {
+        anchor.addEventListener("click", function () {
+            const detailsId = this.dataset.activateDetails;
+            const icon = this.querySelector("span");
+            const detailsElement = document.getElementById(`auditlog-details-${detailsId}`);
+
+            if (detailsId && detailsElement) {
+                const isActive = this.classList.contains("active");
+
+                if (isActive) {
+                    detailsElement.classList.add("hide");
+                    this.classList.remove("active");
+                    icon.classList.replace("ri-arrow-up-s-line", "ri-arrow-down-s-line");
+                } else {
+                    detailsElement.classList.remove("hide");
+                    this.classList.add("active");
+                    icon.classList.replace("ri-arrow-down-s-line", "ri-arrow-up-s-line");
+                }
+            }
+        });
+    });
+};

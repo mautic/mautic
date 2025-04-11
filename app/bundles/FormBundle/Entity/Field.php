@@ -149,6 +149,8 @@ class Field implements UuidInterface
 
     private bool $isReadOnly = false;
 
+    private string $fieldWidth = '100%';
+
     /**
      * @var array
      */
@@ -243,6 +245,11 @@ class Field implements UuidInterface
         $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
         $builder->addNullableField('mappedObject', Types::STRING, 'mapped_object');
         $builder->addNullableField('mappedField', Types::STRING, 'mapped_field');
+        $builder->createField('fieldWidth', Types::STRING)
+            ->columnName('field_width')
+            ->length(50)
+            ->option('default', '100%')
+            ->build();
         static::addUuidField($builder);
     }
 
@@ -277,6 +284,7 @@ class Field implements UuidInterface
                     'isReadOnly',
                     'mappedObject',
                     'mappedField',
+                    'fieldWidth',
                 ]
             )
             ->build();
@@ -1048,6 +1056,19 @@ class Field implements UuidInterface
     public function isAutoFillReadOnly(): bool
     {
         return $this->isAutoFill && $this->isReadOnly;
+    }
+
+    public function getFieldWidth(): string
+    {
+        return empty($this->fieldWidth) ? '100%' : $this->fieldWidth;
+    }
+
+    public function setFieldWidth(?string $fieldWidth): Field
+    {
+        $this->isChanged('fieldWidth', $fieldWidth);
+        $this->fieldWidth = $fieldWidth;
+
+        return $this;
     }
 
     public function setIsReadOnly(?bool $isReadOnly): void

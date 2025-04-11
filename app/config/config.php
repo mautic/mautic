@@ -115,7 +115,6 @@ $connectionSettings = [
     'charset'               => 'utf8mb4',
     'default_table_options' => [
         'charset'    => 'utf8mb4',
-        'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's

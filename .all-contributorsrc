@@ -1544,6 +1544,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "pedroasgomes",
+      "name": "Pedro Gomes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/99080726?v=4",
+      "profile": "https://github.com/pedroasgomes",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

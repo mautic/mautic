@@ -253,13 +253,14 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
-        {{ customContent('right.section.top', _context) }}
-
-        {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
-
-        {{ customContent('right.section.bottom', _context) }}
-    </div>
+    {% set right_top = customContent('right.section.top', _context) %}
+    {% set right_bottom = customContent('right.section.bottom', _context) %}
+    {% if right_top or right_bottom %}
+        <div class="col-md-3 bdr-l height-auto">
+            {{ right_top }}
+            {{ right_bottom }}
+        </div>
+    {% endif %}
     <!--/ right section -->
 </div>
 <!--/ end: box layout -->

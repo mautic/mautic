@@ -6092,13 +6092,16 @@ input[style]:hover {
   padding: var(--spacing-01) var(--spacing-04);
 }
 .form-control[disabled],
-.form-control[readonly],
 fieldset[disabled] .form-control {
   color: var(--text-disabled);
 }
 .form-control[disabled] {
   cursor: not-allowed;
   border-bottom-color: transparent;
+}
+.form-control[readonly] {
+  background-color: transparent;
+  color: var(--text-primary);
 }
 .form-stack .form-control {
   position: relative;
