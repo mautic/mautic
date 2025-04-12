@@ -22,7 +22,8 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^6.0"
+    "mautic/core-lib": "^6.0",
+    "sensio/framework-extra-bundle": "^6.2"
   },
   "require-dev": {
     "codeception/codeception": "^5.1",

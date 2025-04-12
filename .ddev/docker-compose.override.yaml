@@ -1,0 +1,8 @@
+version: '3.6'
+services:
+  mailhog:
+    image: mailhog/mailhog
+    container_name: ddev-${DDEV_SITENAME}-mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8888:8025"   # Web UI changed from 8025 to 8888
