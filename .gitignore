@@ -23,7 +23,7 @@
 /app/console
 /app/tests.bootstrap*
 /app/phpunit.xml
-
+!/.ddev/docker-compose.override.yaml
 /var/bootstrap*
 
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
