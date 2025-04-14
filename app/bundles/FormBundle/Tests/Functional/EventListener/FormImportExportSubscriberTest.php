@@ -6,7 +6,6 @@ namespace Mautic\FormBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\EntityExportEvent;
-use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Form;
@@ -76,21 +75,21 @@ final class FormImportExportSubscriberTest extends TestCase
         $form->method('getRenderStyle')->willReturn('inline');
         $form->method('getPostActionProperty')->willReturn(null);
         $form->method('getFormAttributes')->willReturn([]);
-    
+
         // ✅ FIX: Provide empty arrays to avoid foreach(null) crash
         $form->method('getFields')->willReturn([]);
         $form->method('getActions')->willReturn([]);
-    
+
         $this->formModel->method('getEntity')->willReturn($form);
-    
+
         $event = new EntityExportEvent(Form::ENTITY_NAME, 1);
         $this->eventDispatcher->dispatch($event);
-    
+
         $exportedData = $event->getEntities();
-    
+
         $this->assertArrayHasKey(Form::ENTITY_NAME, $exportedData);
         $this->assertNotEmpty($exportedData[Form::ENTITY_NAME]);
-    
+
         $firstItem = reset($exportedData[Form::ENTITY_NAME]);
         $this->assertSame(1, $firstItem['id']);
         $this->assertSame('Test Form', $firstItem['name']);

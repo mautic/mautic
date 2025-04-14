@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\EventListener\CampaignEventImportExportSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
-use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\MockObject\MockObject;

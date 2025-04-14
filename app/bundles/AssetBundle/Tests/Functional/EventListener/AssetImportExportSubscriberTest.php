@@ -9,7 +9,6 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\EventListener\AssetImportExportSubscriber;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
-use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\MockObject\MockObject;

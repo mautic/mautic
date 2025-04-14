@@ -6,7 +6,6 @@ namespace Mautic\PageBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\EntityExportEvent;
-use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PageBundle\Entity\Page;

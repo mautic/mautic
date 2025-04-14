@@ -52,11 +52,7 @@ class ExportHelperTest extends TestCase
     private array $filePaths = [];
 
     private MockObject&FilePathResolver $filePathResolver;
-
-    /**
-     * @var ProcessSignalService|MockObject
-     */
-    private $processSignalService;
+    private MockObject&ProcessSignalService $processSignalService;
 
     protected function setUp(): void
     {
@@ -70,7 +66,7 @@ class ExportHelperTest extends TestCase
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
-            $this->processSignalService
+            $this->processSignalService,
             $this->pathsHelper,
         );
     }

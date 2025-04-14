@@ -94,8 +94,8 @@ class CampaignControllerTest extends MauticMysqlTestCase
             'role'       => [
                 'name'        => 'perm_non_admin',
                 'permissions' => [
-                    'lead:leads'         => $bitwise,
-                    'campaign:campaigns' => 2,
+                    'lead:leads'             => $bitwise,
+                    'campaign:campaigns'     => 2,
                     'campaign:export:enable' => 2,
                 ],
             ],
@@ -246,7 +246,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
         // Mock an event subscriber response that returns some dummy data to export
         $dispatcher = static::getContainer()->get('event_dispatcher');
         $dispatcher->addListener(\Mautic\CoreBundle\Event\EntityExportEvent::class, function ($event) {
-            if ($event->getEntityName() === Campaign::ENTITY_NAME) {
+            if (Campaign::ENTITY_NAME === $event->getEntityName()) {
                 $event->addEntity(Campaign::ENTITY_NAME, [
                     'id'   => $event->getEntityId(),
                     'name' => 'Exported Campaign',
@@ -255,7 +255,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
         });
 
         print_r($this->campaign->getId());
-        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/' . $this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
 
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
