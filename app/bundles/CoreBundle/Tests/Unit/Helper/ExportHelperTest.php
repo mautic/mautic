@@ -83,9 +83,9 @@ class ExportHelperTest extends TestCase
 
     public function testDownloadAsZip(): void
     {
-        $tempDir = sys_get_temp_dir();
+        $tempDir     = sys_get_temp_dir();
         $zipFilePath = $tempDir.'/test-download.zip';
-        $zip = new \ZipArchive();
+        $zip         = new \ZipArchive();
         $zip->open($zipFilePath, \ZipArchive::CREATE);
         $zip->addFromString('test.txt', 'This is test content');
         $zip->close();
