@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EntityImportUndoEvent extends Event
+final class EntityImportUndoEvent extends Event
 {
     /**
      * @param array<string, mixed> $summary

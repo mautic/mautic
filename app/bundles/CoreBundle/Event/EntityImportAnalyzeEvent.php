@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EntityImportAnalyzeEvent extends Event
+final class EntityImportAnalyzeEvent extends Event
 {
     /**
      * @var array<string, mixed>
@@ -32,8 +34,6 @@ class EntityImportAnalyzeEvent extends Event
     }
 
     /**
-     * Set an argument dynamically.
-     *
      * @param array<string, mixed> $value
      */
     public function setSummary(string $key, array $value): void
@@ -41,7 +41,7 @@ class EntityImportAnalyzeEvent extends Event
         $this->summary[$key] = $value;
     }
 
-    public function getSummary(): mixed
+    public function getSummary(): ?array
     {
         return $this->summary ?? null;
     }

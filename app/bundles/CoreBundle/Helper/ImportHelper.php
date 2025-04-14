@@ -48,8 +48,6 @@ class ImportHelper
             }
 
             $zip->close();
-        } else {
-            dump($result);
         }
 
         if ($jsonFilePath) {

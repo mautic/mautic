@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EntityImportEvent extends Event
+final class EntityImportEvent extends Event
 {
     /**
      * @var array<int, int>
@@ -39,7 +41,9 @@ class EntityImportEvent extends Event
         return $this->entityName;
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @return mixed[]
+     */
     public function getEntityData(): array
     {
         return $this->data;
@@ -50,17 +54,12 @@ class EntityImportEvent extends Event
         return $this->userId;
     }
 
-    /**
-     * Add a single entityIdMap.
-     */
     public function addEntityIdMap(int $originalId, int $newId): void
     {
         $this->idMap[$originalId] = $newId;
     }
 
     /**
-     * Get IdMap.
-     *
      * @return array<int, int>
      */
     public function getEntityIdMap(): array
@@ -69,8 +68,6 @@ class EntityImportEvent extends Event
     }
 
     /**
-     * Get dependencies.
-     *
      * @return array<string, array<string, mixed>>
      */
     public function getDependencies(): array
@@ -99,8 +96,6 @@ class EntityImportEvent extends Event
     }
 
     /**
-     * Set an argument dynamically.
-     *
      * @param array<string, mixed> $value
      */
     public function setStatus(string $key, array $value): void
@@ -109,8 +104,6 @@ class EntityImportEvent extends Event
     }
 
     /**
-     * Get an argument by key (returns null if not found).
-     *
      * @return mixed|null
      */
     public function getStatus(): mixed

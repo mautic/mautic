@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EntityExportEvent extends Event
+final class EntityExportEvent extends Event
 {
     /**
      * @var array<string, array<string, mixed>>
@@ -45,8 +47,6 @@ class EntityExportEvent extends Event
     }
 
     /**
-     * Get all entities.
-     *
      * @return array<string, array<string, mixed>>
      */
     public function getEntities(): array
@@ -65,8 +65,6 @@ class EntityExportEvent extends Event
     }
 
     /**
-     * Get dependencies.
-     *
      * @return array<string, array<string, mixed>>
      */
     public function getDependencies(): array
@@ -92,23 +90,5 @@ class EntityExportEvent extends Event
     public function addDependencies(array $entities): void
     {
         $this->dependencies = array_merge($this->dependencies, $entities);
-    }
-
-    /**
-     * Set an argument dynamically (e.g., import status, counts, errors).
-     */
-    public function setArgument(string $key, mixed $value): void
-    {
-        $this->arguments[$key] = $value;
-    }
-
-    /**
-     * Get an argument by key (returns null if not found).
-     *
-     * @return mixed|null
-     */
-    public function getArgument(string $key): mixed
-    {
-        return $this->arguments[$key] ?? null;
     }
 }
