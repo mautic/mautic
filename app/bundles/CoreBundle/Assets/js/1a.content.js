@@ -719,6 +719,14 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         }, false));
     }
+
+    // Sidebar toggle for elements with data-toggle="sidebar"
+    mQuery(container + " [data-toggle='sidebar']").off('click.sidebarToggle').on('click.sidebarToggle', function () {
+        const sidebar = document.querySelector('.app-sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('open');
+        }
+    });
 };
 
 Mautic.setDynamicContentEditors = function(container) {
@@ -1956,3 +1964,15 @@ document.addEventListener('DOMContentLoaded', function () {
     Mautic.initFilterCommands();
     Mautic.handlePopoverInsertion();
 });
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     const toggles = document.querySelectorAll('[data-toggle="sidebar"]');
+//     toggles.forEach(function (toggle) {
+//         toggle.addEventListener('click', function () {
+//             const sidebar = document.querySelector('.app-sidebar');
+//             if (sidebar) {
+//                 sidebar.classList.toggle('open');
+//             }
+//         });
+//     });
+// });
