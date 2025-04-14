@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller\Api;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
@@ -259,5 +261,216 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($payload['description'], $response['campaigns'][$campaignId]['description'], $clientResponse->getContent());
         Assert::assertEquals($payload['events'][0]['name'], $response['campaigns'][$campaignId]['events'][0]['name'], $clientResponse->getContent());
         Assert::assertEquals($segment->getId(), $response['campaigns'][$campaignId]['lists'][0]['id'], $clientResponse->getContent());
+    }
+
+    public function testExportCampaignAction(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create and persist campaign with events, as before
+        $segment = new LeadList();
+        $segment->setName('test');
+        $segment->setAlias('test');
+        $segment->setPublicName('test');
+
+        $email = new Email();
+        $email->setName('test');
+        $email->setSubject('Ahoy {contactfield=email}');
+        $email->setCustomHtml('Your email is <b>{contactfield=email}</b>');
+        $email->setUseOwnerAsMailer(true);
+
+        $dwc = new DynamicContent();
+        $dwc->setName('test');
+        $dwc->setSlotName('test');
+        $dwc->setContent('test');
+
+        $company = new Company();
+        $company->setName('test');
+
+        $contact1 = new Lead();
+        $contact1->setEmail('contact@one.email');
+
+        $contact2 = new Lead();
+        $contact2->setEmail('contact@two.email');
+        $contact2->setOwner($user);
+
+        $member1 = new ListLead();
+        $member1->setLead($contact1);
+        $member1->setList($segment);
+        $member1->setDateAdded(new \DateTime());
+
+        $member2 = new ListLead();
+        $member2->setLead($contact2);
+        $member2->setList($segment);
+        $member2->setDateAdded(new \DateTime());
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->persist($dwc);
+        $this->em->persist($company);
+        $this->em->persist($contact1);
+        $this->em->persist($contact2);
+        $this->em->persist($member1);
+        $this->em->persist($member2);
+        $this->em->flush();
+
+        // Create the campaign
+        $campaign = new Campaign();
+        $campaign->setName('test campaign');
+        $campaign->setDescription('Test campaign for export');
+
+        // Create events
+        $event1 = new Event();
+        $event1->setName('DWC event test');
+        $event1->setDescription('API test');
+        $event1->setType('dwc.decision');
+        $event1->setEventType('decision'); // Set the event type
+        $event1->setCampaign($campaign);  // Set the campaign for this event
+
+        $event2 = new Event();
+        $event2->setName('Send email');
+        $event2->setDescription('API test');
+        $event2->setType('email.send');
+        $event2->setEventType('action'); // Set the event type
+        $event2->setCampaign($campaign);  // Set the campaign for this event
+
+        // Add events to the campaign (using addEvents)
+        $campaign->addEvents([
+            'new_43' => $event1, // Key for event1
+            'new_44' => $event2, // Key for event2
+        ]);
+
+        // Persist campaign and events
+        $this->em->persist($event1);
+        $this->em->persist($event2);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Export the campaign
+        $this->client->request(Request::METHOD_GET, '/api/campaigns/export/'.$campaign->getId());
+        $clientResponse = $this->client->getResponse();
+
+        // Check response status code
+        $this->assertResponseStatusCodeSame(200, (string) $clientResponse->getStatusCode());
+
+        // Decode the response content
+        $responseData = json_decode($clientResponse->getContent(), true);
+
+        // Ensure the response contains campaign data
+        $this->assertNotEmpty($responseData);
+        $this->assertArrayHasKey('campaign', $responseData[0]);
+
+        // Since 'campaign' is an array, we'll need to check the first element
+        $this->assertArrayHasKey('name', $responseData[0]['campaign'][0]);  // Access the first campaign in the array
+        $this->assertEquals($campaign->getName(), $responseData[0]['campaign'][0]['name']);
+        $this->assertEquals($campaign->getDescription(), $responseData[0]['campaign'][0]['description']);
+
+        // Check if the campaign export includes the expected events
+        $this->assertCount(2, $responseData[0]['campaign_event']);
+
+        // Ensure proper serialization of the campaign events
+        foreach ($responseData[0]['campaign_event'] as $event) {
+            $this->assertArrayHasKey('id', $event);
+            $this->assertArrayHasKey('name', $event);
+            // Additional checks for event properties if necessary
+        }
+    }
+
+    public function testImportCampaignActionJson(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Provide the full structure exactly like the export output
+        $payload = [[
+            'campaign' => [[
+                'id'              => 1,
+                'name'            => 'test2',
+                'description'     => null,
+                'is_published'    => false,
+                'canvas_settings' => [
+                    'nodes' => [
+                        ['id' => '1', 'positionX' => '553', 'positionY' => '158'],
+                        ['id' => 'lists', 'positionX' => '653', 'positionY' => '53'],
+                    ],
+                    'connections' => [
+                        [
+                            'sourceId' => 'lists',
+                            'targetId' => '1',
+                            'anchors'  => [
+                                'source' => 'leadsource',
+                                'target' => 'top',
+                            ],
+                        ],
+                    ],
+                ],
+                'uuid' => 'b4ddc4d7-149e-4a81-9141-0e03c598627a',
+            ]],
+            'campaign_event' => [[
+                'id'          => 1,
+                'campaign_id' => 1,
+                'name'        => 'Device visit',
+                'description' => null,
+                'type'        => 'page.devicehit',
+                'event_type'  => 'decision',
+                'event_order' => 0,
+                'properties'  => [
+                    'device_type'  => [],
+                    'device_brand' => [],
+                    'device_os'    => [],
+                ],
+                'trigger_interval'      => 0,
+                'trigger_interval_unit' => null,
+                'trigger_mode'          => null,
+                'triggerDate'           => null,
+                'channel'               => 'page',
+                'channel_id'            => 0,
+                'parent_id'             => null,
+                'uuid'                  => 'b3c03e30-d6a2-469b-9607-a9a98d7ef238',
+            ]],
+            'lists' => [[
+                'id'                   => 1,
+                'name'                 => 'Test Seg',
+                'is_published'         => true,
+                'description'          => null,
+                'alias'                => 'test-seg',
+                'public_name'          => 'Test Seg',
+                'filters'              => [],
+                'is_global'            => true,
+                'is_preference_center' => false,
+                'uuid'                 => 'd697157e-9ae3-4600-aa2e-4a2a5a6e36e0',
+            ]],
+            'dependencies' => [[
+                'campaign_event' => [
+                    ['campaign' => 1, 'campaign_event' => 1],
+                ],
+                'lists' => [
+                    ['campaign' => 1, 'lists' => 1],
+                ],
+            ]],
+        ]];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/campaigns/import',
+            [],
+            [],
+            [],
+            json_encode($payload, JSON_PRETTY_PRINT)
+        );
+
+        $clientResponse = $this->client->getResponse();
+
+        // Debug early exit if something fails
+        if (201 !== $clientResponse->getStatusCode()) {
+            $this->fail('Import failed with error: '.$clientResponse->getContent());
+        }
+
+        // Success check
+        $this->assertResponseStatusCodeSame(201, 'Expected status code 201 for successful import.');
+        $responseData = json_decode($clientResponse->getContent(), true);
+        $this->assertIsArray($responseData);
+        $this->assertContains('Campaign imported successfully.', $responseData);
     }
 }

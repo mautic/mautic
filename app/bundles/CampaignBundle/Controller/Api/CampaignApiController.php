@@ -391,7 +391,7 @@ class CampaignApiController extends CommonApiController
         }
 
         // Prepare response
-        $view = $this->view($data, Response::HTTP_OK);
+        $view = $this->view([$data], Response::HTTP_OK);
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
@@ -400,14 +400,14 @@ class CampaignApiController extends CommonApiController
     public function importCampaignAction(Request $request, UserHelper $userHelper, ImportHelper $importHelper): Response
     {
         // Check if user has permission to import campaigns
-        if (!$this->security->isAdmin() && !$this->security->isGranted('campaign:imports:create')) {
+        if (!$this->security->isGranted('campaign:imports:create')) {
             return $this->accessDenied();
         }
 
         // Decode request JSON
         $data = json_decode($request->getContent(), true);
 
-        if (!$data || !isset($data[Campaign::ENTITY_NAME])) {
+        if (!$data || !isset($data[0][Campaign::ENTITY_NAME])) {
             $files = $request->files->all();
 
             if (1 !== count($files)) {

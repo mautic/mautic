@@ -486,14 +486,15 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     private function insertCampaignFormXref(int $campaignId, int $formId): void
     {
         $connection = $this->entityManager->getConnection();
+        $tableName  = MAUTIC_TABLE_PREFIX.'campaign_form_xref';
 
         $exists = $connection->fetchOne(
-            'SELECT 1 FROM campaign_form_xref WHERE campaign_id = :campaignId AND form_id = :formId',
+            "SELECT 1 FROM {$tableName} WHERE campaign_id = :campaignId AND form_id = :formId",
             ['campaignId' => $campaignId, 'formId' => $formId]
         );
 
         if (!$exists) {
-            $connection->insert('campaign_form_xref', [
+            $connection->insert($tableName, [
                 'campaign_id' => $campaignId,
                 'form_id'     => $formId,
             ]);
@@ -504,14 +505,18 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     private function insertCampaignSegmentXref(int $campaignId, int $segmentId): void
     {
         $connection = $this->entityManager->getConnection();
+        $tableName  = MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref';
 
         $exists = $connection->fetchOne(
-            'SELECT 1 FROM campaign_leadlist_xref WHERE campaign_id = :campaignId AND leadlist_id = :leadlistId',
-            ['campaignId' => $campaignId, 'leadlistId' => $segmentId]
+            "SELECT 1 FROM {$tableName} WHERE campaign_id = :campaignId AND leadlist_id = :leadlistId",
+            [
+                'campaignId' => $campaignId,
+                'leadlistId' => $segmentId,
+            ]
         );
 
         if (!$exists) {
-            $connection->insert('campaign_leadlist_xref', [
+            $connection->insert($tableName, [
                 'campaign_id'     => $campaignId,
                 'leadlist_id'     => $segmentId,
             ]);
