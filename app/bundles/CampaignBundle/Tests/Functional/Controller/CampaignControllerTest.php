@@ -96,7 +96,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
                 'permissions' => [
                     'lead:leads'             => $bitwise,
                     'campaign:campaigns'     => 2,
-                    'campaign:export:enable' => 2,
+                    'campaign:export:enable' => 1024,
                 ],
             ],
         ]);
@@ -277,5 +277,20 @@ class CampaignControllerTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+    }
+
+    public function testExportAction(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(38); // Ensures export permission
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('.zip', $response->headers->get('Content-Disposition'));
     }
 }
