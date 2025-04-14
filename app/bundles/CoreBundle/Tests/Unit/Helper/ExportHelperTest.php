@@ -81,6 +81,25 @@ class ExportHelperTest extends TestCase
         parent::tearDown();
     }
 
+    public function testDownloadAsZip(): void
+    {
+        $tempDir = sys_get_temp_dir();
+        $zipFilePath = $tempDir.'/test-download.zip';
+        $zip = new \ZipArchive();
+        $zip->open($zipFilePath, \ZipArchive::CREATE);
+        $zip->addFromString('test.txt', 'This is test content');
+        $zip->close();
+
+        $this->filePaths[] = $zipFilePath;
+
+        $response = $this->exportHelper->downloadAsZip($zipFilePath, 'exported.zip');
+
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));
+    }
+
     /**
      * Test if exportDataAs() correctly generates a CSV file when we input some array data.
      */
