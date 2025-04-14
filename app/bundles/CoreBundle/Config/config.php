@@ -623,6 +623,7 @@ return [
                     'translator',
                     'mautic.helper.core_parameters',
                     'mautic.helper.file_path_resolver',
+                    'Mautic\CoreBundle\ProcessSignal\ProcessSignalService',
                     'mautic.helper.paths',
                 ],
             ],
