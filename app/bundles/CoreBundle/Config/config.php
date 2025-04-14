@@ -386,12 +386,6 @@ return [
             'mautic.helper.update_checks' => [
                 'class' => Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
             ],
-            'mautic.helper.import' => [
-                'class'     => Mautic\CoreBundle\Helper\ImportHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                ],
-            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
