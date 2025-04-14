@@ -17,11 +17,6 @@ final class EntityExportEvent extends Event
      */
     private array $dependencies = [];
 
-    /**
-     * @var array<string, mixed> stores additional arguments such as import status
-     */
-    private array $arguments = [];
-
     public function __construct(private string $entityName, private int $entityId)
     {
     }

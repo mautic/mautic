@@ -41,6 +41,9 @@ final class EntityImportAnalyzeEvent extends Event
         $this->summary[$key] = $value;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSummary(): ?array
     {
         return $this->summary ?? null;
