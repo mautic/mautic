@@ -473,4 +473,103 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertIsArray($responseData);
         $this->assertContains('Campaign imported successfully.', $responseData);
     }
+
+    public function testImportCampaignActionZip(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Same campaign structure as the export
+        $payload = [[
+            'campaign' => [[
+                'id'              => 1,
+                'name'            => 'test zip import',
+                'description'     => 'Imported from ZIP',
+                'is_published'    => false,
+                'canvas_settings' => [
+                    'nodes' => [
+                        ['id' => '1', 'positionX' => '100', 'positionY' => '100'],
+                        ['id' => 'lists', 'positionX' => '200', 'positionY' => '50'],
+                    ],
+                    'connections' => [
+                        [
+                            'sourceId' => 'lists',
+                            'targetId' => '1',
+                            'anchors'  => [
+                                'source' => 'leadsource',
+                                'target' => 'top',
+                            ],
+                        ],
+                    ],
+                ],
+                'uuid' => 'zip-uuid-test',
+            ]],
+            'campaign_event' => [[
+                'id'               => 1,
+                'campaign_id'      => 1,
+                'name'             => 'Event via ZIP',
+                'description'      => null,
+                'type'             => 'page.devicehit',
+                'event_type'       => 'decision',
+                'event_order'      => 0,
+                'properties'       => [],
+                'trigger_interval' => 0,
+                'channel'          => 'page',
+                'channel_id'       => 0,
+                'uuid'             => 'event-uuid-zip',
+            ]],
+            'lists' => [[
+                'id'                   => 1,
+                'name'                 => 'ZIP Seg',
+                'alias'                => 'zip-seg',
+                'public_name'          => 'ZIP Seg',
+                'is_published'         => true,
+                'filters'              => [],
+                'uuid'                 => 'list-uuid-zip',
+                'is_global'            => true,
+                'is_preference_center' => false,
+            ]],
+            'dependencies' => [[
+                'campaign_event' => [
+                    ['campaign' => 1, 'campaign_event' => 1],
+                ],
+                'lists' => [
+                    ['campaign' => 1, 'lists' => 1],
+                ],
+            ]],
+        ]];
+
+        // Create temporary zip file
+        $zip     = new \ZipArchive();
+        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_zip_test').'.zip';
+
+        if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
+            $zip->addFromString('campaign.json', json_encode($payload, JSON_PRETTY_PRINT));
+            $zip->close();
+        } else {
+            $this->fail('Failed to create test ZIP file.');
+        }
+
+        // Upload via API
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/campaigns/import',
+            [],
+            ['file'         => new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'import.zip')],
+            ['CONTENT_TYPE' => 'multipart/form-data']
+        );
+
+        $response = $this->client->getResponse();
+
+        // Clean up file
+        unlink($zipPath);
+
+        if (201 !== $response->getStatusCode()) {
+            $this->fail('Import failed with error: '.$response->getContent());
+        }
+
+        $this->assertResponseStatusCodeSame(201);
+        $decoded = json_decode($response->getContent(), true);
+        $this->assertContains('Campaign imported successfully.', $decoded);
+    }
 }

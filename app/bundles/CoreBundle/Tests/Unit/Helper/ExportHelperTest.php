@@ -100,6 +100,49 @@ class ExportHelperTest extends TestCase
         $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));
     }
 
+    public function testWriteToZipFileWithLocalAsset(): void
+    {
+        $assetFileName = 'test-image.png';
+        $tempDir       = sys_get_temp_dir().'/mautic_test_assets_case';
+        $assetFilePath = $tempDir.'/media/files/'.$assetFileName;
+        $jsonFilePath  = $tempDir.'/entity_data.json';
+
+        // Ensure clean state
+        if (!file_exists(dirname($assetFilePath))) {
+            mkdir(dirname($assetFilePath), 0777, true);
+        }
+
+        file_put_contents($assetFilePath, 'mock image content');
+
+        $jsonData = [
+            [
+                'asset' => [
+                    [
+                        'id'               => 1,
+                        'storage_location' => 'local',
+                        'path'             => $assetFileName,
+                    ],
+                ],
+            ],
+        ];
+
+        file_put_contents($jsonFilePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+
+        // Mock pathsHelper to return base media path
+        $this->pathsHelper->method('getSystemPath')->with('media')->willReturn($tempDir.'/media');
+
+        $resultZipPath     = $this->exportHelper->writeToZipFile(file_get_contents($jsonFilePath));
+        $this->filePaths[] = $resultZipPath;
+
+        $this->assertFileExists($resultZipPath);
+
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($resultZipPath));
+        $this->assertNotFalse($zip->locateName('entity_data.json'));
+        $this->assertNotFalse($zip->locateName('assets/'.$assetFileName));
+        $zip->close();
+    }
+
     /**
      * Test if exportDataAs() correctly generates a CSV file when we input some array data.
      */
