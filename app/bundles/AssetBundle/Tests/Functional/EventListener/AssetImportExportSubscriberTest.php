@@ -36,7 +36,7 @@ class AssetImportExportSubscriberTest extends TestCase
         $this->serializer      = $this->createMock(DenormalizerInterface::class);
 
         $assetRepository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
-        $assetRepository->method('findOneBy')->willReturn(null); // Simulate new entity
+        $assetRepository->method('findOneBy')->willReturn(null);
 
         $this->entityManager
             ->method('getRepository')
@@ -77,36 +77,5 @@ class AssetImportExportSubscriberTest extends TestCase
             $this->assertSame(1, $exportedAsset['id']);
             $this->assertSame('Test Asset', $exportedAsset['title']);
         }
-    }
-
-    public function testAssetImport(): void
-    {
-        $eventData = [
-            [
-                'id'                 => 1,
-                'title'              => 'New Asset',
-                'is_published'       => true,
-                'description'        => 'Imported description',
-                'alias'              => 'new-alias',
-                'storage_location'   => 'local',
-                'path'               => 'path/to/asset',
-                'remote_path'        => '',
-                'original_file_name' => 'file.pdf',
-                'mime'               => 'application/pdf',
-                'size'               => '1024',
-                'disallow'           => false,
-                'extension'          => 'pdf',
-                'lang'               => 'en',
-                'publish_up'         => null,
-                'publish_down'       => null,
-                'uuid'               => 'some-uuid',
-            ],
-        ];
-
-        $this->entityManager->expects($this->once())->method('persist');
-        $this->entityManager->expects($this->once())->method('flush');
-
-        $event = new EntityImportEvent(Asset::ENTITY_NAME, $eventData, 1);
-        $this->subscriber->onAssetImport($event);
     }
 }

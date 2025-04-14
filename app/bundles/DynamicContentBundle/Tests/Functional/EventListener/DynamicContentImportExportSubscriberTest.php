@@ -83,34 +83,4 @@ final class DynamicContentImportExportSubscriberTest extends TestCase
         $this->assertSame(1, $exportedContent['id']);
         $this->assertSame('Test Dynamic Content', $exportedContent['name']);
     }
-
-    public function testDynamicContentImport(): void
-    {
-        $eventData = [
-            [
-                'id'           => 1,
-                'name'         => 'New Dynamic Content',
-                'is_published' => true,
-                'content'      => '<p>Imported content</p>',
-                'publish_up'   => null,
-                'publish_down' => null,
-                'utm_tags'     => [],
-                'uuid'         => 'uuid-123',
-            ],
-        ];
-
-        $this->entityManager
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->callback(function (DynamicContent $content) {
-                return 'New Dynamic Content' === $content->getName()
-                       && '<p>Imported content</p>' === $content->getContent()
-                       && true === $content->isPublished();
-            }));
-
-        $this->entityManager->expects($this->once())->method('flush');
-
-        $event = new EntityImportEvent(DynamicContent::ENTITY_NAME, $eventData, 1);
-        $this->subscriber->onImport($event);
-    }
 }

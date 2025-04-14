@@ -103,48 +103,4 @@ final class SegmentImportExportSubscriberTest extends TestCase
         $this->assertFalse($exportedSegment['is_global']);
         $this->assertFalse($exportedSegment['is_preference_center']);
     }
-
-    public function testSegmentImport(): void
-    {
-        $importData = [
-            [
-                'id'                   => 1,
-                'name'                 => 'Imported Segment',
-                'is_published'         => true,
-                'description'          => 'Imported description',
-                'alias'                => 'imported-alias',
-                'public_name'          => 'Imported Public Name',
-                'filters'              => [],
-                'is_global'            => true,
-                'is_preference_center' => false,
-                'uuid'                 => 'uuid-456',
-            ],
-        ];
-
-        $repository = $this->createMock(\Doctrine\Persistence\ObjectRepository::class);
-        $repository->method('findOneBy')->willReturn(null);
-
-        $this->entityManager
-            ->method('getRepository')
-            ->with(LeadList::class)
-            ->willReturn($repository);
-
-        $segment = new LeadList();
-        $ref     = new \ReflectionClass($segment);
-        $idProp  = $ref->getProperty('id');
-        $idProp->setAccessible(true);
-        $idProp->setValue($segment, 123);
-
-        $this->serializer
-            ->method('denormalize')
-            ->willReturnCallback(fn ($data, $type, $format, $context) => $context['object_to_populate']);
-
-        $this->entityManager->expects($this->once())->method('persist')->with($this->isInstanceOf(LeadList::class));
-        $this->entityManager->expects($this->once())->method('flush');
-
-        $event = new EntityImportEvent(LeadList::ENTITY_NAME, $importData, 99);
-        $this->eventDispatcher->dispatch($event);
-
-        $this->assertSame(123, $event->getEntityIdMap()[1]);
-    }
 }

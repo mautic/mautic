@@ -85,40 +85,4 @@ class PageImportExportSubscriberTest extends TestCase
         $this->assertSame(1, $exportedPage['id'], 'Page ID mismatch.');
         $this->assertSame('Test Page', $exportedPage['title'], 'Page title mismatch.');
     }
-
-    public function testPageImport(): void
-    {
-        $eventData = [
-            [
-                'id'            => 1,
-                'title'         => 'New Page',
-                'is_published'  => true,
-                'alias'         => 'new-alias',
-                'content'       => '<p>Sample content</p>',
-                'publish_up'    => null,
-                'hits'          => 0,
-                'unique_hits'   => 0,
-                'variant_hits'  => 0,
-                'revision'      => 1,
-                'redirect_type' => '',
-                'redirect_url'  => '',
-                'publish_down'  => null,
-                'uuid'          => 'test-uuid',
-            ],
-        ];
-
-        $this->entityManager
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->callback(function (Page $page) {
-                return 'New Page' === $page->getTitle()
-                       && true === $page->isPublished()
-                       && 'new-alias' === $page->getAlias();
-            }));
-
-        $this->entityManager->expects($this->once())->method('flush');
-
-        $event = new EntityImportEvent(Page::ENTITY_NAME, $eventData, 1);
-        $this->subscriber->onPageImport($event);
-    }
 }

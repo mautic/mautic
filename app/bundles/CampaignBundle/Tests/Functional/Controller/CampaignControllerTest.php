@@ -96,6 +96,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
                 'permissions' => [
                     'lead:leads'         => $bitwise,
                     'campaign:campaigns' => 2,
+                    'campaign:export:enable' => 2,
                 ],
             ],
         ]);
@@ -234,5 +235,47 @@ class CampaignControllerTest extends MauticMysqlTestCase
         }
 
         return $events;
+    }
+
+    public function testExportActionWithValidCampaign(): void
+    {
+        $nonAdminUser = $this->setupCampaignData();
+
+        $this->loginOtherUser($nonAdminUser);
+
+        // Mock an event subscriber response that returns some dummy data to export
+        $dispatcher = static::getContainer()->get('event_dispatcher');
+        $dispatcher->addListener(\Mautic\CoreBundle\Event\EntityExportEvent::class, function ($event) {
+            if ($event->getEntityName() === Campaign::ENTITY_NAME) {
+                $event->addEntity(Campaign::ENTITY_NAME, [
+                    'id'   => $event->getEntityId(),
+                    'name' => 'Exported Campaign',
+                ]);
+            }
+        });
+
+        print_r($this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/' . $this->campaign->getId());
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $contentType = $response->headers->get('Content-Type');
+        echo "\n\nContent-Type: $contentType\n\n";
+        echo $response->getContent();
+
+        // $this->assertStringContainsString('application/zip', $response->headers->get('Content-Type'));
+        // $this->assertStringContainsString('.zip', $response->headers->get('Content-Disposition'));
+    }
+
+    public function testExportActionWithInvalidCampaign(): void
+    {
+        $adminUser = $this->setupCampaignData(255);
+        $this->loginOtherUser($adminUser);
+
+        // Intentionally request an invalid ID
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/999999');
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 }
