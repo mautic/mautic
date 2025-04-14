@@ -293,4 +293,25 @@ class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertSame('application/zip', $response->headers->get('Content-Type'));
         $this->assertStringContainsString('.zip', $response->headers->get('Content-Disposition'));
     }
+
+    public function testBatchExportAction(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(); // creates campaign + grants export permission
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request(
+            'GET',
+            '/s/campaigns/batchExport',
+            [
+                'filetype' => 'zip',
+                'ids'      => json_encode([$this->campaign->getId()]),
+            ]
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertEquals('application/zip', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('.zip', (string) $response->headers->get('Content-Disposition'));
+    }
 }
