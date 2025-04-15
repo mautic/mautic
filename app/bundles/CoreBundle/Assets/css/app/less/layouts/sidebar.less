@@ -30,6 +30,12 @@
   z-index: @sidebar-zindex;
   top: 0;
   bottom: 0;
+  left: -230px;
+  transition: left 0.3s ease;
+
+  &.open {
+    left: 0px;
+  }
 
   // sidebar left
   // -------------------------
@@ -73,15 +79,11 @@
     padding-left: 15px;
     padding-right: 15px;
 
-    // sidebar header fixed
     .header-fixed & {
       position: absolute;
       top: 0;
-
-      //box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
     }
 
-    // add top space to `sidebar-content` if header is present
     ~ .sidebar-content {
       top: @header-height;
     }
@@ -101,7 +103,6 @@
       color: transparent;
     }
 
-    // add bottom space to `sidebar-content` if footer is present
     ~ .sidebar-content {
       bottom: @footer-height;
     }
@@ -115,12 +116,13 @@
     width: 100%;
     margin-top: @navbar-height;
 
-    // nav tab
     .nav.nav-tabs {
       border-bottom: 1px solid darken(@sidebar-right-bg, 1%);
       box-shadow: none;
+
       > li {
         margin-bottom: 0;
+
         > a {
           border-width: 0;
           border-radius: 0;
@@ -129,20 +131,24 @@
           padding-bottom: 12px;
           color: var(--text-secondary);
           background-color: transparent;
+
           &:hover,
           &:focus {
             color: var(--text-primary);
             background-color: transparent;
           }
         }
+
         &.active > a {
           overflow: visible;
+
           &,
           &:hover,
           &:focus {
             color: var(--text-primary);
             background-color: var(--layer-hover);
           }
+
           &:after {
             top: auto;
             bottom: -1px;
@@ -154,7 +160,6 @@
   }
 
   // sidebar nav
-  // -------------------------
   .nav-sidebar {
     > .nav {
       > li {
@@ -162,6 +167,7 @@
           overflow: hidden;
           padding: 12px 22px;
           .transition(all .15s ease);
+
           .text {
             .transition(~"opacity var(--duration-expressive) ease .1s, line-height");
             opacity: 1;
@@ -172,6 +178,7 @@
             display: block;
             line-height: 18px;
           }
+
           .icon {
             font-weight: normal;
             font-size: 14px;
@@ -179,6 +186,7 @@
             display: block;
             transition: var(--transition-all-expressive);
           }
+
           .arrow {
             .transition(var(--transition-all-expressive));
             opacity: 1;
@@ -188,7 +196,7 @@
             display: block;
           }
         }
-        // Open and active state
+
         &.open,
         &.active {
           > a {
@@ -201,13 +209,10 @@
           }
         }
 
-        // nav-submenu style
         > .nav-submenu {
           position: relative;
           padding-left: 50px;
 
-
-          // the line
           &:after {
             content: '';
             position: absolute;
@@ -226,7 +231,6 @@
               padding-bottom: var(--spacing-05);
             }
 
-            // the dot
             &:after {
               content: '';
               position: absolute;
@@ -237,8 +241,8 @@
               height: 7px;
               border-radius: 7px;
             }
+
             &.active {
-              // the dot
               &:after {
                 background-color: @brand-warning !important;
               }
@@ -253,10 +257,10 @@
         }
       }
 
-      // nav-heading
       .nav-heading {
         text-transform: uppercase;
         padding: 10px 18px;
+
         &:first-child {
           padding-top: 20px;
         }
@@ -266,42 +270,26 @@
 }
 
 // breakpoint screen-sm and up
-// -------------------------
 @media (min-width: @screen-sm-min) {
-  // sidebar
-  // -------------------------
   .app-sidebar {
-    // sidebar left
-    // -------------------------
     &.sidebar-left {
       left: 0;
 
-      // reset app-content
       ~ #app-content {
         margin-left: @sidebar-left-width;
 
-        // sidebar is on collapse state
         .sidebar-left-collapse & {
           margin-left: @sidebar-left-collapse-width;
         }
       }
-      // reset app-footer
+
       ~ #app-footer {
         margin-left: @sidebar-left-width;
 
-        // reset app-footer on sidebar collapse
         .sidebar-left-collapse & {
           margin-left: @sidebar-left-collapse-width;
         }
       }
     }
   }
-}
-.app-sidebar {
-  left: -230px;
-  transition: left 0.3s ease;
-}
-
-.app-sidebar.open {
-  left: 0px;
 }

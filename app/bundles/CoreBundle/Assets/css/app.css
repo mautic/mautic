@@ -1761,6 +1761,11 @@ body > #app-wrapper {
   z-index: 990;
   top: 0;
   bottom: 0;
+  left: -230px;
+  transition: left 0.3s ease;
+}
+.app-sidebar.open {
+  left: 0px;
 }
 .app-sidebar.sidebar-left {
   width: 230px;
@@ -2016,13 +2021,6 @@ body > #app-wrapper {
   .sidebar-left-collapse .app-sidebar.sidebar-left ~ #app-footer {
     margin-left: 60px;
   }
-}
-.app-sidebar {
-  left: -230px;
-  transition: left 0.3s ease;
-}
-.app-sidebar.open {
-  left: 0px;
 }
 .csstransforms3d.sidebar-open-ltr #app-content {
   -webkit-transform: translate3d(230px, 0, 0);
