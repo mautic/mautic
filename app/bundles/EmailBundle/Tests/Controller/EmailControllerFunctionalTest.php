@@ -112,7 +112,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // --- Check if the default "No Segment available" option is present and disabled ---
         $firstOption = $segmentSelect->filter('option')->first();
-        $this->assertTrue($firstOption->attr('disabled') !== null);
+        $this->assertTrue(null !== $firstOption->attr('disabled'));
         $this->assertEquals('No Segment available', trim($firstOption->text()));
 
         // --- Check Category filter select box exists and has the expected option ---
@@ -123,7 +123,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $translator = $this->getContainer()->get('translator');
         \assert($translator instanceof TranslatorInterface);
         $expectedPlaceholder = $translator->trans('mautic.core.filter.placeholder', [
-            '%entity%' => $translator->trans('mautic.core.filter.categories')
+            '%entity%' => $translator->trans('mautic.core.filter.categories'),
         ]);
         $this->assertEquals($expectedPlaceholder, $categorySelect->attr('data-placeholder'));
 
