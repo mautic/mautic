@@ -32,7 +32,6 @@ class ExportHelper
         private CoreParametersHelper $coreParametersHelper,
         private FilePathResolver $filePathResolver,
         private ProcessSignalService $processSignalService,
-        private PathsHelper $pathsHelper,
     ) {
     }
 
@@ -243,7 +242,10 @@ class ExportHelper
             ]
         );
     }
-
+    
+    /**
+     * @param array<string|int, string> $assetList
+     */
     public function writeToZipFile(string $jsonOutput, array $assetList): string
     {
         $tempDir      = sys_get_temp_dir();

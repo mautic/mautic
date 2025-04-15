@@ -85,6 +85,7 @@ final class EntityExportCommand extends ModeratedCommand
 
     /**
      * @param array<array<string, mixed>> $data
+     * @param array<string|int, string> $assetList
      */
     private function outputData(array $data, array $assetList, InputInterface $input, OutputInterface $output): int
     {

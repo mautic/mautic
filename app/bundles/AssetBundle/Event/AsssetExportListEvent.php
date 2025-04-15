@@ -14,14 +14,14 @@ final class AsssetExportListEvent extends CommonEvent
     private array $list = [];
 
     /**
-     * @param array<string, mixed> $data
+     * @param list<array<string, array<string, mixed>>> $data
      */
     public function __construct(private array $data)
     {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return list<array<string, array<string, mixed>>>
      */
     public function getEntityData(): array
     {
