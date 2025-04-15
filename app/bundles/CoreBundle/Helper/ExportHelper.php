@@ -242,7 +242,7 @@ class ExportHelper
             ]
         );
     }
-    
+
     /**
      * @param array<string|int, string> $assetList
      */
