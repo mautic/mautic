@@ -21,11 +21,12 @@ class CoreHelpersExtensionTest extends TestCase
         $this->extension = new CoreHelpersExtension($this->translator);
     }
 
-    public function testGetFilterAttributesWithPlaceholderAndOnchange(): void
+    public function testGetFilterAttributesWithFilter(): void
     {
         $filter = [
-            'placeholder' => 'Custom Placeholder',
-            'onchange'    => 'someFunction()',
+            'placeholder'       => 'Custom Placeholder',
+            'onchange'          => 'someFunction()',
+            'prefix-exceptions' => ['prefix', 'exceptions'],
         ];
 
         $this->translator->expects($this->never())->method('trans');
@@ -37,27 +38,7 @@ class CoreHelpersExtensionTest extends TestCase
         $this->assertSame('template', $attributes['data-tmpl']);
         $this->assertSame('Custom Placeholder', $attributes['data-placeholder']);
         $this->assertSame('someFunction()', $attributes['onchange']);
-    }
-
-    public function testGetFilterAttributesWithOnChange(): void
-    {
-        $filterName = 'status';
-        $filter     = [
-            'placeholder' => 'Select status',
-            'onchange'    => 'doSomething()',
-        ];
-        $target = '#target';
-        $tmpl   = 'template-id';
-
-        $expected = [
-            'id'               => 'status',
-            'name'             => 'status',
-            'data-tmpl'        => 'template-id',
-            'data-placeholder' => 'Select status',
-            'onchange'         => 'doSomething()',
-        ];
-
-        $this->assertSame($expected, $this->extension->getFilterAttributes($filterName, $filter, $target, $tmpl));
+        $this->assertSame('prefix,exceptions', $attributes['data-prefix-exceptions']);
     }
 
     public function testGetFilterAttributesWithoutFilter(): void
