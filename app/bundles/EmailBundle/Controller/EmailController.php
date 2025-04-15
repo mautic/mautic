@@ -98,8 +98,6 @@ class EmailController extends FormController
 
         $listFilters = [
             'filters' => [
-                'placeholder' => $this->translator->trans('mautic.email.filter.placeholder'),
-                'multiple'    => true,
                 'groups'      => [], // Reset available groups
             ],
         ];

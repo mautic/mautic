@@ -55,35 +55,32 @@ class CoreHelpersExtension extends AbstractExtension
     /**
      * @param array<string,mixed> $filter
      *
-     * @return array<string>
+     * @return array<string, string>
      */
     public function getFilterAttributes(string $filterName, array $filter, string $target, string $tmpl): array
     {
-        $attr       = [
-            'id="'.$filterName.'"',
-            'name="'.$filterName.'"',
+        $attr = [
+            'id'        => $filterName,
+            'name'      => $filterName,
+            'data-tmpl' => $tmpl,
         ];
-        if (!empty($filter['multiple'])) {
-            $attr[] = 'multiple';
-        }
 
-        if (!empty($filter['placeholder'])) {
-            $attr[] = 'data-placeholder="'.$filter['placeholder'].'"';
-        } else {
-            $attr[] = 'data-placeholder="'.$this->translate->trans('mautic.core.list.filter').'"';
-        }
+        // Set data-placeholder
+        $attr['data-placeholder'] = !empty($filter['placeholder'])
+            ? $filter['placeholder']
+            : $this->translate->trans('mautic.core.list.filter');
 
+        // Handle onchange vs listfilter attributes
         if (!empty($filter['onchange'])) {
-            $attr[] = 'onchange="'.$filter['onchange'].'"';
+            $attr['onchange'] = $filter['onchange'];
         } else {
-            $attr[] = 'data-toggle="listfilter"';
-            $attr[] = 'data-target="'.$target.'"';
+            $attr['data-toggle']  = 'listfilter';
+            $attr['data-target']  = $target;
         }
 
-        $attr[] = 'data-tmpl="'.$tmpl.'"';
-
+        // Add prefix exceptions if any
         if (!empty($filter['prefix-exceptions'])) {
-            $attr[] = 'data-prefix-exceptions="'.implode(',', $filter['prefix-exceptions']).'"';
+            $attr['data-prefix-exceptions'] = implode(',', $filter['prefix-exceptions']);
         }
 
         return $attr;

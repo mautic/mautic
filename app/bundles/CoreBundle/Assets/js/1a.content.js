@@ -1741,7 +1741,9 @@ Mautic.initFilterCommands = function () {
     const selectFields = document.querySelectorAll('.popover-content select');
 
     selectFields.forEach(function (selectElement) {
-        const options = Array.from(selectElement.options).map(option => option.value);
+        const options = Array.from(selectElement.options)
+            .map(option => option.value)
+            .filter(value => value !== "");
         Mautic.filterCommands.push(...options);
     });
 };

@@ -1,47 +1,65 @@
-{% if filters is defined and filters is not empty %}
-    <div class="form-group">
-        {% for filterName, filter in filters %}
-        {% set attr = getFilterAttributes(
-            filterName|trans,
-            filter,
-            target|default('.page-list'),
-            tmpl|default('list')
-        ) %}
-        <select {{ attr|join(' ')|raw }}>
-        {% if filter.groups is defined %}
+{% macro html_attributes(attributes) %}
+    {%- for attrName, attrValue in attributes %}
+        {{- ' ' ~ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"
+    {%- endfor %}
+{% endmacro %}
+
+{% if filters|default([])|length %}
+    {% for filterName, filter in filters %}
+        {% set targetSelector = target|default('.page-list') %}
+        {% set templateType = tmpl|default('list') %}
+
+        {% if filter.groups|default([])|length %}
             {% for groupLabel, groupFilter in filter.groups %}
-                <optgroup label="{{ groupLabel|trans }}"{% if groupFilter.prefix is defined %} data-prefix="{{ groupFilter.prefix }}"{% endif %}>
-                    {% if groupFilter.options is defined %}
-                    {% for value, label in groupFilter.options %}
+                {% set attr = getFilterAttributes(groupLabel, filter, targetSelector, templateType) %}
+                {% set placeholder = groupFilter.placeholder|default('mautic.core.filter.placeholder'|trans({'%entity%': groupLabel|trans}))|trans %}
+                {% set mergedAttr = attr|merge({'data-placeholder': placeholder}) %}
+
+                <div class="form-group">
+                    <label for="{{ groupLabel }}" class="hide">{{ placeholder }}</label>
+                    <select {{ _self.html_attributes(mergedAttr) }}>
+                        {% if groupFilter.options|default([])|length %}
+                            <option></option> <!-- Placeholder -->
+                            {% for value, label in groupFilter.options %}
+                                {% if label is iterable %}
+                                    {% set value = label.value|default(label.id) %}
+                                    {% set label = label.label|default(label.title|default(label.name)) %}
+                                {% endif %}
+                                {% if groupFilter.prefix is defined %}
+                                    {% set value = groupFilter.prefix ~ ':' ~ value %}
+                                {% endif %}
+                                <option value="{{ value|escape('html_attr') }}"
+                                    {{ (groupFilter.values is defined and value in groupFilter.values) ? 'selected' : '' }}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        {% else %}
+                            <option disabled>{{ 'mautic.core.filter.no_options'|trans({'%entity%': groupLabel|trans}) }}</option>
+                        {% endif %}
+                    </select>
+                </div>
+            {% endfor %}
+
+        {% elseif filter.options|default([])|length %}
+            {% set attr = getFilterAttributes(filterName|trans, filter, targetSelector, templateType) %}
+            {% set placeholder = filterName|trans %}
+            {% set mergedAttr = attr|merge({'data-placeholder': placeholder}) %}
+
+            <div class="form-group">
+                <label for="{{ filterName }}" class="hide">{{ placeholder }}</label>
+                <select id="{{ filterName }}" {{ _self.html_attributes(mergedAttr) }}>
+                    {% for value, label in filter.options %}
                         {% if label is iterable %}
                             {% set value = label.value|default(label.id) %}
                             {% set label = label.label|default(label.title|default(label.name)) %}
                         {% endif %}
-
-                        {% set selected = (groupFilter.values is defined and value in groupFilter.values) ? ' selected' : '' %}
-
-                        {% if groupFilter.prefix is defined %}
-                            {% set value = groupFilter.prefix ~ ':' ~ value %}
-                        {% endif %}
-                    <option value="{{ value|escape('html_attr') }}"{{ selected }}>{{ label }}</option>
+                        <option value="{{ value|escape('html_attr') }}"
+                            {{ (filter.values is defined and value in filter.values) ? 'selected' : '' }}>
+                            {{ (filter.translateLabels is not defined or filter.translateLabels is empty) ? label|purify : label|trans }}
+                        </option>
                     {% endfor %}
-                    {% endif %}
-                </optgroup>
-            {% endfor %}
-        {% elseif filter.options is defined %}
-            {% for value, label in filter.options %}
-                {% if label is iterable %}
-                    {% set value = label.value|default(label.id) %}
-                    {% set label = label.label|default(label.title|default(label.name)) %}
-                {% endif %}
-
-                {% set selected = (filter.values is defined and value in filter.values) ? ' selected' : '' %}
-                <option value="{{ value|escape('html_attr') }}"{{ selected }}>
-                    {{ (filter.translateLabels is not defined or filter.translateLabels is empty) ? label|purify : label|trans }}
-                </option>
-            {% endfor %}
+                </select>
+            </div>
         {% endif %}
-        </select>
-        {% endfor %}
-    </div>
+    {% endfor %}
 {% endif %}
