@@ -1964,15 +1964,3 @@ document.addEventListener('DOMContentLoaded', function () {
     Mautic.initFilterCommands();
     Mautic.handlePopoverInsertion();
 });
-
-// document.addEventListener('DOMContentLoaded', function () {
-//     const toggles = document.querySelectorAll('[data-toggle="sidebar"]');
-//     toggles.forEach(function (toggle) {
-//         toggle.addEventListener('click', function () {
-//             const sidebar = document.querySelector('.app-sidebar');
-//             if (sidebar) {
-//                 sidebar.classList.toggle('open');
-//             }
-//         });
-//     });
-// });
