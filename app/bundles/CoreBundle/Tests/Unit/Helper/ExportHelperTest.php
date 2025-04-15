@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
@@ -25,8 +24,6 @@ class ExportHelperTest extends TestCase
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
     private ExportHelper $exportHelper;
-
-    private MockObject&PathsHelper $pathsHelper;
 
     /**
      * @var array<array<string, int|string>>
