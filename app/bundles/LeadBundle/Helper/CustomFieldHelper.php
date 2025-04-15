@@ -15,17 +15,6 @@ class CustomFieldHelper
 
     public const TYPE_SELECT  = 'select';
 
-    public static ?DateTimeHelper $dateTimeHelper = null;
-
-    private static function getDateTimeHelper(\DateTimeInterface|string $string = '', string $fromFormat = 'Y-m-d H:i:s', string $timezone = 'local'): DateTimeHelper
-    {
-        if (null !== self::$dateTimeHelper) {
-            return self::$dateTimeHelper;
-        }
-
-        return new DateTimeHelper($string, $fromFormat, $timezone);
-    }
-
     /**
      * Fixes value type for specific field types.
      *
@@ -54,7 +43,7 @@ class CustomFieldHelper
      *
      * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, $value)
+    public static function fieldValueTransfomer(array $field, $value, DateTimeHelper $dateTimeHelper = null)
     {
         if (null === $value) {
             // do not transform null values
@@ -74,7 +63,9 @@ class CustomFieldHelper
                     throw new \InvalidArgumentException('Wrong type given. String or DateTimeInterface expected.');
                 }
 
-                $dtHelper = self::getDateTimeHelper($value);
+                $dtHelper = $dateTimeHelper ?: new DateTimeHelper($value, null, 'local');
+                $dtHelper->setDateTime($value);
+
                 switch ($type) {
                     case 'datetime':
                         $value = $dtHelper->toLocalString('Y-m-d H:i:s');
@@ -86,19 +77,6 @@ class CustomFieldHelper
                         $value = $dtHelper->toLocalString('H:i:s');
                         break;
                 }
-                break;
-            case 'text':
-            case 'textarea':
-                if (!is_string($value)) {
-                    throw new \InvalidArgumentException('Wrong type given. String or DateTimeInterface expected.');
-                }
-
-                // Looking for text inbetween % characters and treating it as datetime
-                $value = preg_replace_callback('/%([A-Z]+(?:[\+\-]\d+[A-Z]+)?)%/', function ($matches) {
-                    $dtHelper = self::getDateTimeHelper($matches[1]);
-
-                    return $dtHelper->toLocalString('Y-m-d H:i:s');
-                }, $value);
                 break;
         }
 
@@ -113,11 +91,11 @@ class CustomFieldHelper
      *
      * @return mixed[]
      */
-    public static function fieldsValuesTransformer(array $fields, array $values): array
+    public static function fieldsValuesTransformer(array $fields, array $values, DateTimeHelper $dateTimeHelper = null): array
     {
         foreach ($values as $alias => &$value) {
             if (!empty($fields[$alias]) && is_array($fields[$alias])) {
-                $value = self::fieldValueTransfomer($fields[$alias], $value);
+                $value = self::fieldValueTransfomer($fields[$alias], $value, $dateTimeHelper);
             }
         }
 
