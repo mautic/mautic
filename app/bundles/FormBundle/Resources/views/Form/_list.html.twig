@@ -122,10 +122,7 @@
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.category %}
-                        {% set catName = category ? category.title : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = category ? '#' ~ category.color : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">
                         <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>

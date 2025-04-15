@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
@@ -211,7 +212,8 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->eventScheduler,
             $this->inactiveHelper,
-            $this->eventExecutioner
+            $this->eventExecutioner,
+            $this->createMock(ProcessSignalService::class)
         );
     }
 }

@@ -231,6 +231,33 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->updateColumn(1, $userId);
     }
 
+    public function testUpdatingLeadFieldWithNotFoundException(): void
+    {
+        $this->expectException(LeadFieldWasNotFoundException::class);
+        $this->fieldModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn(null);
+        $this->backgroundService->updateColumn(-1, 0);
+    }
+
+    public function testUpdateColumnThrowingExceptions(): void
+    {
+        $leadField = new LeadField();
+        $leadField->setCharLengthLimit(200);
+        $leadField->setId(9999);
+        $this->fieldModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($leadField);
+
+        $this->customFieldColumn->expects($this->once())
+            ->method('processUpdateLeadColumnLength')
+            ->with($leadField)
+            ->willThrowException(new \OutOfRangeException());
+
+        $this->expectException(\OutOfRangeException::class);
+        $this->backgroundService->updateColumn($leadField->getId(), 1);
+    }
+
     public function testDeleteColumnWithNoError(): void
     {
         $leadField = new LeadField();

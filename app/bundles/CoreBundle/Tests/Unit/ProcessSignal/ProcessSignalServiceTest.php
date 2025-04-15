@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Test\ProcessSignal;
+namespace Mautic\CoreBundle\Tests\Unit\ProcessSignal;
 
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;

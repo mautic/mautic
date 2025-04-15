@@ -86,13 +86,18 @@ input[style] {
   }
 }
 
-.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+.form-control[disabled], fieldset[disabled] .form-control {
   color: var(--text-disabled);
 }
 
 .form-control[disabled] {
   cursor: not-allowed;
   border-bottom-color: transparent;
+}
+
+.form-control[readonly] {
+  background-color: transparent;
+  color: var(--text-primary);
 }
 
 // stacked form

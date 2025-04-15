@@ -8,7 +8,7 @@
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
 {% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : item,
@@ -19,6 +19,7 @@
         'targetLabel': 'mautic.focus.focus_items'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': item.category}) }}
 {% endblock %}
 
 {% block actions %}

@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
+use Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
 use Mautic\LeadBundle\Field\Event\DeleteColumnEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
@@ -65,19 +66,30 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testStopPropagationUpdate(): void
     {
-        $leadField          = new LeadField();
+        $leadField = new LeadField();
+
         $dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $backgroundSettings = $this->createMock(BackgroundSettings::class);
 
-        $backgroundSettings->expects($this->once())
+        $dispatcher
+            ->expects($this->once())
+            ->method('hasListeners')
+            ->willReturn(true);
+
+        $backgroundSettings
+            ->expects($this->once())
             ->method('shouldProcessColumnChangeInBackground')
             ->willReturn(true);
 
-        $dispatcher->expects($this->once())
+        $dispatcher
+            ->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->isInstanceOf(UpdateColumnEvent::class),
-                'mautic.lead_field_pre_update_column',
+                $this->callback(function ($event) {
+                    /* @var AddColumnBackgroundEvent $event */
+                    return $event instanceof UpdateColumnEvent;
+                }),
+                'mautic.lead_field_pre_update_column'
             );
 
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);

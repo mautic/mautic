@@ -15,7 +15,7 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : notification,
@@ -26,6 +26,7 @@
         'targetLabel'     : 'mautic.notification.notifications'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': notification.category}) }}
 {% endblock %}
 
 {% block actions %}

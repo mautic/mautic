@@ -523,3 +523,25 @@ code:hover > .copy-icon {
 .rounded-corners-preview--32 {
   border-radius: 32px;
 }
+
+.category--inline-color {
+  width: 18px;
+  height: 8px;
+  border-radius: 10px;
+  background: var(--category-color);
+  transition: var(--transition-all-productive);
+
+  i { 
+    opacity: 0; 
+    transition: var(--transition-all-productive); 
+    filter: invert(100%) grayscale(100%) contrast(500%);
+    color: var(--category-color);
+  }
+}
+
+.category--inline:hover .category--inline-color {
+  height: 16px;
+  width: 26px;
+
+  i { opacity: 1; }
+}

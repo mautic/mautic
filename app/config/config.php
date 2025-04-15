@@ -15,14 +15,6 @@ $projectRoot = $container->getParameter('kernel.project_dir');
 
 include __DIR__.'/paths_helper.php';
 
-// Load extra annotations
-$container->loadFromExtension('sensio_framework_extra', [
-    'router'  => ['annotations' => false],
-    'request' => ['converters' => false],
-    'view'    => ['annotations' => true],
-    'cache'   => ['annotations' => false],
-]);
-
 // Build and store Mautic bundle metadata
 $symfonyBundles        = $container->getParameter('kernel.bundles');
 $bundleMetadataBuilder = new Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths);
@@ -123,7 +115,6 @@ $connectionSettings = [
     'charset'               => 'utf8mb4',
     'default_table_options' => [
         'charset'    => 'utf8mb4',
-        'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's

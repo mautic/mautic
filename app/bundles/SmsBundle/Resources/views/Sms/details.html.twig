@@ -5,7 +5,7 @@
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{sms.getName()}}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : sms,
@@ -20,6 +20,7 @@
         'targetLabel': 'mautic.sms.smses'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': sms.category}) }}
 {% endblock %}
 
 {% block actions %}

@@ -18,7 +18,7 @@
 
 {% block mauticContent %}list{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': list,
     'customButtons': customButtons|default([]),
@@ -28,6 +28,7 @@
     'routeBase': 'segment',
     'targetLabel': 'mautic.lead.lead.lists'|trans
 }) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': list.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ list.name }}{% endblock %}

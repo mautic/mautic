@@ -131,7 +131,9 @@ final class ReportSubscriber implements EventSubscriberInterface
                 self::PREFIX_TRACKABLES.'.channel = "focus"')
             ->leftJoin(self::PREFIX_STATS, MAUTIC_TABLE_PREFIX.'page_redirects', self::PREFIX_REDIRECTS,
                 self::PREFIX_REDIRECTS.'.id = '.self::PREFIX_TRACKABLES.'.redirect_id')
-            ->groupBy(self::PREFIX_STATS.'.focus_id', self::PREFIX_STATS.'.type');
+            ->groupBy(self::PREFIX_STATS.'.focus_id', self::PREFIX_STATS.'.type')
+            ->orderBy(self::PREFIX_FOCUS.'.name', 'ASC')
+            ->addOrderBy(self::PREFIX_STATS.'.type', 'ASC');
 
         $event->applyDateFilters($queryBuilder, 'date_added', self::PREFIX_STATS);
         $event->setQueryBuilder($queryBuilder);

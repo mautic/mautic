@@ -21,7 +21,7 @@
 
 {% block mauticContent %}page{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{ include('@MauticCore/Helper/page_actions.html.twig', {
     'item': activePage,
     'customButtons': customButtons|default([]),
@@ -31,6 +31,7 @@
     'routeBase': 'page',
     'targetLabel': 'mautic.page.pages'|trans
 }) }}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activePage.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}
@@ -55,27 +56,45 @@
         'status': 'available'
     }) -}}
 
-    {% set tags = [] %}
+    {% set blueTags = [] %}
+    {% set grayTags = [] %}
 
-    {% set tags = tags
-        |merge(activePage.isPreferenceCenter
-            ? [{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.form.preference_center' }]
-            : [])
-        |merge(activePage.isVariant and not activePage.isVariant(true)
-            ? [{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]
-            : [])
-        |merge(activePage.isVariant(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]
-            : [])
-        |merge(activePage.isTranslation and not activePage.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
-            : [])
-        |merge(activePage.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
-            : [])
-    %}
+    {% if activePage.isPreferenceCenter %}
+        {% set blueTags = blueTags|merge([{ type: 'read-only', color: 'blue', icon_only: true, label: 'mautic.email.form.preference_center', icon: 'ri-equalizer-2-fill' }]) %}
+    {% endif %}
 
-    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+    {% if activePage.isTranslation and not activePage.isTranslation(true) %}
+        {% set blueTags = blueTags|merge([{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon: 'ri-translate', icon_only: true }]) %}
+    {% endif %}
+
+    {% if activePage.noIndex is defined and activePage.noIndex == 1 %}
+        {% set blueTags = blueTags|merge([{ label: 'mautic.core.tag.search_index.disabled'|trans, icon: 'ri-eye-off-fill', color: 'blue', icon_only: true }]) %}
+    {% endif %}
+
+    {% if activePage.isVariant and not activePage.isVariant(true) %}
+        {% set grayTags = grayTags|merge([{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]) %}
+    {% endif %}
+
+    {% if activePage.isVariant(true) %}
+        {% set grayTags = grayTags|merge([{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]) %}
+    {% endif %}
+
+    {% if activePage.isTranslation(true) %}
+        {% set grayTags = grayTags|merge([{ 
+            color: 'warm-gray', 
+            label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+            icon: 'ri-translate',
+            attributes: {
+                'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id})
+            }
+        }]) %}
+    {% endif %}
+
+    {% if activePage.language is defined and activePage.language is not empty %}
+        {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
+    {% endif %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: blueTags|merge(grayTags) } %}
 
 {% endblock %}
 
@@ -105,31 +124,8 @@
       <div class="col-md-9 height-auto">
           <div>
               <!-- page detail header -->
-                {% set extra_content %}
-                    {% if activePage.isVariant(true) %}
-                        <div class="small">
-                            <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': variants.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.variant_of'|trans({'%parent%': variants.parent.getName()}) -}}
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% if activePage.isTranslation(true) %}
-                        <div class="small">
-                            <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id}) }}" data-toggle="ajax">
-                                {{- 'mautic.core.translation_of'|trans({'%parent%': translations.parent.getName()}) -}}
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% if activePage.isPreferenceCenter %}
-                        <div class="small">
-                            {{ 'mautic.core.icon_tooltip.preference_center'|trans }}
-                        </div>
-                    {% endif %}
-                {% endset %}
-
                 {% include '@MauticCore/Helper/description.html.twig' with {
-                    'description': activePage.metaDescription,
-                    'extra_content': extra_content
+                    'description': activePage.metaDescription
                 } %}
               <!--/ page detail header -->
 
@@ -267,7 +263,6 @@
                                 {
                                     label: 'mautic.core.open_link',
                                     variant: 'ghost',
-                                    size: 'sm',
                                     icon_only: true,
                                     icon: 'ri-external-link-line',
                                     onclick: 'window.open("' ~ pageUrl ~ '", "_blank");',
@@ -334,7 +329,6 @@
                                         {
                                             label: 'mautic.core.open_link',
                                             variant: 'ghost',
-                                            size: 'sm',
                                             icon_only: true,
                                             icon: 'ri-external-link-line',
                                             onclick: 'window.open("' ~ previewUrl ~ '", "_blank");',

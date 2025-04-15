@@ -292,6 +292,40 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(2, $contactCGroupScores->first()->getScore());
     }
 
+    public function testUpdateLeadActionWithTokensInTextCustomField(): void
+    {
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+        $applicationTester = new ApplicationTester($application);
+
+        $contactIds = $this->createContacts();
+        $campaign   = $this->createCampaignWithTokens($contactIds);
+
+        $this->em->clear();
+
+        $exitCode = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        Assert::assertSame(0, $exitCode->getStatusCode());
+
+        $this->em->clear();
+
+        $today = new \DateTime('today');
+
+        /** @var Lead $contact */
+        $contact = $this->contactRepository->getEntity($contactIds[0]);
+
+        $positionValue = $contact->getFieldValue('position');
+        $cityValue     = $contact->getFieldValue('city');
+
+        $this->assertNotNull($positionValue, 'Position value should not be null');
+        $this->assertNotNull($cityValue, 'City value should not be null');
+
+        $this->assertEquals($today->format('Y-m-d H:i:s'), $positionValue);
+
+        $expectedCityValue = 'Hello '.$today->format('Y-m-d H:i:s').' '.$this->contacts[0]['firstname'];
+        $this->assertEquals($expectedCityValue, $cityValue);
+    }
+
     /**
      * @return array<int, int>
      */
@@ -877,6 +911,51 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 ],
             ]
         );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    /**
+     * @param array<int, int> $contactIds
+     */
+    private function createCampaignWithTokens(array $contactIds): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Update contact');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        foreach ($contactIds as $key => $contactId) {
+            $campaignLead = new CampaignLead();
+            $campaignLead->setCampaign($campaign);
+            /** @var Lead $lead */
+            $lead = $this->em->getReference(Lead::class, $contactId);
+            $campaignLead->setLead($lead);
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($key, $campaignLead);
+        }
+
+        $this->em->flush();
+
+        $event = new Event();
+        $event->setCampaign($campaign);
+        $event->setName('Update contact with tokens');
+        $event->setType('lead.updatelead');
+        $event->setEventType('action');
+        $event->setTriggerMode('immediate');
+        $event->setProperties(
+            [
+                'position'                   => '{datetime=today}',
+                'city'                       => 'Hello {datetime=today} {contactfield=firstname}',
+            ]
+        );
+
+        $campaign->addEvent(1, $event);
 
         $this->em->persist($campaign);
         $this->em->flush();

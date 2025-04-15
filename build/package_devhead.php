@@ -21,9 +21,6 @@ mkdir(__DIR__.'/packaging');
 echo "Copying files\n";
 system("rsync -az --exclude-from 'excludefiles.txt' ../ packaging > /dev/null");
 
-// Generate the bootstrap.php.cache file
-system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php', $result);
-
 // Common steps
 include_once __DIR__.'/processfiles.php';
 

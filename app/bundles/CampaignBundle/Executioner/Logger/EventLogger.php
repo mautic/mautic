@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Model\SummaryModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -33,6 +34,7 @@ class EventLogger
         private LeadEventLogRepository $leadEventLogRepository,
         private LeadRepository $leadRepository,
         private SummaryModel $summaryModel,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
@@ -50,7 +52,9 @@ class EventLogger
     public function persistLog(LeadEventLog $log): void
     {
         $this->leadEventLogRepository->saveEntity($log);
-        $this->summaryModel->updateSummary([$log]);
+        if ($this->coreParametersHelper->get('campaign_use_summary')) {
+            $this->summaryModel->updateSummary([$log]);
+        }
     }
 
     /**
@@ -113,7 +117,9 @@ class EventLogger
         }
 
         $this->leadEventLogRepository->saveEntities($collection->getValues());
-        $this->summaryModel->updateSummary($collection->getValues());
+        if ($this->coreParametersHelper->get('campaign_use_summary')) {
+            $this->summaryModel->updateSummary($collection->getValues());
+        }
 
         return $this;
     }

@@ -41,11 +41,11 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->result->expects($this->once())
             ->method('fetchOne')
-            ->willReturn('5.7.23-23-log');
+            ->willReturn('8.4.0-23-log');
 
         $version = $this->provider->getVersion();
 
-        $this->assertSame('5.7.23-23-log', $version);
+        $this->assertSame('8.4.0-23-log', $version);
         $this->assertFalse($this->provider->isMariaDb());
         $this->assertTrue($this->provider->isMySql());
     }
@@ -59,11 +59,11 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->result->expects($this->once())
             ->method('fetchOne')
-            ->willReturn('10.3.9-MariaDB');
+            ->willReturn('10.11.0-MariaDB');
 
         $version = $this->provider->getVersion();
 
-        $this->assertSame('10.3.9-MariaDB', $version);
+        $this->assertSame('10.11.0-MariaDB', $version);
         $this->assertTrue($this->provider->isMariaDb());
         $this->assertFalse($this->provider->isMySql());
     }

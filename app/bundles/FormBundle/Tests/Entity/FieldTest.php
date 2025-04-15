@@ -328,4 +328,16 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         yield ['checkboxgrp', ['multiple' => 0], true];
         yield ['checkboxgrp', ['multiple' => 1], true];
     }
+
+    public function testFieldWidth(): void
+    {
+        $field = new Field();
+        $this->assertEquals('100%', $field->getFieldWidth(), 'Default field width should be 100%');
+
+        $field->setFieldWidth('50%');
+        $this->assertEquals('50%', $field->getFieldWidth(), 'Field width should be updated to 50%');
+
+        $field->setFieldWidth('');
+        $this->assertEquals('100%', $field->getFieldWidth(), 'Field width should default to 100% when set to empty string');
+    }
 }

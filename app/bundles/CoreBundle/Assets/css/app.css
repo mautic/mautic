@@ -6092,13 +6092,16 @@ input[style]:hover {
   padding: var(--spacing-01) var(--spacing-04);
 }
 .form-control[disabled],
-.form-control[readonly],
 fieldset[disabled] .form-control {
   color: var(--text-disabled);
 }
 .form-control[disabled] {
   cursor: not-allowed;
   border-bottom-color: transparent;
+}
+.form-control[readonly] {
+  background-color: transparent;
+  color: var(--text-primary);
 }
 .form-stack .form-control {
   position: relative;
@@ -10018,6 +10021,26 @@ code:hover > .copy-icon {
 }
 .rounded-corners-preview--32 {
   border-radius: 32px;
+}
+.category--inline-color {
+  width: 18px;
+  height: 8px;
+  border-radius: 10px;
+  background: var(--category-color);
+  transition: var(--transition-all-productive);
+}
+.category--inline-color i {
+  opacity: 0;
+  transition: var(--transition-all-productive);
+  filter: invert(100%) grayscale(100%) contrast(500%);
+  color: var(--category-color);
+}
+.category--inline:hover .category--inline-color {
+  height: 16px;
+  width: 26px;
+}
+.category--inline:hover .category--inline-color i {
+  opacity: 1;
 }
 .toggle {
   display: inline-block;

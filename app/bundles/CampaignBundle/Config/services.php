@@ -37,6 +37,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.campaign.executioner.inactive', Mautic\CampaignBundle\Executioner\InactiveExecutioner::class);
     $services->alias('mautic.campaign.executioner.scheduled', Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class);
     $services->alias('mautic.campaign.scheduler.optimized', Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized::class);
+    $services->alias('mautic.campaign.event_logger', Mautic\CampaignBundle\Executioner\Logger\EventLogger::class);
+    $services->alias('mautic.campaign.executioner.kickoff', Mautic\CampaignBundle\Executioner\KickoffExecutioner::class);
     $services->set(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
 
     if ('test' === ($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'prod')) {
