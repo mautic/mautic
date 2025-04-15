@@ -90,38 +90,48 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        // Request the emails page
+        // --- Load the Emails page ---
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
         $this->assertResponseIsSuccessful();
 
-        // Extract data-content from the quick filters button
+        // --- Extract the quick filters HTML ---
         $dataContent = $crawler->filter('#core-quick-filters')->extract(['data-content'])[0] ?? '';
         $crawler     = new Crawler($dataContent, $this->client->getInternalRequest()->getUri());
 
-        // Get all optgroup labels
-        $labels = $crawler->filterXPath('//select[@id="filters"]/optgroup')->each(
-            fn (Crawler $node) => $node->attr('label')
-        );
+        // --- Assert all expected labels are present ---
+        $labels = $crawler->filter('label');
+        $this->assertCount(3, $labels);
+        $this->assertEquals('Filter by Segment', $labels->eq(0)->text());
+        $this->assertEquals('Filter by Category', $labels->eq(1)->text());
+        $this->assertEquals('Filter by Theme', $labels->eq(2)->text());
 
+        // --- Check Segment filter select box ---
+        $segmentSelect = $crawler->filter('#mautic\.core\.filter\.lists');
+        $this->assertCount(1, $segmentSelect);
+        $this->assertEquals('Filter by Segment', $segmentSelect->attr('data-placeholder'));
+
+        // --- Check if the default "No Segment available" option is present and disabled ---
+        $firstOption = $segmentSelect->filter('option')->first();
+        $this->assertTrue($firstOption->attr('disabled') !== null);
+        $this->assertEquals('No Segment available', trim($firstOption->text()));
+
+        // --- Check Category filter select box exists and has the expected option ---
+        $categorySelect = $crawler->filter('#mautic\.core\.filter\.categories');
+        $this->assertEquals(1, $categorySelect->count(), 'Category select list not found');
+
+        // --- Validate data-placeholder using translator service ---
         $translator = $this->getContainer()->get('translator');
         \assert($translator instanceof TranslatorInterface);
+        $expectedPlaceholder = $translator->trans('mautic.core.filter.placeholder', [
+            '%entity%' => $translator->trans('mautic.core.filter.categories')
+        ]);
+        $this->assertEquals($expectedPlaceholder, $categorySelect->attr('data-placeholder'));
 
-        // Assert that "Categories" filter exists
-        $this->assertContains($translator->trans('mautic.core.filter.categories'), $labels);
-
-        // Get options inside the "Category" optgroup
-        $label       = $translator->trans('mautic.core.filter.categories');
-        $optionGroup = $crawler->filter('optgroup[label="'.$label.'"] option');
-        $this->assertCount(2, $optionGroup);
-
-        $options     = $optionGroup->each(
-            fn (Crawler $node) => $node->text()
-        );
-
-        // Assert that "Uncategorized" exists in the category options
-        $this->assertContains($translator->trans('mautic.core.form.uncategorized'), $options);
-        // Assert that "FilterTest" exists in the category options
-        $this->assertContains($categoryName, $options);
+        // --- Check for presence of the dynamically created category option ---
+        $categorySelectOptions = $categorySelect->filter('option');
+        $this->assertGreaterThanOrEqual(1, $categorySelectOptions->count(), 'Category options not found');
+        $this->assertEquals('category:filtertest', $categorySelectOptions->eq(1)->attr('value'));
+        $this->assertEquals('FilterTest', trim($categorySelectOptions->eq(1)->text()));
     }
 
     /**z
