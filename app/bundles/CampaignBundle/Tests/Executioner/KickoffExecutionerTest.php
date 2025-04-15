@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -145,6 +146,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->executioner,
             $this->scheduler,
+            $this->createMock(ProcessSignalService::class),
             $this->coreParametersHelper
         );
     }

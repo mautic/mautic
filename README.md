@@ -343,6 +343,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/1792826181"><img src="https://avatars.githubusercontent.com/u/105675530?v=4?s=100" width="100px;" alt="Jun"/><br /><sub><b>Jun</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=1792826181" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/goma101"><img src="https://avatars.githubusercontent.com/u/104629384?v=4?s=100" width="100px;" alt="Guilherme Gomes"/><br /><sub><b>Guilherme Gomes</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=goma101" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=goma101" title="Tests">⚠️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/pedroasgomes"><img src="https://avatars.githubusercontent.com/u/99080726?v=4?s=100" width="100px;" alt="Pedro Gomes"/><br /><sub><b>Pedro Gomes</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pedroasgomes" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ElPollero"><img src="https://avatars.githubusercontent.com/u/130322184?v=4?s=100" width="100px;" alt="ElPollero"/><br /><sub><b>ElPollero</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ElPollero" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

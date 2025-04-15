@@ -547,6 +547,10 @@ Mautic.convertLeadFilterInput = function(el) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
 
+        mQuery('#leadlist_filters_' + filterNum + '_properties_filter').on('keypress', function (event) {
+            if ( event.which === 13 ) event.preventDefault();
+        })
+
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
 

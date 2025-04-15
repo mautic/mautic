@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,6 +45,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         private EventExecutioner $executioner,
         private EventScheduler $scheduler,
         private ScheduledContactFinder $scheduledContactFinder,
+        private ProcessSignalService $processSignalService,
     ) {
     }
 
@@ -234,6 +236,8 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
             // Execute if there are any that did not get rescheduled
             $this->executioner->executeLogs($event, $logs, $this->counter);
+
+            $this->processSignalService->throwExceptionIfSignalIsCaught();
 
             // Get next batch
             $this->scheduledContactFinder->clear($fetchedContacts);
