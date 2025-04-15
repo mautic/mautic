@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -65,7 +66,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $event->addEntity(Campaign::ENTITY_NAME, $campaignData);
-        $this->logAction('export', $campaignId, $campaignData);
+        $this->logAction('export', $campaignId, []);
 
         $campaignEvent = new EntityExportEvent(Event::ENTITY_NAME, $campaignId);
         $campaignEvent = $this->dispatcher->dispatch($campaignEvent);
@@ -202,7 +203,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $stats[$status]['ids'][]   = $object->getId();
             ++$stats[$status]['count'];
 
-            $this->logAction('import', $object->getId(), $campaignData);
+            $campaignEvent = new CampaignEvent($object, $isNew);
+            $this->dispatcher->dispatch($campaignEvent);
         }
 
         foreach ($stats as $status => $info) {
@@ -761,7 +763,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             if ($entity) {
                 $this->entityManager->remove($entity);
-                $this->logAction('undo_import', $id, ['deletedEntity' => Campaign::class]);
+                $this->logAction('undo_import', $id, []);
             }
         }
 

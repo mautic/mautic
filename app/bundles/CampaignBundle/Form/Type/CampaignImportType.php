@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -11,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignImportType extends AbstractType
+final class CampaignImportType extends AbstractType
 {
     /**
      * Build the form fields for importing campaign data.

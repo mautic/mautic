@@ -348,6 +348,10 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Export the campaign
+        $this->client->request(Request::METHOD_GET, '/api/campaigns/export/99999');
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(404, (string) $clientResponse->getStatusCode());
+
         $this->client->request(Request::METHOD_GET, '/api/campaigns/export/'.$campaign->getId());
         $clientResponse = $this->client->getResponse();
 

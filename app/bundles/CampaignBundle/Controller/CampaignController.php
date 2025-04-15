@@ -5,6 +5,7 @@ namespace Mautic\CampaignBundle\Controller;
 use Doctrine\DBAL\Cache\CacheException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\AssetBundle\Event\AsssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -40,6 +41,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -187,7 +189,12 @@ class CampaignController extends AbstractStandardFormController
         }
 
         $jsonOutput = json_encode([$data], JSON_PRETTY_PRINT);
-        $filePath   = $exportHelper->writeToZipFile($jsonOutput);
+
+        $assetListEvent = new AsssetExportListEvent([$data]);
+        $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
+        $assetList      = $assetListEvent->getList();
+
+        $filePath   = $exportHelper->writeToZipFile($jsonOutput, $assetList);
 
         if (!file_exists($filePath)) {
             $this->logger->error('Export file could not be created', ['filePath' => $filePath]);
@@ -275,8 +282,12 @@ class CampaignController extends AbstractStandardFormController
             }
         }
 
+        $assetListEvent = new AsssetExportListEvent($allData);
+        $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
+        $assetList      = $assetListEvent->getList();
+
         $jsonOutput = json_encode($allData, JSON_PRETTY_PRINT);
-        $filePath   = $exportHelper->writeToZipFile($jsonOutput);
+        $filePath   = $exportHelper->writeToZipFile($jsonOutput, $assetList);
 
         if (!file_exists($filePath)) {
             $this->logger->error('Export file could not be created', ['filePath' => $filePath]);

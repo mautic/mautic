@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\AssetBundle\Event\AsssetExportListEvent;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -68,7 +69,11 @@ final class EntityExportCommand extends ModeratedCommand
             return self::FAILURE;
         }
 
-        return $this->outputData($allData, $input, $output);
+        $assetListEvent = new AsssetExportListEvent($allData);
+        $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
+        $assetList      = $assetListEvent->getList();
+
+        return $this->outputData($allData, $assetList, $input, $output);
     }
 
     private function dispatchEntityExportEvent(string $entityName, int $entityId): EntityExportEvent
@@ -81,7 +86,7 @@ final class EntityExportCommand extends ModeratedCommand
     /**
      * @param array<array<string, mixed>> $data
      */
-    private function outputData(array $data, InputInterface $input, OutputInterface $output): int
+    private function outputData(array $data, array $assetList, InputInterface $input, OutputInterface $output): int
     {
         $jsonOutput = json_encode($data, JSON_PRETTY_PRINT);
 
@@ -91,7 +96,7 @@ final class EntityExportCommand extends ModeratedCommand
             $filePath = $this->writeToFile($jsonOutput);
             $output->writeln('<info>JSON file created at:</info> '.$filePath);
         } elseif ($input->getOption('zip-file')) {
-            $zipPath = $this->exportHelper->writeToZipFile($jsonOutput);
+            $zipPath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList);
             $output->writeln('<info>ZIP file created at:</info> '.$zipPath);
         } else {
             $output->writeln('<error>You must specify one of --json-only, --json-file, or --zip-file options.</error>');

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
@@ -245,7 +244,7 @@ class ExportHelper
         );
     }
 
-    public function writeToZipFile(string $jsonOutput): string
+    public function writeToZipFile(string $jsonOutput, array $assetList): string
     {
         $tempDir      = sys_get_temp_dir();
         $jsonFilePath = sprintf('%s/entity_data.json', $tempDir);
@@ -263,30 +262,12 @@ class ExportHelper
         $zip = new \ZipArchive();
         if (true === $zip->open($zipFilePath, \ZipArchive::CREATE)) {
             $zip->addFile($jsonFilePath, 'entity_data.json');
-
-            $data = json_decode($jsonOutput, true);
-
-            foreach ($data as $section) {
-                if (!is_array($section)) {
-                    continue;
-                }
-
-                if (!isset($section[Asset::ENTITY_NAME]) || !is_array($section[Asset::ENTITY_NAME])) {
-                    continue;
-                }
-
-                foreach ($section[Asset::ENTITY_NAME] as $asset) {
-                    $location = $asset['storage_location'] ?? null;
-                    $path     = $asset['path'] ?? null;
-
-                    if ('local' === $location && !empty($path)) {
-                        $assetPath = $this->pathsHelper->getSystemPath('media').'/files/'.$path;
-                        if (file_exists($assetPath)) {
-                            $zip->addFile($assetPath, 'assets/'.basename($assetPath));
-                        }
-                    }
+            foreach ($assetList as $assetPath) {
+                if (file_exists($assetPath)) {
+                    $zip->addFile($assetPath, 'assets/'.basename($assetPath));
                 }
             }
+
             $zip->close();
             @unlink($jsonFilePath);
         }
