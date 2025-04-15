@@ -6,6 +6,9 @@ on:
       - '[0-9].*'
   pull_request:
   merge_group:
+  schedule:
+    # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
+    - cron: '45 10 * * *'
 
 permissions:
   contents: read # to fetch code (actions/checkout)
