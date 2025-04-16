@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -20,7 +21,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
+final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use UserEntityTrait;
 
@@ -425,82 +426,13 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
-        // Provide the full structure exactly like the export output
-        $payload = [[
-            'campaign' => [[
-                'id'              => 1,
-                'name'            => 'test2',
-                'description'     => null,
-                'is_published'    => false,
-                'canvas_settings' => [
-                    'nodes' => [
-                        ['id' => '1', 'positionX' => '553', 'positionY' => '158'],
-                        ['id' => 'lists', 'positionX' => '653', 'positionY' => '53'],
-                    ],
-                    'connections' => [
-                        [
-                            'sourceId' => 'lists',
-                            'targetId' => '1',
-                            'anchors'  => [
-                                'source' => 'leadsource',
-                                'target' => 'top',
-                            ],
-                        ],
-                    ],
-                ],
-                'uuid' => 'b4ddc4d7-149e-4a81-9141-0e03c598627a',
-            ]],
-            'campaign_event' => [[
-                'id'          => 1,
-                'campaign_id' => 1,
-                'name'        => 'Device visit',
-                'description' => null,
-                'type'        => 'page.devicehit',
-                'event_type'  => 'decision',
-                'event_order' => 0,
-                'properties'  => [
-                    'device_type'  => [],
-                    'device_brand' => [],
-                    'device_os'    => [],
-                ],
-                'trigger_interval'      => 0,
-                'trigger_interval_unit' => null,
-                'trigger_mode'          => null,
-                'triggerDate'           => null,
-                'channel'               => 'page',
-                'channel_id'            => 0,
-                'parent_id'             => null,
-                'uuid'                  => 'b3c03e30-d6a2-469b-9607-a9a98d7ef238',
-            ]],
-            'lists' => [[
-                'id'                   => 1,
-                'name'                 => 'Test Seg',
-                'is_published'         => true,
-                'description'          => null,
-                'alias'                => 'test-seg',
-                'public_name'          => 'Test Seg',
-                'filters'              => [],
-                'is_global'            => true,
-                'is_preference_center' => false,
-                'uuid'                 => 'd697157e-9ae3-4600-aa2e-4a2a5a6e36e0',
-            ]],
-            'dependencies' => [[
-                'campaign_event' => [
-                    ['campaign' => 1, 'campaign_event' => 1],
-                ],
-                'lists' => [
-                    ['campaign' => 1, 'lists' => 1],
-                ],
-            ]],
-        ]];
-
         $this->client->request(
             Request::METHOD_POST,
             '/api/campaigns/import',
             [],
             [],
             [],
-            json_encode($payload, JSON_PRETTY_PRINT)
+            json_encode(FixtureHelper::getPayload(), JSON_PRETTY_PRINT)
         );
 
         $clientResponse = $this->client->getResponse();
@@ -522,72 +454,12 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
-        // Same campaign structure as the export
-        $payload = [[
-            'campaign' => [[
-                'id'              => 1,
-                'name'            => 'test zip import',
-                'description'     => 'Imported from ZIP',
-                'is_published'    => false,
-                'canvas_settings' => [
-                    'nodes' => [
-                        ['id' => '1', 'positionX' => '100', 'positionY' => '100'],
-                        ['id' => 'lists', 'positionX' => '200', 'positionY' => '50'],
-                    ],
-                    'connections' => [
-                        [
-                            'sourceId' => 'lists',
-                            'targetId' => '1',
-                            'anchors'  => [
-                                'source' => 'leadsource',
-                                'target' => 'top',
-                            ],
-                        ],
-                    ],
-                ],
-                'uuid' => 'zip-uuid-test',
-            ]],
-            'campaign_event' => [[
-                'id'               => 1,
-                'campaign_id'      => 1,
-                'name'             => 'Event via ZIP',
-                'description'      => null,
-                'type'             => 'page.devicehit',
-                'event_type'       => 'decision',
-                'event_order'      => 0,
-                'properties'       => [],
-                'trigger_interval' => 0,
-                'channel'          => 'page',
-                'channel_id'       => 0,
-                'uuid'             => 'event-uuid-zip',
-            ]],
-            'lists' => [[
-                'id'                   => 1,
-                'name'                 => 'ZIP Seg',
-                'alias'                => 'zip-seg',
-                'public_name'          => 'ZIP Seg',
-                'is_published'         => true,
-                'filters'              => [],
-                'uuid'                 => 'list-uuid-zip',
-                'is_global'            => true,
-                'is_preference_center' => false,
-            ]],
-            'dependencies' => [[
-                'campaign_event' => [
-                    ['campaign' => 1, 'campaign_event' => 1],
-                ],
-                'lists' => [
-                    ['campaign' => 1, 'lists' => 1],
-                ],
-            ]],
-        ]];
-
         // Create temporary zip file
         $zip     = new \ZipArchive();
         $zipPath = tempnam(sys_get_temp_dir(), 'mautic_zip_test').'.zip';
 
         if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
-            $zip->addFromString('campaign.json', json_encode($payload, JSON_PRETTY_PRINT));
+            $zip->addFromString('campaign.json', json_encode(FixtureHelper::getPayload(), JSON_PRETTY_PRINT));
             $zip->close();
         } else {
             $this->fail('Failed to create test ZIP file.');
