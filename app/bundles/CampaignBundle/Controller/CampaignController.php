@@ -41,7 +41,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -178,16 +177,6 @@ class CampaignController extends AbstractStandardFormController
         $event = $this->dispatcher->dispatch($event);
         $data  = $event->getEntities();
 
-        if (empty($data)) {
-            $this->logger->warning('No data found for campaign export', ['objectId' => $objectId]);
-            $this->addFlashMessage('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], FlashBag::LEVEL_ERROR);
-
-            return new JsonResponse([
-                'error'   => $this->translator->trans('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], 'flashes'),
-                'flashes' => $this->getFlashContent(),
-            ], 400);
-        }
-
         $jsonOutput = json_encode([$data], JSON_PRETTY_PRINT);
 
         $assetListEvent = new AsssetExportListEvent([$data]);
@@ -271,14 +260,6 @@ class CampaignController extends AbstractStandardFormController
 
             if (!empty($data)) {
                 $allData[] = $data;
-            } else {
-                $this->logger->warning('No data found for campaign export', ['objectId' => $objectId]);
-                $this->addFlashMessage('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], FlashBag::LEVEL_ERROR);
-
-                return new JsonResponse([
-                    'error'   => $this->translator->trans('mautic.campaign.error.export.no_data', ['%objectId%' => $objectId], 'flashes'),
-                    'flashes' => $this->getFlashContent(),
-                ], 400);
             }
         }
 

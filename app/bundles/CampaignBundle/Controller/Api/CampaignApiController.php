@@ -383,13 +383,6 @@ class CampaignApiController extends CommonApiController
         $this->dispatcher->dispatch($event);
         $data = $event->getEntities();
 
-        // Check if there is data to export
-        if (empty($data)) {
-            return $this->handleView(
-                $this->view(['error' => $this->translator->trans('mautic.campaign.error.export.no_data', [], 'flashes')], Response::HTTP_BAD_REQUEST)
-            );
-        }
-
         // Prepare response
         $view = $this->view([$data], Response::HTTP_OK);
         $this->setSerializationContext($view);

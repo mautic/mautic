@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Controller\Api;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -17,9 +18,12 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use UserEntityTrait;
+
     public function setUp(): void
     {
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
@@ -381,6 +385,41 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    public function testExportCampaignActionAccessDenied(): void
+    {
+        // Create a user without export permissions
+        $nonAdminUser = $this->createUserWithPermission([
+            'user-name'  => 'non-admin',
+            'email'      => 'non-admin@mautic-test.com',
+            'first-name' => 'non-admin',
+            'last-name'  => 'non-admin',
+            'role'       => [
+                'name'        => 'perm_non_admin',
+                'permissions' => [
+                    'campaign:campaigns'     => 2,
+                    'campaign:export:enable' => 2,
+                ],
+            ],
+        ]);
+
+        $this->loginUser($nonAdminUser);
+
+        // Create and persist a campaign
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign');
+        $campaign->setDescription('Test description');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Attempt to export the campaign
+        $this->client->request(Request::METHOD_GET, '/api/campaigns/export/'.$campaign->getId());
+
+        $response = $this->client->getResponse();
+
+        // Assert that access is denied
+        $this->assertEquals(403, $response->getStatusCode());
+    }
+
     public function testImportCampaignActionJson(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
@@ -575,5 +614,138 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(201);
         $decoded = json_decode($response->getContent(), true);
         $this->assertContains('Campaign imported successfully.', $decoded);
+    }
+
+    public function testImportCampaignAccessDenied(): void
+    {
+        $userWithoutPermission = $this->createUserWithPermission([
+            'user-name'  => 'no-import-user',
+            'email'      => 'no-import@mautic-test.com',
+            'first-name' => 'NoImport',
+            'last-name'  => 'User',
+            'role'       => [
+                'name'        => 'no_import_role',
+                'permissions' => [
+                    // Do not grant 'campaign:imports:create'
+                ],
+            ],
+        ]);
+
+        $this->loginUser($userWithoutPermission);
+
+        // Attempt to import a campaign
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import');
+
+        $response = $this->client->getResponse();
+
+        // Assert that access is denied
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testImportCampaignNoFileUploaded(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Attempt to import with no files
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import');
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('No JSON content found and exactly one ZIP file must be uploaded.', $response->getContent());
+    }
+
+    private function createTemporaryFile(string $extension): string
+    {
+        $filePath = tempnam(sys_get_temp_dir(), 'mautic_test_').'.'.$extension;
+        file_put_contents($filePath, 'test content');
+
+        return $filePath;
+    }
+
+    public function testImportCampaignInvalidFile(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create a temporary file
+        $filePath = $this->createTemporaryFile('txt');
+
+        // Upload the invalid file
+        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testImportCampaignUnsupportedFileType(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create a temporary file with a non-ZIP extension
+        $filePath = $this->createTemporaryFile('txt');
+        $file     = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testImportCampaignFilePathDoesNotExist(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        $filePath = tempnam(sys_get_temp_dir(), 'mautic_test_');
+
+        // Create an UploadedFile object with the deleted file path
+        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.zip', null, null, true);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+    }
+
+    public function testImportCampaignMalformedJson(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Create a temporary ZIP file with invalid JSON
+        $zipPath = $this->createTemporaryFile('zip');
+        $zip     = new \ZipArchive();
+        if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
+            $zip->addFromString('malformed.json', '{invalid json}');
+            $zip->close();
+        }
+
+        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'test.zip', null, null, true);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('Malformed campaign JSON file - unable to parse JSON.', $response->getContent());
+
+        // Clean up
+        unlink($zipPath);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-final class ImportHelper
+class ImportHelper
 {
     public function __construct(
         private PathsHelper $pathsHelper,
