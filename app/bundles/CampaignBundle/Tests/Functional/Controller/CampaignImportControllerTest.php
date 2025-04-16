@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -36,9 +37,22 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         // Simulate file upload
         $filePath = tempnam(sys_get_temp_dir(), 'import_test_').'.zip';
         file_put_contents($filePath, 'dummy content');
-        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.zip', 'application/zip', null, true);
 
-        $this->client->request(Request::METHOD_POST, '/s/campaign/import/upload', [], ['campaign_import' => ['campaignFile' => $file]]);
+        $uploadedFile = new UploadedFile(
+            $filePath,
+            'test.zip',
+            'application/zip',
+            null,
+            true
+        );
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/campaign/import/upload',
+            [], // Parameters
+            ['campaign_import' => ['campaignFile' => $uploadedFile]],
+            ['CONTENT_TYPE'    => 'multipart/form-data']
+        );
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode()); // Expect a redirect
