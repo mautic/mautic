@@ -151,8 +151,8 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         }
 
         $summary = [
-            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
+            EntityImportEvent::NEW    => ['names' => []],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
         ];
 
         foreach ($event->getEntityData() as $item) {
@@ -160,15 +160,13 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getTitle();
                 $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
-                ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['title'];
-                ++$summary[EntityImportEvent::NEW]['count'];
             }
         }
 
         foreach ($summary as $type => $data) {
-            if ($data['count'] > 0) {
+            if (count($data['names']) > 0) {
                 $event->setSummary($type, [Page::ENTITY_NAME => $data]);
             }
         }

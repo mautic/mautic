@@ -144,8 +144,8 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         }
 
         $summary = [
-            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
+            EntityImportEvent::NEW    => ['names' => []],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
         ];
 
         foreach ($event->getEntityData() as $item) {
@@ -153,15 +153,13 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
-                ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['name'];
-                ++$summary[EntityImportEvent::NEW]['count'];
             }
         }
 
         foreach ($summary as $type => $info) {
-            if ($info['count'] > 0) {
+            if (count($info['names']) > 0) {
                 $event->setSummary($type, [DynamicContent::ENTITY_NAME => $info]);
             }
         }

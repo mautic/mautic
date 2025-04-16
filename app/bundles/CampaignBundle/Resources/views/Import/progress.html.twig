@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    {% set progress = importProgress.progress ?? 0 %}
+    {% set progress = importProgress ?? 0 %}
     {% set isComplete = progress >= 100 %}
     {% set hasErrors = (
         (importSummary|default([]))|filter(s =>

@@ -221,8 +221,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $summary = [
-            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
+            EntityImportEvent::NEW    => ['names' => []],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
         ];
 
         foreach ($event->getEntityData() as $element) {
@@ -231,15 +231,13 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
-                ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $element['name'] ?? '';
-                ++$summary[EntityImportEvent::NEW]['count'];
             }
         }
 
         foreach ($summary as $status => $info) {
-            if ($info['count'] > 0) {
+            if (count($info['names']) > 0) {
                 $event->setSummary($status, [Campaign::ENTITY_NAME => $info]);
             }
         }

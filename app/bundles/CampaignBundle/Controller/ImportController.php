@@ -260,32 +260,12 @@ final class ImportController extends AbstractFormController
                 return $this->redirectToRoute('mautic_campaign_import_action', ['objectAction' => 'new']);
             }
             $session->set('mautic.campaign.import.step', self::STEP_IMPORT_FROM_ZIP);
-            $session->set('mautic.campaign.import.progress', 50);
             $session->set('mautic.campaign.import.analyzeSummary', $analyzeSummary);
-
-            // Calculate update_count create_count
-            $updateCount = 0;
-            $createCount = 0;
-
-            foreach ($analyzeSummary as $summary) {
-                if (!empty($summary[EntityImportEvent::UPDATE])) {
-                    foreach ($summary[EntityImportEvent::UPDATE] as $details) {
-                        $updateCount += $details['count'];
-                    }
-                }
-                if (!empty($summary[EntityImportEvent::NEW])) {
-                    foreach ($summary[EntityImportEvent::NEW] as $details) {
-                        $createCount += $details['count'];
-                    }
-                }
-            }
 
             return $this->delegateView([
                 'viewParameters' => [
-                    'importProgress'  => ['progress' => 50],
+                    'importProgress'  => 50,
                     'analyzeSummary'  => $analyzeSummary,
-                    'updateCount'     => $updateCount,
-                    'createCount'     => $createCount,
                     'mauticContent'   => 'campaignImport',
                 ],
                 'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
@@ -377,13 +357,12 @@ final class ImportController extends AbstractFormController
                 }
 
                 $session->set('mautic.campaign.import.summary', $importSummary);
-                $session->set('mautic.campaign.import.progress', 100);
                 $this->resetImport();
             }
 
             return $this->delegateView([
                 'viewParameters' => [
-                    'importProgress'  => ['progress' => 100],
+                    'importProgress'  => 100,
                     'importSummary'   => $importSummary,
                     'mauticContent'   => 'campaignImport',
                 ],
@@ -430,7 +409,6 @@ final class ImportController extends AbstractFormController
                             $mergedSummary[$status][$entityName] = [
                                 'names'   => [],
                                 'uuids'   => [],
-                                'count'   => 0,
                             ];
                         }
 
@@ -442,7 +420,6 @@ final class ImportController extends AbstractFormController
                             $mergedSummary[$status][$entityName]['uuids'],
                             $info['uuids'] ?? []
                         );
-                        $mergedSummary[$status][$entityName]['count'] += $info['count'] ?? 0;
                     }
                 }
             }

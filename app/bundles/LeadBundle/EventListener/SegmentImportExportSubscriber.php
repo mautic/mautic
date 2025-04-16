@@ -185,8 +185,8 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         }
 
         $summary = [
-            EntityImportEvent::NEW    => ['names' => [], 'count' => 0],
-            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => [], 'count' => 0],
+            EntityImportEvent::NEW    => ['names' => []],
+            EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
             'errors'                  => [],
         ];
 
@@ -205,10 +205,8 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
-                ++$summary[EntityImportEvent::UPDATE]['count'];
             } else {
                 $summary[EntityImportEvent::NEW]['names'][] = $item['name'];
-                ++$summary[EntityImportEvent::NEW]['count'];
             }
         }
 
@@ -220,7 +218,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            if (isset($data['count']) && is_int($data['count']) && $data['count'] > 0) {
+            if (isset($data['names']) && count($data['names']) > 0) {
                 $event->setSummary($type, [LeadList::ENTITY_NAME => $data]);
             }
         }
