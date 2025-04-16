@@ -162,6 +162,43 @@ class DynamicContentTypeTest extends TestCase
             ->with('type')
             ->willReturn($formBuilderInterfaceMock);
 
+        $formBuilderInterfaceMock->expects($this->exactly(3))
+            ->method('addEventListener')
+            ->withConsecutive(
+                [
+                    FormEvents::PRE_SUBMIT,
+                    $this->callback(function ($listener) {
+                        $reflection = new \ReflectionFunction($listener);
+                        $parameters = $reflection->getParameters();
+
+                        return FormEvent::class === (string) $parameters[0]->getType();
+                    }),
+                ],
+                [
+                    FormEvents::PRE_SET_DATA,
+                    $this->callback(function ($listener) {
+                        $reflection = new \ReflectionFunction($listener);
+                        $parameters = $reflection->getParameters();
+
+                        return FormEvent::class === (string) $parameters[0]->getType();
+                    }),
+                ],
+                [
+                    FormEvents::POST_SUBMIT,
+                    $this->callback(function ($listener) {
+                        $reflection = new \ReflectionFunction($listener);
+                        $parameters = $reflection->getParameters();
+
+                        return FormEvent::class === (string) $parameters[0]->getType();
+                    }),
+                ]
+            );
+
+        $formBuilderInterfaceMock->expects($this->once())
+            ->method('get')
+            ->with('type')
+            ->willReturn($formBuilderInterfaceMock);
+
         $dynamicContentType->buildForm($formBuilderInterfaceMock, $options);
     }
 

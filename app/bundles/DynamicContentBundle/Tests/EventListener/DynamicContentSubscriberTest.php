@@ -96,6 +96,8 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
         $this->subscriber            = new DynamicContentSubscriber(
+        $this->leadRepository        = $this->createMock(LeadListRepository::class);
+        $this->subscriber            = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
             $this->assetTokenHelper,
@@ -106,7 +108,8 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dynamicContentModel,
             $this->security,
             $this->contactTracker,
-            $this->companyLeadRepository
+            $this->companyLeadRepository,
+            $this->leadRepository,
         );
     }
 

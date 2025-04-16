@@ -19,6 +19,7 @@ use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -348,6 +349,21 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
                 // sort by language
                 ksort($results);
+
+                break;
+
+            case 'slot_name':
+                $entities = $this->getRepository()->getSlotNamesList(
+                    $filter,
+                    $limit,
+                    $start
+                );
+                foreach ($entities as $entity) {
+                    $results[] = [
+                        'label' => $entity['slot_name'],
+                        'value' => $entity['slot_name'],
+                    ];
+                }
 
                 break;
         }

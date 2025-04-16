@@ -19,9 +19,9 @@ use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Validator\Constraints\NoNesting;
 use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameType;
+use Mautic\DynamicContentBundle\Validator\Constraints\TypeChoice;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -63,6 +63,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var string
      */
     private $name;
+
+    /**
+     * @Groups({"dynamicContent:read", "dynamicContent:write"})
+     */
+    private string $type = TypeList::HTML;
 
     /**
      * @Groups({"dynamicContent:read", "dynamicContent:write"})
@@ -119,6 +124,14 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     private $slotName;
 
+    /**
+     * @Groups({"dynamicContent:read", "dynamicContent:write"})
+     */
+    private ?int $displayOrder = null;
+
+    /**
+     * DynamicContent constructor.
+     */
     public function __construct()
     {
         $this->stats               = new ArrayCollection();
@@ -178,6 +191,13 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
             ->columnName('sent_count')
             ->build();
 
+        $builder->addNamedField(
+            'displayOrder',
+            Types::INTEGER,
+            'display_order',
+            true
+        );
+
         $builder->createField('content', 'text')
             ->columnName('content')
             ->nullable()
@@ -222,8 +242,10 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
         $metadata->addPropertyConstraint('content', new NoNesting());
 
-        $metadata->addPropertyConstraint('type', new NotBlank(['message' => 'mautic.core.type.required']));
-        $metadata->addPropertyConstraint('type', new Choice(['choices' => (new TypeList())->getChoices()]));
+        $metadata->addPropertyConstraint('type', new NotBlank(['message' => 'mautic.core.name.required']));
+        $metadata->addPropertyConstraint('type', new TypeChoice());
+
+        $metadata->addConstraint(new SlotNameType());
 
         $metadata->addConstraint(new SlotNameType());
 
@@ -262,6 +284,24 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                                 ->atPath('filters')
                                 ->addViolation();
                     }
+
+                    $violations = $validator->validate(
+                        $dwc->getDisplayOrder(),
+                        [
+                            new NotBlank(
+                                [
+                                    'message' => 'mautic.dynamicContent.order.required',
+                                ]
+                            ),
+                        ]
+                    );
+                    if (count($violations) > 0) {
+                        foreach ($violations as $violation) {
+                            $context->buildViolation($violation->getMessage())
+                                ->atPath('displayOrder')
+                                ->addViolation();
+                        }
+                    }
                 }
             },
         ));
@@ -275,6 +315,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'name',
                 'category',
                 'type',
+                'displayOrder',
             ])
             ->addProperties([
                 'publishUp',
@@ -287,6 +328,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'filters',
                 'isCampaignBased',
                 'slotName',
+                'displayOrder',
             ])
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')
@@ -532,6 +574,19 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         if ($this->getIsCampaignBased()) {
             $this->setSlotName('');
         }
+    }
+
+    public function getDisplayOrder(): ?int
+    {
+        return $this->displayOrder;
+    }
+
+    public function setDisplayOrder(?int $displayOrder = null): self
+    {
+        $this->isChanged('displayOrder', $displayOrder);
+        $this->displayOrder = $displayOrder;
+
+        return $this;
     }
 
     /**

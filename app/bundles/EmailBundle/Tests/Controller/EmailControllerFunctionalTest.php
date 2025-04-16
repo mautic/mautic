@@ -751,4 +751,28 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertStringContainsString('Email subject maximum length is 190 characters', $response->getContent());
     }
+
+    private function createDynamicContent(string $type): DynamicContent
+    {
+        $dynamicContent = new DynamicContent();
+        $dynamicContent->setName('Dynamic content');
+        $dynamicContent->setType($type);
+        $dynamicContent->setIsCampaignBased(false);
+        $dynamicContent->setSlotName('slot-name');
+        $dynamicContent->setContent('text content');
+        $dynamicContent->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ]);
+        $this->em->persist($dynamicContent);
+
+        return $dynamicContent;
+    }
 }

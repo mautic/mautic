@@ -7,8 +7,10 @@ namespace Mautic\DynamicContentBundle\Tests\Controller;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
+use Mautic\DynamicContentBundle\Tests\Functional\DynamicContentReOrderingTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
@@ -20,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
+    use DynamicContentReOrderingTrait;
 
     public function testDwcGetEndpointForNoSlotNorContact(): void
     {
@@ -75,5 +78,104 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/dynamiccontents/new', $payload);
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $this->client->getResponse()->getContent());
+    }
+
+    public function testDynamicContentValidation(): void
+    {
+        $payload = [
+            'name'            => 'New Dynamic Content',
+            'isPublished'     => true,
+            'isCampaignBased' => 0,
+            'slotName'        => 'test-slot-Name',
+            'type'            => TypeList::HTML,
+            'language'        => 'en',
+            'filters'         => [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'city',
+                    'object'   => 'lead',
+                    'type'     => 'text',
+                    'filter'   => 'Pune',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', '/api/dynamiccontents/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertNotEmpty($response['errors']);
+    }
+
+    /**
+     * @dataProvider dataProviderWhileAdding
+     *
+     * @param array<string, int> $expectedOrder
+     */
+    public function testReOrderingNewDwcViaApi(string $orderValue, array $expectedOrder): void
+    {
+        $this->createDynamicContent('DC-1', 'slot-Name', 0);
+        $this->createDynamicContent('DC-2', 'slot-Name', 1);
+        $this->createDynamicContent('DC-3', 'slot-Name', 2);
+
+        $payload = [
+            'name'            => 'DC-4',
+            'isPublished'     => true,
+            'isCampaignBased' => 0,
+            'slotName'        => 'slot-Name',
+            'displayOrder'    => $orderValue,
+            'type'            => TypeList::HTML,
+            'language'        => 'en',
+            'filters'         => [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'city',
+                    'object'   => 'lead',
+                    'type'     => 'text',
+                    'filter'   => 'Pune',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/dynamiccontents/new', $payload);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        Assert::assertNotEmpty($response['dynamicContent']);
+        Assert::assertSame('DC-4', $response['dynamicContent']['name']);
+
+        $this->assertDynamicContentOrder('slot-Name', $expectedOrder);
+    }
+
+    /**
+     * @dataProvider dataProviderWhileEditing
+     *
+     * @param array<string, int> $expectedOrder
+     */
+    public function testReOrderingForExistingDwcViaApi(string $orderValue, array $expectedOrder, bool $switchInitialOrder): void
+    {
+        $dwc1 = $this->createDynamicContent('DC-1', 'slot-Name', 0);
+        $this->createDynamicContent('DC-2', 'slot-Name', 1);
+        $this->createDynamicContent('DC-3', 'slot-Name', 2);
+        $dwc4 = $this->createDynamicContent('DC-4', 'slot-Name', 3);
+
+        $dwcId   = $switchInitialOrder ? $dwc1->getId() : $dwc4->getId();
+        $dwcName = $switchInitialOrder ? $dwc1->getName() : $dwc4->getName();
+
+        $payload = [
+            'isCampaignBased' => 0,
+            'slotName'        => 'slot-Name',
+            'displayOrder'    => $orderValue,
+        ];
+
+        $this->client->request(Request::METHOD_PATCH, "/api/dynamiccontents/{$dwcId}/edit", $payload);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        Assert::assertNotEmpty($response['dynamicContent']);
+        Assert::assertSame($dwcName, $response['dynamicContent']['name']);
     }
 }

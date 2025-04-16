@@ -58,6 +58,10 @@ class EmailSendEvent extends CommonEvent
 
     private bool $isSubject = false;
 
+    private bool $isPreview = false;
+
+    private bool $isSubject = false;
+
     /**
      * @param array $args
      * @param bool  $isDynamicContentParsing

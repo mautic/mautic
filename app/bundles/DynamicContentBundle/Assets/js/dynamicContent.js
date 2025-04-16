@@ -162,10 +162,36 @@ Mautic.dynamicContentOnLoad = function (container, response) {
 
     var availableFilters = mQuery('div.dwc-filter').find('select[data-mautic="available_filters"]');
     Mautic.activateChosenSelect(availableFilters, false);
-
     Mautic.dynamicFiltersOnLoad('div.dwc-filter');
     Mautic.dwcGenerator.init();
 };
+
+Mautic.activateSlotNameLookupField = function (fieldOptions, filterId) {
+    Mautic.activateLookupField (fieldOptions, filterId, 'dwc_slotName');
+};
+
+Mautic.fetchDwcDisplayOrder = function(slotName) {
+    mQuery.ajax({
+        url: `${mauticAjaxUrl}?action=dynamicContent:getDwcTokensBySlotName`,
+        data: { slotName: slotName },
+        success: function(response) {
+            const displayOrders = response.display_orders;
+            const orderField = mQuery('select#dwc_displayOrder').empty();
+            const currentOrder = parseInt(orderField.attr('data-current-order'));
+
+            mQuery('<option/>').val('').text(Mautic.translate('mautic.dynamicContent.choose.placeholder')).appendTo(orderField);
+            mQuery('<option/>').val(0).text(Mautic.translate('mautic.dynamicContent.choose.default.order')).appendTo(orderField);
+
+            mQuery.each(displayOrders, function (label, value) {
+                if (value !== currentOrder) {
+                    mQuery('<option/>').val(value).text(label).appendTo(orderField);
+                }
+            })
+            orderField.trigger('chosen:updated');
+        },
+        error: Mautic.processAjaxError
+    });
+}
 
 Mautic.dynamicFiltersOnLoad = function(container, response) {
 

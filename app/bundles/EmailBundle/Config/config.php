@@ -249,6 +249,13 @@ return [
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
+            'mautic.email.validator.text_only_dynamic_content_subject_validator' => [
+                'class'     => Mautic\EmailBundle\Validator\TextOnlyDynamicContentValidator::class,
+                'arguments' => [
+                    'mautic.dynamicContent.model.dynamicContent',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
         ],
         'fixtures' => [
             'mautic.email.fixture.email' => [

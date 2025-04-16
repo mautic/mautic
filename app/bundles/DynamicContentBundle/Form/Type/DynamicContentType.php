@@ -133,9 +133,47 @@ class DynamicContentType extends AbstractType
                 'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
+                    'class'                  => 'form-control',
+                    'tooltip'                => 'mautic.dynamicContent.send.slot_name.tooltip',
+                    'data-callback'          => 'activateSlotNameLookupField',
+                    'data-toggle'            => 'field-lookup',
+                    'data-chosen-lookup'     => 'dynamicContent:slotNameList',
+                    'placeholder'            => '',
+                    'data-no-record-message' => '',
+                    'onchange'               => 'Mautic.fetchDwcDisplayOrder(mQuery(this).val())',
                 ],
+            ]
+        );
+
+        $displayOrderArray = ['mautic.dynamicContent.choose.default.order' => 0];
+        $slotName          = $options['data']->getSlotName() ?? '';
+        $currentOrder      = $options['data']->getDisplayOrder() ?? 0;
+
+        if (!empty($slotName)) {
+            $dynamicContents = $this->em->getRepository(DynamicContent::class)
+                ->getDynamicContentBySlotName($slotName);
+            foreach ($dynamicContents as $dynamicContent) {
+                if ($currentOrder != (int) $dynamicContent['display_order']) {
+                    $key                     = "({$dynamicContent['display_order']}) {$dynamicContent['name']}";
+                    $displayOrderArray[$key] = (int) $dynamicContent['display_order'];
+                }
+            }
+        }
+
+        $builder->add(
+            'displayOrder',
+            ChoiceType::class,
+            [
+                'label'      => 'mautic.dynamicContent.label.order',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'              => 'form-control',
+                    'tooltip'            => 'mautic.dynamicContent.label.order.tooltip',
+                    'data-current-order' => $options['data']->getDisplayOrder(),
+                ],
+                'choices'     => $displayOrderArray,
+                'data'        => $options['data']->getDisplayOrder() - 1,
+                'placeholder' => 'mautic.dynamicContent.choose.placeholder',
             ]
         );
 
@@ -352,6 +390,30 @@ class DynamicContentType extends AbstractType
             ),
             ARRAY_FILTER_USE_KEY
         );
+    }
+
+    /**
+     * @param FormInterface<FormInterface> $form
+     */
+    private function addContentField(FormInterface $form, ?string $type): void
+    {
+        $enableEditor = TypeList::HTML === $type;
+        $editorClass  = 'editor editor-advanced editor-builder-tokens';
+
+        $form->add('content', TextareaType::class, [
+            'label'      => 'mautic.dynamicContent.form.content',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'tooltip'              => 'mautic.dynamicContent.form.content.help',
+                'class'                => 'form-control'.($enableEditor ? ' '.$editorClass : ''),
+                'rows'                 => 15,
+                'data-editor-enable'   => $enableEditor,
+                'data-editor-class'    => $editorClass,
+                'data-token-callback'  => 'email:getBuilderTokens',
+                'data-token-activator' => '{',
+            ],
+            'required' => false,
+        ]);
     }
 
     /**

@@ -17,6 +17,7 @@ use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -44,12 +45,14 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private ContactTracker $contactTracker,
         private CompanyLeadRepository $companyLeadRepository,
+        private LeadListRepository $segmentRepository,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
+            DynamicContentEvents::PRE_SAVE          => ['setDisplayOrder', 0],
             DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
             DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
             DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
@@ -57,6 +60,34 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_SEND              => ['onEmailGenerate', 255],
             EmailEvents::EMAIL_ON_DISPLAY           => ['onEmailDisplay', 255],
         ];
+    }
+
+    public function setDisplayOrder(Events\DynamicContentEvent $event): void
+    {
+        $dynamicContent = $event->getDynamicContent();
+        $changes        = $event->getChanges();
+        if ($dynamicContent->getIsCampaignBased() || !isset($changes['displayOrder'])) {
+            return;
+        }
+        $dcRepository = $this->dynamicContentModel->getRepository();
+        $lastOrder    = $dcRepository->getLastDisplayOrder($dynamicContent->getSlotName()) + 1;
+        if ($dynamicContent->isNew()) {
+            $newOrder     = $dynamicContent->getDisplayOrder() + 1;
+
+            if ($lastOrder !== $newOrder) {
+                $dcRepository->reorderDwc($lastOrder, $newOrder, $dynamicContent->getSlotName());
+            }
+            $dynamicContent->setDisplayOrder($newOrder);
+        } else {
+            $previousOrder = $changes['displayOrder'][0] ?? $lastOrder;
+            if ($previousOrder !== $dynamicContent->getDisplayOrder()) {
+                $newOrder = $dynamicContent->getDisplayOrder() + 1;
+                $dcRepository->reorderDwc($previousOrder, $newOrder, $dynamicContent->getSlotName());
+                if ($previousOrder > $dynamicContent->getDisplayOrder()) {
+                    $dynamicContent->setDisplayOrder($newOrder);
+                }
+            }
+        }
     }
 
     /**
@@ -83,6 +114,16 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     public function onDelete(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
+
+        // Reordering other dwc after deletion.
+        $dcRepository = $this->dynamicContentModel->getRepository();
+        $slotName     = $entity->getSlotName();
+        $currentOrder = $entity->getDisplayOrder();
+        if (!$entity->getIsCampaignBased()
+            && $currentOrder < ($lastOrder = $dcRepository->getLastDisplayOrder($slotName))) {
+            $dcRepository->reorderDwc($currentOrder, ++$lastOrder, $slotName);
+        }
+
         $log    = [
             'bundle'   => 'dynamicContent',
             'object'   => 'dynamicContent',

@@ -130,6 +130,12 @@ class DynamicContentController extends FormController
             : $request->get('updateSelect', false);
         $form         = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
+        if (isset($dwc['slotName'])) {
+            $entity->setSlotName($dwc['slotName']);
+        }
+
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
+
         if (Request::METHOD_POST === $method) {
             $valid = false;
 
@@ -270,6 +276,9 @@ class DynamicContentController extends FormController
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
+        if (!empty($dwc)) {
+            $entity->setSlotName($dwc['slotName'] ?? '');
+        }
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
@@ -431,9 +440,11 @@ class DynamicContentController extends FormController
     public function cloneAction(Request $request, $objectId)
     {
         $model  = $this->getModel('dynamicContent');
+        /* @var DynamicContent $entity */
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
+            $entity->setDisplayOrder(0);
             if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')
                 || !$this->security->hasEntityAccess(
                     'dynamiccontent:dynamiccontents:viewown',
