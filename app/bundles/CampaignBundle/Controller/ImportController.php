@@ -93,7 +93,7 @@ final class ImportController extends AbstractFormController
 
     public function uploadAction(Request $request): Response
     {
-        $fullPath = $this->getFullZipPath();
+        $fullPath = $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
         $fileName = $this->getImportFileName();
 
         $importDir = $this->pathsHelper->getImportCampaignsPath();
@@ -222,14 +222,6 @@ final class ImportController extends AbstractFormController
         $session->set('mautic.campaign.import.file', $fileName);
 
         return $fileName;
-    }
-
-    /**
-     * Return full absolute path to the ZIP file.
-     */
-    private function getFullZipPath(): string
-    {
-        return $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
     }
 
     public function progressAction(ImportHelper $importHelper): Response

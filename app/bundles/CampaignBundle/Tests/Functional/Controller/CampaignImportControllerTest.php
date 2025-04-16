@@ -14,6 +14,75 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
+    /** @var array<int, array<string, mixed>> */
+    public array $payload = [[
+        'campaign' => [[
+            'id'              => 1,
+            'name'            => 'test2',
+            'description'     => null,
+            'is_published'    => false,
+            'canvas_settings' => [
+                'nodes' => [
+                    ['id' => '1', 'positionX' => '553', 'positionY' => '158'],
+                    ['id' => 'lists', 'positionX' => '653', 'positionY' => '53'],
+                ],
+                'connections' => [
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => '1',
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ],
+            'uuid' => 'b4ddc4d7-149e-4a81-9141-0e03c598627a',
+        ]],
+        'campaign_event' => [[
+            'id'          => 1,
+            'campaign_id' => 1,
+            'name'        => 'Device visit',
+            'description' => null,
+            'type'        => 'page.devicehit',
+            'event_type'  => 'decision',
+            'event_order' => 0,
+            'properties'  => [
+                'device_type'  => [],
+                'device_brand' => [],
+                'device_os'    => [],
+            ],
+            'trigger_interval'      => 0,
+            'trigger_interval_unit' => null,
+            'trigger_mode'          => null,
+            'triggerDate'           => null,
+            'channel'               => 'page',
+            'channel_id'            => 0,
+            'parent_id'             => null,
+            'uuid'                  => 'b3c03e30-d6a2-469b-9607-a9a98d7ef238',
+        ]],
+        'lists' => [[
+            'id'                   => 1,
+            'name'                 => 'Test Seg',
+            'is_published'         => true,
+            'description'          => null,
+            'alias'                => 'test-seg',
+            'public_name'          => 'Test Seg',
+            'filters'              => [],
+            'is_global'            => true,
+            'is_preference_center' => false,
+            'uuid'                 => 'd697157e-9ae3-4600-aa2e-4a2a5a6e36e0',
+        ]],
+        'dependencies' => [[
+            'campaign_event' => [
+                ['campaign' => 1, 'campaign_event' => 1],
+            ],
+            'lists' => [
+                ['campaign' => 1, 'lists' => 1],
+            ],
+        ]],
+    ]];
+
     public function setUp(): void
     {
         parent::setUp();
@@ -144,20 +213,28 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/');
         $session = $this->client->getRequest()->getSession();
+
+        $fixturesDir = __DIR__.'/Fixtures';
+        if (!is_dir($fixturesDir)) {
+            mkdir($fixturesDir, 0775, true);
+        }
+
+        $fakePath = $fixturesDir.'/fake.zip';
+        file_put_contents($fakePath, 'dummy zip content');
+
         $session->set('mautic.campaign.import.step', 2);
-        $session->set('mautic.campaign.import.file', __DIR__.'/Fixtures/fake.zip');
+        $session->set('mautic.campaign.import.file', $fakePath);
         $session->save();
 
         $importHelper = $this->createMock(ImportHelper::class);
-        $importHelper->method('readZipFile')->willReturn([[
-            Campaign::ENTITY_NAME => [['name' => 'Test campaign', 'uuid' => 123]],
-        ]]);
+        $importHelper->method('readZipFile')->willReturn($this->payload);
         static::getContainer()->set(ImportHelper::class, $importHelper);
 
         $this->client->request('GET', '/s/campaign/import/progress');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        @unlink($fakePath);
     }
 
     public function testProgressActionImportEmptyFile(): void
@@ -188,24 +265,56 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/');
         $session = $this->client->getRequest()->getSession();
+
+        $fixturesDir = __DIR__.'/Fixtures';
+        if (!is_dir($fixturesDir)) {
+            mkdir($fixturesDir, 0775, true);
+        }
+
+        $fakePath = $fixturesDir.'/fake.zip';
+        file_put_contents($fakePath, 'dummy zip content');
+
         $session->set('mautic.campaign.import.step', 3);
-        $session->set('mautic.campaign.import.file', __DIR__.'/Fixtures/fake.zip');
+        $session->set('mautic.campaign.import.file', $fakePath);
         $session->save();
 
         $importHelper = $this->createMock(ImportHelper::class);
-        $importHelper->method('readZipFile')->willReturn([[
-            Campaign::ENTITY_NAME => [[
-                'name'  => 'Imported campaign',
-                'uuid'  => 123,
-                'ids'   => [999],
-                'names' => ['Imported campaign'],
-            ]],
-        ]]);
+        $importHelper->method('readZipFile')->willReturn($this->payload);
         static::getContainer()->set(ImportHelper::class, $importHelper);
 
         $this->client->request('GET', '/s/campaign/import/progress');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        @unlink($fakePath);
+    }
+
+    public function testUploadActionWithValidFile(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        $tmpFile = tempnam(sys_get_temp_dir(), 'upl');
+        file_put_contents($tmpFile, 'dummy zip content');
+
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(
+            $tmpFile,
+            'test.zip',
+            'application/zip',
+            null,
+            true // test mode
+        );
+
+        $this->client->request(
+            'POST',
+            '/s/campaign/import/upload',
+            [],
+            ['campaign_import' => ['campaignFile' => $uploadedFile]]
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        @unlink($tmpFile);
     }
 }
