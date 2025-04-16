@@ -95,6 +95,39 @@ class ExportHelperTest extends TestCase
         $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));
     }
 
+    public function testWriteToZipFileIncludesAssets(): void
+    {
+        $tempDir = sys_get_temp_dir();
+
+        // Create temporary asset files
+        $assetFilePath1 = tempnam($tempDir, 'asset_test1');
+        file_put_contents($assetFilePath1, 'Asset content 1');
+
+        $assetFilePath2 = tempnam($tempDir, 'asset_test2');
+        file_put_contents($assetFilePath2, 'Asset content 2');
+
+        $assetList  = [$assetFilePath1, $assetFilePath2];
+        $jsonOutput = json_encode(['key' => 'value']);
+
+        // Call the method
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList);
+
+        // Open the ZIP file and verify contents
+        $zip = new \ZipArchive();
+        $zip->open($zipFilePath);
+
+        $this->assertTrue(false !== $zip->locateName('entity_data.json'));
+        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath2)));
+
+        $zip->close();
+
+        // Clean up
+        unlink($assetFilePath1);
+        unlink($assetFilePath2);
+        unlink($zipFilePath);
+    }
+
     /**
      * Test if exportDataAs() correctly generates a CSV file when we input some array data.
      */

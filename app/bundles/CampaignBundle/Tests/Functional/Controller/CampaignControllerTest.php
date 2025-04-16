@@ -80,7 +80,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws NotSupported
      */
-    private function setupCampaignData(int $bitwise = 2, int $export): User
+    private function setupCampaignData(int $bitwise, int $export): User
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->em->getRepository(User::class);
