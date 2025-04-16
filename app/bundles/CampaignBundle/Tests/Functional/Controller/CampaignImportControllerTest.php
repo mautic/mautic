@@ -297,24 +297,24 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $tmpFile = tempnam(sys_get_temp_dir(), 'upl');
         file_put_contents($tmpFile, 'dummy zip content');
 
-        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(
-            $tmpFile,
-            'test.zip',
-            'application/zip',
-            null,
-            true // test mode
-        );
+        $fileArray = [
+            'tmp_name' => $tmpFile,
+            'name'     => 'test.zip',
+            'type'     => 'application/zip',
+            'size'     => filesize($tmpFile),
+            'error'    => UPLOAD_ERR_OK,
+        ];
 
         $this->client->request(
             'POST',
             '/s/campaign/import/upload',
-            [],
-            ['campaign_import' => ['campaignFile' => $uploadedFile]]
+            ['campaign_import' => []], // POST data
+            ['campaign_import' => ['campaignFile' => $fileArray]] // FILES (no UploadedFile)
         );
 
         $response = $this->client->getResponse();
-
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
         @unlink($tmpFile);
     }
 }
