@@ -56,4 +56,20 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertStringContainsString('campaignImport', $response->getContent());
     }
+
+    public function testUndoAction(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        // Start the session by making a request
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/new');
+
+        // Invoke the undo action
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/undo');
+        $response = $this->client->getResponse();
+
+        // Assert the expected outcome
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
 }
