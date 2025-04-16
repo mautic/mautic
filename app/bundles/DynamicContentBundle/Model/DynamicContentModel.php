@@ -16,7 +16,9 @@ use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -175,25 +177,20 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     /**
      * @param Lead|array $lead
-     * @param string     $source
-     *
-     * @return Stat|null
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
-    {
-        if (empty($lead)) {
-            return null;
-        }
-
-        if ($lead instanceof Lead && !$lead->getId()) {
+    public function createStatEntry(
+        DynamicContent $dynamicContent,
+        $lead,
+        PageDisplayEvent|EmailSendEvent|null $event = null,
+    ): ?Stat {
+        if (empty($lead)
+            || ($lead instanceof Lead && !$lead->getId())
+            || (is_array($lead) && !isset($lead['id']))
+        ) {
             return null;
         }
 
         if (is_array($lead)) {
-            if (empty($lead['id'])) {
-                return null;
-            }
-
             $lead = $this->em->getReference(Lead::class, $lead['id']);
         }
 
@@ -201,7 +198,25 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
         $stat->setDynamicContent($dynamicContent);
-        $stat->setSource($source);
+        $detail = [
+            'slotName' => $dynamicContent->getSlotName(),
+        ];
+
+        if ($event instanceof PageDisplayEvent || $event instanceof EmailSendEvent) {
+            $detail['tokenPlacement'] = 'body';
+            if ($event instanceof EmailSendEvent) {
+                $stat->setSource('email');
+                $stat->setSourceId($event->getEmail()->getId());
+                if ($event->getIsSubject()) {
+                    $detail['tokenPlacement'] = 'subject';
+                }
+            } else {
+                $stat->setSource('page');
+                $stat->setSourceId($event->getPage()->getId());
+            }
+        }
+
+        $stat->setSentDetails($detail);
 
         $this->getStatRepository()->saveEntity($stat);
 

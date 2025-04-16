@@ -54,6 +54,10 @@ class EmailSendEvent extends CommonEvent
      */
     private array $errors = [];
 
+    private bool $isPreview = false;
+
+    private bool $isSubject = false;
+
     /**
      * @param array $args
      * @param bool  $isDynamicContentParsing
@@ -382,5 +386,25 @@ class EmailSendEvent extends CommonEvent
     public function getErrors(): array
     {
         return $this->errors;
+    }
+
+    public function getIsPreview(): bool
+    {
+        return $this->isPreview;
+    }
+
+    public function setIsPreview(bool $isPreview): void
+    {
+        $this->isPreview = $isPreview;
+    }
+
+    public function getIsSubject(): bool
+    {
+        return $this->isSubject;
+    }
+
+    public function setIsSubject(bool $isSubject): void
+    {
+        $this->isSubject = $isSubject;
     }
 }

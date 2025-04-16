@@ -11,12 +11,14 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -41,7 +43,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private CorePermissions $security,
         private ContactTracker $contactTracker,
-        private CompanyModel $companyModel,
+        private CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 
@@ -52,6 +54,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
             DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
             PageEvents::PAGE_ON_DISPLAY             => ['decodeTokens', 254],
+            EmailEvents::EMAIL_ON_SEND              => ['onEmailGenerate', 255],
+            EmailEvents::EMAIL_ON_DISPLAY           => ['onEmailDisplay', 255],
         ];
     }
 
@@ -91,15 +95,15 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
-        /** @var Lead $lead */
+        /** @var Lead|array<mixed> $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
-        if ($lead instanceof Lead && $content) {
-            $leadArray = $lead->getProfileFields();
+        if ($content) {
+            $leadArray      = $lead instanceof Lead ? $lead->getProfileFields() : $lead;
             try {
-                $primaryCompany         = $this->companyModel->getCompanyLeadRepository()->getPrimaryCompanyByLeadId($lead->getId());
+                $primaryCompany         = $this->companyLeadRepository->getPrimaryCompanyByLeadId($leadArray['id']);
                 $leadArray['companies'] = [$primaryCompany];
             } catch (PrimaryCompanyNotFoundException) {
             }
@@ -153,20 +157,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = [];
-        if ($lead instanceof Lead) {
-            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        }
-
-        $result = [];
-        foreach ($tokens as $token => $dwc) {
-            $result[$token] = '';
-            if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
-                $result[$token] = $dwc['content'];
-            }
-        }
-        $content = str_replace(array_keys($result), array_values($result), $content);
+        $tokens  = $this->dynamicContentHelper->getDwcTokensWithContent($content, $lead, $event);
+        $content = str_replace(array_keys($tokens), array_values($tokens), $content);
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
@@ -181,7 +173,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            if (!$slotContent = $this->dynamicContentHelper->getDynamicContentForLead($slotName, $lead)) {
+            if (!$slotContent = $this->dynamicContentHelper->getDynamicContentForLead($slotName, $lead, $event)) {
                 continue;
             }
 
@@ -193,5 +185,45 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $content = $dom->saveHTML();
 
         $event->setContent($content);
+    }
+
+    public function onEmailDisplay(EmailSendEvent $event): void
+    {
+        $event->setIsPreview(true);
+        $this->onEmailGenerate($event);
+    }
+
+    public function onEmailGenerate(EmailSendEvent $event): void
+    {
+        if ($event->isDynamicContentParsing()) {
+            // prevent a loop
+            return;
+        }
+
+        if (!$lead = $event->getLead()) {
+            $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        }
+
+        if (!$lead) {
+            return;
+        }
+
+        $content = $event->getContent();
+        if (empty($content)) {
+            return;
+        }
+
+        $event->setSubject(
+            $this->dynamicContentHelper->replaceTokensWithPlainText($event->getSubject(), $lead, $event)
+        );
+        /**
+         * here removing title from email content as in title we are storing Email subject
+         * tokens in subject are already replaced in above line
+         * otherwise it will create duplicate stat record in email body for same subject.
+         */
+        $emailContentWithoutTitle  = preg_replace('/<title\b[^>]*>(.*?)<\/title>/is', '', $content);
+        $event->addTokens(
+            $this->dynamicContentHelper->getDwcTokensWithContent($emailContentWithoutTitle, $lead, $event)
+        );
     }
 }

@@ -77,6 +77,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                         'ignore_paginator' => true,
+                        'orderBy'          => 'e.displayOrder',
                     ], $parameters[0]);
 
                     return ['some entity'];
@@ -93,6 +94,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                         'ignore_paginator' => true,
+                        'orderBy'          => 'e.displayOrder',
                     ], $parameters[0]);
 
                     return [];

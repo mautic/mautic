@@ -11,6 +11,8 @@ use Mautic\CoreBundle\Helper\Serializer;
  */
 class DynamicContentRepository extends CommonRepository
 {
+    public const SEARCH = ':search';
+
     /**
      * Get a list of entities.
      *
@@ -147,10 +149,10 @@ class DynamicContentRepository extends CommonRepository
         if (!empty($search)) {
             if (is_array($search)) {
                 $search = array_map('intval', $search);
-                $q->andWhere($q->expr()->in('e.id', ':search'))
+                $q->andWhere($q->expr()->in('e.id', self::SEARCH))
                   ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
+                $q->andWhere($q->expr()->like('e.name', self::SEARCH))
                   ->setParameter('search', "%{$search}%");
             }
         }
@@ -184,6 +186,30 @@ class DynamicContentRepository extends CommonRepository
         }
 
         return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getSlotNamesList(string $search = '', int $limit = 10, int $start = 0): array
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->select('distinct slot_name')
+            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content')
+            ->where('is_published = :true')
+            ->setParameter('true', true, 'boolean');
+
+        if (!empty($search)) {
+            $qb->andWhere($qb->expr()->like('slot_name', self::SEARCH))
+                ->setParameter('search', "{$search}%");
+        }
+
+        if (!empty($limit)) {
+            $qb->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     /**

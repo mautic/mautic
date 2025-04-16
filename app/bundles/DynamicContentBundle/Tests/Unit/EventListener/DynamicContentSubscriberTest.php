@@ -108,7 +108,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dynamicContentModel,
             $this->security,
             $this->contactTracker,
-            $this->companyModel
+            $this->companyLeadRepositoryMock
         );
     }
 
@@ -159,28 +159,6 @@ HTML;
         $this->contactTracker->expects($this->once())
             ->method('getContact')
             ->willReturn($contact);
-
-        $this->dynamicContentHelper->expects($this->once())
-            ->method('convertLeadToArray')
-            ->with($contact)
-            ->willReturn(['id' => 123, 'email' => 'john@doe.email']);
-
-        $this->dynamicContentHelper->expects($this->once())
-            ->method('findDwcTokens')
-            ->with($content, $contact)
-            ->willReturn([
-                'test-token'  => [
-                    'content' => $dwcContent,
-                    'filters' => [
-                        [
-                            'field'    => 'email',
-                            'operator' => '!empty',
-                            'filter'   => '',
-                            'type'     => 'email',
-                        ],
-                    ],
-                ],
-            ]);
 
         $this->dynamicContentHelper->expects($this->once())
             ->method('getDynamicContentForLead')
