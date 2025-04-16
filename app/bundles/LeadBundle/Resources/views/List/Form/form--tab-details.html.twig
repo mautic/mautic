@@ -1,0 +1,48 @@
+<div class="pa-md">
+    <div class="row">
+        <div class="col-md-9 height-auto pt-lg">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.name) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.description) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 height-auto pt-lg">
+            {% set settingsTileContent %}
+                <div class="row layer-two">
+                    <div class="col-xs-12">
+                        {{ form_row(form.isPublished) }}
+                        {{ form_row(form.category) }}
+                        <div class="row">
+                            {% set moreOptions %}
+                                {{ form_row(form.alias) }}
+                                {{ form_row(form.isGlobal) }}
+                            {% endset %}
+                            {% include '@MauticCore/Helper/accordion.html.twig' with {
+                                'items': [
+                                    {
+                                        'title': 'mautic.lead.list.form.visibility',
+                                        'content': moreOptions
+                                    }
+                                ]
+                            } %}
+                        </div>
+                    </div>
+                </div>
+            {% endset %}
+            
+            {% include '@MauticCore/Components/tile--base.html.twig' with {
+                'tiles': [
+                    {
+                        'content': settingsTileContent
+                    }
+                ]
+            } %}
+        </div>
+    </div>
+</div>

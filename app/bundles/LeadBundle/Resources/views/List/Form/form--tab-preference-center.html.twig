@@ -1,0 +1,27 @@
+<div class="pa-md">
+    <div class="row mt-32">
+        <div class="col-xs-12">
+            {% set preferenceCenterOptions %}
+                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    'pictogram': 'slider',
+                    'size': '64'
+                } %}
+                <div class="row mt-48">
+                    <div class="col-md-6">
+                        {{ form_row(form.isPreferenceCenter) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.publicName) }}
+                    </div>
+                </div>
+            {% endset %}
+            {% include '@MauticCore/Components/content-block.html.twig' with {
+                'heading': 'mautic.lead.list.form.preference_center_settings',
+                'subheading': 'mautic.lead.list.form.preference_center_description',
+                'childContainer': preferenceCenterOptions
+            } %}
+        </div>
+    </div>
+</div>

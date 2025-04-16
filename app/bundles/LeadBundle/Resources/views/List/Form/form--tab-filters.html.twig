@@ -1,0 +1,32 @@
+<div class="pa-md">
+    <div class="row">
+
+        <div class="alert alert-info"><p>{{ 'mautic.lead.lead.segment.filter.info'|trans }}</p></div>
+        <div class="form-group">
+    <div class="available-filters mb-md pl-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}" data-index="{{ index + 1 }}">
+        <select class="chosen form-control" id="available_segment_filters">
+            <option value=""></option>
+            {% for object, field in form.vars.fields %}
+            {% set icon = 'company' == object ? 'building' : 'user' %}
+            {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
+            <optgroup label="{{ header }}">
+                {% for value, params in field %}
+                {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
+                <option value="{{ value|e }}" id="available_{{ object }}_{{ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-operators="{{ operators|e }}" class="segment-filter {{ icon }}">
+                    {{ params.label|trans }}
+                </option>
+                {% endfor %}
+            </optgroup>
+            {% endfor %}
+        </select>
+    </div>
+    </div>
+    </div>
+    <div class="row">
+            <div class="col-xs-12 height-auto pt-lg ">
+
+    {{ form_widget(form.filters) }}
+
+    </div>
+    </div>
+</div>
