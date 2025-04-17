@@ -269,6 +269,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             if (!isset($entityData[$entity])) {
                 continue;
             }
+            $this->updateFormRelatedData($entityData, $entityData['dependencies'], $entity);
 
             $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
             $subEvent = $this->dispatcher->dispatch($subEvent);
@@ -572,6 +573,32 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                     }
                     if (isset($email['preference_center_id']) && isset($dependency[Page::ENTITY_NAME])) {
                         $email['preference_center_id'] = $dependency[Page::ENTITY_NAME];
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed>             $data
+     * @param array<int, array<string, mixed>> $dependencies
+     */
+    private function updateFormRelatedData(array &$data, array $dependencies, string $entity): void
+    {
+        if (empty($data[Form::ENTITY_NAME])) {
+            return;
+        }
+
+        $formDependencies = $this->getSubDependencies($dependencies, Form::ENTITY_NAME);
+        if (empty($formDependencies)) {
+            return;
+        }
+
+        foreach ($data[$entity] as &$item) {
+            foreach ($formDependencies as $dependency) {
+                if (isset($dependency[$entity]) && isset($item['id']) && $item['id'] === $dependency[$entity]) {
+                    if (isset($item['form']) && isset($dependency[Form::ENTITY_NAME])) {
+                        $item['form'] = $dependency[Form::ENTITY_NAME];
                     }
                 }
             }
