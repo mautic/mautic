@@ -371,6 +371,7 @@ final class ImportController extends AbstractFormController
             $fileData = $importHelper->readZipFile($fullPath);
         } catch (\RuntimeException $e) {
             $this->logger->error($e->getMessage());
+
             return ['errors' => $e->getMessage()];
         }
 

@@ -61,7 +61,7 @@ final class EntityImportCommand extends ModeratedCommand
         try {
             $fileData = $this->importHelper->readZipFile($filePath);
         } catch (\RuntimeException $e) {
-            $output->writeln('<error>' . $e->getMessage(). '</error>');
+            $output->writeln('<error>'.$e->getMessage().'</error>');
 
             return self::FAILURE;
         }
