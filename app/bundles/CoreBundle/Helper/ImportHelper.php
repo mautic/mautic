@@ -12,51 +12,68 @@ class ImportHelper
     }
 
     /**
-     * @return ?array<string, mixed>
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException If the ZIP file cannot be opened or JSON is invalid
      */
-    public function readZipFile(string $filePath): ?array
+    public function readZipFile(string $filePath): array
     {
         $tempDir      = sys_get_temp_dir();
         $zip          = new \ZipArchive();
         $jsonFilePath = null;
 
-        $result = $zip->open($filePath);
-        if (true === $result) {
-            $zip->extractTo($tempDir);
-            $mediaPath    = $this->pathsHelper->getSystemPath('media').'/files/';
+        if (true !== $zip->open($filePath)) {
+            throw new \RuntimeException(sprintf('Unable to open ZIP file: %s', $filePath));
+        }
 
-            for ($i = 0; $i < $zip->numFiles; ++$i) {
-                $filename        = $zip->getNameIndex($i);
-                $sourcePath      = $tempDir.'/'.$filename;
-                $destinationPath = $mediaPath.substr($filename, strlen('assets/'));
-
-                if (str_starts_with($filename, 'assets/')) {
-                    if (is_dir($sourcePath)) {
-                        if (!is_dir($destinationPath)) {
-                            mkdir($destinationPath, 0755, true);
-                        }
-                    } else {
-                        $dirPath = dirname($destinationPath);
-                        if (!is_dir($dirPath)) {
-                            mkdir($dirPath, 0755, true);
-                        }
-                        copy($sourcePath, $destinationPath);
-                    }
-                } elseif ('json' === pathinfo($filename, PATHINFO_EXTENSION)) {
-                    $jsonFilePath = $tempDir.'/'.$filename;
-                }
-            }
-
+        if (!$zip->extractTo($tempDir)) {
             $zip->close();
+            throw new \RuntimeException(sprintf('Unable to extract ZIP file to temp directory: %s', $tempDir));
         }
 
-        if ($jsonFilePath) {
-            $fileContents = file_get_contents($jsonFilePath);
+        $mediaPath = $this->pathsHelper->getSystemPath('media').'/files/';
 
-            return json_decode($fileContents, true);
-        } else {
-            return $jsonFilePath;
+        for ($i = 0; $i < $zip->numFiles; ++$i) {
+            $filename        = $zip->getNameIndex($i);
+            $sourcePath      = $tempDir.'/'.$filename;
+            $destinationPath = $mediaPath.substr($filename, strlen('assets/'));
+
+            if (str_starts_with($filename, 'assets/')) {
+                if (is_dir($sourcePath)) {
+                    if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
+                        throw new \RuntimeException(sprintf('Failed to create directory: %s', $destinationPath));
+                    }
+                } else {
+                    $dirPath = dirname($destinationPath);
+                    if (!is_dir($dirPath) && !mkdir($dirPath, 0755, true) && !is_dir($dirPath)) {
+                        throw new \RuntimeException(sprintf('Failed to create directory: %s', $dirPath));
+                    }
+                    if (!copy($sourcePath, $destinationPath)) {
+                        throw new \RuntimeException(sprintf('Failed to copy file to destination: %s', $destinationPath));
+                    }
+                }
+            } elseif ('json' === pathinfo($filename, PATHINFO_EXTENSION)) {
+                $jsonFilePath = $tempDir.'/'.$filename;
+            }
         }
+
+        $zip->close();
+
+        if (!$jsonFilePath || !is_readable($jsonFilePath)) {
+            throw new \RuntimeException('JSON file not found or not readable in ZIP archive.');
+        }
+
+        $fileContents = file_get_contents($jsonFilePath);
+        if (false === $fileContents) {
+            throw new \RuntimeException('Failed to read JSON file contents.');
+        }
+
+        $jsonData = json_decode($fileContents, true);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \RuntimeException('Invalid JSON: '.json_last_error_msg());
+        }
+
+        return $jsonData;
     }
 
     /**

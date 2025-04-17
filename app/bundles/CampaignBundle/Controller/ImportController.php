@@ -263,16 +263,8 @@ final class ImportController extends AbstractFormController
                 'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
             ]);
         } else {
-            // Process import and update progress
-            $fileData = $importHelper->readZipFile($fullPath);
-            if (empty($fileData)) {
-                $this->logger->error('Import failed: No data found in file.');
-                $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
-
-                $importSummary = [
-                    EntityImportEvent::ERRORS => ['Invalid file data.'],
-                ];
-            } else {
+            try {
+                $fileData      = $importHelper->readZipFile($fullPath);
                 $userId        = $this->userHelper->getUser()->getId();
                 $importSummary = [];
 
@@ -350,6 +342,13 @@ final class ImportController extends AbstractFormController
 
                 $session->set('mautic.campaign.import.summary', $importSummary);
                 $this->resetImport();
+            } catch (\RuntimeException $e) {
+                $this->logger->error($e->getMessage());
+                $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
+
+                $importSummary = [
+                    EntityImportEvent::ERRORS => [$e->getMessage()],
+                ];
             }
 
             return $this->delegateView([
@@ -368,11 +367,11 @@ final class ImportController extends AbstractFormController
      */
     private function analyzeData(ImportHelper $importHelper, string $fullPath): array
     {
-        $fileData = $importHelper->readZipFile($fullPath);
-        if (empty($fileData)) {
-            $this->logger->error('Import failed: No data found in file.');
-
-            return ['errors' => 'Invalid file data.'];
+        try {
+            $fileData = $importHelper->readZipFile($fullPath);
+        } catch (\RuntimeException $e) {
+            $this->logger->error($e->getMessage());
+            return ['errors' => $e->getMessage()];
         }
 
         $allData = [];

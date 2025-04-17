@@ -58,10 +58,10 @@ final class EntityImportCommand extends ModeratedCommand
             return self::FAILURE;
         }
 
-        $fileData = $this->importHelper->readZipFile($filePath);
-
-        if (null === $fileData) {
-            $output->writeln('<error>Failed to read or decode the file data.</error>');
+        try {
+            $fileData = $this->importHelper->readZipFile($filePath);
+        } catch (\RuntimeException $e) {
+            $output->writeln('<error>' . $e->getMessage(). '</error>');
 
             return self::FAILURE;
         }

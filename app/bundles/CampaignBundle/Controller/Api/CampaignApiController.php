@@ -431,11 +431,11 @@ class CampaignApiController extends CommonApiController
                 );
             }
 
-            $data = $importHelper->readZipFile($zipPath);
-
-            if (!$data) {
+            try {
+                $data = $importHelper->readZipFile($zipPath);
+            } catch (\RuntimeException $e) {
                 return $this->handleView(
-                    $this->view(['error' => 'Malformed campaign JSON file - unable to parse JSON.'], Response::HTTP_BAD_REQUEST)
+                    $this->view(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST)
                 );
             }
         }

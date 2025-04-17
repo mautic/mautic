@@ -593,7 +593,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
 
-        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
 
     public function testImportCampaignMalformedJson(): void
@@ -616,7 +616,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('Malformed campaign JSON file - unable to parse JSON.', $response->getContent());
+        $this->assertStringContainsString('Unable to open ZIP file', $response->getContent());
 
         // Clean up
         unlink($zipPath);
