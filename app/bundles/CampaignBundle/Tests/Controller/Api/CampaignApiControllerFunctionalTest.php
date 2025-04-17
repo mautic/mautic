@@ -29,7 +29,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';
-        $this->useCleanupRollback = false;
+        $this->useCleanupRollback                = false;
 
         parent::setUp();
     }
