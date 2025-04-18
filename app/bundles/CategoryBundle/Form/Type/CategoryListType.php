@@ -42,7 +42,7 @@ class CategoryListType extends AbstractType
                 $categories = $this->model->getLookupResults($options['bundle'], '', 0);
                 $choices    = [];
                 foreach ($categories as $l) {
-                    $choices[$l['title']] = $l['id'];
+                    $choices[$l['title'].' ('.$l['id'].')'] = $l['id'];
                 }
                 $choices[$createNew] = 'new';
 
