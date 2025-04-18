@@ -328,4 +328,31 @@ class InputHelperTest extends TestCase
             [[[null]], [[null]]],
         ];
     }
+
+    /**
+     * @testdox Test that safeRawUrlDecode method
+     *
+     * @covers \Mautic\CoreBundle\Helper\InputHelper::safeRawUrlDecode
+     */
+    public function testSafeRawUrlDecode(): void
+    {
+        $reflection = new \ReflectionClass(InputHelper::class);
+        $method     = $reflection->getMethod('safeRawUrlDecode');
+        $method->setAccessible(true);
+
+        // Test cases for special characters (should remain encoded)
+        $specialCharTests = [
+            'https://example.com/âbč' => 'https://example.com/âbč',
+            '100%Café'                => '100%Café',
+            'Mautic'                  => 'Mautic',
+            'Résumé'                  => 'Résumé',
+            '日本語'                     => '日本語',
+        ];
+
+        // Run tests for special characters
+        foreach ($specialCharTests as $input => $expected) {
+            $result = $method->invokeArgs(null, [$input]);
+            $this->assertEquals($expected, $result, "Special character test failed for input: $input");
+        }
+    }
 }

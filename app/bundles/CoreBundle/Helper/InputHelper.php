@@ -426,7 +426,7 @@ class InputHelper
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 
             // After cleaning encode the value
-            $value = $hasUnicode ? rawurldecode($value) : $value;
+            $value = $hasUnicode ? self::safeRawUrlDecode($value) : $value;
 
             // Was a doctype found?
             if ($doctypeFound && false === $hasUnicode) {
@@ -592,5 +592,32 @@ class InputHelper
     private static function filter_string_polyfill(string $string): string
     {
         return preg_replace('/\x00|<[^>]*>?/', '', $string);
+    }
+
+    /**
+     * Safely decode URL-encoded strings while preserving UTF-8 characters.
+     * This is a replacement for rawurldecode that handles UTF-8 properly.
+     *
+     * @param string $value The URL-encoded string to decode
+     *
+     * @return string|null The decoded string with UTF-8 characters preserved
+     */
+    private static function safeRawUrlDecode(mixed $value): ?string
+    {
+        // First, identify and protect UTF-8 encoded characters
+        $pattern = '/%([0-9A-F]{2})/i';
+
+        return preg_replace_callback($pattern, function ($matches) {
+            $hex = $matches[1];
+            $dec = hexdec($hex);
+
+            // Check if this is part of a UTF-8 sequence
+            if ($dec >= 0xC0) { // First byte of a UTF-8 sequence
+                return $matches[0]; // Keep it encoded
+            }
+
+            // For non-UTF-8 characters, decode normally
+            return chr($dec);
+        }, $value);
     }
 }
