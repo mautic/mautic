@@ -14,23 +14,19 @@
 
 							{% set userPath = [] %}
 							{% set user_id = '1' %}
-							{% set usersEmail = log.details['email'][1] %}
-							{% set emailIsMatch = false %}
+							{% set usersUsername = log.details['username'][1] %}
 							{% set usernameIsMatch = false %}
 
 							{% for user in users %}
-								{% if usersEmail is defined and usersEmail is not empty and user.email == usersEmail %}
-									{% set emailIsMatch = true %}
-									{% set user_id = user.id %}
-								{% else %}
+								{% if usersUsername is defined and usersUsername is not empty and user.username == usersUsername %}
 									{% set usernameIsMatch = true %}
 									{% set user_id = user.id %}
 								{% endif %}
 							{% endfor %}
-							{% if log.details['username'][1] is defined and log.details['username'][1] is not empty %}
-								{% if emailIsMatch == true %}
-									{% set userPath = userPath|merge([user_id, log.details['username'][1]]) %}
-								{% endif %}
+							{% if usernameIsMatch %}
+							    {% set userPath = userPath|merge([user_id, log.details['username'][1]]) %}
+							{% else %}
+							    <!-- There should be a special management for that case, which should not normally happen -->
 							{% endif %}
 
 						{% elseif log.action == 'create' and log.object == 'role' %}
