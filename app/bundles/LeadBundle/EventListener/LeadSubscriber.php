@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
@@ -22,6 +23,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
@@ -57,6 +59,8 @@ class LeadSubscriber implements EventSubscriberInterface
         ModelFactory $modelFactory,
         private CoreParametersHelper $coreParametersHelper,
         private CompanyLeadRepository $companyLeadRepository,
+        private LeadListRepository $leadListRepository,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
         private $isTest = false,
     ) {
         $this->router              = $router;
@@ -172,6 +176,16 @@ class LeadSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+
+        // Update segment counts when a contact is deleted
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $leadId     = (int) $lead->getId();
+            $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
+
+            foreach ($segmentIds as $segmentId) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+            }
+        }
     }
 
     /**

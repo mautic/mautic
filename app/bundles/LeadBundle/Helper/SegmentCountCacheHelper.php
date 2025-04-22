@@ -27,6 +27,10 @@ class SegmentCountCacheHelper
     public function setSegmentContactCount(int $segmentId, int $count): void
     {
         $this->cacheStorageHelper->set($this->generateCacheKey($segmentId), $count);
+
+        if ($this->cacheStorageHelper->has($this->generateCacheKey($segmentId).'.recount')) {
+            $this->cacheStorageHelper->delete($this->generateCacheKey($segmentId).'.recount');
+        }
     }
 
     public function hasSegmentContactCount(int $segmentId): bool
@@ -35,6 +39,11 @@ class SegmentCountCacheHelper
     }
 
     public function invalidateSegmentContactCount(int $segmentId): void
+    {
+        $this->cacheStorageHelper->set($this->generateCacheKey($segmentId).'.recount', true);
+    }
+
+    public function deleteSegmentContactCount(int $segmentId): void
     {
         if ($this->hasSegmentContactCount($segmentId)) {
             $this->cacheStorageHelper->delete($this->generateCacheKey($segmentId));

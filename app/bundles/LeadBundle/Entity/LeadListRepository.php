@@ -600,6 +600,31 @@ SQL;
     }
 
     /**
+     * Get the list of IDs for segments that the lead belongs to.
+     *
+     * @return int[]
+     */
+    public function getLeadSegmentIds(int $leadId): array
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+
+        $sql = <<<SQL
+            SELECT leadlist_id 
+            FROM $tableName
+            WHERE lead_id = ?
+                AND manually_removed = 0
+SQL;
+
+        return $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                $sql,
+                [$leadId],
+                [\PDO::PARAM_INT]
+            )
+            ->fetchFirstColumn();
+    }
+
+    /**
      * @param int[] $expectedSegmentIds
      *
      * @return int[]
