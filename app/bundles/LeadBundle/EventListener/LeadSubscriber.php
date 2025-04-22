@@ -73,6 +73,7 @@ class LeadSubscriber implements EventSubscriberInterface
         return [
             LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
             LeadEvents::LEAD_POST_DELETE     => ['onLeadDelete', 0],
+            LeadEvents::LEAD_PRE_DELETE      => ['onLeadPreDelete', 0],
             LeadEvents::LEAD_PRE_MERGE       => ['preLeadMerge', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
             LeadEvents::FIELD_POST_SAVE      => ['onFieldPostSave', 0],
@@ -82,6 +83,28 @@ class LeadSubscriber implements EventSubscriberInterface
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
             LeadEvents::LEAD_COMPANY_CHANGE  => ['onLeadCompanyChange', 0],
         ];
+    }
+    
+    /**
+     * Find lead linked segment ids to update post delete.
+     */
+    public function onLeadPreDelete(Events\LeadEvent $event): void
+    {
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $leadId     = (int) $event->getLead()->getId();
+            $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
+
+            foreach ($segmentIds as $segmentId) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+            }
+        } else {
+            $leadId     = (int) $event->getLead()->getId();
+            $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
+
+            foreach ($segmentIds as $segmentId) {
+                $this->segmentCountCacheHelper->decrementSegmentContactCount($segmentId);
+            }
+        }
     }
 
     /**
@@ -176,16 +199,6 @@ class LeadSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
-
-        // Update segment counts when a contact is deleted
-        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
-            $leadId     = (int) $lead->getId();
-            $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
-
-            foreach ($segmentIds as $segmentId) {
-                $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
-            }
-        }
     }
 
     /**

@@ -412,10 +412,15 @@ class TriggerCampaignCommand extends ModeratedCommand
     private function updateCampaignSegmentContactCount(Campaign $campaign): void
     {
         $segmentIds = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
-
+        $updateSegmentCountInBackground = $this->coreParametersHelper->get('update_segment_contact_count_in_background', false);
+        
         foreach ($segmentIds as $segmentId) {
-            $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
-            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+            if ($updateSegmentCountInBackground) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+            } else {
+                $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
+                $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+            }
         }
     }
 

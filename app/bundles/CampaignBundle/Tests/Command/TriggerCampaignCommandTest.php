@@ -19,6 +19,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     protected function setUp(): void
     {
+        $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCacheCountInBackground' === $this->getName();
         parent::setUp();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
@@ -740,6 +741,30 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // Execute the command again to trigger related events.
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
         // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
+    }
+    
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
+     */
+    public function testSegmentCacheCountInBackground(): void
+    {
+        // Remove cache key if it exists
+        $this->segmentCountCacheHelper->deleteSegmentContactCount(1);
+
+        // Execute the command again to trigger related events.
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
+
+        // Count should be 0 as it's marked for background update but not yet processed
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(0, $count);
+
+        // Run the segment count cache command to process background updates
+        $this->testSymfonyCommand('mautic:segments:update:cache');
+
+        // Segment cache count should now be 50
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
         self::assertEquals(50, $count);
     }
