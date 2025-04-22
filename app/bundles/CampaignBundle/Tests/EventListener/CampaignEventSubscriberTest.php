@@ -132,7 +132,7 @@ class CampaignEventSubscriberTest extends TestCase
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')
             ->with($mockLead, $mockEvent);
-            
+
         $this->notificationHelper->expects($this->never())
             ->method('notifyOfUnpublish');
 
@@ -176,7 +176,7 @@ class CampaignEventSubscriberTest extends TestCase
         $this->eventRepo->expects($this->once())
             ->method('getFailedCountEvent')
             ->withAnyParameters()
-            ->willReturn(35);
+            ->willReturn(90);
 
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')
