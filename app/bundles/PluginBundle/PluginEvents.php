@@ -133,4 +133,13 @@ final class PluginEvents
      * @var string
      */
     public const ON_PLUGIN_INSTALL = 'mautic.plugin.on_plugin_install';
+
+    /**
+     * The mautic.plugin.on_plugin_uninstall event is dispatched when a plugin is uninstalled.
+     *
+     * The event listener receives a Mautic\PluginBundle\Event\PluginUninstallEvent instance.
+     *
+     * @var string
+     */
+    public const ON_PLUGIN_UNINSTALL = 'mautic.plugin.on_plugin_uninstall';
 }
