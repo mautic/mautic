@@ -48,20 +48,4 @@ class ApiEnvVarsTest extends TestCase
         $this->assertEquals(3600, $this->envVars->get('MAUTIC_API_OAUTH2_ACCESS_TOKEN_LIFETIME'));
         $this->assertEquals(1_209_600, $this->envVars->get('MAUTIC_API_OAUTH2_REFRESH_TOKEN_LIFETIME'));
     }
-
-    public function testRateLimitIsEnabled(): void
-    {
-        $this->config->set('api_rate_limiter_limit', 100);
-
-        ApiEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
-
-        $this->assertTrue($this->envVars->get('MAUTIC_API_RATE_LIMIT_ENABLED'));
-    }
-
-    public function testRateLimitIsDisabled(): void
-    {
-        ApiEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
-
-        $this->assertFalse($this->envVars->get('MAUTIC_API_RATE_LIMIT_ENABLED'));
-    }
 }

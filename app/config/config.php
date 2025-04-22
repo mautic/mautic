@@ -257,37 +257,19 @@ $container->loadFromExtension('jms_serializer', [
     ],
 ]);
 
-$container->loadFromExtension('framework', [
-    'cache' => [
-        'pools' => [
-            'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
-            'doctrine_result_cache'  => [
-                'adapter' => 'cache.adapter.array',
-            ],
-        ],
-    ],
-]);
-
 // Twig Configuration
 $container->loadFromExtension('twig', [
     'exception_controller' => null,
 ]);
 
-$rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
-$container->loadFromExtension('noxlogic_rate_limit', [
-    'enabled'        => 0 === $rateLimit ? false : true,
-    'storage_engine' => 'cache',
-    'cache_service'  => 'api_rate_limiter_cache',
-    'path_limits'    => [
-        [
-            'path'   => '/api',
-            'limit'  => $rateLimit,
-            'period' => 3600,
+$container->loadFromExtension('framework', [
+    'cache' => [
+        'pools' => [
+            'doctrine_result_cache'  => [
+                'adapter' => 'cache.adapter.array',
+            ],
         ],
     ],
-    'fos_oauth_key_listener' => true,
-    'display_headers'        => true,
-    'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(
