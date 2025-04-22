@@ -434,4 +434,19 @@ class EventRepository extends CommonRepository
 
         return (int) $q->executeQuery()->fetchOne();
     }
+
+    /**
+     * Get the count of failed event for Event.
+     */
+    public function getFailedCountEvent(int $eventId): int
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(le.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
+            ->innerJoin('le', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')
+            ->where('le.event_id = :eventId')
+            ->setParameters(['eventId' => $eventId]);
+
+        return (int) $q->executeQuery()->fetchOne();
+    }
 }

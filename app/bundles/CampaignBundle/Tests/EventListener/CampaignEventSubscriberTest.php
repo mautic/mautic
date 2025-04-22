@@ -98,11 +98,6 @@ class CampaignEventSubscriberTest extends TestCase
 
     public function testFailedEventGeneratesANotification(): void
     {
-        $this->leadEventLogRepositoryMock->expects($this->once())
-            ->method('isLastFailed')
-            ->with(42, 42)
-            ->willReturn(false);
-
         $mockLead     = $this->createMock(Lead::class);
         $mockLead->expects($this->any())
             ->method('getId')
@@ -110,7 +105,7 @@ class CampaignEventSubscriberTest extends TestCase
         $mockCampaign = $this->createMock(Campaign::class);
         $mockCampaign->expects($this->once())
             ->method('getLeads')
-            ->willReturn(new ArrayCollection(range(0, 99)));
+            ->willReturn(new ArrayCollection(range(0, 90)));
 
         $mockEvent = $this->createMock(Event::class);
         $mockEvent->expects($this->once())
@@ -130,19 +125,16 @@ class CampaignEventSubscriberTest extends TestCase
             ->willReturn($mockLead);
 
         $this->eventRepo->expects($this->once())
-            ->method('getFailedCountLeadEvent')
+            ->method('getFailedCountEvent')
             ->withAnyParameters()
-            ->willReturn(105);
-
-        // Set failed count to 5% of getLeads()->count()
-        $this->eventRepo->expects($this->once())
-            ->method('incrementFailedCount')
-            ->with($mockEvent)
-            ->willReturn(5);
+            ->willReturn(10);
 
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')
             ->with($mockLead, $mockEvent);
+            
+        $this->notificationHelper->expects($this->never())
+            ->method('notifyOfUnpublish');
 
         $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
 
@@ -151,11 +143,6 @@ class CampaignEventSubscriberTest extends TestCase
 
     public function testFailedCountOverDisableCampaignThresholdDisablesTheCampaign(): void
     {
-        $this->leadEventLogRepositoryMock->expects($this->once())
-            ->method('isLastFailed')
-            ->with(42, 42)
-            ->willReturn(false);
-
         $mockLead     = $this->createMock(Lead::class);
         $mockLead->expects($this->any())
             ->method('getId')
@@ -187,14 +174,8 @@ class CampaignEventSubscriberTest extends TestCase
             ->willReturn($mockLead);
 
         $this->eventRepo->expects($this->once())
-            ->method('getFailedCountLeadEvent')
+            ->method('getFailedCountEvent')
             ->withAnyParameters()
-            ->willReturn(200);
-
-        // Set failed count to 35% of getLeads()->count()
-        $this->eventRepo->expects($this->once())
-            ->method('incrementFailedCount')
-            ->with($mockEvent)
             ->willReturn(35);
 
         $this->notificationHelper->expects($this->once())
