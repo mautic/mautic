@@ -44,7 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *         "email:read"
  *        },
  *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "asset", "page", "translationChildren", "unsubscribeForm", "fields", "actions", "lists", "preferenceCenter", "assetAttachments"}
+ *       "api_included"={"category", "asset", "page", "translationChildren", "unsubscribeForm", "fields", "actions", "lists", "excludedLists", "preferenceCenter", "assetAttachments"}
  *     },
  *     "denormalization_context"={
  *       "groups"={
