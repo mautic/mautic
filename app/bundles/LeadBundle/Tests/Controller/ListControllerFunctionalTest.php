@@ -23,9 +23,12 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     private LeadListRepository $listRepo;
 
     private LeadRepository $leadRepo;
+    
+    private $segmentCountCacheHelper;
 
     protected function setUp(): void
     {
+        $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->getName();
         parent::setUp();
         $this->listModel = static::getContainer()->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
@@ -33,6 +36,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         \assert($this->listRepo instanceof LeadListRepository);
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         \assert($leadModel instanceof LeadModel);
+        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
         $this->leadRepo = $leadModel->getRepository();
     }
 
@@ -620,5 +624,85 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));
+    }
+    
+    /**
+     * @throws \Exception
+     */
+    public function testSegmentCountInBackground(): void
+    {
+        // Import command class to use its constant
+        $commandName = 'mautic:segments:update:cache';
+        
+        // Save segment.
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+
+        $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        $segmentId = $segment->getId();
+        $this->segmentCountCacheHelper->deleteSegmentContactCount($segmentId);
+
+        // Check segment count UI for no contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('No Contacts', $html);
+
+        // Add 4 contacts.
+        $contacts   = $this->saveContacts();
+        $contact1Id = $contacts[0]->getId();
+
+        // Rebuild segment - set current count to the cache.
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
+
+        // Run the background update command
+        $this->testSymfonyCommand($commandName);
+
+        // Check segment count UI for 4 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 4 Contacts', $html);
+
+        // Remove 1 contact from segment.
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
+        self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        // Run the background update command 
+        $this->testSymfonyCommand($commandName);
+
+        // Check segment count UI for 3 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 3 Contacts', $html);
+
+        // Add 1 contact back to segment.
+        $parameters = ['ids' => [$contact1Id]];
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
+        self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        // Run the background update command
+        $this->testSymfonyCommand($commandName);
+
+        // Check segment count UI for 4 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 4 Contacts', $html);
+
+        // Check segment count AJAX for 4 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('View 4 Contacts', $response['content']['html']);
+        self::assertSame(4, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
     }
 }
