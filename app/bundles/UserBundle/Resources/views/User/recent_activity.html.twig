@@ -12,22 +12,17 @@
 
 						{% if log.action == 'create' and log.object == 'user' %}
 
-							{% set userPath = [] %}
-							{% set user_id = '1' %}
-							{% set usersUsername = log.details['username'][1] %}
-							{% set usernameIsMatch = false %}
+							{% set user_username = '' %}
+							{% set user_id = '0' %}
+							{% set usersEmail = log.details['email'][1] %}
+							{% set usersName  = log.details['username'][1] %}
 
 							{% for user in users %}
-								{% if usersUsername is defined and usersUsername is not empty and user.username == usersUsername %}
-									{% set usernameIsMatch = true %}
+								{% if usersEmail is defined and usersEmail is not empty and user.email == usersEmail %}
+									{% set user_username = user.userName %}
 									{% set user_id = user.id %}
 								{% endif %}
 							{% endfor %}
-							{% if usernameIsMatch %}
-							    {% set userPath = userPath|merge([user_id, log.details['username'][1]]) %}
-							{% else %}
-							    <!-- There should be a special management for that case, which should not normally happen -->
-							{% endif %}
 
 						{% elseif log.action == 'create' and log.object == 'role' %}
 
@@ -139,9 +134,14 @@
 										{{ 'mautic.user.role.form.updated_by'|trans }}
 
 									{% elseif log.action == 'create' %}
-										<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: userPath[0]}) }}" data-toggle="ajax">
-											{{ userPath[1] }}</a>
-										{{ 'mautic.user.user.form.created_by'|trans }}
+										{% if not user_id == '0' %}
+											<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: user_id}) }}" data-toggle="ajax">
+												{{ user_username }}</a>
+											{{ 'mautic.user.user.form.created_by'|trans }}
+										{% else %}
+											{{ usersName }}
+											{{ 'mautic.user.user.form.created_by'|trans }}
+										{% endif %}
 									{% endif %}
 
 								{% elseif log.object == 'role' %}
