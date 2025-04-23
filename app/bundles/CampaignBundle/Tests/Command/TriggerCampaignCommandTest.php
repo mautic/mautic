@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
@@ -762,7 +763,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         self::assertEquals(0, $count);
 
         // Run the segment count cache command to process background updates
-        $this->testSymfonyCommand('mautic:segments:update:cache');
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Segment cache count should now be 50
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
