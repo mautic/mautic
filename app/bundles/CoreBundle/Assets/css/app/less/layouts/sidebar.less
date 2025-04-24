@@ -30,12 +30,6 @@
   z-index: @sidebar-zindex;
   top: 0;
   bottom: 0;
-  left: -230px;
-  transition: left 0.3s ease;
-
-  &.open {
-    left: 0px;
-  }
 
   // sidebar left
   // -------------------------
@@ -267,6 +261,11 @@
       }
     }
   }
+}
+
+// sidebar nav
+html.responsejs.sidebar-open-ltr .sidebar-left {
+  left: 0px;
 }
 
 // breakpoint screen-sm and up

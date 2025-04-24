@@ -1761,11 +1761,6 @@ body > #app-wrapper {
   z-index: 990;
   top: 0;
   bottom: 0;
-  left: -230px;
-  transition: left 0.3s ease;
-}
-.app-sidebar.open {
-  left: 0px;
 }
 .app-sidebar.sidebar-left {
   width: 230px;
@@ -2004,6 +1999,9 @@ body > #app-wrapper {
 }
 .app-sidebar .nav-sidebar > .nav .nav-heading:first-child {
   padding-top: 20px;
+}
+html.responsejs.sidebar-open-ltr .sidebar-left {
+  left: 0px;
 }
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {
