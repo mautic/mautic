@@ -16,6 +16,8 @@ class ChartQuery extends AbstractChart
 {
     private DateTimeHelper $dateTimeHelper;
 
+    private Connection $connection;
+
     private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
     /**

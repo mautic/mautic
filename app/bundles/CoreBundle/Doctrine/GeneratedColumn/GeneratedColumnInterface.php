@@ -8,6 +8,11 @@ interface GeneratedColumnInterface
 {
     public function getTableName(): string;
 
+    /**
+     * Returns the raw table name without prefix.
+     */
+    public function getRawTableName(): string;
+
     public function getColumnName(): string;
 
     public function addIndexColumn(string $indexColumn): void;

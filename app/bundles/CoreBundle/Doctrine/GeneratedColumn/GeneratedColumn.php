@@ -17,7 +17,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     private ?string $originalDateColumn = null;
 
-    private ?string $timeUnit = null;
+    private string $timeUnit = '';
 
     /**
      * @var bool
@@ -57,6 +57,14 @@ final class GeneratedColumn implements GeneratedColumnInterface
     public function getTableName(): string
     {
         return $this->tablePrefix.$this->tableName;
+    }
+
+    /**
+     * Returns the raw table name without prefix.
+     */
+    public function getRawTableName(): string
+    {
+        return $this->tableName;
     }
 
     public function getColumnName(): string

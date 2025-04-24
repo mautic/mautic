@@ -139,7 +139,7 @@ return [
                 'class'       => Mautic\CampaignBundle\EventListener\CampaignEventDeleteSubscriber::class,
                 'arguments'   => [
                     'mautic.campaign.repository.lead_event_log',
-                    'mautic.helper.campaign_config',
+                    'mautic.helper.core_parameters',
                     'mautic.campaign.model.campaign',
                     'mautic.campaign.model.event',
                 ],
@@ -157,14 +157,15 @@ return [
                     'mautic.security',
                 ],
             ],
-            'mautic.campaign.calendarbundle.subscriber'           => [
+            // CalendarSubscriber was removed in 7.x
+            /*'mautic.campaign.calendarbundle.subscriber'           => [
                 'class'     => Mautic\CampaignBundle\EventListener\CalendarSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                     'translator',
                     'router',
                 ],
-            ],
+            ],*/
             'mautic.campaign.pointbundle.subscriber'              => [
                 'class' => Mautic\CampaignBundle\EventListener\PointSubscriber::class,
             ],
@@ -173,7 +174,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'mautic.security',
-                    'mautic.helper.templating',
+                    'twig',
                 ],
             ],
             'mautic.campaign.dashboard.subscriber'                => [
@@ -223,9 +224,10 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                 ],
             ],
-            'mautic.campaign.update.subscriber'                   => [
+            // CampaignUpdateSubscriber was removed in 7.x
+            /*'mautic.campaign.update.subscriber'                   => [
                 'class' => Mautic\CampaignBundle\EventListener\CampaignUpdateSubscriber::class,
-            ],
+            ],*/
             'mautic.campaign.generated_columns.subscriber' => [
                 'class' => Mautic\CampaignBundle\EventListener\GeneratedColumnSubscriber::class,
             ],
@@ -260,7 +262,7 @@ return [
             ],
             'mautic.campaign.type.leadsource'           => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['@router', '@translator'],
             ],
             'mautic.form.type.campaignconfig'           => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',

@@ -31,7 +31,7 @@ final class GeneratedColumns implements GeneratedColumnsInterface
             return;
         }
 
-        $tableName = $generatedColumn->getTableName();
+        $tableName = $generatedColumn->getRawTableName();
 
         if (!isset($this->dateColumnIndex[$tableName])) {
             $this->dateColumnIndex[$tableName] = [];
@@ -60,8 +60,11 @@ final class GeneratedColumns implements GeneratedColumnsInterface
 
     public function getGeneratedColumnForDateColumn(string $table, string $column, string $unit): GeneratedColumn
     {
-        if (isset($this->dateColumnIndex[$table][$column][$unit])) {
-            return $this->dateColumnIndex[$table][$column][$unit];
+        // Remove table prefix if it exists to ensure consistent lookups
+        $rawTable = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
+
+        if (isset($this->dateColumnIndex[$rawTable][$column][$unit])) {
+            return $this->dateColumnIndex[$rawTable][$column][$unit];
         }
 
         throw new \UnexpectedValueException("Generated column for original date column {$column} in table {$table} with unit {$unit} does not exist.");
@@ -72,15 +75,12 @@ final class GeneratedColumns implements GeneratedColumnsInterface
         $this->position = 0;
     }
 
-    /**
-     * @return GeneratedColumn
-     */
-    public function current(): mixed
+    public function current(): GeneratedColumn
     {
         return $this->generatedColumns[$this->position];
     }
 
-    public function key(): mixed
+    public function key(): int
     {
         return $this->position;
     }
