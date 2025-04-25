@@ -85,10 +85,11 @@ class ChartQueryTest extends TestCase
         $generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
 
         $generatedColumn->addIndexColumn('email_id');
+        $generatedColumn->setFilterDateColumn('generated_sent_date');
         $generatedColumn->setOriginalDateColumn($this->dateColumn, $this->unit);
         $generatedColumns->add($generatedColumn);
 
-        $generatedColumnsProvider->expects($this->once())
+        $generatedColumnsProvider->expects($this->exactly(2))
             ->method('getGeneratedColumns')
             ->willReturn($generatedColumns);
 
@@ -99,6 +100,10 @@ class ChartQueryTest extends TestCase
             ->with('t.generated_sent_date AS date, COUNT(*) AS count');
 
         $this->queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('t.generated_sent_date BETWEEN :dateFrom AND :dateTo');
+
+        $this->queryBuilder->expects($this->once())
             ->method('groupBy')
             ->with('t.generated_sent_date');
 
@@ -106,42 +111,30 @@ class ChartQueryTest extends TestCase
             ->method('orderBy')
             ->with('t.generated_sent_date');
 
-        $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
-    }
-
-    public function testGeneratedDateColumnWithFilterDateColumn(): void
-    {
-        $this->createChartQuery();
-
-        $generatedColumn          = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
-        $generatedColumns         = new GeneratedColumns();
-        $generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
-
-        $generatedColumn->addIndexColumn('email_id');
-        $generatedColumn->setFilterDateColumn('generated_sent_date');
-        $generatedColumn->setOriginalDateColumn($this->dateColumn, $this->unit);
-        $generatedColumns->add($generatedColumn);
-
-        $generatedColumnsProvider->expects($this->once())
-            ->method('getGeneratedColumns')
-            ->willReturn($generatedColumns);
-
-        $generatedColumnsProvider->expects($this->once())
-            ->method('generatedColumnsAreSupported')
-            ->willReturn(true);
-
-        $this->chartQuery->setGeneratedColumnProvider($generatedColumnsProvider);
-
         $this->queryBuilder->method('getQueryPart')
-            ->with('from')
-            ->willReturn([['table' => 'email_stats', 'alias' => 't']]);
+            ->willReturnMap(
+                [
+                    ['from', [[
+                        'table' => 'emails',
+                        'alias' => 'e',
+                    ]]],
+                    [
+                        'join',
+                        [
+                            'e' => [
+                                [
+                                    'joinType'      => 'inner',
+                                    'joinTable'     => 'email_stats',
+                                    'joinAlias'     => 't',
+                                    'joinCondition' => 't.id = e.id',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
 
-        $this->queryBuilder->expects($this->once())
-            ->method('andWhere')
-            ->with('t.generated_sent_date BETWEEN :dateFrom AND :dateTo');
-
-        $query = clone $this->queryBuilder;
-        $this->chartQuery->applyDateFilters($query, $this->dateColumn, 't');
+        $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
 
     public function testPhpOrderingInCompleteTimeDataHour(): void
