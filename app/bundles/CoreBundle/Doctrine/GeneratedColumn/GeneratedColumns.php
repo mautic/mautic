@@ -42,17 +42,12 @@ final class GeneratedColumns implements GeneratedColumnsInterface
         $this->dateColumnIndex[$tableName][$originalDateColumn][$timeUnit] = $generatedColumn;
     }
 
+    /**
+     * @deprecated use self::getGeneratedColumnForDateColumn() instead
+     */
     public function getForOriginalDateColumnAndUnit(string $originalDateColumn, string $unit): GeneratedColumnInterface
     {
-        // First try to search in the organized index
-        foreach ($this->dateColumnIndex as $tableIndex) {
-            if (isset($tableIndex[$originalDateColumn][$unit])) {
-                return $tableIndex[$originalDateColumn][$unit];
-            }
-        }
-
-        // If not found, search in the flat array (backward compatibility)
-        foreach ($this->generatedColumns as $generatedColumn) {
+        foreach (array_reverse($this->generatedColumns) as $generatedColumn) {
             if ($generatedColumn->getOriginalDateColumn() === $originalDateColumn && $generatedColumn->getTimeUnit() === $unit) {
                 return $generatedColumn;
             }
