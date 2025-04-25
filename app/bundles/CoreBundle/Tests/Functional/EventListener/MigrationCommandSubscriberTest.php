@@ -18,8 +18,6 @@ class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->markTestSkipped('This test requires a specific database configuration that supports DATE_FORMAT in generated columns');
-
         parent::setUp();
 
         $this->tablePrefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
