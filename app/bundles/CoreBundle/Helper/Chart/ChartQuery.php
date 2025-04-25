@@ -579,7 +579,7 @@ class ChartQuery extends AbstractChart
         try {
             return $this->generatedColumnProvider->getGeneratedColumns()
                 ->getGeneratedColumnForDateColumn($tableName, $dateColumn, $this->unit);
-        } catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException) {
             return null;
         }
     }
