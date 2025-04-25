@@ -37,16 +37,25 @@ class GeneratedColumnSubscriberTest extends TestCase
         Assert::assertCount(5, $generatedColumns);
 
         $generatedColumns = iterator_to_array($generatedColumns);
-        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_hour DATETIME AS (DATE_FORMAT(date_added, \"%Y-%m-%d %H:00\")) STORED COMMENT '(DC2Type:generated)';
-            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_hour_date_added`(campaign_id, generated_date_added_hour, date_added)', array_shift($generatedColumns));
-        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_day DATE AS (DATE_FORMAT(date_added, \"%Y-%m-%d\")) STORED COMMENT '(DC2Type:generated)';
-            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_day`(campaign_id, generated_date_added_day)', array_shift($generatedColumns));
-        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_week CHAR(7) AS (DATE_FORMAT(date_added, \"%Y %U\")) STORED COMMENT '(DC2Type:generated)';
-            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_week_date_added`(campaign_id, generated_date_added_week, date_added)', array_shift($generatedColumns));
-        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_month CHAR(7) AS (DATE_FORMAT(date_added, \"%Y-%m\")) STORED COMMENT '(DC2Type:generated)';
-            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_month_date_added`(campaign_id, generated_date_added_month, date_added)', array_shift($generatedColumns));
-        $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_year YEAR AS (DATE_FORMAT(date_added, \"%Y\")) STORED COMMENT '(DC2Type:generated)';
-            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_year_date_added`(campaign_id, generated_date_added_year, date_added)', array_shift($generatedColumns));
+        $alterTableSql    = 'ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_hour DATETIME AS (DATE_FORMAT(date_added, \"%Y-%m-%d %H:00\")) STORED COMMENT '(DC2Type:generated)';
+            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_hour_date_added`(campaign_id, generated_date_added_hour, date_added)';
+        $this->assertAlterTableSql($alterTableSql, array_shift($generatedColumns));
+
+        $alterTableSql = 'ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_day DATE AS (DATE_FORMAT(date_added, \"%Y-%m-%d\")) STORED COMMENT '(DC2Type:generated)';
+            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_day`(campaign_id, generated_date_added_day)';
+        $this->assertAlterTableSql($alterTableSql, array_shift($generatedColumns));
+
+        $alterTableSql = 'ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_week CHAR(7) AS (DATE_FORMAT(date_added, \"%Y %U\")) STORED COMMENT '(DC2Type:generated)';
+            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_week_date_added`(campaign_id, generated_date_added_week, date_added)';
+        $this->assertAlterTableSql($alterTableSql, array_shift($generatedColumns));
+
+        $alterTableSql = 'ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_month CHAR(7) AS (DATE_FORMAT(date_added, \"%Y-%m\")) STORED COMMENT '(DC2Type:generated)';
+            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_month_date_added`(campaign_id, generated_date_added_month, date_added)';
+        $this->assertAlterTableSql($alterTableSql, array_shift($generatedColumns));
+
+        $alterTableSql = 'ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_year YEAR AS (DATE_FORMAT(date_added, \"%Y\")) STORED COMMENT '(DC2Type:generated)';
+            ALTER TABLE ".MAUTIC_TABLE_PREFIX.'campaign_leads ADD INDEX `'.MAUTIC_TABLE_PREFIX.'campaign_id_generated_date_added_year_date_added`(campaign_id, generated_date_added_year, date_added)';
+        $this->assertAlterTableSql($alterTableSql, array_shift($generatedColumns));
     }
 
     private function assertAlterTableSql(string $expectedSql, GeneratedColumnInterface $generatedColumn): void
