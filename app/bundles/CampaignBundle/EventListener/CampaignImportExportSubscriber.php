@@ -675,6 +675,9 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             case 'form.submit':
                 $this->updateArrayProperty($event, 'properties.forms', $eventDependency, Form::ENTITY_NAME);
                 break;
+            case 'email.send.to.user':
+                $this->updateArrayProperty($event, 'properties.useremail.email', $eventDependency, Email::ENTITY_NAME);
+                break;
             case 'lead.changepoints':
             case 'lead.points':
                 $this->updateProperty($event, 'properties.group', $eventDependency, Group::ENTITY_NAME);

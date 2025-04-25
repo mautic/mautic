@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
@@ -170,6 +171,12 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                     if (!empty($properties['group'])) {
                         $dependencies[Group::ENTITY_NAME] = (int) $properties['group'];
                         $this->exportEntity(Group::ENTITY_NAME, (int) $properties['group'], $data, $event);
+                    }
+                    break;
+                case 'email.send.to.user':
+                    if (!empty($properties['useremail'])) {
+                        $dependencies[Email::ENTITY_NAME] = (int) $properties['useremail']['email'];
+                        $this->exportEntity(Email::ENTITY_NAME, (int) $properties['useremail']['email'], $data, $event);
                     }
                     break;
             }
