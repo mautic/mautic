@@ -6,10 +6,7 @@ namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 final class GeneratedColumn implements GeneratedColumnInterface
 {
-    /**
-     * @var string
-     */
-    private $tablePrefix = '';
+    private string $tablePrefix = '';
 
     private string $columnName;
 
@@ -108,11 +105,6 @@ final class GeneratedColumn implements GeneratedColumnInterface
         return $this->tablePrefix.$this->indexColumnsToString('_');
     }
 
-    private function indexColumnsToString(string $separator = ', '): string
-    {
-        return implode($separator, $this->indexColumns);
-    }
-
     public function getFilterDateColumn(): ?string
     {
         return $this->filterDateColumn;
@@ -121,5 +113,10 @@ final class GeneratedColumn implements GeneratedColumnInterface
     public function setFilterDateColumn(?string $filterDateColumn): void
     {
         $this->filterDateColumn = $filterDateColumn;
+    }
+
+    private function indexColumnsToString(string $separator = ', '): string
+    {
+        return implode($separator, $this->indexColumns);
     }
 }
