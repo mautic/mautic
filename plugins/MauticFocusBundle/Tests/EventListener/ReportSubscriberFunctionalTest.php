@@ -21,6 +21,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
     }
+
     public function testGenerateFocusItemReportWithAllAvailableColumns(): void
     {
         $this->fillDatabase();
