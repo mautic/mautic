@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -15,20 +17,18 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
+class CampaignTestAbstract extends TestCase
 {
-    protected static $mockId   = 232;
+    protected static int $mockId   = 232;
 
-    protected static $mockName = 'Mock name';
+    protected static string $mockName = 'Mock name';
 
-    /**
-     * @return CampaignModel
-     */
-    protected function initCampaignModel()
+    protected function initCampaignModel(): CampaignModel
     {
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
