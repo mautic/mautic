@@ -292,7 +292,7 @@ final class ReportSubscriber implements EventSubscriberInterface
 
         $data = [
             'display_name' => 'mautic.report.datasource.focus.leads',
-            'columns'      => array_merge($columns, $columnsLeads, $event->getLeadColumns() ),
+            'columns'      => array_merge($columns, $columnsLeads, $event->getLeadColumns()),
         ];
 
         $event->addTable(self::CONTEXT_FOCUS_LEADS, $data, self::FOCUS_GROUP);
