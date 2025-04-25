@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -72,8 +73,9 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->will($this->returnValue($formRepository));
 
-        $eventCollector    = $this->createMock(EventCollector::class);
-        $membershipBuilder = $this->createMock(MembershipBuilder::class);
+        $eventCollector             = $this->createMock(EventCollector::class);
+        $membershipBuilder          = $this->createMock(MembershipBuilder::class);
+        $generatedColumnsProvider   = $this->createMock(GeneratedColumnsProviderInterface::class);
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
@@ -90,7 +92,8 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             $this->createMock(Translator::class),
             $userHelper,
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
+            $generatedColumnsProvider
         );
 
         return $campaignModel;

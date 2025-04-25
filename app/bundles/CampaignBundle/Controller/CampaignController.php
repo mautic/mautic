@@ -197,20 +197,19 @@ class CampaignController extends AbstractStandardFormController
         $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($objectId);
         $dateFrom        = null;
         $dateTo          = null;
-        $dateToPlusOne   = null;
         if ($this->coreParametersHelper->get('campaign_by_range')) {
-            $dateFrom      = new \DateTimeImmutable($dateFromValue);
-            $dateTo        = new \DateTimeImmutable($dateToValue);
-            $dateToPlusOne = $dateTo->modify('+1 day');
+            $dateFrom = new \DateTimeImmutable($dateFromValue);
+            $dateTo   = new \DateTimeImmutable($dateToValue);
+            $dateTo   = $dateTo->modify('+1 day');
         }
 
-        $leadCount = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($objectId);
-        $logCounts = $this->processCampaignLogCounts($objectId, $dateFrom, $dateToPlusOne);
+        $hasCampaignLeads = $this->getCampaignModel()->getRepository()->hasCampaignLeads($objectId);
+        $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
         $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
         $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
-        $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
+        $this->processCampaignEvents($events, $hasCampaignLeads, $campaignLogCounts, $campaignLogCountsProcessed);
         $sortedEvents           = $this->processCampaignEventsFromParentCondition($events);
 
         $sourcesList     = $this->getCampaignModel()->getSourceLists();
@@ -1108,18 +1107,18 @@ class CampaignController extends AbstractStandardFormController
      *
      * @throws CacheException
      */
-    private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateToPlusOne): array
+    private function processCampaignLogCounts(int $id, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateTo): array
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             /** @var SummaryRepository $summaryRepo */
             $summaryRepo                = $this->doctrine->getManager()->getRepository(Summary::class);
-            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
+            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateTo);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
             /** @var LeadEventLogRepository $eventLogRepo */
             $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateTo);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo);
         }
 
         return [
@@ -1135,7 +1134,7 @@ class CampaignController extends AbstractStandardFormController
      */
     private function processCampaignEvents(
         array &$events,
-        int $leadCount,
+        bool $hasCampaignLeads,
         array $campaignLogCounts,
         array $campaignLogCountsProcessed,
     ): void {
@@ -1155,7 +1154,7 @@ class CampaignController extends AbstractStandardFormController
                 [$totalNo, $totalYes]        = $campaignLogCounts[$event['id']];
                 $total                       = $totalYes + $totalNo;
 
-                if ($leadCount) {
+                if ($hasCampaignLeads) {
                     $event['percent']    = min(100, max(0, round(($loggedCount / $total) * 100, 1)));
                     $event['yesPercent'] = min(100, max(0, round(($totalYes / $total) * 100, 1)));
                     $event['noPercent']  = min(100, max(0, round(($totalNo / $total) * 100, 1)));

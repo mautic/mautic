@@ -132,6 +132,12 @@ class ChartQuery extends AbstractChart
         }
 
         if ($dateColumn) {
+            $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $dateColumn, (string) $tablePrefix);
+
+            if ($generatedColumn) {
+                $dateColumn = $generatedColumn->getFilterDateColumn() ?: $dateColumn;
+            }
+
             if ($this->dateFrom && $this->dateTo) {
                 // Between is faster so if we know both dates...
                 /** @var \DateTime $dateFrom */
@@ -563,10 +569,41 @@ class ChartQuery extends AbstractChart
     }
 
     /**
-     * @param string $tablePrefix
-     * @param string $column
+     * @return \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn|null
      */
-    private function getDateConstruct($tablePrefix, $column): string
+    private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix)
+    {
+        if (!$this->generatedColumnProvider || !$this->generatedColumnProvider->generatedColumnsAreSupported()) {
+            return null;
+        }
+
+        $from = $query->getQueryPart('from');
+        if (empty($from)) {
+            return null;
+        }
+
+        $tableName = $from[0]['table'];
+
+        if (str_starts_with($tableName, '(')) {
+            return null;
+        }
+
+        try {
+            if (str_starts_with($tableName, MAUTIC_TABLE_PREFIX)) {
+                $tableName = substr($tableName, strlen(MAUTIC_TABLE_PREFIX));
+            }
+
+            return $this->generatedColumnProvider->getGeneratedColumns()->getGeneratedColumnForDateColumn(
+                MAUTIC_TABLE_PREFIX.$tableName,
+                $dateColumn,
+                $this->unit
+            );
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
+    }
+
+    private function getDateConstruct(string $tablePrefix, string $column): string
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();

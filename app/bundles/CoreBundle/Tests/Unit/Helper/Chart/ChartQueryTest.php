@@ -12,8 +12,9 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChartQueryTest extends \PHPUnit\Framework\TestCase
+class ChartQueryTest extends TestCase
 {
     private \DateTime $dateFrom;
 
@@ -109,6 +110,40 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             ->with('t.generated_sent_date');
 
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
+    }
+
+    public function testGeneratedDateColumnWithFilterDateColumn(): void
+    {
+        $this->createChartQuery();
+
+        $generatedColumn          = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
+        $generatedColumns         = new GeneratedColumns();
+        $generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+
+        $generatedColumn->addIndexColumn('email_id');
+        $generatedColumn->setFilterDateColumn('generated_sent_date');
+        $generatedColumn->setOriginalDateColumn($this->dateColumn, $this->unit);
+        $generatedColumns->add($generatedColumn);
+
+        $generatedColumnsProvider->expects($this->exactly(2))
+            ->method('getGeneratedColumns')
+            ->willReturn($generatedColumns);
+
+        $generatedColumnsProvider->expects($this->once())
+            ->method('generatedColumnsAreSupported')
+            ->willReturn(true);
+
+        $this->chartQuery->setGeneratedColumnProvider($generatedColumnsProvider);
+
+        $this->queryBuilder->method('getQueryPart')
+            ->with('from')
+            ->willReturn([['table' => 'email_stats', 'alias' => 't']]);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('t.generated_sent_date BETWEEN :dateFrom AND :dateTo');
+
+        $this->chartQuery->applyDateFilters($this->queryBuilder, $this->dateColumn, 't');
     }
 
     public function testPhpOrderingInCompleteTimeDataHour(): void
