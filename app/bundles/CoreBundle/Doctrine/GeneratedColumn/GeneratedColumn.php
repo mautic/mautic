@@ -67,7 +67,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     public function getTimeUnit(): string
     {
-        return $this->timeUnit;
+        return $this->timeUnit ?? '';
     }
 
     public function getAlterTableSql(): string

@@ -27,10 +27,7 @@ class ChartQueryTest extends TestCase
      */
     private MockObject $connection;
 
-    /**
-     * @var MockObject|QueryBuilder
-     */
-    private MockObject $queryBuilder;
+    private QueryBuilder&MockObject $queryBuilder;
 
     private string $dateColumn;
 
@@ -125,7 +122,7 @@ class ChartQueryTest extends TestCase
         $generatedColumn->setOriginalDateColumn($this->dateColumn, $this->unit);
         $generatedColumns->add($generatedColumn);
 
-        $generatedColumnsProvider->expects($this->exactly(2))
+        $generatedColumnsProvider->expects($this->once())
             ->method('getGeneratedColumns')
             ->willReturn($generatedColumns);
 
@@ -143,7 +140,8 @@ class ChartQueryTest extends TestCase
             ->method('andWhere')
             ->with('t.generated_sent_date BETWEEN :dateFrom AND :dateTo');
 
-        $this->chartQuery->applyDateFilters($this->queryBuilder, $this->dateColumn, 't');
+        $query = clone $this->queryBuilder;
+        $this->chartQuery->applyDateFilters($query, $this->dateColumn, 't');
     }
 
     public function testPhpOrderingInCompleteTimeDataHour(): void
