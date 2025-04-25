@@ -19,6 +19,10 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     private array $indexColumns = [];
 
+    private ?string $filterDateColumn = null;
+
+    private bool $stored = false;
+
     public function __construct(
         private string $tableName,
         string $columnName,
@@ -45,6 +49,11 @@ final class GeneratedColumn implements GeneratedColumnInterface
         $this->indexColumns[] = $indexColumn;
     }
 
+    public function prependIndexColumn(string $indexColumn): void
+    {
+        array_unshift($this->indexColumns, $indexColumn);
+    }
+
     public function setOriginalDateColumn(string $originalDateColumn, string $timeUnit): void
     {
         $this->originalDateColumn = $originalDateColumn;
@@ -67,9 +76,26 @@ final class GeneratedColumn implements GeneratedColumnInterface
             ALTER TABLE {$this->getTableName()} ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
     }
 
+    public function getAddColumnSql(): string
+    {
+        return "ADD {$this->getColumnName()} {$this->getColumnDefinition()}";
+    }
+
+    public function getAddIndexSql(): string
+    {
+        return "ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
+    }
+
     public function getColumnDefinition(): string
     {
-        return "{$this->columnType} AS ({$this->as}) COMMENT '(DC2Type:generated)'";
+        $stored = $this->stored ? ' STORED' : '';
+
+        return "{$this->columnType} AS ({$this->as}){$stored} COMMENT '(DC2Type:generated)'";
+    }
+
+    public function setStored(bool $stored): void
+    {
+        $this->stored = $stored;
     }
 
     public function getIndexColumns(): array
@@ -85,5 +111,15 @@ final class GeneratedColumn implements GeneratedColumnInterface
     private function indexColumnsToString(string $separator = ', '): string
     {
         return implode($separator, $this->indexColumns);
+    }
+
+    public function getFilterDateColumn(): ?string
+    {
+        return $this->filterDateColumn;
+    }
+
+    public function setFilterDateColumn(?string $filterDateColumn): void
+    {
+        $this->filterDateColumn = $filterDateColumn;
     }
 }

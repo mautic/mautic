@@ -466,6 +466,31 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * Returns true if the campaign has at least one lead.
+     *
+     * @throws \Doctrine\DBAL\Cache\CacheException
+     */
+    public function hasCampaignLeads(int $campaignId): bool
+    {
+        $q = $this->getReplicaConnection()->createQueryBuilder();
+
+        $q->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('cl.campaign_id', ':campaignId'),
+                    $q->expr()->eq('cl.manually_removed', '0')
+                )
+            )
+            ->setParameter('campaignId', $campaignId)
+            ->setMaxResults(1);
+
+        $results = $q->executeQuery()->fetchAllAssociative();
+
+        return !empty($results);
+    }
+
+    /**
      * Get lead data of a campaign.
      *
      * @param int        $start

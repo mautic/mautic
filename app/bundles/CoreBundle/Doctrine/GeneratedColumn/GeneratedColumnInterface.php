@@ -12,6 +12,10 @@ interface GeneratedColumnInterface
 
     public function addIndexColumn(string $indexColumn): void;
 
+    public function prependIndexColumn(string $indexColumn): void;
+
+    public function setStored(bool $stored): void;
+
     /**
      * If set then the line chart queries will use this column for the time unit instead of the original.
      */
@@ -23,9 +27,17 @@ interface GeneratedColumnInterface
 
     public function getAlterTableSql(): string;
 
+    public function getAddColumnSql(): string;
+
+    public function getAddIndexSql(): string;
+
     public function getColumnDefinition(): string;
 
     public function getIndexColumns(): array;
 
     public function getIndexName(): string;
+
+    public function getFilterDateColumn(): ?string;
+
+    public function setFilterDateColumn(?string $filterDateColumn): void;
 }

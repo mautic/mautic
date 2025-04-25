@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Form\Type\CampaignType;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -43,6 +44,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 {
+    private GeneratedColumnsProviderInterface $generatedColumnsProvider;
+
     public function __construct(
         protected ListModel $leadListModel,
         protected FormModel $formModel,
@@ -57,8 +60,10 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -666,6 +671,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query  = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
 
         $contacts = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
         $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);
