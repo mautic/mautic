@@ -12,9 +12,4 @@ interface GeneratedColumnsInterface extends \Iterator, \Countable
      * @throws \UnexpectedValueException
      */
     public function getForOriginalDateColumnAndUnit(string $originalDateColumn, string $unit): GeneratedColumnInterface;
-
-    /**
-     * @throws \UnexpectedValueException
-     */
-    public function getGeneratedColumnForDateColumn(string $table, string $column, string $unit): GeneratedColumn;
 }
