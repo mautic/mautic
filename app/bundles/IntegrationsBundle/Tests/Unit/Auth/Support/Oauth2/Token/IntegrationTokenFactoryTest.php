@@ -8,6 +8,9 @@ use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationTokenFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group time-sensitive
+ */
 class IntegrationTokenFactoryTest extends TestCase
 {
     public function testTokenGeneratedWithExpiresIn(): void
