@@ -234,7 +234,7 @@ class ChartQuery extends AbstractChart
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
-        $dateConstruct = $this->getDateConstruct($query, $tablePrefix, $column);
+        $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
 
         if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -603,7 +603,7 @@ class ChartQuery extends AbstractChart
         }
     }
 
-    private function getDateConstruct(QueryBuilder $query, string $tablePrefix, string $column): string
+    private function getDateConstruct(string $tablePrefix, string $column): string
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();
