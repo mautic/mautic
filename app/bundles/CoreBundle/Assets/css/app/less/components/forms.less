@@ -29,17 +29,30 @@ label {
 
 // form control
 // -------------------------
-.form-control,
-.chosen-container-single .chosen-single,
-.form-control.search.tt-input {
+input[style] {
   background-color: var(--field) !important;
+  &:hover {background-color: var(--field-hover) !important;}
+}
+
+.btn-datepicker + input {
+  &,
+  &:hover {
+    background-color: transparent;
+    border-color: transparent;
+    padding-left: 6px;
+    color: var(--text-secondary);
+    cursor: default;
+    font-size: 92%;
+  }
+}
+
+.form-control, .chosen-container .chosen-single, .form-control.search.tt-input {
+  background-color: var(--field);
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
   transition: var(--transition-all-productive);
-  outline: 2px solid transparent;
-  outline-offset: -2px;
-  border-radius: var(--border-radius-md);
-
+  border-radius: var(--border-radius-sm);
+  .outline();
   .box-shadow(none);
 
   // Rounded
@@ -48,12 +61,9 @@ label {
     border-radius: @input-height-base;
   }
 
-  &:hover {
-    background-color: var(--field-hover) !important;
-  }
+  &:hover {background-color: var(--field-hover);}
 
   &:focus {
-    outline: 2px solid var(--focus);
     box-shadow: none;
   }
 }
@@ -71,6 +81,15 @@ label {
   &.not-chosen {
     padding: var(--spacing-01) var(--spacing-04);
   }
+}
+
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+  color: var(--text-disabled);
+}
+
+.form-control[disabled] {
+  cursor: not-allowed;
+  border-bottom-color: transparent;
 }
 
 //Search
@@ -269,6 +288,8 @@ input[type=file].form-control {
   padding: 6px;
 }
 
+input[type=file] {.outline();}
+
 // Custom file input
 // -------------------------
 .btn-file {
@@ -322,7 +343,7 @@ input[type=file].form-control {
           margin-top: 1px;
           background-color: transparent;
           border-radius: @border-radius-base;
-          border: 1px solid rgba(0, 0, 0, 0.2);
+          border: 1px solid var(--text-primary);
 
           &:after {
             content: "";
@@ -353,7 +374,7 @@ input[type=file].form-control {
         // checked state
         &:checked {
           +span {
-            border: 1px solid @gray-dark;
+            border: 1px solid var(--text-primary);
 
             &:after {
               .scale(1);
@@ -367,7 +388,7 @@ input[type=file].form-control {
       &:hover {
         input {
           +span {
-            border: 1px solid rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--text-primary);
           }
 
           &:checked {
@@ -406,31 +427,51 @@ input[type=file].form-control {
   .radio-option {
     margin-bottom: var(--spacing-02);
   }
+  label {align-self: stretch;}
 
   input[type="radio"] {
-    width: 16px;
-    height: 16px;
+    height: 18px;
+    width: 18px;
+    flex-shrink: 0;
     vertical-align: top;
     margin-right: 4px;
     appearance: none;
     -webkit-appearance: none;
+    background-color: transparent;
     margin: 0;
-    border: 4px solid white;
     border-radius: 50%;
-    outline: 1px solid black;
-    transition: 0.2s all linear;
+    border: 1px solid var(--icon-primary, #161616);
     outline-offset: -1px;
     margin-right: 4px;
-  }
+    .transition(var(--transition-all-productive));
+    .outline-noff();
 
-  input[type="radio"]:checked {
-    background-color: black;
-
+    &:checked {
+      &:before {
+        position: relative;
+        display: inline-block;
+        border-radius: 50%;
+        background-color: var(--icon-primary, #161616);
+        block-size: 100%;
+        content: "";
+        inline-size: 100%;
+        -webkit-transform: scale(.5);
+        transform: scale(.5);
+      }
+    }
   }
 
   input[type="radio"]:hover {
     cursor: pointer;
     opacity: 0.7;
+  }
+}
+
+.radio-cards {
+  svg,
+  img {
+    width: 100%;
+    border-radius: 4px;
   }
 }
 
@@ -465,10 +506,43 @@ input[type=file].form-control {
 }
 
 input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
+  --mtc-checkbox-size: 14px;
+  aspect-ratio: 1 / 1;
+  height: var(--mtc-checkbox-size);
   vertical-align: -3px;
-  accent-color: var(--text-primary);
+  background-color: transparent;
+  appearance: none;
+  border: 1px solid var(--interactive);
+  border-radius: 4px;
+  margin: 0;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  .transition(var(--transition-all-productive));
+  .outline-noff();
+
+  &:after {
+    content: "";
+    height: calc(var(--mtc-checkbox-size) - 6px);
+    aspect-ratio: 1/1;
+    border-radius: 3px;
+    -webkit-transform: scale(.5);
+    -ms-transform: scale(.5);
+    -o-transform: scale(.5);
+    transform: scale(.5);
+    .transition(var(--transition-all-productive));
+  }
+
+  &:checked {
+    &:after {
+      background-color: var(--interactive);
+      -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+      -o-transform: scale(1);
+      transform: scale(1);
+      .transition(var(--transition-all-productive));
+    }
+  }
 }
 
 // time input (3 select boxes hh:mm:ss)

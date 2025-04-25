@@ -15,13 +15,30 @@
 }
 
 .alert {
-  border-width: 0 0 0 3px;
+  border-width: 0;
   color: var(--text-primary);
   display: flex;
   flex-wrap: nowrap;
   gap: 3px;
   background-color: var(--layer);
   border-radius: var(--border-radius-sm);
+  position: relative;
+  overflow: hidden;
+
+  &:after {
+    display: flex;
+    content: "";
+    width: 5px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &[class*="col-"] {
+    padding-left: 25px;
+  }
 
   &.alert-success,
   &.alert-info,
@@ -40,6 +57,7 @@
 
     &.notification {
       position: relative;
+      border-radius: 0;
       &:before {
         position: absolute;
         top: 20px;
@@ -49,21 +67,24 @@
       .close {
         position: absolute;
         top: 10px;
-        right: 0;
+        right: 5px;
       }
     }
+  }
+
+  .close {
+    font-size: 13px;
+    position: absolute;
+    right: 12px;
+    top: 18px;
   }
 
   &:has(.btn) { align-items: center; }
 }
 
-.nav-tabs-contained + .tab-content,
-.nav-tabs-contained + * > .tab-content {
-  .alert { background-color: var(--layer-alternate); }
-}
-
 .alert-success {
-  border-color: var(--support-success);
+  background-color: var(--notification-background-success);
+  &:after { background-color: var(--support-success); }
 
   &:not([class*="col-"]):before {
     content: '\EB80';
@@ -72,7 +93,8 @@
 }
 
 .alert-info {
-  border-color: var(--support-info);
+  background-color: var(--notification-background-info);
+  &:after { background-color: var(--support-info); }
 
   &:not([class*="col-"]):before {
     content: '\F448';
@@ -81,7 +103,8 @@
 }
 
 .alert-warning {
-  border-color: var(--support-warning);
+  background-color: var(--notification-background-warning);
+  &:after { background-color: var(--support-warning); }
 
   &:not([class*="col-"]):before {
     content: '\ECA0';
@@ -90,7 +113,8 @@
 }
 
 .alert-danger {
-  border-color: var(--support-error);
+  background-color: var(--notification-background-error);
+  &:after { background-color: var(--support-error); }
 
   &:not([class*="col-"]):before {
     content: '\ED94';
@@ -122,9 +146,9 @@
 
   a {
     font-weight: 700;
-    color: lighten(@mautic-primary, 10%);
+    &,
     &:hover {
-      color: lighten(@mautic-primary, 30%);
+      color: var(--text-inverse);
     }
   }
 
@@ -167,8 +191,6 @@
 }
 
 .alert-growl-buttons {
-  margin-top: 10px;
-
   .btn + .btn {
     margin-left: 5px;
   }
@@ -179,9 +201,8 @@
   color: var(--text-inverse);
   margin-left: 10px;
   font-weight: normal;
-}
-
-.alert .close {
-  font-size: (@font-size-base);
-  margin-left: 10px;
+  position: relative;
+  order: 2;
+  top: unset;
+  right: unset;
 }

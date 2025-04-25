@@ -12,6 +12,7 @@
   padding-left: 15px;
   margin: 0;
   display: flex;
+  flex-direction: column;
 
   @media (min-width: @screen-sm-min) {
     max-width: @container-sm;
@@ -22,11 +23,6 @@
   @media (min-width: @screen-lg-min) {
     max-width: @container-lg;
   }
-}
-
-.container-column {
-  .container-fixed();
-  flex-direction: column;
 }
 
 // Fluid container
@@ -46,7 +42,6 @@
 .row {
   display: flex;
   flex-wrap: wrap;
-  max-width: 100%;
   .make-row();
 }
 

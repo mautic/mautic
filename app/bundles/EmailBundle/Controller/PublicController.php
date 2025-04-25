@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
+use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -456,7 +457,7 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, Request $request, string $objectId, string $objectType = null, EmailModel $model)
+    public function previewAction(AnalyticsHelper $analyticsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
     {
         $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
@@ -464,9 +465,14 @@ class PublicController extends CommonFormController
         if (null === $emailEntity) {
             return $this->notFound();
         }
+        $publicPreview = $emailEntity->isPublicPreview();
+        $draftEnabled  = $emailConfig->isDraftEnabled();
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $publicPreview = $emailEntity->getDraft()->isPublicPreview();
+        }
 
         if (
-            ($this->security->isAnonymous() && (!$emailEntity->getIsPublished() || !$emailEntity->isPublicPreview()))
+            ($this->security->isAnonymous() && (!$emailEntity->isPublished() || !$publicPreview))
             || (!$this->security->isAnonymous()
                 && !$this->security->hasEntityAccess(
                     'email:emails:viewown',
@@ -492,6 +498,11 @@ class PublicController extends CommonFormController
 
         $BCcontent = $emailEntity->getContent();
         $content   = $emailEntity->getCustomHtml();
+
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $content = $emailEntity->getDraftContent();
+        }
+
         if (empty($content) && !empty($BCcontent)) {
             $template = $emailEntity->getTemplate();
             $slots    = $this->factory->getTheme($template)->getSlots('email');

@@ -11,11 +11,19 @@
         {% endif %}
         <div class="text-muted">{{ format(n.message, 'html') }}</div>
     </div>
-    <a href="javascript:void(0);"
-       class="btn btn-ghost btn-icon btn-sm close btn-nospin pull-right do-not-close"
-       data-toggle="tooltip"
-       title="{{ 'mautic.core.notifications.clear'|trans }}"
-       onclick="Mautic.clearNotification({{ n.id }});">
-        <i class="ri-close-line do-not-close"></i>
-    </a>
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                variant: 'ghost',
+                icon_only: true,
+                icon: 'ri-close-line do-not-close',
+                label: 'mautic.core.notifications.clear',
+                size: 'xs',
+                attributes: {
+                    'class': 'pull-right close do-not-close'
+                },
+                onclick: 'Mautic.clearNotification(' ~ n.id ~ ');'
+            }
+        ]
+    } %}
 </div>

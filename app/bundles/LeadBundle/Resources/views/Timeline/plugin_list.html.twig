@@ -160,14 +160,24 @@
               <span class="timeline-row-lead-id hide">{% if event.leadId is defined %}{{ event.leadId }}{% endif %}</span>
               <div class="btn-group" role="group" style="float: right;">
                   <span class="timeline-icon">
-                      <a href="javascript:void(0);"
-                         onclick="mQuery('#timeline-details-{{ loop.index }}').toggleClass('hide')"
-                         data-activate-details="{{ loop.index }}"
-                         class="btn btn-xs btn-nospin btn-ghost {% if details is empty %}disabled{% endif %}"
-                         data-toggle="tooltip"
-                         title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
-                          <span class="fa ri-fw {{ icon }}"></span>
-                      </a>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: 'mautic.lead.timeline.toggle_details',
+                                variant: 'ghost',
+                                size: 'xs',
+                                icon: icon,
+                                icon_only: true,
+                                onclick: "mQuery('#timeline-details-{{ loop.index }}').toggleClass('hide')",
+                                attributes: {
+                                    'data-activate-details': loop.index,
+                                    'class': details is empty ? 'disabled' : '',
+                                    'data-toggle': 'tooltip',
+                                }
+                            }
+                        ]
+                    } %}
+
                   </span>
 
                   <span class="timeline-icon">

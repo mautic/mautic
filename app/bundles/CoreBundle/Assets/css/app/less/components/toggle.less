@@ -42,7 +42,7 @@
 }
 
 .toggle__label:focus .toggle__switch,
-.toggle:not(.toggle--disabled):active .toggle__switch {
+.toggle:not(.toggle--disabled):not(:has(.disabled)):active .toggle__switch {
     box-shadow: 0 0 0 1px var(--focus-inset, #ffffff), 0 0 0 3px var(--focus, #0f62fe)
 }
 
@@ -82,25 +82,31 @@
     visibility: visible
 }
 
-.toggle--disabled .toggle__appearance {
-    cursor: not-allowed
-}
+.toggle--disabled, .toggle:has(.disabled)
+{
+    cursor: not-allowed;
 
-.toggle--disabled .toggle__label-text,
-.toggle--disabled .toggle__text {
-    color: var(--text-disabled, rgba(22, 22, 22, 0.25))
-}
+    .toggle__label {
+        pointer-events: none;
+    }
 
-.toggle--disabled .toggle__switch {
-    background-color: var(--button-disabled, #c6c6c6)
-}
+    .toggle__label-text,
+    .toggle__text {
+        color: var(--text-disabled, rgba(22, 22, 22, 0.25));
+    }
 
-.toggle--disabled .toggle__switch::before {
-    background-color: var(--icon-on-color-disabled, #8d8d8d)
-}
+    .toggle__switch {
+        background-color: var(--button-disabled, #c6c6c6);
+    }
 
-.toggle--disabled .toggle__check {
-    fill: var(--button-disabled, #c6c6c6)
+    .toggle__switch::before {
+        background-color: var(--icon-on-color-disabled, #8d8d8d);
+        box-shadow: none;
+    }
+
+    .toggle__check {
+        fill: var(--button-disabled, #c6c6c6);
+    }
 }
 
 .toggle--readonly .toggle__appearance {
@@ -144,7 +150,7 @@
 (forced-colors:active) {
 
     .toggle__label:focus .toggle__switch,
-    .toggle:not(.toggle--disabled):active .toggle__switch {
+    .toggle:not(.toggle--disabled):not(:has(.disabled)):active .toggle__switch {
         color: Highlight;
         outline: 1px solid Highlight
     }

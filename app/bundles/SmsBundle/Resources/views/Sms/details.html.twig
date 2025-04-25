@@ -5,6 +5,23 @@
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{sms.getName()}}{% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : sms,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(
+                permissions['sms:smses:viewown'],
+                permissions['sms:smses:viewother'],
+                sms.getCreatedBy()
+            ),
+        },
+        'routeBase' : 'sms',
+        'targetLabel': 'mautic.sms.smses'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
     {% set customButtons = [] %}
     {{- include('@MauticCore/Helper/page_actions.html.twig',
@@ -23,11 +40,6 @@
                     permissions['sms:smses:deleteother'],
                     sms.getCreatedBy()
                 ),
-                'close' : securityHasEntityAccess(
-                    permissions['sms:smses:viewown'],
-                    permissions['sms:smses:viewother'],
-                    sms.getCreatedBy()
-                ),
             },
             'routeBase' : 'sms',
         }
@@ -37,15 +49,24 @@
 {% block publishStatus %}
 {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
     'entity': sms,
-    'status': 'available'
+    'status': sms.getPublishUp() is not null ? 'sending' : 'available'
 }) -}}
+{% set tags = [
+    {
+        color: 'warm-gray',
+        label: smsType == 'list'
+            ? 'mautic.sms.type.list.header'
+            : (smsType == 'template' ? 'mautic.sms.type.template.header' : type)
+    }
+] %}
+
+{% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
 
-{# This doesn't seem to be used anywhere: #}
-{# {% set smsType = sms.getSmsType() %}
+{% set smsType = sms.getSmsType() %}
 {% if smsType is empty %}
     {% set smsType = 'template' %}
-{% endif %} #}
+{% endif %}
 
 {% block content %}
 <!-- start: box layout -->
@@ -55,13 +76,6 @@
         <div>
             <!-- page detail header -->
             <!-- sms detail collapseable toggler -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10">
-                        <div class="text-white dark-sm mb-0">{{ sms.getDescription()|purify }}</div>
-                    </div>
-                </div>
-            </div>
             <div class="collapse pr-md pl-md" id="sms-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">

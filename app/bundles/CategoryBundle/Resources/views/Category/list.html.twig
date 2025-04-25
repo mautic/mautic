@@ -9,45 +9,55 @@
 	{% trans %}mautic.category.header.index{% endtrans %}
 {% endblock %}
 
-{% block actions %}
-	{{- include('@MauticCore/Helper/page_actions.html.twig', {
-        'templateButtons': {
-            'new': permissions[permissionBase ~ ":create"]
-        },
-        'routeBase': 'category',
-        'query': {
-            'bundle': bundle,
-            'show_bundle_select': true,
-        },
-        'editMode': 'ajaxModal',
-        'editAttr': {
-            'data-target': '#MauticSharedModal',
-            'data-header': 'mautic.category.header.new'|trans,
-            'data-toggle':'ajaxmodal',
-        },
-    }) -}}
-{% endblock %}
-
 {% block content %}
 	{% if isIndex %}
-		<div id="page-list-wrapper">
+		<div id="page-list-wrapper" class="panel panel-default">
 			{# //TODO - Restore these buttons to the listactions when custom content is supported #}
 			{# <div class="btn-group">
 							        <button type="button" class="btn btn-ghost"><i class="ri-upload-line"></i></button>
 							        <button type="button" class="btn btn-ghost"><i class="ri-archive-2-line"></i></button>
 							    </div> #}
-			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue': searchValue,
-                'searchHelp' : 'mautic.category.help.searchcommands',
-                'filters'    : {
-                    'bundle': {
-                        'options'        : categoryTypes,
-                        'values'         : {0: bundle},
-                        'translateLabels': true,
-                    },
-                },
-                'action': currentRoute,
-            }) -}}
+                                {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                                    'searchValue': searchValue,
+                                    'filters': {
+                                        'bundle': {
+                                            'options': categoryTypes,
+                                            'values': {0: bundle},
+                                            'translateLabels': true,
+                                        },
+                                    },
+                                    'action': currentRoute,
+                                    'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                                        'templateButtons': {
+                                            'new': permissions[permissionBase ~ ":create"]
+                                        },
+                                        'routeBase': 'category',
+                                        'query': {
+                                            'bundle': bundle,
+                                            'show_bundle_select': true,
+                                        },
+                                        'editMode': 'ajaxModal',
+                                        'editAttr': {
+                                            'data-target': '#MauticSharedModal',
+                                            'data-header': 'mautic.category.header.new'|trans,
+                                            'data-toggle': 'ajaxmodal',
+                                        },
+                                    }),
+                                    'quickFilters': [
+                                        {
+                                            'search': 'mautic.core.searchcommand.ispublished',
+                                            'label': 'mautic.core.form.available',
+                                            'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                                            'icon': 'ri-check-line'
+                                        },
+                                        {
+                                            'search': 'mautic.core.searchcommand.isunpublished',
+                                            'label': 'mautic.core.form.unavailable',
+                                            'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                                            'icon': 'ri-close-line'
+                                        }
+                                    ]
+                                }) -}}
             <div class="page-list">
                 {{ block('listResults') }}
 			</div>

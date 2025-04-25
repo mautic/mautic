@@ -1,9 +1,9 @@
-<div class="card" style="height: {{ widget.height|default('310') - 10 }}px;">
-    <div class="card-header">
-        <h4>{{ widget.name|purify }}</h4>
+<div class="tile" style="height: {{ widget.height|default('310') - 10 }}px;">
+    <div class="card-header d-flex jc-space-between ai-center">
+        <h4 class="fw-sb">{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                <a class="btn btn-ghost btn-icon btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
                     <i class="ri-more-2-fill"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
@@ -41,6 +41,7 @@
             </div>
         {% endif %}
     </div>
+    <hr class="bdr-b">
     <div class="card-body">
         {% if widget.errorMessage %}
             <div class="alert alert-danger" role="alert">
@@ -51,5 +52,8 @@
             {{ include(widget.template, widget.templateData) }}
             <!-- end: {{ widget.template }} -->
         {% endif %}
+    </div>
+    <div class="widget-overlay d-flex ai-center jc-center">
+        <i class="ri-drag-drop-fill ri-4x text-primary"></i>
     </div>
 </div>

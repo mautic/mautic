@@ -40,7 +40,7 @@
 {% endblock %}
 
 {% block content %}
-  <div id="grapesjsbuilder_assets" class="hide" data-assets="{{ url('grapesjsbuilder_assets') }}" data-upload="{{ url('grapesjsbuilder_upload') }}" data-delete="{{ url('grapesjsbuilder_delete') }}"></div>
+  <div id="grapesjsbuilder_assets" class="hide"></div>
 
   {% set template, attr = form.template.vars.data, form.vars.attr %}
   {% set attr = attr|merge({
@@ -96,7 +96,7 @@
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.title) }}
               {% if isVariant %}
-                  
+
                   {{ form_row(form.variantSettings) }}
               {% else %}
                   {{ form_row(form.alias) }}
@@ -105,7 +105,14 @@
                   {{ form_row(form.translationParent) }}
               {% endif %}
 
-              {{ form_row(form.isPublished) }}
+              {{ form_row(form.isPublished, {
+				'attr': {
+					'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
+					'data-start': 'mautic.core.form.available_on_scheduled_date',
+					'data-both': 'mautic.core.form.available_during_scheduled_period',
+					'data-end': 'mautic.core.form.available_until_scheduled_end'
+				}
+			}) }}
 
               {% if (permissions['page:preference_center:editown'] or permissions['page:preference_center:editother']) and not activePage.isVariant %}
                   {{ form_row(form.isPreferenceCenter) }}

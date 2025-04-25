@@ -307,7 +307,7 @@ Mautic.formActionOnLoad = function (container, response) {
             var newField = false;
         } else {
             //append content
-            mQuery(newHtml).appendTo('#mauticforms_actions');
+            mQuery(newHtml).appendTo('#mauticforms_actions .drop-here');
             var newField = true;
         }
         //activate new stuff

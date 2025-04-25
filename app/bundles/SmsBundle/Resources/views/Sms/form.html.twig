@@ -35,7 +35,14 @@
 {% block rightFormContent %}
 {{ form_row(form.category) }}
 {{ form_row(form.language) }}
-{{ form_row(form.isPublished) }}
+{{ form_row(form.isPublished, {
+    'attr': {
+        'data-none': 'mautic.core.form.sending_paused',
+        'data-start': 'mautic.core.form.sending_on_scheduled_start',
+        'data-both': 'mautic.core.form.sending_during_scheduled_period',
+        'data-end': 'mautic.core.form.available_until_scheduled_end'
+    }
+}) }}
 
 <div id="leadList"{% if 'template' == type %} class="hide"{% endif %}>
     {{ form_row(form.lists) }}
@@ -72,4 +79,3 @@
     ) -}}
 {% endif %}
 {% endblock %}
-

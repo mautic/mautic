@@ -11,19 +11,53 @@
         'entity': entity,
         'status': 'available'
     }) -}}
+
+    {% set tags = [
+        {
+            color: 'warm-gray',
+            label: entity.isCampaignBased
+                ? 'mautic.dwc.form.is.campaign'
+                : 'mautic.dwc.form.is.standalone'
+        }
+    ] %}
+
+    {% set tags = tags
+        |merge(entity.isTranslation and not entity.isTranslation(true)
+            ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+            : [])
+        |merge(entity.isTranslation(true)
+            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
+            : [])
+    %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
 
-{% block actions include('@MauticCore/Helper/page_actions.html.twig', {
-    'item': entity,
-    'customButtons': customButtons|default([]),
-    'templateButtons': {
-        'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], entity.createdBy),
-        'clone': permissions['dynamiccontent:dynamiccontents:create'],
-        'delete': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:deleteown'], permissions['dynamiccontent:dynamiccontents:deleteother'], entity.createdBy),
-        'close': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:viewown'], permissions['dynamiccontent:dynamiccontents:viewother'], entity.createdBy),
-    },
-    'routeBase': 'dynamicContent',
-})  %}
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : entity,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:viewown'], permissions['dynamiccontent:dynamiccontents:viewother'], entity.createdBy),
+        },
+        'routeBase'       : 'dynamicContent',
+        'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
+    }
+) -}}
+{% endblock %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'item': entity,
+        'customButtons': customButtons|default([]),
+        'templateButtons': {
+            'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], entity.createdBy),
+            'clone': permissions['dynamiccontent:dynamiccontents:create'],
+            'delete': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:deleteown'], permissions['dynamiccontent:dynamiccontents:deleteother'], entity.createdBy),
+        },
+        'routeBase': 'dynamicContent',
+    }) -}}
+{% endblock %}
 
 {% block content %}
   {%- set translationContent = include('@MauticCore/Translation/index.html.twig', {
@@ -40,32 +74,29 @@
       <div class="col-md-9 height-auto">
           <div>
               <!-- page detail header -->
-              <div class="pr-md pl-md pt-lg pb-lg">
-                  <div class="box-layout">
-                      <div class="col-xs-10">
-                          <div class="text-muted">{{ entity.description|purify }}</div>
-                          {% if entity.isVariant(true) %}
-                              <div class="small">
-                                  <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': variants.parent.id}) }}" data-toggle="ajax">
-                                      {{ 'mautic.core.variant_of'|trans({'%parent%': variants.parent.name}) }}
-                                  </a>
-                              </div>
-                          {% endif %}
-                          {% if entity.isTranslation(true) %}
-                              <div class="small">
-                                  <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.id}) }}" data-toggle="ajax">
-                                      {{ 'mautic.core.translation_of'|trans({'%parent%': translations.parent.name}) }}
-                                  </a>
-                              </div>
-                          {% endif %}
-                          {% if not entity.isCampaignBased %}
-                              <div class="small">
-                                  {{ 'mautic.dynamicContent.header.is_filter_based'|trans({'%slot%': entity.slotName}) }}
-                              </div>
-                          {% endif %}
-                      </div>
-                  </div>
-              </div>
+                {% set description %}
+                    {% if entity.isVariant(true) %}
+                        <div class="small">
+                            <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': variants.parent.id}) }}" data-toggle="ajax">
+                                {{ 'mautic.core.variant_of'|trans({'%parent%': variants.parent.name}) }}
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% if entity.isTranslation(true) %}
+                        <div class="small">
+                            <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.id}) }}" data-toggle="ajax">
+                                {{ 'mautic.core.translation_of'|trans({'%parent%': translations.parent.name}) }}
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% if not entity.isCampaignBased %}
+                        <div class="small">
+                            {{ 'mautic.dynamicContent.header.is_filter_based'|trans({'%slot%': entity.slotName}) }}
+                        </div>
+                    {% endif %}
+                {% endset %}
+
+                {% include '@MauticCore/Helper/description.html.twig' with { 'description': description } %}
               <!--/ page detail header -->
               <!-- page detail collapseable -->
               <div class="collapse pr-md pl-md" id="page-details">

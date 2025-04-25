@@ -93,8 +93,9 @@ class FieldType extends AbstractType
                     'mautic.lead.field.group.professional' => 'professional',
                 ],
                 'attr' => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.lead.field.form.group.help',
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.lead.field.form.group.help',
+                    'onchange' => 'Mautic.updateLeadFieldOrderChoiceList();',
                 ],
                 'expanded'    => false,
                 'multiple'    => false,
@@ -445,16 +446,58 @@ class FieldType extends AbstractType
             return $cleaningRules;
         };
 
+        $setupOrderField = function (FormInterface $form, string $object = null, string $group = null) use ($builder, $disabled): void {
+            /** @var LeadFieldRepository $leadFieldRepository */
+            $leadFieldRepository = $this->em->getRepository(LeadField::class);
+
+            $options = [
+                'label'         => 'mautic.core.order.field',
+                'class'         => LeadField::class,
+                'choice_label'  => 'label',
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => [
+                    'class'   => 'form-control',
+                    'tooltip' => $disabled ? 'mautic.core.order.field.tooltip.disabled' : 'mautic.core.order.field.tooltip',
+                ],
+                'required'        => false,
+                'auto_initialize' => false,
+                'disabled'        => $disabled,
+            ];
+            // There's no need to filter list during FormEvents::PRE_SUBMIT.
+            if ($object && $group) {
+                $options['query_builder'] = fn (EntityRepository $er) => $er->createQueryBuilder('f')
+                    ->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC)
+                    ->where('f.object = :object')
+                    ->setParameter('object', $object)
+                    ->andWhere('f.group = :group')
+                    ->setParameter('group', $group)
+                    ->andWhere('f.isFixed = FALSE');
+            }
+
+            // get order list
+            $transformer = new FieldToOrderTransformer($leadFieldRepository);
+            $form->add(
+                $builder->create(
+                    'order',
+                    EntityType::class,
+                    $options,
+                )->addModelTransformer($transformer)->getForm()
+            );
+        };
+
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier): void {
+            function (FormEvent $event) use ($formModifier, $setupOrderField): void {
                 $formModifier($event);
+                /** @var LeadField $field */
+                $field = $event->getData();
+                $setupOrderField($event->getForm(), $field->getObject(), $field->getGroup());
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier, $disableDefaultValue): void {
+            function (FormEvent $event) use ($formModifier, $disableDefaultValue, $setupOrderField): void {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
                 $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
@@ -471,28 +514,8 @@ class FieldType extends AbstractType
                 }
 
                 $event->setData($data);
+                $setupOrderField($event->getForm());
             }
-        );
-
-        /** @var LeadFieldRepository $leadFieldRepository */
-        $leadFieldRepository = $this->em->getRepository(LeadField::class);
-
-        // get order list
-        $transformer = new FieldToOrderTransformer($leadFieldRepository);
-        $builder->add(
-            $builder->create(
-                'order',
-                EntityType::class,
-                [
-                    'label'         => 'mautic.core.order.field',
-                    'class'         => LeadField::class,
-                    'choice_label'  => 'label',
-                    'label_attr'    => ['class' => 'control-label'],
-                    'attr'          => ['class' => 'form-control', 'tooltip' => 'mautic.core.order.field.tooltip'],
-                    'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC),
-                    'required'      => false,
-                ]
-            )->addModelTransformer($transformer)
         );
 
         $builder->add(
@@ -551,7 +574,8 @@ class FieldType extends AbstractType
             [
                 'label' => 'mautic.lead.field.form.isshortvisible',
                 'attr'  => [
-                    'tooltip' => 'mautic.lead.field.form.isshortvisible.tooltip',
+                    'tooltip'         => 'mautic.lead.field.form.isshortvisible.tooltip',
+                    'data-disable-on' => '{"leadfield_object":"company"}',
                 ],
             ]
         );
@@ -595,8 +619,9 @@ class FieldType extends AbstractType
             [
                 'label' => 'mautic.lead.field.form.isuniqueidentifer',
                 'attr'  => [
-                    'tooltip'  => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
-                    'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)',
+                    'tooltip'         => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
+                    'onchange'        => 'Mautic.displayUniqueIdentifierWarning(this);',
+                    'data-disable-on' => '{"leadfield_object":"company"}',
                 ],
                 'data' => (!empty($data)),
             ]
@@ -625,7 +650,10 @@ class FieldType extends AbstractType
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.object',
                 'placeholder' => false,
-                'attr'        => ['class' => 'form-control'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.updateLeadFieldOrderChoiceList();',
+                ],
                 'required'    => false,
                 'disabled'    => ($disabled || !$new),
             ]

@@ -35,7 +35,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     public function testPasswordResetAction(): void
     {
         $crawler    = $this->client->request('GET', '/passwordreset');
-        $saveButton = $crawler->selectButton('reset password');
+        $saveButton = $crawler->selectButton('Reset password');
         $form       = $saveButton->form();
         $form['passwordreset[identifier]']->setValue('test@example.com');
 

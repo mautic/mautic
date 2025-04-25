@@ -32,7 +32,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
         </span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ml-a campaign-event-icon event-type-color"></i>
-        <div class="campaign-event-stat">
+        <div class="campaign-event-stat pa-4">
             <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>
             {% if (event.logCountForPending) %}
             <span class="campaign-event-stat-divider">|</span>
@@ -48,7 +48,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
                 <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
                 <span class="campaign-event-name ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span>
             </div>
-            <div class="campaign-event-stat">
+            <div class="campaign-event-stat pa-4">
                 <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>
                 {% if (event.logCountForPending) %}
                 <span class="campaign-event-stat-divider">|</span>
@@ -65,7 +65,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
             </span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ml-a campaign-event-icon event-type-color"></i>
-        <div class="campaign-event-stat">
+        <div class="campaign-event-stat pa-4">
             <span data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>
             {% if (event.logCountForPending) %}
             <span class="campaign-event-stat-divider">|</span>

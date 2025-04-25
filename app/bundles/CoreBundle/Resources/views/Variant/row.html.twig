@@ -53,15 +53,24 @@
                 <div class="col-xs-11">
                     {% if isWinner %}
                         <div class="mr-xs pull-left" data-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
-                            <a class="btn btn-warning"
-                               data-toggle="confirmation"
-                               href="{{ path(actionRoute, {'objectAction': 'winner', 'objectId': variant.id}) }}"
-                               data-message="{{ 'mautic.core.ab_test.confirm_make_winner'|trans({'%name%': attribute(variant, nameGetter)})|e }}"
-                               data-confirm-text="{{ 'mautic.core.ab_test.make_winner'|trans|e }}"
-                               data-confirm-callback="executeAction"
-                               data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
-                                <i class="ri-trophy-fill"></i>
-                            </a>
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: 'mautic.core.ab_test.make_winner',
+                                        variant: 'warning',
+                                        icon_only: true,
+                                        icon: 'ri-trophy-fill',
+                                        href: path(actionRoute, {'objectAction': 'winner', 'objectId': variant.id}),
+                                        attributes: {
+                                            'data-toggle': 'confirmation',
+                                            'data-message': ('mautic.core.ab_test.confirm_make_winner'|trans({'%name%': attribute(variant, nameGetter)})|e),
+                                            'data-confirm-text': ('mautic.core.ab_test.make_winner'|trans|e),
+                                            'data-confirm-callback': 'executeAction',
+                                            'data-cancel-text': ('mautic.core.form.cancel'|trans|e)
+                                        }
+                                    }
+                                ]
+                            } %}
                         </div>
                     {% endif %}
                     <h5 class="fw-sb text-primary">

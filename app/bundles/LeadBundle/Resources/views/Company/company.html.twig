@@ -15,13 +15,27 @@
 
 {% block headerTitle %}{{ company.name }}{% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : company,
+        'routeBase'       : 'company',
+        'langVar'         : 'company',
+        'customButtons'   : [],
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser),
+        },
+        'targetLabel'     : 'mautic.lead.lead.companies'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
 {% set canEdit     = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], company.permissionUser) %}
 {% set canMerge    = securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser) %}
 {% set canDownload = securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser) %}
 {% set buttons     = [] %}
 
-{# Merge button #}
 {% if canMerge and canEdit %}
     {% set buttons = buttons|merge([{
         'attr': {
@@ -35,7 +49,6 @@
     }]) %}
 {% endif %}
 
-{# Download button #}
 {% if canDownload %}
     {% set buttons = buttons|merge([{
         'attr': {
@@ -47,7 +60,7 @@
     }]) %}
 {% endif %}
 
-  {{ include ('@MauticCore/Helper/page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
         'item': company,
         'routeBase': 'company',
         'langVar': 'company',
@@ -55,7 +68,6 @@
         'templateButtons': {
             'edit': canEdit,
             'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser),
-            'close': securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser),
         },
   }) }}
 {% endblock %}
@@ -185,7 +197,7 @@
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="mt-sm points-panel text-center">
                 <h1>{{ 'mautic.company.score.count'|trans({'%count%': company.score}) }}</h1>
                 <hr/>
