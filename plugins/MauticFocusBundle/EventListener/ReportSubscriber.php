@@ -87,21 +87,17 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'formula' => 'CASE 
                     WHEN '.self::PREFIX_STATS.'.type = "view" THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2 
-                        INNER JOIN '.MAUTIC_TABLE_PREFIX.'focus f2 
-                        ON f2.id = fs2.focus_id 
+                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                         
                         WHERE fs2.type = "view" 
-                        AND f2.id = '.self::PREFIX_FOCUS.'.id
-                        GROUP BY f2.id
+                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        GROUP BY fs2.focus_id
                     )
                     WHEN '.self::PREFIX_STATS.'.type = "submission" THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2 
-                        INNER JOIN '.MAUTIC_TABLE_PREFIX.'focus f2 
-                        ON f2.id = fs2.focus_id 
+                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                          
                         WHERE fs2.type = "submission" 
-                        AND f2.id = '.self::PREFIX_FOCUS.'.id
-                        GROUP BY f2.id
+                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
+                        GROUP BY fs2.focus_id
                     )
                     ELSE MAX('.self::PREFIX_TRACKABLES.'.hits)
                 END',
@@ -236,33 +232,27 @@ final class ReportSubscriber implements EventSubscriberInterface
                 'formula' => 'CASE 
                     WHEN '.self::PREFIX_STATS.'.type = "view" THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2 
-                        INNER JOIN '.MAUTIC_TABLE_PREFIX.'focus f2 
-                        ON f2.id = fs2.focus_id 
-                        WHERE fs2.type = "view" 
-                        AND f2.id = '.self::PREFIX_FOCUS.'.id
+                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                          
+                        WHERE fs2.type = "view"                         
+                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
                         AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
-                        GROUP BY f2.id
+                        GROUP BY fs2.focus_id
                     )
                     WHEN '.self::PREFIX_STATS.'.type = "submission" THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2 
-                        INNER JOIN '.MAUTIC_TABLE_PREFIX.'focus f2 
-                        ON f2.id = fs2.focus_id 
+                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                         
                         WHERE fs2.type = "submission" 
-                        AND f2.id = '.self::PREFIX_FOCUS.'.id
+                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
                         AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
-                        GROUP BY f2.id
+                        GROUP BY fs2.focus_id
                     )
                     WHEN '.self::PREFIX_STATS.'.type = "click" THEN (
                         SELECT COUNT(fs2.id) 
-                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2 
-                        INNER JOIN '.MAUTIC_TABLE_PREFIX.'focus f2 
-                        ON f2.id = fs2.focus_id 
+                        FROM '.MAUTIC_TABLE_PREFIX.'focus_stats fs2                         
                         WHERE fs2.type = "click" 
-                        AND f2.id = '.self::PREFIX_FOCUS.'.id
+                        AND fs2.focus_id = '.self::PREFIX_STATS.'.focus_id
                         AND fs2.lead_id = '.self::PREFIX_LEADS.'.id
-                        GROUP BY f2.id
+                        GROUP BY fs2.focus_id
                     )
                 END',
             ],
