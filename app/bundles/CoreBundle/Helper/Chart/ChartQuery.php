@@ -132,7 +132,7 @@ class ChartQuery extends AbstractChart
         }
 
         if ($dateColumn) {
-            $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $dateColumn, (string) $tablePrefix);
+            $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $dateColumn);
 
             if ($generatedColumn) {
                 $dateColumn = $generatedColumn->getFilterDateColumn() ?: $dateColumn;
@@ -234,7 +234,7 @@ class ChartQuery extends AbstractChart
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
-        $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
+        $dateConstruct = $this->getDateConstruct($query, $tablePrefix, $column);
 
         if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -571,7 +571,7 @@ class ChartQuery extends AbstractChart
     /**
      * @return \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn|null
      */
-    private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix)
+    private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn)
     {
         if (!$this->generatedColumnProvider || !$this->generatedColumnProvider->generatedColumnsAreSupported()) {
             return null;
@@ -598,12 +598,12 @@ class ChartQuery extends AbstractChart
                 $dateColumn,
                 $this->unit
             );
-        } catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException) {
             return null;
         }
     }
 
-    private function getDateConstruct(string $tablePrefix, string $column): string
+    private function getDateConstruct(QueryBuilder $query, string $tablePrefix, string $column): string
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();
