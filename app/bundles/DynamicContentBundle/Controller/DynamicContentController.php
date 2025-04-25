@@ -398,6 +398,26 @@ class DynamicContentController extends FormController
         \assert($trackableModel instanceof TrackableModel);
         $trackables = $trackableModel->getTrackableList('dynamicContent', $entity->getId());
 
+        // Get all variations with the same slot name including current entity
+        $variations = [];
+        if (!$entity->getIsCampaignBased() && $entity->getSlotName()) {
+            // Setup filter to get all variations with same slot name (including current entity)
+            $filter = [
+                'force' => [
+                    ['column' => 'e.slotName', 'expr' => 'eq', 'value' => $entity->getSlotName()],
+                    ['column' => 'e.variantParent', 'expr' => 'isNull'],
+                    ['column' => 'e.translationParent', 'expr' => 'isNull'],
+                ],
+            ];
+
+            // Get variations with fixed sort order by display order descending
+            $variations = $model->getEntities([
+                'filter'     => $filter,
+                'orderBy'    => 'e.displayOrder',
+                'orderByDir' => 'DESC',
+            ]);
+        }
+
         return $this->delegateView(
             [
                 'returnUrl'       => $action,
@@ -418,6 +438,7 @@ class DynamicContentController extends FormController
                     'trackables'    => $trackables,
                     'entityViews'   => $entityViews,
                     'dateRangeForm' => $dateRangeForm->createView(),
+                    'variations'    => $variations,
                 ],
             ]
         );
