@@ -1973,7 +1973,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         $this->getName(),
                         false,
                         $errorHeader,
-                        'text-danger ri-error-warning-line-circle',
+                        'text-danger ri-error-warning-line',
                         null,
                         $user
                     );
