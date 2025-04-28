@@ -31,6 +31,6 @@ class PluginBadge implements BadgeInterface
 
     public function isResolved(): bool
     {
-        return null !== $this->preAuthenticatedToken || null !== $this->pluginResponse;
+        return true;
     }
 }

@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -45,7 +46,7 @@ class ExceptionListener extends ErrorListener
         }
 
         // Check for exceptions we don't want to handle
-        if ($exception instanceof AuthenticationException || $exception instanceof AccessDeniedException || $exception instanceof LogoutException
+        if ($exception instanceof AuthenticationException || $exception instanceof AccessDeniedException || $exception instanceof LazyResponseException || $exception instanceof LogoutException
         ) {
             return;
         }

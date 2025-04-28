@@ -7,6 +7,7 @@ namespace Mautic\UserBundle\Security\Authenticator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Exception\RespondingAuthenticationException;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
@@ -83,6 +84,10 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 }
 
                 $user = $authEvent->getUser();
+
+                if (!isset($user)) {
+                    throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
+                }
             }
 
             $response = $authEvent->getResponse();
@@ -93,7 +98,11 @@ final class PluginAuthenticator extends AbstractAuthenticator
             }
         }
 
-        if (!$user instanceof User && !$authenticated && null === $response) {
+        if (!$authenticated && $response) {
+            throw new RespondingAuthenticationException($response);
+        }
+
+        if (!$authenticated && null === $response) {
             throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
         }
 
@@ -166,6 +175,10 @@ final class PluginAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
+        if ($exception instanceof RespondingAuthenticationException) {
+            return $exception->getResponse();
+        }
+
         $this->logger->info(sprintf('Authentication request failed: %s', $exception->getMessage()));
 
         // Gets app/bundles/UserBundle/Security/Firewall/AuthenticationListener.php:74 and till the end of the method referenced.
