@@ -22,9 +22,9 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
 
         $timezone = 'UTC';
         $nowUTC   = new \DateTime('now', new \DateTimeZone($timezone));
-        if ($nowUTC->format('G') < 4) {
+        if ($nowUTC->format('G') <= 4) {
             $timezone = 'Asia/Bangkok'; // +07:00
-        } elseif ($nowUTC->format('G') > 20) {
+        } elseif ($nowUTC->format('G') >= 20) {
             $timezone = 'America/Phoenix'; // -07:00
         }
 
