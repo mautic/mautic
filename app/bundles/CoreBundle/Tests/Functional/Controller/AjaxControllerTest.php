@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\Psr7\Response;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -31,39 +29,15 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
-    /**
-     * @var MockHandler
-     */
-    private $clientMockHandler;
-
     protected function setUp(): void
     {
-        $this->configParams['composer_updates'] = 'testUpdateRunChecksAction' !== $this->getName();
-
         parent::setUp();
-
-        $this->clientMockHandler = static::getContainer()->get(MockHandler::class);
-    }
-
-    public function testUpdateRunChecksAction(): void
-    {
-        $responseToPostUpdate  = new Response();
-        $responseToGetUpdate   = new Response(200, [], file_get_contents(__DIR__.'/../../Fixtures/releases.json'));
-        $responseToGetMetadata = new Response(200, [], file_get_contents(__DIR__.'/../../Fixtures/metadata.json'));
-
-        $this->clientMockHandler->append($responseToPostUpdate, $responseToGetUpdate, $responseToGetMetadata);
-
-        $this->client->request('GET', 's/ajax?action=core:updateRunChecks');
-        $response = $this->client->getResponse();
-        self::assertResponseIsSuccessful($response->getContent());
-        Assert::assertStringContainsString('Great! You are running the current version of Mautic.', $response->getContent());
     }
 
     /**
@@ -763,7 +737,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             '\s*<kbd>esc<\/kbd>\n'.
             '\s*<\/div>\n'.
             '\s*<\/div>\n\n'.
-            '<div class="pa-sm" id="globalSearchPanel">\n'. // Matches the search panel div
+            '<div id="globalSearchPanel">\n'. // Matches the search panel div
             '\s*<!-- No results message -->\n'. // Matches the "No results message" comment
             '\s*<div class="text-center text-secondary mt-sm">\n'. // Matches the no-results div
             '\s*.*?\n'. // Matches random text inside the no-results div

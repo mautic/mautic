@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -564,6 +565,73 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($action);
 
         return $action;
+    }
+
+    public function testCloneActionWithCondition(): void
+    {
+        $form = $this->createForm('Conditional Form', 'Conditional Form');
+        $this->em->flush();
+
+        $field1 = $this->createFormField([
+            'label'        => 'Country',
+            'type'         => 'country',
+            'mappedObject' => 'contact',
+            'mappedField'  => 'country',
+        ])->setForm($form);
+        $this->em->persist($field1);
+
+        $field2 = $this->createFormField([
+            'label'        => 'State',
+            'mappedObject' => 'contact',
+            'mappedField'  => 'state',
+            'conditions'   => [
+                'any'    => 0,
+                'expr'   => 'in',
+                'values' => ['United States'],
+            ],
+            'parent' => $field1->getId(),
+        ])->setForm($form);
+
+        $fieldSubmit = $this->createFormField([
+            'label'        => 'Submit',
+            'type'         => 'button',
+        ])->setForm($form);
+
+        $this->em->persist($field2);
+        $this->em->flush();
+
+        $form->addField($field1->getId(), $field1);
+        $form->addField($field2->getId(), $field2);
+        $form->addField($fieldSubmit->getId(), $fieldSubmit);
+
+        $field2->setParent((string) $field1->getId());
+
+        $this->em->persist($form);
+        $this->em->flush();
+
+        // request for form clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/forms/clone/{$form->getId()}");
+        $mauticform     = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $mauticform['mauticform[name]']->setValue('Clone Conditional Form');
+        $mauticform['mauticform[isPublished]']->setValue('1');
+
+        $this->client->submit($mauticform);
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $forms = $this->em->getRepository(Form::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $forms);
+
+        $originalForm = $forms[0];
+        $clonedForm   = $forms[1];
+        Assert::assertSame($form->getId(), $originalForm->getId());
+        Assert::assertNotSame($form->getId(), $clonedForm->getId());
+
+        $fields = $clonedForm->getFields()->getValues();
+        Assert::assertCount(3, $fields);
+
+        list($clonedField1, $clonedField2, $clonedSubmit) = $fields;
+        Assert::assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
     }
 
     private function createForm(string $name, string $alias): Form

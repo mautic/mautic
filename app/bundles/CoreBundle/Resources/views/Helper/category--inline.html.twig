@@ -1,0 +1,7 @@
+<div class="d-flex ai-center mt-sm float-right">
+    <div class="category--inline d-inline-flex ai-center h-32 pr-xs" data-toggle="tooltip" data-placement="right" title="{{ (category.title|default('mautic.core.form.uncategorized'|trans)|striptags) }}">
+        <span class="category--inline-color d-inline-flex ai-center jc-center" style="--category-color: {% if category.color is defined and category.color %}#{{ category.color }}{% else %}var(--label-background-gray){% endif %};">
+            <i class="ri-folder-6-fill fs-10"></i>
+        </span>
+    </div>
+</div>

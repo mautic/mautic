@@ -245,7 +245,7 @@ class Notification extends FormEntity implements UuidInterface
             'heading',
             new NotBlank(
                 [
-                    'message' => 'mautic.core.title.required',
+                    'message' => 'mautic.core.heading.required',
                 ]
             )
         );
@@ -254,7 +254,7 @@ class Notification extends FormEntity implements UuidInterface
             'message',
             new NotBlank(
                 [
-                    'message' => 'mautic.lead.email.body.required',
+                    'message' => 'mautic.core.message.required',
                 ]
             )
         );

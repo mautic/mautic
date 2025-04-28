@@ -12,8 +12,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
-use Mautic\CoreBundle\Entity\UuidInterface;
-use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -24,10 +22,9 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface, UuidInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface
 {
     use CustomFieldEntityTrait;
-    use UuidTrait;
 
     public const FIELD_ALIAS     = '';
 
@@ -423,8 +420,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ],
             FieldModel::$coreFields
         );
-
-        static::addUuidField($builder);
     }
 
     /**

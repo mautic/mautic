@@ -36,13 +36,28 @@ Mautic.getEntityId = function() {
 Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     if (typeof baseUrl == 'undefined') {
         baseUrl = window.location.pathname;
+
+        // Reset to first page by modifying the path
+        baseUrl = baseUrl.replace(/\/\d+$/, '/1');
     }
 
-    if (baseUrl.indexOf('tmpl') == -1) {
-        baseUrl = baseUrl + "?tmpl=" + tmpl
+    // Start building the query parameters
+    var params = [];
+
+    if (tmpl) {
+        params.push('tmpl=' + tmpl);
     }
 
-    var route = baseUrl + "&name=" + name + "&orderby=" + encodeURIComponent(orderby);
+    if (name) {
+        params.push('name=' + name);
+    }
+
+    if (orderby) {
+        params.push('orderby=' + encodeURIComponent(orderby));
+    }
+
+    var route = baseUrl + (params.length ? '?' + params.join('&') : '');
+
     Mautic.loadContent(route, '', 'POST', target);
 };
 

@@ -306,8 +306,8 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function needsRebuild(): bool
     {
-        // Manual segments never require rebuild
-        if (empty($this->getFilters())) {
+        // Manual or unpublished segments never require rebuild
+        if (empty($this->getFilters()) || !$this->isPublished()) {
             return false;
         }
 

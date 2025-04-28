@@ -235,6 +235,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->logger,
         );
 
+        $this->setSecurity($this->leadModel);
+
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
@@ -249,13 +251,11 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['anonymize_ip', false],
-                ['ip_lookup_create_organization', false]
-            )
-            ->willReturn(false);
+        $this->coreParametersHelperMock->method('get')
+            ->willReturnMap([
+                ['anonymize_ip', false, false],
+                ['ip_lookup_create_organization', false, false],
+            ]);
 
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
@@ -280,13 +280,11 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['anonymize_ip', false],
-                ['ip_lookup_create_organization', false]
-            )
-            ->willReturnOnConsecutiveCalls(false, true);
+        $this->coreParametersHelperMock->method('get')
+            ->willReturnMap([
+                ['anonymize_ip', false, false],
+                ['ip_lookup_create_organization', false, true],
+            ]);
 
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
@@ -429,6 +427,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -471,6 +470,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -509,6 +509,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -548,6 +549,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $mockLeadModel->setUserHelper($mockUserModel);
+        $this->setSecurity($mockLeadModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -587,17 +589,21 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->method('findByIdOrName')
             ->with(1)
             ->willReturn($stageMock);
+        $matcher = $this->exactly(2);
 
-        $this->entityManagerMock->expects($this->exactly(2))
-            ->method('getRepository')
-            ->withConsecutive(
-                [StagesChangeLog::class],
-                [Stage::class]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $stagesChangeLogRepo,
-                $stageRepositoryMock
-            );
+        $this->entityManagerMock->expects($matcher)
+            ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame(StagesChangeLog::class, $parameters[0]);
+
+                    return $stagesChangeLogRepo;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame(Stage::class, $parameters[0]);
+
+                    return $stageRepositoryMock;
+                }
+            });
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -623,17 +629,21 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->method('findByIdOrName')
             ->with($data['stage'])
             ->willReturn(null);
+        $matcher = $this->exactly(2);
 
-        $this->entityManagerMock->expects($this->exactly(2))
-            ->method('getRepository')
-            ->withConsecutive(
-                [StagesChangeLog::class],
-                [Stage::class]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $stagesChangeLogRepo,
-                $stageRepositoryMock
-            );
+        $this->entityManagerMock->expects($matcher)
+            ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame(StagesChangeLog::class, $parameters[0]);
+
+                    return $stagesChangeLogRepo;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame(Stage::class, $parameters[0]);
+
+                    return $stageRepositoryMock;
+                }
+            });
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -833,5 +843,19 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($event);
 
         $leadModel->dispatchBatchEventForTest($action, $leadsParams);
+    }
+
+    private function setSecurity(LeadModel $companyModel): void
+    {
+        $security = $this->createMock(CorePermissions::class);
+        $security->method('hasEntityAccess')
+            ->willReturn(true);
+        $security->method('isGranted')
+            ->willReturn(true);
+
+        $reflection = new \ReflectionClass($companyModel);
+        $property   = $reflection->getProperty('security');
+        $property->setAccessible(true);
+        $property->setValue($companyModel, $security);
     }
 }

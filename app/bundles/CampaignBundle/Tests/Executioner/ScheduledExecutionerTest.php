@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -320,13 +321,19 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->scheduler->expects($this->exactly(2))
             ->method('shouldSchedule')
             ->willReturn(true);
+        $matcher = $this->exactly(2);
 
-        $this->scheduler->expects($this->exactly(2))
-            ->method('reschedule')
-            ->withConsecutive(
-                [$log1, $oneMinuteDateTime],
-                [$log2, $twoMinuteDateTime]
-            );
+        $this->scheduler->expects($matcher)
+            ->method('reschedule')->willReturnCallback(function (...$parameters) use ($matcher, $log1, $oneMinuteDateTime, $log2, $twoMinuteDateTime) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame($log1, $parameters[0]);
+                    $this->assertSame($oneMinuteDateTime, $parameters[1]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame($log2, $parameters[0]);
+                    $this->assertSame($twoMinuteDateTime, $parameters[1]);
+                }
+            });
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -476,7 +483,8 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->executioner,
             $this->scheduler,
-            $this->contactFinder
+            $this->contactFinder,
+            $this->createMock(ProcessSignalService::class)
         );
     }
 }

@@ -99,15 +99,24 @@ final class ListCommandTest extends AbstractMauticTestCase
         EOF;
 
         $connection = $this->createMock(Connection::class);
+        $matcher    = $this->exactly(2);
 
-        $connection->method('getPlugins')
-            ->withConsecutive(
-                [1, 1, 'koco/mautic-recaptcha-bundle'],
-                [1, 1, 'maatoo/mautic-referrals-bundle'])
-            ->willReturnOnConsecutiveCalls(
-                json_decode($plugin1, true),
-                json_decode($plugin2, true)
-            );
+        $connection->expects($matcher)->method('getPlugins')->willReturnCallback(function (...$parameters) use ($matcher, $plugin1, $plugin2) {
+            if (1 === $matcher->getInvocationCount()) {
+                $this->assertSame(1, $parameters[0]);
+                $this->assertSame(1, $parameters[1]);
+                $this->assertSame('koco/mautic-recaptcha-bundle', $parameters[2]);
+
+                return json_decode($plugin1, true);
+            }
+            if (2 === $matcher->getInvocationCount()) {
+                $this->assertSame(1, $parameters[0]);
+                $this->assertSame(1, $parameters[1]);
+                $this->assertSame('maatoo/mautic-referrals-bundle', $parameters[2]);
+
+                return json_decode($plugin2, true);
+            }
+        });
 
         $allowlistPayload = DTOAllowlist::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true));
         $allowlist        = $this->createMock(Allowlist::class);

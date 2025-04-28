@@ -163,10 +163,16 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getCanvasTotalContacts(int $campaignId): int
     {
-        $crawler       = $this->getCrawlers($campaignId);
+        $from = date('Y-m-d', strtotime('-2 months'));
+        $to   = date('Y-m-d', strtotime('-1 month'));
+        $this->client->request('GET', sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
+        $response      = $this->client->getResponse();
+        $body          = json_decode($response->getContent(), true);
+        $crawler       = new Crawler($body['newContent']);
         $canvasJson    = trim($crawler->filter('canvas')->html());
         $canvasData    = json_decode($canvasJson, true);
         $datasets      = $canvasData['datasets'] ?? [];
+        $this->client->restart();
 
         return $this->processTotalContactStats($datasets);
     }
@@ -191,17 +197,15 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getCrawlers(int $campaignId): Crawler
     {
-        $from = date('F d, Y', strtotime('-2 months'));
-        $to   = date('F d, Y', strtotime('-1 month'));
+        $from = date('Y-m-d', strtotime('-2 months'));
+        $to   = date('Y-m-d', strtotime('-1 month'));
+        $url  = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaignId, $from, $to);
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        $body     = json_decode($response->getContent(), true);
+        $this->client->restart();
 
-        $parameters = [
-            'daterange' => [
-                'date_from' => $from,
-                'date_to'   => $to,
-            ],
-        ];
-
-        return $this->client->request(Request::METHOD_POST, '/s/campaigns/view/'.$campaignId, $parameters);
+        return new Crawler($body['actions']);
     }
 
     /**
@@ -210,9 +214,9 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
     private function getActionCounts(int $campaignId): array
     {
         $crawler        = $this->getCrawlers($campaignId);
-        $successPercent = trim($crawler->filter('#actions-container')->filter('span')->eq(0)->html());
-        $completed      = trim($crawler->filter('#actions-container')->filter('span')->eq(1)->html());
-        $pending        = trim($crawler->filter('#actions-container')->filter('span')->eq(2)->html());
+        $successPercent = trim($crawler->filter('.campaign-event-list')->filter('span')->eq(0)->html());
+        $completed      = trim($crawler->filter('.campaign-event-list')->filter('span')->eq(1)->html());
+        $pending        = trim($crawler->filter('.campaign-event-list')->filter('span')->eq(2)->html());
 
         return [
             'successPercent' => $successPercent,
@@ -318,5 +322,31 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->em->flush();
 
         return $leadEventLog;
+    }
+
+    public function testCampaignView(): void
+    {
+        $campaign = $this->saveSomeCampaignLeadEventLogs();
+        $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk());
+        self::assertStringContainsString('Campaign ABC', $response->getContent());
+        self::assertSame('', trim($crawler->filter('#decisions-container')->text()));
+        self::assertSame('', trim($crawler->filter('#actions-container')->text()));
+        self::assertSame('', trim($crawler->filter('#conditions-container')->text()));
+        self::assertSame('', trim($crawler->filter('#campaign-graph-div')->text()));
+    }
+
+    public function testCampaignViewEvents(): void
+    {
+        $from     = date('Y-m-d', strtotime('-2 months'));
+        $to       = date('Y-m-d', strtotime('-1 month'));
+        $campaign = $this->saveSomeCampaignLeadEventLogs();
+        $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk());
+        $body     = json_decode($response->getContent(), true);
+        self::assertCount(2, $body);
+        self::arrayHasKey('actions');
     }
 }

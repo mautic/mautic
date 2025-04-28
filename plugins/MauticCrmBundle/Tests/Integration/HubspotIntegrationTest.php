@@ -179,12 +179,18 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
     public function testAppendToFormKeys(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [HubspotIntegration::ACCESS_KEY, TextType::class],
-                [$this->integration->getApiKey(), TextType::class],
-            );
+        $matcher = self::exactly(2);
+        $builder->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame(HubspotIntegration::ACCESS_KEY, $parameters[0]);
+                    $this->assertSame(TextType::class, $parameters[1]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame($this->integration->getApiKey(), $parameters[0]);
+                    $this->assertSame(TextType::class, $parameters[1]);
+                }
+            })->willReturnSelf();
 
         $this->integration->appendToForm($builder, [], 'keys');
     }

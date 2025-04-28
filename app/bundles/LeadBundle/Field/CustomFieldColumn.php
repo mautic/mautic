@@ -48,7 +48,10 @@ class CustomFieldColumn
             $columnExists = $leadsSchema->checkColumnExists($leadField->getAlias(), $leadField->isNew());
 
             if ($columnExists && $this->customFieldIndex->isUpdatePending($leadField)) {
-                $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+                try {
+                    $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+                } catch (NoListenerException) {
+                }
                 $this->processUpdateLeadColumn($leadField);
             }
 
@@ -139,6 +142,37 @@ class CustomFieldColumn
         }
 
         $this->customFieldIndex->updateUniqueIdentifierIndex($leadField);
+    }
+
+    /**
+     * @throws SchemaException
+     * @throws \OutOfRangeException
+     */
+    public function updateLeadColumn(LeadField $leadField): void
+    {
+        try {
+            $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+        } catch (NoListenerException) {
+        } catch (AbortColumnUpdateException) { // if processing in background
+            return;
+        }
+
+        $this->processUpdateLeadColumn($leadField);
+
+        $this->processUpdateLeadColumnLength($leadField);
+    }
+
+    /**
+     * @throws SchemaException
+     * @throws \OutOfRangeException
+     */
+    public function processUpdateLeadColumnLength(LeadField $leadField): void
+    {
+        $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
+
+        $leadsSchema->updateColumnLength($leadField->getAlias(), $leadField->getCharLengthLimit());
+
+        $leadsSchema->executeChanges();
     }
 
     /**

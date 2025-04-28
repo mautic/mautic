@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -58,15 +59,22 @@ class ExportHelperTest extends TestCase
      */
     private MockObject $filePathResolver;
 
+    /**
+     * @var ProcessSignalService|MockObject
+     */
+    private $processSignalService;
+
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
+        $this->processSignalService     = $this->createMock(ProcessSignalService::class);
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
-            $this->filePathResolver
+            $this->filePathResolver,
+            $this->processSignalService
         );
     }
 

@@ -284,6 +284,55 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
     }
 
+    public function testSegmentClone(): void
+    {
+        $segment   = $this->saveSegment('Test Segment', 'testsegment');
+        $segmentId = $segment->getId();
+
+        // Number of segments before clone
+        $segmentsCountBefore = $this->em->getRepository(LeadList::class)->count([]);
+        // Go to clone segment action
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.(string) $segmentId);
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        // First submit
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $crawler = $this->client->submit($form);
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), 'Correct Apply');
+        // Second submit
+        $form = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $this->client->submit($form);
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), 'Correct Apply');
+        // Number of segments after clone
+        $segmentsCountAfter = $this->em->getRepository(LeadList::class)->count([]);
+        // Check that just one segment was created
+        $this->assertSame($segmentsCountBefore + 1, $segmentsCountAfter);
+    }
+
+    public function testSegmentAliasCreation(): void
+    {
+        $segment   = $this->saveSegment('Test Segment Alias', 'test-segment-alias');
+        $segmentId = $segment->getId();
+
+        // Clone segment
+        $aliasFirst = $this->getAliasWhenCloneSegment($segmentId);
+        // Clone segment again
+        $aliasSecond = $this->getAliasWhenCloneSegment($segmentId);
+        // Check that aliases are not the same
+        $this->assertNotSame($aliasFirst, $aliasSecond);
+    }
+
+    private function getAliasWhenCloneSegment(int $segmentId): string
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.(string) $segmentId);
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        // Save cloned segment
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $crawler = $this->client->submit($form);
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), 'Correct Apply');
+
+        return $crawler->filter('#leadlist_alias')->attr('value');
+    }
+
     public function testSegmentNotFoundOnAjax(): void
     {
         // Emulate invalid request parameter.
@@ -396,6 +445,46 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
+    public function testUnpublishedSegmentDoesNotShowRebuildingLabel(): void
+    {
+        // Create a segment that would normally show "Building" label
+        $segment = $this->saveSegment('Unpublished Segment', 'unpublished-segment', [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'operator' => '!empty',
+                'display'  => '',
+            ],
+        ]);
+
+        // Set last built date in the past to trigger "Building" label for published segments
+        $segment->setLastBuiltDate(new \DateTime('-1 year'));
+
+        // Unpublish the segment - this should prevent "Building" label
+        $segment->setIsPublished(false);
+        $this->listModel->saveEntity($segment);
+        $this->em->clear();
+
+        $segmentId = $segment->getId();
+
+        // Check segment count UI - should show "No Contacts" rather than "Building"
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        $spClass = $this->getSegmentCountClass($crawler, $segmentId);
+        self::assertSame('No Contacts', $html);
+        self::assertSame('label label-gray col-count', $spClass);
+
+        // Check segment count AJAX - should also show "No Contacts"
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('No Contacts', $response['content']['html']);
+        self::assertSame('label label-gray col-count', $response['content']['className']);
+        self::assertSame(0, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
+    }
+
     public function testSegmentWarningIcon(): void
     {
         $segmentWithOldLastRebuildDate            = $this->saveSegment('Lead List 1', 'lead-list-1');
@@ -416,11 +505,11 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(3, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
         $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
     }
 

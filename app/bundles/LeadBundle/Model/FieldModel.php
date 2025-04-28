@@ -631,16 +631,16 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
-        // Save the entity now if it's an existing entity
-        if (!$entity->isNew()) {
+        if ($entity->isNew()) {
+            try {
+                $this->customFieldColumn->createLeadColumn($entity);
+            } catch (CustomFieldLimitException $e) {
+                // Convert to original Exception not to cause BC
+                throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
+            }
+        } else {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
-        }
-
-        try {
-            $this->customFieldColumn->createLeadColumn($entity);
-        } catch (CustomFieldLimitException $e) {
-            // Convert to original Exception not to cause BC
-            throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
+            $this->customFieldColumn->updateLeadColumn($entity);
         }
 
         // Update order of the other fields.

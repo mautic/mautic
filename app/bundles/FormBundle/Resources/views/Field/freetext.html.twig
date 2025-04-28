@@ -65,12 +65,14 @@
   }) %}
 {% endif %}
 {% set containerAttributes = containerAttributes|merge({
+
         'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
         'class': containerAttributes.class|default([])|merge([
           'mauticform-row',
           'mauticform-' ~ containerClass,
           'mauticform-field-' ~ order,
         ]),
+        'style': 'width: ' ~ field.fieldWidth
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}

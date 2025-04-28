@@ -138,20 +138,29 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->expects($this->once())
             ->method('dispatchEmailSendEvent')
             ->willReturn($emailSendEvent);
+        // Different handling of tokens in the To, BC, BCC fields.
+        $matcher = $this->exactly(3);
 
         // Different handling of tokens in the To, BC, BCC fields.
-        $this->customFieldValidator->expects($this->exactly(3))
-            ->method('validateFieldType')
-            ->withConsecutive(
-                ['unpublished-field', 'email'],
-                ['unpublished-field', 'email'],
-                ['active-field', 'email']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->throwException(new RecordNotPublishedException()),
-                $this->throwException(new RecordNotPublishedException()),
-                null
-            );
+        $this->customFieldValidator->expects($matcher)
+            ->method('validateFieldType')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('unpublished-field', $parameters[0]);
+                    $this->assertSame('email', $parameters[1]);
+                    throw new RecordNotPublishedException();
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('unpublished-field', $parameters[0]);
+                    $this->assertSame('email', $parameters[1]);
+                    throw new RecordNotPublishedException();
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('active-field', $parameters[0]);
+                    $this->assertSame('email', $parameters[1]);
+
+                    return null;
+                }
+            });
 
         // The event is dispatched only for valid tokens.
         $this->dispatcher->expects($this->once())
@@ -170,21 +179,31 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 ),
                 EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT,
             );
+        $matcher = $this->exactly(4);
 
-        $this->emailValidator->expects($this->exactly(4))
-            ->method('validate')
-            ->withConsecutive(
-                ['hello@there.com'],
-                ['bob@bobek.cz'],
-                ['hidden@translation.in'],
-                ['{invalid-token}']
-            )
-            ->willReturnOnConsecutiveCalls(
-                null,
-                null,
-                null,
-                $this->throwException(new InvalidEmailException('{invalid-token}'))
-            );
+        $this->emailValidator->expects($matcher)
+            ->method('validate')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('hello@there.com', $parameters[0]);
+
+                    return null;
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('bob@bobek.cz', $parameters[0]);
+
+                    return null;
+                }
+                if (3 === $matcher->getInvocationCount()) {
+                    $this->assertSame('hidden@translation.in', $parameters[0]);
+
+                    return null;
+                }
+                if (4 === $matcher->getInvocationCount()) {
+                    $this->assertSame('{invalid-token}', $parameters[0]);
+
+                    return throw new InvalidEmailException('{invalid-token}');
+                }
+            });
         // Send email method
 
         $this->emailModel

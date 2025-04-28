@@ -50,26 +50,26 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
     public function testBuildForm(): void
     {
         $options = [];
+        $matcher = $this->exactly(2);
 
-        $this->formBuilder->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'useremail',
-                    EmailSendType::class,
-                    [
+        $this->formBuilder->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame('useremail', $parameters[0]);
+                    $this->assertSame(EmailSendType::class, $parameters[1]);
+                    $this->assertSame([
                         'label' => 'mautic.email.emails',
                         'attr'  => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.email.choose.emails_descr',
                         ],
                         'update_select' => 'formaction_properties_useremail_email',
-                    ],
-                ],
-                [
-                    'user_id',
-                    UserListType::class,
-                    [
+                    ], $parameters[2]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame('user_id', $parameters[0]);
+                    $this->assertSame(UserListType::class, $parameters[1]);
+                    $this->assertEquals([
                         'label'      => 'mautic.email.form.users',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
@@ -82,9 +82,11 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
                                 'message' => 'mautic.core.value.required',
                             ]
                         ),
-                    ],
-                ]
-            );
+                    ], $parameters[2]);
+                }
+
+                return $this->formBuilder;
+            });
 
         $this->form->buildForm($this->formBuilder, $options);
     }

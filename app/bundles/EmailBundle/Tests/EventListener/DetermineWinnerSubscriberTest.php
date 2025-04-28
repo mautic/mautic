@@ -60,23 +60,10 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 'readRate'   => 50,
             ],
         ];
-
-        $this->translator->method('trans')
-            ->withConsecutive(
-                ['mautic.email.abtest.label.opened'],
-                ['mautic.email.abtest.label.sent'],
-                ['mautic.email.abtest.label.opened'],
-                ['mautic.email.abtest.label.sent'],
-                ['mautic.email.abtest.label.opened'],
-                ['mautic.email.abtest.label.sent'])
-            ->willReturnOnConsecutiveCalls(
-                'opened',
-                'sent',
-                'opened',
-                'sent',
-                'opened',
-                'sent'
-            );
+        $this->translator->method('trans')->willReturnMap([
+            ['mautic.email.abtest.label.opened', [], null, null, 'opened'],
+            ['mautic.email.abtest.label.sent', [], null, null, 'sent'],
+        ]);
 
         $this->em->expects($this->once())
             ->method('getRepository')
@@ -133,26 +120,27 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             2 => 153,
         ];
 
-        $this->translator->method('trans')
-            ->withConsecutive(
-                ['mautic.email.abtest.label.clickthrough'],
-                ['mautic.email.abtest.label.opened'],
-                ['mautic.email.abtest.label.clickthrough'],
-                ['mautic.email.abtest.label.opened'],
-                ['mautic.email.abtest.label.clickthrough'],
-                ['mautic.email.abtest.label.opened'])
-            ->willReturnOnConsecutiveCalls(
-                'clickthrough',
-                'opened',
-                'clickthrough',
-                'opened',
-                'clickthrough',
-                'opened'
-            );
+        $this->translator->method('trans')->willReturnMap(
+            [
+                ['mautic.email.abtest.label.clickthrough', [], null, null, 'clickthrough'],
+                ['mautic.email.abtest.label.opened', [], null, null, 'opened'],
+            ]
+        );
 
-        $this->em->method('getRepository')
-            ->withConsecutive([Hit::class], [Stat::class])
-            ->willReturnOnConsecutiveCalls($pageRepoMock, $emailRepoMock);
+        $matcher = $this->exactly(2);
+
+        $this->em->expects($matcher)->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $pageRepoMock, $emailRepoMock) {
+            if (1 === $matcher->getInvocationCount()) {
+                $this->assertSame(Hit::class, $parameters[0]);
+
+                return $pageRepoMock;
+            }
+            if (2 === $matcher->getInvocationCount()) {
+                $this->assertSame(Stat::class, $parameters[0]);
+
+                return $emailRepoMock;
+            }
+        });
 
         $parentMock->expects($this->once())
             ->method('getRelatedEntityIds')

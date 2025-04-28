@@ -169,10 +169,7 @@
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName  = category is not empty ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color    = category is not empty ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                         {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item }) -}}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>

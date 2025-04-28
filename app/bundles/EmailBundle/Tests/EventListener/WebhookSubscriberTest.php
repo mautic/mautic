@@ -32,26 +32,26 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnWebhookBuild(): void
     {
-        $event = $this->createMock(WebhookBuilderEvent::class);
+        $event   = $this->createMock(WebhookBuilderEvent::class);
+        $matcher = $this->exactly(2);
 
-        $event->expects($this->exactly(2))
-            ->method('addEvent')
-            ->withConsecutive(
-                [
-                    EmailEvents::EMAIL_ON_SEND,
-                    [
+        $event->expects($matcher)
+            ->method('addEvent')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->getInvocationCount()) {
+                    $this->assertSame(EmailEvents::EMAIL_ON_SEND, $parameters[0]);
+                    $this->assertSame([
                         'label'       => 'mautic.email.webhook.event.send',
                         'description' => 'mautic.email.webhook.event.send_desc',
-                    ],
-                ],
-                [
-                    EmailEvents::EMAIL_ON_OPEN,
-                    [
+                    ], $parameters[1]);
+                }
+                if (2 === $matcher->getInvocationCount()) {
+                    $this->assertSame(EmailEvents::EMAIL_ON_OPEN, $parameters[0]);
+                    $this->assertSame([
                         'label'       => 'mautic.email.webhook.event.open',
                         'description' => 'mautic.email.webhook.event.open_desc',
-                    ],
-                ]
-            );
+                    ], $parameters[1]);
+                }
+            });
 
         $this->subscriber->onWebhookBuild($event);
     }

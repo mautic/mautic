@@ -1625,4 +1625,154 @@ class MailHelperTest extends TestCase
         $this->assertEquals($email, $to[0]->getAddress());
         $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
     }
+
+    public function testSetCcWithIndexedArray(): void
+    {
+        $symfonyMailer = new Mailer(new SmtpTransport());
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->requestStack,
+            $this->entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+        );
+
+        $addresses = ['cc1@example.com', 'cc2@example.com'];
+        $result    = $mailer->setCc($addresses, 'Default Name');
+
+        $this->assertTrue($result);
+
+        $cc = $mailer->message->getCc();
+        $this->assertCount(2, $cc);
+        $this->assertEquals('cc1@example.com', $cc[0]->getAddress());
+        $this->assertEquals('Default Name', $cc[0]->getName());
+        $this->assertEquals('cc2@example.com', $cc[1]->getAddress());
+        $this->assertEquals('Default Name', $cc[1]->getName());
+    }
+
+    public function testSetCcWithAssociativeArray(): void
+    {
+        $symfonyMailer = new Mailer(new SmtpTransport());
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->requestStack,
+            $this->entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+        );
+
+        $addresses = [
+            'cc1@example.com' => 'Name 1',
+            'cc2@example.com' => null,
+        ];
+        $result = $mailer->setCc($addresses, 'Default Name');
+
+        $this->assertTrue($result);
+
+        $cc = $mailer->message->getCc();
+        $this->assertCount(2, $cc);
+        $this->assertEquals('cc1@example.com', $cc[0]->getAddress());
+        $this->assertEquals('Name 1', $cc[0]->getName());
+        $this->assertEquals('cc2@example.com', $cc[1]->getAddress());
+        $this->assertEquals('Default Name', $cc[1]->getName());
+    }
+
+    public function testSetBccWithIndexedArray(): void
+    {
+        $symfonyMailer = new Mailer(new SmtpTransport());
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->requestStack,
+            $this->entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+        );
+
+        $addresses = ['bcc1@example.com', 'bcc2@example.com'];
+        $result    = $mailer->setBcc($addresses, 'Default Name');
+
+        $this->assertTrue($result);
+
+        $bcc = $mailer->message->getBcc();
+        $this->assertCount(2, $bcc);
+        $this->assertEquals('bcc1@example.com', $bcc[0]->getAddress());
+        $this->assertEquals('Default Name', $bcc[0]->getName());
+        $this->assertEquals('bcc2@example.com', $bcc[1]->getAddress());
+        $this->assertEquals('Default Name', $bcc[1]->getName());
+    }
+
+    public function testSetBccWithAssociativeArray(): void
+    {
+        $symfonyMailer = new Mailer(new SmtpTransport());
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->createMock(PathsHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->requestStack,
+            $this->entityManager,
+            $this->createMock(ModelFactory::class),
+            $this->createMock(AssetModel::class),
+            $this->createMock(TrackableModel::class),
+            $this->createMock(RedirectModel::class),
+        );
+
+        $addresses = [
+            'bcc1@example.com' => 'Name 1',
+            'bcc2@example.com' => null,
+        ];
+        $result = $mailer->setBcc($addresses, 'Default Name');
+
+        $this->assertTrue($result);
+
+        $bcc = $mailer->message->getBcc();
+        $this->assertCount(2, $bcc);
+        $this->assertEquals('bcc1@example.com', $bcc[0]->getAddress());
+        $this->assertEquals('Name 1', $bcc[0]->getName());
+        $this->assertEquals('bcc2@example.com', $bcc[1]->getAddress());
+        $this->assertEquals('Default Name', $bcc[1]->getName());
+    }
 }

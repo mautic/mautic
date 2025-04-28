@@ -611,7 +611,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             // Allow plugin to manipulate the data
             $event = new ReportDataEvent($entity, $data, $totalResults, $dataOptions);
             $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_DISPLAY);
-            $data = $event->getData();
+            $data        = $event->getData();
+            $dataOptions = $event->getOptions();
         }
 
         if ($this->isDebugMode()) {
@@ -640,7 +641,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             'dataColumns'       => $dataColumns,
             'graphs'            => $graphs,
             'contentTemplate'   => $contentTemplate,
-            'columns'           => $tableDetails['columns'],
+            'columns'           => $dataOptions['columns'],
             'limit'             => ($paginate) ? $limit : 0,
             'page'              => ($paginate) ? $reportPage : 1,
             'dateFrom'          => $dataOptions['dateFrom'],
