@@ -457,8 +457,8 @@ class ContactManagementCest
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
-        // Select change segment option from dropdown for multiple selections
-        $contact->selectOptionFromDropDownForMultipleSelections(7);
+        // Select Set Do Not Contact option from dropdown for multiple selections
+        $contact->selectOptionFromDropDownForMultipleSelections(2);
 
         $I->waitForElementClickable(ContactPage::$doNotContactSaveButton, 10);
         $I->click(ContactPage::$doNotContactSaveButton);
