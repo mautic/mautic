@@ -57,7 +57,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $buttonCrawler = $crawler->selectButton('Save');
+        $buttonCrawler = $crawler->selectButton('Apply');
         $form          = $buttonCrawler->form();
         $form->setValues([
             'dwc[name]'    => 'Some name',
@@ -193,7 +193,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
     private function submitFormAndAssertNoNestingValidation(Crawler $crawler): void
     {
-        $buttonCrawler = $crawler->selectButton('Save');
+        $buttonCrawler = $crawler->selectButton('Apply');
         $form          = $buttonCrawler->form();
         $form->setValues([
             'dwc[name]'    => 'Some name',
