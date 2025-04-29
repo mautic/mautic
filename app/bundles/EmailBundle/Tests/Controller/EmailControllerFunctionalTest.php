@@ -461,7 +461,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $dwc            = $this->createDynamicContent($type);
         $subject        = sprintf('Email with DWC {dwc=%s}', $dwc->getSlotName());
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/new');
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $buttonCrawler  =  $crawler->selectButton('Save changes');
         $form           = $buttonCrawler->form();
         $form['emailform[emailType]']->setValue('template');
         $form['emailform[subject]']->setValue($subject);
