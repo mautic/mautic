@@ -16,6 +16,13 @@ return function (ContainerConfigurator $configurator): void {
         ->autoconfigure()
         ->public();
 
+    $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class)
+        ->decorate('doctrine.migrations.migrations_factory')
+        ->args([
+            service('.inner'),
+            service('service_container'),
+        ]);
+
     $excludes = [
         'Doctrine',
         'Model/IteratorExportDataModel.php',

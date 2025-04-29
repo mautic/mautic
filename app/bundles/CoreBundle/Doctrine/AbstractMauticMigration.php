@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Doctrine;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface /** @phpstan-ignore-line ContainerAwareInterface is deprecated. This will need bigger refactoring. See https://github.com/doctrine/DoctrineMigrationsBundle/issues/521 */
+abstract class AbstractMauticMigration extends AbstractMigration
 {
     protected const TABLE_NAME = null;
 
@@ -22,31 +26,35 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     public const COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected ContainerInterface $container;
 
     /**
      * Supported platforms.
      *
-     * @var array
+     * @var string[]
      */
-    protected $supported = ['mysql'];
+    protected array $supported = ['mysql'];
 
     /**
      * Database prefix.
-     *
-     * @var string
      */
-    protected $prefix;
+    protected string $prefix;
 
     /**
      * Database platform.
-     *
-     * @var string
      */
-    protected $platform;
+    protected string $platformString;
+
+    protected CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(
+        Connection $connection,
+        LoggerInterface $logger,
+    ) {
+        parent::__construct($connection, $logger);
+
+        $this->platformString = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
+    }
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -56,12 +64,10 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     public function up(Schema $schema): void
     {
-        $platform = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
-
         // Abort the migration if the platform is unsupported
-        $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
+        $this->abortIf(!in_array($this->platformString, $this->supported), 'The database platform is unsupported for migrations');
 
-        $function = $this->platform.'Up';
+        $function = $this->platformString.'Up';
 
         if (method_exists($this, $function)) {
             $this->$function($schema);
@@ -73,14 +79,12 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         // Not supported
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function setContainer(ContainerInterface $container = null): void
     {
-        $this->container     = $container;
-        $this->prefix        = $container->getParameter('mautic.db_table_prefix');
-        $this->platform      = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
+        $this->container            = $container;
+        $this->coreParametersHelper = $container->get(CoreParametersHelper::class);
+        $this->platform             = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
+        $this->prefix               = (string) $this->coreParametersHelper->get('db_table_prefix', '');
     }
 
     /**
