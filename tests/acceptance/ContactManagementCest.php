@@ -251,6 +251,8 @@ class ContactManagementCest
         // Add the contacts to the campaign
         $campaign->addContactsToCampaign();
 
+        $I->ensureNotificationAppears('2 contacts affected');
+
         // Navigate back to the campaign page and click on the "Contacts" tab
         $I->amOnPage(CampaignPage::$URL);
         $I->waitForElementClickable(CampaignPage::$contactsTab, 5);
