@@ -336,7 +336,7 @@ final class ImportController extends AbstractFormController
                         $this->addFlashMessage(
                             'mautic.campaign.notice.import.finished',
                             [
-                                '%id%' => $campaignId,
+                                '%id%'   => $campaignId,
                                 '%name%' => htmlspecialchars($campaignName, ENT_QUOTES, 'UTF-8'),
                             ]
                         );
