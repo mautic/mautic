@@ -191,7 +191,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             }
 
             $object->setName(strip_tags($campaignData['name'] ?? ''));
-            $object->setDescription(strip_tags($campaignData['description'] ?? ''));            
+            $object->setDescription(strip_tags($campaignData['description'] ?? ''));
             $object->setIsPublished(false);
             $object->setCanvasSettings($campaignData['canvas_settings'] ?? '');
 
