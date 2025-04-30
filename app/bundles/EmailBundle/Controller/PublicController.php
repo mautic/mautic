@@ -195,6 +195,14 @@ class PublicController extends CommonFormController
                 }
             }
 
+            if ($isUnsubscribeAll) {
+                if (!empty($stat)) {
+                    $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+                } else {
+                    $model->setDoNotContactLead($lead, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+                }
+            }
+
             if (!$showContactPreferences || $isUnsubscribeAll) {
                 if (!empty($stat)) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
@@ -737,15 +745,11 @@ class PublicController extends CommonFormController
 
     public function getUnsubscribeMessage($idHash, $model, $stat, $translator): string
     {
-        $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
-
         return $this->getUnsubscribeText($translator, $stat->getEmailAddress(), $idHash);
     }
 
     public function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, TranslatorInterface $translator, string $urlEmail): string
     {
-        $model->setDoNotContactLead($lead, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
-
         return $this->getUnsubscribeText($translator, $urlEmail, $idHash);
     }
 
