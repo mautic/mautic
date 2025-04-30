@@ -391,7 +391,7 @@ class Mailbox
      */
     protected function isConnected(): bool
     {
-        return $this->isConfigured() && $this->imapStream && @imap_ping($this->imapStream);
+        return $this->isConfigured() && $this->imapStream && imap_is_open($this->imapStream);
     }
 
     /**
