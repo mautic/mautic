@@ -124,6 +124,7 @@ class PublicController extends CommonFormController
         $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
         $isUnsubscribeAll       = $request->get('unsubscribe_all');
         $showContactPreferences = $this->coreParametersHelper->get('show_contact_preferences');
+        $isUnsubscribeRequest   = !$request->isMethod(Request::METHOD_HEAD);
 
         if (!empty($stat)) {
             if ($isOneClickUnsubscribe) {
@@ -195,7 +196,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            if (!$showContactPreferences || $isUnsubscribeAll) {
+            if ($isUnsubscribeRequest && (!$showContactPreferences || $isUnsubscribeAll)) {
                 if (!empty($stat)) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
                 } elseif ($lead && $lead instanceof Lead) {
