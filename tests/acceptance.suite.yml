@@ -3,7 +3,7 @@ modules:
   enabled:
     - \Helper\DbHelper
     - WebDriver:
-        url: "https://web:443"
+        url: '%SITE_URL%'
         host: selenium-chrome
         browser: chrome
         port: 4444
