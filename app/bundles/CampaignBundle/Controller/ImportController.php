@@ -176,7 +176,11 @@ final class ImportController extends AbstractFormController
     public function cancelAction(): Response
     {
         $filePath = $this->requestStack->getSession()->get('mautic.campaign.import.file');
-        $this->removeImportFile($filePath);
+
+        if (is_string($filePath)) {
+            $this->removeImportFile($filePath);
+        }
+
         $this->resetImport();
         $this->addFlashMessage('mautic.campaign.notice.import.canceled', [], FlashBag::LEVEL_NOTICE);
 
