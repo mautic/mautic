@@ -22,7 +22,7 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
     {
         $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', 'CONCAT(YEAR(date_added), "-", LPAD(MONTH(date_added), 2, "0"), "-", LPAD(DAY(date_added), 2, "0"), " ", LPAD(HOUR(date_added), 2, "0"), ":00:00")', 'H'));
         $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', 'CONCAT(YEAR(date_added), "-", LPAD(MONTH(date_added), 2, "0"), "-", LPAD(DAY(date_added), 2, "0"))', 'd', true));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', 'CONCAT(YEAR(date_added), " ", LPAD(WEEK(date_added), 2, "0"))', 'W'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', 'CONCAT(YEAR(date_added), " ", LPAD(FLOOR((DAYOFYEAR(date_added) - 1) / 7) + 1, 2, "0"))', 'W'));
         $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', 'CONCAT(YEAR(date_added), "-", LPAD(MONTH(date_added), 2, "0"))', 'm'));
         $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', 'YEAR(date_added)', 'Y'));
     }
