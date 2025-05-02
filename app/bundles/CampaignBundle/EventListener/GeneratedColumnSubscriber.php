@@ -20,17 +20,17 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
 
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
-        $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', '%Y-%m-%d %H:00', 'H'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', '%Y-%m-%d', 'd', true));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', '%Y %U', 'W'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', '%Y-%m', 'm'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', '%Y', 'Y'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', 'CONCAT(YEAR(date_added), "-", LPAD(MONTH(date_added), 2, "0"), "-", LPAD(DAY(date_added), 2, "0"), " ", LPAD(HOUR(date_added), 2, "0"), ":00:00")', 'H'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', 'CONCAT(YEAR(date_added), "-", LPAD(MONTH(date_added), 2, "0"), "-", LPAD(DAY(date_added), 2, "0"))', 'd', true));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', 'CONCAT(YEAR(date_added), " ", LPAD(WEEK(date_added), 2, "0"))', 'W'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', 'CONCAT(YEAR(date_added), "-", LPAD(MONTH(date_added), 2, "0"))', 'm'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', 'YEAR(date_added)', 'Y'));
     }
 
-    private function buildGeneratedColumn(string $name, string $type, string $format, string $unit, bool $filterDateColumn = false): GeneratedColumn
+    private function buildGeneratedColumn(string $name, string $type, string $expression, string $unit, bool $filterDateColumn = false): GeneratedColumn
     {
         $columnName      = 'generated_date_added_'.$name;
-        $generatedColumn = new GeneratedColumn('campaign_leads', $columnName, $type, 'DATE_FORMAT(date_added, "'.$format.'")');
+        $generatedColumn = new GeneratedColumn('campaign_leads', $columnName, $type, $expression);
         $generatedColumn->prependIndexColumn('campaign_id');
         $generatedColumn->setOriginalDateColumn('date_added', $unit);
         $generatedColumn->setStored(true);
