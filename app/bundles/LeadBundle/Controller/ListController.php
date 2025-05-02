@@ -759,7 +759,7 @@ class ListController extends FormController
                 'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
-                    'mauticContent' => 'list',
+                    'mauticContent' => 'leadlist',
                 ],
                 'flashes' => [
                     [
@@ -824,7 +824,7 @@ class ListController extends FormController
             'contentTemplate' => '@MauticLead/List/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
-                'mauticContent' => 'list',
+                'mauticContent' => 'leadlist',
             ],
         ]);
     }

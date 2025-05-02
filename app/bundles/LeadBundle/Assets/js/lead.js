@@ -298,7 +298,7 @@ Mautic.leadlistOnLoad = function(container, response) {
         });
     }
 
-    mQuery('#campaign-share-tab').hover(function () {
+    mQuery('#campaign-share-tab').on('mouseenter', function () {
         if (Mautic.shareTableLoaded != true) {
             Mautic.loadAjaxColumn('campaign-share-stat', 'lead:getCampaignShareStats', 'afterStatsLoad');
             Mautic.shareTableLoaded = true;
