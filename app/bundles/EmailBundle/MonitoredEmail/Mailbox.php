@@ -393,7 +393,12 @@ class Mailbox
      */
     protected function isConnected(): bool
     {
-        return $this->isConfigured() && $this->imapStream && @imap_ping($this->imapStream);
+        if (function_exists('imap_open')) {
+            // imap_is_open is only available from PHP 8.2.1
+            return $this->isConfigured() && $this->imapStream && imap_is_open($this->imapStream);
+        } else {
+            return $this->isConfigured() && $this->imapStream && @imap_ping($this->imapStream);
+        }
     }
 
     /**
