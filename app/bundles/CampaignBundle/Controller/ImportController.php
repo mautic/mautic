@@ -176,11 +176,7 @@ final class ImportController extends AbstractFormController
     public function cancelAction(): Response
     {
         $filePath = $this->requestStack->getSession()->get('mautic.campaign.import.file');
-
-        if ($filePath && file_exists($filePath)) {
-            unlink($filePath);
-            $this->logger->info("Campaign import file removed: {$filePath}");
-        }
+        $this->removeImportFile($filePath);
         $this->resetImport();
         $this->addFlashMessage('mautic.campaign.notice.import.canceled', [], FlashBag::LEVEL_NOTICE);
 
@@ -217,7 +213,8 @@ final class ImportController extends AbstractFormController
             return $fileName;
         }
 
-        $fileName = sprintf('%s.zip', (new DateTimeHelper())->toUtcString('YmdHis'));
+        $uniqueId = bin2hex(random_bytes(8));
+        $fileName = sprintf('%s_%s.zip', (new DateTimeHelper())->toUtcString('YmdHis'), $uniqueId);
 
         $session->set('mautic.campaign.import.file', $fileName);
 
@@ -248,6 +245,8 @@ final class ImportController extends AbstractFormController
             if (!$analyzeSummary || !empty($analyzeSummary['errors'])) {
                 $this->logger->error('Import failed: No data found in file.');
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
+                $this->removeImportFile($fullPath);
+                $this->resetImport();
 
                 return $this->redirectToRoute('mautic_campaign_import_action', ['objectAction' => 'new']);
             }
@@ -343,12 +342,14 @@ final class ImportController extends AbstractFormController
                     }
                 }
 
+                $this->removeImportFile($fullPath);
                 $session->set('mautic.campaign.import.summary', $importSummary);
                 $this->resetImport();
             } catch (\RuntimeException $e) {
                 $this->logger->error($e->getMessage());
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
 
+                $this->removeImportFile($fullPath);
                 $importSummary = [
                     EntityImportEvent::ERRORS => [$e->getMessage()],
                 ];
