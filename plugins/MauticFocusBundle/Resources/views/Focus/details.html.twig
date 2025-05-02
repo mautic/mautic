@@ -6,6 +6,94 @@
 
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+    {% if item.type is defined and item.type is not empty %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: ('mautic.focus.form.type.' ~ item.type),
+                icon: {
+                    'form': 'ri-survey-fill',
+                    'link': 'ri-link',
+                    'notice': 'ri-information-2-fill'
+                }[item.type],
+                color: 'high-contrast',
+                attributes: {
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'top',
+                    'title': 'mautic.focus.type'|trans
+                }
+            }]
+        } %}
+    {% endif %}
+
+    {% if item.style is defined and item.style is not empty %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [{
+                label: ('mautic.focus.style.' ~ item.style),
+                icon: {
+                    'modal': 'ri-window-2-fill',
+                    'notification': 'ri-notification-3-fill',
+                    'bar': 'ri-layout-bottom-2-fill',
+                    'page': 'ri-macbook-fill'
+                }[item.style],
+                color: 'blue',
+                attributes: {
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'top',
+                    'title': 'mautic.focus.style'|trans
+                }
+            }]
+        } %}
+    {% endif %}
+
+{% if item.properties.when is defined and item.properties.when is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            icon: {
+                'immediately': 'ri-flashlight-fill',
+                'scroll_slight': 'ri-mouse-fill',
+                'scroll_middle': 'ri-scroll-to-bottom-fill',
+                'scroll_bottom': 'ri-scroll-to-bottom-fill',
+                'leave': 'ri-picture-in-picture-exit-fill'
+            }[item.properties.when],
+            label: ('mautic.focus.form.when.' ~ item.properties.when ~ '.description'),
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{% if item.properties.frequency is defined and item.properties.frequency is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            icon: {
+                'everypage': 'ri-repeat-2-fill',
+                'once': 'ri-repeat-one-fill',
+                'q2min': 'ri-reset-left-line',
+                'q15min': 'replay-15-fill',
+                'hourly': 'ri-history-fill 24-hours-fill',
+                'daily': 'ri-calendar-schedule-fill'
+            }[item.properties.frequency],
+            label: ('mautic.focus.form.frequency.' ~ item.properties.frequency ~ '.description'),
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+{% endif %}
+
+{% if item.properties.timeout is defined and item.properties.timeout is not empty %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: item.properties.timeout,
+            icon: 'ri-timer-fill',
+            color: 'blue',
+            attributes: {
+                'data-toggle': 'tooltip',
+                'data-placement': 'top',
+                'title': 'mautic.focus.form.timeout.description'|trans
+            }
+        }]
+    } %}
+{% endif %}
 {% endblock %}
 
 {% block preHeader %}

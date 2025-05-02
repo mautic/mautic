@@ -6790,6 +6790,21 @@ ul.line-legend li {
 .contact-avatar {
   width: 100%;
 }
+.pictogram--size-48 {
+  width: 48px;
+}
+.pictogram--size-64 {
+  width: 64px;
+}
+.pictogram--size-80 {
+  width: 80px;
+}
+.pictogram--size-96 {
+  width: 96px;
+}
+.pictogram--size-128 {
+  width: 128px;
+}
 .table > thead > tr > th,
 .table > tbody > tr > th,
 .table > tfoot > tr > th,
@@ -9302,6 +9317,110 @@ lesshat-selector { -lh-property: 0 ;
   }
   .fo-5-lg {
     order: 5;
+  }
+}
+.animation--slide-in-up {
+  animation: animationSlideInUp var(--duration-expressive) forwards;
+}
+.animation--slide-in-down {
+  animation: animationSlideInDown var(--duration-expressive) forwards;
+}
+.animation--slide-in-left {
+  animation: animationSlideInLeft var(--duration-expressive) forwards;
+}
+.animation--slide-in-right {
+  animation: animationSlideInRight var(--duration-expressive) forwards;
+}
+.animation--slide-scale-in-up {
+  animation: animationSlideScaleInUp var(--duration-expressive) forwards;
+}
+.animation--slide-scale-in-down {
+  animation: animationSlideScaleInDown var(--duration-expressive) forwards;
+}
+.animation--slide-scale-in-left {
+  animation: animationSlideScaleInLeft var(--duration-expressive) forwards;
+}
+.animation--slide-scale-in-right {
+  animation: animationSlideScaleInRight var(--duration-expressive) forwards;
+}
+@keyframes animationSlideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes animationSlideInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes animationSlideInLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes animationSlideInRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes animationSlideScaleInUp {
+  from {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes animationSlideScaleInDown {
+  from {
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes animationSlideScaleInLeft {
+  from {
+    transform: translateX(-20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes animationSlideScaleInRight {
+  from {
+    transform: translateX(20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
   }
 }
 .map-options {
