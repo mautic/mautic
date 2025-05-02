@@ -31,7 +31,7 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
     {
         $columnName      = 'generated_date_added_'.$name;
         $generatedColumn = new GeneratedColumn('campaign_leads', $columnName, $type, 'DATE_FORMAT(date_added, "'.$format.'")');
-        $generatedColumn->addIndexColumn('campaign_id');
+        $generatedColumn->prependIndexColumn('campaign_id');
         $generatedColumn->setOriginalDateColumn('date_added', $unit);
 
         if ($filterDateColumn) {
