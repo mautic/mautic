@@ -20,14 +20,14 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
 
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
-        $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', '%Y-%m-%d %H:00', 'H'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', '%Y-%m-%d', 'd', true));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', '%Y %U', 'W'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', '%Y-%m', 'm'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', '%Y', 'Y'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', 'H'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', 'd', true));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', 'W'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', 'm'));
+        $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', 'Y'));
     }
 
-    private function buildGeneratedColumn(string $name, string $type, string $expression, string $unit, bool $filterDateColumn = false): GeneratedColumn
+    private function buildGeneratedColumn(string $name, string $type, string $unit, bool $filterDateColumn = false): GeneratedColumn
     {
         $columnName = 'generated_date_added_'.$name;
 
