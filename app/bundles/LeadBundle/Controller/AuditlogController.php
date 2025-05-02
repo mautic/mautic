@@ -52,6 +52,7 @@ class AuditlogController extends CommonController
                     'lead'   => $lead,
                     'page'   => $page,
                     'events' => $events,
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
                 ],
                 'passthroughVars' => [
                     'route'         => false,
