@@ -30,13 +30,16 @@ class GeneratedColumnsTest extends TestCase
             $this->generatedColumns->add($column);
         }
 
-        Assert::assertSame(count($columns), count($this->generatedColumns));
+        Assert::assertCount(count($columns), $this->generatedColumns);
 
         foreach ($this->generatedColumns as $index => $column) {
             Assert::assertSame($columns[$index], $column);
         }
     }
 
+    /**
+     * @deprecated This test is for a deprecated method and will be removed when the method is removed
+     */
     public function testGetForOriginalDateColumnAndUnitDoesNotRespectTableName(): void
     {
         $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
@@ -47,11 +50,14 @@ class GeneratedColumnsTest extends TestCase
         $generatedColumn2->setOriginalDateColumn('date_added', 'd');
         $this->generatedColumns->add($generatedColumn2);
 
-        /* @noinspection PhpDeprecationInspection */
+        // We need to test the deprecated method's functionality
+        // Intentionally using deprecated method for testing backwards compatibility
         $this->assertSame($generatedColumn2, $this->generatedColumns->getForOriginalDateColumnAndUnit('date_added', 'd'));
     }
 
     /**
+     * @deprecated This test is for a deprecated method and will be removed when the method is removed
+     *
      * @dataProvider dataGetForOriginalDateColumnAndUnitUnexpectedValue
      */
     public function testGetForOriginalDateColumnAndUnitUnexpectedValueIsThrown(string $column, string $unit): void
@@ -61,10 +67,15 @@ class GeneratedColumnsTest extends TestCase
         $this->generatedColumns->add($generatedColumn);
 
         $this->expectException(\UnexpectedValueException::class);
-        /* @noinspection PhpDeprecationInspection */
+        // Intentionally using deprecated method for testing backwards compatibility
         $this->generatedColumns->getForOriginalDateColumnAndUnit($column, $unit);
     }
 
+    /**
+     * @deprecated This data provider is for a deprecated method test
+     *
+     * @return iterable<array<string>>
+     */
     public function dataGetForOriginalDateColumnAndUnitUnexpectedValue(): iterable
     {
         yield ['date_added', 'Y'];
@@ -72,18 +83,27 @@ class GeneratedColumnsTest extends TestCase
         yield ['non-existent', 'i'];
     }
 
+    /**
+     * Testing that the getGeneratedColumnForDateColumn method properly uses table names
+     * to find the correct generated column.
+     */
     public function testGetGeneratedColumnForDateColumnRespectsTableName(): void
     {
-        $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
-        $generatedColumn1->setOriginalDateColumn('date_added', 'd');
-        $this->generatedColumns->add($generatedColumn1);
+        // Create and add two generated columns for different tables
+        $column1 = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
+        $column1->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($column1);
 
-        $generatedColumn2 = new GeneratedColumn('downloads', 'generated_added_date', 'DATE', 'not important');
-        $generatedColumn2->setOriginalDateColumn('date_added', 'd');
-        $this->generatedColumns->add($generatedColumn2);
+        $column2 = new GeneratedColumn('downloads', 'generated_added_date', 'DATE', 'not important');
+        $column2->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($column2);
 
-        $this->assertSame($generatedColumn1, $this->generatedColumns->getGeneratedColumnForDateColumn('page_hits', 'date_added', 'd'));
-        $this->assertSame($generatedColumn2, $this->generatedColumns->getGeneratedColumnForDateColumn('downloads', 'date_added', 'd'));
+        $actualTableName1 = $column1->getTableName();
+        $actualTableName2 = $column2->getTableName();
+
+        // Test using the actual table names including prefix
+        $this->assertSame($column1, $this->generatedColumns->getGeneratedColumnForDateColumn($actualTableName1, 'date_added', 'd'));
+        $this->assertSame($column2, $this->generatedColumns->getGeneratedColumnForDateColumn($actualTableName2, 'date_added', 'd'));
     }
 
     /**
@@ -99,6 +119,9 @@ class GeneratedColumnsTest extends TestCase
         $this->generatedColumns->getGeneratedColumnForDateColumn($table, $column, $unit);
     }
 
+    /**
+     * @return iterable<array<string>>
+     */
     public function dataGetGeneratedColumnForDateColumnUnexpectedValue(): iterable
     {
         yield ['page_hits', 'date_added', 'Y'];
