@@ -1,19 +1,21 @@
 name: Push translations to Transifex
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches:
+      - '[0-9].*'
     paths:
       - '**/Translations/en_US/*.ini'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   push-to-transifex:
+    if: github.repository == 'mautic/mautic'
     name: Push translations to Transifex
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
 
     steps:
     - uses: actions/checkout@v4
@@ -29,7 +31,7 @@ jobs:
 
     - name: Push translations to Transifex
       env:
-        MAUTIC_CONFIG_PARAMETERS: '{"transifex_api_token": "${{ secrets.TRANSIFEX_API_TOKEN }}" }'  
+        MAUTIC_CONFIG_PARAMETERS: '{"transifex_api_token": "${{ secrets.TRANSIFEX_API_TOKEN }}"}'
       run: |
         echo "MAUTIC_CONFIG_PARAMETERS=${MAUTIC_CONFIG_PARAMETERS}" >> $GITHUB_ENV
         php bin/console mautic:transifex:push
