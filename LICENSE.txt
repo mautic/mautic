@@ -23,6 +23,10 @@ Mautic includes works under other copyright notices and distributed
 according to the terms of the GNU General Public License or a compatible
 license, including:
 
+Graphics
+
+    Carbon Design System Pictograms - Apache License 2.0 - Copyright 2015 IBM Corp.
+
 Javascript
 
     Bootstrap - MIT - Copyright (c) 2011-2014 Twitter, Inc

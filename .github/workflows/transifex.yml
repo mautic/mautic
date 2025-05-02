@@ -1,0 +1,37 @@
+name: Push translations to Transifex
+
+on:
+  push:
+    branches:
+      - '[0-9].*'
+    paths:
+      - '**/Translations/en_US/*.ini'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  push-to-transifex:
+    if: github.repository == 'mautic/mautic'
+    name: Push translations to Transifex
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.3
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: Install dependencies
+      uses: "ramsey/composer-install@v3"
+
+    - name: Push translations to Transifex
+      env:
+        MAUTIC_CONFIG_PARAMETERS: '{"transifex_api_token": "${{ secrets.TRANSIFEX_API_TOKEN }}"}'
+      run: |
+        echo "MAUTIC_CONFIG_PARAMETERS=${MAUTIC_CONFIG_PARAMETERS}" >> $GITHUB_ENV
+        php bin/console mautic:transifex:push

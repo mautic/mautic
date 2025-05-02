@@ -6,10 +6,18 @@ namespace Mautic\FormBundle\Twig\Extension;
 
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 final class FormFieldExtension extends AbstractExtension
 {
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('formFieldFlipBooleanList', 'array_flip'),
+        ];
+    }
+
     public function getFunctions()
     {
         return [
