@@ -10,6 +10,8 @@ final class GeneratedColumns implements GeneratedColumnsInterface
 
     /**
      * Simple array of generated columns.
+     *
+     * @var GeneratedColumn[]
      */
     private array $generatedColumns = [];
 
