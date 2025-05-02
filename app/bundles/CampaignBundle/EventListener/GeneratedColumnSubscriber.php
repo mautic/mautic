@@ -29,13 +29,25 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
 
     private function buildGeneratedColumn(string $name, string $type, string $expression, string $unit, bool $filterDateColumn = false): GeneratedColumn
     {
-        $columnName      = 'generated_date_added_'.$name;
-        $generatedColumn = new GeneratedColumn('campaign_leads', $columnName, $type, 'DATE_FORMAT(date_added, "'.$expression.'")');
+        $columnName = 'generated_date_added_'.$name;
+
+        // For each time unit, create an expression using only deterministic SQL functions
+        // MariaDB is very restrictive about what functions can be used in generated columns
+        // We need to use the most basic functions possible
+        $deterministic = match ($name) {
+            // For hour, use a trick: MySQL lets you store a datetime as-is, but remove the minutes and seconds
+            'hour'  => 'date_added - INTERVAL MINUTE(date_added) MINUTE - INTERVAL SECOND(date_added) SECOND',
+            'day'   => 'DATE(date_added)',
+            'week'  => 'YEARWEEK(date_added)',
+            'month' => 'EXTRACT(YEAR_MONTH FROM date_added)',
+            'year'  => 'YEAR(date_added)',
+            default => '',
+        };
+
+        $generatedColumn = new GeneratedColumn('campaign_leads', $columnName, $type, $deterministic);
         $generatedColumn->prependIndexColumn('campaign_id');
         $generatedColumn->setOriginalDateColumn('date_added', $unit);
-
-        // Use VIRTUAL instead of STORED columns to allow DATE_FORMAT in MariaDB
-        $generatedColumn->setStored(false);
+        $generatedColumn->setStored(true);
 
         if ($filterDateColumn) {
             $generatedColumn->setFilterDateColumn($columnName);
