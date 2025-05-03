@@ -30,7 +30,7 @@ class AuditlogController extends CommonController
         $session = $request->getSession();
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
-                'search'        => InputHelper::clean($request->request->get('search')),
+                'search' => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
                 'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
@@ -49,13 +49,13 @@ class AuditlogController extends CommonController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'   => $lead,
-                    'page'   => $page,
+                    'lead' => $lead,
+                    'page' => $page,
                     'events' => $events,
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
                 ],
                 'passthroughVars' => [
-                    'route'         => false,
+                    'route' => false,
                     'mauticContent' => 'leadAuditlog',
                     'auditLogCount' => $events['total'],
                 ],
@@ -87,7 +87,7 @@ class AuditlogController extends CommonController
         $session = $request->getSession();
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
-                'search'        => InputHelper::clean($request->request->get('search')),
+                'search' => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
                 'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
@@ -110,17 +110,17 @@ class AuditlogController extends CommonController
             }
 
             return [
-                'eventName'      => $eventLabel,
-                'eventType'      => $event['eventType'] ?? '',
+                'eventName' => $eventLabel,
+                'eventType' => $event['eventType'] ?? '',
                 'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
 
-        $results    = $this->getAuditlogs($lead, $filters, $order, 1, 200);
-        $count      = $results['total'];
-        $items      = $results['events'];
+        $results = $this->getAuditlogs($lead, $filters, $order, 1, 200);
+        $count = $results['total'];
+        $items = $results['events'];
         $iterations = ceil($count / 200);
-        $loop       = 1;
+        $loop = 1;
 
         // Max of 50 iterations for 10K result export
         if ($iterations > 50) {
