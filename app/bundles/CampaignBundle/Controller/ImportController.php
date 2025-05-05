@@ -369,7 +369,7 @@ final class ImportController extends AbstractFormController
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int|string, array<string, mixed>>
      */
     private function analyzeData(ImportHelper $importHelper, string $fullPath): array
     {
