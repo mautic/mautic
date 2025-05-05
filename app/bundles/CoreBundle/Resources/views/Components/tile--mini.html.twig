@@ -1,0 +1,12 @@
+{% for tile in tiles %}
+    <a href="{{ tile.link|default('#') }}" class="tile tile--clickable">
+        <div class="d-flex jc-space-between ai-center">
+            <div class="tile-title">{{ tile.title }}</div>
+            {% if tile.icon is defined %}
+                <div class="tile-icon">
+                    <i class="{{ tile.icon }} text-interactive ri-lg"></i>
+                </div>
+            {% endif %}
+        </div>
+    </a>
+{% endfor %}

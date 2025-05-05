@@ -102,5 +102,71 @@
         }) }}
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.trigger.noresults.tip'}) }}
+    {% if searchValue is not empty %}
+        {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.trigger.noresults.tip'}) }}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+            <div class="mb-md">
+                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    'pictogram': 'react-to-data',
+                    'size': '80'
+                } %}
+            </div>
+
+            {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                type: 'default',
+                eyebrow: 'mautic.point.trigger.onboarding.eyebrow',
+                heading: 'mautic.point.trigger.onboarding.heading',
+                copy: 'mautic.point.trigger.onboarding.copy',
+            }) }}
+
+            {% set triggersUseContainer %}
+            <div class="mb-md">
+                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    'pictogram': 'construct',
+                    'size': '64'
+                } %}
+            </div>
+            <div class="type-body-02">
+                {% include '@MauticCore/Components/list--styled.html.twig' with {
+                    'type': 'ordered',
+                    'style': 'numbers', 
+                    'items': [
+                        'mautic.point.trigger.onboarding.step1',
+                        'mautic.point.trigger.onboarding.step2',
+                        'mautic.point.trigger.onboarding.step3',
+                    ]
+                } %}
+            </div>
+            <div class="mt-lg">
+                {{ include('@MauticCore/Notification/inline_notification.html.twig', {
+                    'title': 'mautic.point.trigger.onboarding.notification.title',
+                    'content': 'mautic.point.trigger.onboarding.notification.content',
+                    'alert_type': 'success',
+                    'dismissible': false,
+                }) }}
+            </div>
+            {% endset %}
+
+        {{ include('@MauticCore/Components/content-group.html.twig', {
+            heading: 'mautic.point.trigger.onboarding.group.heading',
+            childContainer: triggersUseContainer,
+            cta: {
+                'label': 'mautic.point.trigger.onboarding.cta',
+                'link': path('mautic_pointtrigger_action', {'objectAction': 'new'}),
+                attributes: {
+                    'data-toggle': 'ajax',
+                },
+            }
+        }) }}
+        {% endset %}
+
+        {{ include('@MauticCore/Components/content-block.html.twig', {
+            heading: 'mautic.point.trigger.empty.heading',
+            subheading: 'mautic.point.trigger.empty.subheading',
+            childContainer: childContainer,
+        }) }}
+    </div>
+    {% endif %}
 {% endif %}
