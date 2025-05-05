@@ -15,7 +15,7 @@
         ) is not empty
         or
         (analyzeSummary|default([]))|filter(group =>
-            group.errors is defined and group.errors is not empty
+            group.errors is defined and group.errors.messages is defined and group.errors.messages is not empty
         ) is not empty
     ) %}
     {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}

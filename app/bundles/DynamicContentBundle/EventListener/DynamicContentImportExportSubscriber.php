@@ -146,9 +146,18 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         $summary = [
             EntityImportEvent::NEW    => ['names' => []],
             EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
+            'errors'                  => [],
         ];
+        $uuidRegex = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
         foreach ($event->getEntityData() as $item) {
+            // UUID format check
+            $uuid = $item['uuid'] ?? '';
+            if (!empty($uuid) && !preg_match($uuidRegex, $uuid)) {
+                $summary['errors'][] = sprintf('Invalid UUID format for %s', $event->getEntityName());
+                break;
+            }
+
             $existing = $this->entityManager->getRepository(DynamicContent::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
@@ -158,9 +167,16 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             }
         }
 
-        foreach ($summary as $type => $info) {
-            if (count($info['names']) > 0) {
-                $event->setSummary($type, [DynamicContent::ENTITY_NAME => $info]);
+        foreach ($summary as $type => $data) {
+            if ('errors' === $type) {
+                if (count($data) > 0) {
+                    $event->setSummary('errors', ['messages' => $data]);
+                }
+                break;
+            }
+
+            if (isset($data['names']) && count($data['names']) > 0) {
+                $event->setSummary($type, [DynamicContent::ENTITY_NAME => $data]);
             }
         }
     }

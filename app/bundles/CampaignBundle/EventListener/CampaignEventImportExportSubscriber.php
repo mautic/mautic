@@ -281,9 +281,18 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $summary = [
             EntityImportEvent::NEW    => ['names' => []],
             EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
+            'errors'                  => [],
         ];
+        $uuidRegex = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
         foreach ($event->getEntityData() as $element) {
+            // UUID format check
+            $uuid = $element['uuid'] ?? '';
+            if (!empty($uuid) && !preg_match($uuidRegex, $uuid)) {
+                $summary['errors'][] = sprintf('Invalid UUID format for %s', $event->getEntityName());
+                break;
+            }
+
             $existing = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
 
             if ($existing) {
@@ -294,9 +303,16 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             }
         }
 
-        foreach ($summary as $status => $info) {
-            if (count($info['names']) > 0) {
-                $event->setSummary($status, [Event::ENTITY_NAME => $info]);
+        foreach ($summary as $type => $data) {
+            if ('errors' === $type) {
+                if (count($data) > 0) {
+                    $event->setSummary('errors', ['messages' => $data]);
+                }
+                break;
+            }
+
+            if (isset($data['names']) && count($data['names']) > 0) {
+                $event->setSummary($type, [Event::ENTITY_NAME => $data]);
             }
         }
     }

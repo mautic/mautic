@@ -235,7 +235,6 @@ final class ImportController extends AbstractFormController
         // If there's no valid file, show an error
         if (!$fullPath || !file_exists($fullPath)) {
             if (self::STEP_UPLOAD_ZIP !== $step) {
-                $this->logger->error("Import file missing: {$fullPath}");
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
             }
             $this->resetImport();
@@ -246,8 +245,7 @@ final class ImportController extends AbstractFormController
         if (self::STEP_PROGRESS_BAR === $step) {
             $analyzeSummary = $this->analyzeData($importHelper, $fullPath);
 
-            if (!$analyzeSummary || !empty($analyzeSummary['errors'])) {
-                $this->logger->error('Import failed: No data found in file.');
+            if (empty($analyzeSummary)) {
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
                 $this->removeImportFile($fullPath);
                 $this->resetImport();
@@ -380,7 +378,7 @@ final class ImportController extends AbstractFormController
         } catch (\RuntimeException $e) {
             $this->logger->error($e->getMessage());
 
-            return ['errors' => $e->getMessage()];
+            return ['errors' => ['messages' => $e->getMessage()]];
         }
 
         $allData = [];
@@ -428,7 +426,7 @@ final class ImportController extends AbstractFormController
             }
         }
 
-        return empty($allData) ? ['errors' => 'Unknown status'] : $allData;
+        return $allData;
     }
 
     public function undoAction(): JsonResponse

@@ -1,18 +1,20 @@
-<ul class="text-danger">
-    {# Show errors from importSummary.errors #}
-    {% for error in importSummary.errors|default([]) %}
-        <li>{{ error }}</li>
-    {% endfor %}
+<div class="justify-content-center>
+    <ul class="text-danger">
+        {# Show errors from importSummary.errors #}
+        {% for error in importSummary.errors|default([]) %}
+            {{ error }}
+        {% endfor %}
 
-    {# Show errors from analyzeSummary (grouped errors) #}
-    {% for group in analyzeSummary|default([]) %}
-        {% if group.errors is defined and group.errors is not empty %}
-            {% for error in group.errors %}
-                {{ error }}
-            {% endfor %}
-        {% endif %}
-    {% endfor %}
-</ul>
+        {# Show errors from analyzeSummary (grouped errors) #}
+        {% for group in analyzeSummary|default([]) %}
+            {% if group.errors is defined and group.errors.messages is defined %}
+                {% for message in group.errors.messages %}
+                    {{ message }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
 
 <div class="justify-content-center gap-3 mt-md">
     {{ include('@MauticCore/Helper/confirm.html.twig', {

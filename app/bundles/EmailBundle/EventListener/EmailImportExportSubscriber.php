@@ -213,9 +213,18 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         $summary = [
             EntityImportEvent::NEW    => ['names' => []],
             EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
+            'errors'                  => [],
         ];
+        $uuidRegex = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
         foreach ($event->getEntityData() as $item) {
+            // UUID format check
+            $uuid = $item['uuid'] ?? '';
+            if (!empty($uuid) && !preg_match($uuidRegex, $uuid)) {
+                $summary['errors'][] = sprintf('Invalid UUID format for %s', $event->getEntityName());
+                break;
+            }
+
             $existing = $this->entityManager->getRepository(Email::class)->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
@@ -226,7 +235,14 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($summary as $type => $data) {
-            if (count($data['names']) > 0) {
+            if ('errors' === $type) {
+                if (count($data) > 0) {
+                    $event->setSummary('errors', ['messages' => $data]);
+                }
+                break;
+            }
+
+            if (isset($data['names']) && count($data['names']) > 0) {
                 $event->setSummary($type, [Email::ENTITY_NAME => $data]);
             }
         }

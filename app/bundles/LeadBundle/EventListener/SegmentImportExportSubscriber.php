@@ -189,14 +189,23 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             EntityImportEvent::UPDATE => ['names' => [], 'uuids' => []],
             'errors'                  => [],
         ];
+        $uuidRegex = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
 
         foreach ($event->getEntityData() as $item) {
+            // UUID format check
+            $uuid = $item['uuid'] ?? '';
+            if (!empty($uuid) && !preg_match($uuidRegex, $uuid)) {
+                $summary['errors'][] = sprintf('Invalid UUID format for %s', $event->getEntityName());
+                break;
+            }
+
             if (!empty($item['filters'])) {
                 foreach ($item['filters'] as $filter) {
                     if (isset($filter['object']) && 'custom_object' === $filter['object']) {
                         $plugins = $this->pluginModel->getAllPluginsConfig();
                         if (!isset($plugins['CustomObjectsBundle'])) {
                             $summary['errors'][] = 'Segment filter uses Custom Objects but the plugin CustomObjectBundle is not installed.';
+                            break;
                         }
                     }
                 }
@@ -215,7 +224,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
                 if (count($data) > 0) {
                     $event->setSummary('errors', ['messages' => $data]);
                 }
-                continue;
+                break;
             }
 
             if (isset($data['names']) && count($data['names']) > 0) {
