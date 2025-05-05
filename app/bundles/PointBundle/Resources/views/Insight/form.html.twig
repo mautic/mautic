@@ -1,0 +1,59 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent 'pointInsight' %}
+{% block headerTitle %}
+    {% if entity.id %}
+        {{ entity.name }} <small>{{ 'mautic.point.insight.header.edit'|trans }}</small>
+    {% else %}
+        {{ 'mautic.point.insight.header.new'|trans }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+        <!-- container -->
+        <div class="col-md-9 bg-auto height-auto bdr-r pa-md">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.name) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.category) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form_row(form.description) }}
+                </div>
+            </div>
+
+            <hr />
+            
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.insightType) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.pointGroups) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.insightAction) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.customField) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 bg-white height-auto">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {# Entferne den Aufruf für form.active #}
+                {# {{ form_row(form.active) }} #}
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %} 

@@ -1,0 +1,283 @@
+<?php
+
+namespace Mautic\PointBundle\Entity;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\FormEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+
+class PointInsight extends FormEntity
+{
+    /**
+     * @var int
+     */
+    private $id;
+
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var string|null
+     */
+    private $description;
+
+    /**
+     * @var string|null
+     */
+    private $insightType;
+
+    /**
+     * @var string|null
+     */
+    private $insightAction;
+
+    /**
+     * @var string|null
+     */
+    private $customField;
+
+    /**
+     * @var array
+     */
+    private $pointGroups = [];
+
+    /**
+     * @var Category|null
+     **/
+    private $category;
+
+    public function __clone()
+    {
+        $this->id = null;
+
+        parent::__clone();
+    }
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('point_insights')
+            ->setCustomRepositoryClass(PointInsightRepository::class);
+
+        $builder->addIdColumns();
+
+        $builder->createField('insightType', 'string')
+            ->columnName('insight_type')
+            ->nullable()
+            ->build();
+
+        $builder->createField('insightAction', 'string')
+            ->columnName('insight_action')
+            ->nullable()
+            ->build();
+
+        $builder->createField('customField', 'string')
+            ->columnName('custom_field')
+            ->nullable()
+            ->build();
+
+        $builder->createField('pointGroups', 'array')
+            ->columnName('point_groups')
+            ->build();
+
+        $builder->addCategory();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
+            'message' => 'mautic.core.name.required',
+        ]));
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return PointInsight
+     */
+    public function setName($name)
+    {
+        $this->isChanged('name', $name);
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string|null $description
+     *
+     * @return PointInsight
+     */
+    public function setDescription($description)
+    {
+        $this->isChanged('description', $description);
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInsightType()
+    {
+        return $this->insightType;
+    }
+
+    /**
+     * @param string|null $insightType
+     *
+     * @return PointInsight
+     */
+    public function setInsightType($insightType)
+    {
+        $this->isChanged('insightType', $insightType);
+        $this->insightType = $insightType;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInsightAction()
+    {
+        return $this->insightAction;
+    }
+
+    /**
+     * @param string|null $insightAction
+     *
+     * @return PointInsight
+     */
+    public function setInsightAction($insightAction)
+    {
+        $this->isChanged('insightAction', $insightAction);
+        $this->insightAction = $insightAction;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCustomField()
+    {
+        return $this->customField;
+    }
+
+    /**
+     * @param string|null $customField
+     *
+     * @return PointInsight
+     */
+    public function setCustomField($customField)
+    {
+        $this->isChanged('customField', $customField);
+        $this->customField = $customField;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPointGroups()
+    {
+        return $this->pointGroups;
+    }
+
+    /**
+     * @param array $pointGroups
+     *
+     * @return PointInsight
+     */
+    public function setPointGroups($pointGroups)
+    {
+        $this->isChanged('pointGroups', $pointGroups);
+        $this->pointGroups = $pointGroups;
+
+        return $this;
+    }
+
+    /**
+     * @return Category|null
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param Category|null $category
+     *
+     * @return PointInsight
+     */
+    public function setCategory($category)
+    {
+        $this->isChanged('category', $category);
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->isPublished();
+    }
+
+    /**
+     * Alias of isActive()
+     *
+     * @return bool
+     */
+    public function getActive()
+    {
+        return $this->isActive();
+    }
+
+    /**
+     * @param bool $active
+     *
+     * @return PointInsight
+     */
+    public function setActive($active)
+    {
+        return $this->setIsPublished($active);
+    }
+} 

@@ -25,7 +25,11 @@ return [
             ],
             'mautic_point.insights_index' => [
                 'path'       => '/points/insights/{page}',
-                'controller' => 'MauticPlugin\LeuchtfeuerPointComparisonBundle\Controller\PointInsightController::indexAction',
+                'controller' => 'Mautic\PointBundle\Controller\InsightController::indexAction',
+            ],
+            'mautic_point.insights_action' => [
+                'path'       => '/points/insights/{objectAction}/{objectId}',
+                'controller' => 'Mautic\PointBundle\Controller\InsightController::executeAction',
             ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',

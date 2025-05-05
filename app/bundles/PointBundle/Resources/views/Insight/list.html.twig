@@ -1,5 +1,5 @@
+{% set tmpl = tmpl|default('index') %}
 {% set isIndex = 'index' == tmpl %}
-{% set tmpl = 'list' %}
 {% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent 'pointInsight' %}
@@ -10,43 +10,124 @@
     {% if isIndex %}
         <div class="panel panel-default bdr-t-wdh-0">
             {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue': searchValue,
-                'action': currentRoute,
-                'searchHelp': 'mautic.point.help.searchcommands',
-                'filters': {
-                    'placeholder': 'mautic.core.search.placeholder'|trans
-                }
+                'searchValue': searchValue|default(''),
+                'action': currentRoute|default(''),
+                'searchHelp': 'mautic.point.insight.help.searchcommands',
+                'routeBase': 'point.insights',
+                'langVar': 'point.insight',
+                'templateButtons': {
+                    'new': permissions['point:points:create']|default(true),
+                },
             }) }}
             <div class="page-list">
     {% endif %}
 
-    <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered point-list">
-            <thead>
+    {% if items|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped table-bordered pointinsight-list" id="insightTable">
+                <thead>
                 <tr>
-                    <th>{{ 'mautic.core.id'|trans }}</th>
-                    <th>{{ 'mautic.core.name'|trans }}</th>
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#insightTable',
+                    }) }}
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'point.insight',
+                            'orderBy': 'pi.name',
+                            'text': 'mautic.core.name',
+                            'class': 'col-pointinsight-name',
+                            'default': true,
+                    }) }}
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'point.insight',
+                            'orderBy': 'cat.title',
+                            'text': 'mautic.core.category',
+                            'class': 'col-pointinsight-category visible-md visible-lg',
+                    }) }}
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'point.insight',
+                            'orderBy': 'pi.insightAction',
+                            'text': 'mautic.core.type',
+                            'class': 'visible-md visible-lg col-pointinsight-type',
+                    }) }}
+
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'point.insight',
+                            'orderBy': 'pi.id',
+                            'text': 'mautic.core.id',
+                            'class': 'col-pointinsight-id visible-md visible-lg',
+                    }) }}
                 </tr>
-            </thead>
-            <tbody>
-                {% if items|length > 0 %}
-                    {% for item in items %}
-                        <tr>
-                            <td>{{ item.id }}</td>
-                            <td>{{ item.name }}</td>
-                        </tr>
-                    {% endfor %}
-                {% else %}
+                </thead>
+                <tbody>
+                {% for item in items %}
                     <tr>
-                        <td colspan="2">{{ 'mautic.core.noresults'|trans }}</td>
+                        <td>
+                            {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                    'item': item,
+                                    'templateButtons': {
+                                        'edit': permissions['point:points:edit'],
+                                        'clone': permissions['point:points:create'],
+                                        'delete': permissions['point:points:delete'],
+                                    },
+                                    'routeBase': 'point.insights',
+                                    'langVar': 'point.insight',
+                            }) }}
+                        </td>
+                        <td>
+                            <div>
+                                {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'point.insight'}) }}
+                                {% if permissions['point:points:edit'] %}
+                                    <a href="{{ path('mautic_point.insights_action', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">
+                                        {{ item.name }}
+                                    </a>
+                                {% else %}
+                                    {{ item.name }}
+                                {% endif %}
+                            </div>
+                            {% if item.description is not empty %}
+                                <div class="text-secondary mt-4">
+                                    <small>{{ item.description|purify }}</small>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="visible-md visible-lg">
+                            {% if item.category %}
+                                {{ item.category.title }}
+                            {% endif %}
+                        </td>
+                        <td class="visible-md visible-lg">
+                            {{ item.insightAction }}
+                        </td>
+                        <td class="visible-md visible-lg">{{ item.id }}</td>
                     </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page|default(1),
+                    'limit': limit|default(25),
+                    'menuLinkId': 'mautic_point.insights_index',
+                    'baseUrl': path('mautic_point.insights_index'),
+                    'sessionVar': 'point.insight',
+            }) }}
+        </div>
+    {% else %}
+        {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.insight.noresults.tip'|default('mautic.point.insight.noresults.tip')}) }}
+    {% endif %}
 
     {% if isIndex %}
             </div>
         </div>
+        
+        {{ include('@MauticCore/Helper/protip.html.twig', {
+            tip: 'mautic.point.insights.protip'|default('mautic.protip.triggers.behavioral')
+        }) }}
     {% endif %}
 {% endblock %} 
