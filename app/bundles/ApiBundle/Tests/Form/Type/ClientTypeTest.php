@@ -95,10 +95,10 @@ class ClientTypeTest extends TestCase
 
         $this->builder->expects($matcher)
             ->method('addEventSubscriber')->willReturnCallback(function (...$parameters) use ($matcher, $cleanSubscriber, $formExitSubscriber) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($cleanSubscriber, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($formExitSubscriber, $parameters[0]);
                 }
 

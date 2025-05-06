@@ -31,9 +31,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class SsoAuthenticatorTest extends TestCase
 {
-    /**
-     * @dataProvider provideIsPost
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideIsPost')]
     public function testIsPost(string $method, bool $isPost, bool $expected): void
     {
         $path              = '/path';
@@ -81,9 +79,7 @@ class SsoAuthenticatorTest extends TestCase
         yield 'is POST and not POST only' => [Request::METHOD_POST, false, true];
     }
 
-    /**
-     * @dataProvider provideCheckPath
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCheckPath')]
     public function testCheckPath(bool $expected): void
     {
         $path              = '/path';
@@ -123,9 +119,7 @@ class SsoAuthenticatorTest extends TestCase
         yield 'Is not correct path' => [false];
     }
 
-    /**
-     * @dataProvider provideFormOnly
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormOnly')]
     public function testFormOnly(string $mimeType, bool $isForm, bool $expected): void
     {
         $path              = '/path';
@@ -169,9 +163,7 @@ class SsoAuthenticatorTest extends TestCase
         yield 'is form and not form only' => ['application/x-www-form-urlencoded', false, true];
     }
 
-    /**
-     * @dataProvider provideRequestIntegrationParameter
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideRequestIntegrationParameter')]
     public function testHasRequestIntegrationParameter(?bool $addToPost, bool $isPost, bool $expected): void
     {
         $path              = '/path';
@@ -221,9 +213,7 @@ class SsoAuthenticatorTest extends TestCase
         yield 'has no POST or GET parameter and is not POST only' => [null, false, false];
     }
 
-    /**
-     * @dataProvider provideEnableCsrf
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideEnableCsrf')]
     public function testBadges(bool $enableCsrf): void
     {
         $username          = 'mautic';

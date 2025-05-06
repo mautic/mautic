@@ -14,14 +14,12 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
     public function testEntitiesAreFetchedFromOrganizerResults(): void
     {
         $organizer = $this->getOrgnanizer();
-        $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $matcher = $this->exactly(2);
+        $repo      = $this->createMock(IntegrationEntityRepository::class);
+        $matcher   = $this->exactly(2);
 
         $repo->expects($matcher)
             ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Lead::OBJECT, $parameters[1]);
                     $this->assertSame('lead', $parameters[2]);
@@ -33,7 +31,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame(0, $parameters[8]);
                     $this->assertSame($organizer->getLeadIds(), $parameters[9]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Contact::OBJECT, $parameters[1]);
                     $this->assertSame('lead', $parameters[2]);
@@ -55,14 +53,12 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
     public function testThatCampaignMembersAreFetched(): void
     {
         $organizer = $this->getOrgnanizer();
-        $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $matcher = $this->exactly(4);
+        $repo      = $this->createMock(IntegrationEntityRepository::class);
+        $matcher   = $this->exactly(4);
 
         $repo->expects($matcher)
             ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Lead::OBJECT, $parameters[1]);
                     $this->assertSame('lead', $parameters[2]);
@@ -89,7 +85,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
                         ],
                     ];
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Contact::OBJECT, $parameters[1]);
                     $this->assertSame('lead', $parameters[2]);
@@ -116,7 +112,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
                         ],
                     ];
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(CampaignMember::OBJECT, $parameters[1]);
                     $this->assertSame('lead', $parameters[2]);
@@ -141,7 +137,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
                         ],
                     ];
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertNull($parameters[1]);
                     $this->assertSame('lead', $parameters[2]);

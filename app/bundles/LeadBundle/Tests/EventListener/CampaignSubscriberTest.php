@@ -49,7 +49,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, array<string, array<int, string>|bool|int|null>>
      */
-    public function provideFormDNC(): array
+    public static function provideFormDNC(): array
     {
         return [
             [
@@ -247,10 +247,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider provideFormDNC
-     *
      * @param array<string> $channels
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormDNC')]
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);

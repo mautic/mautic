@@ -9,7 +9,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-abstract class AbstractAssetTest extends MauticMysqlTestCase
+abstract class AbstractAssetTestCase extends MauticMysqlTestCase
 {
     protected Asset $asset;
 

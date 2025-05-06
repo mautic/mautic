@@ -15,9 +15,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * @dataProvider provideFieldLength
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideFieldLength')]
     public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
@@ -97,9 +95,8 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, string> $properties
-     *
-     * @dataProvider dataForCreatingNewBooleanField
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanField')]
     public function testCreatingNewBooleanField(array $properties, string $expectedMessage): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
@@ -137,7 +134,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */
-    public function dataForCreatingNewBooleanField(): iterable
+    public static function dataForCreatingNewBooleanField(): iterable
     {
         yield 'No properties' => [
             [],
@@ -183,7 +180,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<array<mixed>>
      */
-    public function provideFieldLength(): iterable
+    public static function provideFieldLength(): iterable
     {
         yield [ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH];
         yield [64, null];

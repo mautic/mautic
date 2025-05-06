@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-abstract class AbstractCampaignTest extends MauticMysqlTestCase
+abstract class AbstractCampaignTestCase extends MauticMysqlTestCase
 {
     protected function saveSomeCampaignLeadEventLogs(bool $emulatePendingCount = false): Campaign
     {

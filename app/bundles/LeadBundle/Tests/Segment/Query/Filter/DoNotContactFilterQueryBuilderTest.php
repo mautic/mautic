@@ -24,9 +24,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         Assert::assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
     }
 
-    /**
-     * @dataProvider dataApplyQuery
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());
@@ -44,7 +42,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     /**
      * @return iterable<array<string>>
      */
-    public function dataApplyQuery(): iterable
+    public static function dataApplyQuery(): iterable
     {
         yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
         yield ['eq', '0', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];

@@ -106,7 +106,7 @@ class InactiveHelperTest extends TestCase
         $log = $this->createMock(LeadEventLog::class);
         $log->expects($this->exactly(3))
             ->method('getNonActionPathTaken')
-            ->will($this->onConsecutiveCalls(1, 0, 1));
+            ->willReturnOnConsecutiveCalls(1, 0, 1);
 
         /** @var Campaign&MockObject */
         $campaign = $this->createMock(Campaign::class);
@@ -118,7 +118,7 @@ class InactiveHelperTest extends TestCase
         $parentEvent = $this->createMock(Event::class);
         $parentEvent->expects($this->exactly(4))
             ->method('getLogByContactAndRotation')
-            ->will($this->onConsecutiveCalls($log, $log, $log, null));
+            ->willReturnOnConsecutiveCalls($log, $log, $log, null);
 
         $event = new Event();
         $event->setParent($parentEvent);
@@ -128,11 +128,11 @@ class InactiveHelperTest extends TestCase
 
         $parentEvent->expects($this->any())
             ->method('getNegativeChildren')
-            ->will($this->onConsecutiveCalls(new ArrayCollection(), new ArrayCollection([$event])));
+            ->willReturnOnConsecutiveCalls(new ArrayCollection(), new ArrayCollection([$event]));
 
         $parentEvent->expects($this->any())
             ->method('getPositiveChildren')
-            ->will($this->onConsecutiveCalls(new ArrayCollection(), new ArrayCollection()));
+            ->willReturnOnConsecutiveCalls(new ArrayCollection(), new ArrayCollection());
 
         $this->leadRepository->expects($this->exactly(4))
             ->method('getContactRotations')

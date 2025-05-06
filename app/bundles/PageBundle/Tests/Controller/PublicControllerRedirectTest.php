@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerRedirectTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider redirectTypeOptions
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('redirectTypeOptions')]
     public function testValidationRedirectWithoutUrl(string $redirectUrl, string $expectedMessage): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/new');
@@ -33,7 +31,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string, string}>
      */
-    public function redirectTypeOptions(): iterable
+    public static function redirectTypeOptions(): iterable
     {
         yield 'redirect set, empty redirect URL' => ['', 'A value is required.'];
         yield 'redirect set, invalid redirect URL' => ['invalid.url', 'This value is not a valid URL.'];

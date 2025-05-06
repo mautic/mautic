@@ -133,17 +133,17 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->sessionMock->expects($matcher)
             ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.progress', $parameters[0]);
 
                     return [0, 100];
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.stats', $parameters[0]);
 
                     return ['sent' => 0, 'failed' => 0, 'failedRecipients' => []];
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.active', $parameters[0]);
 
                     return false;
@@ -181,17 +181,17 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->sessionMock->expects($matcher)
             ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.progress', $parameters[0]);
 
                     return [0, 100];
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.stats', $parameters[0]);
 
                     return ['sent' => 0, 'failed' => 0, 'failedRecipients' => []];
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.active', $parameters[0]);
 
                     return false;

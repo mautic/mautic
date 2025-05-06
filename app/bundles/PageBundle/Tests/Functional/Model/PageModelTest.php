@@ -75,9 +75,7 @@ class PageModelTest extends MauticMysqlTestCase
         return substr(bin2hex(random_bytes($length)), 0, $length);
     }
 
-    /**
-     * @dataProvider pageHitBotScenariosProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('pageHitBotScenariosProvider')]
     public function testItNotRegistersPageHitsFromBot(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isHit): void
     {
         $lead = new Lead();
@@ -147,7 +145,7 @@ class PageModelTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<mixed>>
      */
-    public function pageHitBotScenariosProvider(): iterable
+    public static function pageHitBotScenariosProvider(): iterable
     {
         // $trackingHash, $sentBefore, $userAgent, $ipAddress, $isHit
         yield 'All good' => ['test_hash_bot_ratio_1', '-80 second', 'Mozilla/5.0', self::IP_NOT_IN_ANY_BLOCK_LIST, true];
@@ -162,9 +160,7 @@ class PageModelTest extends MauticMysqlTestCase
         yield 'Permanently blocked User Agent' => ['test_hash_bot_ratio_10', '-80 second', 'MSNBOT', self::IP_NOT_IN_ANY_BLOCK_LIST2, false];
     }
 
-    /**
-     * @dataProvider pageHitBotScenariosProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('pageHitBotScenariosProvider')]
     public function testRedirect(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isHit): void
     {
         $lead = new Lead();

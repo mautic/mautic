@@ -111,9 +111,8 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param string[]|string $emails
-     *
-     * @dataProvider dataForTestAjaxGetLeadsByFieldValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestAjaxGetLeadsByFieldValue')]
     public function testAjaxGetLeadsByFieldValue($emails, bool $createFlag, int $expectedCount): void
     {
         $this->createLeads($emails, $createFlag);
@@ -134,7 +133,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<string, array<int, int|string|bool|string[]>>
      */
-    public function dataForTestAjaxGetLeadsByFieldValue(): iterable
+    public static function dataForTestAjaxGetLeadsByFieldValue(): iterable
     {
         yield 'Email passed as string with associated contact' => [
             'john@doe.com', // Email

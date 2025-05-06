@@ -44,7 +44,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $this->connection->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->will($this->onConsecutiveCalls($builderCompare, $builderAlias));
+            ->willReturnOnConsecutiveCalls($builderCompare, $builderAlias);
 
         $builderAlias->expects($this->once())
             ->method('select')
@@ -82,11 +82,11 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $exprCompare->expects($matcher)
             ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.id', $parameters[0]);
                     $this->assertSame(':lead', $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.date_field', $parameters[0]);
                     $this->assertSame(':value', $parameters[1]);
                 }
@@ -109,11 +109,11 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $builderCompare->expects($matcher)
             ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $contactId, $value, $builderCompare) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lead', $parameters[0]);
                     $this->assertSame($contactId, $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('value', $parameters[0]);
                     $this->assertSame($value, $parameters[1]);
                 }
@@ -150,7 +150,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $this->connection->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->will($this->onConsecutiveCalls($builderCompare, $builderAlias));
+            ->willReturnOnConsecutiveCalls($builderCompare, $builderAlias);
 
         $builderAlias->expects($this->once())
             ->method('select')
@@ -188,11 +188,11 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $exprCompare->expects($matcher)
             ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.id', $parameters[0]);
                     $this->assertSame(':lead', $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('company.date_field', $parameters[0]);
                     $this->assertSame(':value', $parameters[1]);
                 }
@@ -201,13 +201,13 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $builderCompare->expects($matcher)
             ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);
                     $this->assertSame('companies_lead', $parameters[2]);
                     $this->assertSame('l.id = companies_lead.lead_id', $parameters[3]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('companies_lead', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies', $parameters[1]);
                     $this->assertSame('company', $parameters[2]);
@@ -232,11 +232,11 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $builderCompare->expects($matcher)
             ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $contactId, $value, $builderCompare) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lead', $parameters[0]);
                     $this->assertSame($contactId, $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('value', $parameters[0]);
                     $this->assertSame($value, $parameters[1]);
                 }
@@ -341,7 +341,7 @@ final class LeadFieldRepositoryTest extends TestCase
     private function createQueryMock(): MockObject
     {
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
-        $query = $this->getMockBuilder(AbstractQuery::class)
+        $query = $this->getMockBuilder(Query::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
                 'setParameters',
@@ -349,8 +349,6 @@ final class LeadFieldRepositoryTest extends TestCase
                 'getSQL',
                 '_doExecute',
                 'execute',
-            ])
-            ->addMethods([
                 'setFirstResult',
                 'setMaxResults',
             ])

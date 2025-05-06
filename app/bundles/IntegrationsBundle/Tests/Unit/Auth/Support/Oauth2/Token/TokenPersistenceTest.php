@@ -180,7 +180,7 @@ class TokenPersistenceTest extends TestCase
 
         $integration = $this->createMock(Integration::class);
         $integration->method('getApiKeys')
-            ->willReturnOnConsecutiveCalls(null, $apiKeys, ['access_token' => $accessToken]);
+            ->willReturnOnConsecutiveCalls(null, $apiKeys, ['access_token' => $accessToken], null, null);
 
         $this->tokenPersistence->setIntegration($integration);
         $this->assertFalse($this->tokenPersistence->hasToken());

@@ -196,10 +196,10 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $reportGeneratorEventMock->expects($matcher)
             ->method('usesColumn')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(['u.first_name', 'u.last_name'], $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('i.ip_address', $parameters[0]);
                 }
 
@@ -248,7 +248,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->expects($matcher)->method('leftJoin')
             ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('utm', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);
                     $this->assertSame('l', $parameters[2]);

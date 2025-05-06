@@ -13,9 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider xssPayloadsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
     public function testContactTrackingTagsXss(string $payload, ?string $expectedSanitized): void
     {
         $this->logoutUser();

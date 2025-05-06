@@ -13,11 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * This test must run in a separate process because it sets the global constant
  * MAUTIC_INSTALLER which breaks other tests.
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class Oauth2Test extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
@@ -29,9 +27,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    /**
-     * @dataProvider provideMethods
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideMethods')]
     public function testAuthorize(string $method): void
     {
         // Disable the default logging in via username and password.

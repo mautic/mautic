@@ -58,9 +58,8 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, string> $data
-     *
-     * @dataProvider dataNewUserForPasswordField
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataNewUserForPasswordField')]
     public function testNewUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/new');
@@ -82,7 +81,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */
-    public function dataNewUserForPasswordField(): iterable
+    public static function dataNewUserForPasswordField(): iterable
     {
         yield 'Blank' => [
             [
@@ -118,9 +117,8 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, string> $data
-     *
-     * @dataProvider dataForEditUserForPasswordField
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
@@ -136,7 +134,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, string>>>
      */
-    public function dataForEditUserForPasswordField(): iterable
+    public static function dataForEditUserForPasswordField(): iterable
     {
         yield 'Do not match with confirm' => [
             [

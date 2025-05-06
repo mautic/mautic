@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\ProcessSignal;
 use Mautic\CoreBundle\ProcessSignal\Exception\InvalidStateException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalState;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ProcessSignalTest extends TestCase
@@ -30,16 +31,14 @@ class ProcessSignalTest extends TestCase
     /**
      * @return iterable<string, string[]>
      */
-    public function dataFromStringThrowsException(): iterable
+    public static function dataFromStringThrowsException(): iterable
     {
         yield 'No tag' => ['No tag'];
         yield 'Invalid tag' => ['<<<StartOfState>>{"key":"value"}<<<EndOfState>>>'];
         yield 'Invalid JSON' => ['<<<StartOfState>>>{"key"="value"}<<<EndOfState>>>'];
     }
 
-    /**
-     * @dataProvider dataFromStringThrowsException
-     */
+    #[DataProvider('datafromStringThrowsException')]
     public function testFromStringThrowsException(string $string): void
     {
         $this->expectException(InvalidStateException::class);

@@ -15,10 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 class PointEntityValidationTest extends MauticMysqlTestCase
 {
     /**
-     * @dataProvider deltaScenariosProvider
-     *
      * @throws MappingException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnCreate(int $delta, string $errorMessage = ''): void
     {
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/new');
@@ -28,9 +27,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $this->testPointData($form, $delta, $errorMessage);
     }
 
-    /**
-     * @dataProvider deltaScenariosProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnCreateViaAPI(int $delta, string $errorMessage = ''): void
     {
         $this->client->request(
@@ -57,10 +54,9 @@ class PointEntityValidationTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider deltaScenariosProvider
-     *
      * @throws MappingException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnUpdate(int $delta, string $errorMessage = ''): void
     {
         $point = new Point();

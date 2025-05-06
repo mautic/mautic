@@ -348,7 +348,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledEvent $event) use ($now) {
                         // The first log was scheduled to 10 minutes.
                         Assert::assertGreaterThan($now->modify('+9 minutes'), $event->getLog()->getTriggerDate());
@@ -357,7 +357,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                     $callback($parameters[0]);
                     $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED, $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledEvent $event) use ($now) {
                         // The second log was not scheduled so the default interval is used.
                         Assert::assertGreaterThan($now->modify('+59 minutes'), $event->getLog()->getTriggerDate());
@@ -366,7 +366,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                     $callback($parameters[0]);
                     $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED, $parameters[1]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledBatchEvent $event) {
                         Assert::assertCount(2, $event->getScheduled());
                     };

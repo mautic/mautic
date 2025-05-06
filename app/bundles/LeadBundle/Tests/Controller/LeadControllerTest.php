@@ -36,7 +36,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
-        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://default';
+        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->name() ? 'sync://' : 'in-memory://default';
 
         parent::setUp();
     }
@@ -402,9 +402,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    /**
-     * @testdox Ensure correct Preferred Timezone placeholder on add/edit contact page
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');

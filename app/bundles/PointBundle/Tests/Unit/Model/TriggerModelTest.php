@@ -122,7 +122,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher, $contact, $triggerEvent) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (TriggerBuilderEvent $event) {
                         // PHPUNIT calls this callback twice for unknown reason. We need to set it only once.
                         if (array_key_exists('email.send_to_user', $event->getEvents())) {
@@ -144,7 +144,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
                     $callback($event);
                     $this->assertSame(PointEvents::TRIGGER_ON_BUILD, $eventName);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (TriggerExecutedEvent $event) use ($contact, $triggerEvent) {
                         $this->assertSame($contact, $event->getLead());
                         $this->assertSame($triggerEvent, $event->getTriggerEvent());

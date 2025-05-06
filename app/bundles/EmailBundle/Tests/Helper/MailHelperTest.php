@@ -812,9 +812,7 @@ class MailHelperTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideEmails
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmails')]
     public function testValidateEmails(string $email, bool $isValid): void
     {
         $helper = $this->mockEmptyMailHelper();
@@ -844,7 +842,7 @@ class MailHelperTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function provideEmails(): array
+    public static function provideEmails(): array
     {
         return [
             ['john@doe.com', true],
@@ -1264,9 +1262,7 @@ class MailHelperTest extends TestCase
 
         $coreParametersHelper->method('get')->willReturnMap($parameterMap);
 
-        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockMailboxHelper = $this->createMock(Mailbox::class);
         $mockMailboxHelper->method('isConfigured')
             ->willReturn(false);
 
@@ -1320,9 +1316,7 @@ class MailHelperTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider minifyHtmlDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('minifyHtmlDataProvider')]
     public function testMinifyHtml(bool $minifyHtml, string $html, string $expectedHtml): void
     {
         $params = [
@@ -1563,7 +1557,7 @@ class MailHelperTest extends TestCase
             ['mailer_from_name', null, 'No Body'],
             ['mailer_address_length_limit', null, 30], // Set a small address length limit for testing
         ];
-        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+        $this->coreParametersHelper->method('get')->willReturnMap($params);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);

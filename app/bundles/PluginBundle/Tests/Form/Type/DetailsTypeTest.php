@@ -83,9 +83,7 @@ class DetailsTypeTest extends TestCase
         self::assertSame(1, $calls);
     }
 
-    /**
-     * @dataProvider authorizedDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('authorizedDataProvider')]
     public function testBuildFormRequiresAuthorization(bool $isAuthorized, string $label): void
     {
         /** @var MockObject&FormBuilderInterface $builder */
@@ -165,9 +163,8 @@ class DetailsTypeTest extends TestCase
 
     /**
      * @param array<string> $expectedFeatures
-     *
-     * @dataProvider withFeaturesProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('withFeaturesProvider')]
     public function testBuildFormWithFeatures(?int $integrationId, array $expectedFeatures): void
     {
         /** @var MockObject&FormBuilderInterface $builder */

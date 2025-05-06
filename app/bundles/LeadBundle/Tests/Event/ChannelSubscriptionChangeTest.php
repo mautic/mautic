@@ -8,9 +8,7 @@ use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 
 class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Tests that getters returns same values as the contstruct
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Tests that getters returns same values as the contstruct')]
     public function testGetterReturnConstruct(): void
     {
         $lead      = new Lead();
@@ -28,9 +26,7 @@ class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('unsubscribed', $event->getNewStatusVerb());
     }
 
-    /**
-     * @testdox Test that the default verb is unsubscribed if not recongized
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the default verb is unsubscribed if not recongized')]
     public function testGetStatusVerbReturnsUnsubscribedForUnrecognized(): void
     {
         $lead      = new Lead();

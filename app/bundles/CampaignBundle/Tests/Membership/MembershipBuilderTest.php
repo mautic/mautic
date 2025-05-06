@@ -108,28 +108,28 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->campaignMemberRepository->expects($matcher)
             ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertFalse($parameters[2]);
 
                     return [20];
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertFalse($parameters[2]);
 
                     return [21];
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertFalse($parameters[2]);
 
                     return [22];
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertFalse($parameters[2]);
@@ -171,28 +171,28 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->campaignMemberRepository->expects($matcher)
             ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertTrue($parameters[2]);
 
                     return [20];
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertTrue($parameters[2]);
 
                     return [21];
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertTrue($parameters[2]);
 
                     return [22];
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
                     $this->assertTrue($parameters[2]);

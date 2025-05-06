@@ -88,11 +88,10 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     ];
 
     /**
-     * @dataProvider formDataProvider
-     *
      * @param array<string, mixed> $payload
      * @param array<string, mixed> $expectedResponse
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('formDataProvider')]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
         $this->client->request('POST', '/api/forms/new', $payload);
@@ -146,7 +145,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<int, array<int, array<string, mixed>>>
      */
-    public function formDataProvider(): array
+    public static function formDataProvider(): array
     {
         return [
             [

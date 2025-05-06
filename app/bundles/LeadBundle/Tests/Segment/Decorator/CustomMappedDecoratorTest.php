@@ -8,11 +8,9 @@ use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(CustomMappedDecorator::class)]
 class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getField
-     */
     public function testGetField(): void
     {
         $customMappedDecorator = $this->getDecorator();
@@ -24,9 +22,6 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('open_count', $customMappedDecorator->getField($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getTable
-     */
     public function testGetTable(): void
     {
         $customMappedDecorator = $this->getDecorator();
@@ -38,9 +33,6 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(MAUTIC_TABLE_PREFIX.'email_stats', $customMappedDecorator->getTable($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getQueryType
-     */
     public function testGetQueryType(): void
     {
         $customMappedDecorator = $this->getDecorator();
@@ -52,9 +44,6 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('mautic.lead.query.builder.special.dnc', $customMappedDecorator->getQueryType($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getForeignContactColumn
-     */
     public function testGetForeignContactColumn(): void
     {
         $customMappedDecorator = $this->getDecorator();

@@ -10,9 +10,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class EventControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider fieldAndValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldAndValueProvider')]
     public function testCreateContactConditionOnStateField(string $field, string $value): void
     {
         // Fetch the campaign condition form.
