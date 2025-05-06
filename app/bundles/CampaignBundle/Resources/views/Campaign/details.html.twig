@@ -19,8 +19,22 @@
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
+    {% set buttons = [] %}
+
+    {% if securityHasEntityAccess(permissions['campaign:campaigns:viewown'], permissions['campaign:campaigns:viewother'], campaign.createdBy) and enableExportPermission is not empty%}
+        {% set buttons = buttons|merge([{
+            'attr': {
+                'data-toggle': 'download',
+                'href': path('mautic_campaign_action', {'objectAction': 'export', 'objectId': campaign.id}),
+            },
+            'btnText': 'mautic.core.export'|trans,
+            'iconClass': 'ri-export-line',
+        }]) %}
+    {% endif %}
+
   {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': campaign,
+    'customButtons': buttons,
     'templateButtons': {
         'edit': securityHasEntityAccess(
             permissions['campaign:campaigns:editown'],
