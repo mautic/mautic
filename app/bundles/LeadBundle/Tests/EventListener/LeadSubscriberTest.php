@@ -165,7 +165,7 @@ class LeadSubscriberTest extends CommonMocks
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->will($this->returnValue($eventTypeName));
+            ->willReturn($eventTypeName);
 
         $lead = new Lead();
 
@@ -206,7 +206,7 @@ class LeadSubscriberTest extends CommonMocks
 
         $repo->expects($matcher)
             ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($lead, $parameters[0]);
                     $this->assertSame('lead', $parameters[1]);
                     $this->assertSame('api-single', $parameters[2]);
@@ -215,7 +215,7 @@ class LeadSubscriberTest extends CommonMocks
 
                     return $logs;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($lead, $parameters[0]);
                     $this->assertSame('lead', $parameters[1]);
                     $this->assertSame('api-batch', $parameters[2]);
@@ -277,7 +277,7 @@ class LeadSubscriberTest extends CommonMocks
         // This method will be called exactly once per set of changes
         $this->auditLogModel->expects($matcher)
             ->method('writeToLog')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $lead2, $lead3) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
@@ -296,7 +296,7 @@ class LeadSubscriberTest extends CommonMocks
                         'ipAddress' => null,
                     ], $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
@@ -315,7 +315,7 @@ class LeadSubscriberTest extends CommonMocks
                         'ipAddress' => null,
                     ], $parameters[0]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',

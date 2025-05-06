@@ -123,7 +123,7 @@
                                 <optgroup label="{{ ('mautic.lead.' ~ object)|trans }}">
                                     {% for value, params in field %}
                                         {% set list = params.properties.list|default([]) %}
-                                        {% set choices = (params.properties.type is same as 'boolean') ?  formFieldParseBooleanList(list) : formFieldParseListForChoices(list) %}
+                                        {% set choices = (params.properties.type is same as 'boolean') ?  formFieldParseBooleanList(list)|formFieldFlipBooleanList : formFieldParseListForChoices(list) %}
                                         {% set list = choices|json_encode %}
                                         {% set callback = params.properties.callback|default('') %}
                                         {% set operators = (params.operators is defined and params.operators is not empty) ? params.operators|json_encode|escape : '{}' %}

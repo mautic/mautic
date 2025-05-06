@@ -27,7 +27,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        if ('testLabelsForFormAction' === $this->getName(false)) {
+        if ('testLabelsForFormAction' === $this->name()) {
             $this->truncateTables('assets', 'categories', 'emails', 'lead_lists');
         }
     }
@@ -363,9 +363,8 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      message: string,
      *      message_arg: array<string, mixed>
      *  }> $expectedMessages The expected messages with translation arguments
-     *
-     * @dataProvider dataTestLabelsForFormActions
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestLabelsForFormActions')]
     public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
     {
         $form = $this->createForm('test', 'test');
@@ -410,7 +409,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      }>
      *  }>
      */
-    public function dataTestLabelsForFormActions(): iterable
+    public static function dataTestLabelsForFormActions(): iterable
     {
         $category = new Category();
         $category->setTitle('Category');

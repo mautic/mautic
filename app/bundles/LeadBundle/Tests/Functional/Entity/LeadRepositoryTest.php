@@ -20,22 +20,21 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<string, array<string, bool>>>
+     * @return array<int, list<array<string, bool>>>
      */
     public static function joinIpAddressesProvider(): array
     {
         return [
-            ['' => []],
-            ['' => ['joinIpAddresses' => true]],
-            ['' => ['joinIpAddresses' => false]],
+            [[]],
+            [['joinIpAddresses' => true]],
+            [['joinIpAddresses' => false]],
         ];
     }
 
     /**
-     * @dataProvider joinIpAddressesProvider
-     *
      * @param array<string, bool> $args
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('joinIpAddressesProvider')]
     public function testSaveIpAddressToContacts($args): void
     {
         $contactRepo = $this->em->getRepository(Lead::class);

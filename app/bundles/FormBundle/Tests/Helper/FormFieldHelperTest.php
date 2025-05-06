@@ -16,20 +16,14 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $translatorMock = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translatorMock = $this->createMock(Translator::class);
 
-        $validatorMock = $this->getMockBuilder(ValidatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $validatorMock = $this->createMock(ValidatorInterface::class);
 
         $this->fixture = new FormFieldHelper($translatorMock, $validatorMock);
     }
 
-    /**
-     * @dataProvider fieldProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldProvider')]
     public function testPopulateField($field, $value, $formHtml, $expectedValue, $message): void
     {
         $this->fixture->populateField($field, $value, 'mautic', $formHtml);

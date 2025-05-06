@@ -12,9 +12,7 @@ class SchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided(): void
     {
-        $sendScheduleMock = $this->getMockBuilder(SendSchedule::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $sendScheduleMock = $this->createMock(SendSchedule::class);
 
         $schedulerSubscriber = new SchedulerSubscriber($sendScheduleMock);
 

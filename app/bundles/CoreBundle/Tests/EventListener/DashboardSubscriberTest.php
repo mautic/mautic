@@ -229,27 +229,27 @@ class DashboardSubscriberTest extends TestCase
         $matcher         = self::exactly(5);
         $routeCollection->expects($matcher) // no null object and  exception object
             ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_model_action', $parameters[0]);
 
                     return null;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_model_action', $parameters[0]);
 
                     return $route;
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_item_action', $parameters[0]);
 
                     return $route;
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_lead_action', $parameters[0]);
 
                     return $route;
                 }
-                if (5 === $matcher->getInvocationCount()) {
+                if (5 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_lead_action', $parameters[0]);
 
                     return null;

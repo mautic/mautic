@@ -11,10 +11,9 @@ use PHPUnit\Framework\TestCase;
 final class BarStringTransformerTest extends TestCase
 {
     /**
-     * @dataProvider transformProvider
-     *
      * @param mixed $value
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('transformProvider')]
     public function testTransform($value, string $expected): void
     {
         $transformer = new BarStringTransformer();
@@ -37,11 +36,10 @@ final class BarStringTransformerTest extends TestCase
     }
 
     /**
-     * @dataProvider reverseTransformProvider
-     *
      * @param mixed    $value
      * @param string[] $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('reverseTransformProvider')]
     public function testReverseTransform($value, array $expected): void
     {
         $transformer = new BarStringTransformer();

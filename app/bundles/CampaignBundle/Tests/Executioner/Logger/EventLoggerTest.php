@@ -98,7 +98,7 @@ class EventLoggerTest extends TestCase
             );
 
         $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')->willReturnOnConsecutiveCalls([1, 1, 2]);
+        $campaign->method('getId')->willReturnOnConsecutiveCalls(1, 1, 2);
 
         $event = $this->createMock(Event::class);
         $event->method('getCampaign')->willReturn($campaign);

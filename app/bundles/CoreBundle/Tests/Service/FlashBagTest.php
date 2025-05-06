@@ -146,7 +146,7 @@ class FlashBagTest extends TestCase
 
     public function testAddTypeError(): void
     {
-        $this->assertAddTypeCases(FlashBag::LEVEL_ERROR, 'text-danger ri-error-warning-line-circle');
+        $this->assertAddTypeCases(FlashBag::LEVEL_ERROR, 'text-danger ri-error-warning-line');
     }
 
     public function testAddTypeNotice(): void

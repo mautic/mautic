@@ -2,12 +2,12 @@
 
 namespace Mautic\AssetBundle\Tests\Controller;
 
-use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
+use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UploadControllerFunctionalTest extends AbstractAssetTest
+class UploadControllerFunctionalTest extends AbstractAssetTestCase
 {
     public function testUploadWithWrongMimetype(): void
     {

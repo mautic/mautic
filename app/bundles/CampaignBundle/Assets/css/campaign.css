@@ -411,7 +411,12 @@
   left: 0;
 }
 
-#leads-container .spinner {
+#leads-container .spinner,
+#decisions-container .spinner,
+#actions-container .spinner,
+#conditions-container .spinner,
+#campaign-graph-div .spinner
+{
     text-align: center;
     line-height: 250px;
     font-size: 24px;

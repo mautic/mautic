@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InstallNewFilesStepTest extends AbstractStepTest
+class InstallNewFilesStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject|TranslatorInterface

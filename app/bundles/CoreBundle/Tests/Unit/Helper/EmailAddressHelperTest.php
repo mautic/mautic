@@ -15,9 +15,7 @@ final class EmailAddressHelperTest extends TestCase
         $this->helper = new EmailAddressHelper();
     }
 
-    /**
-     * @dataProvider emailProvider
-     */
+    #[PHPUnit\Framework\Attributes\DataProvider('emailProvider')]
     public function testCleanEmail(string $email, string $expected): void
     {
         $this->assertSame($expected, $this->helper->cleanEmail($email));
@@ -38,9 +36,8 @@ final class EmailAddressHelperTest extends TestCase
 
     /**
      * @param array<int, string> $expected
-     *
-     * @dataProvider variationsProvider
      */
+    #[PHPUnit\Framework\Attributes\DataProvider('variationsProvider')]
     public function testGetVariations(string $email, array $expected): void
     {
         $this->assertSame(

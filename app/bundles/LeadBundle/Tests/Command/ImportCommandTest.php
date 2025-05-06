@@ -89,12 +89,12 @@ class ImportCommandTest extends TestCase
         $inputInterfaceMock = $this->createMock(InputInterface::class);
         $matcher            = $this->exactly(2);
         $inputInterfaceMock->expects($matcher)->method('getOption')->willReturnCallback(function (...$parameters) use ($matcher) {
-            if (1 === $matcher->getInvocationCount()) {
+            if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('id', $parameters[0]);
 
                 return 42;
             }
-            if (2 === $matcher->getInvocationCount()) {
+            if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame('limit', $parameters[0]);
 
                 return 10;

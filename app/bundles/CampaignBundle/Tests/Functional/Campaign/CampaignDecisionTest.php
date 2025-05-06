@@ -19,14 +19,13 @@ class CampaignDecisionTest extends MauticMysqlTestCase
     protected $useCleanupRollback = false;
 
     /**
-     * @dataProvider dataProviderLeadSelect
-     *
      * @param array<mixed> $additionalValue
      *
      * @throws OptimisticLockException
      * @throws ORMException
      * @throws MappingException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderLeadSelect')]
     public function testCampaignContactFieldValueDecision(
         string $object,
         string $type,
@@ -158,7 +157,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, mixed>
      */
-    public function dataProviderLeadSelect(): iterable
+    public static function dataProviderLeadSelect(): iterable
     {
         yield 'With include filter for contact select field' => ['lead', 'select', 'in'];
         yield 'With exclude filter for contact select field' => ['lead', 'select', '!in'];

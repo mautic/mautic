@@ -153,9 +153,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @dataProvider setIsGlobalDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setIsGlobalDataProvider')]
     public function testSetIsGlobal($value, $expected, array $changes): void
     {
         $segment = new LeadList();
@@ -175,9 +173,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, []];
     }
 
-    /**
-     * @dataProvider setIsPreferenceCenterDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
     public function testSetIsPreferenceCenter($value, $expected, array $changes): void
     {
         $segment = new LeadList();

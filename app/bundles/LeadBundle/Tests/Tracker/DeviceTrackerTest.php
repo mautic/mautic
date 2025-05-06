@@ -75,13 +75,9 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $cacheProvider               = new CacheProvider($coreParametersHelper, $container);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
         $this->deviceCreatorService  = new DeviceCreatorService();
-        $this->deviceTrackingService = $this->getMockBuilder(DeviceTrackingServiceInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
 
-        $this->logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->logger = $this->createMock(Logger::class);
     }
 
     public function testDeviceCreatedByUserAgent(): void

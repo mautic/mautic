@@ -91,12 +91,12 @@ class LanguageHelperTest extends TestCase
         $langFile = $this->tmpPath.'/../languageList.txt';
         $matcher  = $this->exactly(2);
         $this->coreParametersHelper->expects($matcher)->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
-            if (1 === $matcher->getInvocationCount()) {
+            if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('language_list_file', $parameters[0]);
 
                 return '';
             }
-            if (2 === $matcher->getInvocationCount()) {
+            if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame('translations_list_url', $parameters[0]);
 
                 return 'https://languages.test';

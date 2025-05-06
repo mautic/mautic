@@ -148,10 +148,10 @@ class SyncProcessTest extends TestCase
         $matcher = $this->exactly(2);
         $this->integrationSyncProcess->expects($matcher)
             ->method('getSyncReport')->willReturnCallback(function (...$parameters) use ($matcher, $integrationSyncReport) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(1, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(2, $parameters[0]);
                 }
 
@@ -189,7 +189,7 @@ class SyncProcessTest extends TestCase
 
         $this->eventDispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (CompletedSyncIterationEvent $event) {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
@@ -200,7 +200,7 @@ class SyncProcessTest extends TestCase
                     $callback($parameters[0]);
                     $this->assertSame(IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC, $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (CompletedSyncIterationEvent $event) {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getNewObjectMappings('bar'));
@@ -223,10 +223,10 @@ class SyncProcessTest extends TestCase
         $matcher = $this->exactly(2);
         $this->mauticSyncProcess->expects($matcher)
             ->method('getSyncReport')->willReturnCallback(function (...$parameters) use ($matcher, $internalSyncReport) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(1, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(2, $parameters[0]);
                 }
 

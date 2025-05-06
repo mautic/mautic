@@ -13,13 +13,15 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @IgnoreAnnotation("covers")
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
     {
-        $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->getName();
+        $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->name();
 
         parent::setUp();
     }
@@ -61,13 +63,6 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful($clientResponse->getContent());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::saveEntity
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::newEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::editEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::deleteEntityAction
-     * @covers \Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::execute
-     */
     public function testFieldApiEndpointsWithBackgroundProcessingEnabled(): void
     {
         $alias   = uniqid('field');
@@ -90,12 +85,6 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertDeleteResponse($payload, $id, $alias, true);
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::saveEntity
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::newEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::editEntityAction
-     * @covers \Mautic\LeadBundle\Controller\Api\FieldApiController::deleteEntityAction
-     */
     public function testFieldApiEndpointsWithBackgroundProcessingDisabled(): void
     {
         $alias   = uniqid('field');
@@ -115,9 +104,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, array<string, string>> $properties
-     *
-     * @dataProvider dataForCreatingNewBooleanFieldApiEndpoint
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanFieldApiEndpoint')]
     public function testCreatingNewBooleanFieldApiEndpoint(array $properties, string $expectedMessage): void
     {
         $payload = [
@@ -143,7 +131,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|array<string, array<string, string>>>>
      */
-    public function dataForCreatingNewBooleanFieldApiEndpoint(): iterable
+    public static function dataForCreatingNewBooleanFieldApiEndpoint(): iterable
     {
         yield 'No properties' => [
             [

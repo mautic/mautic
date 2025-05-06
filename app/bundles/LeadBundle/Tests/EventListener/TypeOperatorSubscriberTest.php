@@ -281,7 +281,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
                     $callback = function (array $options) {
@@ -299,7 +299,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     };
                     $callback($parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('filter', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
                     $callback = function (array $options) {
@@ -333,7 +333,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
                     $callback = function (array $options) {
@@ -352,7 +352,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     };
                     $callback($parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('filter', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
                     $callback = function (array $options) {

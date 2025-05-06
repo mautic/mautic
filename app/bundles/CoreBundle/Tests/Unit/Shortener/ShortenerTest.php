@@ -21,9 +21,7 @@ class ShortenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->shortener = new Shortener($this->coreParametersHelper);
     }

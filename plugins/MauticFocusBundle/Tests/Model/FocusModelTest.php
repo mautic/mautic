@@ -65,9 +65,7 @@ class FocusModelTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @dataProvider focusTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('focusTypeProvider')]
     public function testGetContentWithForm(string $type, InvokedCount $count): void
     {
         $this->formModel->expects(self::once())->method('getPages')->willReturn(['', '']);
@@ -97,7 +95,7 @@ class FocusModelTest extends TestCase
         $focusModel->getContent($focus);
     }
 
-    public function focusTypeProvider(): \Generator
+    public static function focusTypeProvider(): \Generator
     {
         yield ['form', self::once()];
         yield ['notice', self::never()];

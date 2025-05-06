@@ -28,17 +28,11 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->fieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldModel = $this->createMock(FieldModel::class);
 
-        $this->fieldsWithUniqueIdentifier = $this->getMockBuilder(FieldsWithUniqueIdentifier::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
-        $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->companyRepository = $this->createMock(CompanyRepository::class);
     }
 
     public function testUniqueFieldNotFoundException(): void

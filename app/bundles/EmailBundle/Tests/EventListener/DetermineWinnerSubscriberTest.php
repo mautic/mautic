@@ -130,12 +130,12 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->em->expects($matcher)->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $pageRepoMock, $emailRepoMock) {
-            if (1 === $matcher->getInvocationCount()) {
+            if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame(Hit::class, $parameters[0]);
 
                 return $pageRepoMock;
             }
-            if (2 === $matcher->getInvocationCount()) {
+            if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame(Stat::class, $parameters[0]);
 
                 return $emailRepoMock;

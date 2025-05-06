@@ -505,11 +505,11 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(3, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
         $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line-circle fs-14"]')->count();
+        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="text-danger ri-error-warning-line fs-14"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
@@ -547,9 +547,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertNull($segmentExistCheck);
     }
 
-    /**
-     * @dataProvider dateFieldProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateFieldProvider')]
     public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(

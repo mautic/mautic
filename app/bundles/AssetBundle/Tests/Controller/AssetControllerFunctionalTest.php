@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
+use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\UserBundle\Entity\Permission;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AssetControllerFunctionalTest extends AbstractAssetTest
+class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
 
@@ -116,9 +116,8 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
 
     /**
      * @param array<string, string[]> $permission
-     *
-     * @dataProvider getValuesProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getValuesProvider')]
     public function testEditWithPermissions(string $route, array $permission, int $expectedStatusCode, string $userCreatorUN): void
     {
         $userCreator = $this->getUser($userCreatorUN);
@@ -149,7 +148,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
     /**
      * @return \Generator<string, mixed[]>
      */
-    public function getValuesProvider(): \Generator
+    public static function getValuesProvider(): \Generator
     {
         yield 'The sales user with edit own permission can edits its own asset' => [
             'route'              => 'edit',

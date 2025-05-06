@@ -6792,19 +6792,19 @@ ul.line-legend li {
 .contact-avatar {
   width: 100%;
 }
-.illustration--size-48 {
+.pictogram--size-48 {
   width: 48px;
 }
-.illustration--size-64 {
+.pictogram--size-64 {
   width: 64px;
 }
-.illustration--size-80 {
+.pictogram--size-80 {
   width: 80px;
 }
-.illustration--size-96 {
+.pictogram--size-96 {
   width: 96px;
 }
-.illustration--size-128 {
+.pictogram--size-128 {
   width: 128px;
 }
 .table > thead > tr > th,

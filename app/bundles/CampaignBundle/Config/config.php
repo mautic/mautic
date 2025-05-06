@@ -23,6 +23,14 @@ return [
                 'path'       => '/campaigns/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::contactsAction',
             ],
+            'mautic_campaign_event_stats'     => [
+                'path'       => '/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::eventStatsAction',
+            ],
+            'mautic_campaign_graph'     => [
+                'path'       => '/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::graphAction',
+            ],
             'mautic_campaign_preview'      => [
                 'path'       => '/campaign/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',

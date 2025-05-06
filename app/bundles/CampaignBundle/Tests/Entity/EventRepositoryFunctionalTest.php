@@ -17,7 +17,7 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{?\DateTime, ?\DateTime, int}>
      */
-    public function dataGetContactPendingEventsConsidersCampaignPublishUpAndDown(): iterable
+    public static function dataGetContactPendingEventsConsidersCampaignPublishUpAndDown(): iterable
     {
         yield 'Publish Up and Down not set' => [null, null, 1];
         yield 'Publish Up and Down set' => [new \DateTime('-1 day'), new \DateTime('+1 day'), 1];
@@ -29,9 +29,7 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         yield 'Publish Down in the future' => [null, new \DateTime('+1 day'), 1];
     }
 
-    /**
-     * @dataProvider dataGetContactPendingEventsConsidersCampaignPublishUpAndDown
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetContactPendingEventsConsidersCampaignPublishUpAndDown')]
     public function testGetContactPendingEventsConsidersCampaignPublishUpAndDown(?\DateTime $publishUp, ?\DateTime $publishDown, int $expectedCount): void
     {
         $repository = static::getContainer()->get('mautic.campaign.repository.event');

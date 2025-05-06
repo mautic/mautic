@@ -10,9 +10,7 @@ use PHPUnit\Framework\Assert;
 
 final class FormTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider setNoIndexDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setNoIndexDataProvider')]
     public function testSetNoIndex($value, $expected, array $changes): void
     {
         $form = new Form();
