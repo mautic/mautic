@@ -4,42 +4,31 @@ declare(strict_types=1);
 
 namespace Mautic\CacheBundle\Tests\Csrf;
 
-use Closure;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CacheBundle\Csrf\CacheTokenStorage;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 
 class CacheTokenStorageTest extends TestCase
 {
-    /**
-     * @var CacheProviderInterface|MockObject
-     */
-    private $cache;
+    private CacheProviderInterface|MockObject $cache;
+    private MockObject|SessionInterface $session;
+    private CacheTokenStorage $cacheTokenStorage;
 
     /**
-     * @var MockObject|SessionInterface
+     * @var array<string, string|array<string>>
      */
-    private $session;
-
-    /**
-     * @var CacheTokenStorage
-     */
-    private $cacheTokenStorage;
-
-    /**
-     * @var string[]
-     */
-    private $sessionStorage = [];
+    private array $sessionStorage = [];
 
     /**
      * @var array<string, CacheItem>
      */
-    private $cacheStorage   = [];
+    private array $cacheStorage = [];
 
     public function setUp(): void
     {
@@ -47,12 +36,14 @@ class CacheTokenStorageTest extends TestCase
 
         $this->cache             = $this->createMock(CacheProviderInterface::class);
         $this->session           = $this->createMock(SessionInterface::class);
-        $this->cacheTokenStorage = new CacheTokenStorage($this->cache, $this->session);
+        $requestStack            = $this->createMock(RequestStack::class);
+        $requestStack->method('getSession')->willReturn($this->session);
+        $this->cacheTokenStorage = new CacheTokenStorage($this->cache, $requestStack);
 
-        $createCacheItem = Closure::bind(
+        $createCacheItem = \Closure::bind(
             static function ($key) {
-                $item = new CacheItem();
-                $item->key = CacheItem::validateKey($key);
+                $item        = new CacheItem();
+                $item->key   = CacheItem::validateKey($key);
                 $item->isHit = false;
 
                 return $item;
@@ -173,7 +164,7 @@ class CacheTokenStorageTest extends TestCase
 
     private function getNamespace(CacheTokenStorage $object): ?string
     {
-        return Closure::bind(function ($object) {
+        return \Closure::bind(function (CacheTokenStorage $object): ?string {
             return $object->namespace;
         }, null, CacheTokenStorage::class)($object);
     }

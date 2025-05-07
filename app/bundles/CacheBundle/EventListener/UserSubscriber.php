@@ -11,10 +11,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 
 class UserSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ClearableTokenStorageInterface
-     */
-    private $tokenStorage;
+    private ClearableTokenStorageInterface $tokenStorage;
 
     public function __construct(ClearableTokenStorageInterface $tokenStorage)
     {
@@ -22,9 +19,9 @@ class UserSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return string[]
+     * @return array<string, string>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserEvents::USER_LOGOUT => 'onUserLogout',

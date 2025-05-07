@@ -5,38 +5,26 @@ declare(strict_types=1);
 namespace Mautic\CacheBundle\Csrf;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
-use Psr\Cache\CacheException;
-use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 
 class CacheTokenStorage implements ClearableTokenStorageInterface
 {
-    const TOKEN_TEMPLATE               = '_csrf_%s';
-    const SESSION_KEY_TOKEN_IDENTIFIER = 'csrf_token_identifier';
-    const SESSION_KEY_TOKEN_KEYS       = 'csrf_token_keys';
+    public const TOKEN_TEMPLATE               = '_csrf_%s';
+    public const SESSION_KEY_TOKEN_IDENTIFIER = 'csrf_token_identifier';
+    public const SESSION_KEY_TOKEN_KEYS       = 'csrf_token_keys';
 
-    /**
-     * @var CacheProviderInterface
-     */
-    private $cache;
+    private CacheProviderInterface $cache;
+    private SessionInterface $session;
+    private ?string $namespace = null;
 
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
-     * @var string|null
-     */
-    private $namespace;
-
-    public function __construct(CacheProviderInterface $cacheProvider, SessionInterface $session)
+    public function __construct(CacheProviderInterface $cacheProvider, RequestStack $requestStack)
     {
         $this->cache   = $cacheProvider;
-        $this->session = $session;
+        $this->session = $requestStack->getSession();
     }
 
     /**
@@ -54,7 +42,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId)
+    public function getToken(string $tokenId): string
     {
         $this->init();
 
@@ -66,12 +54,9 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     }
 
     /**
-     * @param string $tokenId
-     * @param string $token
-     *
-     * @return void
+     * {@inheritdoc}
      */
-    public function setToken($tokenId, $token)
+    public function setToken(string $tokenId, string $token): void
     {
         $this->init();
 
@@ -88,7 +73,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId)
+    public function removeToken(string $tokenId): ?string
     {
         $this->init();
 
@@ -106,7 +91,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function hasToken($tokenId)
+    public function hasToken(string $tokenId): bool
     {
         $this->init();
 
