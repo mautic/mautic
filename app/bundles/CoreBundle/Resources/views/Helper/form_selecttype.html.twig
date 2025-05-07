@@ -21,10 +21,10 @@
 
                         {% set typeOneContent %}
                         <h3 class="mb-48">{{ typeOneHeader|trans }}</h3>
-                        {% if typeOneIllustration is defined and typeOneIllustration is not empty %}
+                        {% if typeOnePictogram is defined and typeOnePictogram is not empty %}
                             <div class="mb-md">
-                                {% include '@MauticCore/Helper/_illustration.html.twig' with {
-                                    'illustration': typeOneIllustration,
+                                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                                    'pictogram': typeOnePictogram,
                                     'size': '64',
                                     'color': 'var(--icon-interactive)'
                                 } %}
@@ -64,10 +64,10 @@
                     <div class="col-md-6">
                         {% set typeTwoContent %}
                         <h3 class="mb-48">{{ typeTwoHeader|trans }}</h3>
-                        {% if typeTwoIllustration is defined and typeTwoIllustration is not empty %}
+                        {% if typeTwoPictogram is defined and typeTwoPictogram is not empty %}
                         <div class="mb-md">
-                            {% include '@MauticCore/Helper/_illustration.html.twig' with {
-                                'illustration': typeTwoIllustration,
+                            {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                                'pictogram': typeTwoPictogram,
                                 'size': '64',
                                 'color': 'var(--icon-interactive)'
                             } %}
