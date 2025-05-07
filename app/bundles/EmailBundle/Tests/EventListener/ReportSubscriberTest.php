@@ -369,8 +369,10 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->expects($this->once())
             ->method('select')
-            ->with($this->stringContains('e.id, e.name, e.sent_count, e.read_count, tr.unique_hits as `unique_clicks`'))
-            ->willReturn($queryBuilderMock);
+            ->with('e.id, e.name, e.sent_count, e.read_count,
+                        count(CASE WHEN dnc.id and dnc.reason = 1 THEN 1 ELSE null END) as unsubscribed,
+                        count(CASE WHEN dnc.id and dnc.reason = 2 THEN 1 ELSE null END) as bounced')
+             ->willReturn($queryBuilderMock);
 
         $eventMock->expects($this->once())
             ->method('getOptions')
@@ -379,14 +381,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $queryBuilderMock->expects($this->any())
             ->method('getQueryParts')
             ->willReturn(['join' => []]);
-
-        $queryBuilderMock->expects($this->exactly(2))
-            ->method('setParameter')
-            ->withConsecutive(
-                ['unsubscribed', DoNotContact::UNSUBSCRIBED],
-                ['bounced', DoNotContact::BOUNCED]
-            )
-            ->willReturnSelf();
 
         $queryBuilderMock->expects($this->once())
             ->method('groupBy')
