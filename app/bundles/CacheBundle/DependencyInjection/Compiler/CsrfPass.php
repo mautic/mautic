@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CacheBundle\DependencyInjection\Compiler;
 
 use Mautic\CacheBundle\Csrf\CacheTokenStorage;
+use Mautic\CacheBundle\Factory\SessionFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CsrfPass implements CompilerPassInterface
@@ -22,12 +24,18 @@ class CsrfPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $definition = $container->findDefinition('security.csrf.token_storage');
+        // Create a session factory service
+        $sessionFactoryDefinition = new Definition(SessionFactory::class);
+        $sessionFactoryDefinition->setArguments([new Reference('request_stack')]);
+        $sessionFactoryDefinition->setPublic(false);
+        $container->setDefinition('mautic.cache.session_factory', $sessionFactoryDefinition);
 
+        // Set up the token storage with our cache provider and session factory
+        $definition = $container->findDefinition('security.csrf.token_storage');
         $definition->setClass(CacheTokenStorage::class)
             ->setArguments([
-                new Reference('mautic.cache.provider'),
-                new Reference('request_stack'),
+                new Reference('mautic.cache.provider_tag_aware'),
+                new Reference('mautic.cache.session_factory'),
             ]);
     }
 }
