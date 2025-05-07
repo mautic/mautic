@@ -26,7 +26,7 @@ class LookupHelper
         protected UserHelper $userHelper,
         protected Logger $logger,
         protected LeadModel $leadModel,
-        protected CompanyModel $companyModel
+        protected CompanyModel $companyModel,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('Clearbit');
     }

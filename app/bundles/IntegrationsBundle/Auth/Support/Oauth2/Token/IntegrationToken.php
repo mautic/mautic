@@ -19,7 +19,7 @@ class IntegrationToken implements TokenInterface
         ?string $accessToken,
         ?string $refreshToken,
         $expiresAt = null,
-        private array $extraData = []
+        private array $extraData = [],
     ) {
         $this->accessToken  = (string) $accessToken;
         $this->refreshToken = (string) $refreshToken;

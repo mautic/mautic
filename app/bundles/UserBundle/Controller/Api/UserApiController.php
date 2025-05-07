@@ -5,7 +5,6 @@ namespace Mautic\UserBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -21,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @extends CommonApiController<User>
@@ -45,7 +45,6 @@ class UserApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory
     ) {
         $userModel     = $modelFactory->getModel('user.user');
         \assert($userModel instanceof UserModel);
@@ -57,7 +56,7 @@ class UserApiController extends CommonApiController
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
         $this->dataInputMasks   = ['signature' => 'html'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
@@ -67,9 +66,9 @@ class UserApiController extends CommonApiController
      *
      * @throws NotFoundHttpException
      */
-    public function getSelfAction()
+    public function getSelfAction(TokenStorageInterface $tokenStorage)
     {
-        $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+        $currentUser = $tokenStorage->getToken()->getUser();
         $view        = $this->view($currentUser, Response::HTTP_OK);
 
         return $this->handleView($view);
@@ -176,7 +175,7 @@ class UserApiController extends CommonApiController
      * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+     * @throws NotFoundHttpException
      */
     public function isGrantedAction(Request $request, $id)
     {
@@ -215,7 +214,7 @@ class UserApiController extends CommonApiController
         }
 
         $filter = $request->query->get('filter', null);
-        $limit  = $request->query->get('limit', null);
+        $limit  = (int) $request->query->get('limit', null);
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);

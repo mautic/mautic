@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\CoreBundle\EventListener\OptimisticLockSubscriber;
+use Mautic\CoreBundle\EventListener\UUIDListener;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -46,7 +47,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias(GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
-    $services->alias('mautic.factory', Mautic\CoreBundle\Factory\MauticFactory::class);
+    $services->alias(Symfony\Component\DependencyInjection\ContainerInterface::class, 'service_container');
     $services->alias(Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class, 'argument_resolver');
 
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
@@ -56,7 +57,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.language', Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', Mautic\CoreBundle\Helper\EmailAddressHelper::class);
     $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
-    $services->alias('twig.helper.slots', Mautic\CoreBundle\Twig\Helper\SlotsHelper::class);
 
     $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 
@@ -68,5 +68,8 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$ormConfiguration', service('doctrine.orm.default_configuration'))
         ->tag('doctrine.event_subscriber');
     $services->get(OptimisticLockSubscriber::class)
+        ->tag('doctrine.event_subscriber');
+    $services->set(UUIDListener::class)
+        ->arg('$em', service('doctrine.orm.entity_manager'))
         ->tag('doctrine.event_subscriber');
 };

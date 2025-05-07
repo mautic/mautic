@@ -3,14 +3,6 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\Persistence\Mapping\MappingException;
-use Mautic\CoreBundle\Form\Type\SlotButtonType;
-use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
-use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
-use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
-use Mautic\CoreBundle\Form\Type\SlotImageCardType;
-use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
-use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
-use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -29,13 +21,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
+     */
+    private array $convertedContent = [];
+
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
         private EmailModel $emailModel,
         private TrackableModel $pageTrackableModel,
         private RedirectModel $pageRedirectModel,
         private TranslatorInterface $translator,
-        private MailHashHelper $mailHash
+        private MailHashHelper $mailHash,
     ) {
     }
 
@@ -81,6 +78,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
             '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
             '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
+            '{brand=name}'       => $this->translator->trans('mautic.core.token.brand_name'),
             '{subject}'          => $this->translator->trans('mautic.email.subject'),
         ];
 
@@ -93,114 +91,13 @@ class BuilderSubscriber implements EventSubscriberInterface
         // these should not allow visual tokens
         $tokens = [
             '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{dnc_url}'         => $this->translator->trans('mautic.email.token.unsubscribe_all_url'),
+            '{resubscribe_url}' => $this->translator->trans('mautic.email.token.resubscribe_url'),
             '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
                 $event->filterTokens($tokens)
-            );
-        }
-
-        if ($event->slotTypesRequested()) {
-            $event->addSlotType(
-                'text',
-                $this->translator->trans('mautic.core.slot.label.text'),
-                'font',
-                '@MauticCore/Slots/text.html.twig',
-                SlotTextType::class,
-                1000
-            );
-            $event->addSlotType(
-                'image',
-                $this->translator->trans('mautic.core.slot.label.image'),
-                'image',
-                '@MauticCore/Slots/image.html.twig',
-                SlotImageCardType::class,
-                900
-            );
-            $event->addSlotType(
-                'imagecard',
-                $this->translator->trans('mautic.core.slot.label.imagecard'),
-                'id-card-o',
-                '@MauticCore/Slots/imagecard.html.twig',
-                SlotImageCardType::class,
-                870
-            );
-            $event->addSlotType(
-                'imagecaption',
-                $this->translator->trans('mautic.core.slot.label.imagecaption'),
-                'image',
-                '@MauticCore/Slots/imagecaption.html.twig',
-                SlotImageCaptionType::class,
-                850
-            );
-            $event->addSlotType(
-                'button',
-                $this->translator->trans('mautic.core.slot.label.button'),
-                'external-link',
-                '@MauticCore/Slots/button.html.twig',
-                SlotButtonType::class,
-                800
-            );
-            $event->addSlotType(
-                'socialfollow',
-                $this->translator->trans('mautic.core.slot.label.socialfollow'),
-                'twitter',
-                '@MauticCore/Slots/socialfollow.html.twig',
-                SlotSocialFollowType::class,
-                600
-            );
-            $event->addSlotType(
-                'codemode',
-                $this->translator->trans('mautic.core.slot.label.codemode'),
-                'code',
-                '@MauticCore/Slots/codemode.html.twig',
-                SlotCodeModeType::class,
-                500
-            );
-            $event->addSlotType(
-                'separator',
-                $this->translator->trans('mautic.core.slot.label.separator'),
-                'minus',
-                '@MauticCore/Slots/separator.html.twig',
-                SlotSeparatorType::class,
-                400
-            );
-
-            $event->addSlotType(
-                'dynamicContent',
-                $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
-                'tag',
-                '@MauticCore/Slots/dynamiccontent.html.twig',
-                SlotDynamicContentType::class,
-                300
-            );
-        }
-
-        if ($event->sectionsRequested()) {
-            $event->addSection(
-                'one-column',
-                $this->translator->trans('mautic.core.slot.label.onecolumn'),
-                'file-text-o',
-                '@MauticCore/Sections/one-column.html.twig',
-                null,
-                1000
-            );
-            $event->addSection(
-                'two-column',
-                $this->translator->trans('mautic.core.slot.label.twocolumns'),
-                'columns',
-                '@MauticCore/Sections/two-column.html.twig',
-                null,
-                900
-            );
-            $event->addSection(
-                'three-column',
-                $this->translator->trans('mautic.core.slot.label.threecolumns'),
-                'th',
-                '@MauticCore/Sections/three-column.html.twig',
-                null,
-                800
             );
         }
     }
@@ -278,6 +175,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+        $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+        $event->addToken('{resubscribe_url}', $this->emailModel->buildUrl('mautic_email_resubscribe', ['idHash' => $idHash]));
 
         $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {
@@ -299,6 +198,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
+        $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
     }
 
     public function convertUrlsToTokens(EmailSendEvent $event): void
@@ -316,9 +216,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
-        /**
-         * @var Trackable|Redirect $trackable
-         */
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
@@ -331,43 +228,27 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Parses content for URLs and tokens.
+     * Parses the content for URLs and replaces them for trackables.
      *
-     * @param int|null $emailId
+     * @param ?int $emailId
      *
-     * @return array<mixed>
+     * @return Trackable[]|Redirect[]
      *
      * @throws MappingException
      */
     private function parseContentForUrls(EmailSendEvent $event, $emailId): array
     {
-        static $convertedContent = [];
+        $cacheKey = $event->getContentHash().'-'.$emailId;
 
         // Prevent parsing the exact same content over and over
-        if (!isset($convertedContent[$event->getContentHash()])) {
-            $html = $event->getContent();
-            $text = $event->getPlainText();
-
-            $contentTokens = $event->getTokens();
-
+        if (!isset($this->convertedContent[$cacheKey])) {
             [$content, $trackables] = $this->pageTrackableModel->parseContentForTrackables(
-                [$html, $text],
-                $contentTokens,
+                [$event->getContent(), $event->getPlainText()],
+                $event->getTokens(),
                 ($emailId) ? 'email' : null,
                 $emailId
             );
-
-            [$html, $text] = $content;
-            unset($content);
-
-            if ($html) {
-                $event->setContent($html);
-            }
-            if ($text) {
-                $event->setPlainText($text);
-            }
-
-            $convertedContent[$event->getContentHash()] = $trackables;
+            $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {
                 $trackableRepository = $this->pageTrackableModel->getRepository();
@@ -382,10 +263,18 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
                 }
             }
-
-            unset($html, $text, $trackables);
         }
 
-        return $convertedContent[$event->getContentHash()];
+        [$content, $trackables] = $this->convertedContent[$cacheKey];
+        [$html, $text]          = $content;
+
+        if ($html) {
+            $event->setContent($html);
+        }
+        if ($text) {
+            $event->setPlainText($text);
+        }
+
+        return $trackables;
     }
 }

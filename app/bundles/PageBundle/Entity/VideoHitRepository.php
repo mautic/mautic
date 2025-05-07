@@ -37,7 +37,7 @@ class VideoHitRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'h.url', 'h.date_hit', [], ['date_hit']);
+        return $this->getTimelineResults($query, $options, 'h.url', 'h.date_hit', [], ['date_hit'], null, 'h.id');
     }
 
     /**

@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-educate",
+            "directory": "themes/_educate",
+            "target": "git@github.com:mautic/theme-educate.git"
+        }
+    ]
+}

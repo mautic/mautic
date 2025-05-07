@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
 use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
@@ -19,6 +18,7 @@ use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Service\SearchCommandListInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -27,6 +27,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -63,7 +64,7 @@ class AjaxController extends CommonController
      */
     public function delegateAjaxAction(
         Request $request,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
     ) {
         // process ajax actions
         $action     = $request->get('action');
@@ -121,7 +122,7 @@ class AjaxController extends CommonController
     public function executeAjaxAction(
         Request $request,
         $action,
-        $bundle = null
+        $bundle = null,
     ) {
         if (method_exists($this, $action.'Action')) {
             return $this->forwardWithPost(
@@ -181,12 +182,9 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function globalCommandListAction(Request $request): JsonResponse
+    public function globalCommandListAction(SearchCommandListInterface $searchCommandList): JsonResponse
     {
-        $dispatcher = $this->dispatcher;
-        $event      = new CommandListEvent();
-        $dispatcher->dispatch($event, CoreEvents::BUILD_COMMAND_LIST);
-        $allCommands = $event->getCommands();
+        $allCommands = $searchCommandList->getList();
         $translator  = $this->translator;
         $dataArray   = [];
         $dupChecker  = [];
@@ -321,14 +319,14 @@ class AjaxController extends CommonController
         $dataArray   = ['success' => 0];
         $name        = InputHelper::clean($request->request->get('model'));
         $id          = (int) $request->request->get('id');
-        $extra       = InputHelper::clean($request->request->get('parameter'));
+        $extra       = InputHelper::clean($request->request->all()['parameter']);
         $model       = $this->getModel($name);
         $entity      = $model->getEntity($id);
         $currentUser = $this->user;
 
         if (method_exists($entity, 'getCheckedOutBy')) {
             $checkedOut = $entity->getCheckedOutBy();
-            if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
+            if (!empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 // entity exists, is checked out, and is checked out by the current user so go ahead and unlock
                 \assert($model instanceof FormModel);
                 $model->unlockEntity($entity, $extra);
@@ -498,7 +496,8 @@ class AjaxController extends CommonController
         PathsHelper $pathsHelper,
         LanguageHelper $languageHelper,
         CookieHelper $cookieHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
+        KernelInterface $kernel,
     ): JsonResponse {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -569,7 +568,7 @@ class AjaxController extends CommonController
             }
 
             $input       = new ArgvInput($args);
-            $application = new Application($this->container->get('kernel'));
+            $application = new Application($kernel);
             $application->setAutoExit(false);
             $output = new BufferedOutput();
 
@@ -613,7 +612,7 @@ class AjaxController extends CommonController
             } else {
                 // Upgrading from 1.0.5
 
-                return $this->updateFinalizationAction($request, $cookieHelper);
+                return $this->updateFinalizationAction($request, $cookieHelper, $kernel);
             }
         }
 
@@ -623,14 +622,15 @@ class AjaxController extends CommonController
     /**
      * Finalize update.
      */
-    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper): JsonResponse
+    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper, KernelInterface $kernel): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
 
+        \assert($kernel instanceof \AppKernel);
         // Here as a just in case it's needed for a future upgrade
         $dataArray['success'] = 1;
-        $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', ['%version%' => $this->factory->getVersion()]);
+        $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', ['%version%' => $kernel->getVersion()]);
 
         // Check for a post install message
         if ($postMessage = $request->getSession()->get('post_upgrade_message', false)) {

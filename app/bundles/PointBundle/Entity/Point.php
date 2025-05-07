@@ -8,12 +8,37 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Point extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "point:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "point:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Point extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
@@ -60,7 +85,7 @@ class Point extends FormEntity
     private $properties = [];
 
     /**
-     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
+     * @var ArrayCollection<int,LeadPointLog>
      */
     private $log;
 
@@ -118,6 +143,8 @@ class Point extends FormEntity
         $builder->createManyToOne('group', Group::class)
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

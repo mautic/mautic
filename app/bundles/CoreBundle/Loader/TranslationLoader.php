@@ -13,11 +13,11 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
     public function __construct(
         private BundleHelper $bundleHelper,
-        private PathsHelper $pathsHelper
+        private PathsHelper $pathsHelper,
     ) {
     }
 
-    public function load($resource, $locale, $domain = 'messages')
+    public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
     {
         $bundles   = $this->bundleHelper->getMauticBundles(true);
         $catalogue = new MessageCatalogue($locale);

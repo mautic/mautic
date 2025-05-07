@@ -14,7 +14,7 @@ final class InternalObjectFindByIdEvent extends Event
     private ?object $entity = null;
 
     public function __construct(
-        private ObjectInterface $object
+        private ObjectInterface $object,
     ) {
     }
 

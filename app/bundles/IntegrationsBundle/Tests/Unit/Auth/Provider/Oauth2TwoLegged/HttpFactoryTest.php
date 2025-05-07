@@ -36,7 +36,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(InvalidCredentialsException::class);
 
-        $credentials = new class() implements AuthCredentialsInterface {
+        $credentials = new class implements AuthCredentialsInterface {
         };
 
         (new HttpFactory())->getClient($credentials);
@@ -46,18 +46,18 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return '';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return '';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -70,18 +70,18 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return '';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -94,18 +94,18 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return '';
             }
@@ -118,28 +118,28 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements PasswordCredentialsGrantInterface {
+        $credentials = new class implements PasswordCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return '';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return '';
             }
@@ -152,28 +152,28 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements PasswordCredentialsGrantInterface {
+        $credentials = new class implements PasswordCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'foo';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return '';
             }
@@ -184,18 +184,18 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
@@ -207,18 +207,18 @@ class HttpFactoryTest extends TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credentials2 = new class() implements ClientCredentialsGrantInterface {
+        $credentials2 = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'bar';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'foo';
             }
@@ -256,28 +256,28 @@ class HttpFactoryTest extends TestCase
 
     public function testPasswordGrantTypeIsUsed(): void
     {
-        $credentials = new class() implements PasswordCredentialsGrantInterface {
+        $credentials = new class implements PasswordCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'username';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return 'password';
             }
@@ -293,18 +293,18 @@ class HttpFactoryTest extends TestCase
 
     public function testClientCredentialsGrantTypeIsUsed(): void
     {
-        $credentials = new class() implements ClientCredentialsGrantInterface {
+        $credentials = new class implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'foo';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'bar';
             }
@@ -361,8 +361,7 @@ class HttpFactoryTest extends TestCase
      */
     private function extractMiddleware(ClientInterface $client): OAuth2Middleware
     {
-        $handler = $client->getConfig()['handler'];
-
+        $handler    = $client->getConfig()['handler']; /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
         $reflection = new \ReflectionClass($handler);
         $property   = $reflection->getProperty('stack');
         $property->setAccessible(true);
@@ -388,38 +387,38 @@ class HttpFactoryTest extends TestCase
      */
     private function getCredentials(): PasswordCredentialsGrantInterface
     {
-        return new class() implements PasswordCredentialsGrantInterface, StateInterface, ScopeInterface, CredentialsInterface {
+        return new class implements PasswordCredentialsGrantInterface, StateInterface, ScopeInterface, CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://test.com';
             }
 
-            public function getClientId(): ?string
+            public function getClientId(): string
             {
                 return 'bar';
             }
 
-            public function getUsername(): ?string
+            public function getUsername(): string
             {
                 return 'username';
             }
 
-            public function getPassword(): ?string
+            public function getPassword(): string
             {
                 return 'password';
             }
 
-            public function getState(): ?string
+            public function getState(): string
             {
                 return 'state';
             }
 
-            public function getScope(): ?string
+            public function getScope(): string
             {
                 return 'scope';
             }
 
-            public function getClientSecret(): ?string
+            public function getClientSecret(): string
             {
                 return 'secret';
             }

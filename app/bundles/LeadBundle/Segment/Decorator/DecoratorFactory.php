@@ -18,7 +18,7 @@ class DecoratorFactory
         private CustomMappedDecorator $customMappedDecorator,
         private DateOptionFactory $dateOptionFactory,
         private CompanyDecorator $companyDecorator,
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

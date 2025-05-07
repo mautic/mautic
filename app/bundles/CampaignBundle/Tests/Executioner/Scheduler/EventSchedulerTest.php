@@ -15,8 +15,10 @@ use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
@@ -35,6 +37,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
     private DateTime $dateTimeScheduler;
 
+    private Optimized $optimizedScheduler;
+
     /**
      * @var EventCollector|MockObject
      */
@@ -50,6 +54,11 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $coreParamtersHelper;
 
+    /**
+     * @var PeakInteractionTimer|MockObject
+     */
+    private MockObject $peakInteractionTimer;
+
     private EventScheduler $scheduler;
 
     protected function setUp(): void
@@ -60,16 +69,19 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 fn () => 'America/New_York'
             );
-        $this->eventLogger       = $this->createMock(EventLogger::class);
-        $this->intervalScheduler = new Interval($this->logger, $this->coreParamtersHelper);
-        $this->dateTimeScheduler = new DateTime($this->logger);
-        $this->eventCollector    = $this->createMock(EventCollector::class);
-        $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
-        $this->scheduler         = new EventScheduler(
+        $this->eventLogger                = $this->createMock(EventLogger::class);
+        $this->peakInteractionTimer       = $this->createMock(PeakInteractionTimer::class);
+        $this->intervalScheduler          = new Interval($this->logger, $this->coreParamtersHelper);
+        $this->dateTimeScheduler          = new DateTime($this->logger);
+        $this->optimizedScheduler         = new Optimized($this->peakInteractionTimer);
+        $this->eventCollector             = $this->createMock(EventCollector::class);
+        $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $this->scheduler                  = new EventScheduler(
             $this->logger,
             $this->eventLogger,
             $this->intervalScheduler,
             $this->dateTimeScheduler,
+            $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
             $this->coreParamtersHelper
@@ -188,7 +200,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-09-01 09:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertEquals('2018-08-31 17:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
@@ -243,7 +255,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-09-01 11:00:00', $executionDate->format('Y-m-d H:i:s'));
+        // It is OK to set the execution date 15 seconds in the past. It means execute right now.
+        $this->assertEquals('2018-08-31 13:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
@@ -371,11 +384,12 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $scheduler = new EventScheduler(
+        $scheduler         = new EventScheduler(
             $this->logger,
             $this->eventLogger,
             $this->intervalScheduler,
             $this->dateTimeScheduler,
+            $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
             $coreParamtersHelper

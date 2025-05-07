@@ -369,9 +369,9 @@ class ContentPreviewSettingsTypeTest extends TestCase
             [
                 'attr' => [
                     'class'                   => 'form-control',
-                    'data-callback'           => 'activateContactLookupField',
+                    'data-callback'           => 'activatePreviewContactLookupField',
                     'data-toggle'             => 'field-lookup',
-                    'data-lookup-callback'    => 'updateContactLookupListFilter',
+                    'data-lookup-callback'    => 'updatePreviewContactLookupListFilter',
                     'data-chosen-lookup'      => 'lead:contactList',
                     'placeholder'             => 'startTyping',
                     'data-no-record-message'  => 'nomatches',
@@ -382,7 +382,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
     private function createEmail(): Email
     {
-        return new class() extends Email {
+        return new class extends Email {
             private int $id = 0;
 
             public function getId(): int

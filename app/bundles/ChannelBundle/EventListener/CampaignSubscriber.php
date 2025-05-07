@@ -38,7 +38,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private ActionDispatcher $actionDispatcher,
         private EventCollector $eventCollector,
         private LoggerInterface $logger,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -132,7 +132,11 @@ class CampaignSubscriber implements EventSubscriberInterface
             ++$priority;
         }
 
-        $pendingEvent->failRemaining($this->translator->trans('mautic.channel.message.failed'));
+        // Remove logs from failures if they are also in successful logs
+        // This handles Marketing Messages with multiple channels where one channel fails but another succeeds.
+        $this->removeSuccessfulFromFailures($pendingEvent);
+
+        $pendingEvent->failRemainingPending($this->translator->trans('mautic.channel.message.failed'));
     }
 
     /**
@@ -202,6 +206,16 @@ class CampaignSubscriber implements EventSubscriberInterface
         foreach ($success as $key => $log) {
             if (!empty($log->getMetadata()['failed'])) {
                 $success->remove($key);
+            }
+        }
+    }
+
+    private function removeSuccessfulFromFailures(PendingEvent $pendingEvent): void
+    {
+        $successfulKeys = $pendingEvent->getSuccessful()->getKeys();
+        foreach ($successfulKeys as $key) {
+            if ($pendingEvent->getFailures()->containsKey($key)) {
+                $pendingEvent->getFailures()->remove($key);
             }
         }
     }

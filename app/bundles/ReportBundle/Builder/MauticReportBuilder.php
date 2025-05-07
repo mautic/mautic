@@ -81,16 +81,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
     public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
-    /**
-     * @var string
-     */
-    private $contentTemplate;
+    private ?string $contentTemplate = null;
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private Connection $db,
         private Report $entity,
-        private ChannelListHelper $channelListHelper
+        private ChannelListHelper $channelListHelper,
     ) {
     }
 
@@ -112,10 +109,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
     /**
      * Gets the getContentTemplate path.
-     *
-     * @return string
      */
-    public function getContentTemplate()
+    public function getContentTemplate(): ?string
     {
         return $this->contentTemplate;
     }

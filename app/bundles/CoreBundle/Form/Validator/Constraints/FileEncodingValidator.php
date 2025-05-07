@@ -25,11 +25,26 @@ class FileEncodingValidator extends ConstraintValidator
             return;
         }
 
-        /*
-            If file is below the max size then only check for UTF-8 encoding.
-        */
-        if (!mb_check_encoding(file_get_contents($field->getPathname()), 'UTF-8')) {
-            $this->context->addViolation($constraint->encodingFormatMessage, ['%keyword%' => $field->getClientOriginalName()]);
+        // Open the file in "reading only" mode
+        $fileHandle = fopen($field->getPathname(), 'rb');
+
+        // Handler is valid or not
+        if (false === $fileHandle) {
+            return;
         }
+
+        // While we are not yet at the end of the file
+        while (!feof($fileHandle)) {
+            // Read the current line
+            $line = fgets($fileHandle);
+
+            // Check for UTF-8 encoding
+            if (!mb_check_encoding($line, 'UTF-8')) {
+                $this->context->addViolation($constraint->encodingFormatMessage);
+            }
+        }
+
+        // Finally, close the file handle.
+        fclose($fileHandle);
     }
 }

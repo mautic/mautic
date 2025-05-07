@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class ConfigMonitoredEmailType extends AbstractType
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -48,7 +48,7 @@ class ConfigMonitoredEmailType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'monitored_email';
     }

@@ -15,7 +15,7 @@ final class FieldCrate
         private string $key,
         private string $name,
         private string $type,
-        private array $properties
+        private array $properties,
     ) {
     }
 

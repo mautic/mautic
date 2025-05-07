@@ -1,0 +1,11 @@
+{% if showMore is defined %}
+  <a href="{{ url('mautic_tagmanager_index', {'search': searchString}) }}" data-toggle="ajax">
+    <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+  </a>
+{% else %}
+    <a href="{{ url('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+      <span class="fw-sb">{{ item.tag }}</span>
+      <span class="ml-4 mr-sm">#{{ item.id }}</span>
+    </a>
+  <div class="clearfix"></div>
+{% endif %}

@@ -26,7 +26,7 @@ class GenericStageActionType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'genericstage_settings';
     }

@@ -14,7 +14,7 @@ final class DoNotContactRemoveEvent extends Event
     public function __construct(
         private Lead $lead,
         private string $channel,
-        private bool $persist = true
+        private bool $persist = true,
     ) {
     }
 

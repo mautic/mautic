@@ -36,7 +36,7 @@ class TwitterCommandHelper
         private PostCountModel $postCountModel,
         private Translator $translator,
         private EntityManagerInterface $em,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
         $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');
@@ -316,9 +316,9 @@ class TwitterCommandHelper
      *
      * @param string $name Space separated first & last name. Supports multiple first names
      *
-     * @return array{string, string}
+     * @return array{0: string, 1?: string}
      */
-    private function splitName($name): array
+    private function splitName(string $name): array
     {
         // array the entire name
         $nameParts = explode(' ', $name);

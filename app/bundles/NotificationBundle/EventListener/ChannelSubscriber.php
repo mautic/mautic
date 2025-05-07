@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IntegrationHelper $integrationHelper
+        private IntegrationHelper $integrationHelper,
     ) {
     }
 

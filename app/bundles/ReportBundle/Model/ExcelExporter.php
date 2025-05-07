@@ -14,7 +14,7 @@ class ExcelExporter
 {
     public function __construct(
         protected FormatterHelper $formatterHelper,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

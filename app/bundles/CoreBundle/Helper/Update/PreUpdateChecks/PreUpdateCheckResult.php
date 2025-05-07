@@ -17,7 +17,7 @@ class PreUpdateCheckResult
     public function __construct(
         public bool $success,
         public ?AbstractPreUpdateCheck $check,
-        array $errors = []
+        array $errors = [],
     ) {
         foreach ($errors as $error) {
             if (!($error instanceof PreUpdateCheckError)) {

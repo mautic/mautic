@@ -132,7 +132,7 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->method('getRepository')->willReturn($leadRepository);
         $leadRepository->method('getContacts')->willReturn($contactData);
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager->expects($this->exactly(1))
             ->method('detach');
 
         $this->messageQueueRepository->method('getQueuedMessages')

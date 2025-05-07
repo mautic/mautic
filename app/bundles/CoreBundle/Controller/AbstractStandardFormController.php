@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -34,7 +33,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
         protected FormFactoryInterface $formFactory,
         protected FormFieldHelper $fieldHelper,
         ManagerRegistry $managerRegistry,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -42,9 +40,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
-        parent::__construct($managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -675,7 +673,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         ];
 
         foreach ($namespaces as $namespace) {
-            if ($this->get('twig')->getLoader()->exists($namespace.'/'.$file)) {
+            if ($this->container->get('twig')->getLoader()->exists($namespace.'/'.$file)) {
                 return $namespace.'/'.$file;
             }
         }
@@ -766,7 +764,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';
-        $dateRangeValues = $request->$method->get('daterange', $request->getSession()->get($name, []));
+        $dateRangeValues = $request->$method->all()['daterange'] ?? $request->getSession()->get($name, []);
         $request->getSession()->set($name, $dateRangeValues);
 
         $dateRangeForm = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);

@@ -31,6 +31,14 @@ return [
                 'path'       => '/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignMapStatsController::viewAction',
             ],
+            'mautic_campaign_metrics_email_weekdays' => [
+                'path'       => '/campaign/metrics/email-weekdays/{objectId}/{dateFrom}/{dateTo}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::emailWeekdaysAction',
+            ],
+            'mautic_campaign_metrics_email_hours' => [
+                'path'       => '/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::emailHoursAction',
+            ],
         ],
         'api'  => [
             'mautic_api_campaignsstandard'            => [
@@ -103,7 +111,9 @@ return [
     ],
 
     'categories' => [
-        'campaign' => null,
+        'campaign' => [
+            'class' => Mautic\CampaignBundle\Entity\Campaign::class,
+        ],
     ],
 
     'services' => [
@@ -190,6 +200,7 @@ return [
                     'mautic.campaign.event_logger',
                     'mautic.campaign.scheduler.interval',
                     'mautic.campaign.scheduler.datetime',
+                    'mautic.campaign.scheduler.optimized',
                     'mautic.campaign.event_collector',
                     'event_dispatcher',
                     'mautic.helper.core_parameters',
@@ -289,7 +300,6 @@ return [
                     'event_dispatcher',
                     'mautic.campaign.scheduler',
                     'monolog.logger.mautic',
-                    'mautic.factory',
                     'mautic.tracker.contact',
                 ],
             ],
@@ -356,9 +366,17 @@ return [
         ],
     ],
     'parameters' => [
-        'campaign_time_wait_on_event_false'       => 'PT1H',
-        'campaign_use_summary'                    => 0,
-        'campaign_by_range'                       => 0,
-        'delete_campaign_event_log_in_background' => false,
+        'campaign_time_wait_on_event_false'                                                     => 'PT1H',
+        'campaign_use_summary'                                                                  => 0,
+        'campaign_by_range'                                                                     => 0,
+        'delete_campaign_event_log_in_background'                                               => false,
+        'campaign_email_stats_enabled'                                                          => true,
+        'peak_interaction_timer_cache_timeout'                                                  => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_CACHE_TIMEOUT,
+        'peak_interaction_timer_best_default_hour_start'                                        => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_BEST_HOUR_START,
+        'peak_interaction_timer_best_default_hour_end'                                          => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_BEST_HOUR_END,
+        'peak_interaction_timer_best_default_days'                                              => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_BEST_DAYS,
+        'peak_interaction_timer_fetch_interactions_from'                                        => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_INTERACTIONS_FROM,
+        'peak_interaction_timer_fetch_limit'                                                    => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_FETCH_LIMIT,
+        'peak_interaction_timer_max_optimal_days'                                               => Mautic\LeadBundle\Services\PeakInteractionTimer::DEFAULT_MAX_OPTIMAL_DAYS,
     ],
 ];

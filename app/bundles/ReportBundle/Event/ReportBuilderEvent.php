@@ -40,7 +40,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         string $context,
         private array|Paginator $leadFields,
         private ReportHelper $reportHelper,
-        private ?string $reportSource = null
+        private ?string $reportSource = null,
     ) {
         $this->context = $context;
     }

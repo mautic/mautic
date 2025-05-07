@@ -204,8 +204,8 @@ Mautic.generatePageTitle = function(route){
             currentModuleItem = mQuery('.page-header h1').text();
         }
 
-        // Encoded entites are decoded by this process and can cause a XSS
-        currentModuleItem = mQuery('<div>'+currentModuleItem+'</div>').text();
+        // Safely set the text content to prevent XSS
+        currentModuleItem = mQuery('<div>').text(currentModuleItem).html();
 
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
@@ -335,11 +335,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
     //initalize live search boxes
     mQuery(container + " *[data-toggle='livesearch']").each(function (index) {
         Mautic.activateLiveSearch(mQuery(this), "lastSearchStr", "liveCache");
-    });
-
-    //initialize list filters
-    mQuery(container + " *[data-toggle='listfilter']").each(function (index) {
-        Mautic.activateListFilterSelect(mQuery(this));
     });
 
     //initialize tooltips
@@ -475,10 +470,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
     mQuery(container + ' input[class=list-checkbox]').on('change', function () {
         var disabled = Mautic.batchActionPrecheck(container) ? false : true;
-        var color    = (disabled) ? 'btn-default' : 'btn-info';
-        var button   = container + ' th.col-actions .input-group-btn button';
+        var color    = (disabled) ? 'btn-ghost' : 'btn-info';
+        var button   = container + ' th.col-actions .btn.dropdown-toggle';
         mQuery(button).prop('disabled', disabled);
-        mQuery(button).removeClass('btn-default btn-info').addClass(color);
+        mQuery(button).removeClass('btn-ghost btn-info').addClass(color);
     });
 
     //Copy form buttons to the toolbar
@@ -577,17 +572,12 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         }
     });
-    Mautic.activateGlobalFroalaOptions();
     Mautic.getBuilderContainer = function() {
         return container;
     }
 
     // This turns all textarea elements with class "editor" into CKEditor ones, except for Dynamic Content elements, which can be initialized with Mautic.setDynamicContentEditors().
-    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
-        mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
-            mQuery(this).froalaEditor();
-        });
-    } else if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
+    if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             const textarea = mQuery(this);
 
@@ -659,9 +649,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
         mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-ltr');
         });
-        mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
-            mQuery("html").removeClass('sidebar-open-rtl');
-        });
     }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
@@ -679,32 +666,28 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         });
 
-        if (mQuery('#globalSearchContainer').length) {
-            mQuery('#globalSearchContainer .search-button').click(function () {
-                mQuery('#globalSearchContainer').addClass('active');
-                if (mQuery('#globalSearchInput').val()) {
-                    mQuery('#globalSearchDropdown').addClass('open');
-                }
-                setTimeout(function () {
-                    mQuery('#globalSearchInput').focus();
-                }, 100);
-                mQuery('body').on('click.globalsearch', function (event) {
-                    var target = event.target;
-                    if (!mQuery(target).parents('#globalSearchContainer').length && !mQuery(target).parents('#globalSearchDropdown').length) {
-                        Mautic.closeGlobalSearchResults();
-                    }
-                });
+        const $modal = mQuery('#gsearchModal'),
+        $input = mQuery('#globalSearchInput'),
+        $results = mQuery('.gsearch--results'),
+        $panel = mQuery('#globalSearchPanel');
+
+        $input.on('change keyup paste', function () {
+            const hasValue = mQuery(this).val();
+            $results.toggleClass('hide', !hasValue);
+            if (!hasValue) $panel.empty();
+        });
+
+        Mautic.activateLiveSearch("#globalSearchInput", "lastGlobalSearchStr", "globalLivecache");
+
+        $modal
+            .on('shown.bs.modal', () => setTimeout(() => $input.focus(), 100))
+            .on('hidden.bs.modal', () => {
+                $input.val('');
+                $results.addClass('hide');
+                $panel.empty();
             });
 
-            mQuery("#globalSearchInput").on('change keyup paste', function () {
-                if (mQuery(this).val()) {
-                    mQuery('#globalSearchDropdown').addClass('open');
-                } else {
-                    mQuery('#globalSearchDropdown').removeClass('open');
-                }
-            });
-            Mautic.activateLiveSearch("#globalSearchInput", "lastGlobalSearchStr", "globalLivecache");
-        }
+        $results.on('click', 'a', () => $modal.modal('hide'));
     }
 
     Mautic.renderCharts(container);
@@ -740,20 +723,15 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
 Mautic.setDynamicContentEditors = function(container) {
     // The editor for dynamic content should only be initialized when the modal is opened due to conflicts and not being able to edit content otherwise
-    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor-dynamic-content').length && Mautic.getActiveBuilderName() === 'legacy') {
-        console.log('[Builder] Using Froala for the Dynamic Content editor (legacy)');
-        mQuery(container + ' textarea.editor-dynamic-content').each(function () {
-            mQuery(this).froalaEditor();
-        });
-    } else if (mQuery(container + ' textarea.editor-dynamic-content').length) {
+    if (mQuery(container + ' textarea.editor-dynamic-content').length) {
         console.log('[Builder] Using CKEditor for the Dynamic Content editor');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             const textarea = mQuery(this);
-            const maxButtons = [ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']
-            let minButtons = ['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline'];
+            const maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'TokenPlugin', 'sourceEditing'];
+            let minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = ['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize'];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
             }
 
             let ckEditorToolbar = minButtons;
@@ -834,21 +812,12 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
-            mQuery('textarea').froalaEditor('destroy');
-        } else {
-            if (ckEditors.size > 0) {
-                ckEditors.forEach(function(value, key, map){
-                    map.get(key).destroy()
-                })
-                ckEditors.clear();
-            }
+        if (ckEditors.size > 0) {
+            ckEditors.forEach(function(value, key, map){
+                map.get(key).destroy()
+            })
+            ckEditors.clear();
         }
-
-        //turn off shuffle events
-        mQuery('html')
-            .off('fa.sidebar.minimize')
-            .off('fa.sidebar.maximize');
 
         mQuery(container + " input[data-toggle='color']").each(function() {
             mQuery(this).minicolors('destroy');
@@ -936,7 +905,7 @@ Mautic.ajaxifyLink = function (el, event) {
 
     var link = mQuery(el).attr('data-menu-link');
     if (link !== undefined && link.charAt(0) != '#') {
-        link = "#" + link;
+        link = "#" + CSS.escape(link);
     }
 
     var method = mQuery(el).attr('data-method');
@@ -953,11 +922,6 @@ Mautic.ajaxifyLink = function (el, event) {
 
     //give an ajaxified link the option of not displaying the global loading bar
     var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
-
-    //close the global search results if opened
-    if (mQuery('#globalSearchContainer').length && mQuery('#globalSearchContainer').hasClass('active')) {
-        Mautic.closeGlobalSearchResults();
-    }
 
     Mautic.loadContent(route, link, method, target, showLoadingBar);
 };
@@ -1478,65 +1442,6 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 };
 
 /**
- * Filters a list based on select value
- *
- * @param el
- */
-Mautic.activateListFilterSelect = function(el) {
-    var filterName       = mQuery(el).attr('name');
-    var isMultiple       = mQuery(el).attr('multiple') ? true : false;
-    var prefixExceptions = mQuery(el).data('prefix-exceptions');
-
-    if (isMultiple && prefixExceptions) {
-        if (typeof Mautic.listFilterValues == 'undefined') {
-            Mautic.listFilterValues = {};
-        }
-
-        // Store values for comparison on change
-        Mautic.listFilterValues[filterName] = mQuery(el).val();
-    }
-
-    mQuery(el).on('change', function() {
-        var filterVal = mQuery(this).val();
-        if (filterVal == null) {
-            filterVal = [];
-        }
-
-        if (prefixExceptions) {
-            var limited = prefixExceptions.split(',');
-
-            if (filterVal.length > 1) {
-                for (var i=0; i<filterVal.length; i++) {
-                    if (mQuery.inArray(filterVal[i], Mautic.listFilterValues[filterName]) == -1) {
-                        var newOption = mQuery(this).find('option[value="' + filterVal[i] + '"]');
-                        var prefix    = mQuery(newOption).parent().data('prefix');
-
-                        if (mQuery.inArray(prefix, limited) != -1) {
-                            mQuery(newOption).siblings().prop('selected', false);
-
-                            filterVal = mQuery(this).val();
-                            mQuery(this).trigger('chosen:updated');
-                        }
-                    }
-                }
-            }
-
-            Mautic.listFilterValues[filterName] = filterVal;
-        }
-
-        var tmpl = mQuery(this).data('tmpl');
-        if (!tmpl) {
-            tmpl = 'list';
-        }
-
-        var filters   = (isMultiple) ? JSON.stringify(filterVal) : filterVal;
-        var request   = window.location.pathname + '?tmpl=' + tmpl + '&' + filterName + '=' + filters;
-
-        Mautic.loadContent(request, '', 'POST', mQuery(this).data('target'));
-    });
-};
-
-/**
  * Converts an input to a color picker
  * @param el
  */
@@ -1780,15 +1685,6 @@ Mautic.activateSortable = function(el) {
 };
 
 /**
- * Close global search results
- */
-Mautic.closeGlobalSearchResults = function () {
-    mQuery('#globalSearchContainer').removeClass('active');
-    mQuery('#globalSearchDropdown').removeClass('open');
-    mQuery('body').off('click.globalsearch');
-};
-
-/**
  * Download a link via iframe
  *
  * @param link
@@ -1824,3 +1720,239 @@ Mautic.processCsvContactExport = function (route) {
         }
     });
 };
+
+/**
+ * Quick Filters
+ * This module handles the quick filtering functionality in Mautic's list views.
+ * Includes initialization, toggling, applying, and resetting.
+ * @namespace Mautic
+ */
+
+/**
+ * Initializes the filter commands by collecting them from the DOM.
+ */
+Mautic.initFilterCommands = function () {
+    const filterElements = document.querySelectorAll('.label[data-filter]');
+    Mautic.filterCommands = Array.from(filterElements).map(function (el) {
+        return el.dataset.filter;
+    });
+
+    // Include select field options as filter commands
+    const selectFields = document.querySelectorAll('.popover-content select');
+
+    selectFields.forEach(function (selectElement) {
+        const options = Array.from(selectElement.options).map(option => option.value);
+        Mautic.filterCommands.push(...options);
+    });
+};
+
+/**
+ * Toggles the active state of a filter label and manages conflicting filters.
+ *
+ * @param {HTMLElement} element
+ */
+Mautic.toggleFilter = function (element) {
+    const filterValue = element.dataset.filter;
+    const conflictGroup = element.dataset.conflictGroup || null;
+
+    // If the filter is in a conflict group, deactivate other filters in the same group
+    if (conflictGroup) {
+        // Get all filters in the same conflict group
+        const filtersInGroup = document.querySelectorAll(`.label[data-conflict-group="${conflictGroup}"]`);
+        filtersInGroup.forEach(function (filterElement) {
+            if (filterElement !== element) {
+                filterElement.classList.remove('active');
+            }
+        });
+    }
+
+    // Toggle active class on the clicked element
+    element.classList.toggle('active');
+};
+
+/**
+ * Applies the selected filters when the "Apply filters" button is clicked.
+ */
+Mautic.applyFilters = function () {
+    const searchInput = document.getElementById('list-search');
+    let currentSearchValue = searchInput.value || '';
+    currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
+
+    const activeFilters = document.querySelectorAll('.label.active');
+    let filterCommands = Array.from(activeFilters).map(function (filterElement) {
+        return filterElement.dataset.filter;
+    });
+
+    const selectFields = document.querySelectorAll('.popover-content select');
+    selectFields.forEach(function (selectElement) {
+        const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
+        filterCommands.push(...selectedOptions);
+    });
+
+    const newSearchValue = (currentSearchValue + ' ' + filterCommands.join(' ')).trim();
+    searchInput.value = newSearchValue;
+
+    // Properly destroy and reinitialize popover
+    const popoverTrigger = mQuery('[data-toggle="popover"]');
+    popoverTrigger.popover('destroy');
+    popoverTrigger.popover({
+        html: true,
+        container: 'body'
+    });
+
+    const enterKeyEvent = new KeyboardEvent('keyup', {
+        key: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true
+    });
+    searchInput.dispatchEvent(enterKeyEvent);
+};
+
+/**
+ * Resets the filters when the "Reset filters" button is clicked.
+ */
+Mautic.resetFilters = function () {
+    const searchInput = document.getElementById('list-search');
+    let currentSearchValue = searchInput.value || '';
+    currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
+    searchInput.value = currentSearchValue.trim();
+
+    const activeFilters = document.querySelectorAll('.label.active');
+    activeFilters.forEach(function (filterElement) {
+        filterElement.classList.remove('active');
+    });
+
+    const selectFields = document.querySelectorAll('.popover-content select');
+    selectFields.forEach(function (selectElement) {
+        selectElement.value = null;
+        if (typeof mQuery !== 'undefined') {
+            mQuery(selectElement).trigger('chosen:updated');
+        }
+    });
+
+    // Properly destroy the popover instead of hiding it
+    const popoverTrigger = mQuery('[data-toggle="popover"]');
+    popoverTrigger.popover('destroy');
+
+    const enterKeyEvent = new KeyboardEvent('keyup', {
+        key: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true
+    });
+    searchInput.dispatchEvent(enterKeyEvent);
+};
+
+/**
+ * Removes existing filter commands from the search input value.
+ *
+ * @param {string} searchValue
+ * @returns {string}
+ */
+Mautic.removeFilterCommands = function (searchValue) {
+    if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
+        Mautic.initFilterCommands();
+    }
+
+    // Escape special characters in filter commands for regex
+    const escapedCommands = Mautic.filterCommands.map(cmd => cmd.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+
+    // Create a regex to match filter commands as whole words
+    const regex = new RegExp('\\b(' + escapedCommands.join('|') + ')\\b', 'g');
+
+    // Remove filter commands and extra spaces
+    return searchValue.replace(regex, '').replace(/\s{2,}/g, ' ').trim();
+};
+
+/**
+ * Parses the search input value and returns an array of active filter commands.
+ *
+ * @returns {Array<string>}
+ */
+Mautic.getActiveFilterCommands = function () {
+    const searchInput = document.getElementById('list-search');
+    if (!searchInput) {
+        return []; // Return an empty array if there's no search input
+    }
+    const searchValue = searchInput.value || '';
+
+    if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
+        Mautic.initFilterCommands();
+    }
+
+    // Escape special characters in filter commands for regex
+    const escapedCommands = Mautic.filterCommands.map(cmd => cmd.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+
+    // Create a regex to match filter commands as whole words
+    const regex = new RegExp('\\b(' + escapedCommands.join('|') + ')\\b', 'g');
+
+    const matches = searchValue.match(regex);
+    return matches ? matches : [];
+};
+
+/**
+ * Initializes the active states of filter labels based on the current search input.
+ *
+ * @param {HTMLElement} popoverElement
+ */
+Mautic.initializePopoverFilters = function (popoverElement) {
+    const activeFilterCommands = Mautic.getActiveFilterCommands();
+
+    // Handle regular filter labels
+    activeFilterCommands.forEach(function (filterCommand) {
+        const label = popoverElement.querySelector(`.label[data-filter="${filterCommand}"]`);
+        if (label) {
+            label.classList.add('active');
+        }
+
+        // Handle select fields
+        const selectFields = popoverElement.querySelectorAll('select');
+        selectFields.forEach(function (selectElement) {
+            // Check if the value matches either the raw value or a category format
+            Array.from(selectElement.options).forEach(function (option) {
+                const isSelected = activeFilterCommands.some(cmd =>
+                    cmd === option.value ||
+                    cmd === `category:${option.value}`
+                );
+                option.selected = isSelected;
+            });
+
+            // Initialize chosen
+            mQuery(selectElement).chosen({
+                width: '100%',
+                allow_single_deselect: true
+            });
+
+            // Update the UI
+            mQuery(selectElement).trigger('chosen:updated');
+        });
+    });
+};
+
+/**
+ * Handles the insertion of the popover and initializes active filter labels.
+ */
+Mautic.handlePopoverInsertion = function () {
+    mQuery(document).on('inserted.bs.popover', '[data-toggle="popover"]', function () {
+        const popoverId = mQuery(this).attr('aria-describedby');
+        if (!popoverId) return;
+
+        const popoverElement = document.getElementById(popoverId);
+        if (!popoverElement) return;
+
+        Mautic.initializePopoverFilters(popoverElement);
+
+        // Initialize Chosen after popover content is inserted
+        mQuery('.popover-content select').chosen({
+            width: '100%',
+            allow_single_deselect: true
+        });
+    });
+};
+
+// Initialize filter commands on page load
+document.addEventListener('DOMContentLoaded', function () {
+    Mautic.initFilterCommands();
+    Mautic.handlePopoverInsertion();
+});

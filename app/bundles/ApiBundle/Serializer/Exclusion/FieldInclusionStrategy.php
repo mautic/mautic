@@ -20,7 +20,7 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
     public function __construct(
         private array $fields,
         $level = 3,
-        private $path = null
+        private $path = null,
     ) {
         $this->level  = (int) $level;
     }

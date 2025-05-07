@@ -18,7 +18,7 @@ class ProcessWebhookQueuesCommand extends Command
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
-        private WebhookModel $webhookModel
+        private WebhookModel $webhookModel,
     ) {
         parent::__construct();
     }

@@ -34,7 +34,7 @@ class FormSubscriber implements EventSubscriberInterface
         protected IpLookupHelper $ipLookupHelper,
         protected LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
-        private DoNotContact $doNotContact
+        private DoNotContact $doNotContact,
     ) {
     }
 
@@ -68,6 +68,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'    => FormSubmitActionPointsChangeType::class,
             'formTheme'   => '@MauticLead/FormTheme/FormActionChangePoints/_formaction_properties_row.html.twig',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'    => '@MauticLead/Action/points.html.twig',
         ]);
 
         $event->addSubmitAction('lead.changelist', [
@@ -76,6 +77,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description' => 'mautic.lead.lead.events.changelist_descr',
             'formType'    => ListActionType::class,
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'    => '@MauticLead/Action/segments.html.twig',
         ]);
 
         $event->addSubmitAction('lead.changetags', [
@@ -85,6 +87,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'          => ModifyLeadTagsType::class,
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
+            'template'          => '@MauticLead/Action/tags.html.twig',
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
@@ -112,6 +115,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description' => 'mautic.lead.lead.events.changecompanyscore_descr',
             'formType'    => CompanyChangeScoreActionType::class,
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'    => '@MauticLead/Action/points.html.twig',
         ]);
     }
 

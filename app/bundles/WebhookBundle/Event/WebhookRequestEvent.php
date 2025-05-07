@@ -13,7 +13,7 @@ class WebhookRequestEvent extends Event
         private Lead $contact,
         private string $url,
         private array $headers,
-        private array $payload
+        private array $payload,
     ) {
     }
 

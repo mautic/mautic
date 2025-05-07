@@ -27,8 +27,8 @@ class StatsApiController extends CommonApiController
     public function listAction(Request $request, UserHelper $userHelper, $table = null, $itemsName = 'stats', $order = [], $where = [], $start = 0, $limit = 100)
     {
         $response = [];
-        $where    = InputHelper::cleanArray(empty($where) ? $request->query->get('where') ?? [] : $where);
-        $order    = InputHelper::cleanArray(empty($order) ? $request->query->get('order') ?? [] : $order);
+        $where    = InputHelper::cleanArray(empty($where) ? $request->query->all()['where'] ?? [] : $where);
+        $order    = InputHelper::cleanArray(empty($order) ? $request->query->all()['order'] ?? [] : $order);
         $start    = (int) $request->query->get('start', $start);
         $limit    = (int) $request->query->get('limit', $limit);
 

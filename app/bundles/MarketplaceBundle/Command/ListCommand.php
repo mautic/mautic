@@ -17,7 +17,7 @@ class ListCommand extends Command
     public const NAME = 'mautic:marketplace:list';
 
     public function __construct(
-        private PluginCollector $pluginCollector
+        private PluginCollector $pluginCollector,
     ) {
         parent::__construct();
     }

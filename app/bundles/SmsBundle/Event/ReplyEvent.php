@@ -19,7 +19,7 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
      */
     public function __construct(
         private Lead $contact,
-        private $message
+        private $message,
     ) {
     }
 

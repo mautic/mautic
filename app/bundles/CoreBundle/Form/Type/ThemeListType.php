@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ThemeListType extends AbstractType
 {
     public function __construct(
-        private ThemeHelperInterface $themeHelper
+        private ThemeHelperInterface $themeHelper,
     ) {
     }
 
@@ -23,8 +23,10 @@ class ThemeListType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices'           => function (Options $options): array {
-                    $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
-                    $themes['mautic_code_mode'] = 'Code Mode';
+                    $themes = $this->themeHelper->getInstalledThemes($options['feature']);
+                    if ($options['include_code_mode']) {
+                        $themes['mautic_code_mode'] = 'Code Mode';
+                    }
 
                     return array_flip($themes);
                 },
@@ -34,15 +36,14 @@ class ThemeListType extends AbstractType
                 'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => false,
                 'required'          => false,
-                'attr'              => [
-                    'class' => 'form-control',
-                ],
+                'attr'              => ['class' => 'form-control'],
                 'feature'           => 'all',
+                'include_code_mode' => true,
             ]
         );
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -25,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class FieldController extends CommonFormController
 {
@@ -36,7 +36,6 @@ class FieldController extends CommonFormController
         private MappedObjectCollectorInterface $mappedObjectCollector,
         private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         ManagerRegistry $doctrine,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -44,12 +43,12 @@ class FieldController extends CommonFormController
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
     ) {
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -57,7 +56,7 @@ class FieldController extends CommonFormController
      *
      * @return Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Environment $twig)
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -158,7 +157,7 @@ class FieldController extends CommonFormController
         } else {
             $closeModal                = false;
             $viewParams['tmpl']        = 'field';
-            $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, '@MauticForm/Builder/field.html.twig', $customParams['formTheme']) : $form->createView();
+            $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, $twig, $customParams['formTheme']) : $form->createView();
             $viewParams['fieldHeader'] = (!empty($customParams)) ? $this->translator->trans($customParams['label']) : $this->translator->transConditional('mautic.core.type.'.$fieldType, 'mautic.form.field.type.'.$fieldType);
         }
 
@@ -219,11 +218,11 @@ class FieldController extends CommonFormController
      *
      * @return Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, Environment $twig, $objectId)
     {
         $session   = $request->getSession();
         $method    = $request->getMethod();
-        $formfield = $request->request->get('formfield') ?? [];
+        $formfield = $request->request->all()['formfield'] ?? [];
         $formId    = 'POST' === $method ? ($formfield['formId'] ?? '') : $request->query->get('formId');
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
@@ -301,7 +300,7 @@ class FieldController extends CommonFormController
                 $viewParams['tmpl'] = 'field';
                 $viewParams['form'] = (isset($customParams['formTheme'])) ? $this->setFormTheme(
                     $form,
-                    '@MauticForm/Builder/field.html.twig',
+                    $twig,
                     $customParams['formTheme']
                 ) : $form->createView();
                 $viewParams['fieldHeader'] = (!empty($customParams))

@@ -12,7 +12,7 @@ use Twig\TwigFunction;
 class SecurityExtension extends AbstractExtension
 {
     public function __construct(
-        private SecurityHelper $securityHelper
+        private SecurityHelper $securityHelper,
     ) {
     }
 

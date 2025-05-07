@@ -7,9 +7,9 @@
 
 {% block content %}
     {% if isIndex %}
-        <div id="page-list-wrapper">
+        <div id="page-list-wrapper" class="panel panel-default">
             <div class="page-list">
-                {{ block('mainContent') }}        
+                {{ block('mainContent') }}
             </div>
         </div>
     {% else %}
@@ -29,7 +29,7 @@
                 <ul class="list-group list-group-tabs">
                     {% for integration in integrations %}
                         <li class="list-group-item{% if loop.index0 is same as(0) %} active{% endif %}" id="tab{{ integration.getName() }}">
-                            <a href="javascript: void(0);" class="list-group-item-text steps" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}');">
+                            <a href="javascript: void(0);" class="list-group-item-heading steps" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}');">
                                 {{ integration.getDisplayName() }}
                             </a>
                         </li>

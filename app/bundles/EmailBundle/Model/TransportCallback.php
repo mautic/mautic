@@ -13,7 +13,7 @@ class TransportCallback
     public function __construct(
         private DoNotContact $dncModel,
         private ContactFinder $finder,
-        private EmailStatModel $emailStatModel
+        private EmailStatModel $emailStatModel,
     ) {
     }
 

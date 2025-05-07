@@ -15,7 +15,7 @@ class ChannelSubscriptionChange extends Event
         private Lead $lead,
         private $channel,
         private int $oldStatus,
-        private int $newStatus
+        private int $newStatus,
     ) {
     }
 

@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CacheProviderTest extends TestCase
@@ -78,8 +77,7 @@ class CacheProviderTest extends TestCase
             ->with('foo.bar')
             ->willReturn($this->adapter);
 
-        $simpleCache = $this->cacheProvider->getSimpleCache();
-        $this->assertInstanceOf(Psr16Cache::class, $simpleCache);
+        $this->cacheProvider->getSimpleCache();
     }
 
     public function testExceptionThrownIfAdaptorNotFoundInContainer(): void

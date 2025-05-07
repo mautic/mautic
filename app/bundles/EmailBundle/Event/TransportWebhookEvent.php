@@ -16,7 +16,7 @@ final class TransportWebhookEvent extends Event
     private ?Response $response = null;
 
     public function __construct(
-        private Request $request
+        private Request $request,
     ) {
     }
 

@@ -16,7 +16,7 @@ class CleanFormSubscriber implements EventSubscriberInterface
      * @param string|mixed[] $masks
      */
     public function __construct(
-        private $masks = 'clean'
+        private $masks = 'clean',
     ) {
     }
 

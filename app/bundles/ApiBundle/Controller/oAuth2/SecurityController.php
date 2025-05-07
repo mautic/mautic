@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class SecurityController extends CommonController
 {
@@ -15,11 +15,11 @@ class SecurityController extends CommonController
         $session = $request->getSession();
 
         // get the login error if there is one
-        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
+        if ($request->attributes->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
         } else {
-            $error = $session->get(Security::AUTHENTICATION_ERROR);
-            $session->remove(Security::AUTHENTICATION_ERROR);
+            $error = $session->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
+            $session->remove(SecurityRequestAttributes::AUTHENTICATION_ERROR);
         }
         if (!empty($error)) {
             if ($error instanceof Exception\BadCredentialsException) {
@@ -39,7 +39,7 @@ class SecurityController extends CommonController
         return $this->render(
             '@MauticApi/Security/login.html.twig',
             [
-                'last_username' => $session->get(Security::LAST_USERNAME),
+                'last_username' => $session->get(SecurityRequestAttributes::LAST_USERNAME),
                 'route'         => 'mautic_oauth2_server_auth_login_check',
             ]
         );

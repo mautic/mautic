@@ -10,6 +10,6 @@ interface JudgementModeInterface
 {
     public static function adjudicate(
         InformationChangeRequestDAO $leftChangeRequest,
-        InformationChangeRequestDAO $rightChangeRequest
+        InformationChangeRequestDAO $rightChangeRequest,
     ): InformationChangeRequestDAO;
 }

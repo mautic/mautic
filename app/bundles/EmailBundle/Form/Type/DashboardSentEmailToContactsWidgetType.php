@@ -56,10 +56,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'email_dashboard_sent_email_to_contacts_widget';
     }

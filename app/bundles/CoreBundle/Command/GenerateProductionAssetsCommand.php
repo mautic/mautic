@@ -25,7 +25,7 @@ class GenerateProductionAssetsCommand extends Command
         private AssetGenerationHelper $assetGenerationHelper,
         private PathsHelper $pathsHelper,
         private TranslatorInterface $translator,
-        private Filesystem $filesystem
+        private Filesystem $filesystem,
     ) {
         parent::__construct();
     }

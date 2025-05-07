@@ -1,0 +1,204 @@
+<mjml>
+  <mj-head>
+    <mj-style inline="inline">
+      p, li {margin:0 !important; padding:0; line-height:1.4em;}
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#F5F5F5">
+    <!-- Header -->
+    <mj-section background-color="#ffffff" padding="20px 0">
+      <mj-column>
+        <mj-image src="{{ getOverridableUrl('images/placeholder-logo.png') }}" width="70px" />
+      </mj-column>
+    </mj-section>
+    <!-- Hero Section -->
+    <mj-section background-url="{{ getAssetUrl('themes/'~template~'/assets/hero-background.png', null, null, true) }}" background-size="cover" background-repeat="no-repeat" background-position="center" padding-top="60px" padding-bottom="60px">
+      <mj-column width="400px">
+        <mj-text color="#ffffff" font-size="42px" font-weight="bold" align="center" padding-bottom="0px">
+          <p>{subject}</p>
+        </mj-text>
+        <mj-text color="#ffffff" align="center" padding-top="0px">
+          <p>Discover the latest updates and enhancements to your Cloud Creative experience.</p>
+        </mj-text>
+        <mj-button href="#" background-color="#1473E6" color="#ffffff" font-size="14px" font-weight="bold" border-radius="24px" padding="12px 24px">
+          <p>Explore now</p>
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <!-- What's New Section -->
+    <mj-section background-color="#ffffff">
+      <mj-column>
+        <mj-spacer></mj-spacer>
+        <mj-text font-size="24px" font-weight="bold" padding-bottom="10px">
+          <p>What's new in Cloud Creative</p>
+        </mj-text>
+        <mj-text font-size="16px">
+          <p>We're constantly improving our tools to help you create at your best. Check out these exciting updates:</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- New Features Cards -->
+    <mj-section background-color="#ffffff">
+      <mj-column width="50%">
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/brush-line.png', null, null, true) }}" width="36px" padding-bottom="0px" align="left" alt="Designer Icon" />
+        <mj-text font-weight="bold" font-size="18px">
+          <p>Cloud Designer</p>
+        </mj-text>
+        <mj-text>
+          <p>New AI-powered selection tools and enhanced neural filters.</p>
+        </mj-text>
+        <mj-button href="#" background-color="transparent" border="3px solid #1473E6" inner-padding="6px 18px" border-radius="20px" color="#1473E6" font-weight="bold" align="left">
+          <p>Learn more</p>
+        </mj-button>
+        <mj-spacer></mj-spacer>
+      </mj-column>
+      <mj-column width="50%">
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/compasses-2-line.png', null, null, true) }}" width="36px" padding-bottom="0px" align="left" alt="Illustrator Icon" />
+        <mj-text font-weight="bold" font-size="18px">
+          <p>Cloud Illustrator</p>
+        </mj-text>
+        <mj-text>
+          <p>Improved 3D effects and new pattern creation tools.</p>
+        </mj-text>
+        <mj-button href="#" background-color="transparent" border="3px solid #1473E6" inner-padding="6px 18px" border-radius="20px" color="#1473E6" font-weight="bold" align="left">
+          <p>Learn more</p>
+        </mj-button>
+        <mj-spacer></mj-spacer>
+      </mj-column>
+    </mj-section>
+
+    <!-- Tutorial Section -->
+    <mj-section background-color="#FAFAFA">
+      <mj-column>
+        <mj-spacer></mj-spacer>
+        <mj-text font-size="24px" font-weight="bold" padding-bottom="10px" align="center">
+          <p>Master new skills</p>
+        </mj-text>
+        <mj-text font-size="16px" align="center">
+          <p>Enhance your creativity with our latest tutorials:</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#FAFAFA">
+      <mj-column>
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/tutorial.png', null, null, true) }}" alt="Tutorial Thumbnail" />
+        <mj-text font-weight="bold" align="center">
+          <p>Create stunning visual effects in Cloud After Effects</p>
+        </mj-text>
+        <mj-button href="#" background-color="transparent" border="3px solid #1473E6" inner-padding="6px 18px" border-radius="20px" color="#1473E6" font-weight="bold">
+          <p>Watch tutorial</p>
+        </mj-button>
+        <mj-spacer></mj-spacer>
+      </mj-column>
+    </mj-section>
+
+    <!-- Cloud Creative Plan Section -->
+    <mj-section background-color="#ffffff">
+      <mj-column>
+        <mj-spacer></mj-spacer>
+        <mj-text font-size="24px" font-weight="bold" padding-bottom="10px" align="center">
+          <p>Upgrade your Cloud Creative plan</p>
+        </mj-text>
+        <mj-text font-size="16px" align="center">
+          <p>Get access to over 20+ creative desktop and mobile apps, including:</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff">
+      <mj-column width="33.33%">
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/brush-line.png', null, null, true) }}" width="48px" alt="Cloud Designer" padding-bottom="10px" />
+        <mj-text align="center">
+          <p>Cloud Designer</p>
+        </mj-text>
+      </mj-column>
+      <mj-column width="33.33%">
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/compasses-2-line.png', null, null, true) }}" width="48px" alt="Cloud Illustrator" padding-bottom="10px" />
+        <mj-text align="center">
+          <p>Cloud Illustrator</p>
+        </mj-text>
+      </mj-column>
+      <mj-column width="33.33%">
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/layout-line.png', null, null, true) }}" width="48px" alt="Cloud Publisher" padding-bottom="10px" />
+        <mj-text align="center">
+          <p>Cloud Publisher</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff">
+      <mj-column>
+        <mj-button href="#" background-color="#1473E6" color="#ffffff" font-size="16px" font-weight="bold" border-radius="24px" padding="12px 24px">
+          <p>Upgrade now</p>
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <!-- Community Spotlight -->
+    <mj-section background-color="#FAFAFA">
+      <mj-column>
+        <mj-spacer></mj-spacer>
+        <mj-text font-size="24px" font-weight="bold" padding-bottom="10px">
+          <p>Community spotlight</p>
+        </mj-text>
+        <mj-text font-size="16px">
+          <p>Check out this amazing work from our Cloud Creative community:</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#FAFAFA">
+      <mj-column width="50%">
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/community-work-1.png', null, null, true) }}" border-radius="12px" alt="Community Work 1" />
+        <mj-text font-weight="bold">
+          <p>"Neon dreams" by Jane Doe</p>
+        </mj-text>
+        <mj-spacer></mj-spacer>
+      </mj-column>
+      <mj-column width="50%">
+        <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/community-work-2.png', null, null, true) }}" border-radius="12px" alt="Community Work 2" />
+        <mj-text font-weight="bold">
+          <p>"Abstract harmony" by John Smith</p>
+        </mj-text>
+        <mj-spacer></mj-spacer>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+	<mj-section padding-top="0" padding-bottom="20px" background-color="#000000">
+	  <mj-column>
+		<mj-spacer height="40px">
+		</mj-spacer>
+		<mj-image src="{{ getOverridableUrl('images/placeholder-logo-inverse.png') }}" width="70px" padding-bottom="0px">
+		</mj-image>
+		<mj-spacer>
+		</mj-spacer>
+		<mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="white">
+		  <p>{brand=name}
+			<br/>11111 Beautiful City, 1212 Nice Street
+			<br/>Brazil
+			<br/>
+		  </p>
+		</mj-text>
+		<mj-spacer>
+		</mj-spacer>
+		<mj-text font-size="11px" align="center" color="#a1a1a1">
+		  <p>Fancy seeing you down here. You’re getting this email because you gave us your email address.
+		  </p>
+		  <p>Want to change how you receive these emails?
+		  </p>
+		</mj-text>
+		<mj-text font-size="11px" align="center" color="#a1a1a1">
+		  <p>
+			<span data-fr-verified="true"><span data-fr-verified="true" class="atwho-inserted">{unsubscribe_text}</span>⁠⁠⁠⁠⁠⁠⁠</span>
+		  </p>
+		</mj-text>
+		<mj-spacer>
+		</mj-spacer>
+	  </mj-column>
+	</mj-section>
+  </mj-body>
+</mjml>

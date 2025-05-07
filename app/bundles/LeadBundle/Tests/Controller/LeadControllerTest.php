@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -29,7 +30,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
@@ -332,17 +332,11 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testExcelIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
-
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getInternalResponse()->getContent();
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, strlen($content) > 10000);
+        $this->assertTrue(strlen($content) > 10000, $content);
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void
@@ -831,6 +825,30 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertCount($companyLimit, $leadCompanies);
     }
 
+    public function testMax100CompaniesShouldBeFetchedOnContactEditAction(): void
+    {
+        $companyLimit = 123;
+        $counter      = 1;
+        while ($companyLimit >= $counter) {
+            $company = new Company();
+            $company->setName('TestCompany'.$counter);
+            $this->em->persist($company);
+            ++$counter;
+        }
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+
+        // Get the select element for companies
+        $companySelect = $crawler->filter('select[name="lead[companies][]"]');
+
+        // Count the number of option elements within the select (- one option that is not a company)
+        $availableOptions = $companySelect->filter('option')->count() - 1;
+
+        // Assert that the number of available options is 100 (or your expected limit)
+        Assert::assertEquals(100, $availableOptions, 'The number of available company options should be limited to 100');
+    }
+
     public function testNonExitingContactIsRedirected(): void
     {
         $this->client->followRedirects(false);
@@ -862,9 +880,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         ];
 
         $uri = "/s/contacts/contactGroupPoints/{$contact->getId()}";
-        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest('GET', $uri);
+        $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
 
         // Get the form HTML element out of the response, fill it in and submit.
         $responseData = json_decode($response->getContent(), true);
@@ -879,9 +897,10 @@ class LeadControllerTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
+        $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
 
         $scores = $contact->getGroupScores();
         $this->assertCount(2, $scores);
@@ -936,14 +955,18 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $payload = [
-            'lead_batch_dnc' => [
-                'reason' => 'Test Reason',
-                'ids'    => json_encode([$contact->getId()]),
-            ],
-        ];
-
-        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDnc', $payload, [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/contacts/batchDnc');
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $form    = $crawler->selectButton('Save')->form();
+        $form->setValues(
+            [
+                'lead_batch_dnc[reason]' => 'Test Reason',
+                'lead_batch_dnc[ids]'    => json_encode([$contact->getId()]),
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $clientResponse = $this->client->getResponse();
 
@@ -975,16 +998,12 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $this->loadFixtures([LoadLeadData::class]);
 
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
-        $content = ob_get_contents();
-        ob_end_clean();
+        $content = $this->client->getInternalResponse()->getContent();
 
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, strlen($content) > 10000);
+        $this->assertTrue(strlen($content) > 10000, $content);
 
         /** @var AuditLog $auditLog */
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([

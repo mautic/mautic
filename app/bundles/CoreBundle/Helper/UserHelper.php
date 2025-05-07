@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class UserHelper
 {
     public function __construct(
-        protected TokenStorageInterface $tokenStorage
+        protected TokenStorageInterface $tokenStorage,
     ) {
     }
 

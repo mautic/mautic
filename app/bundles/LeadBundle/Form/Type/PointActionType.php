@@ -48,10 +48,7 @@ class PointActionType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadpoints_action';
     }

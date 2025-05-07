@@ -15,26 +15,8 @@
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'checkall': 'true',
-                        'target': '#formTable',
-                        'routeBase': 'form',
-                        'templateButtons': {
-                            'delete': permissions['form:forms:deleteown'] or permissions['form:forms:deleteother'],
-                        },
-                        'customButtons': [
-                            {
-                                'confirm': {
-                                    'message': 'mautic.form.confirm_batch_rebuild'|trans,
-                                    'confirmText': 'mautic.form.rebuild'|trans,
-                                    'confirmAction': path('mautic_form_action', {'objectAction': 'batchRebuildHtml'}),
-                                    'iconClass': 'fa ri-fw ri-refresh-line',
-                                    'btnText': 'mautic.form.rebuild'|trans,
-                                    'precheck': 'batchActionPrecheck',
-                                    'confirmCallback': 'executeBatchAction',
-                                },
-                                'primary': true,
-                            },
-                        ],
+                    'checkall': 'true',
+                    'target': '#formTable',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -131,9 +113,10 @@
                                     <span data-toggle="tooltip" title="{{ 'mautic.form.icon_tooltip.campaign_form'|trans }}"><i class="ri-fw ri-megaphone-fill fs-14"></i></span>
                                 {% endif %}
                             </a>
+                            {{ customContent('form.name', _context) }}
                         </div>
                         {% if item.description %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.description|purify }}</small>
                             </div>
                         {% endif %}

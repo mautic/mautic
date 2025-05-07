@@ -12,7 +12,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private Connection $db,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

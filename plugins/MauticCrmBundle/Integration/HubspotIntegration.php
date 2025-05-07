@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -20,14 +21,13 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -41,11 +41,10 @@ class HubspotIntegration extends CrmAbstractIntegration
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
         EntityManager $entityManager,
-        Session $session,
         RequestStack $requestStack,
-        Router $router,
+        RouterInterface $router,
         TranslatorInterface $translator,
-        Logger $logger,
+        LoggerInterface $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,
         CompanyModel $companyModel,
@@ -54,13 +53,13 @@ class HubspotIntegration extends CrmAbstractIntegration
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
         DoNotContact $doNotContact,
-        protected UserHelper $userHelper
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        protected UserHelper $userHelper,
     ) {
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,
             $entityManager,
-            $session,
             $requestStack,
             $router,
             $translator,
@@ -72,7 +71,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             $notificationModel,
             $fieldModel,
             $integrationEntityModel,
-            $doNotContact
+            $doNotContact,
+            $fieldsWithUniqueIdentifier
         );
     }
 
@@ -294,9 +294,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param FormBuilder $builder
-     * @param array       $data
-     * @param string      $formArea
+     * @param FormBuilderInterface $builder
+     * @param mixed[]              $data
+     * @param string               $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {
@@ -389,7 +389,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $config                         = $this->mergeConfigToFeatureSettings();
-                $fields                         = implode('&property=', array_keys($config['leadFields']));
+                $fields                         = implode('&property=', array_keys($config['leadFields'] ?? []));
                 $params['post_append_to_query'] = '&property='.$fields.'&property=lifecyclestage';
                 $params['Count']                = 100;
 
@@ -525,7 +525,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $this->translator->trans(
                             'mautic.stage.import.action.name',
                             [
-                                '%name%' => $this->userHelper->getUser()->getUsername(),
+                                '%name%' => $this->userHelper->getUser()->getUserIdentifier(),
                             ]
                         )
                     );

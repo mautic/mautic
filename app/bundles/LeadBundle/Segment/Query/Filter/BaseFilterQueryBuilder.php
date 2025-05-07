@@ -13,7 +13,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
     public function __construct(
         private RandomParameterName $parameterNameGenerator,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

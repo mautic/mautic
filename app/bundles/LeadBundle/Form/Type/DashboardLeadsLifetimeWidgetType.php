@@ -15,7 +15,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
     public function __construct(
         private ListModel $segmentModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -39,10 +39,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'lead_dashboard_leads_lifetime_widget';
     }

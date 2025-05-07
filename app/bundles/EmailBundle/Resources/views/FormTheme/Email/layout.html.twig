@@ -13,7 +13,22 @@
         </div>
         <div class="col-xs-2">
             {% if 'emailform_dynamicContent_0_content' is not same as id %}
-                <a class="remove-item btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.dwc.delete_new',
+                        variant: 'ghost',
+                        icon_only: true,
+                        icon: 'ri-delete-bin-line',
+                        danger: true,
+                        size: 'xs',
+                        attributes: {
+                            'class': 'remove-item as-end',
+                            'type': 'button'
+                        }
+                    }
+                ]
+            } %}
             {% endif %}
         </div>
     </div>
@@ -52,7 +67,21 @@
             {{ form_errors(form.display) }}
           </div>
           <div class="col-xs-2 col-sm-1">
-              <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
+            {% include '@MauticCore/Helper/button.html.twig' with {
+                buttons: [
+                    {
+                        label: 'mautic.report.report.label.removefilter',
+                        variant: 'ghost',
+                        icon_only: true,
+                        icon: 'ri-delete-bin-line',
+                        danger: true,
+                        size: 'xs',
+                        attributes: {
+                            'class': 'remove-selected pull-right'
+                        }
+                    }
+                ]
+            } %}
           </div>
           {{ form_widget(form.field) }}
           {{ form_widget(form.type) }}
@@ -69,7 +98,7 @@
             </div>
             <div class="col-xs-2">
                 {% if id is not same as 'emailform_dynamicContent_0_filters_0' %}
-                    <a class="remove-item remove-filter btn btn-default text-danger"><i class="ri-delete-bin-line"></i></a>
+                    <a class="remove-item remove-filter btn btn-ghost text-danger"><i class="ri-delete-bin-line"></i></a>
                 {% endif %}
             </div>
         </div>

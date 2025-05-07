@@ -22,7 +22,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         private $headers,
         private $method,
         private $settings,
-        private $authType
+        private $authType,
     ) {
         $this->integration = $integration;
     }

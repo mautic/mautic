@@ -32,7 +32,7 @@ class FormSubscriber implements EventSubscriberInterface
         MailHelper $mailer,
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private LanguageHelper $languageHelper
+        private LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -105,6 +105,7 @@ class FormSubscriber implements EventSubscriberInterface
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
+            'template'          => '@MauticForm/Action/form_email.html.twig',
         ]);
 
         $event->addSubmitAction('form.repost', [

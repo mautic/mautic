@@ -5,6 +5,9 @@ Mautic.formOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
 
+    Mautic.toggleThemeSelectorVisibility();
+    mQuery('#mauticform_renderStyle_0, #mauticform_renderStyle_1').on('change', Mautic.toggleThemeSelectorVisibility);
+
     Mautic.formBuilderNewComponentInit();
     Mautic.iniNewConditionalField();
 
@@ -13,7 +16,7 @@ Mautic.formOnLoad = function (container) {
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
-            items: '.panel',
+            items: '.form-field-wrapper',
             cancel: '',
             helper: function(e, ui) {
                 ui.children().each(function() {
@@ -304,7 +307,7 @@ Mautic.formActionOnLoad = function (container, response) {
             var newField = false;
         } else {
             //append content
-            mQuery(newHtml).appendTo('#mauticforms_actions');
+            mQuery(newHtml).appendTo('#mauticforms_actions .drop-here');
             var newField = true;
         }
         //activate new stuff
@@ -348,7 +351,7 @@ Mautic.formActionOnLoad = function (container, response) {
 Mautic.initHideItemButton = function(container) {
     mQuery(container).find('[data-hide-panel]').click(function(e) {
         e.preventDefault();
-        mQuery(this).closest('.panel,.panel2').hide('fast');
+        mQuery(this).closest('.form-field-wrapper,.form-field-wrapper').hide('fast');
     });
 }
 
@@ -381,4 +384,19 @@ Mautic.selectFormType = function(formType) {
 
     mQuery('.form-type-modal').remove();
     mQuery('.form-type-modal-backdrop').remove();
+};
+
+/**
+ * Toggles theme selection field visibility and manages theme selection
+ */
+Mautic.toggleThemeSelectorVisibility = function () {
+    var selectField = mQuery('#mauticform_template');
+    var chosenContainer = mQuery('#mauticform_template_chosen');
+
+    if (mQuery('#mauticform_renderStyle_0').prop('checked')) {
+        selectField.val('').trigger('chosen:updated');
+        chosenContainer.addClass('chosen-disabled');
+    } else {
+        chosenContainer.removeClass('chosen-disabled');
+    }
 };

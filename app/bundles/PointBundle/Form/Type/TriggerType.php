@@ -25,7 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class TriggerType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security
+        private CorePermissions $security,
     ) {
     }
 
@@ -164,7 +164,7 @@ class TriggerType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pointtrigger';
     }

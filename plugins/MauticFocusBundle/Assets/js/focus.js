@@ -19,15 +19,15 @@ Mautic.focusOnLoad = function () {
             mQuery(this).click(function () {
                 if (mQuery(this).hasClass('active')) {
                     // Deactivate
-                    mQuery(this).removeClass('active btn-primary').addClass('btn-default');
+                    mQuery(this).removeClass('active btn-primary').addClass('btn-ghost');
 
                     mQuery('#websiteCanvas').css('cursor', 'inherit');
                 } else {
                     // Remove active state from all the droppers
-                    mQuery('.btn-dropper').removeClass('active btn-primary').addClass('btn-default');
+                    mQuery('.btn-dropper').removeClass('active btn-primary').addClass('btn-ghost');
 
                     // Activate this dropper
-                    mQuery(this).removeClass('btn-default').addClass('active btn-primary');
+                    mQuery(this).removeClass('btn-ghost').addClass('active btn-primary');
 
                     // Activate the cross hairs for image
                     mQuery('#websiteCanvas').css('cursor', 'crosshair');
@@ -171,17 +171,6 @@ Mautic.focusOnLoad = function () {
         });
 
         Mautic.focusInitViewportSwitcher();
-
-        mQuery('#focus_editor').on('froalaEditor.contentChanged', function (e, editor) {
-            var content = editor.html.get();
-
-            if (content.indexOf('{focus_form}') !== -1) {
-                Mautic.focusUpdatePreview();
-            } else {
-                mQuery('.mf-content').html(content);
-            }
-
-        });
     } else {
         Mautic.initDateRangePicker();
     }
@@ -211,7 +200,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         };
 
         var spinnerLeft = (mQuery(document).width() - 300) / 2;
-        var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+        var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="ri-loader-3-line ri-spin ri-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
     }
 
     // Disable the close button until everything is loaded
@@ -381,11 +370,11 @@ Mautic.closeFocusBuilder = function (el) {
 Mautic.focusInitViewportSwitcher = function () {
     mQuery('.btn-viewport').on('click', function () {
         if (mQuery(this).data('viewport') == 'mobile') {
-            mQuery('.btn-viewport i').removeClass('ri-macbook-line ri-2x').addClass('ri-smartphone-line ri-3x');
+            mQuery('.btn-viewport i').removeClass('ri-macbook-line ri-2x').addClass('ri-smartphone-line ri-2x');
             mQuery(this).data('viewport', 'desktop');
             Mautic.launchFocusBuilder(true);
         } else {
-            mQuery('.btn-viewport i').removeClass('ri-smartphone-line ri-3x').addClass('ri-macbook-line ri-2x');
+            mQuery('.btn-viewport i').removeClass('ri-smartphone-line ri-2x').addClass('ri-macbook-line ri-2x');
             mQuery(this).data('viewport', 'mobile');
             Mautic.launchFocusBuilder(true);
         }

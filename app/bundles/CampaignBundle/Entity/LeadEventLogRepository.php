@@ -71,6 +71,8 @@ class LeadEventLogRepository extends CommonRepository
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,
                     e.description AS event_description,
+                    e.parent_id AS parent_id,
+                    e.decision_path AS decision_path,
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
@@ -83,7 +85,11 @@ class LeadEventLogRepository extends CommonRepository
                     fl.reason as fail_reason
                     '
                       )
-                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+                        ->add('from', [
+                            'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                            'alias' => 'll',
+                            'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'campaign_date_triggered)',
+                        ], true)
                         ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
                         ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
                         ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
@@ -125,7 +131,7 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);
+        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate'], null, 'll.id');
     }
 
     /**
@@ -209,7 +215,7 @@ class LeadEventLogRepository extends CommonRepository
         $all = false,
         \DateTimeInterface $dateFrom = null,
         \DateTimeInterface $dateTo = null,
-        int $eventId = null
+        int $eventId = null,
     ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
 
@@ -637,5 +643,22 @@ SQL;
         while ($deleteEntries) {
             $deleteEntries = $conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount();
         }
+    }
+
+    /**
+     * Check if last lead/event failed.
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function isLastFailed(int $leadId, int $eventId): bool
+    {
+        /** @var LeadEventLog $log */
+        $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
+
+        if (null !== $log && null !== $log->getFailedLog()) {
+            return true;
+        }
+
+        return false;
     }
 }

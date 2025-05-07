@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -76,7 +77,7 @@ class StatRepository extends CommonRepository
         $createdByUserId = null,
         $companyId = null,
         $campaignId = null,
-        $segmentId = null
+        $segmentId = null,
     ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
@@ -491,7 +492,8 @@ class StatRepository extends CommonRepository
             $timestampColumn,
             ['openDetails'],
             ['dateRead', 'dateSent'],
-            $timeToReadParser
+            $timeToReadParser,
+            's.id'
         );
     }
 
@@ -509,7 +511,7 @@ class StatRepository extends CommonRepository
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
-        $results = $query->execute()->fetchAssociative();
+        $results = $query->executeQuery()->fetchAssociative();
 
         if ($results) {
             $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
@@ -526,18 +528,16 @@ class StatRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmails($query, $limit = 10, $offset = 0)
+    public function getMostEmails($query, $limit = 10, $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -628,6 +628,8 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @deprecated to be removed as it is not used anywhere
+     *
      * @return mixed
      */
     public function checkContactsSentEmail($contacts, $emailId)
@@ -642,6 +644,21 @@ class StatRepository extends CommonRepository
             ->setParameter('contacts', $contacts);
 
         return $query->executeQuery()->fetchAssociative();
+    }
+
+    public function checkContactSentEmail(int $contactId, int $emailId): bool
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('1')
+            ->where('s.email_id = :emailId')
+            ->andWhere('s.lead_id = :contactId')
+            ->andWhere('is_failed = 0')
+            ->setParameter('emailId', $emailId)
+            ->setParameter('contactId', $contactId)
+            ->setMaxResults(1);
+
+        return (bool) $query->executeQuery()->fetchOne();
     }
 
     /**

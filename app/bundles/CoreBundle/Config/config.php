@@ -158,7 +158,6 @@ return [
             'mautic.core.service.flashbag' => [
                 'class'     => Mautic\CoreBundle\Service\FlashBag::class,
                 'arguments' => [
-                    '@session',
                     'translator',
                     'request_stack',
                     'mautic.core.model.notification',
@@ -494,7 +493,7 @@ return [
             'mautic.page.helper.factory' => [
                 'class'     => Mautic\CoreBundle\Factory\PageHelperFactory::class,
                 'arguments' => [
-                    'session',
+                    'request_stack',
                     'mautic.helper.core_parameters',
                 ],
             ],
@@ -588,7 +587,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
                     '%kernel.cache_dir%',
-                    'session',
+                    'request_stack',
                     'mautic.helper.paths',
                     'kernel',
                 ],
@@ -770,7 +769,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.helper.paths',
-                    'session',
+                    'request_stack',
                     'mautic.helper.app_version',
                 ],
                 'tag' => 'mautic.update_step',
@@ -904,6 +903,8 @@ return [
         'tmp_path'                        => '%kernel.project_dir%/var/tmp',
         'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
+        'brand_name'                      => 'Your Brand (configurable)',
+        'primary_brand_color'             => '000000',
         'db_driver'                       => 'pdo_mysql',
         'db_host'                         => '127.0.0.1',
         'db_port'                         => 3306,
@@ -1441,7 +1442,6 @@ return [
             ],
         ],
         'composer_updates'                                        => false,
-        'load_froala_assets'                                      => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only'                                      => false,
         Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE  => null,
         'gdpr_user_purge_threshold'                               => 1095, // Minimum no. of days a user has to be inactive to get picked up by `mautic:maintenance:cleanup --gdpr`

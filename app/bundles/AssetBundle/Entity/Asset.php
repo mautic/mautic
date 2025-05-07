@@ -2,54 +2,95 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Asset extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "asset:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "asset:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Asset extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+
     /**
-     * @var int
+     * @var int|null
+     *
+     * @Groups({"asset:read", "download:read", "email:read"})
      */
     private $id;
 
     /**
-     * @var string
+     * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $title;
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $description;
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $storageLocation = 'local';
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $path;
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $remotePath;
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $originalFileName;
 
@@ -89,51 +130,71 @@ class Asset extends FormEntity
 
     /**
      * @var string
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $alias;
 
     /**
      * @var string
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $language = 'en';
 
     /**
      * @var \DateTimeInterface|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $publishDown;
 
     /**
      * @var int
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $downloadCount = 0;
 
     /**
      * @var int
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $uniqueDownloadCount = 0;
 
     /**
      * @var int
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $revision = 1;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      **/
     private $category;
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $extension;
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $mime;
 
@@ -144,11 +205,15 @@ class Asset extends FormEntity
 
     /**
      * @var string|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $downloadUrl;
 
     /**
      * @var bool|null
+     *
+     * @Groups({"asset:read", "asset:write", "download:read", "email:read"})
      */
     private $disallow = true;
 
@@ -216,6 +281,8 @@ class Asset extends FormEntity
         $builder->createField('disallow', 'boolean')
             ->nullable()
             ->build();
+
+        static::addUuidField($builder);
     }
 
     /**
@@ -894,8 +961,8 @@ class Asset extends FormEntity
             $ch = curl_init($this->getRemotePath());
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
             curl_exec($ch);
 
@@ -930,8 +997,8 @@ class Asset extends FormEntity
             $ch = curl_init($this->getRemotePath());
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
             curl_exec($ch);
 
             return curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -945,7 +1012,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Returns Font Awesome icon class based on file type.
+     * Returns icon class based on file type.
      */
     public function getIconClass(): string
     {
@@ -961,7 +1028,7 @@ class Asset extends FormEntity
         // Search for icon name by file extension.
         foreach ($fileTypes as $icon => $extensions) {
             if (in_array($fileType, $extensions)) {
-                return 'ri-file-'.$icon.'-fill';
+                return 'ri-file-'.$icon.'-line';
             }
         }
 
@@ -1018,7 +1085,7 @@ class Asset extends FormEntity
             'audio' => [
                 'mp3',
             ],
-            'archive' => [
+            'zip' => [
                 'zip',
                 'rar',
                 'iso',
@@ -1049,7 +1116,7 @@ class Asset extends FormEntity
                 'htm',
                 'sql',
             ],
-            'powerpoint' => [
+            'ppt' => [
                 'ppt',
                 'pptx',
                 'pptm',
@@ -1164,6 +1231,29 @@ class Asset extends FormEntity
                     ->setTranslationDomain('validators')
                     ->addViolation();
             }
+            $loader           = new ParameterLoader();
+            $parameters       = $loader->getParameterBag();
+            $mimeTypesAllowed = $parameters->get('allowed_mimetypes');
+
+            if (!empty($object->getFileMimeType()) && !in_array($object->getFileMimeType(), $mimeTypesAllowed)) {
+                $context->buildViolation('mautic.asset.asset.error.invalid.mimetype', [
+                    '%fileMimetype%'=> $object->getFileMimeType(),
+                    '%mimetypes%'   => implode(', ', $mimeTypesAllowed),
+                ])->atPath('file')
+                    ->setTranslationDomain('validators')
+                    ->addViolation();
+            }
+
+            $extensionsAllowed = array_keys($mimeTypesAllowed);
+            $fileType          = $object->getExtension();
+            if (null !== $object->getExtension() && !in_array($fileType, $extensionsAllowed)) {
+                $context->buildViolation('mautic.asset.asset.error.file.extension', [
+                    '%fileExtension%'=> $object->getExtension(),
+                    '%extensions%'   => implode(', ', $extensionsAllowed),
+                ])->atPath('file')
+                    ->setTranslationDomain('validators')
+                    ->addViolation();
+            }
 
             // Unset any remote file data
             $object->setRemotePath(null);
@@ -1244,8 +1334,8 @@ class Asset extends FormEntity
                 $ch = curl_init($this->getRemotePath());
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_HEADER, 1);
-                curl_setopt($ch, CURLOPT_NOBODY, 1);
+                curl_setopt($ch, CURLOPT_HEADER, true);
+                curl_setopt($ch, CURLOPT_NOBODY, true);
                 curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
                 curl_exec($ch);

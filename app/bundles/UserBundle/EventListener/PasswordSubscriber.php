@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\EventListener;
 
-use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
-use Mautic\UserBundle\UserEvents;
+use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 final class PasswordSubscriber implements EventSubscriberInterface
 {
@@ -19,16 +20,28 @@ final class PasswordSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION => ['onUserFormAuthentication', 0],
+            CheckPassportEvent::class => ['checkPassport', -100], // After default password checker
         ];
     }
 
-    public function onUserFormAuthentication(AuthenticationEvent $authenticationEvent): void
+    public function checkPassport(CheckPassportEvent $event): void
     {
-        $userPassword = $authenticationEvent->getToken()->getCredentials(); /* @phpstan-ignore-line getCredentials() is deprecated since Symfony 5.4, refactoring needed */
+        $passport = $event->getPassport();
+        if (!$passport->hasBadge(PasswordStrengthBadge::class)) {
+            return;
+        }
 
-        if (!$this->passwordStrengthEstimatorModel->validate($userPassword)) {
+        $badge = $passport->getBadge(PasswordStrengthBadge::class);
+        \assert($badge instanceof PasswordStrengthBadge);
+        $presentedPassword = $badge->getPresentedPassword();
+        if ('' === $presentedPassword) {
+            throw new BadCredentialsException('The presented password cannot be empty.');
+        }
+
+        if (!$this->passwordStrengthEstimatorModel->validate($presentedPassword)) {
             throw new WeakPasswordException();
         }
+
+        $badge->setResolved();
     }
 }

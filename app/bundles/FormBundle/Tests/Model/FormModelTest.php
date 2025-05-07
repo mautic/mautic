@@ -186,7 +186,6 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->setFields($form, $fields);
         $entityFields = $form->getFields()->toArray();
 
-        /** @var Field $newField */
         $newField = $entityFields[array_keys($fields)[0]];
 
         /** @var Field $fileField */
@@ -201,7 +200,6 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         /** @var Field $childField */
         $newChildField = $entityFields[array_keys($fields)[4]];
 
-        $this->assertInstanceOf(Field::class, $newField);
         $this->assertSame('email', $newField->getType());
         $this->assertSame('email', $newField->getAlias());
         $this->assertSame(1, $newField->getOrder());
@@ -461,7 +459,15 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $this->formModel->getEntity(5);
 
-        $this->assertSame($options, $formField->getProperties()['list']['list']);
+        if ('lookup' === $type) {
+            $expectedList = [];
+            foreach ($options as $option) {
+                $expectedList[$option['value']] = $option['label'];
+            }
+            $this->assertSame($expectedList, $formField->getProperties()['list']['list']);
+        } else {
+            $this->assertSame($options, $formField->getProperties()['list']['list']);
+        }
     }
 
     private function standardSyncListStaticFieldTest(string $type): Field

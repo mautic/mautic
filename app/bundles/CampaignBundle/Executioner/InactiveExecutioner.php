@@ -43,7 +43,7 @@ class InactiveExecutioner implements ExecutionerInterface
         private TranslatorInterface $translator,
         private EventScheduler $scheduler,
         private InactiveHelper $helper,
-        private EventExecutioner $executioner
+        private EventExecutioner $executioner,
     ) {
     }
 

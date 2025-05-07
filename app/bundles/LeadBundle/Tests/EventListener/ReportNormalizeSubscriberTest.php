@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\EventListener\ReportNormalizeSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
-use Mautic\ReportBundle\Event\ReportDataEvent;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
 {
@@ -30,29 +32,49 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         $field->setAlias('field1');
         $field->setName($field->getAlias());
         $field->setProperties($properties);
-
         $fieldModel->saveEntity($field);
 
-        $rows = [
-            [
-                'field1' => $value,
-            ],
-        ];
+        $contact = new Lead();
+        $contact->setEmail('contact@example.com');
+        $contact->addUpdatedField('field1', $value);
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        \assert($contactModel instanceof LeadModel);
+        $contactModel->saveEntity($contact);
 
         $report = new Report();
-        $report->setColumns(['l.firstname' => 'l.firstname']);
-        $event      = new ReportDataEvent($report, $rows, [], []);
-        $subscriber = new ReportNormalizeSubscriber($fieldModel);
-        $subscriber->onReportDisplay($event);
+        $report->setName('report subscriber test');
+        $report->setColumns([
+            'l.email',
+            'l.field1',
+        ]);
+        $report->setSource('leads');
+        $this->em->persist($report);
+        $this->em->flush();
+        $this->em->clear();
 
-        $this->assertEquals(
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+
+        // convert html table to php array
+        $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 1);
+
+        $this->assertSame([
+            // no., email, expected
+            ['1', 'contact@example.com', $expected],
+        ], $crawlerReportTable);
+
+        // Test API response
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $result         = json_decode($clientResponse->getContent(), true);
+        $this->assertEquals(1, $result['totalResults']);
+        $this->assertEquals([
             [
-                [
-                    'field1' => $expected,
-                ],
+                'email'  => 'contact@example.com',
+                'field1' => $expected,
             ],
-            $event->getData()
-        );
+        ], $result['data']);
     }
 
     /**
@@ -63,13 +85,22 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         return [
             // Test for boolean custom field
             [
-                'value'      => 'yes',
+                'value'      => '1',
                 'type'       => 'boolean',
                 'properties' => [
                     'yes' => 'True',
                     'no'  => 'False',
                 ],
                 'expected'   => 'True',
+            ],
+            [
+                'value'      => '0',
+                'type'       => 'boolean',
+                'properties' => [
+                    'yes' => 'True',
+                    'no'  => 'False',
+                ],
+                'expected'   => 'False',
             ],
 
             // Test for select custom field
@@ -103,5 +134,13 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
                 'expected'   => 'Option 1|Option 3',
             ],
         ];
+    }
+
+    /**
+     * @return array<int,array<int,mixed>>
+     */
+    private function domTableToArray(Crawler $crawler): array
+    {
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
     }
 }

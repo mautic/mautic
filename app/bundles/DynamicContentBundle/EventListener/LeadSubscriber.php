@@ -15,7 +15,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private StatRepository $statRepository
+        private StatRepository $statRepository,
     ) {
     }
 

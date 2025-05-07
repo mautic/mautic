@@ -12,7 +12,7 @@ class Campaign
 {
     public function __construct(
         private CampaignRepository $campaignRepository,
-        private EmailRepository $emailRepository
+        private EmailRepository $emailRepository,
     ) {
     }
 

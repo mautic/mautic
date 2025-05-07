@@ -9,7 +9,7 @@ class ExecutedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     public function __construct(
         private AbstractEventAccessor $config,
-        private LeadEventLog $log
+        private LeadEventLog $log,
     ) {
     }
 

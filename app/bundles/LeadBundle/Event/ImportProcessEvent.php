@@ -15,7 +15,7 @@ final class ImportProcessEvent extends CommonEvent
     public function __construct(
         public Import $import,
         public LeadEventLog $eventLog,
-        public array $rowData
+        public array $rowData,
     ) {
     }
 

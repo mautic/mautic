@@ -141,7 +141,7 @@ class PageRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('p.language', ":$unique"),
                     $q->expr()->like('p.language', ":$langUnique")
                 );

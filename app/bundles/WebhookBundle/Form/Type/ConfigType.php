@@ -2,7 +2,7 @@
 
 namespace Mautic\WebhookBundle\Form\Type;
 
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -38,8 +38,8 @@ class ConfigType extends AbstractType
 
         $builder->add('events_orderby_dir', ChoiceType::class, [
             'choices' => [
-                'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
-                'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
+                'mautic.webhook.config.event.orderby.chronological'         => Order::Ascending->value,
+                'mautic.webhook.config.event.orderby.reverse.chronological' => Order::Descending->value,
             ],
             'label' => 'mautic.webhook.config.event.orderby',
             'attr'  => [
@@ -63,7 +63,7 @@ class ConfigType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'webhookconfig';
     }

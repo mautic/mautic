@@ -27,7 +27,7 @@ class CompanyType extends AbstractType
     public function __construct(
         private EntityManager $em,
         protected RouterInterface $router,
-        protected TranslatorInterface $translator
+        protected TranslatorInterface $translator,
     ) {
     }
 
@@ -106,7 +106,7 @@ class CompanyType extends AbstractType
                             'name'  => 'merge',
                             'label' => 'mautic.lead.merge',
                             'attr'  => [
-                                'class'       => 'btn btn-default btn-dnd',
+                                'class'       => 'btn btn-ghost btn-dnd',
                                 'icon'        => 'ri-building-2-line',
                                 'data-toggle' => 'ajaxmodal',
                                 'data-target' => '#MauticSharedModal',

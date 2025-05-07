@@ -58,7 +58,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
             'integration_reference_id' => $objectMapping->getIntegrationReferenceId(),
         ];
         Assert::assertSame($expectedData, $this->repository->getInternalObject(...$arguments));
-        Assert::assertSame($expectedData, $this->repository->getInternalObjectWithLock(...$arguments));
+        Assert::assertSame($expectedData, $this->repository->getInternalObjectWithLock(...$arguments)); // @phpstan-ignore argument.unresolvableType (PHPStan bug I guess)
     }
 
     public function testUpdateInternalObjectId(): void

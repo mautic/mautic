@@ -12,10 +12,12 @@ use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -339,7 +341,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $mockRepo = $this->createMock(EntityRepository::class);
         $mockRepo->expects($this->once())
             ->method('find')
-            ->willReturn(0);
+            ->willReturn(new User());
 
         $this->entityManager->expects($this->once())
             ->method('getRepository')
@@ -353,15 +355,17 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'email'     => 'demo@demo.com',
         ];
 
-        $mockValidation = $this->createMock(ConstraintViolation::class);
+        $mockValidation = $this->createMock(ConstraintViolationInterface::class);
         $mockValidation->expects($this->once())
             ->method('getMessage')
             ->willReturn('password');
 
-        $this->validator->expects($this->any())
-            ->method('validate')
+        $this->validator->method('validate')
             ->withConsecutive([$data['email']], [$data['password']])
-            ->willReturnOnConsecutiveCalls([], ['password' => $mockValidation]);
+            ->willReturnOnConsecutiveCalls(
+                new ConstraintViolationList([]),
+                new ConstraintViolationList([$mockValidation])
+            );
 
         $this->assertEquals([0 => 'password'], $this->installer->createAdminUserStep($data));
     }

@@ -10,11 +10,6 @@
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'checkall': 'true',
                             'target'  : '#themeTable',
-                            'langVar' : 'core.theme',
-                            'routeBase': 'themes',
-                            'templateButtons': {
-                                'delete': permissions['core:themes:delete'],
-                            },
                         })}}
 
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -152,11 +147,11 @@
                                 {% endfor %}
                                 {% if item['config']['features'] is defined and item['config']['features'] is not empty %}
                                     {% for feature in item['config']['features'] %}
-                                        
+
                                             <span class="label label-gray">
                                                 {{ ('mautic.core.theme.feature.' ~ feature|e)|trans }}
                                             </span>
-                                        
+
                                     {% endfor %}
                                 {% endif %}
                                 </div>

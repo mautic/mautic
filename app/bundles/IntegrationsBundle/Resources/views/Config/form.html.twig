@@ -50,7 +50,7 @@
     <div class="tab-pane fade{% if 'details-container' == activeTab %} in active{% endif %} bdr-w-0" id="details-container">
         {% if useConfigFormNotes and integrationObject.getAuthorizationNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getAuthorizationNote().getType() }}">
-                {{ integrationObject.getAuthorizationNote().getNote()|trans  }}
+                {{ integrationObject.getAuthorizationNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
         {{ form_row(form.isPublished) }}
@@ -70,14 +70,20 @@
             <div class="row">
                 <div class="col-xs-12 text-center">
                     <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
-                    <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
-                        <i class="ri-key-2-line "></i>
-                        {% if integrationObject.isAuthorized() %}
-                            {{ 'mautic.integration.form.reauthorize'|trans }}
-                        {% else %}
-                            {{ 'mautic.integration.form.authorize'|trans }}
-                        {% endif %}
-                    </button>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                label: integrationObject.isAuthorized() ? 'mautic.integration.form.reauthorize' : 'mautic.integration.form.authorize',
+                                variant: 'success',
+                                icon: 'ri-key-2-line',
+                                attributes: {
+                                    'id': 'integration_details_authButton',
+                                    'name': 'integration_details[authButton]'
+                                },
+                                onclick: 'Mautic.authorizeIntegration()'
+                            }
+                        ]
+                    } %}
                 </div>
             </div>
             {% endif %}
@@ -90,7 +96,7 @@
     <div class="tab-pane fade{% if 'features-container' == activeTab %} in active{% endif %} bdr-w-0" id="features-container">
         {% if useConfigFormNotes and integrationObject.getFeaturesNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getFeaturesNote().getType() }}">
-                {{ integrationObject.getFeaturesNote().getNote()|trans  }}
+                {{ integrationObject.getFeaturesNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
 
@@ -130,7 +136,7 @@
 
         {% if useConfigFormNotes and integrationObject.getFieldMappingNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getFieldMappingNote().getType() }}">
-                {{ integrationObject.getFieldMappingNote().getNote()|trans  }}
+                {{ integrationObject.getFieldMappingNote().getNote()|trans|purify  }}
             </div>
         {% endif %}
 
