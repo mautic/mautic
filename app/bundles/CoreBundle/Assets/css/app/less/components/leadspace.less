@@ -1,0 +1,126 @@
+.leadspace {
+  &[size="super"] .leadspace__section {
+    min-block-size: 640px; // 40rem
+  }
+
+  &[size="tall"] .leadspace__section {
+    min-block-size: 560px; // 35rem
+  }
+
+  &[size="medium"] .leadspace__section {
+    min-block-size: 480px; // 30rem
+  }
+
+  &[size="short"] .leadspace__section {
+    min-block-size: 320px; // 20rem
+  }
+}
+
+@media (min-width: 66rem) {
+  .leadspace .leadspace__section {
+      position: relative;
+      margin-inline: auto;
+      max-inline-size: 99rem;
+  }
+}
+
+.leadspace .leadspace--content__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  block-size: 100%;
+  margin-block-end: 2rem;
+}
+
+@media (min-width: 66rem) {
+  .leadspace[size="super"] .leadspace--content__container {
+      min-block-size: 608px; // 38rem
+  }
+}
+
+.leadspace .background-media {
+  aspect-ratio: 4 / 3;
+  block-size: auto;
+  overflow: clip;
+}
+
+@media (min-width: @screen-md-min) {
+    .leadspace .background-media {
+      position: absolute;
+      aspect-ratio: auto;
+      block-size: 100%;
+      inset: 0px;
+    }
+}
+
+.background-media--container {
+  contain: layout;
+}
+
+.background-media--mobile-position {
+  block-size: 100%;
+}
+
+.background-media--item {
+  block-size: 100%;
+}
+
+.image__img {
+  display: block;
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+.leadspace .leadspace__overlay {
+  margin-inline: auto;
+  padding-inline: 1rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  inline-size: 100%;
+  max-inline-size: none;
+  padding-block-start: 1rem;
+}
+
+@media (min-width: @screen-md-min) {
+  .leadspace .leadspace__overlay {
+    inset-block-start: 0px;
+    padding-block-start: 2rem;
+    padding-inline: 2rem;
+  }
+}
+
+.leadspace .leadspace__gradient {
+  position: absolute;
+  display: block;
+  block-size: 100%;
+  inline-size: calc(100% + 1px);
+  inset-block-start: 0px;
+  inset-inline-start: -1px;
+  padding-block-end: 0px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.leadspace .leadspace__gradient__rect {
+  fill: url(#stops);
+}
+
+.leadspace .leadspace__gradient__stops stop {
+  stop-color: var(--background);
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(1) {
+  stop-opacity: 1;
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(2) {
+  stop-opacity: 1;
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(3) {
+  stop-opacity: 0.75;
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(4) {
+  stop-opacity: 0;
+}
