@@ -1,0 +1,122 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div size="{{ variant }}" gradient-style-scheme="with-gradient" alt="Image alt text"
+            default-src="1e7618ebe43eb5c8ce512709495c42fd.jpg" id="leadspace" class="leadspace" type="left">
+
+            <section part="section" class="leadspace__section d-flex fd-column">
+                <div part="container" class="leadspace__container d-flex fg-1">
+                    <div part="overlay" class="leadspace--gradient leadspace__overlay d-flex pl-32 pr-32 pt-32">
+                        {% if gradient is defined and gradient == 'with-gradient'  %}
+                        <svg part="gradient" viewBox="0 0 100 100" preserveAspectRatio="none"
+                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            class="leadspace__gradient">
+                            <defs>
+                                <linearGradient id="stops" class="leadspace__gradient__stops" gradientTransform="">
+                                    <stop offset="0%"></stop>
+                                    <stop offset="25%"></stop>
+                                    <stop offset="50%"></stop>
+                                    <stop offset="75%"></stop>
+
+                                </linearGradient>
+                            </defs>
+                            <rect width="100" height="100" class="leadspace__gradient__rect"></rect>
+                        </svg>
+                        {% endif %}
+
+                        <div part="content-container" class="leadspace--content__container d-flex fd-column jc-space-between mb-32">
+
+                            <!-- Navigation and heading -->
+                            <div part="row row--content" class="leadspace__row">
+                                {% if tags is defined and tags is iterable %}
+                                {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                tags: tags,
+                                } %}
+                                {% endif %}
+                    
+                                <div type-style="display-01" highlight="" role="heading" aria-level="1" id="leadspace-heading"
+                                    slot="heading">
+                                    <h1 class="type-fluid-display-01">{{ heading|trans }}</h1>
+                                </div>
+                            </div>
+
+                            <!-- Description and action -->
+                            {% if variant != 'short' %}
+                            <div part="content" class="leadspace__content">
+                                {% if description is defined %}
+                                <div part="row row--description" class="leadspace__row row">
+                                    <div class="col-lg-5 col-md-9 col-xs-12">
+                                        <p part="description" id="leadspace__desc" class="leadspace__desc type-heading-03 mt-32 mb-32">
+                                            {{ description|trans }}
+                                        </p>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <div part="action" class="leadspace__action">
+                                    <div slot="action" id="button-group" role="list" style="button-group--item-count: 2;" class="d-flex fd-column fd-row-md">
+                                        {% if buttons is defined %}
+                                        {% set buttons = buttons|map((button, index) => 
+                                            index == 0 
+                                                ? button|merge({'variant': 'primary', 'size': 'lg'}) 
+                                                : button|merge({'variant': 'tertiary', 'size': 'lg'})
+                                        ) %}
+                                        
+                                        {% include '@MauticCore/Helper/button.html.twig' with {
+                                            buttons: buttons
+                                        } %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                           
+                        </div>
+                    </div>
+                    <slot name="image"></slot>
+                </div>
+            </section>
+
+
+
+
+  
+
+            
+            
+            <div slot="image" opacity="100" alt="Image alt text" default-src="1e7618ebe43eb5c8ce512709495c42fd.jpg"
+                id="background-media" gradient-direction="left-to-right" mobile-position="bottom">
+
+                <div part="container" class=" cds--background-media--container cds--background-media--mobile-position cds--background-media--mobile-position--bottom cds--background-media--image ">
+                    <!--?lit$232226281$-->
+                    <div part="item" class="cds--background-media--item" style="opacity:1">
+                      <!--?lit$232226281$-->
+                  <!--?lit$232226281$--> <!--?lit$232226281$-->
+                  <slot></slot>
+                  <picture part="picture">
+                    <!--?lit$232226281$--><!----><source media="(min-width: 1312px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg"><!----><!----><source media="(min-width: 672px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg"><!----><!----><source media="(min-width: 320px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg"><!----><!----><source media="(min-width: 0px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg"><!---->
+                    <img aria-describedby="image-caption long-description" part="image" loading="lazy" class=" c4d--image__img " src="1e7618ebe43eb5c8ce512709495c42fd.jpg" alt="Image alt text">
+                  </picture>
+                  <div id="long-description" part="long-description" class="c4d--image__longdescription">
+                    <slot name="long-description"></slot>
+                  </div>
+                  <slot name="icon"></slot>
+                 
+                  <!--?lit$232226281$-->
+                
+                      <slot></slot>
+                    </div>
+                  </div>
+
+                <div media="(min-width: 1312px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg" id="image-item">
+                </div>
+                <div media="(min-width: 672px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg" id="image-item">
+                </div>
+                <div media="(min-width: 320px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg" id="image-item">
+                </div>
+                <div media="(min-width: 0px)" srcset="1e7618ebe43eb5c8ce512709495c42fd.jpg"
+                    id="c4d-image-item">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
