@@ -10259,24 +10259,21 @@ lesshat-selector { -lh-property: 0 ;
 .nav-tabs-contained + .tab-content .tile.tile-selectable:hover {
   background: var(--layer-hover-02);
 }
-.leadspace[size="super"] .leadspace__section {
-  min-block-size: 640px;
+.leadspace[size="super"] .leadspace--heading,
+.leadspace[size="tall"] .leadspace--heading,
+.leadspace[size="medium"] .leadspace--heading {
+  margin-bottom: 48px;
 }
-.leadspace[size="tall"] .leadspace__section {
-  min-block-size: 560px;
+.leadspace[size="short"] .leadspace--heading {
+  margin-bottom: 32px;
 }
-.leadspace[size="medium"] .leadspace__section {
-  min-block-size: 480px;
-}
-.leadspace[size="short"] .leadspace__section {
-  min-block-size: 320px;
-}
-@media (min-width: 66rem) {
-  .leadspace .leadspace__section {
-    position: relative;
-    margin-inline: auto;
-    max-inline-size: 99rem;
-  }
+.leadspace .leadspace__section {
+  min-block-size: unset;
+  position: relative;
+  margin-inline: auto;
+  max-inline-size: 99rem;
+  display: flex;
+  background-color: var(--cds-background, #ffffff);
 }
 .leadspace .leadspace--content__container {
   display: flex;
@@ -10285,38 +10282,10 @@ lesshat-selector { -lh-property: 0 ;
   block-size: 100%;
   margin-block-end: 2rem;
 }
-@media (min-width: 66rem) {
-  .leadspace[size="super"] .leadspace--content__container {
-    min-block-size: 608px;
-  }
-}
 .leadspace .background-media {
   aspect-ratio: 4 / 3;
   block-size: auto;
   overflow: clip;
-}
-@media (min-width: 992px) {
-  .leadspace .background-media {
-    position: absolute;
-    aspect-ratio: auto;
-    block-size: 100%;
-    inset: 0px;
-  }
-}
-.background-media--container {
-  contain: layout;
-}
-.background-media--mobile-position {
-  block-size: 100%;
-}
-.background-media--item {
-  block-size: 100%;
-}
-.image__img {
-  display: block;
-  block-size: 100%;
-  inline-size: 100%;
-  object-fit: cover;
 }
 .leadspace .leadspace__overlay {
   margin-inline: auto;
@@ -10330,16 +10299,9 @@ lesshat-selector { -lh-property: 0 ;
   max-inline-size: none;
   padding-block-start: 1rem;
 }
-@media (min-width: 992px) {
-  .leadspace .leadspace__overlay {
-    inset-block-start: 0px;
-    padding-block-start: 2rem;
-    padding-inline: 2rem;
-  }
-}
 .leadspace .leadspace__gradient {
   position: absolute;
-  display: block;
+  display: none;
   block-size: 100%;
   inline-size: calc(100% + 1px);
   inset-block-start: 0px;
@@ -10352,7 +10314,7 @@ lesshat-selector { -lh-property: 0 ;
   fill: url(#stops);
 }
 .leadspace .leadspace__gradient__stops stop {
-  stop-color: var(--background);
+  stop-color: var(--stop-color, var(--layer));
 }
 .leadspace .leadspace__gradient__stops stop:nth-of-type(1) {
   stop-opacity: 1;
@@ -10365,6 +10327,84 @@ lesshat-selector { -lh-property: 0 ;
 }
 .leadspace .leadspace__gradient__stops stop:nth-of-type(4) {
   stop-opacity: 0;
+}
+.leadspace[size=tall] .leadspace__section {
+  block-size: auto;
+  min-block-size: 35rem;
+}
+.leadspace__action {
+  --button-group--item-count: 3;
+  display: grid;
+  grid-auto-rows: 1fr;
+  grid-gap: 1rem;
+  grid-template-columns: 1fr;
+}
+.leadspace__container {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+}
+.background-media--container {
+  contain: layout;
+}
+.background-media--mobile-position,
+.background-media--item {
+  block-size: 100%;
+}
+.image__img {
+  display: block;
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+}
+@media (min-width: 1200px) {
+  .leadspace[size="super"] .leadspace--heading {
+    margin-bottom: 96px;
+  }
+  .leadspace[size="super"] .leadspace__section {
+    min-block-size: 640px;
+  }
+  .leadspace[size="tall"] .leadspace--heading {
+    margin-bottom: 96px;
+  }
+  .leadspace[size="tall"] .leadspace__section {
+    min-block-size: 560px;
+  }
+  .leadspace[size="medium"] .leadspace--heading {
+    margin-bottom: 48px;
+  }
+  .leadspace[size="medium"] .leadspace__section {
+    min-block-size: 480px;
+  }
+  .leadspace[size="short"] .leadspace--heading {
+    margin-bottom: 48px;
+  }
+  .leadspace[size="short"] .leadspace__section {
+    min-block-size: 320px;
+  }
+  .leadspace .background-media {
+    position: absolute;
+    aspect-ratio: auto;
+    block-size: 100%;
+    inset: 0px;
+  }
+  .leadspace .leadspace__overlay {
+    inset-block-start: 0px;
+    padding-block-start: 2rem;
+    padding-inline: 2rem;
+  }
+  .leadspace .leadspace__gradient {
+    display: block;
+  }
+  .leadspace .leadspace__section {
+    position: relative;
+    margin-inline: auto;
+    max-inline-size: 99rem;
+  }
+  .leadspace__action {
+    display: inline-grid;
+    grid-template-columns: repeat(var(--button-group--item-count), 1fr);
+  }
 }
 @media (min-width: 992px) {
   .modal-xl {
