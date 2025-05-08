@@ -1,12 +1,12 @@
 <div class="row">
     <div class="col-xs-12">
-        <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" alt="{{ media.alt }}" id="leadspace"
+        <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" {%  if gradientStyleSchemeColor is defined %}style="--context-aware-color:{{ gradientStyleSchemeColor }}"{% endif %} alt="{{ media.alt }}" id="leadspace"
             class="leadspace" type="left">
             <section part="section" class="leadspace__section">
                 <div part="container" class="leadspace__container">
                     <div part="overlay" class="leadspace--gradient leadspace__overlay fg-1 pl-32 pr-32 pt-32">
                         {% if gradientStyleScheme is defined and gradientStyleScheme == 'with-gradient' %}
-                        <svg part="gradient" style="--stop-color:{{ gradientStyleSchemeColor }}" viewBox="0 0 100 100"
+                        <svg part="gradient" viewBox="0 0 100 100"
                             preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
                             xmlns:xlink="http://www.w3.org/1999/xlink" class="leadspace__gradient">
                             <defs>
@@ -29,7 +29,7 @@
                                     <div class="col-xs-12 col-md-9 col-lg-6">
                                         <div type-style="display-01" highlight="" role="heading" aria-level="2"
                                             class="leadspace--heading" slot="heading">
-                                            <div class="{% if variant == 'short' %}type-fluid-heading-05{% else %}type-fluid-display-01{% endif %}">
+                                            <div class="{% if variant == 'short' %}type-fluid-heading-05{% else %}type-fluid-display-01{% endif %}{% if gradientStyleSchemeColor is defined %} leadspace__context-aware-color{% endif %}">
                                                 {{ heading|trans }}
                                             </div>
                                         </div>
@@ -41,7 +41,7 @@
                                 {% if description is defined %}
                                 <div part="row row--description" class="leadspace__row row">
                                     <div class="col-lg-5 col-md-9 col-xs-12">
-                                        <p part="description" id="leadspace__desc" class="leadspace__desc type-heading-03">
+                                        <p part="description" id="leadspace__desc" class="leadspace__desc type-heading-03 {% if gradientStyleSchemeColor is defined %} leadspace__context-aware-color{% endif %}">
                                             {{ description|trans }}
                                         </p>
                                     </div>
@@ -55,7 +55,13 @@
                                         button|merge({
                                             'variant': index == 0 ? 'primary' : 'tertiary',
                                             'size': 'lg',
-                                            'wide': true
+                                            'wide': true,
+                                            'attributes': index == 0 ? 
+                                                (button.attributes is defined ? button.attributes : {}) : 
+                                                (button.attributes is defined ? 
+                                                    button.attributes|merge({'class': (button.attributes.class is defined ? button.attributes.class ~ ' ' : '') ~ (gradientStyleSchemeColor is defined ? 'leadspace__context-aware-color' : '')}) : 
+                                                    {'class': gradientStyleSchemeColor is defined ? 'leadspace__context-aware-color' : ''}
+                                                )
                                         })
                                     ) %}
                                     {% include '@MauticCore/Helper/button.html.twig' with {buttons: buttons} %}
@@ -67,7 +73,7 @@
                     </div>
                     {% if media is defined %}
                     <div id="background-media" gradient-direction="left-to-right" mobile-position="bottom"
-                        class="background-media">
+                        class="background-media {% if gradientStyleScheme is defined and gradientStyleScheme == 'with-gradient' %}background-media--with-gradient{% endif %}">
                         <div part="container"
                             class="background-media--container background-media--mobile-position background-media--mobile-position--bottom background-media--image">
                             <div part="item" class="background-media--item" style="opacity:1">
