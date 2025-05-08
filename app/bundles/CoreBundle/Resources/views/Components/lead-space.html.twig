@@ -2,7 +2,6 @@
     <div class="col-xs-12">
         <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" alt="{{ media.alt }}" id="leadspace"
             class="leadspace" type="left">
-
             <section part="section" class="leadspace__section">
                 <div part="container" class="leadspace__container">
                     <div part="overlay" class="leadspace--gradient leadspace__overlay fg-1 pl-32 pr-32 pt-32">
@@ -21,65 +20,49 @@
                             <rect width="100" height="100" class="leadspace__gradient__rect"></rect>
                         </svg>
                         {% endif %}
-
-                        <div part="content-container"
-                            class="leadspace--content__container d-flex fd-column jc-space-between mb-32">
-
+                        <div part="content-container" class="leadspace--content__container d-flex fd-column jc-space-between mb-32">
                             <div part="row row--content" class="leadspace__row">
                                 {% if tags is defined and tags is iterable %}
-                                {% include '@MauticCore/Helper/_tag.html.twig' with {
-                                tags: tags,
-                                } %}
+                                    {% include '@MauticCore/Helper/_tag.html.twig' with {tags: tags} %}
                                 {% endif %}
                                 <div class="row">
                                     <div class="col-xs-12 col-md-9 col-lg-6">
                                         <div type-style="display-01" highlight="" role="heading" aria-level="2"
                                             class="leadspace--heading" slot="heading">
-                                            <div
-                                                class="{% if variant == 'short' %}type-fluid-heading-05{% else %}type-fluid-display-01{% endif %}">
+                                            <div class="{% if variant == 'short' %}type-fluid-heading-05{% else %}type-fluid-display-01{% endif %}">
                                                 {{ heading|trans }}
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                             {% if variant != 'short' %}
                             <div part="content" class="leadspace__content">
                                 {% if description is defined %}
                                 <div part="row row--description" class="leadspace__row row">
                                     <div class="col-lg-5 col-md-9 col-xs-12">
-                                        <p part="description" id="leadspace__desc"
-                                            class="leadspace__desc type-heading-03">
+                                        <p part="description" id="leadspace__desc" class="leadspace__desc type-heading-03">
                                             {{ description|trans }}
                                         </p>
                                     </div>
                                 </div>
                                 {% endif %}
-
                                 {% if buttons is defined %}
-
                                 <div part="action" id="button-group" role="list"
                                     style="--button-group--item-count: {{ buttons|length }};"
                                     class="leadspace__action mt-32">
-                                    {% set buttons = buttons|map((button, index) =>
-                                    button|merge({
-                                    'variant': index == 0 ? 'primary' : 'tertiary',
-                                    'size': 'lg',
-                                    'wide': true
-                                    })
+                                    {% set buttons = buttons|map((button, index) => 
+                                        button|merge({
+                                            'variant': index == 0 ? 'primary' : 'tertiary',
+                                            'size': 'lg',
+                                            'wide': true
+                                        })
                                     ) %}
-
-                                    {% include '@MauticCore/Helper/button.html.twig' with {
-                                    buttons: buttons
-                                    } %}
+                                    {% include '@MauticCore/Helper/button.html.twig' with {buttons: buttons} %}
                                 </div>
-
                                 {% endif %}
                             </div>
                             {% endif %}
-
                         </div>
                     </div>
                     {% if media is defined %}
@@ -89,8 +72,7 @@
                             class="background-media--container background-media--mobile-position background-media--mobile-position--bottom background-media--image">
                             <div part="item" class="background-media--item" style="opacity:1">
                                 <picture part="picture">
-                                    <img part="image" class="image__img " src="{{ asset(media.src) }}"
-                                        alt="{{ media.alt }}">
+                                    <img part="image" class="image__img" src="{{ asset(media.src) }}" alt="{{ media.alt }}">
                                 </picture>
                             </div>
                         </div>
