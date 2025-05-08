@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-xs-12">
-        <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" {%  if gradientStyleSchemeColor is defined %}style="--context-aware-color:{{ gradientStyleSchemeColor }}"{% endif %} alt="{{ media.alt }}" id="leadspace"
+        <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" {%  if gradientStyleSchemeColor is defined %}style="--context-aware-color:{{ gradientStyleSchemeColor }}"{% endif %} {% if media.alt is defined %}alt="{{ media.alt }}"{% endif %} id="leadspace"
             class="leadspace" type="left">
             <section part="section" class="leadspace__section">
                 <div part="container" class="leadspace__container">
@@ -78,7 +78,7 @@
                             class="background-media--container background-media--mobile-position background-media--mobile-position--bottom background-media--image">
                             <div part="item" class="background-media--item" style="opacity:1">
                                 <picture part="picture">
-                                    <img part="image" class="image__img" src="{{ asset(media.src) }}" alt="{{ media.alt }}">
+                                    <img part="image" class="image__img" src="{{ asset(media.src) }}" {% if media.alt is defined %}alt="{{ media.alt }}"{% endif %}>
                                 </picture>
                             </div>
                         </div>
