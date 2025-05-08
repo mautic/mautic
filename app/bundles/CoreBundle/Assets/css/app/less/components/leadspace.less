@@ -30,6 +30,7 @@
     aspect-ratio: 4 / 3;
     block-size: auto;
     overflow: clip;
+    filter: contrast(1.2);
   }
   
   .leadspace__overlay {
@@ -61,7 +62,7 @@
     }
     
     &__stops stop {
-      stop-color: var(--stop-color, var(--layer));
+      stop-color: var(--context-aware-color, var(--layer));
       
       &:nth-of-type(1) {
         stop-opacity: 1;
@@ -116,6 +117,19 @@
 
 @media (min-width: @screen-lg-min) {
   .leadspace {
+    .leadspace__context-aware-color {
+      color: var(--context-aware-color);
+      border-color: var(--context-aware-color);
+      filter: invert(1) grayscale(1) contrast(5) brightness(30);
+      &,
+      &:active,
+      &:hover,
+      &:focus {
+        background-color: unset;
+        i { color: var(--context-aware-color); }
+      }
+    }
+    
     &[size="super"] {
       .leadspace--heading {
         margin-bottom: 96px;
@@ -157,6 +171,11 @@
       aspect-ratio: auto;
       block-size: 100%;
       inset: 0px;
+    }
+
+    .background-media--with-gradient {
+      inline-size: 75%;
+      margin-left: auto;
     }
     
     .leadspace__overlay {
