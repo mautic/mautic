@@ -35,7 +35,6 @@ class SegmentReportSubscriber implements EventSubscriberInterface
         }
 
         $columns = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-
         $filters = $this->fieldsBuilder->getLeadFilter('l.', 'lll.');
 
         $segmentColumns = [
@@ -47,12 +46,18 @@ class SegmentReportSubscriber implements EventSubscriberInterface
                 'label' => 'mautic.lead.report.segment.manually_added',
                 'type'  => 'bool',
             ],
+            'email_domain' => [
+                'label'    => 'mautic.lead.report.segment.domain',
+                'type'     => 'string',
+                'alias'    => 'email_domain',
+                'formula'  => 'CASE WHEN l.email LIKE \'%@%\' THEN SUBSTRING_INDEX(l.email, \'@\', -1) ELSE \'unknown\' END',
+            ],
         ];
 
         $data = [
             'display_name' => 'mautic.lead.report.segment.membership',
             'columns'      => array_merge($columns, $segmentColumns, $event->getStandardColumns('s.', ['publish_up', 'publish_down'])),
-            'filters'      => $filters,
+            'filters'      => array_merge($filters, ['email_domain' => ['label' => 'mautic.lead.report.segment.domain', 'type' => 'string']]),
         ];
         $event->addTable(self::SEGMENT_MEMBERSHIP, $data, ReportSubscriber::GROUP_CONTACTS);
 
