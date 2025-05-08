@@ -88,6 +88,22 @@
                 copy: 'mautic.lead.list.contentblock.copy',
                 childContainer: childContainer,
             }) }}
+
+            {{ include('@MauticCore/Components/lead-space.html.twig', {
+                variant: 'super',
+                heading: 'mautic.lead.list.contentblock.heading',
+                description: 'Use this area for a short line of copy to support the title',
+                buttons: [
+                    {
+                        'label': 'mautic.lead.list.contentblock.button',
+                        'href': '#',
+                    },
+                    {
+                        'label': 'mautic.lead.list.contentblock.button',
+                        'href': '#',
+                    },
+                ],
+            }) }}
         </div>
     {% endif %}
 {% endif %}
