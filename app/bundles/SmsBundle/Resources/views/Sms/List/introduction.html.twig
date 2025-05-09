@@ -1,0 +1,17 @@
+<div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+{% set childContainer %}
+    <div class="mt-32 mb-md">
+        {% include '@MauticCore/Helper/pictogram.html.twig' with {
+            'pictogram': 'mobile',
+            'size': '80'
+        } %}
+    </div>
+{% endset %}
+
+{{ include('@MauticCore/Components/content-block.html.twig', {
+    heading: 'mautic.sms.contentblock.heading',
+    subheading: 'mautic.sms.contentblock.subheading',
+    copy: 'mautic.sms.contentblock.copy',
+    childContainer: childContainer
+}) }}
+</div>

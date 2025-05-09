@@ -1,0 +1,17 @@
+<div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+    {% set childContainer %}
+        <div class="mt-32 mb-md">
+            {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                'pictogram': 'ibm--automation-platform',
+                'size': '80'
+            } %}
+        </div>
+    {% endset %}
+
+    {{ include('@MauticCore/Components/content-block.html.twig', {
+        heading: 'mautic.campaign.contentblock.heading',
+        subheading: 'mautic.campaign.contentblock.subheading',
+        copy: 'mautic.campaign.contentblock.copy',
+        childContainer: childContainer,
+    }) }}
+</div>

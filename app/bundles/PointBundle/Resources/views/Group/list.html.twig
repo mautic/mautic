@@ -117,23 +117,7 @@
                 {% if searchValue is not empty %}
                     {{ include('@MauticCore/Helper/noresults.html.twig') }}
                 {% else %}
-                    <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
-                        {% set childContainer %}
-                            <div class="mb-md">
-                                {% include '@MauticCore/Helper/pictogram.html.twig' with {
-                                    'pictogram': 'filter-and-group-data',
-                                    'size': '80'
-                                } %}
-                            </div>
-                        {% endset %}
-                
-                        {{ include('@MauticCore/Components/content-block.html.twig', {
-                            heading: 'mautic.point.group.onboarding.heading',
-                            subheading: 'mautic.point.group.onboarding.subheading',
-                            copy: 'mautic.point.group.onboarding.copy',
-                            childContainer: childContainer,
-                        }) }}
-                    </div>
+                    {{ include('@MauticPoint/Group/List/introduction.html.twig') }}
                 {% endif %}
             {% endif %}
         </div>
