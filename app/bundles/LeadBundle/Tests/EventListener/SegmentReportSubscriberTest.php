@@ -99,7 +99,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'alias' => 'manually_added',
                     ],
                     'email_domain' => [
-                        'label'    => null,
+                        'label'    => '',
                         'type'     => 'string',
                         'alias'    => 'email_domain',
                         'formula'  => 'CASE WHEN l.email LIKE \'%@%\' THEN SUBSTRING_INDEX(l.email, \'@\', -1) ELSE \'unknown\' END',
@@ -152,7 +152,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'alias' => 'filter',
                     ],
                     'email_domain' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 'email_domain',
                     ],
