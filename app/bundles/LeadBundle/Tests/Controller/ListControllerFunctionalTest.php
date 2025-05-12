@@ -547,9 +547,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertNull($segmentExistCheck);
     }
 
-    /**
-     * @dataProvider dateFieldProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateFieldProvider')]
     public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class AbstractStepTest extends TestCase
+abstract class AbstractStepTestCase extends TestCase
 {
     /**
      * @var ProgressBar

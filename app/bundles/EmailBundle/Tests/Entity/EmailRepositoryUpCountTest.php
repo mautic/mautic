@@ -69,11 +69,11 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->queryBuilderMock->expects($matcher)->method('set')->willReturnCallback(function (...$parameters) use ($matcher) {
-            if (1 === $matcher->getInvocationCount()) {
+            if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('read_count', $parameters[0]);
                 $this->assertSame('read_count + 2', $parameters[1]);
             }
-            if (2 === $matcher->getInvocationCount()) {
+            if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame('variant_read_count', $parameters[0]);
                 $this->assertSame('variant_read_count + 2', $parameters[1]);
             }

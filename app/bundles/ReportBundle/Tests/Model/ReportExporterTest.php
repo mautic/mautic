@@ -98,13 +98,13 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent $event, string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow) {
                 $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
                 Assert::assertSame($event->getFile(), 'my-path');
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     Assert::assertSame($event->getScheduler(), $scheduler1);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     Assert::assertSame($event->getScheduler(), $scheduler2);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     Assert::assertSame($event->getScheduler(), $schedulerNow);
                 }
 

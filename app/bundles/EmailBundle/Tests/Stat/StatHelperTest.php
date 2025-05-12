@@ -18,15 +18,10 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
         $mockStatRepository = $this->createMock(StatRepository::class);
 
         $emailStatmodel->method('getRepository')->willReturn($mockStatRepository);
-        $matcher = $this->once();
 
-        $mockStatRepository->expects($matcher)
+        $mockStatRepository->expects($this->once())
             ->method('deleteStats')
-            ->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
-                    $this->assertSame(['1', '2', '3', '4', '5'], $parameters[0]);
-                }
-            });
+            ->with([1, 2, 3, 4, 5]);
 
         $statHelper = new StatHelper($emailStatmodel);
 

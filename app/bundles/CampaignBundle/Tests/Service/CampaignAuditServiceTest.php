@@ -67,7 +67,7 @@ class CampaignAuditServiceTest extends TestCase
 
         $this->flashBag->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.notice.campaign.unpublished.email', $parameters[0]);
                     $this->assertSame([
                         '%name%'      => null,
@@ -76,7 +76,7 @@ class CampaignAuditServiceTest extends TestCase
                     ], $parameters[1]);
                     $this->assertSame(FlashBag::LEVEL_WARNING, $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.notice.campaign.unpublished.email', $parameters[0]);
                     $this->assertSame([
                         '%name%'      => null,

@@ -4,13 +4,10 @@ namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(ConfigHelper::class)]
 class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Ensure a mixed numeric/string keyed array is formatted to all string based keys
-     *
-     * @covers \Mautic\ConfigBundle\Mapper\Helper\ConfigHelper::bindNestedConfigValues
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Ensure a mixed numeric/string keyed array is formatted to all string based keys')]
     public function testNestedLocalParametersAreBoundCorrectly(): void
     {
         $defaults = [

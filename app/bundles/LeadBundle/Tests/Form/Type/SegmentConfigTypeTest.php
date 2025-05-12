@@ -62,12 +62,12 @@ final class SegmentConfigTypeTest extends TestCase
 
         $this->formBuilderInterface->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $rebuildParameters, $buildParameters) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('segment_rebuild_time_warning', $parameters[0]);
                     $this->assertSame(NumberType::class, $parameters[1]);
                     $this->assertSame($rebuildParameters, $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('segment_build_time_warning', $parameters[0]);
                     $this->assertSame(NumberType::class, $parameters[1]);
                     $this->assertSame($buildParameters, $parameters[2]);

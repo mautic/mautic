@@ -254,19 +254,10 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('from')
             ->with(MAUTIC_TABLE_PREFIX.'lead_devices', 'dev')
             ->willReturn($queryBuilderMock);
-        $matcher = $this->exactly(1);
 
-        $queryBuilderMock->expects($matcher)->method('leftJoin')
-            ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock) {
-                if (1 === $matcher->getInvocationCount()) {
-                    $this->assertSame('dev', $parameters[0]);
-                    $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);
-                    $this->assertSame('l', $parameters[2]);
-                    $this->assertSame('l.id = dev.lead_id', $parameters[3]);
-                }
-
-                return $queryBuilderMock;
-            });
+        $queryBuilderMock->method('leftJoin')
+            ->with('dev', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dev.lead_id')
+            ->willReturnSelf();
 
         return $queryBuilderMock;
     }

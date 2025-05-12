@@ -55,7 +55,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->formBuilder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('values', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
                     $this->assertSame([
@@ -69,7 +69,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         'required' => false,
                     ], $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('any', $parameters[0]);
                     $this->assertSame(YesNoButtonGroupType::class, $parameters[1]);
                     $this->assertSame([
@@ -80,7 +80,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         'data' => false,
                     ], $parameters[2]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('expr', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
                     $this->assertSame([
@@ -129,7 +129,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder->expects($matcher)->method('add')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher) {
-                    if (1 === $matcher->getInvocationCount()) {
+                    if (1 === $matcher->numberOfInvocations()) {
                         $this->assertSame('values', $parameters[0]);
                         $this->assertSame(ChoiceType::class, $parameters[1]);
                         $this->assertSame([

@@ -30,9 +30,8 @@ class FieldModelTest extends MauticMysqlTestCase
 
     /**
      * @param array<string, mixed[]> $filters
-     *
-     * @dataProvider dataForGetFieldsProperties
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetFieldsProperties')]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         /** @var FieldModel $fieldModel */
@@ -56,7 +55,7 @@ class FieldModelTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, mixed[]>
      */
-    public function dataForGetFieldsProperties(): iterable
+    public static function dataForGetFieldsProperties(): iterable
     {
         // When mautic is installed the total number of fields are 42.
         yield 'All fields' => [

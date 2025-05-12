@@ -28,7 +28,7 @@
     "codeception/codeception": "^5.1",
     "codeception/module-asserts": "^3.0",
     "codeception/module-db": "^3.1",
-    "codeception/module-webdriver": "^3.2",
+    "codeception/module-webdriver": "^4.0",
     "friendsofphp/php-cs-fixer": "^3.14",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
@@ -40,7 +40,7 @@
     "phpstan/phpstan-doctrine": "^2.0",
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
-    "phpunit/phpunit": "^9.5",
+    "phpunit/phpunit": "^10.0",
     "rector/rector": "2.0",
     "symfony/browser-kit": "~6.4.0",
     "symfony/dom-crawler": "~6.4.0",
@@ -154,7 +154,12 @@
     "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=5G bin/phpstan analyse --ansi",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
-    "rector": "bin/rector process --ansi",
+    "rector-code": "bin/rector process --ansi",
+    "rector-tests": "bin/rector process --config=rector-tests.php --ansi",
+    "rector": [
+      "@rector-code",
+      "@rector-tests"
+    ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
     "generate-assets": "bin/console mautic:assets:generate"

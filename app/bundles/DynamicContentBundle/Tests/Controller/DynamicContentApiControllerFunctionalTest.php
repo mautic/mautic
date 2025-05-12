@@ -15,11 +15,8 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
- */
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;

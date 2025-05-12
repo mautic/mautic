@@ -12,11 +12,9 @@ use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterFactory::class)]
 class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory
-     */
     public function testLeadFilter(): void
     {
         $tableSchemaColumnsCache = $this->createMock(TableSchemaColumnsCache::class);

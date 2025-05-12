@@ -56,72 +56,36 @@ class PageTestAbstract extends TestCase
      */
     protected function getPageModel($transliterationEnabled = true)
     {
-        $cookieHelper = $this
-            ->getMockBuilder(CookieHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $cookieHelper = $this->createMock(CookieHelper::class);
 
         $this->router = $this->createMock(Router::class);
 
-        $ipLookupHelper = $this
-            ->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
 
-        $leadModel = $this
-            ->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadModel = $this->createMock(LeadModel::class);
 
-        $leadFieldModel = $this
-            ->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadFieldModel = $this->createMock(FieldModel::class);
 
         $redirectModel = $this->getRedirectModel();
 
-        $companyModel = $this
-            ->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $companyModel = $this->createMock(CompanyModel::class);
 
-        $trackableModel = $this
-            ->getMockBuilder(TrackableModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $trackableModel = $this->createMock(TrackableModel::class);
 
-        $dispatcher = $this
-            ->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->createMock(EventDispatcher::class);
 
-        $translator = $this
-            ->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
-        $pageRepository = $this
-            ->getMockBuilder(PageRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pageRepository = $this->createMock(PageRepository::class);
 
-        $coreParametersHelper = $this
-            ->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $hitRepository = $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
-        $messageBus = $this
-            ->getMockBuilder(MessageBus::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $messageBus = $this->createMock(MessageBus::class);
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
@@ -131,20 +95,16 @@ class PageTestAbstract extends TestCase
         $contactTracker->expects($this
             ->any())
             ->method('getContact')
-            ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
-            );
+            ->willReturn(['id' => self::$mockId, 'name' => self::$mockName]);
 
         $entityManager->expects($this
             ->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [\Mautic\PageBundle\Entity\Page::class, $pageRepository],
-                        [\Mautic\PageBundle\Entity\Hit::class, $hitRepository],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [\Mautic\PageBundle\Entity\Page::class, $pageRepository],
+                    [\Mautic\PageBundle\Entity\Hit::class, $hitRepository],
+                ]
             );
 
         $coreParametersHelper->expects($this->any())
@@ -188,10 +148,7 @@ class PageTestAbstract extends TestCase
      */
     protected function getRedirectModel()
     {
-        $shortener = $this
-            ->getMockBuilder(Shortener::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $shortener = $this->createMock(Shortener::class);
 
         $mockRedirectModel = $this->getMockBuilder(RedirectModel::class)
             ->setConstructorArgs([
@@ -208,8 +165,7 @@ class PageTestAbstract extends TestCase
             ->onlyMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
-        $mockRedirect = $this->getMockBuilder(\Mautic\PageBundle\Entity\Redirect::class)
-            ->getMock();
+        $mockRedirect = $this->createMock(\Mautic\PageBundle\Entity\Redirect::class);
 
         $mockRedirectModel->expects($this->any())
             ->method('createRedirectEntity')

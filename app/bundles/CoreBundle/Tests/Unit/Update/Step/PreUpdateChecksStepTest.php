@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Update\Step\PreUpdateChecksStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PreUpdateChecksStepTest extends AbstractStepTest
+class PreUpdateChecksStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject|TranslatorInterface
