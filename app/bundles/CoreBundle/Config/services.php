@@ -31,6 +31,8 @@ return function (ContainerConfigurator $configurator): void {
         'Helper/Update/PreUpdateChecks',
         'Predis/Replication/StrategyConfig.php',
         'Predis/Replication/MasterOnlyStrategy.php',
+        'ProcessSignal/Exception',
+        'ProcessSignal/ProcessSignalState.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
         'Twig/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',

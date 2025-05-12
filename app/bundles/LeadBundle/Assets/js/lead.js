@@ -335,7 +335,7 @@ Mautic.leadlistOnLoad = function(container, response) {
 
         var bodyOverflow = {};
         mQuery('#' + prefix + '_filters').sortable({
-            items: '.panel',
+            items: '.filter--row',
             helper: function(e, ui) {
                 ui.children().each(function() {
                     if (mQuery(this).is(":visible")) {
@@ -464,7 +464,7 @@ Mautic.reorderSegmentFilters = function() {
         prefix = parent.attr('id');
     }
 
-    const $filters = mQuery('#' + prefix + '_filters .panel');
+    const $filters = mQuery('#' + prefix + '_filters .filter--row');
 
     $filters.each(function() {
         const $filter = mQuery(this);
@@ -546,6 +546,10 @@ Mautic.convertLeadFilterInput = function(el) {
     Mautic.loadFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
+
+        mQuery('#leadlist_filters_' + filterNum + '_properties_filter').on('keypress', function (event) {
+            if ( event.which === 13 ) event.preventDefault();
+        })
 
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
@@ -701,7 +705,7 @@ Mautic.segmentFilter = function() {
     };
 
     const getFilterCount = function() {
-        return mQuery('.selected-filters').children('.segment-filter').length;
+        return mQuery('.selected-filters').children('.filter--row').length;
     };
 
     const showCopyBasedOnGlue = function($filter) {
@@ -782,6 +786,9 @@ Mautic.segmentFilter = function() {
             $glueWrapper.find('select').val('or');
             $glueWrapper.removeClass('hide');
         }
+
+        // Hide the "When" text in the cloned filter
+        $clone.find('.filter--condition-when').addClass('hide');
 
         const $filters = $origin.closest('.selected-filters');
 
@@ -1609,8 +1616,8 @@ Mautic.initUniqueIdentifierFields = function() {
 
 Mautic.updateFilterPositioning = function (el) {
     var $el       = mQuery(el);
-    var $parentEl = $el.closest('.panel');
-    var list      = $parentEl.parent().children('.panel');
+    var $parentEl = $el.closest('.filter--row');
+    var list      = $parentEl.parent().children('.filter--row');
     const isFirst = list.index($parentEl) === 0;
 
     if (isFirst) {

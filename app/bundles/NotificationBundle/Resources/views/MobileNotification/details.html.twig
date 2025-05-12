@@ -15,7 +15,7 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : notification,
@@ -26,6 +26,7 @@
         'targetLabel'     : 'mautic.notification.mobile_notifications'|trans
     }
 ) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': notification.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -126,6 +127,8 @@
                   {{ contacts|raw }}
               </div>
           </div>
+          <!--/ tab-content -->
+
       </div>
       <!--/ left section -->
 
@@ -133,6 +136,21 @@
       <div class="col-md-3 bdr-l height-auto">
           <!-- activity feed -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}, with_context=false) }}
+
+          {% if security.isGranted('lead:leads:viewown') %}
+          {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
+              title: 'mautic.core.useful_links',
+              items: [
+                  {
+                      label: 'mautic.lead.lead.contacts.mobile_sent'|trans,
+                      link: path('mautic_contact_index', {
+                          'search': ('mautic.lead.lead.searchcommand.mobile_sent'|trans) ~ ':' ~ notification.id
+                      }),
+                      icon: 'ri-smartphone-line'
+                  }
+              ]
+          } %}
+          {% endif %}
       </div>
       <!--/ right section -->
       <input name="entityId" id="entityId" type="hidden" value="{{ notification.id|e }}" />

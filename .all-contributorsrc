@@ -1534,6 +1534,52 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "goma101",
+      "name": "Guilherme Gomes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/104629384?v=4",
+      "profile": "https://github.com/goma101",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "pedroasgomes",
+      "name": "Pedro Gomes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/99080726?v=4",
+      "profile": "https://github.com/pedroasgomes",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ElPollero",
+      "name": "ElPollero",
+      "avatar_url": "https://avatars.githubusercontent.com/u/130322184?v=4",
+      "profile": "https://github.com/ElPollero",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "pelbox",
+      "name": "Gagandeep Singh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6670191?v=4",
+      "profile": "http://pelbox.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "PedroLoureiro1",
+      "name": "PedroLoureiro1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/116733776?v=4",
+      "profile": "https://github.com/PedroLoureiro1",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

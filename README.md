@@ -5,7 +5,8 @@
 	<p align="center">
 		Open Source Marketing Automation Software.
     <br />
-    <a href="https://mautic.org"><strong>🌐 mautic.org</strong></a>
+    <a href="https://mautic.org"><strong>🌐 mautic.org</strong></a><br /><br />
+<a href="https://digitalpublicgoods.net/r/mautic"><img src="https://img.shields.io/badge/Verified-DPG%20(Since%20%202024)-3333AB?logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iMzEiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMSAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0LjIwMDggMjEuMzY3OEwxMC4xNzM2IDE4LjAxMjRMMTEuNTIxOSAxNi40MDAzTDEzLjk5MjggMTguNDU5TDE5LjYyNjkgMTIuMjExMUwyMS4xOTA5IDEzLjYxNkwxNC4yMDA4IDIxLjM2NzhaTTI0LjYyNDEgOS4zNTEyN0wyNC44MDcxIDMuMDcyOTdMMTguODgxIDUuMTg2NjJMMTUuMzMxNCAtMi4zMzA4MmUtMDVMMTEuNzgyMSA1LjE4NjYyTDUuODU2MDEgMy4wNzI5N0w2LjAzOTA2IDkuMzUxMjdMMCAxMS4xMTc3TDMuODQ1MjEgMTYuMDg5NUwwIDIxLjA2MTJMNi4wMzkwNiAyMi44Mjc3TDUuODU2MDEgMjkuMTA2TDExLjc4MjEgMjYuOTkyM0wxNS4zMzE0IDMyLjE3OUwxOC44ODEgMjYuOTkyM0wyNC44MDcxIDI5LjEwNkwyNC42MjQxIDIyLjgyNzdMMzAuNjYzMSAyMS4wNjEyTDI2LjgxNzYgMTYuMDg5NUwzMC42NjMxIDExLjExNzdMMjQuNjI0MSA5LjM1MTI3WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==" alt="DPG Badge"></a>
     <br />
     <br />
     <a href="https://mautic.org/start-using-mautic/try-mautic/">Request a trial</a> · <a href="https://www.mautic.org/download">Self-host/download</a> · <a href="https://www.mautic.org/community">Community channels</a>
@@ -340,6 +341,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/1792826181"><img src="https://avatars.githubusercontent.com/u/105675530?v=4?s=100" width="100px;" alt="Jun"/><br /><sub><b>Jun</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=1792826181" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/goma101"><img src="https://avatars.githubusercontent.com/u/104629384?v=4?s=100" width="100px;" alt="Guilherme Gomes"/><br /><sub><b>Guilherme Gomes</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=goma101" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=goma101" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/pedroasgomes"><img src="https://avatars.githubusercontent.com/u/99080726?v=4?s=100" width="100px;" alt="Pedro Gomes"/><br /><sub><b>Pedro Gomes</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pedroasgomes" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ElPollero"><img src="https://avatars.githubusercontent.com/u/130322184?v=4?s=100" width="100px;" alt="ElPollero"/><br /><sub><b>ElPollero</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ElPollero" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://pelbox.com"><img src="https://avatars.githubusercontent.com/u/6670191?v=4?s=100" width="100px;" alt="Gagandeep Singh"/><br /><sub><b>Gagandeep Singh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pelbox" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/PedroLoureiro1"><img src="https://avatars.githubusercontent.com/u/116733776?v=4?s=100" width="100px;" alt="PedroLoureiro1"/><br /><sub><b>PedroLoureiro1</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=PedroLoureiro1" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

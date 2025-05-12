@@ -47,9 +47,8 @@ class PointActionHelperTest extends TestCase
 
     /**
      * @param array<string, mixed> $action
-     *
-     * @dataProvider urlHitsActionDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('urlHitsActionDataProvider')]
     public function testValidateUrlPageHitsAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/ppk');
@@ -71,7 +70,7 @@ class PointActionHelperTest extends TestCase
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function urlHitsActionDataProvider(): array
+    public static function urlHitsActionDataProvider(): array
     {
         return [
             'url_matches_first_hit' => [
@@ -117,9 +116,8 @@ class PointActionHelperTest extends TestCase
 
     /**
      * @param array<string, mixed> $action
-     *
-     * @dataProvider returnWithinActionDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('returnWithinActionDataProvider')]
     public function testValidateUrlReturnWithinAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/test/');
@@ -146,7 +144,7 @@ class PointActionHelperTest extends TestCase
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function returnWithinActionDataProvider(): array
+    public static function returnWithinActionDataProvider(): array
     {
         return [
             'valid_return_within' => [

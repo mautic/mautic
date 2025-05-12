@@ -10,9 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Check that extension is valid
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that extension is valid')]
     public function testValidExtension(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -31,9 +29,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->checkExtension($extension, $allowedExtensions, $extensionErrorMsg);
     }
 
-    /**
-     * @testdox Check that extension is not valid
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check that extension is not valid')]
     public function testInvalidExtension(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -56,9 +52,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->checkExtension($extension, $allowedExtensions, $extensionErrorMsg);
     }
 
-    /**
-     * @testdox Check file size is ok
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check file size is ok')]
     public function testFileSizeIsOk(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -74,9 +68,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg);
     }
 
-    /**
-     * @testdox Check file size bigger than allowed one
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Check file size bigger than allowed one')]
     public function testFileSizeIsBiggerThanAllowed(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -96,9 +88,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg);
     }
 
-    /**
-     * @testdox Test concat message from validators
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test concat message from validators')]
     public function testBadExtensionAndBadSize(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);

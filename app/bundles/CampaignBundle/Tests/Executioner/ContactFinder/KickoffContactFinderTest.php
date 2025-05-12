@@ -25,13 +25,9 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadRepository = $this->createMock(LeadRepository::class);
 
-        $this->campaignRepository = $this->getMockBuilder(CampaignRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->campaignRepository = $this->createMock(CampaignRepository::class);
     }
 
     public function testNoContactsFoundExceptionIsThrown(): void

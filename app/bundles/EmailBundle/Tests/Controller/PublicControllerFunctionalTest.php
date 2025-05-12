@@ -42,13 +42,13 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['show_contact_categories']         = 0;
         $this->configParams['show_contact_preferred_channels'] = 0;
 
-        if (in_array($this->getName(), self::UNSUBSCRIBE_TESTS)) {
+        if (in_array($this->name(), self::UNSUBSCRIBE_TESTS)) {
             $this->configParams['show_contact_preferences'] = 0;
         } else {
             $this->configParams['show_contact_preferences'] = 1;
         }
 
-        if (in_array($this->getName(), ['testContactPreferencesSaveMessage'])) {
+        if (in_array($this->name(), ['testContactPreferencesSaveMessage'])) {
             $this->configParams['show_contact_segments']           = 1;
             $this->configParams['show_contact_frequency']          = 1;
             $this->configParams['show_contact_pause_dates']        = 1;
@@ -249,7 +249,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{contactLocale: string|null, pageLocale: string|null, expectedLocale: string}>
      */
-    public function dataForTestUnsubscribeFormActionWithUsingLandingPage(): iterable
+    public static function dataForTestUnsubscribeFormActionWithUsingLandingPage(): iterable
     {
         yield 'No page or contact locale, default to "en"' => [
             'contactLocale'  => null,
@@ -300,9 +300,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    /**
-     * @dataProvider dataForTestUnsubscribeFormActionWithUsingLandingPage
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestUnsubscribeFormActionWithUsingLandingPage')]
     public function testUnsubscribeFormActionWithUsingLandingPage(?string $contactLocale, ?string $pageLocale, string $expectedLocale): void
     {
         $lead = $this->createLead($contactLocale);

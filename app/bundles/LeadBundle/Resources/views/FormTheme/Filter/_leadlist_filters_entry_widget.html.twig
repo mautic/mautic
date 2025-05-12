@@ -18,13 +18,39 @@
   {% endif %}
 
   {% if isPrototype or fields[object][filterType].label is defined %}
-    <div class="segment-filter panel {% if inGroup %}in-group{% endif %}" id="{{ id }}">
-        <div class="panel-heading pl-0 pr-0">
-            <div class="panel-glue col-sm-2 pl-0{% if '0' == form.vars.name %} hide{% endif %}">
+
+      <div class="filter--row mb-md segment-filter d-flex fw-nowrap ai-center gap-sm {% if inGroup %}in-group{% endif %}" id="{{ id }}">
+            <span class="filter--condition-when fw-sb{% if '0' != form.vars.name %} hide{% endif %}">{{ 'mautic.lead.list.form.glue.when'|trans }}</span>
+            <div class="filter--condition panel-glue d-flex ai-center gap-xs pl-0{% if '0' == form.vars.name %} hide{% endif %}">
+                <i class="ri-draggable ri-1x text-primary"></i>
                 {{ form_widget(form.glue) }}
             </div>
-            <div class="col-sm-2 pr-0 pull-right">
-                <div class="segment-button d-flex jc-end btn-group btn-group-xs pull-right" role="group">
+
+            <div class="filter--panel panel fg-0">
+                <div class="d-flex ai-center fw-nowrap">
+                    <div class="filter--field-name d-flex ai-center pr-lg pl-lg" size="lg">
+                        <i class="object-icon {{ class }}" aria-hidden="true"></i>
+                        <span>{% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+                    </div>
+
+                    <div class="filter--field-operator">
+                        {{ form_widget(form.operator) }}
+                    </div>
+
+                    {% set hasErrors = (form.properties.vars.errors|length > 0) %}
+                    <div class="filter--field-properties {% if hasErrors %}has-error{% endif %}">
+                        <div class="properties-form">
+                            {{ form_widget(form.properties) }}
+                        </div>
+                        {{ form_errors(form.properties) }}
+                    </div>
+                    {{ form_widget(form.field) }}
+                    {{ form_widget(form.type) }}
+                    {{ form_widget(form.object) }}
+                </div>
+            </div>
+            <div class="pr-0 pull-right">
+                <div class="segment-button btn-group d-flex jc-end pull-right" role="group">
                     {% include '@MauticCore/Helper/button.html.twig' with {
                         buttons: [
                             {
@@ -54,27 +80,7 @@
                     } %}
                 </div>
             </div>
-        </div>
-        <div class="panel-body">
-            <div class="col-xs-6 col-sm-3 field-name">
-                <span><i class="object-icon {{ class }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
-            </div>
-
-            <div class="col-xs-6 col-sm-3 padding-none">
-                {{ form_widget(form.operator) }}
-            </div>
-
-            {% set hasErrors = (form.properties.vars.errors|length > 0) %}
-            <div class="col-xs-12 col-sm-6 padding-none {% if hasErrors %}has-error{% endif %}">
-                <div class="properties-form">
-                    {{ form_widget(form.properties) }}
-                </div>
-                {{ form_errors(form.properties) }}
-            </div>
-            {{ form_widget(form.field) }}
-            {{ form_widget(form.type) }}
-            {{ form_widget(form.object) }}
-        </div>
     </div>
+
   {% endif %}
 {% endblock %}

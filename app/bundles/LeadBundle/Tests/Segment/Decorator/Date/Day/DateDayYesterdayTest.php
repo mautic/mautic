@@ -9,11 +9,9 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(DateDayYesterday::class)]
 class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday::getOperator
-     */
     public function testGetOperatorBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -30,9 +28,6 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('like', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday::getOperator
-     */
     public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -53,9 +48,6 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('=<', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday::getParameterValue
-     */
     public function testGetParameterValueBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -78,11 +70,7 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2018-03-01%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday::getParameterValue
-     *
-     * @dataProvider dataProviderForOperatorAndType
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderForOperatorAndType')]
     public function testGetParameterValueSingle(string $operator, string $type, string $expectedDateValue): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -109,7 +97,7 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return mixed[]
      */
-    public function dataProviderForOperatorAndType(): iterable
+    public static function dataProviderForOperatorAndType(): iterable
     {
         yield ['lt', 'date', '2018-03-01'];
         yield ['lte', 'date', '2018-03-01'];

@@ -8,7 +8,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RemoveDeletedFilesStepTest extends AbstractStepTest
+class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject|TranslatorInterface

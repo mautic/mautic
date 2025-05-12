@@ -170,11 +170,11 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         // Validate there are only two integration entities (two contacts with same email)
         $integrationEntities = $this->getPersistedIntegrationEntities();
-        $this->assertEquals(2, count($integrationEntities));
+        $this->assertCount(2, $integrationEntities);
 
         // Validate that there were 4 found entries (two duplciate leads)
         $sfEntities = $this->getReturnedSfEntities();
-        $this->assertEquals(4, count($sfEntities));
+        $this->assertCount(4, $sfEntities);
     }
 
     public function testThatLeadsAreOnlyCreatedIfEnabled(): void
@@ -198,20 +198,18 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $counter = 0;
         $sf->expects($this->exactly(2))
             ->method('getMauticContactsToUpdate')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$counter) {
-                        ++$counter;
+            ->willReturnCallback(
+                function () use (&$counter) {
+                    ++$counter;
 
-                        return true;
-                    }
-                )
+                    return true;
+                }
             );
 
         $sf->method('getSalesforceSyncLimit')
             ->willReturn(50);
 
-        $sf->expects($this->exactly(1))
+        $sf->expects($this->once())
             ->method('getMauticContactsToCreate');
 
         $sf->pushLeads();
@@ -225,26 +223,22 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $counter = 0;
         $sf->expects($this->exactly(2))
             ->method('getMauticContactsToUpdate')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$counter) {
-                        ++$counter;
+            ->willReturnCallback(
+                function () use (&$counter) {
+                    ++$counter;
 
-                        return true;
-                    }
-                )
+                    return true;
+                }
             );
 
         $counter = 0;
         $sf->method('getSalesforceSyncLimit')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$counter) {
-                        ++$counter;
+            ->willReturnCallback(
+                function () use (&$counter) {
+                    ++$counter;
 
-                        return (1 === $counter) ? 100 : 0;
-                    }
-                )
+                    return (1 === $counter) ? 100 : 0;
+                }
             );
 
         $sf->expects($this->never())
@@ -263,7 +257,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         // should be a DateTime
         $lastSync = $lastSyncMethod->invokeArgs($sf, []);
-        $this->assertTrue($lastSync instanceof \DateTime);
+        $this->assertInstanceOf(\DateTime::class, $lastSync);
 
         // Set the override set by fetch command
         define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
@@ -272,7 +266,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $lastSync = $lastSyncMethod->invokeArgs($sf, []);
 
         // should be teh same as MAUTIC_DATE_MODIFIED_OVERRIDE override
-        $this->assertTrue($lastSync instanceof \DateTime);
+        $this->assertInstanceOf(\DateTime::class, $lastSync);
         $this->assertEquals(MAUTIC_DATE_MODIFIED_OVERRIDE, $lastSync->format('U'));
 
         $lead          = new Lead();
@@ -298,7 +292,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         // Should be a DateTime object
         $lead     = new Lead();
         $lastSync = $lastSyncMethod->invokeArgs($sf, [$lead, $params]);
-        $this->assertTrue($lastSync instanceof \DateTime);
+        $this->assertInstanceOf(\DateTime::class, $lastSync);
     }
 
     public function testLeadsAreNotCreatedInSfIfFoundToAlreadyExistAsContacts(): void
@@ -548,7 +542,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
          * Ensures that makeRequest is called with the mautic_timeline__c endpoint.
          * If it is, then we've successfully exported contact activity.
          */
-        $sf->expects($this->exactly(1))
+        $sf->expects($this->once())
             ->method('makeRequest')
             ->with('https://sftest.com/services/data/v38.0/composite/')
             ->willReturnCallback(
@@ -741,9 +735,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     protected function setMocks()
     {
-        $integrationEntityRepository = $this->getMockBuilder(IntegrationEntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
 
         // we need insight into the entities persisted
         $integrationEntityRepository->method('saveEntities')
@@ -771,9 +763,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     return $this->getLeadsToUpdate('Lead', 2, 2, 'Lead')['Lead'];
                 }
             );
-        $auditLogRepo = $this->getMockBuilder(AuditLogRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $auditLogRepo = $this->createMock(AuditLogRepository::class);
 
         $auditLogRepo
             ->expects($this->any())
@@ -979,9 +969,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ]
             );
 
-        $integrationEntityModelMock = $this->getMockBuilder(IntegrationEntityModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integrationEntityModelMock = $this->createMock(IntegrationEntityModel::class);
 
         $integrationEntityModelMock->method('getEntityByIdAndSetSyncDate')
             ->willReturn(new IntegrationEntity());
@@ -1006,68 +994,63 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $this->fieldsWithUniqueIdentifier,
             ])
             ->onlyMethods($this->sfMockMethods)
-            ->addMethods(['findLeadsToCreate'])
             ->getMock();
 
         $sf->method('makeRequest')
-            ->will(
-                $this->returnCallback(
-                    function () use ($maxSfContacts, $maxSfLeads, $updateObject) {
-                        $args = func_get_args();
-                        // Determine what to return by analyzing the URL and query parameters
-                        switch (true) {
-                            case str_contains($args[0], '/query'):
-                                if (isset($args[1]['q']) && str_contains($args[0], 'from CampaignMember')) {
-                                    return [];
-                                } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
-                                    return [
-                                        'totalSize' => 0,
-                                        'records'   => [],
-                                    ];
-                                } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
-                                    return [
-                                        'totalSize' => 0,
-                                        'records'   => [],
-                                    ];
-                                } elseif (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
-                                    return [
-                                        'records' => [
-                                            ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
-                                        ],
-                                    ];
-                                } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
-                                    return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
-                                } else {
-                                    // Extract emails
-                                    $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
-                                    if ($found) {
-                                        $emails = explode("','", $match[1]);
+            ->willReturnCallback(
+                function () use ($maxSfContacts, $maxSfLeads, $updateObject) {
+                    $args = func_get_args();
+                    // Determine what to return by analyzing the URL and query parameters
+                    switch (true) {
+                        case str_contains($args[0], '/query'):
+                            if (isset($args[1]['q']) && str_contains($args[0], 'from CampaignMember')) {
+                                return [];
+                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
+                                return [
+                                    'totalSize' => 0,
+                                    'records'   => [],
+                                ];
+                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
+                                return [
+                                    'totalSize' => 0,
+                                    'records'   => [],
+                                ];
+                            } elseif (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
+                                return [
+                                    'records' => [
+                                        ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
+                                    ],
+                                ];
+                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
+                                return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
+                            } else {
+                                // Extract emails
+                                $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
+                                if ($found) {
+                                    $emails = explode("','", $match[1]);
 
-                                        return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
-                                    } else {
-                                        return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
-                                    }
+                                    return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                                } else {
+                                    return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
                                 }
-                                // no break
-                            case str_contains($args[0], '/composite'):
-                                return $this->getSalesforceCompositeResponse($args[1]);
-                        }
+                            }
+                            // no break
+                        case str_contains($args[0], '/composite'):
+                            return $this->getSalesforceCompositeResponse($args[1]);
                     }
-                )
+                }
             );
 
         /* @var \PHPUnit\Framework\MockObject\MockObject $this->>dispatcher */
         $this->dispatcher->method('dispatch')
-            ->will(
-                $this->returnCallback(
-                    function () use ($sf, $integration) {
-                        $args = func_get_args();
+            ->willReturnCallback(
+                function () use ($sf, $integration) {
+                    $args = func_get_args();
 
-                        return match ($args[0]) {
-                            default => new PluginIntegrationKeyEvent($sf, $integration->getApiKeys()),
-                        };
-                    }
-                )
+                    return match ($args[0]) {
+                        default => new PluginIntegrationKeyEvent($sf, $integration->getApiKeys()),
+                    };
+                }
             );
 
         $sf->setIntegrationSettings($integration);

@@ -146,8 +146,8 @@ class EmailControllerTest extends TestCase
     {
         $this->containerMock->expects($this->once())
             ->method('get')
-            ->withConsecutive(['router'])
-            ->willReturnOnConsecutiveCalls($this->routerMock);
+            ->with('router')
+            ->willReturn($this->routerMock);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -179,8 +179,8 @@ class EmailControllerTest extends TestCase
     {
         $this->containerMock->expects($this->once())
             ->method('get')
-            ->withConsecutive(['router'])
-            ->willReturnOnConsecutiveCalls($this->routerMock);
+            ->with('router')
+            ->willReturn($this->routerMock);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')

@@ -26,12 +26,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
-    /**
-     * @param array<mixed> $data
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public function __construct(?string $name = null)
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct($name);
 
         $this->configParams += [
             'db_driver' => 'pdo_mysql',
@@ -160,7 +157,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $prefix = MAUTIC_TABLE_PREFIX;
 
         foreach ($tables as $table) {
-            $this->connection->executeQuery("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+            $this->connection->executeQuery("TRUNCATE TABLE `{$prefix}{$table}`");
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
         }
     }
 

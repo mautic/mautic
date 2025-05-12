@@ -5,8 +5,9 @@
  * @param container
  */
 Mautic.campaignOnLoad = function (container, response) {
+    Mautic.lazyLoadGraphStatsOnCampaignDetail();
     Mautic.lazyLoadContactListOnCampaignDetail();
-
+    Mautic.lazyLoadEventStatsOnCampaignDetail();
     const $flashes = mQuery('#flashes');
     const $builder = mQuery('#campaign-builder');
     const isCampaignPreview = $builder.hasClass('preview');
@@ -125,8 +126,9 @@ Mautic.campaignOnLoad = function (container, response) {
             $builder.addClass('hide').removeClass('builder-active');
             $flashes.removeClass('alert-offset');
         });
-
-        Mautic.prepareCampaignCanvas();
+        if (!isCampaignPreview) {
+            Mautic.prepareCampaignCanvas();
+        }
 
         // Open the builder directly when saved from the builder
         if (response && response.inBuilder) {
@@ -176,11 +178,9 @@ Mautic.campaignOnLoad = function (container, response) {
                 Mautic.campaignEventInsertOnError(event, jqxhr);
             }
         });
-
-        if (isCampaignPreview) {
-            Mautic.previewCampaignLabels();
-        }
     }
+
+    Mautic.campaignAuditlogOnLoad(container, response);
 };
 
 Mautic.lazyLoadContactListOnCampaignDetail = function() {
@@ -198,6 +198,93 @@ Mautic.lazyLoadContactListOnCampaignDetail = function() {
         Mautic.processPageContent(response);
     });
 };
+
+Mautic.lazyLoadGraphStatsOnCampaignDetail = function() {
+    const containerId = '#campaign-graph-div';
+    const container = mQuery(containerId);
+
+    // Load the contacts only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    const campaignGraphUrl = container.data('target-url');
+    mQuery.get(campaignGraphUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};
+
+Mautic.lazyLoadEventStatsOnCampaignDetail = function()  {
+    const containerId = '#campaign-tab-content';
+    const container = mQuery(containerId);
+
+    if (!container.length) {
+        return;
+    }
+
+    const campaignEventStatUrl = container.data('event-target-url');
+    if ('undefined' == typeof campaignEventStatUrl) {
+        // We don't have to make AJAX requests if the URL is empty
+        return;
+    }
+    mQuery.get(campaignEventStatUrl, function(response) {
+        if (response.errors && 'dev' == mauticEnv) {
+            alert(response.errors[0].message);
+            console.log(response.errors);
+        }
+
+        if (typeof response.preview !== 'undefined')
+        {
+            mQuery('#preview-container').html(response.preview);
+            Mautic.prepareCampaignCanvas();
+            Mautic.previewCampaignLabels();
+        }
+        else
+        {
+            mQuery('#decisions_li').remove();
+            mQuery('#decisions-container').remove();
+        }
+
+        if (typeof response.decisions !== 'undefined')
+        {
+            mQuery('#decisions-container').html(response.decisions);
+        }
+        else
+        {
+            mQuery('#decisions_li').remove();
+            mQuery('#decisions-container').remove();
+        }
+
+        if (typeof response.actions !== 'undefined')
+        {
+            mQuery('#actions-container').html(response.actions);
+        }
+        else
+        {
+            mQuery('#actions_li').remove();
+            mQuery('#actions-container').remove();
+        }
+
+        if (typeof response.conditions !== 'undefined')
+        {
+            mQuery('#conditions-container').html(response.conditions);
+        }
+        else
+        {
+            mQuery('#conditions_li').remove();
+            mQuery('#conditions-container').remove();
+        }
+
+        mQuery('ul#campaign_nav_header_ul li').removeClass('active');
+        mQuery('ul#campaign_nav_header_ul li').eq(0).addClass('active');
+
+        mQuery('div#campaign-tab-content .tab-pane').removeClass('active in');
+        mQuery('div#campaign-tab-content .tab-pane').eq(0).addClass('active in');
+
+    });
+}
+
 
 /**
  * Update chosen tooltips
@@ -2330,3 +2417,52 @@ Mautic.previewCampaignLabels = function() {
         });
     });
 }
+
+Mautic.campaignAuditlogOnLoad = function (container, response) {
+    document.querySelector("#campaign-auditlog a[data-activate-details='all']")?.addEventListener("click", function () {
+        let icon = this.querySelector("span:first-child");
+        let isExpanded = icon.classList.contains("ri-arrow-down-s-line");
+
+        document.querySelectorAll("#campaign-auditlog a[data-activate-details]:not([data-activate-details='all'])").forEach(element => {
+            const detailsId = element.getAttribute("data-activate-details");
+            const detailsElem = document.querySelector(`#auditlog-details-${detailsId}`);
+            const elementIcon = element.querySelector("span:first-child");
+
+            if (detailsElem) {
+                detailsElem.classList.toggle("hide", !isExpanded);
+                element.classList.toggle("active", isExpanded);
+                elementIcon.classList.replace(
+                    isExpanded ? "ri-arrow-down-s-line" : "ri-arrow-up-s-line",
+                    isExpanded ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"
+                );
+            }
+        });
+
+        icon.classList.replace(
+            isExpanded ? "ri-arrow-down-s-line" : "ri-arrow-up-s-line",
+            isExpanded ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"
+        );
+    });
+
+    document.querySelectorAll("#campaign-auditlog a[data-activate-details]:not([data-activate-details='all'])").forEach(anchor => {
+        anchor.addEventListener("click", function () {
+            const detailsId = this.dataset.activateDetails;
+            const icon = this.querySelector("span");
+            const detailsElement = document.getElementById(`auditlog-details-${detailsId}`);
+
+            if (detailsId && detailsElement) {
+                const isActive = this.classList.contains("active");
+
+                if (isActive) {
+                    detailsElement.classList.add("hide");
+                    this.classList.remove("active");
+                    icon.classList.replace("ri-arrow-up-s-line", "ri-arrow-down-s-line");
+                } else {
+                    detailsElement.classList.remove("hide");
+                    this.classList.add("active");
+                    icon.classList.replace("ri-arrow-down-s-line", "ri-arrow-up-s-line");
+                }
+            }
+        });
+    });
+};

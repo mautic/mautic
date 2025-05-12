@@ -159,9 +159,7 @@
                         {%- endif -%}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.category %}
-                        {% set catName, color = (category) ? category.title : 'mautic.core.form.uncategorized'|trans, (category) ? '#' ~ category.color : '#' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg" title="{{ item.dateAdded ? dateToFullConcat(item.dateAdded) : '' }}">
                         {{ item.dateAdded ? dateToDate(item.dateAdded) : '' }}

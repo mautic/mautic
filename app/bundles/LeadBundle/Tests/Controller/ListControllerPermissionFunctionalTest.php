@@ -138,9 +138,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Edit Segment - Segment Test', $crawler->html());
     }
 
-    /**
-     * @dataProvider dataSegmentCloneUserPermissions
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSegmentCloneUserPermissions')]
     public function testSegmentCloningOwnedSegmentWithDifferentPermissions(string $name, int $perm, int $expected): void
     {
         $user = $this->createUser(
@@ -167,7 +165,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, mixed[]>
      */
-    public function dataSegmentCloneUserPermissions(): iterable
+    public static function dataSegmentCloneUserPermissions(): iterable
     {
         yield 'Only create' => ['user-clone-1', 32, Response::HTTP_FORBIDDEN];
         yield 'Create and View own' => ['user-clone-2', 34, Response::HTTP_OK];

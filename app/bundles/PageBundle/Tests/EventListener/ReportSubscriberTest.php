@@ -228,9 +228,7 @@ class ReportSubscriberTest extends TestCase
             ->method('trans')
             ->willReturnArgument(0);
 
-        $mockExprBuilder = $this->getMockBuilder(ExpressionBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockExprBuilder = $this->createMock(ExpressionBuilder::class);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()

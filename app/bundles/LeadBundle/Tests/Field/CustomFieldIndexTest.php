@@ -34,9 +34,8 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test getting unique identifier if object is lead or company.
-     *
-     * @dataProvider getHasMatchingUniqueIdentifierIndexProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getHasMatchingUniqueIdentifierIndexProvider')]
     public function testHasMatchingUniqueIdentifierIndex(string $object, string $field, string $fieldKey): void
     {
         $this->leadFieldMock->expects($this->once())
@@ -58,7 +57,7 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
      *
      * @return iterable<string, string[]>
      */
-    public function getHasMatchingUniqueIdentifierIndexProvider(): iterable
+    public static function getHasMatchingUniqueIdentifierIndexProvider(): iterable
     {
         yield 'Lead object'    => ['lead', 'email', 'email_key'];
         yield 'Company object' => ['company', 'company_email', 'company_email_key'];

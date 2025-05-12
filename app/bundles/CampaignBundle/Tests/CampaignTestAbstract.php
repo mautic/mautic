@@ -29,30 +29,21 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
      */
     protected function initCampaignModel()
     {
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
-        $security = $this->getMockBuilder(CorePermissions::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $security = $this->createMock(CorePermissions::class);
 
         $security->expects($this->any())
             ->method('isGranted')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $userHelper = $this->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userHelper = $this->createMock(UserHelper::class);
 
-        $formRepository = $this->getMockBuilder(FormRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formRepository = $this->createMock(FormRepository::class);
 
         $formRepository->expects($this->any())
             ->method('getFormList')
-            ->will($this->returnValue([['id' => self::$mockId, 'name' => self::$mockName]]));
+            ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
 
         $leadListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
@@ -61,7 +52,7 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 
         $leadListModel->expects($this->any())
             ->method('getUserLists')
-            ->will($this->returnValue([['id' => self::$mockId, 'name' => self::$mockName]]));
+            ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
 
         $formModel = $this->getMockBuilder(FormModel::class)
             ->disableOriginalConstructor()
@@ -70,7 +61,7 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 
         $formModel->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($formRepository));
+            ->willReturn($formRepository);
 
         $eventCollector    = $this->createMock(EventCollector::class);
         $membershipBuilder = $this->createMock(MembershipBuilder::class);

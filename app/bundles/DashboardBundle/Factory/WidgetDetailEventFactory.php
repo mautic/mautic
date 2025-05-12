@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Factory;
 
-use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -17,7 +17,7 @@ class WidgetDetailEventFactory
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private CacheProvider $cacheProvider,
+        private CacheProviderTagAwareInterface $cacheProvider,
         private CorePermissions $corePermissions,
         private UserHelper $userHelper,
         private CoreParametersHelper $coreParametersHelper,

@@ -4,12 +4,9 @@ namespace Mautic\LeadBundle\Tests\Segment\IntegrationCampaign;
 
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(IntegrationCampaignParts::class)]
 class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId
-     */
     public function testConnectwise(): void
     {
         $field             = 'Connectwise::283';
@@ -19,10 +16,6 @@ class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('283', $doNotContactParts->getCampaignId());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId
-     */
     public function testSalesforceExplicit(): void
     {
         $field             = 'Salesforce::22';
@@ -32,10 +25,6 @@ class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('22', $doNotContactParts->getCampaignId());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId
-     */
     public function testSalesforceDefault(): void
     {
         $field             = '44';

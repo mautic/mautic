@@ -3,7 +3,7 @@
 namespace Mautic\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
@@ -45,7 +45,7 @@ class DashboardModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private CacheProviderInterface $cacheProvider,
+        private CacheProviderTagAwareInterface $cacheProvider,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

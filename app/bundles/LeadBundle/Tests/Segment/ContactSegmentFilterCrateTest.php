@@ -4,11 +4,9 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterCrate::class)]
 class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testEmptyFilter(): void
     {
         $filter = [];
@@ -26,9 +24,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testDateIdentifiedFilter(): void
     {
         $filter = [
@@ -54,9 +49,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testDateFilter(): void
     {
         $filter = [
@@ -82,9 +74,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testBooleanFilter(): void
     {
         $filter = [
@@ -101,9 +90,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($contactSegmentFilterCrate->filterValueDoNotNeedAdjustment());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testNumericFilter(): void
     {
         $filter = [
@@ -120,9 +106,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($contactSegmentFilterCrate->filterValueDoNotNeedAdjustment());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testCompanyTypeFilter(): void
     {
         $filter = [
@@ -135,9 +118,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($contactSegmentFilterCrate->isCompanyType());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testMultiselectFilter(): void
     {
         $filter = [
@@ -163,9 +143,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testNotMultiselectFilter(): void
     {
         $filter = [
@@ -191,9 +168,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testOldEqualInsteadOfInOperator(): void
     {
         $filter = [
@@ -219,11 +193,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     *
-     * @dataProvider specialFieldsToConvertToEmptyProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
     public function testSpecialFieldsToConvertToNotEmpty($field): void
     {
         $filter = [
@@ -249,11 +219,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     *
-     * @dataProvider specialFieldsToConvertToEmptyProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
     public function testSpecialFieldsToConvertToEmpty($field): void
     {
         $filter = [
@@ -289,9 +255,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
-     */
     public function testBehaviorsTypeFilter(): void
     {
         $filter = [

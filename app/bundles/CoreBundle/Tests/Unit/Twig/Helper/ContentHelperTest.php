@@ -15,13 +15,9 @@ class ContentHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $dispatcherMock = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcherMock = $this->createMock(EventDispatcherInterface::class);
 
-        $delegationMock = $this->getMockBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $delegationMock = $this->createMock(Environment::class);
 
         $this->contentHelper = new ContentHelper($delegationMock, $dispatcherMock);
     }

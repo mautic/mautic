@@ -64,7 +64,7 @@ class UserListType extends AbstractType
         );
 
         foreach ($users as $user) {
-            $this->choices[$user->getName(true)] = $user->getId();
+            $this->choices[$user->getName(true).' ('.$user->getId().')'] = $user->getId();
         }
 
         // sort by user name

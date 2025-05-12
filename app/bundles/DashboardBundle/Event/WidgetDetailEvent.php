@@ -2,7 +2,7 @@
 
 namespace Mautic\DashboardBundle\Event;
 
-use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -38,7 +38,7 @@ class WidgetDetailEvent extends CommonEvent
 
     private bool $isPreview = false;
 
-    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProvider $cacheProvider = null)
+    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProviderTagAwareInterface $cacheProvider = null)
     {
         $this->startTime = microtime(true);
         $this->setWidget($widget);

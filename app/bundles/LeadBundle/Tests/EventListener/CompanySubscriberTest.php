@@ -50,7 +50,7 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
-            ->will($this->returnValue($ip));
+            ->willReturn($ip);
 
         $auditLogModel = $this->createMock(AuditLogModel::class);
         $auditLogModel->expects($this->once())
@@ -63,12 +63,12 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $company->deletedId = $companyId;
         $company->expects($this->once())
             ->method('getPrimaryIdentifier')
-            ->will($this->returnValue($companyName));
+            ->willReturn($companyName);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
             ->method('getCompany')
-            ->will($this->returnValue($company));
+            ->willReturn($company);
 
         $subscriber->onCompanyDelete($event);
     }
@@ -96,7 +96,7 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
-            ->will($this->returnValue($ip));
+            ->willReturn($ip);
 
         $auditLogModel = $this->createMock(AuditLogModel::class);
         $auditLogModel->expects($this->once())
@@ -108,18 +108,18 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $company = $this->createMock(Company::class);
         $company->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue($companyId));
+            ->willReturn($companyId);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
             ->method('getCompany')
-            ->will($this->returnValue($company));
+            ->willReturn($company);
         $event->expects($this->once())
             ->method('getChanges')
-            ->will($this->returnValue($changes));
+            ->willReturn($changes);
         $event->expects($this->once())
             ->method('isNew')
-            ->will($this->returnValue($isNew));
+            ->willReturn($isNew);
 
         $subscriber->onCompanyPostSave($event);
     }

@@ -98,7 +98,7 @@
                         {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'page.page'}) }}
                         <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                             {{ item.title }} ({{ item.alias }})
-                            {% if item.isVariant or item.isTranslation or item.isPreferenceCenter %}
+                            {% if item.isVariant or item.isTranslation or item.isPreferenceCenter or pageConfig.isDraftEnabled %}
                                 <span>
                                     {% if item.isVariant %}
                                         <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
@@ -115,16 +115,18 @@
                                             <i class="ri-settings-5-line"></i>
                                         </span>
                                     {% endif %}
+                                    {% if pageConfig.isDraftEnabled and item.hasDraft %}
+                                        <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                    <i class="fa fa-fw fa-file"></i>
+                                </span>
+                                    {% endif %}
                                 </span>
                             {% endif %}
                         </a>
                         {{ customContent('page.name', _context) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.category %}
-                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
-                        {% set color = category ? '#' ~ category.color : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.hits }}</td>
                     <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">

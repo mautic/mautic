@@ -36,11 +36,10 @@ JSON;
     }
 
     /**
-     * @dataProvider patchProvider
-     *
      * @param mixed[] $payload
      * @param mixed[] $expectedResponsePayload
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('patchProvider')]
     public function testEditMessageWithPatch(array $payload, array $expectedResponsePayload): void
     {
         $channel = new Channel();

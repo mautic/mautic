@@ -31,12 +31,12 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         $pathHelperMock = $this->createMock(PathsHelper::class);
 
         $packagesMock->method('getUrl')
-            ->will($this->returnCallback(function (string $path) {
+            ->willReturnCallback(function (string $path) {
                 $packageName = $version = null;
                 $absolute    = $ignorePrefix = false;
 
                 return "{$path}/{$packageName}/{$version}/{$absolute}/{$ignorePrefix}}";
-            }));
+            });
 
         $assetsHelper = new AssetsHelper($packagesMock);
         $pathHelperMock->method('getSystemPath')->willReturn('https://example.com/');
@@ -50,7 +50,7 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         ];
     }
 
-    public function getFixturesDir()
+    public static function getFixturesDirectory(): string
     {
         return __DIR__.'/Fixtures/';
     }
