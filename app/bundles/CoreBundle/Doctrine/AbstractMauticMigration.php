@@ -83,7 +83,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     {
         $this->container            = $container;
         $this->coreParametersHelper = $container->get(CoreParametersHelper::class);
-        $this->platform             = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
+        $this->platformString       = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
         $this->prefix               = (string) $this->coreParametersHelper->get('db_table_prefix', '');
     }
 
