@@ -349,6 +349,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('tokens', $tokens);
         $this->assertArrayHasKey('{contactfield=email}', $tokens['tokens']);
         $this->assertArrayHasKey('{dwc=test-dwc-token}', $tokens['tokens']);
+        $this->assertSame('DWC:test-dwc-token', $tokens['tokens']['{dwc=test-dwc-token}']);
     }
 
     private function createDwcTokens(): void

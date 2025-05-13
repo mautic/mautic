@@ -123,10 +123,16 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $tokens         = $dwcTokenHelper->getTokens(
                 static::dwcTokenRegex,
                 '',
-                'name',
+                'slot_name',
                 'slot_name',
                 $expr
             );
+            if (is_array($tokens)) {
+                array_walk($tokens, function (&$val) {
+                    $val = 'DWC:'.$val;
+                });
+            }
+
             $event->addTokens(is_array($tokens) ? $tokens : []);
 
             $event->addTokens(

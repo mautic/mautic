@@ -179,10 +179,7 @@ Mautic.customItemRenderer = function (item) {
         tokenName = tokenName.substring(2);
     }
 
-    if (tokenId.match(/dwc=/i)){
-        const tn = tokenId.substr(5, tokenId.length - 6);
-        tokenName = tokenName + ' (' + tn + ')';
-    } else if (tokenId.match(/contactfield=company/i) && !tokenName.match(/company/i)){
+    if (tokenId.match(/contactfield=company/i) && !tokenName.match(/company/i)){
         tokenName = 'Company ' + tokenName;
     }
 
