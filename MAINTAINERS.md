@@ -37,6 +37,7 @@ This document contains a list of maintainers in this repo. See [mautic/.github/M
 | Luiz Eduardo | @luizeof | Powertic |
 | Mattias Michaux | @mollux | Dropsolid |
 | Mohit Aghera | @mohit-rocks | Independent |
+| Dennis Ameling | @dennisameling | Independent |
 
 ## Contributors
 
