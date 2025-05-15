@@ -43,13 +43,7 @@
                             <tr>
                                 <td>
                                     <div class="text-left">
-                                        <input type="hidden" id="{{ channel.value }}-hidden"
-                                               name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
-                                               value="">
-                                        <input type="checkbox" id="{{ channel.value }}"
-                                               name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
-                                               onclick="togglePreferredChannel(this.value);"
-                                               value="{{ channel.value|escape }}" {{ checked }}>
+                                        {{ form_widget(form.lead_channels.subscribed_channels[key]) }}
                                         <label for="{{ channel.value }}" id="is-contactable-{{ channel.value }}">
                                             {{ 'mautic.lead.contact.me.label'|trans({'%channel%' : channelName}) }}
                                         </label>
