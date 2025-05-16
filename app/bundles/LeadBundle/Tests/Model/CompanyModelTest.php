@@ -2,14 +2,11 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class CompanyModelTest extends \PHPUnit\Framework\TestCase
