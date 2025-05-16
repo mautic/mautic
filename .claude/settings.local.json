@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(ddev bin/phpunit:*)",
+      "Bash(ddev composer cs:*)",
+      "Bash(ddev composer fixcs:*)",
+      "Bash(ddev composer phpstan:*)",
+      "Bash(ddev composer test:*)",
+      "Bash(ddev describe:*)",
+      "Bash(ddev exec bin/console doctrine:connection-info:*)",
+      "Bash(ddev exec:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(sed:*)",
+      "WebFetch(domain:api-platform.com)"
+    ],
+    "deny": []
+  }
+}
