@@ -91,14 +91,19 @@ class LeadModelTest extends MauticMysqlTestCase
         Assert::assertEquals('Name', $contactAfterThirdImport->getLastname());
     }
 
-    private function importContactWithCompany(array $contactFields, array $companyFields, array $data, bool $skipIfExists): bool
+    /**
+     * @param array<string, string> $contactFields
+     * @param array<string, string> $companyFields
+     * @param array<string, string> $data
+     */
+    private function importContactWithCompany(array $contactFields, array $companyFields, array $data, bool $skipIfExists): void
     {
         /** @var LeadModel $leadModel */
         $leadModel = self::getContainer()->get('mautic.lead.model.lead');
 
         $mergedFields = array_merge($contactFields, $companyFields);
 
-        return $leadModel->import($mergedFields, $data, null, null, null, true, null, null, $skipIfExists);
+        $leadModel->import($mergedFields, $data, null, null, null, true, null, null, $skipIfExists);
     }
 
     private function createCompany(string $name, string $email): Company
