@@ -22,6 +22,123 @@
 {% block content %}
 {% set index = form.filters.vars.value|length > 0 ? max(form.filters.vars.value|keys) : 0 %}
 {{ form_start(form) }}
+
+{# Tab content blocks #}
+{% set detailsTabContent %}
+<div class="pa-md">
+    <div class="row">
+        <div class="col-md-9 height-auto pt-lg">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.name) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.description) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 height-auto pt-lg">
+            {% set settingsTileContent %}
+                <div class="row layer-two">
+                    <div class="col-xs-12">
+                        {{ form_row(form.isPublished) }}
+                        {{ form_row(form.category) }}
+                        <div class="row">
+                            {% set moreOptions %}
+                                {{ form_row(form.alias) }}
+                                {{ form_row(form.isGlobal) }}
+                            {% endset %}
+                            {% include '@MauticCore/Helper/accordion.html.twig' with {
+                                'items': [
+                                    {
+                                        'title': 'mautic.lead.list.form.visibility',
+                                        'content': moreOptions
+                                    }
+                                ]
+                            } %}
+                        </div>
+                    </div>
+                </div>
+            {% endset %}
+            
+            {% include '@MauticCore/Components/tile--base.html.twig' with {
+                'tiles': [
+                    {
+                        'content': settingsTileContent
+                    }
+                ]
+            } %}
+        </div>
+    </div>
+</div>
+{% endset %}
+
+{% set filtersTabContent %}
+<div class="pa-md">
+    <div class="row">
+        <div class="alert alert-info"><p>{{ 'mautic.lead.lead.segment.filter.info'|trans }}</p></div>
+        <div class="form-group">
+            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}" data-index="{{ index + 1 }}">
+                <select class="chosen form-control" id="available_segment_filters">
+                    <option value=""></option>
+                    {% for object, field in form.vars.fields %}
+                    {% set icon = 'company' == object ? 'building' : 'user' %}
+                    {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
+                    <optgroup label="{{ header }}">
+                        {% for value, params in field %}
+                        {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
+                        <option value="{{ value|e }}" id="available_{{ object }}_{{ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-operators="{{ operators|e }}" class="segment-filter {{ icon }}">
+                            {{ params.label|trans }}
+                        </option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 height-auto pt-lg ">
+            <div id="leadlist_filters" class="selected-filters">
+                {{ form_widget(form.filters) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endset %}
+
+{% set preferenceCenterTabContent %}
+<div class="pa-md">
+    <div class="row mt-32">
+        <div class="col-xs-12">
+            {% set preferenceCenterOptions %}
+                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    'pictogram': 'slider',
+                    'size': '64'
+                } %}
+                <div class="row mt-48">
+                    <div class="col-md-6">
+                        {{ form_row(form.isPreferenceCenter) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.publicName) }}
+                    </div>
+                </div>
+            {% endset %}
+            {% include '@MauticCore/Components/content-block.html.twig' with {
+                'heading': 'mautic.lead.list.form.preference_center_settings',
+                'subheading': 'mautic.lead.list.form.preference_center_description',
+                'childContainer': preferenceCenterOptions
+            } %}
+        </div>
+    </div>
+</div>
+{% endset %}
+
 <div class="box-layout">
     <div class="col-xs-12 height-auto">
         {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
@@ -29,17 +146,17 @@
                 {
                     'title': 'mautic.core.details',
                     'id': 'details',
-                    'content': include('@MauticLead/List/Form/form--tab-details.html.twig')
+                    'content': detailsTabContent
                 },
                 {
                     'title': 'mautic.core.filters',
                     'id': 'filters',
-                    'content': include('@MauticLead/List/Form/form--tab-filters.html.twig')
+                    'content': filtersTabContent
                 },
                 {
                     'title': 'Preference center',
                     'id': 'preference-center',
-                    'content': include('@MauticLead/List/Form/form--tab-preference-center.html.twig')
+                    'content': preferenceCenterTabContent
                 }
             ],
             'style': 'line'
@@ -47,6 +164,5 @@
     </div>
 </div>
 
-{{ form_rest(form) }}
 {{ form_end(form) }}
 {% endblock %}
