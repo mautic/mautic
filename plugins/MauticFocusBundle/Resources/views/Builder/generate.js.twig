@@ -517,6 +517,9 @@
                 if (typeof Focus.iframeResizerEnabled !== 'undefined') {
                     return true;
                 }
+                if (typeof Focus.iframe === 'undefined') {
+                    return false;
+                }
 
                 {% if style in ['modal', 'notification', 'bar'] %}
                 Focus.iframeHeight = 0;

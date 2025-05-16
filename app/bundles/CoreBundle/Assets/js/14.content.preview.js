@@ -94,7 +94,7 @@ Mautic.contentPreviewUrlGenerator = {
 /**
  * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
  */
-Mautic.updateContactLookupListFilter = function(field, item) {
+Mautic.updatePreviewContactLookupListFilter = function(field, item) {
     if (item && item.id) {
         mQuery('#content_preview_settings_contact_id').val(item.id);
         mQuery(field).val(item.value);
@@ -109,7 +109,7 @@ Mautic.updateContactLookupListFilter = function(field, item) {
  * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
  * Take a look at https://github.com/twitter/typeahead.js/
  */
-Mautic.activateContactLookupField = function(fieldOptions, filterId) {
+Mautic.activatePreviewContactLookupField = function(fieldOptions, filterId) {
 
     const lookupElementId = 'content_preview_settings_contact';
     const action          = mQuery('#'+ lookupElementId).attr('data-chosen-lookup');

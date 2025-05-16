@@ -81,7 +81,7 @@ Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
     var $schedulePreviewData = mQuery('#schedule_preview_data');
 
     var isScheduledVal = 0;
-    if (!mQuery($isScheduled).prop("checked")) { //$isScheduled.val() does not work
+    if (mQuery($isScheduled).prop("checked")) { //$isScheduled.val() does not work
         isScheduledVal = 1;
     }
 
@@ -109,7 +109,7 @@ Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
 
 Mautic.checkIsScheduled = function ($isScheduled) {
     var $scheduleForm = mQuery('#schedule-container .schedule_form');
-    if (!mQuery($isScheduled).prop("checked")) {
+    if (mQuery($isScheduled).prop("checked")) {
         $scheduleForm.show();
         return;
     }
