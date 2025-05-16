@@ -921,7 +921,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->companyDeduper->checkForDuplicateCompanies($queryFields);
     }
 
-    protected function getFieldData(array $fields, array $data): array
+    protected function getFieldData($fields, $data): array
     {
         // Set profile data using the form so that values are validated
         $fieldData = [];
