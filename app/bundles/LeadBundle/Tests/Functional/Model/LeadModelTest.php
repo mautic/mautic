@@ -130,6 +130,9 @@ class LeadModelTest extends MauticMysqlTestCase
         return $this->em->getRepository(Lead::class)->findOneBy(['email' => $email]);
     }
 
+    /**
+     * @return array<int, array<string, string>>
+     */
     private function getCompaniesForContact(Lead $contact): array
     {
         /** @var CompanyModel $companyModel */
