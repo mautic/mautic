@@ -2012,6 +2012,9 @@ body > #app-wrapper {
 .app-sidebar .nav-sidebar > .nav .nav-heading:first-child {
   padding-top: 20px;
 }
+html.responsejs.sidebar-open-ltr .sidebar-left {
+  left: 0px;
+}
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {
     left: 0;
@@ -6092,6 +6095,7 @@ input[style]:hover {
   padding: var(--spacing-01) var(--spacing-04);
 }
 .form-control[disabled],
+.form-control[readonly],
 fieldset[disabled] .form-control {
   color: var(--text-disabled);
 }

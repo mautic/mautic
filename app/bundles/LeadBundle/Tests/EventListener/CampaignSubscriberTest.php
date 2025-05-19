@@ -435,9 +435,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $this->mockLeadModel->expects($this->once())
+        $this->mockLeadModel->expects($this->exactly(2))
             ->method('setFieldValues')
-            ->with($lead, $properties, false);
+            ->with($lead, $properties, false, true, false);
 
         $this->mockLeadModel->expects($this->once())
             ->method('saveEntity')

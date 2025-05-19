@@ -813,4 +813,22 @@ SQL;
 
         return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
     }
+
+    /**
+     * @return int[]
+     */
+    public function getLeadSegmentIds(int $leadId): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('ll.id')
+            ->from(LeadList::class, 'll')
+            ->innerJoin('ll.leads', 'l')
+            ->where(
+                $qb->expr()->eq('l.lead', ':leadId')
+            )
+            ->setParameter('leadId', $leadId);
+        $result = $qb->getQuery()->getArrayResult();
+
+        return array_column($result, 'id');
+    }
 }

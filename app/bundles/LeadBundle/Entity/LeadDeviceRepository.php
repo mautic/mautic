@@ -35,19 +35,21 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
     {
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.device as device')
+        $selectQuery = $this->_em->getConnection()->createQueryBuilder();
+        $selectQuery->select('es.id as id, es.device as device')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
 
         if (null !== $deviceNames) {
             if (!is_array($deviceNames)) {
                 $deviceNames = [$deviceNames];
             }
+
+            $or = $selectQuery->expr()->or(
+                ...array_map(fn ($key, $deviceName) => $selectQuery->expr()->eq('es.device', ':device'.$key), array_keys($deviceNames), $deviceNames)
+            );
+            $selectQuery->andWhere($or);
             foreach ($deviceNames as $key => $deviceName) {
-                $sq->andWhere(
-                    $sq->expr()->eq('es.device', ':device'.$key)
-                )
-                    ->setParameter('device'.$key, $deviceName);
+                $selectQuery->setParameter('device'.$key, $deviceName);
             }
         }
 
@@ -55,11 +57,13 @@ class LeadDeviceRepository extends CommonRepository
             if (!is_array($deviceBrands)) {
                 $deviceBrands = [$deviceBrands];
             }
+
+            $or = $selectQuery->expr()->or(
+                ...array_map(fn ($key, $deviceBrand) => $selectQuery->expr()->eq('es.device_brand', ':deviceBrand'.$key), array_keys($deviceBrands), $deviceBrands)
+            );
+            $selectQuery->andWhere($or);
             foreach ($deviceBrands as $key => $deviceBrand) {
-                $sq->andWhere(
-                    $sq->expr()->eq('es.device_brand', ':deviceBrand'.$key)
-                )
-                    ->setParameter('deviceBrand'.$key, $deviceBrand);
+                $selectQuery->setParameter('deviceBrand'.$key, $deviceBrand);
             }
         }
 
@@ -67,11 +71,13 @@ class LeadDeviceRepository extends CommonRepository
             if (!is_array($deviceModels)) {
                 $deviceModels = [$deviceModels];
             }
+
+            $or = $selectQuery->expr()->or(
+                ...array_map(fn ($key, $deviceModel) => $selectQuery->expr()->eq('es.device_model', ':deviceModel'.$key), array_keys($deviceModels), $deviceModels)
+            );
+            $selectQuery->andWhere($or);
             foreach ($deviceModels as $key => $deviceModel) {
-                $sq->andWhere(
-                    $sq->expr()->eq('es.device_model', ':deviceModel'.$key)
-                )
-                    ->setParameter('deviceModel'.$key, $deviceModel);
+                $selectQuery->setParameter('deviceModel'.$key, $deviceModel);
             }
         }
 
@@ -79,26 +85,28 @@ class LeadDeviceRepository extends CommonRepository
             if (!is_array($deviceOss)) {
                 $deviceOss = [$deviceOss];
             }
+
+            $or = $selectQuery->expr()->or(
+                ...array_map(fn ($key, $deviceOs) => $selectQuery->expr()->eq('es.device_os_name', ':deviceOs'.$key), array_keys($deviceOss), $deviceOss)
+            );
+            $selectQuery->andWhere($or);
             foreach ($deviceOss as $key => $deviceOs) {
-                $sq->andWhere(
-                    $sq->expr()->eq('es.device_os_name', ':deviceOs'.$key)
-                )
-                    ->setParameter('deviceOs'.$key, $deviceOs);
+                $selectQuery->setParameter('deviceOs'.$key, $deviceOs);
             }
         }
 
         if (null !== $deviceId) {
-            $sq->andWhere(
-                $sq->expr()->eq('es.id', $deviceId)
+            $selectQuery->andWhere(
+                $selectQuery->expr()->eq('es.id', $deviceId)
             );
         } elseif (null !== $lead) {
-            $sq->andWhere(
-                $sq->expr()->eq('es.lead_id', $lead->getId())
+            $selectQuery->andWhere(
+                $selectQuery->expr()->eq('es.lead_id', $lead->getId())
             );
         }
 
         // get totals
-        $device = $sq->executeQuery()->fetchAllAssociative();
+        $device = $selectQuery->executeQuery()->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
     }
