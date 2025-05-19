@@ -32,10 +32,12 @@ class PointsChangeLogRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->or(
-                $query->expr()->like('lp.event_name', $query->expr()->literal('%'.$options['search'].'%')),
-                $query->expr()->like('lp.action_name', $query->expr()->literal('%'.$options['search'].'%'))
-            ));
+            $query->andWhere(
+                $query->expr()->or(
+                    $query->expr()->like('lp.event_name', ':search'),
+                    $query->expr()->like('lp.action_name', ':search')
+                )
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'lp.event_name', 'lp.date_added', [], ['dateAdded'], null, 'lp.id');

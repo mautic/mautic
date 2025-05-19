@@ -97,7 +97,8 @@ class LeadEventLogRepository extends CommonRepository
                         ->setParameter('eventType', 'decision');
 
         if ($leadId) {
-            $query->where('ll.lead_id = '.(int) $leadId);
+            $query->where('ll.lead_id = :leadId')
+                ->setParameter('leadId', (int) $leadId);
         }
 
         if (isset($options['scheduledState'])) {
@@ -123,12 +124,12 @@ class LeadEventLogRepository extends CommonRepository
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
                 $query->expr()->or(
-                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('c.description', $query->expr()->literal('%'.$options['search'].'%'))
+                    $query->expr()->like('e.name', ':search'),
+                    $query->expr()->like('e.description', ':search'),
+                    $query->expr()->like('c.name', ':search'),
+                    $query->expr()->like('c.description', ':search')
                 )
-            );
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate'], null, 'll.id');
@@ -365,30 +366,33 @@ class LeadEventLogRepository extends CommonRepository
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
 
         if (isset($options['channel'])) {
-            $query->andwhere("e.channel = '".$options['channel']."'");
+            $query->andWhere('e.channel = :channel')
+                ->setParameter('channel', $options['channel']);
         }
 
         if (isset($options['channelId'])) {
-            $query->andwhere('e.channel_id = '.(int) $options['channelId']);
+            $query->andWhere('e.channel_id = :channelId')
+                ->setParameter('channelId', (int) $options['channelId']);
         }
 
         if (isset($options['type'])) {
-            $query->andwhere("e.type = '".$options['type']."'");
+            $query->andWhere('e.type = :type')
+                ->setParameter('type', $options['type']);
         }
 
         if (isset($options['logChannel'])) {
-            $query->andwhere("ll.channel = '".$options['logChannel']."'");
+            $query->andWhere('ll.channel = :logChannel')
+                ->setParameter('logChannel', $options['logChannel']);
         }
 
         if (isset($options['logChannelId'])) {
-            $query->andwhere('ll.channel_id = '.(int) $options['logChannelId']);
+            $query->andWhere('ll.channel_id = :logChannelId')
+                ->setParameter('logChannelId', (int) $options['logChannelId']);
         }
 
-        if (!isset($options['is_scheduled'])) {
-            $query->andWhere($query->expr()->eq('ll.is_scheduled', 0));
-        } else {
-            $query->andWhere($query->expr()->eq('ll.is_scheduled', 1));
-        }
+        $query->andWhere(
+            $query->expr()->eq('ll.is_scheduled', ':isScheduled')
+        )->setParameter('isScheduled', isset($options['is_scheduled']) ? 1 : 0);
 
         return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
     }
