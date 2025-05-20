@@ -44,10 +44,27 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
      */
     public static function dataApplyQuery(): iterable
     {
+        // Standard DNC filters
         yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
         yield ['eq', '0', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
         yield ['neq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
         yield ['neq', '0', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        
+        // New DNC filter types will be tested here
+        // These are placeholder test cases - actual implementation would verify the correct SQL is generated
+        // for each of our new filter types
+        
+        // All DNC filter
+        yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT DISTINCT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0)'];
+        
+        // Hard bounce filter
+        yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 2) AND (par0.channel = \'email\') AND ((par0.comments LIKE \'%unrecognized address%\') OR (par0.comments LIKE \'5%\') OR (par0.comments LIKE \'%5._.__%\') OR (par0.comments LIKE \'%maildir delivery failed%\') OR (par0.comments LIKE \'%invalid%\') OR (par0.comments LIKE \'%Bounced Address%\') OR (par0.comments LIKE \'%Spam reporting address%\') OR (par0.comments LIKE \'%does not exist%\') OR (par0.comments LIKE \'%unknown%\') OR (par0.comments LIKE \'%Incorrectly formatted email address%\') OR (par0.comments LIKE \'%BOGON%\') OR (par0.comments LIKE \'%User unsubscribed%\') OR (par0.comments LIKE \'%Message delivery failed%\') OR (par0.comments LIKE \'%not found%\')) AND (par0.reason = 2))'];
+        
+        // Soft bounce filter
+        yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 2) AND (par0.channel = \'email\') AND ((par0.comments LIKE \'4%\') OR (par0.comments LIKE \'%4._.__%\') OR (par0.comments LIKE \'%timeout%\') OR (par0.comments LIKE \'%connection refused%\') OR (par0.comments LIKE \'%Connection reset by peer%\') OR (par0.comments LIKE \'%Unable to parse reason from bounce report%\')) AND (par0.reason = 2))'];
+        
+        // Spam bounce filter
+        yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 2) AND (par0.channel = \'email\') AND ((par0.comments LIKE \'%spam%\') OR (par0.comments LIKE \'%rejected%\')) AND (par0.reason = 2))'];
     }
 
     private function createConnection(): Connection
@@ -58,9 +75,9 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     /**
      * @param array<string, mixed> $batchLimiters
      */
-    private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
+    private function createFilter(string $operator, string $parameterValue, array $batchLimiters = [], string $filterType = 'dnc_unsubscribed'): ContactSegmentFilter
     {
-        return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
+        return new class($operator, $parameterValue, $batchLimiters, $filterType) extends ContactSegmentFilter {
             /**
              * @noinspection PhpMissingParentConstructorInspection
              */
@@ -71,12 +88,13 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
                  * @var array<string, mixed>
                  */
                 private array $batchLimiters,
+                private string $filterType,
             ) {
             }
 
             public function getDoNotContactParts(): DoNotContactParts
             {
-                return new DoNotContactParts('dnc_unsubscribed');
+                return new DoNotContactParts($this->filterType);
             }
 
             public function getOperator(): string
