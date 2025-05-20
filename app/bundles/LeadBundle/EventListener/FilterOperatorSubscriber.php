@@ -199,6 +199,42 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ]),
                 'object' => 'lead',
             ],
+            'dnc_all' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_all'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_all'),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
+            'dnc_hard_bounce' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_hard_bounce'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_hard_bounce'),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
+            'dnc_soft_bounce' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_soft_bounce'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_soft_bounce'),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
+            'dnc_spam_bounce' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_spam_bounce'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_spam_bounce'),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
             'dnc_bounced' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
                 'properties' => [

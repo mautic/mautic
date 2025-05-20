@@ -118,6 +118,18 @@ class ContactSegmentFilterDictionary
             'foreign_table' => 'page_hits',
             'field'         => 'date_hit',
         ];
+        $this->filters['dnc_all']                      = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+        $this->filters['dnc_hard_bounce']               = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+        $this->filters['dnc_soft_bounce']               = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+        $this->filters['dnc_spam_bounce']               = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
         $this->filters['dnc_bounced']                   = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
