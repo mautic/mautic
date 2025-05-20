@@ -63,44 +63,47 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
         if ($commentFilter = $doNotContactParts->getCommentFilter()) {
             switch ($commentFilter) {
                 case 'hard':
-                    $orX = $expr->orX();
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%unrecognized address%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('5%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%5._._%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%maildir delivery failed%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%invalid%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%Bounced Address%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%Spam reporting address%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%does not exist%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%unknown%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%Incorrectly formatted email address%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%BOGON%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%User unsubscribed%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%Message delivery failed%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%not found%')));
-                    $filterQueryBuilder->andWhere($orX);
+                    $orExpr = $expr->or(
+                        $expr->like($queryAlias.'.comments', $expr->literal('%unrecognized address%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('5%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%5._._%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%maildir delivery failed%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%invalid%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%Bounced Address%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%Spam reporting address%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%does not exist%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%unknown%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%Incorrectly formatted email address%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%BOGON%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%User unsubscribed%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%Message delivery failed%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%not found%'))
+                    );
+                    $filterQueryBuilder->andWhere($orExpr);
                     // Ensure this only applies to bounced emails
                     $filterQueryBuilder->andWhere($expr->eq($queryAlias.'.reason', DoNotContact::BOUNCED));
                     break;
 
                 case 'soft':
-                    $orX = $expr->orX();
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('4%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%4._._%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%timeout%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%connection refused%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%Connection reset by peer%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%Unable to parse reason from bounce report%')));
-                    $filterQueryBuilder->andWhere($orX);
+                    $orExpr = $expr->or(
+                        $expr->like($queryAlias.'.comments', $expr->literal('4%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%4._._%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%timeout%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%connection refused%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%Connection reset by peer%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%Unable to parse reason from bounce report%'))
+                    );
+                    $filterQueryBuilder->andWhere($orExpr);
                     // Ensure this only applies to bounced emails
                     $filterQueryBuilder->andWhere($expr->eq($queryAlias.'.reason', DoNotContact::BOUNCED));
                     break;
 
                 case 'spam':
-                    $orX = $expr->orX();
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%spam%')));
-                    $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%rejected%')));
-                    $filterQueryBuilder->andWhere($orX);
+                    $orExpr = $expr->or(
+                        $expr->like($queryAlias.'.comments', $expr->literal('%spam%')),
+                        $expr->like($queryAlias.'.comments', $expr->literal('%rejected%'))
+                    );
+                    $filterQueryBuilder->andWhere($orExpr);
                     // Ensure this only applies to bounced emails
                     $filterQueryBuilder->andWhere($expr->eq($queryAlias.'.reason', DoNotContact::BOUNCED));
                     break;
