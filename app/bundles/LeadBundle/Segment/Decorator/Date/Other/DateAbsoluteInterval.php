@@ -4,28 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 class DateAbsoluteInterval implements FilterDecoratorInterface
 {
-    private DateDecorator $dateDecorator;
-
-    /**
-     * @var string[]
-     */
-    private array $originalValue;
-
     /**
      * @param string[] $originalValue
      */
-    public function __construct(
-        DateDecorator $dateDecorator,
-        array $originalValue,
-    ) {
-        $this->dateDecorator = $dateDecorator;
-        $this->originalValue = $originalValue;
+    public function __construct(private DateDecorator $dateDecorator, private array $originalValue)
+    {
     }
 
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate): ?string
@@ -75,18 +65,12 @@ class DateAbsoluteInterval implements FilterDecoratorInterface
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): bool|string
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
-     */
-    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate): CompositeExpression|string|null
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }

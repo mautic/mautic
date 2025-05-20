@@ -63,10 +63,6 @@ class FieldFilterTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param mixed[]                                              $value
-     * @param callable(DataTransformerInterface, mixed[]): mixed[] $transform
-     *                                                                        From format to database format
-     *
      * @param mixed $rawFilters
      *
      * @return array|mixed

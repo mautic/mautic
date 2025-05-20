@@ -282,12 +282,12 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         if (!$event->fieldTypeIsOneOf('date', 'datetime')
         || !$event->operatorIsOneOf(
             OperatorOptions::GREATER_THAN,
-                OperatorOptions::GREATER_THAN_OR_EQUAL,
-                OperatorOptions::LESS_THAN,
-                OperatorOptions::LESS_THAN_OR_EQUAL,
-                OperatorOptions::BETWEEN,
-                OperatorOptions::NOT_BETWEEN
-            )
+            OperatorOptions::GREATER_THAN_OR_EQUAL,
+            OperatorOptions::LESS_THAN,
+            OperatorOptions::LESS_THAN_OR_EQUAL,
+            OperatorOptions::BETWEEN,
+            OperatorOptions::NOT_BETWEEN
+        )
         ) {
             return;
         }
