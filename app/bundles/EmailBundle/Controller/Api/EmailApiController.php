@@ -54,7 +54,15 @@ class EmailApiController extends CommonApiController
         $this->entityClass      = Email::class;
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
-        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
+        $this->serializerGroups = [
+            'emailDetails',
+            'categoryList',
+            'publishDetails',
+            'assetList',
+            'formList',
+            'leadListList',
+            'projectList',
+        ];
         $this->dataInputMasks   = [
             'customHtml'     => 'html',
             'dynamicContent' => [

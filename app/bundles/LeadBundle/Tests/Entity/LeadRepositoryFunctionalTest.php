@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -176,6 +177,18 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         foreach ($emails as $email) {
             $this->createLead($email);
         }
+    }
+
+    public function testIfLeadExists(): void
+    {
+        /** @var LeadRepository $repo */
+        $repo = $this->em->getRepository(Lead::class);
+
+        $this->assertFalse($repo->exists('654'));
+
+        $lead = $this->createLead();
+
+        $this->assertTrue($repo->exists((string) $lead->getId()));
     }
 
     private function createLead(string $email = ''): Lead
