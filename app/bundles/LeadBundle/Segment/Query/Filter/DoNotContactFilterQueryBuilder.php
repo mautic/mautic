@@ -27,38 +27,38 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
         $batchLimiters     = $filter->getBatchLimiters();
         $expr              = $queryBuilder->expr();
         $queryAlias        = $this->generateRandomParameterName();
-        
+
         // Handle the All DNC filter type
         if ($doNotContactParts->isAllDnc()) {
             $filterQueryBuilder = $queryBuilder->createQueryBuilder()
                 ->select('DISTINCT '.$queryAlias.'.lead_id')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $queryAlias);
-                
+
             $this->addLeadAndMinMaxLimiters($filterQueryBuilder, $batchLimiters, 'lead_donotcontact');
-            
+
             if ('eq' === $filter->getOperator() xor !$filter->getParameterValue()) {
                 $expression = $expr->in($leadsTableAlias.'.id', $filterQueryBuilder->getSQL());
             } else {
                 $expression = $expr->notIn($leadsTableAlias.'.id', $filterQueryBuilder->getSQL());
             }
-            
+
             $queryBuilder->addLogic($expression, $filter->getGlue());
-            
+
             return $queryBuilder;
         }
-        
+
         $reasonParameter   = "{$queryAlias}reason";
         $channelParameter  = "{$queryAlias}channel";
-        
+
         $queryBuilder->setParameter($reasonParameter, $doNotContactParts->getParameterType());
         $queryBuilder->setParameter($channelParameter, $doNotContactParts->getChannel());
-        
+
         $filterQueryBuilder = $queryBuilder->createQueryBuilder()
             ->select($queryAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $queryAlias)
             ->andWhere($expr->eq($queryAlias.'.reason', ':'.$reasonParameter))
             ->andWhere($expr->eq($queryAlias.'.channel', ':'.$channelParameter));
-            
+
         // Handle comment-based filters (hard bounce, soft bounce, spam bounce)
         if ($commentFilter = $doNotContactParts->getCommentFilter()) {
             switch ($commentFilter) {
@@ -82,7 +82,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
                     // Ensure this only applies to bounced emails
                     $filterQueryBuilder->andWhere($expr->eq($queryAlias.'.reason', DoNotContact::BOUNCED));
                     break;
-                    
+
                 case 'soft':
                     $orX = $expr->orX();
                     $orX->add($expr->like($queryAlias.'.comments', $expr->literal('4%')));
@@ -95,7 +95,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
                     // Ensure this only applies to bounced emails
                     $filterQueryBuilder->andWhere($expr->eq($queryAlias.'.reason', DoNotContact::BOUNCED));
                     break;
-                    
+
                 case 'spam':
                     $orX = $expr->orX();
                     $orX->add($expr->like($queryAlias.'.comments', $expr->literal('%spam%')));

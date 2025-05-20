@@ -9,36 +9,40 @@ class DoNotContactParts
     private string $channel = 'email';
 
     private int $type = DoNotContact::UNSUBSCRIBED;
-    
+
     private ?string $commentFilter = null;
-    
+
     private bool $isAllDnc = false;
 
     public function __construct(?string $field)
     {
         if ($field && str_contains($field, '_all')) {
             $this->isAllDnc = true;
+
             return;
         }
-        
+
         if ($field && str_contains($field, '_hard_bounce')) {
-            $this->type = DoNotContact::BOUNCED;
+            $this->type          = DoNotContact::BOUNCED;
             $this->commentFilter = 'hard';
+
             return;
         }
-        
+
         if ($field && str_contains($field, '_soft_bounce')) {
-            $this->type = DoNotContact::BOUNCED;
+            $this->type          = DoNotContact::BOUNCED;
             $this->commentFilter = 'soft';
+
             return;
         }
-        
+
         if ($field && str_contains($field, '_spam_bounce')) {
-            $this->type = DoNotContact::BOUNCED;
+            $this->type          = DoNotContact::BOUNCED;
             $this->commentFilter = 'spam';
+
             return;
         }
-        
+
         if ($field && str_contains($field, '_manual')) {
             $this->type = DoNotContact::MANUAL;
         }
@@ -61,12 +65,12 @@ class DoNotContactParts
     {
         return $this->type;
     }
-    
+
     public function getCommentFilter(): ?string
     {
         return $this->commentFilter;
     }
-    
+
     public function isAllDnc(): bool
     {
         return $this->isAllDnc;
