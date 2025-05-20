@@ -7,7 +7,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -21,7 +20,7 @@ class DateRangeType extends AbstractType
     private const DATE_REGEX = '/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s([1-9]|[12][0-9]|3[01]),\s\d{4}$/';
 
     public function __construct(
-        private SessionInterface $session,
+        private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
@@ -33,8 +32,8 @@ class DateRangeType extends AbstractType
         $dateTo      = $options['data']['date_to'] ?? null;
 
         if ($options['set_default_values']) {
-            $sessionDateFrom = $this->session->get('mautic.daterange.form.from');
-            $sessionDateTo   = $this->session->get('mautic.daterange.form.to');
+            $sessionDateFrom = $this->requestStack->getSession()->get('mautic.daterange.form.from');
+            $sessionDateTo   = $this->requestStack->getSession()->get('mautic.daterange.form.to');
             if (!empty($sessionDateFrom) && !empty($sessionDateTo)) {
                 $defaultFrom = new \DateTime($sessionDateFrom);
                 $defaultTo   = new \DateTime($sessionDateTo);
@@ -47,8 +46,8 @@ class DateRangeType extends AbstractType
             $dateFrom ??= $defaultFrom->format($humanFormat);
             $dateTo ??= $defaultTo->format($humanFormat);
 
-            $this->session->set('mautic.daterange.form.from', $dateFrom);
-            $this->session->set('mautic.daterange.form.to', $dateTo);
+            $this->requestStack->getSession()->set('mautic.daterange.form.from', $dateFrom);
+            $this->requestStack->getSession()->set('mautic.daterange.form.to', $dateTo);
         }
 
         $constraints = [
