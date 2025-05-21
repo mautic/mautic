@@ -34,8 +34,8 @@ class AuditLogSubscriber implements EventSubscriberInterface
         $details = $this->sanitizeDetails($integration);
 
         $this->auditLogModel->writeToLog([
-            'bundle'    => 'integrations',
-            'object'    => 'integration',
+            'bundle'    => 'integration',
+            'object'    => $integration->getName(),
             'objectId'  => $integration->getId(),
             'action'    => 'update',
             'details'   => $details,
