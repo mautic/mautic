@@ -45,6 +45,8 @@ class AuditLogSubscriber implements EventSubscriberInterface
 
     /**
      * Sanitizes integration details to remove sensitive information before logging.
+     *
+     * @return array<string, mixed>
      */
     private function sanitizeDetails(Integration $integration): array
     {
