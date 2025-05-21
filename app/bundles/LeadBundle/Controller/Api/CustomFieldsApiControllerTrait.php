@@ -199,10 +199,11 @@ trait CustomFieldsApiControllerTrait
             );
         }
 
-        $overwriteWithBlank = !$isPostOrPatch;
-        if (isset($parameters['overwriteWithBlank']) && !empty($parameters['overwriteWithBlank'])) {
-            $overwriteWithBlank = true;
-            unset($parameters['overwriteWithBlank']);
+        $request = $this->requestStack->getCurrentRequest(); 
+
+        $overwriteWithBlank = $request->get('overwriteWithBlank', !$isPostOrPatch); // 
+        if (isset($parameters['overwriteWithBlank'])) {
+            unset($parameters['overwriteWithBlank']); //
         }
 
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
