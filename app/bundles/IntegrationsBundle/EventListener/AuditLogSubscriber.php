@@ -63,7 +63,7 @@ class AuditLogSubscriber implements EventSubscriberInterface
             foreach ($apiKeys as $key => $value) {
                 // Don't log actual sensitive values, just note that they were changed
                 if (in_array(strtolower($key), ['token', 'secret', 'password', 'key', 'client_secret', 'client_id', 'refresh_token'])) {
-                    $details['apiKeys'][$key] = '[MASKED]';
+                    $details['apiKeys'][$key] = '*****';
                 } else {
                     $details['apiKeys'][$key] = $value;
                 }
