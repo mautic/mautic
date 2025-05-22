@@ -366,27 +366,27 @@ class LeadEventLogRepository extends CommonRepository
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
 
         if (isset($options['channel'])) {
-            $query->andWhere('e.channel = ' . $query->expr()->literal($options['channel']));
+            $query->andWhere('e.channel = '.$query->expr()->literal($options['channel']));
         }
 
         if (isset($options['channelId'])) {
-            $query->andWhere('e.channel_id = ' . (int) $options['channelId']);
+            $query->andWhere('e.channel_id = '.(int) $options['channelId']);
         }
 
         if (isset($options['type'])) {
-            $query->andWhere('e.type = ' . $query->expr()->literal($options['type']));
+            $query->andWhere('e.type = '.$query->expr()->literal($options['type']));
         }
 
         if (isset($options['logChannel'])) {
-            $query->andWhere('ll.channel = ' . $query->expr()->literal($options['logChannel']));
+            $query->andWhere('ll.channel = '.$query->expr()->literal($options['logChannel']));
         }
 
         if (isset($options['logChannelId'])) {
-            $query->andWhere('ll.channel_id = ' . (int) $options['logChannelId']);
+            $query->andWhere('ll.channel_id = '.(int) $options['logChannelId']);
         }
 
         $isScheduled = isset($options['is_scheduled']) ? 1 : 0;
-        $query->andWhere('ll.is_scheduled = ' . $isScheduled);
+        $query->andWhere('ll.is_scheduled = '.$isScheduled);
 
         return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
     }
