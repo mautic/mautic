@@ -22,6 +22,7 @@
 
 ### PHP
 - Removed `\Mautic\DashboardBundle\Dashboard\Widget::FORMAT_MYSQL` constant. Use `DateTimeHelper::FORMAT_DB_DATE_ONLY` instead.
+- Removed `Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder` as unused. 
 
 ### Javascript
 - Removed `Mautic.insertTextInEditor` function. Use `Mautic.insertHtmlInEditor` instead.
