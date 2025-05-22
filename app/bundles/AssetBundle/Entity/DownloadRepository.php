@@ -57,7 +57,7 @@ class DownloadRepository extends CommonRepository
 
         if ($leadId) {
             $query->where('d.lead_id = :leadId')
-                ->setParameter('leadId', (int) $leadId);
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {

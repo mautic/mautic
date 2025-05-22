@@ -104,7 +104,7 @@ class MessageQueueRepository extends CommonRepository
 
         if ($leadId) {
             $query->where('mq.lead_id = :leadId')
-                ->setParameter('leadId', (int) $leadId);
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {

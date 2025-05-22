@@ -72,7 +72,7 @@ class HitRepository extends CommonRepository
 
         if ($leadId) {
             $query->where('h.lead_id = :leadId')
-            ->setParameter('leadId', (int) $leadId);
+            ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
@@ -105,7 +105,7 @@ class HitRepository extends CommonRepository
                     ->setParameter('sourceIds', $sourceId);
             } else {
                 $query->andWhere('h.sourceId = :sourceId')
-                ->setParameter('sourceId', (int) $sourceId);
+                ->setParameter('sourceId', $sourceId);
             }
         }
 
@@ -115,7 +115,7 @@ class HitRepository extends CommonRepository
         }
 
         $query->andWhere('h.code = :code')
-        ->setParameter('code', (int) $code);
+        ->setParameter('code', $code);
 
         return $query->getQuery()->getArrayResult();
     }

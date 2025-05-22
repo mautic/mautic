@@ -98,7 +98,7 @@ class LeadEventLogRepository extends CommonRepository
 
         if ($leadId) {
             $query->where('ll.lead_id = :leadId')
-                ->setParameter('leadId', (int) $leadId);
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['scheduledState'])) {

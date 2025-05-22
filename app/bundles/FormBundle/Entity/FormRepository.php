@@ -199,7 +199,7 @@ class FormRepository extends CommonRepository
 
         if (!empty($options['leadId'])) {
             $query->andWhere('fs.lead_id = :leadId')
-                ->setParameter('leadId', (int) $options['leadId']);
+                ->setParameter('leadId', $options['leadId']);
         }
 
         if (!empty($options['formId'])) {
