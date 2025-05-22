@@ -296,6 +296,8 @@ class FieldController extends FormController
                             $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                         } catch (AbortColumnUpdateException) {
                             $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
+                        } catch (AbortColumnCreateException) {
+                            $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
                         } catch (SchemaException $e) {
                             $flashMessage = $e->getMessage();
                             $form['alias']->addError(new FormError($e->getMessage()));
