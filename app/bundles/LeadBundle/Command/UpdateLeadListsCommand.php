@@ -204,7 +204,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                     $dependentLeadList = $this->listModel->getEntity($dependentListId);
                     if (!$dependentLeadList) {
-                        continue;
+                        continue; // Skip if the dependent segment doesn't exist - it may have been deleted
                     }
 
                     // Check if this dependent segment has its own dependencies
