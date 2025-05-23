@@ -105,7 +105,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             }
 
             // Add the current list ID to the rebuilt lists to avoid rebuilding it again
-            $rebuiltLists[] = $list->getId();
+            $rebuiltLists[] = (int) $list->getId();
 
             $this->rebuildSegment($list, $batch, $max, $output, $enableTimeMeasurement);
         } else {
@@ -161,9 +161,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
     }
 
     /**
-     * @param array<int>              $rebuiltLists
-     * @param array<int>              $dependencyChain
-     * @param array<int, string|null> $excludeSegments
+     * @param array<int>        $rebuiltLists    List of segment IDs that have already been rebuilt
+     * @param array<int>        $dependencyChain Chain of segment IDs to detect circular dependencies
+     * @param array<int|string> $excludeSegments List of segment IDs to exclude from rebuilding
+     *
+     * @param-out array<int> $rebuiltLists Updated list of segment IDs that have been rebuilt
      */
     private function rebuildDependentSegments(
         LeadList $leadList,
@@ -182,6 +184,8 @@ class UpdateLeadListsCommand extends ModeratedCommand
         foreach ($leadList->getFilters() as $filter) {
             if ('leadlist' === $filter['type']) {
                 foreach ($filter['filter'] ?? [] as $dependentListId) {
+                    $dependentListId = (int) $dependentListId;
+
                     // Skip if already rebuilt or in exclude list
                     if (in_array($dependentListId, $rebuiltLists) || in_array($dependentListId, $excludeSegments)) {
                         continue;
