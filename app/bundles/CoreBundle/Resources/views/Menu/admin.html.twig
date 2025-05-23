@@ -11,7 +11,7 @@
                         {% set labelAttributes = child.getLabelAttributes() %}
                         {% set labelClasses = (labelAttributes.class is not defined) ? 'nav-item-name' : labelAttributes.class ~ ' nav-item-name' %}
 
-                        {% if child.hasChildren() and child.getDisplayChildren() %}
+                        {% if (child.hasChildren() and child.getDisplayChildren()) or child.getUri() %}
                             <div class="dropdown-header">
                                 {% if extras.iconClass is defined and extras.iconClass is not empty %}
                                     <i class="icon {{ extras.iconClass }}"></i>
