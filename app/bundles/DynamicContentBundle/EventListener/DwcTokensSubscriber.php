@@ -16,7 +16,7 @@ final class DwcTokensSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private BuilderTokenHelperFactory $builderTokenHelperFactory,
-        private Connection $connection
+        private Connection $connection,
     ) {
     }
 
@@ -35,7 +35,7 @@ final class DwcTokensSubscriber implements EventSubscriberInterface
                 'dynamiccontent:dynamiccontents'
             );
 
-            $expr = $this->connection->getExpressionBuilder()
+            $expr = $this->connection->createExpressionBuilder()
                 ->and('e.is_campaign_based <> 1 and e.slot_name is not null');
 
             $tokens = $dwcTokenHelper->getTokens(

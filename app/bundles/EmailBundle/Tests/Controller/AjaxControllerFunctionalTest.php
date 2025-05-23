@@ -362,10 +362,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $dwcToken->setIsPublished(true);
         $dwcToken->setFilters([
             [
-                'glue' => 'and',
-                'field' => 'email',
-                'object' => 'lead',
-                'type' => 'email',
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
                 'operator' => '!empty',
             ],
         ]);
