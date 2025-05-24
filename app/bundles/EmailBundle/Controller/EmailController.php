@@ -1563,7 +1563,7 @@ class EmailController extends FormController
                         ];
 
                         // Send to current user
-                        $error = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
+                        $error = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], true);
                         if (count($error)) {
                             array_push($errors, $error[0]);
                         }
