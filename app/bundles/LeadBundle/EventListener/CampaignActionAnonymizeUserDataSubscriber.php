@@ -82,7 +82,7 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
                 'label'                  => 'mautic.lead.lead.events.anonymize',
                 'description'            => 'mautic.lead.lead.events.anonymize_descr',
                 // Kept for BC in case plugins are listening to the shared trigger
-                'eventName'              => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'eventName'              => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, // @phpstan-ignore-line
                 'formType'               => CampaignActionAnonymizeUserDataType::class,
                 'batchEventName'         => LeadEvents::ON_CAMPAIGN_ACTION_ANONYMIZE_USER_DATA,
             ]
@@ -286,7 +286,7 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
         Company|Lead $leadOrCompany,
         array $field,
         LeadField $leadField,
-        bool $pseudonymize
+        bool $pseudonymize,
     ): Lead|Company {
         if (empty($field['value'])) {
             return $leadOrCompany;

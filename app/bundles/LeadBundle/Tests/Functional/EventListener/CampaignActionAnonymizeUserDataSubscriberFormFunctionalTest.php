@@ -682,7 +682,6 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $form->setValues($data);
 
         $this->client->submit($form);
-//        dump($this->client->getResponse()->getContent());
         $formModel = static::getContainer()->get('mautic.form.model.form');
         assert($formModel instanceof FormModel);
 
@@ -714,7 +713,7 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
     private function addEmailStat(
         Lead $lead,
         Email $emailEntity,
-        string $emailAddress
+        string $emailAddress,
     ): Stat {
         $stat = new Stat();
         $stat->setEmailAddress($emailAddress);

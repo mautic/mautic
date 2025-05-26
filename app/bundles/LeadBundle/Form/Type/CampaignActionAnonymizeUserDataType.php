@@ -30,7 +30,7 @@ class CampaignActionAnonymizeUserDataType extends AbstractType
 
     public function __construct(
         private FieldModel $fieldModel,
-        private Translator $translator
+        private Translator $translator,
     ) {
     }
 
