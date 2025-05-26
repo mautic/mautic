@@ -634,7 +634,6 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         \assert($submissionModel instanceof SubmissionModel);
 
         foreach ($leads as $key => $lead) {
-
             assert($lead instanceof Lead);
             $name       = $sameName ? $lead->getLastname() : $lead->getLastname().'_'.$key;
 
@@ -667,7 +666,6 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
                 'form2' => $submissionsForm2,
             ],
         ];
-
     }
 
     private function addSubmission(int $id, string $email, string $lastname): ?Submission
