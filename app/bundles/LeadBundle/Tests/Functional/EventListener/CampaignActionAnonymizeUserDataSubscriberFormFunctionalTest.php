@@ -946,7 +946,7 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
      * @param array<string> $fieldsToAnonymize
      * @param array<string> $fieldsToDelete
      *
-     * @return array<string, string>
+     * @return array<string, array<string>|string>
      */
     private function getDefaultValuesForm(array $fieldsToAnonymize, array $fieldsToDelete, bool $pseudonymize = false): array
     {
