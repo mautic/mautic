@@ -24,7 +24,7 @@
 {# PICTOGRAM TYPE #}
 {% elseif type == 'pictogram' %}
     <div class="d-flex {% if orientation is defined and orientation == 'horizontal' %}fd-row-sm column-gap-lg {% endif %}fd-column row-gap-xs mb-32">
-        {% include '@MauticCore/Helper/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
+        {% include '@MauticCore/Component/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
         <div>{{ common_header_content }}</div>
     </div>
 
