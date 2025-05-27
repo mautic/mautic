@@ -731,9 +731,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    /**
-     * @dataProvider relativeDateInvalidIntervalValues
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('relativeDateInvalidIntervalValues')]
     public function testSegmentRelativeDateFilterOnlySupportPositiveNumber(string $interval, string $message): void
     {
         $filter = [[
