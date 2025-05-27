@@ -19,7 +19,7 @@
 
     {% set translated_label = tag.label|trans %}
 
-    {% set other_attributes = attributes|filter((v, k) => k != 'class' and k != 'id') %}
+    {% set other_attributes = attributes|filter((v, k) => k != 'id') %}
     {% set truncated_label = translated_label %}
     {% set label_tooltip = '' %}
     {% if translated_label|length > 27 %}
