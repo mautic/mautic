@@ -32,9 +32,7 @@ class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     private function getQueryBuilderMock()
     {
-        $queryBuilderMock = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
 
         $queryBuilderMock->expects($this->once())
             ->method('select')
@@ -70,9 +68,7 @@ class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($queryBuilderMock);
 
-        $abstractQueryMock = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $abstractQueryMock = $this->createMock(AbstractQuery::class);
 
         $queryBuilderMock->expects($this->once())
             ->method('getQuery')

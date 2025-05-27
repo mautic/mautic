@@ -7,6 +7,7 @@ use Gaufrette\Adapter\AwsS3;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Gaufrette\Filesystem;
+use MauticPlugin\MauticCloudStorageBundle\Exception\InvalidCredentialConfigurationException;
 use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
@@ -93,6 +94,10 @@ class AmazonS3Integration extends CloudStorageIntegration
     {
         if (!$this->adapter || !$this->fileSystem) {
             $keys = $this->getDecryptedApiKeys();
+            if (empty($keys['client_id']) || empty($keys['client_secret'])) {
+                $errorMessage = 'Configuration error: client_id and client_secret are not set!';
+                throw new InvalidCredentialConfigurationException('AmazonS3Integration misconfigured: client_id or client_secret missing.');
+            }
 
             $s3Args = [
                 'version'     => 'latest',

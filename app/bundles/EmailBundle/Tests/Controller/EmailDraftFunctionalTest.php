@@ -14,7 +14,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->configParams['email_draft_enabled'] = 'testEmailDraftNotConfigured' !== $this->getName();
+        $this->configParams['email_draft_enabled'] = 'testEmailDraftNotConfigured' !== $this->name();
 
         parent::setUp();
     }

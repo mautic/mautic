@@ -44,6 +44,14 @@ class SmsApiController extends CommonApiController
         $this->entityNameOne   = 'sms';
         $this->entityNameMulti = 'smses';
 
+        $this->serializerGroups = [
+            'smsDetails',
+            'categoryList',
+            'publishDetails',
+            'leadListList',
+            'projectList',
+        ];
+
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 

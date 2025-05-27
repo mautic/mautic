@@ -67,13 +67,13 @@ class UserSummaryNotificationHelperTest extends TestCase
 
         $this->ownerProvider->expects($matcher)
             ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
 
                     return [['owner_id' => 1, 'id' => 1]];
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([2 => 2], $parameters[1]);
 
@@ -87,16 +87,16 @@ class UserSummaryNotificationHelperTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('test', $parameters[0]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('test', $parameters[0]);
                 }
 
@@ -120,13 +120,13 @@ class UserSummaryNotificationHelperTest extends TestCase
 
         $this->ownerProvider->expects($matcher)
             ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
 
                     return [];
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([2 => 2], $parameters[1]);
 
@@ -141,16 +141,16 @@ class UserSummaryNotificationHelperTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('test', $parameters[0]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('test', $parameters[0]);
                 }
 

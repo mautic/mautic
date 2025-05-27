@@ -7,22 +7,17 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseIntegration::class)]
 class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 {
     use DataGeneratorTrait;
 
-    /**
-     * @testdox Test that all records are fetched till last page of results are consumed
-     *
-     * @covers \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that all records are fetched till last page of results are consumed')]
     public function testMultiplePagesOfRecordsAreFetched(): void
     {
         $this->reset();
 
-        $apiHelper = $this->getMockBuilder(ConnectwiseApi::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $apiHelper = $this->createMock(ConnectwiseApi::class);
 
         $apiHelper->expects($this->exactly(2))
             ->method('getContacts')
@@ -46,18 +41,12 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $integration->getRecords([], 'Contact');
     }
 
-    /**
-     * @testdox Test that all records are fetched till last page of results are consumed
-     *
-     * @covers \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that all records are fetched till last page of results are consumed')]
     public function testMultiplePagesOfCampaignMemberRecordsAreFetched(): void
     {
         $this->reset();
 
-        $apiHelper = $this->getMockBuilder(ConnectwiseApi::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $apiHelper = $this->createMock(ConnectwiseApi::class);
 
         $apiHelper->expects($this->exactly(2))
             ->method('getCampaignMembers')
@@ -65,9 +54,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 fn () => $this->generateData(2)
             );
 
-        $integrationEntityModel = $this->getMockBuilder(IntegrationEntityModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integrationEntityModel = $this->createMock(IntegrationEntityModel::class);
 
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->setConstructorArgs([

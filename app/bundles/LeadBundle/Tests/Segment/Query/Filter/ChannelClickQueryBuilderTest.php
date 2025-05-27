@@ -68,7 +68,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function dataApplyQuery(): iterable
+    public static function dataApplyQuery(): iterable
     {
         yield ['eq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
         yield ['eq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
@@ -76,9 +76,7 @@ class ChannelClickQueryBuilderTest extends TestCase
         yield ['neq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
     }
 
-    /**
-     * @dataProvider dataApplyQuery
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -99,7 +97,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function dataApplyQueryWithBatchLimitersMinMaxBoth(): iterable
+    public static function dataApplyQueryWithBatchLimitersMinMaxBoth(): iterable
     {
         yield [['minId' => 1, 'maxId' => 1], 'eq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
         yield [['minId' => 1, 'maxId' => 1], 'eq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
@@ -123,10 +121,9 @@ class ChannelClickQueryBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
-     *
      * @param array<string, mixed> $batchLimiters
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryWithBatchLimitersMinMaxBoth')]
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);

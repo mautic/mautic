@@ -48,7 +48,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addEventListener')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher1) {
-                    if (1 === $matcher1->getInvocationCount()) {
+                    if (1 === $matcher1->numberOfInvocations()) {
                         $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
                         $callback = function (callable $formModifier) {
                             /** @var FormInterface<FormBuilderInterface>&MockObject $form */
@@ -64,7 +64,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
 
                             $form->expects($matcher2)
                                 ->method('add')->willReturnCallback(function (...$parameters) use ($matcher2, $form) {
-                                    if (1 === $matcher2->getInvocationCount()) {
+                                    if (1 === $matcher2->numberOfInvocations()) {
                                         $this->assertSame('condition', $parameters[0]);
                                         $this->assertSame(ChoiceType::class, $parameters[1]);
                                         $this->assertSame([
@@ -83,7 +83,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                                             ],
                                         ], $parameters[2]);
                                     }
-                                    if (2 === $matcher2->getInvocationCount()) {
+                                    if (2 === $matcher2->numberOfInvocations()) {
                                         $this->assertSame('value', $parameters[0]);
                                         $this->assertSame(CollectionType::class, $parameters[1]);
                                         $this->assertSame([

@@ -381,7 +381,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[$sObject]);
                         }
                     } else {
-                        throw new ApiErrorException($this->authorizationError);
+                        throw new ApiErrorException($this->authorizationError ?? '');
                     }
                 }
             }

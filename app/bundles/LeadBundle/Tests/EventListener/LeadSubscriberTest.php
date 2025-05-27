@@ -15,10 +15,12 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\Assert;
@@ -64,30 +66,32 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @var ModelFactory<object>&MockObject
      */
-    private MockObject $modelFacotry;
+    private MockObject $modelFactory;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private LeadListRepository&MockObject $leadListRepository;
 
-    /**
-     * @var CompanyLeadRepository
-     */
-    private $companyLeadRepository;
+    private SegmentCountCacheHelper&MockObject $segmentCountCacheHelper;
+
+    private CoreParametersHelper&MockObject $coreParametersHelper;
+
+    private CompanyLeadRepository&MockObject $companyLeadRepository;
 
     protected function setUp(): void
     {
-        $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel         = $this->createMock(AuditLogModel::class);
-        $this->leadEventDispatcher   = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper       = new DncReasonHelper($this->createMock(TranslatorInterface::class));
-        $this->entityManager         = $this->createMock(EntityManager::class);
-        $this->translator            = $this->createMock(TranslatorInterface::class);
-        $this->router                = $this->createMock(RouterInterface::class);
-        $this->modelFacotry          = $this->createMock(ModelFactory::class);
-        $this->coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
-        $this->companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
+        parent::setUp();
+
+        $this->ipLookupHelper          = $this->createMock(IpLookupHelper::class);
+        $this->auditLogModel           = $this->createMock(AuditLogModel::class);
+        $this->leadEventDispatcher     = $this->createMock(LeadChangeEventDispatcher::class);
+        $this->dncReasonHelper         = new DncReasonHelper($this->createMock(TranslatorInterface::class));
+        $this->entityManager           = $this->createMock(EntityManager::class);
+        $this->translator              = $this->createMock(TranslatorInterface::class);
+        $this->router                  = $this->createMock(RouterInterface::class);
+        $this->modelFactory            = $this->createMock(ModelFactory::class);
+        $this->leadListRepository      = $this->createMock(LeadListRepository::class);
+        $this->segmentCountCacheHelper = $this->createMock(SegmentCountCacheHelper::class);
+        $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
+        $this->companyLeadRepository   = $this->createMock(CompanyLeadRepository::class);
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice(): void
@@ -144,7 +148,8 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
-            $this->modelFacotry,
+            $this->leadListRepository,
+            $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
             $this->companyLeadRepository
         );
@@ -165,7 +170,7 @@ class LeadSubscriberTest extends CommonMocks
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->will($this->returnValue($eventTypeName));
+            ->willReturn($eventTypeName);
 
         $lead = new Lead();
 
@@ -206,7 +211,7 @@ class LeadSubscriberTest extends CommonMocks
 
         $repo->expects($matcher)
             ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($lead, $parameters[0]);
                     $this->assertSame('lead', $parameters[1]);
                     $this->assertSame('api-single', $parameters[2]);
@@ -215,7 +220,7 @@ class LeadSubscriberTest extends CommonMocks
 
                     return $logs;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($lead, $parameters[0]);
                     $this->assertSame('lead', $parameters[1]);
                     $this->assertSame('api-batch', $parameters[2]);
@@ -238,9 +243,11 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
-            $this->modelFacotry,
+            $this->leadListRepository,
+            $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
             $this->companyLeadRepository,
+            $this->modelFactory,
             true
         );
 
@@ -277,7 +284,7 @@ class LeadSubscriberTest extends CommonMocks
         // This method will be called exactly once per set of changes
         $this->auditLogModel->expects($matcher)
             ->method('writeToLog')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $lead2, $lead3) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
@@ -296,7 +303,7 @@ class LeadSubscriberTest extends CommonMocks
                         'ipAddress' => null,
                     ], $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
@@ -315,7 +322,7 @@ class LeadSubscriberTest extends CommonMocks
                         'ipAddress' => null,
                     ], $parameters[0]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',
                         'object'    => 'lead',
@@ -340,9 +347,11 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
-            $this->modelFacotry,
+            $this->leadListRepository,
+            $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
             $this->companyLeadRepository,
+            $this->modelFactory,
             true
         );
 
@@ -401,9 +410,11 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
-            $this->modelFacotry,
+            $this->leadListRepository,
+            $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
             $this->companyLeadRepository,
+            $this->modelFactory,
             true
         );
 

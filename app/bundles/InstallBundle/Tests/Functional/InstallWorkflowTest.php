@@ -15,11 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * This test must run in a separate process because it sets the global constant
  * MAUTIC_INSTALLER which breaks other tests.
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class InstallWorkflowTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;

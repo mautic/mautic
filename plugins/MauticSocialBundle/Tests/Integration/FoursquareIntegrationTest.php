@@ -8,6 +8,7 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(FoursquareIntegration::class)]
 class FoursquareIntegrationTest extends AbstractIntegrationTestCase
 {
     private FoursquareIntegration $integration;
@@ -50,9 +51,6 @@ class FoursquareIntegrationTest extends AbstractIntegrationTestCase
         );
     }
 
-    /**
-     * @covers \MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::getFormType
-     */
     public function testGetFormTypeReturnsNull(): void
     {
         // @phpstan-ignore-next-line - Intentional null check

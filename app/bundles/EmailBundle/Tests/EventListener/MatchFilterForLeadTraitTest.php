@@ -124,9 +124,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
-    /**
-     * @dataProvider dateMatchTestProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateMatchTestProvider')]
     public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect): void
     {
         $filters = [
@@ -164,11 +162,10 @@ class MatchFilterForLeadTraitTest extends TestCase
     }
 
     /**
-     * @dataProvider dataForInNotInOperatorFilter
-     *
      * @param array<string,string> $fieldDetails
      * @param array<string,string> $filterDetails
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForInNotInOperatorFilter')]
     public function testCheckLeadValueIsInFilter(array $fieldDetails, array $filterDetails, bool $expected): void
     {
         $lead = [
@@ -196,15 +193,13 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @return iterable<string, string[]>
      */
-    public function segmentMembershipFilterProvider(): iterable
+    public static function segmentMembershipFilterProvider(): iterable
     {
         yield 'Classic Segment Membership Filter' => ['leadlist'];
         yield 'Static Segment Membership Filter' => ['leadlist_static'];
     }
 
-    /**
-     * @dataProvider segmentMembershipFilterProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('segmentMembershipFilterProvider')]
     public function testIsContactSegmentRelationshipValidEmpty(string $filterField): void
     {
         $lead['id'] = 1;
@@ -240,7 +235,7 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function dataForInNotInOperatorFilter(): iterable
+    public static function dataForInNotInOperatorFilter(): iterable
     {
         // field details, filter details, expected.
         yield [

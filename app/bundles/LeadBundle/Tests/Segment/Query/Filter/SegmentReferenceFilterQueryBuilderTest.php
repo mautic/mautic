@@ -78,15 +78,13 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
     /**
      * @return array<mixed>
      */
-    public function dataApplyQuery(): iterable
+    public static function dataApplyQuery(): iterable
     {
         yield ['eq', "SELECT 1 FROM <prefix>leads l WHERE EXISTS(SELECT null FROM <prefix>leads queryAlias WHERE (l.id = queryAlias.id) AND (EXISTS(SELECT null FROM <prefix>lead_lists_leads para1 WHERE (queryAlias.id = para1.lead_id) AND ((para1.leadlist_id = %s) AND ((para1.manually_added = 1) OR (para1.manually_removed = ''))))))"];
         yield ['neq', "SELECT 1 FROM <prefix>leads l WHERE EXISTS(SELECT null FROM <prefix>leads queryAlias WHERE (l.id = queryAlias.id) AND (EXISTS(SELECT null FROM <prefix>lead_lists_leads para1 WHERE (queryAlias.id = para1.lead_id) AND ((para1.leadlist_id = %s) AND ((para1.manually_added = 1) OR (para1.manually_removed = ''))))))"];
     }
 
-    /**
-     * @dataProvider dataApplyQuery
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $expectedQuery): void
     {
         $queryBuilder = new QueryBuilder($this->connectionMock);

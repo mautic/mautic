@@ -236,11 +236,11 @@ class ContactObjectHelperTest extends TestCase
 
         $contact1->expects($matcher)
             ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('john@doe.com', $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(MauticSyncDataExchange::OBJECT_COMPANY, $parameters[0]);
                     $this->assertSame('Company A', $parameters[1]);
                 }

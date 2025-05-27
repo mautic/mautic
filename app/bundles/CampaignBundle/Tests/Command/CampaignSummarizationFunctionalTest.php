@@ -18,7 +18,7 @@ class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->configParams['campaign_use_summary'] = 'testExecuteCampaignEventWithSummarization' === $this->getName();
+        $this->configParams['campaign_use_summary'] = 'testExecuteCampaignEventWithSummarization' === $this->name();
         parent::setUp();
     }
 

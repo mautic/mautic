@@ -59,7 +59,7 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
 
         $this->formBuilder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $options) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mappedField', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
                     $this->assertSame([
@@ -80,7 +80,7 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
                         ],
                     ], $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('syncDirection', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
                     $this->assertSame([

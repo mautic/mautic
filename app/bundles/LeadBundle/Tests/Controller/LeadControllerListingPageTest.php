@@ -21,10 +21,9 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
     /**
      * @param string[] $location
      *
-     * @dataProvider dataForContactListing
-     *
      * @throws ORMException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForContactListing')]
     public function testContactListingForLocation(array $location, string $expected): void
     {
         $this->createContact($location);
@@ -38,7 +37,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, string|string[]>>
      */
-    public function dataForContactListing(): iterable
+    public static function dataForContactListing(): iterable
     {
         yield 'With no location' => [
             // Location Details

@@ -16,15 +16,13 @@ class CorePermissionsTest extends MauticMysqlTestCase
     /**
      * @return iterable<array{bool}>
      */
-    public function dataVirtualPermission(): iterable
+    public static function dataVirtualPermission(): iterable
     {
         yield 'Permission granted' => [true];
         yield 'Permission declined' => [false];
     }
 
-    /**
-     * @dataProvider dataVirtualPermission
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataVirtualPermission')]
     public function testVirtualPermission(bool $grant): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);

@@ -36,9 +36,7 @@ class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($newLength, $column->getLength(), 'Column length updated.');
     }
 
-    /**
-     * @dataProvider dataUpdateColumnExceptionCheck
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateColumnExceptionCheck')]
     public function testUpdateColumnLengthThrowsException(string $column, int $len, string $message): void
     {
         $this->expectExceptionMessageMatches($message);
@@ -48,7 +46,7 @@ class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
     /**
      * @return mixed[]
      */
-    public function dataUpdateColumnExceptionCheck(): iterable
+    public static function dataUpdateColumnExceptionCheck(): iterable
     {
         // name, length, exception msg.
         yield 'Column name missing.' => ['', 10, '/The column name is should not be empty\/missing./'];

@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
@@ -19,6 +20,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     protected function setUp(): void
     {
+        $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCacheCountInBackground' === $this->name();
         parent::setUp();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
@@ -527,6 +529,25 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
         $this->assertFalse(isset($tags['EmailNotOpen']));
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
+     */
+    public function testSegmentCacheCountInBackground(): void
+    {
+        // Execute the command again to trigger related events.
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
+
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(0, $count);
+
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
     }
 
     public function testCampaignActionChangeMembership(): void

@@ -225,13 +225,11 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $device = new LeadDevice();
         $device->setTrackingId('abc123');
 
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->method('getId')
             ->willReturn(2);
 
@@ -242,7 +240,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $leadDevice2->setTrackingId('def456');
 
         $this->deviceTrackerMock->method('getTrackedDevice')
-            ->willReturnOnConsecutiveCalls($leadDevice1, $leadDevice2);
+            ->willReturnOnConsecutiveCalls($leadDevice1, $leadDevice2, null);
 
         $this->dispatcherMock->expects($this->once())
             ->method('hasListeners')

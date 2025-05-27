@@ -9,11 +9,9 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(DateYearLast::class)]
 class DateYearLastTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast::getOperator
-     */
     public function testGetOperatorBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -30,9 +28,6 @@ class DateYearLastTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('like', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast::getOperator
-     */
     public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -53,9 +48,6 @@ class DateYearLastTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('==<<', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast::getParameterValue
-     */
     public function testGetParameterValueBetween(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -80,9 +72,6 @@ class DateYearLastTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDate->format('Y-%'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast::getParameterValue
-     */
     public function testGetParameterValueSingle(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);

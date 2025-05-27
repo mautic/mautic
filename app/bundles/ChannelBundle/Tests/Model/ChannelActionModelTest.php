@@ -55,10 +55,10 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactModelMock->expects($matcher)
             ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock6, $parameters[0]);
                 }
 
@@ -180,12 +180,12 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->doNotContactMock->expects($matcher)
             ->method('addDncForContact')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(5, $parameters[0]);
                     $this->assertSame('email', $parameters[1]);
                     $this->assertSame(DNC::MANUAL, $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(5, $parameters[0]);
                     $this->assertSame('sms', $parameters[1]);
                     $this->assertSame(DNC::MANUAL, $parameters[2]);

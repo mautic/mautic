@@ -25,8 +25,8 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->randomHelperMock        = $this->getMockBuilder(RandomHelperInterface::class)->getMock();
-        $this->userTokenRepositoryMock = $this->getMockBuilder(UserTokenRepositoryInterface::class)->getMock();
+        $this->randomHelperMock        = $this->createMock(RandomHelperInterface::class);
+        $this->userTokenRepositoryMock = $this->createMock(UserTokenRepositoryInterface::class);
     }
 
     /**

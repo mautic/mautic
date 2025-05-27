@@ -1751,7 +1751,7 @@ class CommonRepository extends ServiceEntityRepository
                         $f->strict       = true;
                         [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                     }
-                } else {
+                } elseif ($f->string) {
                     [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                 }
             }

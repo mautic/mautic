@@ -669,3 +669,56 @@
   .fo-4-lg { order: 4; }
   .fo-5-lg { order: 5; }
 }
+
+// Animations
+// Slide in
+
+.animation--slide-in-up { animation: animationSlideInUp var(--duration-expressive) forwards; }
+.animation--slide-in-down { animation: animationSlideInDown var(--duration-expressive) forwards; }
+.animation--slide-in-left { animation: animationSlideInLeft var(--duration-expressive) forwards; }
+.animation--slide-in-right { animation: animationSlideInRight var(--duration-expressive) forwards; }
+
+.animation--slide-scale-in-up { animation: animationSlideScaleInUp var(--duration-expressive) forwards; }
+.animation--slide-scale-in-down { animation: animationSlideScaleInDown var(--duration-expressive) forwards; } 
+.animation--slide-scale-in-left { animation: animationSlideScaleInLeft var(--duration-expressive) forwards; }
+.animation--slide-scale-in-right { animation: animationSlideScaleInRight var(--duration-expressive) forwards; }
+
+@keyframes animationSlideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes animationSlideInDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes animationSlideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes animationSlideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInUp {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInDown {
+  from { transform: translateY(-20px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInLeft {
+  from { transform: translateX(-20px) scale(0.95); opacity: 0; }
+  to   { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes animationSlideScaleInRight {
+  from { transform: translateX(20px) scale(0.95); opacity: 0; }
+  to   { transform: translateX(0) scale(1); opacity: 1; }
+}

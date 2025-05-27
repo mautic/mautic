@@ -182,11 +182,11 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $matcher = self::exactly(2);
         $builder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(HubspotIntegration::ACCESS_KEY, $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->integration->getApiKey(), $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
                 }

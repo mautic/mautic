@@ -36,7 +36,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<array<string|int|null>>
      */
-    public function regexOperatorProvider(): iterable
+    public static function regexOperatorProvider(): iterable
     {
         yield [
             'regexp',
@@ -60,9 +60,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    /**
-     * @dataProvider regexOperatorProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
     public function testRegexOperatorValidation(string $operator, string $regex, int $expectedResponseCode, ?string $expectedErrorMessage): void
     {
         $this->client->request(

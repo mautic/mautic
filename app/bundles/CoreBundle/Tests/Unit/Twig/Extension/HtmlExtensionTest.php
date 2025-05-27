@@ -11,10 +11,9 @@ use PHPUnit\Framework\TestCase;
 final class HtmlExtensionTest extends TestCase
 {
     /**
-     * @dataProvider convertStringToArrayProvider
-     *
      * @param array<string, mixed> $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('convertStringToArrayProvider')]
     public function testConvertStringToArray(string $input, array|bool $expected): void
     {
         $extension = new HtmlExtension();

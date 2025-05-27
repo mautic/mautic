@@ -11,9 +11,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider delayDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
     public function testSubmitCampaignActionVariousDelayOptions(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $uri = '/s/campaigns/events/new?type=campaign.addremovelead&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
@@ -52,7 +50,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string,array<string|int>>
      */
-    public function delayDataProvider(): iterable
+    public static function delayDataProvider(): iterable
     {
         yield 'The immediate mode cannot be allowed otherwise the contacts will loop too fast for no reason' => [
             'immediate',
@@ -79,9 +77,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    /**
-     * @dataProvider delayDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
     public function testValidationViaCampaignApi(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $segment = new LeadList();

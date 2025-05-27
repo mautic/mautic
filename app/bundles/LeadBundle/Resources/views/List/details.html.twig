@@ -48,6 +48,51 @@
 
 {% block publishStatus %}
   {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': list}) -}}
+
+    {# Dynamic/Static segment tag - must be first #}
+    {% set segmentType = list.filters is defined and list.filters|length > 0 ? 'dynamic' : 'static' %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [
+            {
+                label: ('mautic.lead.tag.' ~ segmentType ~ '_segment')|trans,
+                icon: 'ri-pie-chart-line',
+                color: 'high-contrast',
+                attributes: {
+                    title: ('mautic.lead.tag.' ~ segmentType ~ '_segment.tooltip')|trans,
+                    'data-toggle': 'tooltip',
+                    'tooltip-placement': 'top'
+                }
+            }
+        ]
+    } %}
+
+    {# Tag for visible to other users #}
+    {% if list.isGlobal is defined and list.isGlobal == 1 %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.lead.list.form.isglobal'|trans,
+                    icon: 'ri-group-2-fill',
+                    color: 'blue',
+                    icon_only: true
+                }
+            ]
+        } %}
+    {% endif %}
+
+    {# Tag for available in Preference Center #}
+    {% if list.isPreferenceCenter is defined and list.isPreferenceCenter == 1 %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.lead.list.form.isPreferenceCenter'|trans,
+                    icon: 'ri-equalizer-2-fill',
+                    color: 'blue',
+                    icon_only: true
+                }
+            ]
+        } %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}

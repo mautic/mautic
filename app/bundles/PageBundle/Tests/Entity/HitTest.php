@@ -9,9 +9,7 @@ use PHPUnit\Framework\Assert;
 
 class HitTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider setUrlTitle
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setUrlTitle')]
     public function testSetUrlTitle(string $urlTitle, int $expected): void
     {
         $hit = new Hit();
@@ -23,7 +21,7 @@ class HitTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<int,int|string>>
      */
-    public function setUrlTitle(): iterable
+    public static function setUrlTitle(): iterable
     {
         yield ['custom', 6];
         yield ['Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars ', 191];

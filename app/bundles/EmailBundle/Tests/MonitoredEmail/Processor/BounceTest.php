@@ -19,9 +19,7 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 
 class BounceTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that the transport interface processes the message appropriately
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void
     {
         $transport     = new TestTransport();
@@ -68,9 +66,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($bouncer->process($message));
     }
 
-    /**
-     * @testdox Test that the message is processed appropriately
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         $transport     = new NullTransport();

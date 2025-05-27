@@ -13,9 +13,7 @@ class ClientControllerTest extends MauticMysqlTestCase
 {
     private const TOTAL_COUNT = 6;
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testIndexActionForPager(): void
     {
         $this->createApiClients();

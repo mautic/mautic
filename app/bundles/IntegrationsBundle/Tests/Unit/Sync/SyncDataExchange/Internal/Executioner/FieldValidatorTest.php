@@ -102,13 +102,13 @@ class FieldValidatorTest extends TestCase
         $this->bulkNotification->expects($matcher)
             ->method('addNotification')
             ->willReturnCallback(function (...$parameters) use ($matcher, $firstChangedObject, $secondChangedObject) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->getNotificationAssertion($parameters, "Custom field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync. Your integration integration plugin may be configured improperly.", $firstChangedObject, 'company', 'length');
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->getNotificationAssertion($parameters, "Custom field 'Time' of type 'time' did not match integration type 'date' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'time', 'type');
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->getNotificationAssertion($parameters, "Custom field 'Number' of type 'number' did not match integration type 'url' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'number', 'type');
                 }
             });

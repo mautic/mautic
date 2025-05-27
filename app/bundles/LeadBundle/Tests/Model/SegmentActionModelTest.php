@@ -39,12 +39,12 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactModelMock->expects($matcher)
             ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
                     return false;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock6, $parameters[0]);
 
                     return true;
@@ -75,12 +75,12 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactModelMock->expects($matcher)
             ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
                     return false;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock6, $parameters[0]);
 
                     return true;
@@ -111,10 +111,10 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactModelMock->expects($matcher)
             ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock6, $parameters[0]);
                 }
 
@@ -124,11 +124,11 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactModelMock->expects($matcher)
             ->method('addToLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                     $this->assertSame($segments, $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock6, $parameters[0]);
                     $this->assertSame($segments, $parameters[1]);
                 }
@@ -154,10 +154,10 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactModelMock->expects($matcher)
             ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock6, $parameters[0]);
                 }
 
@@ -167,11 +167,11 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactModelMock->expects($matcher)
             ->method('removeFromLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                     $this->assertSame($segments, $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock6, $parameters[0]);
                 }
             });

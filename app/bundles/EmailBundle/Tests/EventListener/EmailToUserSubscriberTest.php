@@ -28,9 +28,7 @@ class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $lead = new Lead();
 
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockSendEmailToUser = $this->createMock(SendEmailToUser::class);
 
         $subscriber = new EmailToUserSubscriber($mockSendEmailToUser);
 
@@ -56,9 +54,7 @@ class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $lead = new Lead();
 
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockSendEmailToUser = $this->createMock(SendEmailToUser::class);
 
         $subscriber = new EmailToUserSubscriber($mockSendEmailToUser);
 
