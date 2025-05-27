@@ -10,7 +10,7 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: ('mautic.focus.form.type.' ~ item.type),
-                icon: {
+                renderIcon: {
                     'form': 'ri-survey-fill',
                     'link': 'ri-link',
                     'notice': 'ri-information-2-fill'
@@ -29,7 +29,7 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: ('mautic.focus.style.' ~ item.style),
-                icon: {
+                renderIcon: {
                     'modal': 'ri-window-2-fill',
                     'notification': 'ri-notification-3-fill',
                     'bar': 'ri-layout-bottom-2-fill',
@@ -48,7 +48,7 @@
 {% if item.properties.when is defined and item.properties.when is not empty %}
     {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
-            icon: {
+            renderIcon: {
                 'immediately': 'ri-flashlight-fill',
                 'scroll_slight': 'ri-mouse-fill',
                 'scroll_middle': 'ri-scroll-to-bottom-fill',
@@ -57,7 +57,7 @@
             }[item.properties.when],
             label: ('mautic.focus.form.when.' ~ item.properties.when ~ '.description'),
             color: 'blue',
-            icon_only: true
+            iconOnly: true
         }]
     } %}
 {% endif %}
@@ -65,7 +65,7 @@
 {% if item.properties.frequency is defined and item.properties.frequency is not empty %}
     {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
-            icon: {
+            renderIcon: {
                 'everypage': 'ri-repeat-2-fill',
                 'once': 'ri-repeat-one-fill',
                 'q2min': 'ri-reset-left-line',
@@ -75,7 +75,7 @@
             }[item.properties.frequency],
             label: ('mautic.focus.form.frequency.' ~ item.properties.frequency ~ '.description'),
             color: 'blue',
-            icon_only: true
+            iconOnly: true
         }]
     } %}
 {% endif %}
@@ -84,7 +84,7 @@
     {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: item.properties.timeout,
-            icon: 'ri-timer-fill',
+            renderIcon: 'ri-timer-fill',
             color: 'blue',
             attributes: {
                 'data-toggle': 'tooltip',

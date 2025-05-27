@@ -26,7 +26,7 @@
             ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
             : [])
         |merge(entity.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
+            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), renderIcon: 'ri-translate' }]
             : [])
     %}
 

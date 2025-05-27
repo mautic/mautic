@@ -74,7 +74,7 @@
     tags: [
         {
             type: 'read-only',
-            icon: activeForm.formType == 'campaign'
+            renderIcon: activeForm.formType == 'campaign'
             ? 'ri-megaphone-line'
             : 'ri-survey-line',
             color: 'high-contrast',
@@ -89,9 +89,9 @@
     {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: 'mautic.core.tag.search_index.disabled'|trans,
-            icon: 'ri-eye-off-fill',
+            renderIcon: 'ri-eye-off-fill',
             color: 'blue',
-            icon_only: true
+            iconOnly: true
         }]
     } %}
 {% endif %}
@@ -100,9 +100,9 @@
     {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: 'mautic.form.tag.kioskmode.label'|trans,
-            icon: 'ri-spy-fill',
+            renderIcon: 'ri-spy-fill',
             color: 'blue',
-            icon_only: true
+            iconOnly: true
         }]
     } %}
 {% endif %}
@@ -112,7 +112,7 @@
     {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: activeForm.language()|language_name,
-            icon: 'ri-translate-2',
+            renderIcon: 'ri-translate-2',
             color: 'warm-gray',
             attributes: {
                 'data-toggle': 'tooltip',

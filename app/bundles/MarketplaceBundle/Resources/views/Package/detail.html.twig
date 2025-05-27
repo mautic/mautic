@@ -113,7 +113,7 @@
                         type: 'read-only',
                         color: 'warning',
                         label: packageDetail.githubInfo.stars|escape,
-                        icon: 'ri-star-s-fill ri-lg',
+                        renderIcon: 'ri-star-s-fill ri-lg',
                         attributes: {
                             'title': 'marketplace.package.github.stars'|trans,
                             'data-toggle': 'tooltip',
@@ -124,7 +124,7 @@
                         type: 'read-only',
                         color: 'warm-gray',
                         label: packageDetail.packageBase.downloads|escape,
-                        icon: 'ri-download-line',
+                        renderIcon: 'ri-download-line',
                         attributes: {
                             'title': 'marketplace.package.total.downloads'|trans,
                             'data-toggle': 'tooltip',
@@ -137,7 +137,7 @@
                         label: packageDetail.packageBase.type == 'theme'
                             ? 'marketplace.package.type.theme'|trans
                             : 'marketplace.package.type.plugin'|trans,
-                        icon: packageDetail.packageBase.type == 'theme'
+                        renderIcon: packageDetail.packageBase.type == 'theme'
                             ? 'ri-paint-brush-line marketplace-icon'
                             : 'ri-plug-line',
                         attributes: {

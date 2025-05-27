@@ -60,15 +60,15 @@
     {% set grayTags = [] %}
 
     {% if activePage.isPreferenceCenter %}
-        {% set blueTags = blueTags|merge([{ type: 'read-only', color: 'blue', icon_only: true, label: 'mautic.email.form.preference_center', icon: 'ri-equalizer-2-fill' }]) %}
+        {% set blueTags = blueTags|merge([{ type: 'read-only', color: 'blue', iconOnly: true, label: 'mautic.email.form.preference_center', renderIcon: 'ri-equalizer-2-fill' }]) %}
     {% endif %}
 
     {% if activePage.isTranslation and not activePage.isTranslation(true) %}
-        {% set blueTags = blueTags|merge([{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon: 'ri-translate', icon_only: true }]) %}
+        {% set blueTags = blueTags|merge([{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', renderIcon: 'ri-translate', iconOnly: true }]) %}
     {% endif %}
 
     {% if activePage.noIndex is defined and activePage.noIndex == 1 %}
-        {% set blueTags = blueTags|merge([{ label: 'mautic.core.tag.search_index.disabled'|trans, icon: 'ri-eye-off-fill', color: 'blue', icon_only: true }]) %}
+        {% set blueTags = blueTags|merge([{ label: 'mautic.core.tag.search_index.disabled'|trans, renderIcon: 'ri-eye-off-fill', color: 'blue', iconOnly: true }]) %}
     {% endif %}
 
     {% if activePage.isVariant and not activePage.isVariant(true) %}
@@ -76,14 +76,14 @@
     {% endif %}
 
     {% if activePage.isVariant(true) %}
-        {% set grayTags = grayTags|merge([{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]) %}
+        {% set grayTags = grayTags|merge([{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), renderIcon: 'ri-organization-chart' }]) %}
     {% endif %}
 
     {% if activePage.isTranslation(true) %}
         {% set grayTags = grayTags|merge([{ 
             color: 'warm-gray', 
             label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
-            icon: 'ri-translate',
+            renderIcon: 'ri-translate',
             attributes: {
                 'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id})
             }
@@ -91,7 +91,7 @@
     {% endif %}
 
     {% if activePage.language is defined and activePage.language is not empty %}
-        {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
+        {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, renderIcon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
     {% endif %}
 
     {% include '@MauticCore/Components/tag.html.twig' with { tags: blueTags|merge(grayTags) } %}
