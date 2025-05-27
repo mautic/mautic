@@ -7,16 +7,11 @@ namespace Mautic\LeadBundle\Tests\Form\DataTransformer;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilter;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FieldFilterTransformerTest extends TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translator;
-
     private FieldFilterTransformer $transformer;
 
     protected function setUp(): void

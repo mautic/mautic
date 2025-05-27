@@ -708,13 +708,13 @@ return [
                 ],
             ],
             'mautic.lead.data_transformer.field_filter' => [
-                'class' => Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer::class,
+                'class'     => Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer::class,
                 'arguments' => [
                     'service_container',
                 ],
             ],
             'mautic.lead.data_transformer.field_filter.default_value_transformer' => [
-                'class' => Mautic\LeadBundle\Form\DataTransformer\FieldFilter\FieldFilterDefaultValueTransformer::class,
+                'class'     => Mautic\LeadBundle\Form\DataTransformer\FieldFilter\FieldFilterDefaultValueTransformer::class,
                 'arguments' => [
                     'mautic.lead.data_transformer.field_filter',
                     [],

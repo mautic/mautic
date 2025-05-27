@@ -11,7 +11,7 @@ trait FieldFilterDateTransformerTrait
      */
     private function skipTransformation($value): bool
     {
-        return !is_array($value) || (in_array($value['operator'] ?? '', [OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN]));
+        return !is_array($value) || in_array($value['operator'] ?? '', [OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN]);
     }
 
     /**

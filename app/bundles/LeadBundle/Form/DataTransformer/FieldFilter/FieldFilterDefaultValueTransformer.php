@@ -8,20 +8,11 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class FieldFilterDefaultValueTransformer implements DataTransformerInterface
 {
-    private DataTransformerInterface $transformer;
-
-    /**
-     * @var array<string, string>
-     */
-    private array $default;
-
     /**
      * @param array<string, string> $default
      */
-    public function __construct(DataTransformerInterface $transformer, array $default = [])
+    public function __construct(private DataTransformerInterface $transformer, private array $default = [])
     {
-        $this->transformer = $transformer;
-        $this->default     = $default;
     }
 
     public function transform($value)

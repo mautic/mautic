@@ -769,7 +769,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $rows);
     }
 
-    public function relativeDateInvalidIntervalValues(): \Generator
+    public static function relativeDateInvalidIntervalValues(): \Generator
     {
         yield ['-1', 'This value should be positive.'];
         yield ['foo', 'This value is not valid.'];

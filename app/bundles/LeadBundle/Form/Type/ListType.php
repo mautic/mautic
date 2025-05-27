@@ -22,7 +22,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<LeadList>
@@ -30,8 +29,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     public function __construct(
-        FieldFilterTransformer $fieldFilterTransformer,
-        private ListModel $listModel
+        private FieldFilterTransformer $fieldFilterTransformer,
+        private ListModel $listModel,
     ) {
     }
 

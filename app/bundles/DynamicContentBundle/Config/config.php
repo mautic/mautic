@@ -46,7 +46,7 @@ return [
     'services' => [
         'forms' => [
             'mautic.form.type.dwc' => [
-                'class'     => \Mautic\DynamicContentBundle\Form\Type\DynamicContentType::class,
+                'class'     => Mautic\DynamicContentBundle\Form\Type\DynamicContentType::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.list',

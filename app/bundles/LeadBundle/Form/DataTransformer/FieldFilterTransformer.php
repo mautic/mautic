@@ -14,7 +14,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 class FieldFilterTransformer implements DataTransformerInterface, ServiceSubscriberInterface
 {
     public function __construct(
-        ContainerInterface $serviceLocator
+        private ContainerInterface $serviceLocator,
     ) {
     }
 
@@ -42,7 +42,7 @@ class FieldFilterTransformer implements DataTransformerInterface, ServiceSubscri
      *
      * @return mixed[]
      */
-    private function doTransform($value, callable $transform)
+    private function doTransform($value, callable $transform): array
     {
         if (!is_array($value)) {
             return [];
