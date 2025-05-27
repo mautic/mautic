@@ -52,6 +52,7 @@ return [
                     'mautic.lead.model.list',
                     'mautic.lead.data_transformer.field_filter',
                     'mautic.lead.model.lead',
+                    'mautic.dynamiccontent.model.type.list',
                 ],
             ],
             'mautic.form.type.dwc_entry_filters' => [
@@ -76,6 +77,11 @@ return [
                     'event_dispatcher',
                     'mautic.lead.model.lead',
                 ],
+            ],
+        ],
+        'models' => [
+            'mautic.dynamiccontent.model.type.list' => [
+                'class' => Mautic\DynamicContentBundle\DynamicContent\TypeList::class,
             ],
         ],
     ],
