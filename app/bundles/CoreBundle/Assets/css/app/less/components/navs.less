@@ -43,8 +43,6 @@
 // Tabs
 // -------------------------
 .nav-tabs {
-  border-top-right-radius: @nav-pills-border-radius;
-  border-top-left-radius: @nav-pills-border-radius;
   //background-color: @body-bg;
   display: flex;
   flex-wrap: nowrap;
@@ -57,6 +55,7 @@
     > a {
       line-height: 20px;
       color: var(--text-secondary);
+      .outline();
 
       &:hover { color: var(--text-primary); }
 
@@ -75,7 +74,7 @@
     &.active > a {
       overflow: hidden;
       border-top-color: transparent;
-      font-weight: 600;
+      font-weight: bold;
 
       &:after { background-color: @nav-pills-active-link-hover-bg; }
     }
@@ -87,6 +86,7 @@
         background-color: transparent;
         padding: 6px 16px;
         margin-right: -2px;
+        border-radius: 0;
 
         &:after {
           top: unset;
@@ -119,7 +119,7 @@
     > li {
       > a {
         background-color: var(--layer-accent);
-        border-radius: var(--border-radius-sm);
+        border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
 
         &:hover { background-color: var(--layer-accent-hover);}
       }
@@ -165,13 +165,6 @@
 
 .stats-menu__content.tab-content > .tab-pane {
   width: 100%;
-}
-
-.nav-tabs-wrapper:has(.nav-tabs-contained) + .tab-content,
-.nav-tabs-wrapper:has(.nav-tabs-contained) + form > .tab-content,
-.nav-tabs-contained + .tab-content,
-.nav-tabs-contained + form > .tab-content {
-  background-color: var(--layer);
 }
 
 //

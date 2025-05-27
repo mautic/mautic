@@ -5,27 +5,20 @@
 
 {% block headerTitle %}{{ 'mautic.point.group.header.index'|trans }}{% endblock %}
 
-{% block actions %}
-    {{- include(
-        '@MauticCore/Helper/page_actions.html.twig',
-        {
-            'templateButtons': {
-            'new': permissions['point:groups:create']
-        },
-            'routeBase': 'point.group',
-            'langVar': 'point.group'
-        }
-    ) -}}
-{% endblock %}
-
 {% block content %}
-    <div id="page-list-wrapper">
+    <div id="page-list-wrapper" class="panel panel-default">
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig', {
+                'templateButtons': {
+                    'new': permissions['point:groups:create']
+                },
+                'routeBase': 'point.group',
+                'langVar': 'point.group'
+            })
+        }) -}}
         <div class="page-list">
-            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue' : searchValue,
-                'searchHelp'  : 'mautic.lead.list.help.searchcommands',
-                'action'      : currentRoute,
-            }) -}}
             {% if items is defined and items is not empty %}
                 <div class="table-responsive">
                     <table class="table table-hover" id="groupTable">

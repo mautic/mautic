@@ -148,6 +148,7 @@ $container->loadFromExtension(
         ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',
+            'request'  => Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore::class,
         ],
     ]
 );

@@ -287,6 +287,16 @@ class LeadController extends FormController
                             'value'  => 'lead',
                         ],
                     ],
+                    'order' => [
+                        [
+                            'col' => 'f.isFixed',
+                            'dir' => 'DESC',
+                        ],
+                        [
+                            'col' => 'f.order',
+                            'dir' => 'ASC',
+                        ],
+                    ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
                 'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
@@ -1657,7 +1667,7 @@ class LeadController extends FormController
             $campaigns = $campaignModel->getPublishedCampaigns(true);
             $items     = [];
             foreach ($campaigns as $campaign) {
-                $items[$campaign['name']] = $campaign['id'];
+                $items[$campaign['name'].' ('.$campaign['id'].')'] = $campaign['id'];
             }
 
             $route = $this->generateUrl(
@@ -1839,7 +1849,7 @@ class LeadController extends FormController
             $stages = $model->getUserStages();
             $items  = [];
             foreach ($stages as $stage) {
-                $items[$stage['name']] = $stage['id'];
+                $items[$stage['name'].' ('.$stage['id'].')'] = $stage['id'];
             }
 
             $route = $this->generateUrl(
@@ -1941,7 +1951,7 @@ class LeadController extends FormController
             $users = $userModel->getRepository()->getUserList('', 0);
             $items = [];
             foreach ($users as $user) {
-                $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
+                $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
             }
 
             $route = $this->generateUrl(

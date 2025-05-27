@@ -41,7 +41,16 @@
 		</div>
 
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate')|escape }}"/>
-		<button class="btn btn-lg btn-primary btn-block" type="submit">{% trans %}mautic.user.auth.form.loginbtn{% endtrans %}</button>
+		{% include '@MauticCore/Helper/button.html.twig' with {
+			buttons: [
+				{
+					label: 'mautic.user.auth.form.loginbtn',
+					variant: 'primary',
+					size: 'lg',
+					wide: true
+				}
+			]
+		} %}
 
 		<div class="mt-sm text-right">
 			<a href="{{ path('mautic_user_passwordreset') }}">{% trans %}mautic.user.user.passwordreset.link{% endtrans %}</a>

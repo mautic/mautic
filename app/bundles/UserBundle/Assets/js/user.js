@@ -12,7 +12,6 @@ Mautic.userOnLoad = function (container) {
 
     /**
      * Initializes radio button states for UI settings based on localStorage settings.
-     * Applies settings to the document for preview on user changes.
      * Saves settings to localStorage only when the Save button is clicked.
      *
      * @constant {string} prefix - Prefix for localStorage keys.
@@ -20,27 +19,28 @@ Mautic.userOnLoad = function (container) {
     const prefix = 'm-toggle-setting-';
     let temporarySettings = {};
 
-    // Load settings from localStorage on page load
-    Object.keys(localStorage)
-        .filter(key => key.startsWith(prefix))
-        .forEach(setting => {
-            const attributeName = setting.replace(prefix, '');
-            const value = localStorage.getItem(setting);
+    // Load settings from localStorage on page load or use the checked attribute if not set
+    document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
+        const attributeName = radio.dataset.attributeToggle;
+        const settingKey = `${prefix}${attributeName}`;
+        const savedValue = localStorage.getItem(settingKey);
 
-            if (value) {
-                const radio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${value}"]`);
-                if (radio) radio.checked = true;
-                document.documentElement.setAttribute(attributeName, value);
-            }
-        });
+        if (savedValue) {
+            // If a saved value exists in localStorage, apply it
+            const correspondingRadio = document.querySelector(`input[name="${attributeName}"][data-attribute-value="${savedValue}"]`);
+            if (correspondingRadio) correspondingRadio.checked = true;
+        } else if (radio.checked) {
+            // Use the checked state from the HTML as the default if nothing is saved
+            localStorage.setItem(settingKey, radio.dataset.attributeValue); // Persist default value to localStorage
+        }
+    });
 
-    // Handle radio button changes - update temporary settings but do NOT save to localStorage yet
+    // Handle radio button changes - just store in temporary settings
     document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
         radio.addEventListener('change', function () {
             if (this.checked) {
                 const attributeName = this.dataset.attributeToggle;
                 temporarySettings[attributeName] = this.dataset.attributeValue;
-                document.documentElement.setAttribute(attributeName, temporarySettings[attributeName]);
             }
         });
     });
@@ -49,6 +49,7 @@ Mautic.userOnLoad = function (container) {
     document.getElementById('user_buttons_save_toolbar').addEventListener('click', () => {
         Object.entries(temporarySettings).forEach(([attributeName, value]) => {
             localStorage.setItem(`${prefix}${attributeName}`, value);
+            document.documentElement.setAttribute(attributeName, value);
         });
         temporarySettings = {};
     });

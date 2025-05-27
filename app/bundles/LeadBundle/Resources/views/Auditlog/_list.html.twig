@@ -34,11 +34,21 @@
                 </div>
                 <div class="col-sm-2 mt-lg">
                     {% if enableExportPermission %}
-                    <a class="btn btn-tertiary btn-sm btn-block mt-lg" href="{{ url('mautic_contact_auditlog_export_action', {'leadId': lead.id}) }}" data-toggle="download">
-                        <span>
-                            <i class="ri-download-line"></i> <span>{{ 'mautic.core.export'|trans }}</span>
-                        </span>
-                    </a>
+                    {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                            {
+                                href: url('mautic_contact_auditlog_export_action', {'leadId': lead.id}),
+                                icon: 'ri-download-line',
+                                label: 'mautic.core.export',
+                                size: 'sm',
+                                attributes: {
+                                    'data-toggle': 'download'
+                                },
+                                variant: 'tertiary',
+                                icon_only: false
+                            }
+                        ]
+                    } %}
                     {% endif %}
                 </div>
             </div>

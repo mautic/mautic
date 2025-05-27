@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -27,6 +28,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -42,13 +44,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailType extends AbstractType
 {
+    private bool $isDraftEnabled;
+
     public function __construct(
         private TranslatorInterface $translator,
         private EntityManagerInterface $em,
         private StageModel $stageModel,
         private CoreParametersHelper $coreParametersHelper,
-        private ThemeHelperInterface $themeHelper
+        private ThemeHelperInterface $themeHelper,
+        EmailConfigInterface $emailConfig,
     ) {
+        $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -189,6 +195,9 @@ class EmailType extends AbstractType
         );
 
         $template = $options['data']->getTemplate() ?? 'blank';
+        if (true === $this->isDraftEnabled && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getTemplate())) {
+            $template = $options['data']->getDraft()->getTemplate();
+        }
         // If theme does not exist, set empty
         $template = $this->themeHelper->getCurrentTheme($template, 'email');
 
@@ -229,6 +238,10 @@ class EmailType extends AbstractType
             ]
         );
 
+        $html = $options['data']->getCustomHtml();
+        if (true === $this->isDraftEnabled && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getHtml())) {
+            $html = $options['data']->getDraft()->getHtml();
+        }
         $builder->add(
             'customHtml',
             TextareaType::class,
@@ -243,6 +256,7 @@ class EmailType extends AbstractType
                     'data-token-activator' => '{',
                     'rows'                 => '15',
                 ],
+                'data' => $html,
             ]
         );
 
@@ -477,22 +491,27 @@ class EmailType extends AbstractType
 
         $builder->add('sessionId', HiddenType::class);
         $builder->add('emailType', HiddenType::class);
+
+        $extraButtons['pre_extra_buttons'] = [
+            [
+                'name'  => 'builder',
+                'label' => 'mautic.core.builder',
+                'attr'  => [
+                    'class'   => 'btn btn-ghost btn-dnd btn-nospin text-primary btn-builder',
+                    'icon'    => 'ri-layout-line',
+                    'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
+                ],
+            ],
+        ];
+
+        $draftActionButtons = $this->getDraftActionButtons($options['data']);
+        if (!empty($draftActionButtons)) {
+            $extraButtons['post_extra_buttons'] = $draftActionButtons;
+        }
         $builder->add(
             'buttons',
             FormButtonsType::class,
-            [
-                'pre_extra_buttons' => [
-                    [
-                        'name'  => 'builder',
-                        'label' => 'mautic.core.builder',
-                        'attr'  => [
-                            'class'   => 'btn btn-ghost btn-dnd btn-nospin text-primary btn-builder',
-                            'icon'    => 'ri-layout-line',
-                            'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
-                        ],
-                    ],
-                ],
-            ]
+            $extraButtons
         );
 
         $builder->add(
@@ -543,6 +562,50 @@ class EmailType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getDraftActionButtons(Email $email): array
+    {
+        $draftActionButtons = [];
+        if (false === $this->isDraftEnabled || empty($email->getId())) {
+            return $draftActionButtons;
+        }
+
+        if ($email->hasDraft()) {
+            $draftActionButtons[] = [
+                'name'  => 'apply_draft',
+                'label' => 'mautic.core.applydraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-primary btn-apply-draft',
+                    'icon'    => 'fa fa-files-o text-success',
+                ],
+            ];
+            $draftActionButtons[] = [
+                'name'  => 'discard_draft',
+                'label' => 'mautic.core.discarddraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-primary btn-discard-draft',
+                    'icon'    => 'fa fa-trash text-danger',
+                ],
+            ];
+        } else {
+            $draftActionButtons[] = [
+                'name'  => 'save_draft',
+                'label' => 'mautic.core.saveasdraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-primary btn-save-draft',
+                    'icon'    => 'fa fa-file text-success',
+                ],
+            ];
+        }
+
+        return $draftActionButtons;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

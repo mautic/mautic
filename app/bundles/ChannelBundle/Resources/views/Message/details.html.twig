@@ -1,23 +1,41 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
+
 {% block mauicContent %}message
 {% endblock %}
+
 {% block headerTitle %}
 	{{ item.getName() }}
 {% endblock %}
+
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : item,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['channel:messages:viewown'], permissions['channel:messages:viewother'], item.getCreatedBy()),
+        },
+        'routeBase'       : 'message',
+        'targetLabel'     : 'mautic.channel.messages'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
-	{{- include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
         'item': item,
         'templateButtons': {
             'edit': securityHasEntityAccess(permissions['channel:messages:editown'], permissions['channel:messages:editother'], item.getCreatedBy()),
             'clone': permissions['channel:messages:create'],
-            'delete': securityHasEntityAccess(permissions['channel:messages:deleteown'], permissions['channel:messages:deleteown'], item.getCreatedBy()),
+            'delete': securityHasEntityAccess(permissions['channel:messages:deleteown'], permissions['channel:messages:deleteother'], item.getCreatedBy()),
         },
         'routeBase': 'message'
     }) -}}
 {% endblock %}
+
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
 {% endblock %}
+
 {% block content %}
 <!-- start: box layout -->
     <div class="box-layout">
@@ -25,14 +43,7 @@
         <div class="col-md-9 height-auto">
             <div>
                 <!-- form detail header -->
-                <div class="pr-md pl-md pt-lg pb-lg">
-                    <div class="box-layout">
-                        <div class="col-xs-10">
-                            <div class="text-muted">{{ item.getDescription()|purify }}</div>
-                        </div>
-
-                    </div>
-                </div>
+                {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
                 <!--/ form detail header -->
                 <!-- form detail collapseable -->
                 <div class="collapse pr-md pl-md" id="focus-details">
@@ -120,5 +131,5 @@
             {% block rightFormContent %}
             {% endblock %}
         </div>
-    </div> 
+    </div>
 {% endblock %}

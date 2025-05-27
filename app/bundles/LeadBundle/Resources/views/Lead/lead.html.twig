@@ -23,11 +23,29 @@
     {{ lead.secondaryIdentifier|purify }}</span></div>
 {% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : lead,
+        'routeBase'       : 'contact',
+        'langVar'         : 'lead.lead',
+        'customButtons'   : [],
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(
+                permissions['lead:leads:viewown'],
+                permissions['lead:leads:viewother'],
+                lead.permissionUser
+            ),
+        },
+        'targetLabel'     : 'mautic.lead.leads'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
     {% set canEdit = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], lead.permissionUser) %}
     {% set buttons = [] %}
 
-    {# Send email button #}
     {% if fields.core.email is defined %}
         {% set emailAdress = fields.core.email.value %}
         {% set sendButton = {
@@ -49,37 +67,34 @@
         {% set buttons = buttons|merge([sendButton]) %}
     {% endif %}
 
-    {# View Contact Frequency button #}
     {% if canEdit %}
-      {% set buttons = buttons|merge([{
-          'attr': {
-              'data-toggle': 'ajaxmodal',
-              'data-target': '#MauticSharedModal',
-              'data-header': 'mautic.lead.lead.header.contact.frequency'|trans({'%name%': lead.primaryIdentifier|e}),
-              'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactFrequency'}),
-          },
-          'btnText': 'mautic.lead.contact.frequency'|trans,
-          'iconClass': 'ri-settings-5-line',
-      }]) %}
+        {% set buttons = buttons|merge([{
+            'attr': {
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'data-header': 'mautic.lead.lead.header.contact.frequency'|trans({'%name%': lead.primaryIdentifier|e}),
+                'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactFrequency'}),
+            },
+            'btnText': 'mautic.lead.contact.frequency'|trans,
+            'iconClass': 'ri-settings-5-line',
+        }]) %}
 
-      {% if pointGroups is not empty %}
-          {% set buttons = buttons|merge([{
-              'attr': {
-                  'data-toggle': 'ajaxmodal',
-                  'data-target': '#MauticSharedModal',
-                  'data-header': 'mautic.lead.groups.panel.title'|trans,
-                  'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactGroupPoints'}),
-              },
-              'btnText': 'mautic.lead.groups.panel.title'|trans,
-              'iconClass': 'ri-focus-2-fill',
-          }]) %}
-      {% endif %}
-
+        {% if pointGroups is not empty %}
+            {% set buttons = buttons|merge([{
+                'attr': {
+                    'data-toggle': 'ajaxmodal',
+                    'data-target': '#MauticSharedModal',
+                    'data-header': 'mautic.lead.groups.panel.title'|trans,
+                    'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactGroupPoints'}),
+                },
+                'btnText': 'mautic.lead.groups.panel.title'|trans,
+                'iconClass': 'ri-coins-line',
+            }]) %}
+        {% endif %}
     {% endif %}
 
-    {# View Campaigns List button #}
     {% if securityIsGranted('campaign:campaigns:edit') %}
-      {% set buttons = buttons|merge([{
+        {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': 'ajaxmodal',
                 'data-target': '#MauticSharedModal',
@@ -89,10 +104,9 @@
             },
             'btnText': 'mautic.campaign.campaigns'|trans,
             'iconClass': 'ri-megaphone-line',
-      }]) %}
+        }]) %}
     {% endif %}
 
-    {# Merge button #}
     {% if securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], lead.permissionUser) and canEdit %}
         {% set buttons = buttons|merge([{
             'attr': {
@@ -106,8 +120,7 @@
         }]) %}
     {% endif %}
 
-    {# Download button #}
-    {% if securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], lead.permissionUser) and enableExportPermission is not empty  %}
+    {% if securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], lead.permissionUser) and enableExportPermission is not empty %}
         {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': 'download',
@@ -128,11 +141,6 @@
                 'delete': securityHasEntityAccess(
                     permissions['lead:leads:deleteown'],
                     permissions['lead:leads:deleteother'],
-                    lead.permissionUser
-                ),
-                'close': securityHasEntityAccess(
-                    permissions['lead:leads:viewown'],
-                    permissions['lead:leads:viewother'],
                     lead.permissionUser
                 ),
             },

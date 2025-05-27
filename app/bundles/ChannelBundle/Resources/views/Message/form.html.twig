@@ -72,7 +72,14 @@
 
 {% block rightFormContent %}
 {{ form_row(form.category) }}
-{{ form_row(form.isPublished) }}
+{{ form_row(form.isPublished, {
+    'attr': {
+        'data-none': 'mautic.core.form.unavailable_regardless_of_scheduling',
+        'data-start': 'mautic.core.form.available_on_scheduled_date',
+        'data-both': 'mautic.core.form.available_during_scheduled_period',
+        'data-end': 'mautic.core.form.available_until_scheduled_end'
+    }
+}) }}
 {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
 {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
 {% endblock %}

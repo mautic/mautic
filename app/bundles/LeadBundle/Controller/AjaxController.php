@@ -11,8 +11,10 @@ use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -975,5 +977,20 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse([]);
+    }
+
+    public function updateLeadFieldOrderChoiceListAction(Request $request): Response
+    {
+        $object = InputHelper::clean($request->request->get('object'));
+        $group  = InputHelper::clean($request->request->get('group'));
+        $field  = new LeadField();
+        $field->setObject($object);
+        $field->setGroup($group);
+        $form = $this->createForm(FieldType::class, $field);
+
+        return $this->render(
+            '@MauticLead/Field/_field_order.html.twig', [
+                'form' => $form->createView(),
+            ]);
     }
 }

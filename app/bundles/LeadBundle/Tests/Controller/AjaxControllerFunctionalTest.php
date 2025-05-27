@@ -114,6 +114,40 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
     }
 
+    public function testCompanyLookupWithLimit(): void
+    {
+        $company1 = new Company();
+        $company1->setName('Company 1');
+        $this->em->persist($company1);
+
+        $company2 = new Company();
+        $company2->setName('Company 2');
+        $this->em->persist($company2);
+
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1');
+
+        $response = $this->client->getResponse();
+        $content  = json_decode($response->getContent(), true);
+
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertIsArray($content);
+        Assert::assertCount(1, $content, 'The result should contain only one element');
+        Assert::assertSame('Company 1', $content[0]['text']);
+        Assert::assertSame($company1->getId(), (int) $content[0]['value']);
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1&start=1');
+        $response = $this->client->getResponse();
+        $content  = json_decode($response->getContent(), true);
+
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertIsArray($content);
+        Assert::assertCount(1, $content, 'The result should contain only one element');
+        Assert::assertSame('Company 2', $content[0]['text']);
+        Assert::assertSame($company2->getId(), (int) $content[0]['value']);
+    }
+
     public function testSegmentDependencyTree(): void
     {
         $segmentA = new LeadList();
@@ -512,6 +546,65 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         self::assertCount(2, $foundNames);
         self::assertSame('User 3', $foundNames[0]);
         self::assertSame('User 4', $foundNames[1]);
+    }
+
+    /**
+     * @dataProvider leadFieldOrderChoiceListProvider
+     *
+     * @param string[] $expectedOptions
+     */
+    public function testUpdateLeadFieldOrderChoiceListAction(string $object, string $group, array $expectedOptions): void
+    {
+        $payload = [
+            'action' => 'lead:updateLeadFieldOrderChoiceList',
+            'object' => $object,
+            'group'  => $group,
+        ];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/ajax',
+            $payload,
+            [],
+            $this->createAjaxHeaders()
+        );
+
+        // Get the response HTML
+        $response    = $this->client->getResponse();
+        $htmlContent = $response->getContent();
+
+        // Assert the response is successful
+        $this->assertTrue($response->isOk(), "Response was not OK for object: $object, group: $group");
+        $this->assertStringNotContainsString('<form', $htmlContent, 'Response contains a form instead of just field order.');
+        $this->assertStringContainsString('<select', $htmlContent, 'Response contains select tag.');
+
+        // Parse the HTML content using DOMDocument
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($htmlContent);
+        $select  = $dom->getElementsByTagName('select')->item(0);
+        $options = $select->getElementsByTagName('option');
+
+        $actualOptions = [];
+        foreach ($options as $option) {
+            if ($option->textContent) {
+                // Get the text content of each <option>
+                $actualOptions[] = trim($option->textContent);
+            }
+        }
+        // Assert that the actual options match the expected options
+        if (empty($expectedOptions)) {
+            $this->assertEmpty($actualOptions);
+        }
+        foreach ($expectedOptions as $expectedValue) {
+            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '$expectedValue' for object: $object, group: $group");
+        }
+    }
+
+    public function leadFieldOrderChoiceListProvider(): \Generator
+    {
+        yield ['lead', 'core', ['Fax', 'Website']];
+        yield ['lead', 'social', ['Facebook', 'Foursquare', 'Instagram']];
+        yield ['company', 'core', []];
     }
 
     private function getMembersForCampaign(int $campaignId): array

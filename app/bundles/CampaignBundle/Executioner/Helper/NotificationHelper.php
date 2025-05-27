@@ -86,7 +86,7 @@ class NotificationHelper
         );
 
         $subject = $this->translator->trans(
-            'mautic.campaign.event.campaign_unpublished.title',
+            'mautic.campaign.event.campaign_unpublished',
             [
                 '%title%' => $campaign->getName(),
             ]

@@ -19,6 +19,23 @@
   >thead>tr>th {
     vertical-align: middle;
     border-bottom: 1px solid @table-border-color;
+    background-color: var(--layer-accent);
+  }
+}
+
+.table-sort {
+  height: 48px;
+  border-radius: unset;
+  border-color: transparent;
+  &, &:hover, i {color: var(--text-primary);}
+  .table-sort__icon-unsorted { visibility: hidden; }
+  &:hover {
+    background-color: var(--layer-selected-hover);
+    border-color: transparent;
+    .table-sort__icon-unsorted {
+      visibility: visible;
+    }
+    i { color: var(--text-primary); }
   }
 }
 

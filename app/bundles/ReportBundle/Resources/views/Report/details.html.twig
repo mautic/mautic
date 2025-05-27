@@ -13,6 +13,23 @@
     }) -}}
 {% endblock %}
 
+{% block indexButton %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : report,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(
+                permissions['report:reports:viewown'],
+                permissions['report:reports:viewother'],
+                report.createdBy
+            ),
+        },
+        'routeBase' : 'report',
+        'targetLabel': 'mautic.report.reports'|trans
+    }
+) -}}
+{% endblock %}
+
 {% block actions %}
   {%- set buttons = [] -%}
   {% if (data is not empty or graphs is not empty) and enableExportPermission is not empty %}
@@ -51,12 +68,12 @@
           {% endif %}
       {% endif %}
   {% endif %}
+
   {{ include('@MauticCore/Helper/page_actions.html.twig', {
           'item': report,
           'templateButtons': {
               'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], report.createdBy),
               'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], report.createdBy),
-              'close': securityHasEntityAccess(permissions['report:reports:viewown'], permissions['report:reports:viewother'], report.createdBy),
           },
           'routeBase': 'report',
           'langVar': 'report.report',

@@ -5,9 +5,16 @@
     </a>
   {%- else -%}
     <a href="{{ url('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}) }}" data-toggle="ajax">
-      {{- form.name -}}
-      <span size="sm" class="label label-gray pull-right" data-toggle="tooltip" title="{{ 'mautic.form.form.resultcount'|trans }}" data-placement="left">
-          {{- form.resultCount -}}
+      <span class="fw-sb">{{- form.name -}}</span>
+      <span class="ml-4 mr-sm">#{{ form.getId() }}</span>
+        {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+            'entity': form,
+            'status': 'available',
+            'simplified': 'true'
+        }) -}}
+      <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.form.form.resultcount'|trans }}" data-placement="left">
+        <i class="ri-file-list-2-line mr-2"></i>
+        {{- form.resultCount -}}
       </span>
     </a>
   {%- endif -%}

@@ -1,12 +1,13 @@
 <div class="page-header">
-	<div class="row-no-gutters ai-center gap-md fw-nowrap-md fd-row-md fd-column-reverse">
+	<div class="row-no-gutters ai-center-md gap-md fw-nowrap-md fd-row-md fd-column-reverse">
 		<div class="col-xs-12 col-sm-6 col-md-5 va-m">
-			<div class="d-flex ai-center fw-wrap fw-nowrap-md">
+			<div class="d-flex fd-column fw-wrap fw-nowrap-md">
+				{{ indexButton|raw }}
 				<h1 class="pull-left page-header-title">{{ headerTitle|purify }}</h1>
-			<div class="ml-sm pull-left">{{ publishStatus|purify }}</div>
+			<div class="mt-md d-flex gap-xs">{{ publishStatus|raw }}</div>
 			{{ customContent('page.header.left', _context) }}
 			</div>
-			
+
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-7 va-m">
 			<div class="d-flex toolbar jc-end-md jc-start" id="toolbar">
@@ -16,8 +17,8 @@
 
 				<div class="toolbar-bundle-buttons pull-left">{{ toolbar }}</div>
 				<div class="toolbar-form-buttons hide pull-right">
-					<div class="btn-group toolbar-standard hidden-xs hidden-sm "></div>
-					<div class="btn-group toolbar-dropdown hidden-md hidden-lg">
+					<div class="toolbar-standard hidden-xs hidden-sm "></div>
+					<div class="toolbar-dropdown hidden-md hidden-lg">
 						<button type="button" class="btn btn-primary btn-main"></button>
 						<button type="button" class="btn btn-ghost btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 							<i class="ri-arrow-drop-down-line"></i>

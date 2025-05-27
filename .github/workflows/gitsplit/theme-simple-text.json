@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-simple-text",
+            "directory": "themes/_simple-text",
+            "target": "git@github.com:mautic/theme-simple-text.git"
+        }
+    ]
+}
