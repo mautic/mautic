@@ -298,6 +298,12 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $application->setAutoExit(false);
 
         $contactIds = $this->createContacts();
+
+        $contact = $this->contactRepository->getEntity($contactIds[0]);
+        $contact->setAddress1('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadddd');
+        $this->em->persist($contact);
+        $this->em->flush();
+
         $campaign   = $this->createCampaignWithTokens($contactIds);
 
         $this->em->clear();
@@ -313,6 +319,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         /** @var Lead $contact */
         $contact = $this->contactRepository->getEntity($contactIds[0]);
 
+        $address1Value = $contact->getAddress1();
         $positionValue = $contact->getFieldValue('position');
         $cityValue     = $contact->getFieldValue('city');
 
@@ -323,6 +330,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $expectedCityValue = 'Hello '.$today->format('Y-m-d H:i:s').' '.$this->contacts[0]['firstname'];
         $this->assertEquals($expectedCityValue, $cityValue);
+        $this->assertEquals('abcdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $address1Value, 'Shortening too long messages did not work properly');
     }
 
     /**
@@ -951,6 +959,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             [
                 'position'                   => '{datetime=today}',
                 'city'                       => 'Hello {datetime=today} {contactfield=firstname}',
+                'address1'                   => 'abcd{contactfield=address1}',
             ]
         );
 
