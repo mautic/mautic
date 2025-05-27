@@ -5,7 +5,7 @@
         <!-- Add to segments -->
         {% set segments = getEntities('Mautic\\LeadBundle\\Entity\\LeadList', action.properties.addToLists) %}
         {% for segment in segments %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
+            {% include '@MauticCore/Components/tag.html.twig' with {
                 'tags': [{
                     'label': segment.name,
                     'color': 'green',
@@ -23,7 +23,7 @@
         <!-- Remove from segments -->
         {% set segments = getEntities('Mautic\\LeadBundle\\Entity\\LeadList', action.properties.removeFromLists) %}
         {% for segment in segments %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
+            {% include '@MauticCore/Components/tag.html.twig' with {
                 'tags': [{
                     'label': segment.name,
                     'color': 'red',

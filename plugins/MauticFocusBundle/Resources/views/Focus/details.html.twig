@@ -7,7 +7,7 @@
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
     {% if item.type is defined and item.type is not empty %}
-        {% include '@MauticCore/Helper/_tag.html.twig' with {
+        {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: ('mautic.focus.form.type.' ~ item.type),
                 icon: {
@@ -26,7 +26,7 @@
     {% endif %}
 
     {% if item.style is defined and item.style is not empty %}
-        {% include '@MauticCore/Helper/_tag.html.twig' with {
+        {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: ('mautic.focus.style.' ~ item.style),
                 icon: {
@@ -46,7 +46,7 @@
     {% endif %}
 
 {% if item.properties.when is defined and item.properties.when is not empty %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
+    {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             icon: {
                 'immediately': 'ri-flashlight-fill',
@@ -63,7 +63,7 @@
 {% endif %}
 
 {% if item.properties.frequency is defined and item.properties.frequency is not empty %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
+    {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             icon: {
                 'everypage': 'ri-repeat-2-fill',
@@ -81,7 +81,7 @@
 {% endif %}
 
 {% if item.properties.timeout is defined and item.properties.timeout is not empty %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
+    {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: item.properties.timeout,
             icon: 'ri-timer-fill',

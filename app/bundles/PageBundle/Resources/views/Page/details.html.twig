@@ -94,7 +94,7 @@
         {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
     {% endif %}
 
-    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: blueTags|merge(grayTags) } %}
+    {% include '@MauticCore/Components/tag.html.twig' with { tags: blueTags|merge(grayTags) } %}
 
 {% endblock %}
 

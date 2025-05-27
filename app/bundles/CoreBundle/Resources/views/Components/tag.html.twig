@@ -21,16 +21,6 @@
     {% endif %}
 
     {% set translated_label = tag.label|trans %}
-    {% set classes = ['label', 'label-' ~ color] %}
-
-    {% if icon_only %}
-        {% set classes = classes|merge(['label-icon']) %}
-    {% endif %}
-
-    {# Merge additional classes #}
-    {% if attributes.class is defined %}
-        {% set classes = attributes.class is iterable ? classes|merge(attributes.class) : classes|merge([attributes.class]) %}
-    {% endif %}
 
     {% set other_attributes = attributes|filter((v, k) => k != 'class' and k != 'id') %}
     {% set truncated_label = translated_label %}
@@ -42,7 +32,7 @@
 
     {# Wrapper element switching logic #}
     {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}
-    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ translated_label }}" size="{{ size }}"
+    <{{ wrapper_tag }} id="{{ id }}" class="label label-{{ color }}{% if icon_only %} label-icon{% endif %} {{ className|default('') }}" aria-label="{{ translated_label }}" size="{{ size }}"
         {% if wrapper_tag == 'a' %} href="{{ attributes.href }}" {% endif %}
         {% for attr_key, attr_value in other_attributes %}
             {{ attr_key }}="{{ attr_value }}"

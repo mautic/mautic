@@ -7,7 +7,7 @@
             {% set category = getEntity('Mautic\\CategoryBundle\\Entity\\Category', action.properties.category) %}
             {% set categoryName = category ? category.title : '' %}
 
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
+            {% include '@MauticCore/Components/tag.html.twig' with {
                 tags: [
                     {
                         label: 'mautic.form.field.asset.use_category'|trans({'%category_name%': categoryName}),
@@ -24,7 +24,7 @@
             <!-- Specific asset selected -->
             {% set asset = getEntity('Mautic\\AssetBundle\\Entity\\Asset', action.properties.asset) %}
             {% if asset %}
-                {% include '@MauticCore/Helper/_tag.html.twig' with {
+                {% include '@MauticCore/Components/tag.html.twig' with {
                     tags: [
                         {
                             label: asset.title,

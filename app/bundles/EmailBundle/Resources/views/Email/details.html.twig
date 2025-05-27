@@ -106,7 +106,7 @@
         'status': email.getPublishUp() is not null ? 'sending' : 'available'
     }) -}}
 
-        {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+        {% include '@MauticCore/Components/tag.html.twig' with { tags: [
             {
                 color: 'high-contrast',
                 label: emailType == 'list'
@@ -116,12 +116,12 @@
         ] } %}
 
         {% if email.isVariant and not email.isVariant(true) %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+            {% include '@MauticCore/Components/tag.html.twig' with { tags: [
                 { color: 'blue', label: 'mautic.email.icon_tooltip.abtest', icon: 'ri-a-b', icon_only: true }
             ] } %}
         {% endif %}
         {% if email.isVariant(true) %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+            {% include '@MauticCore/Components/tag.html.twig' with { tags: [
                 {
                     color: 'warm-gray',
                     label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}),
@@ -134,12 +134,12 @@
         {% endif %}
 
         {% if email.isTranslation and not email.isTranslation(true) %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+            {% include '@MauticCore/Components/tag.html.twig' with { tags: [
                 { color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon: 'ri-translate', icon_only: true }
             ] } %}
         {% endif %}
         {% if email.isTranslation(true) %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
+            {% include '@MauticCore/Components/tag.html.twig' with { tags: [
                 {
                     color: 'warm-gray',
                     label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}),
@@ -152,7 +152,7 @@
         {% endif %}
         {# Language #}
         {% if email.language is defined and email.language is not empty %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
+            {% include '@MauticCore/Components/tag.html.twig' with {
                 tags: [{
                     label: email.language|language_name,
                     icon: 'ri-translate-2',
