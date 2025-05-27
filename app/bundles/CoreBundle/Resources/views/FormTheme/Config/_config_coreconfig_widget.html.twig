@@ -46,7 +46,7 @@
                     {% endif %}
                 {% endset %}
 
-                {% include '@MauticCore/Helper/accordion.html.twig' with {
+                {% include '@MauticCore/Components/accordion.html.twig' with {
                     'items': [
                         {
                             'title': 'mautic.core.config.technical_paths',
@@ -114,7 +114,7 @@
                             {% include '@MauticCore/FormTheme/Config/_config_coreconfig_widget--dateformat.html.twig' %}
                         {% endset %}
 
-                        {% include '@MauticCore/Helper/accordion.html.twig' with {
+                        {% include '@MauticCore/Components/accordion.html.twig' with {
                             'items': [
                                 {
                                     'title': 'mautic.core.config.pagination_and_display',
@@ -182,7 +182,7 @@
 
                     {% endset %}
 
-                    {% include '@MauticCore/Helper/accordion.html.twig' with {
+                    {% include '@MauticCore/Components/accordion.html.twig' with {
                         'items': [
                             {
                                 'title': 'mautic.core.config.trust_settings',
@@ -279,7 +279,7 @@
                         {% endif %}
                     {% endset %}
 
-                    {% include '@MauticCore/Helper/accordion.html.twig' with {
+                    {% include '@MauticCore/Components/accordion.html.twig' with {
                         'items': [
                             {
                                 'title': 'mautic.core.config.ip_lookup',
