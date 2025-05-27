@@ -464,7 +464,7 @@
                               </div>
                               <input id="content_preview_url" data-route="email/preview" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
                               <span class="input-group-btn">
-                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                {% include '@MauticCore/Components/button.html.twig' with {
                                     buttons: [
                                         {
                                             label: 'mautic.core.open_link',

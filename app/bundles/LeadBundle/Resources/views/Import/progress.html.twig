@@ -62,7 +62,7 @@
                 <p class="small"><span class="imported-count">{{ progress.done }}</span> / <span class="total-count">{{ progress.total }}</span></p>
                 {% if not complete %}
                     <div>
-                        {% include '@MauticCore/Helper/button.html.twig' with {
+                        {% include '@MauticCore/Components/button.html.twig' with {
                             buttons: [
                                 {
                                     label: 'mautic.core.form.cancel',
@@ -88,7 +88,7 @@
                         {% set indexRouteParams = indexRouteParams|merge({
                             'search': 'mautic.lead.lead.searchcommand.import_id'|trans ~ ':' ~ import.id
                         }) %}
-                        {% include '@MauticCore/Helper/button.html.twig' with {
+                        {% include '@MauticCore/Components/button.html.twig' with {
                             buttons: [
                                 {
                                     label: 'mautic.lead.list.view'|trans({'%objects%': objectName}),
