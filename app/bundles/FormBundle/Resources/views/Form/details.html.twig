@@ -70,7 +70,7 @@
     'entity': activeForm,
     'status': 'available'
 }) -}}
-{% include '@MauticCore/Helper/_tag.html.twig' with {
+{% include '@MauticCore/Components/tag.html.twig' with {
     tags: [
         {
             type: 'read-only',
@@ -86,7 +86,7 @@
 } %}
 
 {% if activeForm.noIndex is defined and activeForm.noIndex == 1 %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
+    {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: 'mautic.core.tag.search_index.disabled'|trans,
             icon: 'ri-eye-off-fill',
@@ -97,7 +97,7 @@
 {% endif %}
 
 {% if activeForm.inKioskMode is defined and activeForm.inKioskMode == 1 %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
+    {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: 'mautic.form.tag.kioskmode.label'|trans,
             icon: 'ri-spy-fill',
@@ -109,7 +109,7 @@
 
 {# Language #}
 {% if activeForm.language is defined and activeForm.language is not empty %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
+    {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: activeForm.language()|language_name,
             icon: 'ri-translate-2',

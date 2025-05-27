@@ -4,7 +4,7 @@
     {% if action.properties.add_tags is defined and action.properties.add_tags is not empty and securityIsGranted('tagManager:tagManager:view') %}
         <!-- Add tags -->
         {% for tagName in action.properties.add_tags %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
+            {% include '@MauticCore/Components/tag.html.twig' with {
                 'tags': [{
                     'label': tagName,
                     'color': 'green',
@@ -17,7 +17,7 @@
     {% if action.properties.remove_tags is defined and action.properties.remove_tags is not empty and securityIsGranted('tagManager:tagManager:view') %}
         <!-- Remove tags -->
         {% for tagName in action.properties.remove_tags %}
-            {% include '@MauticCore/Helper/_tag.html.twig' with {
+            {% include '@MauticCore/Components/tag.html.twig' with {
                 'tags': [{
                     'label': tagName,
                     'color': 'red',
