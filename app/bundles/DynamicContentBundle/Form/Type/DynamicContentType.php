@@ -371,7 +371,7 @@ class DynamicContentType extends AbstractType
                 'rows'                 => 15,
                 'data-editor-enable'   => $enableEditor,
                 'data-editor-class'    => $editorClass,
-                'data-token-callback'  => 'email:getBuilderTokens',
+                'data-token-callback'  => 'dynamicContent:getBuilderTokens',
                 'data-token-activator' => '{',
             ],
             'required' => false,
