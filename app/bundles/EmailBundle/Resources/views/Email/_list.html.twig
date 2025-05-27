@@ -141,7 +141,7 @@
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}
