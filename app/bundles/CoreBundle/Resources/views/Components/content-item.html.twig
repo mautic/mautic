@@ -3,7 +3,7 @@
     <div class="content-item__copy type-body-compact-02 {% if cta is defined and cta %} mb-md{% endif %}">{{ copy|trans }}</div>
     {% if cta is defined and cta %}
         {% set cta = cta|merge({'variant': 'link', 'icon': 'ri-arrow-right-line', 'href': cta.link}) %}
-        {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
+        {% include '@MauticCore/Components/button.html.twig' with {buttons: [cta]} %}
     {% endif %}
 {% endset %}
 

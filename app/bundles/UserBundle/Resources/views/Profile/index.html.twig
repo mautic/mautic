@@ -85,7 +85,7 @@
                             {{ form_row(userForm.plainPassword.confirm) }}
                             <h3 id="learning" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
                             <div class="text-secondary small pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
-                            {% include '@MauticCore/Helper/button.html.twig' with {
+                            {% include '@MauticCore/Components/button.html.twig' with {
                                 buttons: [
                                     {
                                         label: 'mautic.user.config.title.experience_and_learning.reset_dismissed',

@@ -25,7 +25,7 @@ Variables:
                     <span class="small text-secondary">{{ dateToFullConcat(note.dateTime) }}</span>
                     <div class="pull-right btn-group">
                         {% if permissions['edit'] %}
-                        {% include '@MauticCore/Helper/button.html.twig' with {
+                        {% include '@MauticCore/Components/button.html.twig' with {
                             buttons: [
                                 {
                                     label: 'mautic.lead.note.header.edit',
@@ -43,7 +43,7 @@ Variables:
                         } %}
                         {% endif %}
                         {% if permissions['delete'] %}
-                        {% include '@MauticCore/Helper/button.html.twig' with {
+                        {% include '@MauticCore/Components/button.html.twig' with {
                             buttons: [
                                 {
                                     label: 'mautic.lead.note.confirmdelete',

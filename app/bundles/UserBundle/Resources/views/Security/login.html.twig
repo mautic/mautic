@@ -41,7 +41,7 @@
 		</div>
 
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate')|escape }}"/>
-		{% include '@MauticCore/Helper/button.html.twig' with {
+		{% include '@MauticCore/Components/button.html.twig' with {
 			buttons: [
 				{
 					label: 'mautic.user.auth.form.loginbtn',

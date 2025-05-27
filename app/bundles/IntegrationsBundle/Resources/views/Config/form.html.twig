@@ -70,7 +70,7 @@
             <div class="row">
                 <div class="col-xs-12 text-center">
                     <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
-                    {% include '@MauticCore/Helper/button.html.twig' with {
+                    {% include '@MauticCore/Components/button.html.twig' with {
                         buttons: [
                             {
                                 label: integrationObject.isAuthorized() ? 'mautic.integration.form.reauthorize' : 'mautic.integration.form.authorize',

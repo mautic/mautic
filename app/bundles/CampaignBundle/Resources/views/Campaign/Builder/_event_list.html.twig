@@ -7,7 +7,7 @@
     <div id="{{ eventGroup|title }}GroupList" class="hide">
         <h4 class="mb-xs">
             <span>{{ ('mautic.campaign.event.'~eventGroup~'s.header')|trans }}</span>
-            {% include '@MauticCore/Helper/button.html.twig' with {
+            {% include '@MauticCore/Components/button.html.twig' with {
                 buttons: [
                     {
                         icon: 'ri-fw ri-corner-right-up-line',

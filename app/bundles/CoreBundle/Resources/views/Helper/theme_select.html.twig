@@ -8,7 +8,6 @@
 {% set isCodeMode = active == codeMode %}
 {% if themes %}
   <div class="row">
-
       {% for themeKey, themeInfo in themes %}
           {% set isSelected = active is same as themeKey %}
           {% if not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features %}
@@ -32,7 +31,7 @@
                                 <i class="ri-file-image-line ri-5x text-secondary" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
                             </div>
                         {% endif %}
-                        {% include '@MauticCore/Helper/button.html.twig' with {
+                        {% include '@MauticCore/Components/button.html.twig' with {
                             buttons: [
                                 {
                                     href: '#',

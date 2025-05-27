@@ -24,7 +24,7 @@
 					</div>
 			        <div class="text-left mt-lg mb-lg{% if startOnLocal %}  hide {% endif %}" id="remote-button">
 						{% if integrations %}
-							{% include '@MauticCore/Helper/button.html.twig' with {
+							{% include '@MauticCore/Components/button.html.twig' with {
 								buttons: [
 									{
 										href: path('mautic_asset_remote') ~ '?tmpl=modal',
