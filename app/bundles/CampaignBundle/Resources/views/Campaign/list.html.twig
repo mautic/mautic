@@ -215,7 +215,7 @@
         </div>
     </div>
 
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.campaigns.reengagement', 'mautic.protip.campaigns.survey', 'mautic.protip.campaigns.crosssell', 'mautic.protip.campaigns.onboarding'])
     }) }}
   {% endif %}
