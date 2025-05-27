@@ -65,7 +65,7 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: ('mautic.asset.type.' ~ type)|trans,
-                icon: activeAsset.getIconClass()|default(''),
+                renderIcon: activeAsset.getIconClass()|default(''),
                 color: 'high-contrast'
             }]
         } %}
@@ -76,9 +76,9 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: 'mautic.asset.tag.disallow.label'|trans,
-                icon: 'ri-eye-off-fill',
+                renderIcon: 'ri-eye-off-fill',
                 color: 'blue',
-                icon_only: true
+                iconOnly: true
             }]
         } %}
     {% endif %}
@@ -88,9 +88,9 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: ('mautic.asset.tag.storage.' ~ activeAsset.getStorageLocation())|trans,
-                icon: activeAsset.getStorageLocation() == 'local' ? 'ri-hard-drive-2-fill' : 'ri-cloud-fill',
+                renderIcon: activeAsset.getStorageLocation() == 'local' ? 'ri-hard-drive-2-fill' : 'ri-cloud-fill',
                 color: 'blue',
-                icon_only: true
+                iconOnly: true
             }]
         } %}
     {% endif %}
@@ -100,7 +100,7 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: activeAsset.getLanguage()|language_name|capitalize,
-                icon: 'ri-translate-2',
+                renderIcon: 'ri-translate-2',
                 color: 'warm-gray',
                 attributes: {
                     'data-toggle': 'tooltip',

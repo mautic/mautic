@@ -55,7 +55,7 @@
         tags: [
             {
                 label: ('mautic.lead.tag.' ~ segmentType ~ '_segment')|trans,
-                icon: 'ri-pie-chart-line',
+                renderIcon: 'ri-pie-chart-line',
                 color: 'high-contrast',
                 attributes: {
                     title: ('mautic.lead.tag.' ~ segmentType ~ '_segment.tooltip')|trans,
@@ -72,9 +72,9 @@
             tags: [
                 {
                     label: 'mautic.lead.list.form.isglobal'|trans,
-                    icon: 'ri-group-2-fill',
+                    renderIcon: 'ri-group-2-fill',
                     color: 'blue',
-                    icon_only: true
+                    iconOnly: true
                 }
             ]
         } %}
@@ -86,9 +86,9 @@
             tags: [
                 {
                     label: 'mautic.lead.list.form.isPreferenceCenter'|trans,
-                    icon: 'ri-equalizer-2-fill',
+                    renderIcon: 'ri-equalizer-2-fill',
                     color: 'blue',
-                    icon_only: true
+                    iconOnly: true
                 }
             ]
         } %}

@@ -7,7 +7,7 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             'tags': [{
                 'label': email.name,
-                'icon': 'ri-mail-line',
+                'renderIcon': 'ri-mail-line',
                 'attributes': {
                     'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.email }),
                     'target': '_blank'
@@ -22,7 +22,7 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             'tags': [{
                 'label': email.name,
-                'icon': 'ri-mail-line',
+                'renderIcon': 'ri-mail-line',
                 'attributes': {
                     'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': action.properties.useremail.email }),
                     'target': '_blank'
@@ -40,7 +40,7 @@
                     {% include '@MauticCore/Components/tag.html.twig' with {
                         'tags': [{
                             'label': user.firstName,
-                            'icon': 'ri-account-circle-line',
+                            'renderIcon': 'ri-account-circle-line',
                             'attributes': {
                                 'href': path('mautic_user_action', {'objectAction': 'edit', 'objectId': user.id }),
                                 'target': '_blank'
@@ -51,7 +51,7 @@
                     {% include '@MauticCore/Components/tag.html.twig' with {
                         'tags': [{
                             'label': user.firstName,
-                            'icon': 'ri-account-circle-line',
+                            'renderIcon': 'ri-account-circle-line',
                         }]
                     } %}
                 {% endif %}
