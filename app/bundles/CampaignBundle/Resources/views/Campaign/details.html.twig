@@ -13,7 +13,7 @@
     'routeBase': 'campaign',
     'targetLabel': 'mautic.campaign.campaigns'|trans
   }) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': campaign.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': campaign.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ campaign.name }}{% endblock %}

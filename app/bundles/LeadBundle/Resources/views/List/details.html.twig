@@ -28,7 +28,7 @@
     'routeBase': 'segment',
     'targetLabel': 'mautic.lead.lead.lists'|trans
 }) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': list.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': list.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ list.name }}{% endblock %}

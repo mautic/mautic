@@ -20,7 +20,7 @@
             'customButtons' : []
         }) -}}
     {% endif %}
-    {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': email.category}) }}
+    {{ include('@MauticCore/Modules/category--inline.html.twig', {'category': email.category}) }}
 {% endblock %}
 
 {% set variantContent = include('@MauticCore/Variant/index.html.twig', {

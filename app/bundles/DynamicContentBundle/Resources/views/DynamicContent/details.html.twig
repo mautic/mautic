@@ -44,7 +44,7 @@
         'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
     }
 ) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': entity.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': entity.category}) }}
 {% endblock %}
 
 {% block actions %}

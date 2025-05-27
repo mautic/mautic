@@ -31,7 +31,7 @@
     'routeBase': 'page',
     'targetLabel': 'mautic.page.pages'|trans
 }) }}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activePage.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activePage.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}

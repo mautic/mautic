@@ -27,7 +27,7 @@
     'langVar': 'form',
     'targetLabel': 'mautic.form.forms'|trans
 }) }}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeForm.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activeForm.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ activeForm.name }}{% endblock %}
