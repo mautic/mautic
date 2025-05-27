@@ -313,7 +313,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $campaign   = $this->createCampaignWithTokens($contactIds);
+        $campaign = $this->createCampaignWithTokens($contactIds);
 
         $this->em->clear();
 
@@ -340,6 +340,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $expectedCityValue = 'Hello '.$today->format('Y-m-d H:i:s').' '.$this->contacts[0]['firstname'];
         $this->assertEquals($expectedCityValue, $cityValue);
         $this->assertEquals('abcdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $address1Value, 'Shortening too long messages did not work properly');
+    }
 
     public function testUpdatesContactCampaignActionWithBooleanFields(): void
     {
