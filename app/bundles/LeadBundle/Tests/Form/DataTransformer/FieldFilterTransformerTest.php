@@ -44,7 +44,7 @@ final class FieldFilterTransformerTest extends TestCase
                     'operator'   => 'gt',
                     'properties' => [
                         'filter' => [
-                            'absoluteDate' => '2020-03-17 18:22',
+                            'absoluteDate' => '2020-03-17 17:22',
                         ],
                     ],
                 ],
@@ -97,7 +97,7 @@ final class FieldFilterTransformerTest extends TestCase
                     'filter'     => '2020-03-17 17:22:34',
                     'properties' => [
                         'filter' => [
-                            'absoluteDate' => '2020-03-17 18:22',
+                            'absoluteDate' => '2020-03-17 17:22',
                         ],
                     ],
                 ],
