@@ -39,7 +39,7 @@
             <i class="{{ tag.renderIcon }}" aria-hidden="true" focusable="false" title="{{ translated_label }}" data-toggle="tooltip" tooltip-placement="top"></i>
         {% else %}
             {% if type == 'dismissible' %}
-                {% if tag.renderIcon %}
+                {% if tag.renderIcon is defined %}
                     <i class="{{ tag.renderIcon }}" aria-hidden="true" focusable="false"></i>
                 {% endif %}
                 <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-toggle="tooltip" tooltip-placement="top"{% endif %}>
@@ -50,7 +50,7 @@
                 </button>
 
             {% elseif type == 'read-only' %}
-                {% if tag.renderIcon %}
+                {% if tag.renderIcon is defined %}
                     <i class="{{ tag.renderIcon }}" aria-hidden="true" focusable="false"></i>
                 {% endif %}
                 <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-toggle="tooltip" tooltip-placement="top"{% endif %}>
@@ -59,14 +59,14 @@
 
             {% elseif type == 'selectable' %}
                 <button type="button" aria-pressed="false" title="{{ label_tooltip ?: translated_label }}">
-                    {% if tag.renderIcon %}
+                    {% if tag.renderIcon is defined %}
                         <i class="{{ tag.renderIcon }}" aria-hidden="true" focusable="false"></i>
                     {% endif %}
                     <span aria-hidden="true">{{ truncated_label }}</span>
                 </button>
 
             {% else %}
-                {% if tag.renderIcon %}
+                {% if tag.renderIcon is defined %}
                     <i class="{{ tag.renderIcon }}" aria-hidden="true" focusable="false"></i>
                 {% endif %}
                 <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}"{% endif %}>
