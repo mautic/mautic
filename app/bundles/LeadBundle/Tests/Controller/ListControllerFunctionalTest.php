@@ -770,8 +770,8 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     public static function relativeDateInvalidIntervalValues(): \Generator
     {
         yield ['-1', 'This value should be positive.'];
-        //yield ['foo', 'This value is not valid.'];
-        //yield ['4.5', 'This value is not valid.'];
+        // yield ['foo', 'This value is not valid.'];
+        // yield ['4.5', 'This value is not valid.'];
     }
 
     /**
