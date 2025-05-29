@@ -30,7 +30,7 @@ final readonly class MigrationFactoryDecorator implements MigrationFactory
         #[AutowireLocator([
             CoreParametersHelper::class,
             IndexHelper::class, // Version20190524124819
-            EntityManagerInterface::class, // Version20201026101117
+            'doctrine.orm.entity_manager', // Version20201026101117
             ModelFactory::class, // Version20211209022550
             IntegrationHelper::class, // Version20221128145933
             Configurator::class, // Version20230615101328, Version20230627140512

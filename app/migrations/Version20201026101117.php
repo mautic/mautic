@@ -86,7 +86,7 @@ final class Version20201026101117 extends AbstractMauticMigration
 
     private function iterateOverAllEntities(string $entityClass, callable $entityModifier): void
     {
-        $entityManager  = $this->container->get(EntityManagerInterface::class);
+        $entityManager  = $this->container->get('doctrine.orm.entity_manager');
         \assert($entityManager instanceof EntityManagerInterface);
         $batchSize      = 50;
         $i              = 1;
