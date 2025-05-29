@@ -55,13 +55,26 @@ class SegmentDateFilterType extends AbstractType
             ]
         );
 
+        $absoluteDateConstraints = [];
+        if (self::ABSOLUTE_DATE_TYPE === $dateTypeMode) {
+            $absoluteDateConstraints = [
+                new Assert\NotBlank(),
+            ];
+        }
+
+        $attr = ['class' => 'form-control'];
+        if (isset($options['attr'])) {
+            $attr = array_merge($attr, $options['attr']);
+        }
+
         $builder->add(
             'absoluteDate',
             TextType::class,
             [
-                'label'    => false,
-                'attr'     => ['class' => 'form-control'],
-                'data'     => $absoluteDate,
+                'label'       => false,
+                'attr'        => $attr,
+                'constraints' => $absoluteDateConstraints,
+                'data'        => $absoluteDate,
             ]
         );
 
@@ -71,7 +84,6 @@ class SegmentDateFilterType extends AbstractType
             [
                 'label' => false,
                 'attr'  => [
-                    'class'    => 'form-control',
                     'preaddon' => 'symbol-hashtag',
                     'step'     => 1,
                     'min'      => 1,
