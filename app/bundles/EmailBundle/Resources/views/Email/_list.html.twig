@@ -74,7 +74,7 @@
                                 'data-toggle': 'ajax',
                                 'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
                             },
-                            'iconClass': 'ri-send-plane-line-o',
+                            'iconClass': 'ri-send-plane-line',
                             'btnText': 'mautic.email.send'
                         } %}
 
@@ -201,5 +201,25 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'mail--verse',
+                        'size': '80'
+                    } %}
+                </div>                
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.email.contentblock.heading',
+                subheading: 'mautic.email.contentblock.subheading',
+                copy: 'mautic.email.contentblock.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

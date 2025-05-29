@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Campaign>
@@ -16,6 +17,7 @@ class CampaignRepository extends CommonRepository
 {
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+    use ProjectRepositoryTrait;
 
     public function getEntities(array $args = [])
     {
@@ -264,7 +266,19 @@ class CampaignRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return match ($filter->command) {
+            $this->translator->trans('mautic.project.searchcommand.name'),
+            $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'campaign_id',
+                'campaign_projects_xref',
+                $this->getTableAlias(),
+                $this->generateRandomParameterName(),
+                $filter->string,
+                $filter->not
+            ),
+            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+        };
     }
 
     /**
@@ -272,7 +286,9 @@ class CampaignRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return $this->getStandardSearchCommands();
+        return array_merge([
+            'mautic.project.searchcommand.name',
+        ], $this->getStandardSearchCommands());
     }
 
     /**

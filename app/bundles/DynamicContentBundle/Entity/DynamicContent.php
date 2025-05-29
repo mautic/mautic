@@ -310,7 +310,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
