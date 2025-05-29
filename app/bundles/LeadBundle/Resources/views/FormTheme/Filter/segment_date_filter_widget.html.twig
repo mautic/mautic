@@ -1,23 +1,20 @@
 {# segment_date_filter_widget.html.twig#}
-{% block _leadlist_filters_entry_properties_widget %}
+{% block segment_date_filter_widget %}
 <div>
-    {% set dateTypeMode = form.children.filter.dateTypeMode|default(null) %}
-    {% if dateTypeMode is not null %}
-    {{ form_row(dateTypeMode) }}
-    <div{{ 'absolute' != dateTypeMode.vars.value ? ' class="absolute-date hide"' : ' class="absolute-date"' }}>
-        {{ form_row(form.children.absoluteDate) }}
+    {{ form_row(form.dateTypeMode) }}
+    <div{{ 'absolute' != form.dateTypeMode.vars.value ? ' class="absolute-date hide"' : ' class="absolute-date"' }}>
+        {{ form_row(form.absoluteDate) }}
     </div>
 
-    <div{{ 'relative' != dateTypeMode.vars.value ? ' class="relative-date hide"' : ' class="relative-date"' }}>
+    <div{{ 'relative' != form.dateTypeMode.vars.value ? ' class="relative-date hide"' : ' class="relative-date"' }}>
         <div class="row">
             <div class="col-sm-4">
-                {{ form_row(form.children.relativeDateInterval) }}
+                {{ form_row(form.relativeDateInterval) }}
             </div>
             <div class="col-sm-8">
-                {{ form_row(form.children.relativeDateIntervalUnit) }}
+                {{ form_row(form.relativeDateIntervalUnit) }}
             </div>
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}

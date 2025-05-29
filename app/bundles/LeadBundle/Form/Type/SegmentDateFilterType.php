@@ -103,8 +103,8 @@ class SegmentDateFilterType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
-        return '_leadlist_filters_entry_properties';
+        return 'segment_date_filter';
     }
 }
