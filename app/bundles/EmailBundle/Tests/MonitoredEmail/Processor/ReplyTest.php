@@ -97,9 +97,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepo);
     }
 
-    /**
-     * @testdox Test that the message is processed appropriately
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         // This tells us that a reply was found and processed

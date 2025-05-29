@@ -210,8 +210,15 @@ class DashboardModel extends FormModel
      */
     public function populateWidgetContent(Widget $widget, $filter = []): void
     {
+        $defaultTimeout = $this->coreParametersHelper->get('cached_data_timeout');
+
+        // Timeout 0 will be interpreted as endless cache, so we set it to -1 which will be interpreted as no cache
+        if (0 === $defaultTimeout) {
+            $defaultTimeout = -1;
+        }
+
         if (null === $widget->getCacheTimeout() || -1 === $widget->getCacheTimeout()) {
-            $widget->setCacheTimeout($this->coreParametersHelper->get('cached_data_timeout'));
+            $widget->setCacheTimeout($defaultTimeout);
         }
 
         // Merge global filter with widget params

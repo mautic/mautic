@@ -1,6 +1,6 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': campaign,
     'templateButtons': {
@@ -13,6 +13,7 @@
     'routeBase': 'campaign',
     'targetLabel': 'mautic.campaign.campaigns'|trans
   }) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': campaign.category}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
@@ -123,18 +124,13 @@
             </div>
             <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
                 <div class="tab-pane active bdr-w-0" id="stats-container">
-                    <div id="emailGraphStats">
-                        {{- include('@MauticCore/Helper/chart.html.twig', {
-                            'chartData': stats,
-                            'chartType': 'line',
-                            'chartHeight': 300
-                        }) -}}
+                    <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
+                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                        <div class="clearfix"></div>
                     </div>
-
                 </div>
                 <div class="tab-pane bdr-w-0" id="reads-map-container"
-                     data-map-url="{{ path('mautic_campaign_map_stats', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
-                >
+                     data-map-url="{{ path('mautic_campaign_map_stats', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                     <div class="spinner">
                         <i class="ri-loader-3-line ri-spin"></i>
                     </div>
@@ -171,33 +167,27 @@
             {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained">
-                <li class="active">
+            <ul class="nav nav-tabs nav-tabs-contained" id="campaign_nav_header_ul">
+                <li class="active" id="preview_li">
                     <a href="#preview-container" role="tab" data-toggle="tab">
                         {{ 'mautic.campaign.preview.header'|trans }}
                     </a>
                 </li>
-                {% if events.decision is not empty %}
-                    <li class="">
-                        <a href="#decisions-container" role="tab" data-toggle="tab">
-                            {{ 'mautic.campaign.event.decisions.header'|trans }}
-                        </a>
-                    </li>
-                {% endif %}
-                {% if events.action is not empty %}
-                    <li class="">
-                        <a href="#actions-container" role="tab" data-toggle="tab">
-                            {{ 'mautic.campaign.event.actions.header'|trans }}
-                        </a>
-                    </li>
-                {% endif %}
-                {% if events.condition is not empty %}
-                    <li class="">
-                        <a href="#conditions-container" role="tab" data-toggle="tab">
-                            {{ 'mautic.campaign.event.conditions.header'|trans }}
-                        </a>
-                    </li>
-                {% endif %}
+                <li class="" id="decisions_li">
+                    <a href="#decisions-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.campaign.event.decisions.header'|trans }}
+                    </a>
+                </li>
+                <li class="" id="actions_li">
+                    <a href="#actions-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.campaign.event.actions.header'|trans }}
+                    </a>
+                </li>
+                <li class="" id="conditions_li">
+                    <a href="#conditions-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.campaign.event.conditions.header'|trans }}
+                    </a>
+                </li>
                 <li class="">
                     <a href="#leads-container" role="tab" data-toggle="tab">
                         {{ 'mautic.lead.leads'|trans }}
@@ -209,33 +199,25 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-md">
+        <div class="tab-content pa-md" id="campaign-tab-content"
+             data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
             <!-- #events-container -->
                 <div class="active tab-pane fade in bdr-w-0" id="preview-container">
-                  {{- include('@MauticCampaign/Campaign/_preview.html.twig', {
-                        'campaignId': campaign.id,
-                        'campaign': campaign,
-                        'campaignEvents': campaignEvents,
-                        'campaignSources': campaignSources,
-                        'eventSettings': eventSettings,
-                        'canvasSettings': campaign.canvasSettings,
-                  }) -}}
+                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="clearfix"></div>
                 </div>
-              {% if events.decision is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="decisions-container">
-                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['decision']}) -}}
+                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="clearfix"></div>
                 </div>
-              {% endif %}
-              {% if events.action is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="actions-container">
-                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['action']}) -}}
+                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="clearfix"></div>
                 </div>
-              {% endif %}
-              {% if events.condition is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="conditions-container">
-                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['condition']}) -}}
+                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="clearfix"></div>
                 </div>
-              {% endif %}
             <!--/ #events-container -->
             <div class="tab-pane fade in bdr-w-0 page-list"
                  id="leads-container"
@@ -252,13 +234,14 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
-        {{ customContent('right.section.top', _context) }}
-
-        {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
-
-        {{ customContent('right.section.bottom', _context) }}
-    </div>
+    {% set right_top = customContent('right.section.top', _context) %}
+    {% set right_bottom = customContent('right.section.bottom', _context) %}
+    {% if right_top or right_bottom %}
+        <div class="col-md-3 bdr-l height-auto">
+            {{ right_top }}
+            {{ right_bottom }}
+        </div>
+    {% endif %}
     <!--/ right section -->
 </div>
 <!--/ end: box layout -->

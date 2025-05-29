@@ -100,9 +100,5 @@ return [
         'api_oauth2_access_token_lifetime'  => 60,
         'api_oauth2_refresh_token_lifetime' => 14,
         'api_batch_max_limit'               => 200,
-        'api_rate_limiter_limit'            => 0,
-        'api_rate_limiter_cache'            => [
-            'adapter' => 'cache.adapter.filesystem',
-        ],
     ],
 ];

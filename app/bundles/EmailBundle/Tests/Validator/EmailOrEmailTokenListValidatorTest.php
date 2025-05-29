@@ -19,10 +19,9 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
     /**
-     * @dataProvider provider
-     *
      * @param mixed $value
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
     public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class extends ExecutionContext {

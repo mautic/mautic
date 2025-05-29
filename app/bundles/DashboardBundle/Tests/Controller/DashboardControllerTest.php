@@ -140,23 +140,15 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isMethod')
             ->willReturn(true);
 
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(true);
-
-        $this->requestMock->method('get')
-            ->withConsecutive(['name'])
-            ->willReturnOnConsecutiveCalls('mockName');
+        $this->requestMock->method('isXmlHttpRequest')->willReturn(true);
+        $this->requestMock->method('get')->willReturn('mockName');
 
         $this->containerMock->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['router'],
-                ['router']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->routerMock,
-                $this->routerMock
-            );
+            ->method('get')->willReturnCallback(function (...$parameters) {
+                $this->assertSame('router', $parameters[0]);
+
+                return $this->routerMock;
+            });
 
         $this->routerMock->expects($this->any())
             ->method('generate')
@@ -175,8 +167,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.notice.save');
 
-        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
-        $this->expectException(\LogicException::class);
         $this->controller->saveAction($this->requestMock);
     }
 
@@ -193,9 +183,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->willReturn('https://some.url');
 
-        $this->requestMock->method('get')
-            ->withConsecutive(['name'])
-            ->willReturnOnConsecutiveCalls('mockName');
+        $this->requestMock->method('get')->willReturn('mockName');
 
         $this->containerMock->expects($this->once())
             ->method('get')
@@ -215,8 +203,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.error.save');
 
-        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
-        $this->expectException(\LogicException::class);
         $this->controller->saveAction($this->requestMock);
     }
 

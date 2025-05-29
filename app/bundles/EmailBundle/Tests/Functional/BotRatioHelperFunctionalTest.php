@@ -37,10 +37,9 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider hitBotScenariosProvider
-     *
      * @throws \Doctrine\ORM\ORMException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('hitBotScenariosProvider')]
     public function testIsHitByBotFunctional(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isRead): void
     {
         $stat          = new Stat();
@@ -71,7 +70,7 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<mixed>>
      */
-    public function hitBotScenariosProvider(): iterable
+    public static function hitBotScenariosProvider(): iterable
     {
         // $trackingHash, $sentBefore, $userAgent, $ipAddress, $isRead
         yield 'All good' => ['test_hash_bot_ratio_1', '-80 second', 'Mozilla/5.0', self::IP_NOT_IN_ANY_BLOCK_LIST, true];

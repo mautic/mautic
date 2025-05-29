@@ -154,13 +154,11 @@ abstract class StandardImportTestHelper extends CommonMocks
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
-                        [Import::class, $importRepository],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
+                    [Import::class, $importRepository],
+                ]
             );
 
         $this->entityManager->expects($this->any())

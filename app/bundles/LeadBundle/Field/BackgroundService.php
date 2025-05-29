@@ -90,6 +90,14 @@ class BackgroundService
         } catch (NoListenerException) {
         }
 
+        try {
+            // Update the column length of leads table.
+            $this->customFieldColumn->processUpdateLeadColumnLength($leadField);
+        } catch (\Mautic\CoreBundle\Exception\SchemaException|\OutOfRangeException $e) {
+            $this->customFieldNotification->customFieldCannotBeUpdated($leadField, $userId);
+            throw $e;
+        }
+
         $this->customFieldColumn->processUpdateLeadColumn($leadField);
         $this->customFieldNotification->customFieldWasUpdated($leadField, $userId);
     }

@@ -13,7 +13,7 @@ class AnonymizeIpCommandTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->configParams['anonymize_ip'] = 'testAnonymizeIpCommandWithFeatureEnable' === $this->getName();
+        $this->configParams['anonymize_ip'] = 'testAnonymizeIpCommandWithFeatureEnable' === $this->name();
         parent::setUp();
     }
 

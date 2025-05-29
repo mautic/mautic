@@ -43,7 +43,14 @@ class ListApiController extends CommonApiController
         $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
-        $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress', 'categoryList'];
+        $this->serializerGroups = [
+            'leadListDetails',
+            'userList',
+            'publishDetails',
+            'ipAddress',
+            'categoryList',
+            'projectList',
+        ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }

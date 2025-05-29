@@ -202,9 +202,7 @@ class OwnerSubscriberTest extends TestCase
 
     protected function getMockLeadModel(): LeadModel&MockObject
     {
-        $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockLeadRepository = $this->createMock(LeadRepository::class);
 
         $mockLeadRepository->method('getLeadOwner')
             ->willReturnMap(
@@ -215,16 +213,12 @@ class OwnerSubscriberTest extends TestCase
                 ]
             );
 
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockLeadModel = $this->createMock(LeadModel::class);
 
         $mockLeadModel->method('getRepository')
             ->willReturn($mockLeadRepository);
 
-        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockMailboxHelper = $this->createMock(Mailbox::class);
         $mockMailboxHelper->method('isConfigured')
             ->willReturn(false);
 
@@ -321,26 +315,27 @@ class OwnerSubscriberTest extends TestCase
         $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('hasId')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         return $translator;
     }
 
-    /**
-     * @dataProvider onSmsTokenReplacementProvider
-     */
-    public function testOnSmsTokenReplacement(string $content, string $expected, Lead $lead): void
+    public function testOnSmsTokenReplacement(): void
     {
-        $leadModel      = $this->createMock(LeadModel::class);
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $leadRepository->method('getLeadOwner')->willReturn(['first_name' => 'John', 'last_name' => 'Doe']);
-        $leadModel->method('getRepository')->willReturn($leadRepository);
-        $translator = $this->createMock(TranslatorInterface::class);
-        $subscriber = new OwnerSubscriber($leadModel, $translator);
+        foreach ($this->onSmsTokenReplacementProvider() as $data) {
+            [$content, $expected, $lead] = $data;
 
-        $event = new TokenReplacementEvent($content, $lead);
-        $subscriber->onSmsTokenReplacement($event);
-        $this->assertEquals($expected, $event->getContent());
+            $leadModel      = $this->createMock(LeadModel::class);
+            $leadRepository = $this->createMock(LeadRepository::class);
+            $leadRepository->method('getLeadOwner')->willReturn(['first_name' => 'John', 'last_name' => 'Doe']);
+            $leadModel->method('getRepository')->willReturn($leadRepository);
+            $translator = $this->createMock(TranslatorInterface::class);
+            $subscriber = new OwnerSubscriber($leadModel, $translator);
+
+            $event = new TokenReplacementEvent($content, $lead);
+            $subscriber->onSmsTokenReplacement($event);
+            $this->assertEquals($expected, $event->getContent());
+        }
     }
 
     protected function getUser(): User
@@ -361,10 +356,9 @@ class OwnerSubscriberTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function onSmsTokenReplacementProvider(): array
+    private function onSmsTokenReplacementProvider(): array
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->any())
             ->method('getId')
             ->willReturn(1);

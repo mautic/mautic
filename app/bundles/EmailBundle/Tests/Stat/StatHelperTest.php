@@ -21,7 +21,7 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
 
         $mockStatRepository->expects($this->once())
             ->method('deleteStats')
-            ->withConsecutive([[1, 2, 3, 4, 5]]);
+            ->with([1, 2, 3, 4, 5]);
 
         $statHelper = new StatHelper($emailStatmodel);
 

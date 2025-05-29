@@ -123,7 +123,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectName', $internalObjectName)
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('date', $createdAt->format(DateTimeHelper::FORMAT_DB))
-            ->setParameter('isDeleted', [], Types::BOOLEAN)
+            ->setParameter('isDeleted', false, Types::BOOLEAN)
             ->setParameter('internalStorage', [], Types::JSON);
 
         return $qb->executeStatement();

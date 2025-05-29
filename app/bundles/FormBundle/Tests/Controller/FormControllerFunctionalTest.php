@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
@@ -27,7 +28,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        if ('testLabelsForFormAction' === $this->getName(false)) {
+        if ('testLabelsForFormAction' === $this->name()) {
             $this->truncateTables('assets', 'categories', 'emails', 'lead_lists');
         }
     }
@@ -363,9 +364,8 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      message: string,
      *      message_arg: array<string, mixed>
      *  }> $expectedMessages The expected messages with translation arguments
-     *
-     * @dataProvider dataTestLabelsForFormActions
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestLabelsForFormActions')]
     public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
     {
         $form = $this->createForm('test', 'test');
@@ -410,7 +410,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      }>
      *  }>
      */
-    public function dataTestLabelsForFormActions(): iterable
+    public static function dataTestLabelsForFormActions(): iterable
     {
         $category = new Category();
         $category->setTitle('Category');
@@ -632,6 +632,29 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         list($clonedField1, $clonedField2, $clonedSubmit) = $fields;
         Assert::assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
+    }
+
+    public function testFormWithProject(): void
+    {
+        $form = $this->createForm('Name', 'Alias');
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler     = $this->client->request('GET', '/s/forms/edit/'.$form->getId());
+        $formCrawler = $crawler->selectButton('Save')->form();
+        $formCrawler['mauticform[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($formCrawler);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedForm = $this->em->find(Form::class, $form->getId());
+        Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
     }
 
     private function createForm(string $name, string $alias): Form

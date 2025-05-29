@@ -212,8 +212,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         // Default to 100 records if no data is populated
-        if (empty($data) && isset($args['limit'])) {
-            $args['limit'] = 100;
+        if (!isset($args['limit'])) {
+            $args['limit'] = empty($data) ? 100 : count($data);
+        } elseif (0 !== $args['limit']) {
+            $args['limit'] = max($args['limit'], count($data));
         }
 
         // Check if the method exists in the model
@@ -226,18 +228,9 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = null;
-
-            $limit = 100;
-            if ($data) {
-                $composite = CompositeExpression::and($expr->in($alias.'.id', $data));
-
-                if (count($data) > $limit) {
-                    $limit = count($data);
-                }
-            }
-
-            $choices = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
+            $composite = $data ? CompositeExpression::and($expr->in($alias.'.id', $data)) : null;
+            $limit     = max(100, count($data));
+            $choices   = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
         }
 
         return $choices;

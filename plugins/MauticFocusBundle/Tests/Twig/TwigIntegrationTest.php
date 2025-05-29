@@ -22,7 +22,7 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         ];
     }
 
-    public function getFixturesDir()
+    public static function getFixturesDirectory(): string
     {
         return __DIR__.'/Fixtures/';
     }

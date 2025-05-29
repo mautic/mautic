@@ -11,14 +11,13 @@ use Symfony\Component\DomCrawler\Crawler;
 final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @dataProvider fieldAndValueProvider
-     *
      * @param array<mixed,mixed> $pageUrl
      * @param array<mixed,mixed> $startDate
      * @param array<mixed,mixed> $endDate
      * @param array<mixed,mixed> $accumulativeTime
      * @param array<mixed,mixed> $page
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fieldAndValueProvider')]
     public function testCreatePageHitConditionForm(
         array $pageUrl,
         array $startDate,
@@ -66,18 +65,18 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
     {
         return [
             [
-                'page_url'           => ['page_url', 'https://example.com'],
-                'startDate'          => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-                'endDate'            => ['endDate', (new \DateTime())->modify('+ 5 days')->format('Y-m-d H:i:s')],
-                'accumulative_time'  => ['accumulative_time', 5],
-                'page'               => ['page', null],
+                'pageUrl'          => ['page_url', 'https://example.com'],
+                'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
+                'endDate'          => ['endDate', (new \DateTime())->modify('+ 5 days')->format('Y-m-d H:i:s')],
+                'accumulativeTime' => ['accumulative_time', 5],
+                'page'             => ['page', null],
             ],
             [
-                'page_url'           => ['page_url', 'https://example.com'],
-                'startDate'          => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-                'endDate'            => ['endDate', (new \DateTime())->modify('+ 10 days')->format('Y-m-d H:i:s')],
-                'accumulative_time'  => ['accumulative_time', null],
-                'page'               => ['page', ''],
+                'pageUrl'          => ['page_url', 'https://example.com'],
+                'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
+                'endDate'          => ['endDate', (new \DateTime())->modify('+ 10 days')->format('Y-m-d H:i:s')],
+                'accumulativeTime' => ['accumulative_time', null],
+                'page'             => ['page', ''],
             ],
         ];
     }

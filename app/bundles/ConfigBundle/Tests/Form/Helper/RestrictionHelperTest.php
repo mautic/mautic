@@ -40,6 +40,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
 class RestrictionHelperTest extends TypeTestCase
 {
     /**
@@ -139,12 +140,7 @@ class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    /**
-     * @testdox Test that the restricted fields are removed from the config
-     *
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the restricted fields are removed from the config')]
     public function testRestrictedFieldsAreRemoved(): void
     {
         $form = $this->factory->create(ConfigType::class, $this->forms);
@@ -173,12 +169,7 @@ class RestrictionHelperTest extends TypeTestCase
         $this->assertTrue($unsubscribes->has('host'));
     }
 
-    /**
-     * @testdox Test that the restricted fields are masked
-     *
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the restricted fields are masked')]
     public function testRestrictedFieldsAreMasked(): void
     {
         $this->displayMode = RestrictionHelper::MODE_MASK;
@@ -211,41 +202,29 @@ class RestrictionHelperTest extends TypeTestCase
      */
     protected function getExtensions()
     {
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
         $translator->method('trans')
             ->willReturnCallback(
                 fn ($key) => $key
             );
 
-        $validator = $this->getMockBuilder(ValidatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $validator = $this->createMock(ValidatorInterface::class);
         $validator
             ->method('validate')
-            ->will($this->returnValue(new ConstraintViolationList()));
+            ->willReturn(new ConstraintViolationList());
         $validator
             ->method('getMetadataFor')
-            ->will($this->returnValue(new ClassMetadata(Form::class)));
+            ->willReturn(new ClassMetadata(Form::class));
 
-        $imapHelper = $this->getMockBuilder(Mailbox::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $imapHelper = $this->createMock(Mailbox::class);
 
         // Register monitored email listeners
         $dispatcher = new EventDispatcher();
-        $bouncer    = $this->getMockBuilder(Bounce::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $bouncer    = $this->createMock(Bounce::class);
         $dispatcher->addSubscriber(new ProcessBounceSubscriber($bouncer));
 
-        $unsubscriber = $this->getMockBuilder(Unsubscribe::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $looper = $this->getMockBuilder(FeedbackLoop::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $unsubscriber = $this->createMock(Unsubscribe::class);
+        $looper       = $this->createMock(FeedbackLoop::class);
         $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper));
 
         // This is what we're really testing here

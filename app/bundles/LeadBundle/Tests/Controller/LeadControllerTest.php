@@ -36,7 +36,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
-        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://default';
+        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->name() ? 'sync://' : 'in-memory://default';
 
         parent::setUp();
     }
@@ -402,9 +402,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    /**
-     * @testdox Ensure correct Preferred Timezone placeholder on add/edit contact page
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');
@@ -823,6 +821,30 @@ class LeadControllerTest extends MauticMysqlTestCase
         $leadCompanies = $form['lead[companies]']->getValue();
 
         Assert::assertCount($companyLimit, $leadCompanies);
+    }
+
+    public function testMax100CompaniesShouldBeFetchedOnContactEditAction(): void
+    {
+        $companyLimit = 123;
+        $counter      = 1;
+        while ($companyLimit >= $counter) {
+            $company = new Company();
+            $company->setName('TestCompany'.$counter);
+            $this->em->persist($company);
+            ++$counter;
+        }
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+
+        // Get the select element for companies
+        $companySelect = $crawler->filter('select[name="lead[companies][]"]');
+
+        // Count the number of option elements within the select (- one option that is not a company)
+        $availableOptions = $companySelect->filter('option')->count() - 1;
+
+        // Assert that the number of available options is 100 (or your expected limit)
+        Assert::assertEquals(100, $availableOptions, 'The number of available company options should be limited to 100');
     }
 
     public function testNonExitingContactIsRedirected(): void

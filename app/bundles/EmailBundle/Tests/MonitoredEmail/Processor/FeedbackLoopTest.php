@@ -13,20 +13,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Monolog\Logger;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(FeedbackLoop::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(Result::class)]
 class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that the message is processed appropriately
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::process
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessage(): void
     {
-        $contactFinder = $this->getMockBuilder(ContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
                 function ($email) {
@@ -51,17 +45,11 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $logger = $this->createMock(Logger::class);
 
-        $doNotContact = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doNotContact = $this->createMock(DoNotContact::class);
 
         $processor = new FeedbackLoop($contactFinder, $translator, $logger, $doNotContact);
 

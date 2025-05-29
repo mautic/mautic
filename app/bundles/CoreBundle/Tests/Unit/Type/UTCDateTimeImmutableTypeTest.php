@@ -33,9 +33,7 @@ class UTCDateTimeImmutableTypeTest extends TestCase
         Assert::assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
-    /**
-     * @dataProvider timezoneProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('timezoneProvider')]
     public function testConvertToDatabaseValueWithDate(string $timezone, string $date): void
     {
         date_default_timezone_set($timezone);
@@ -51,9 +49,7 @@ class UTCDateTimeImmutableTypeTest extends TestCase
         Assert::assertNull($this->type->convertToPHPValue(null, $this->platform));
     }
 
-    /**
-     * @dataProvider timezoneProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('timezoneProvider')]
     public function testConvertToPHPValueWithDate(string $timezone, string $date): void
     {
         date_default_timezone_set($timezone);
@@ -67,7 +63,7 @@ class UTCDateTimeImmutableTypeTest extends TestCase
     /**
      * @return iterable<string[]>
      */
-    public function timezoneProvider(): iterable
+    public static function timezoneProvider(): iterable
     {
         yield ['America/Cayman', '2023-12-14 10:39:25'];
         yield ['Europe/Prague', '2022-11-18 18:32:27'];

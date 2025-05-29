@@ -9,9 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class PlainTextHelperTest extends TestCase
 {
-    /**
-     * @dataProvider emailContentProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emailContentProvider')]
     public function testGetText(string $htmlContent, string $expectedPlainText): void
     {
         $plainTextHelper = new PlainTextHelper();
@@ -24,7 +22,7 @@ class PlainTextHelperTest extends TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function emailContentProvider(): array
+    public static function emailContentProvider(): array
     {
         return [
             // Test case 1: Simple paragraph
@@ -66,9 +64,7 @@ class PlainTextHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getPreviewProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getPreviewProvider')]
     public function testGetPreview(?int $previewLength, string $htmlContent, string $expectedPlainText): void
     {
         $options = [];
@@ -85,7 +81,7 @@ class PlainTextHelperTest extends TestCase
     /**
      * @return array<int, array<int, string|int|null>>
      */
-    public function getPreviewProvider(): array
+    public static function getPreviewProvider(): array
     {
         return [
             // Test case 1: Simple paragraph, with default options

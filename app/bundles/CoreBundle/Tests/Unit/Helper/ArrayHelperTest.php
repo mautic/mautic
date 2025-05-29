@@ -41,11 +41,10 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider removeEmptyValuesProvider
-     *
      * @param mixed[] $value
      * @param mixed[] $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('removeEmptyValuesProvider')]
     public function testRemoveEmptyValues(array $value, array $expected): void
     {
         Assert::assertSame($expected, ArrayHelper::removeEmptyValues($value));

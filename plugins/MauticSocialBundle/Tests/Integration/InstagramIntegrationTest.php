@@ -8,6 +8,7 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(InstagramIntegration::class)]
 class InstagramIntegrationTest extends AbstractIntegrationTestCase
 {
     private InstagramIntegration $integration;
@@ -50,9 +51,6 @@ class InstagramIntegrationTest extends AbstractIntegrationTestCase
         );
     }
 
-    /**
-     * @covers \MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::getFormType
-     */
     public function testGetFormTypeReturnsNull(): void
     {
         // @phpstan-ignore-next-line - Intentional null check

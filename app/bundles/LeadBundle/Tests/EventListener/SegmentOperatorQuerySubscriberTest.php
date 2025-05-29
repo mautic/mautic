@@ -64,9 +64,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    /**
-     * @dataProvider dataOnEmptyOperatorIfEmpty
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataOnEmptyOperatorIfEmpty')]
     public function testOnEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
@@ -121,7 +119,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     /**
      * @return iterable<array<bool|string>>
      */
-    public function dataOnEmptyOperatorIfEmpty(): iterable
+    public static function dataOnEmptyOperatorIfEmpty(): iterable
     {
         yield [false, 'l.email IS NULL'];
         yield [true, "(l.email IS NULL) OR (l.email = '')"];
@@ -146,9 +144,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    /**
-     * @dataProvider dataOnNotEmptyOperatorIfEmpty
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataOnNotEmptyOperatorIfEmpty')]
     public function testOnNotEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
@@ -203,7 +199,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     /**
      * @return iterable<array<bool|string>>
      */
-    public function dataOnNotEmptyOperatorIfEmpty(): iterable
+    public static function dataOnNotEmptyOperatorIfEmpty(): iterable
     {
         yield [false, 'l.email IS NOT NULL'];
         yield [true, "(l.email IS NOT NULL) AND (l.email <> '')"];

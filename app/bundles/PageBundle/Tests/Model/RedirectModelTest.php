@@ -41,10 +41,7 @@ class RedirectModelTest extends PageTestAbstract
 
     public function testRedirectGenerationEvent(): void
     {
-        $shortener = $this
-            ->getMockBuilder(Shortener::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $shortener = $this->createMock(Shortener::class);
 
         $dispatcher = new EventDispatcher();
 

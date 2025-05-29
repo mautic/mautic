@@ -611,14 +611,6 @@ return [
             'mautic.helper.url' => [
                 'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
             ],
-            'mautic.helper.export' => [
-                'class'     => Mautic\CoreBundle\Helper\ExportHelper::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.file_path_resolver',
-                ],
-            ],
             'mautic.helper.composer' => [
                 'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
                 'arguments' => [
@@ -897,6 +889,7 @@ return [
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'brand_name'                      => 'Your Brand (configurable)',
         'primary_brand_color'             => '000000',
+        'rounded_corners'                 => '0',
         'db_driver'                       => 'pdo_mysql',
         'db_host'                         => '127.0.0.1',
         'db_port'                         => 3306,

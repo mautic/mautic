@@ -105,9 +105,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->translator            = $this->createMock(Translator::class);
     }
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testDeprecatedMethodOtherwiseItLowersCodeCoverageAsItsNoLongerUsed(): void
     {
         $deprecationTriggered = false;
@@ -205,20 +203,20 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
                     return $logs;
                 }
             );
+        $matcher = $this->exactly(2);
 
-        $this->actionExecutioner->expects($this->exactly(2))
-            ->method('execute')
-            ->withConsecutive(
-                [
-                    $otherConfig,
-                    $this->isInstanceOf(ArrayCollection::class),
-                ],
-                [
-                    $jumpConfig,
-                    $this->isInstanceOf(ArrayCollection::class),
-                ]
-            )
-            ->willReturn(new EvaluatedContacts());
+        $this->actionExecutioner->expects($matcher)
+            ->method('execute')->willReturnCallback(function (...$parameters) use ($matcher, $otherConfig, $jumpConfig) {
+                $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals($otherConfig, $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals($jumpConfig, $parameters[0]);
+                }
+
+                return new EvaluatedContacts();
+            });
 
         // This should not be called because the rotation is already incremented in the subscriber
         $this->leadRepository->expects($this->never())
@@ -251,13 +249,11 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->setCampaign($campaign)
             ->setProperties(['jumpToEvent' => 999]);
 
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->method('getId')
             ->willReturn(1);
 
-        $log = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log = $this->createMock(LeadEventLog::class);
         $log->method('getLead')
             ->willReturn($lead);
         $log->method('setIsScheduled')

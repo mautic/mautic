@@ -11,9 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class HubspotApiTest extends TestCase
 {
-    /**
-     * @testdox Test Hubspot api when the api-key is invalid
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test Hubspot api when the api-key is invalid')]
     public function testHubspotWhenKeyIsInvalid(): void
     {
         $integration = $this->createMock(HubspotIntegration::class);
