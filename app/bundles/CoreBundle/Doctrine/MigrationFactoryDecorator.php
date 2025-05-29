@@ -6,7 +6,13 @@ namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Version\MigrationFactory;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\LeadBundle\Field\Helper\IndexHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,6 +29,12 @@ final readonly class MigrationFactoryDecorator implements MigrationFactory
         private MigrationFactory $migrationFactory,
         #[AutowireLocator([
             CoreParametersHelper::class,
+            IndexHelper::class, // Version20190524124819
+            EntityManagerInterface::class, // Version20201026101117
+            ModelFactory::class, // Version20211209022550
+            IntegrationHelper::class, // Version20221128145933
+            Configurator::class, // Version20230615101328, Version20230627140512
+            PathsHelper::class, // Versionzz20230929183000
             // Add more services if you need them in a migration.
         ])]
         private ContainerInterface $locator,
