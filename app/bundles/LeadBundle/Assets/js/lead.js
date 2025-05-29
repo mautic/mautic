@@ -532,12 +532,6 @@ Mautic.reorderSegmentFilters = function() {
                     mQuery(this).click();
                 }
             }
-
-            if (mQuery(this).is(':radio') && id.includes("_dateTypeMode_")) {
-                if (mQuery(this).closest('label').hasClass('active')) {
-                    mQuery(this).click();
-                }
-            }
         });
 
         $filter.find('.panel-heading').css('width', ''); // Something is setting width. Remove it.

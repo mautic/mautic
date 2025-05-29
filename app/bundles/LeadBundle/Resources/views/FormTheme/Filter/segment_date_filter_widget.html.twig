@@ -1,6 +1,8 @@
-{# segment_date_filter_widget.html.twig #}
+{# segment_date_filter_widget.html.twig#}
+{% block _leadlist_filters_entry_properties_widget %}
 <div>
-    {% set dateTypeMode = form.children.dateTypeMode %}
+    {% set dateTypeMode = form.children.filter.dateTypeMode|default(null) %}
+    {% if dateTypeMode is not null %}
     {{ form_row(dateTypeMode) }}
     <div{{ 'absolute' != dateTypeMode.vars.value ? ' class="absolute-date hide"' : ' class="absolute-date"' }}>
         {{ form_row(form.children.absoluteDate) }}
@@ -16,4 +18,6 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
+{% endblock %}
