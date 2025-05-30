@@ -7,7 +7,7 @@
 {% set leadId = lead is defined ? lead.id : null %}
 {% extends tmpl is defined and 'index' == tmpl ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
-{% block headerTitle %}{{ integration }}{% endblock %}
+{% block headerTitle %}{{ integration|e }}{% endblock %}
 
 {% block content %}
   {% if not app.request.isXmlHttpRequest %}
