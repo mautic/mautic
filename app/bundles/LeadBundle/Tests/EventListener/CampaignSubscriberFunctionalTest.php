@@ -314,7 +314,6 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $campaign = $this->createCampaignWithTokens($contactIds);
-
         $this->em->clear();
 
         $exitCode = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
