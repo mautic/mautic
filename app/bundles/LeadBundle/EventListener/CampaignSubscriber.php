@@ -325,6 +325,10 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $tokenizedValues = [];
         foreach ($values as $field => $value) {
+            if (isset($fields[$field]) && 'boolean' === $fields[$field]['type'] && 0 === $value) {
+                // 0 is interpreted as 'don't change the bool field' instead of setting it to false, so we change the field manually in this step
+                $lead->addUpdatedField($field, 0);
+            }
             if (is_string($value)) {
                 $tokenizedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
                 $fieldEntity    = $this->leadFieldModel->getEntityByAlias($field);
