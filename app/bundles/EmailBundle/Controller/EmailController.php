@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +47,7 @@ class EmailController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1)
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, UserModel $userModel, $page = 1)
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -230,19 +231,23 @@ class EmailController extends FormController
         }
         $session->set('mautic.email.page', $page);
 
+        $userModel   = $this->getModel('user');
+        $columnPrefs = $userModel->getPreference('user_column_visibility_emails', null, $this->user);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue'    => $search,
-                    'filters'        => $listFilters,
-                    'items'          => $emails,
-                    'totalItems'     => $count,
-                    'page'           => $page,
-                    'limit'          => $limit,
-                    'tmpl'           => $request->get('tmpl', 'index'),
-                    'permissions'    => $permissions,
-                    'model'          => $model,
-                    'isDraftEnabled' => $isDraftEnabled,
+                    'searchValue'     => $search,
+                    'filters'         => $listFilters,
+                    'items'           => $emails,
+                    'totalItems'      => $count,
+                    'page'            => $page,
+                    'limit'           => $limit,
+                    'tmpl'            => $request->get('tmpl', 'index'),
+                    'permissions'     => $permissions,
+                    'model'           => $model,
+                    'isDraftEnabled'  => $isDraftEnabled,
+                    'userColumnPrefs' => $columnPrefs,
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [

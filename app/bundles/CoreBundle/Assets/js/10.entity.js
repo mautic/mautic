@@ -36,7 +36,7 @@ Mautic.getEntityId = function() {
 Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     if (typeof baseUrl == 'undefined') {
         baseUrl = window.location.pathname;
-
+    
         // Reset to first page by modifying the path
         baseUrl = baseUrl.replace(/\/\d+$/, '/1');
     }
@@ -57,8 +57,11 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     }
 
     var route = baseUrl + (params.length ? '?' + params.join('&') : '');
-
-    Mautic.loadContent(route, '', 'POST', target);
+    Mautic.loadContent(route, '', 'POST', target, !0, function() {
+        if (typeof window.applyColumnPrefs === 'function') {
+            window.applyColumnPrefs(window.userColumnPrefs || [])
+        }
+    })
 };
 
 /**
@@ -88,7 +91,11 @@ Mautic.filterTableData = function (name, filterby, filterValue, tmpl, target, ba
     }
 
     var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + value
-    Mautic.loadContent(route, '', 'POST', target);
+    Mautic.loadContent(route, '', 'POST', target, true, function() {
+        if (typeof window.applyColumnPrefs === 'function') {
+            window.applyColumnPrefs(window.userColumnPrefs || []);
+        }
+    });
 };
 
 /**
@@ -108,7 +115,11 @@ Mautic.limitTableData = function (name, limit, tmpl, target, baseUrl) {
     }
 
     var route = baseUrl + "&name=" + name + "&limit=" + limit;
-    Mautic.loadContent(route, '', 'POST', target);
+    Mautic.loadContent(route, '', 'POST', target, true, function() {
+        if (typeof window.applyColumnPrefs === 'function') {
+            window.applyColumnPrefs(window.userColumnPrefs || []);
+        }
+    });
 };
 
 
@@ -212,6 +223,9 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     } else {
                         Mautic.processPageContent(response);
                         Mautic.stopPageLoadingBar();
+                        if (typeof window.applyColumnPrefs === 'function') {
+                            window.applyColumnPrefs(window.userColumnPrefs || []);
+                        }
                     }
                 },
                 error: function (request, textStatus, errorThrown) {

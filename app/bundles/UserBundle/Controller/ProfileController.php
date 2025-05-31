@@ -4,9 +4,11 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -236,5 +238,19 @@ class ProfileController extends FormController
                 ],
             ]
         );
+    }
+
+    public function setPreferenceAction(Request $request, UserHelper $userHelper, UserModel $userModel): JsonResponse
+    {
+        $data  = json_decode($request->getContent(), true);
+        $key   = $data['preference'] ?? null;
+        $value = $data['value'] ?? null;
+
+        // Get current user
+        $user = $userHelper->getUser();
+
+        $userModel->setPreference($key, $value, $user);
+
+        return new JsonResponse(['success' => true]);
     }
 }

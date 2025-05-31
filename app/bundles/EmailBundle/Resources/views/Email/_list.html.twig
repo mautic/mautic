@@ -108,7 +108,7 @@
                             'customButtons' : customButtons,
                         }) -}}
                     </td>
-                    <td>
+                    <td class="col-email-name">
                         <div>
                             {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                                 'item'  : item,
@@ -140,10 +140,10 @@
                             </div>
                         {% endif %}
                     </td>
-                    <td class="visible-md visible-lg">
+                    <td class="visible-md visible-lg col-email-category">
                         {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
-                    <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
+                    <td class="visible-sm visible-md visible-lg col-email-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}
                         <span class="mt-xs label label-warm-gray{{ (item.getPendingCount() > 0 and 'list' == item.getEmailType()) ? '' : ' hide' }}"
                               id="pending-{{ item.getId() }}"
@@ -178,14 +178,14 @@
                         {{ customContent('email.stats', mauticTemplateVars) }}
                         {{ customContent('email.stats.below', mauticTemplateVars) }}
                     </td>
-                    <td class="visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
+                    <td class="visible-lg col-email-dateAdded" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
                         {{ item.getDateAdded() ? dateToDate(item.getDateAdded()) : '' }}
                     </td>
-                    <td class="visible-lg" title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
+                    <td class="visible-lg col-email-dateModified" title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
                         {{ item.getDateModified() ? dateToDate(item.getDateModified()) : '' }}
                     </td>
-                    <td class="visible-lg">{{ item.getCreatedByUser()|escape }}</td>
-                    <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                    <td class="visible-lg col-email-createdByUser">{{ item.getCreatedByUser()|escape }}</td>
+                    <td class="visible-md visible-lg col-email-id">{{ item.getId() }}</td>
                 </tr>
             {% endfor %}
             </tbody>

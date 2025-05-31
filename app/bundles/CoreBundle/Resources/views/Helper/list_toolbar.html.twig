@@ -1,11 +1,45 @@
 {% set wrap = true %}
 
+<style>
+  /* Compact styling for column picker with bigger text and checkboxes */
+  #column-picker-form {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  #column-picker-form .form-check {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 6px 0;
+    font-size: 1.3rem;
+  }
+
+  #column-picker-form .form-check-label {
+    margin-bottom: 0;
+    flex-grow: 1;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  #column-picker-form .form-check-input {
+    margin-left: 30px;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+</style>
+
 <div class="panel-heading pa-0 toolbar--table-toolbar">
 
     <div class="toolbar--batch-actions d-flex jc-space-between bg-primary fd-column fd-row-sm">
         <div class="toolbar--batch-summary d-flex">
             <span class="toolbar--batch-summary__count" data-singular="{{ 'mautic.core.item_selected'|trans|lower }}"
-            data-plural="{{ 'mautic.core.items_selected'|trans|lower }}">0 {{ 'mautic.core.items_selected'|trans|lower }}</span>
+                  data-plural="{{ 'mautic.core.items_selected'|trans|lower }}">
+                0 {{ 'mautic.core.items_selected'|trans|lower }}
+            </span>
         </div>
         <div class="toolbar--action-list d-flex fw-wrap fw-nowrap-sm">
             {{ include('@MauticCore/Helper/toolbar_bulk_actions.html.twig', bulk_actions|default({})) }}
@@ -40,8 +74,149 @@
             }) -}}
         {% endif %}
 
+        {# Existing toolbar actions #}
         {% include '@MauticCore/Helper/toolbar_actions.html.twig' %}
         {{ include('@MauticCore/Helper/toolbar_page_actions.html.twig', page_actions|default({})) }}
+
+        {# Added Columns button #}
+        <button
+            type="button"
+            class="btn btn-default ml-2"
+            id="column-config-toggle"
+            data-toggle="modal"
+            data-target="#column-config-modal"
+            title="{{ 'mautic.core.columns'|trans }}"
+        >
+            <i class="fa fa-columns"></i> {{ 'Columns'|trans }}
+        </button>
     </div>
 
 </div>
+
+{# Modal placeholder for columns selection #}
+<div class="modal fade" id="column-config-modal" tabindex="-1" role="dialog" aria-labelledby="columnConfigModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" tabindex="0">
+      <div class="modal-header">
+        <h5 class="modal-title" id="columnConfigModalLabel">{{ 'Select Columns'|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'Close'|trans }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="column-picker-form" aria-describedby="columnConfigModalLabel">
+            {% set columns = {
+              'name': 'Name',
+              'category': 'Category',
+              'stats': 'Stats',
+              'dateAdded': 'Date Added',
+              'dateModified': 'Date Modified',
+              'createdByUser': 'Created By',
+              'id': 'ID'
+            } %}
+            {% for key, label in columns %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="{{ key }}" id="col-{{ key }}" name="columns" checked>
+                <label class="form-check-label" for="col-{{ key }}">{{ label }}</label>
+              </div>
+            {% endfor %}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ 'Close'|trans }}</button>
+        <button type="button" class="btn btn-primary" id="save-columns">{{ 'Save changes'|trans }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+  window.userColumnPrefs = {{ userColumnPrefs|json_encode|raw }};
+    if (!Array.isArray(window.userColumnPrefs) || window.userColumnPrefs.length === 0) {
+    window.userColumnPrefs = ['BUG','category','stats','dateAdded','dateModified','createdByUser','id'];
+  }
+  console.log('Initial userColumnPrefs:', window.userColumnPrefs);
+
+  document.addEventListener('DOMContentLoaded', function () {
+  const preferenceKey = 'user_column_visibility_emails';
+  const columnPrefs = window.userColumnPrefs;
+  const allColumns = ['name', 'category', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
+
+  // Helper to show/hide columns
+  window.applyColumnPrefs = function(prefs) {
+    allColumns.forEach(col => {
+      const show = prefs.includes(col);
+      const ths = document.querySelectorAll('table.email-list th.col-email-' + col);
+      const tds = document.querySelectorAll('table.email-list td.col-email-' + col);
+
+
+      // Toggle <th>
+      ths.forEach(el => {
+        el.style.setProperty('display', show ? '' : 'none', 'important');
+      });
+      // Toggle <td>
+      tds.forEach(el => {
+        el.style.setProperty('display', show ? '' : 'none', 'important');
+      });
+    });
+  }
+
+  // Apply saved column preferences (from backend)
+  if (columnPrefs.length > 0) {
+    applyColumnPrefs(columnPrefs);
+    // Update modal checkboxes
+    document.querySelectorAll('#column-picker-form input[type="checkbox"]').forEach(cb => {
+      cb.checked = columnPrefs.includes(cb.value);
+    });
+  }
+
+  // Save preferences to backend
+  document.getElementById('save-columns').addEventListener('click', function () {
+    const selected = Array.from(document.querySelectorAll('#column-picker-form input:checked'))
+      .map(cb => cb.value);
+    console.log('Before saving, userColumnPrefs:', window.userColumnPrefs);
+    console.log('Saving columns:', selected);
+
+    fetch('/s/user/set-preference', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': '{{ csrf_token('mautic.core.preference') }}'
+      },
+      body: JSON.stringify({
+        preference: preferenceKey,
+        value: selected
+      })
+    }).then(response => {
+      if (response.ok) {
+        window.userColumnPrefs = selected;
+        applyColumnPrefs(selected);
+        $('#column-config-modal').modal('hide');
+        location.reload(); // fix no botao columns para funcionar bem
+      } else {
+        alert('Failed to save column preferences.');
+      }
+    }).catch(err => {
+      console.error('Error saving preferences:', err);
+    });
+  });
+
+  // Attach modal event handlers ONCE, outside the click handler
+  $('#column-config-modal').on('hidden.bs.modal', function () {
+    $('.modal-backdrop').remove();
+    $('body').removeClass('modal-open');
+    document.querySelectorAll('[aria-hidden="true"]').forEach(el => {
+      el.removeAttribute('aria-hidden');
+    });
+  });
+
+  $('#column-config-modal').on('shown.bs.modal', function () {
+    this.querySelector('.modal-content').focus();
+    document.querySelectorAll('body > *:not(#column-config-modal)').forEach(el => {
+      el.setAttribute('aria-hidden', 'true');
+    });
+    this.removeAttribute('aria-hidden');
+  });
+});
+</script>

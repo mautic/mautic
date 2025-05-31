@@ -71,6 +71,11 @@ return [
                 'path'       => '/account',
                 'controller' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
             ],
+            'mautic_user_set_preference' => [
+                'path'       => '/user/set-preference',
+                'controller' => 'Mautic\UserBundle\Controller\ProfileController::setPreferenceAction',
+                'methods'    => 'POST',
+            ],
         ],
 
         'api' => [
