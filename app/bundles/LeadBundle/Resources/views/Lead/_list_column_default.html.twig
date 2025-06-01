@@ -1,4 +1,4 @@
-<td class="{{ class }}">
+<td class="col-lead-email">
     {% for field in fields %}
         {% if field[column].value is defined %}
             {% if field[column].normalizedValue is string %}{{ normalizeStringValue(field[column].normalizedValue)|purify }}{% endif %}

@@ -57,11 +57,10 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     }
 
     var route = baseUrl + (params.length ? '?' + params.join('&') : '');
-    Mautic.loadContent(route, '', 'POST', target, !0, function() {
-        if (typeof window.applyColumnPrefs === 'function') {
-            window.applyColumnPrefs(window.userColumnPrefs || [])
-        }
-    })
+    Mautic.loadContent(route, '', 'POST', target, true, function () {
+        // Auto-apply column preferences after reordering
+        window.applyColumnPrefsForRoute();
+      });
 };
 
 /**
@@ -91,10 +90,9 @@ Mautic.filterTableData = function (name, filterby, filterValue, tmpl, target, ba
     }
 
     var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + value
-    Mautic.loadContent(route, '', 'POST', target, true, function() {
-        if (typeof window.applyColumnPrefs === 'function') {
-            window.applyColumnPrefs(window.userColumnPrefs || []);
-        }
+    Mautic.loadContent(route, '', 'POST', target, true, function () {
+        // Auto-apply column preferences
+        window.applyColumnPrefsForRoute();
     });
 };
 
@@ -115,10 +113,9 @@ Mautic.limitTableData = function (name, limit, tmpl, target, baseUrl) {
     }
 
     var route = baseUrl + "&name=" + name + "&limit=" + limit;
-    Mautic.loadContent(route, '', 'POST', target, true, function() {
-        if (typeof window.applyColumnPrefs === 'function') {
-            window.applyColumnPrefs(window.userColumnPrefs || []);
-        }
+    Mautic.loadContent(route, '', 'POST', target, true, function () {
+        // Auto-apply column preferences
+        window.applyColumnPrefsForRoute();
     });
 };
 
@@ -223,9 +220,9 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     } else {
                         Mautic.processPageContent(response);
                         Mautic.stopPageLoadingBar();
-                        if (typeof window.applyColumnPrefs === 'function') {
-                            window.applyColumnPrefs(window.userColumnPrefs || []);
-                        }
+
+                        // Auto-apply column preferences
+                        window.applyColumnPrefsForRoute();
                     }
                 },
                 error: function (request, textStatus, errorThrown) {

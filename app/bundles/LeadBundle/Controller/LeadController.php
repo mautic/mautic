@@ -70,6 +70,7 @@ class LeadController extends FormController
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
+        UserModel $userModel,
         $page = 1,
     ) {
         // set some permissions
@@ -211,6 +212,9 @@ class LeadController extends FormController
         \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
 
+        $userModel            = $this->getModel('user');
+        $columnPrefs_contacts = $userModel->getPreference('user_column_visibility_contacts', null, $this->user);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -230,6 +234,7 @@ class LeadController extends FormController
                     'noContactList'    => $dncRepository->getChannelList(null, array_keys($leads)),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
+                    'contactColPrefs'  => $columnPrefs_contacts,
                 ],
                 'contentTemplate' => "@MauticLead/Lead/{$indexMode}.html.twig",
                 'passthroughVars' => [

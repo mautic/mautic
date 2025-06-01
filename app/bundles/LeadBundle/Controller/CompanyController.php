@@ -96,17 +96,21 @@ class CompanyController extends FormController
         $companyIds = array_keys($companies);
         $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : [];
 
+        $userModel           = $this->getModel('user');
+        $columnPrefs_company = $userModel->getPreference('user_column_visibility_company', null, $this->user);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'leadCounts'  => $leadCounts,
-                    'items'       => $companies,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'permissions' => $permissions,
-                    'tmpl'        => $tmpl,
-                    'totalItems'  => $count,
+                    'searchValue'      => $search,
+                    'leadCounts'       => $leadCounts,
+                    'items'            => $companies,
+                    'page'             => $page,
+                    'limit'            => $limit,
+                    'permissions'      => $permissions,
+                    'tmpl'             => $tmpl,
+                    'totalItems'       => $count,
+                    'companyColPrefs'  => $columnPrefs_company,
                 ],
                 'contentTemplate' => '@MauticLead/Company/list.html.twig',
                 'passthroughVars' => [

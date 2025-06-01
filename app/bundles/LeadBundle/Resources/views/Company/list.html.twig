@@ -87,7 +87,7 @@
                   {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.company.email',
-                          'class': 'visible-md visible-lg col-company-category',
+                          'class': 'visible-md visible-lg col-company-email',
                           'orderBy': 'comp.companyemail',
                   }) }}
                   {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -105,7 +105,7 @@
                   {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.lead.list.thead.leadcount',
-                          'class': 'visible-md visible-lg col-leadlist-leadcount',
+                          'class': 'visible-md visible-lg col-company-contacts',
                   }) }}
                   {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
@@ -130,7 +130,7 @@
                                   'routeBase': 'company',
                           }) }}
                       </td>
-                      <td>
+                      <td class="col-company-name">
                           <div>
                           {% if securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.createdBy) %}
                               <a href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
@@ -145,21 +145,21 @@
                           {% endif %}
                           </div>
                       </td>
-                      <td>
+                      <td class="col-company-email">
                           {% if fields.core.companyemail is defined %}
                             {{ fields.core.companyemail.value|purify }}
                           {% endif %}
                       </td>
 
-                      <td class="visible-md visible-lg">
+                      <td class="visible-md visible-lg col-company-website">
                           {% if fields.core.companywebsite is defined %}
                             {{ inputUrl(fields.core.companywebsite.value) }}
                           {% endif %}
                       </td>
-                      <td class="visible-md visible-lg">
+                      <td class="visible-md visible-lg col-company-score">
                           <span size="sm" class="label label-gray">{{ item.score }}</span>
                       </td>
-                      <td class="visible-md visible-lg">
+                      <td class="visible-md visible-lg col-company-contacts">
                           <a size="sm" class="label label-gray"
                              href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans~':'~item.id}) }}"
                              data-toggle="ajax"
@@ -167,7 +167,7 @@
                                   {{ 'mautic.lead.company.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}
                           </a>
                       </td>
-                      <td class="visible-md visible-lg">{{ item.id }}</td>
+                      <td class="visible-md visible-lg col-company-id">{{ item.id }}</td>
                   </tr>
               {% endfor %}
               </tbody>
