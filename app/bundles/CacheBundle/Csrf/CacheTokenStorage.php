@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CacheBundle\Csrf;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
-use Psr\Cache\CacheException;
-use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
@@ -14,9 +12,9 @@ use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 
 class CacheTokenStorage implements ClearableTokenStorageInterface
 {
-    const TOKEN_TEMPLATE               = '_csrf_%s';
-    const SESSION_KEY_TOKEN_IDENTIFIER = 'csrf_token_identifier';
-    const SESSION_KEY_TOKEN_KEYS       = 'csrf_token_keys';
+    public const TOKEN_TEMPLATE               = '_csrf_%s';
+    public const SESSION_KEY_TOKEN_IDENTIFIER = 'csrf_token_identifier';
+    public const SESSION_KEY_TOKEN_KEYS       = 'csrf_token_keys';
 
     /**
      * @var CacheProviderInterface
@@ -54,7 +52,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId)
+    public function getToken($tokenId): string
     {
         $this->init();
 
