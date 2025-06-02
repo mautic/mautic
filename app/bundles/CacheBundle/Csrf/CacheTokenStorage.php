@@ -86,7 +86,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId)
+    public function removeToken($tokenId): ?string
     {
         $this->init();
 
@@ -104,7 +104,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function hasToken($tokenId)
+    public function hasToken($tokenId): bool
     {
         $this->init();
 
