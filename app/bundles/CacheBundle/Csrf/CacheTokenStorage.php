@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CacheBundle\Csrf;
 
-use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
@@ -17,24 +18,32 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     public const SESSION_KEY_TOKEN_KEYS       = 'csrf_token_keys';
 
     /**
-     * @var CacheProviderInterface
+     * @var CacheProviderTagAwareInterface
      */
-    private $cache;
+    private CacheProviderTagAwareInterface $cache;
 
     /**
-     * @var SessionInterface
+     * @var RequestStack
      */
-    private $session;
+    private $requestStack;
 
     /**
      * @var string|null
      */
     private $namespace;
 
-    public function __construct(CacheProviderInterface $cacheProvider, SessionInterface $session)
+    public function __construct(CacheProviderTagAwareInterface $cacheProvider, RequestStack $requestStack)
     {
-        $this->cache   = $cacheProvider;
-        $this->session = $session;
+        $this->cache        = $cacheProvider;
+        $this->requestStack = $requestStack;
+    }
+
+    /**
+     * Get the current session from the request stack.
+     */
+    private function getSession(): SessionInterface
+    {
+        return $this->requestStack->getSession();
     }
 
     /**
@@ -52,7 +61,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId): string
+    public function getToken(mixed $tokenId): string
     {
         $this->init();
 
@@ -86,7 +95,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId): ?string
+    public function removeToken(mixed $tokenId): ?string
     {
         $this->init();
 
@@ -104,7 +113,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function hasToken($tokenId): bool
+    public function hasToken(mixed $tokenId): bool
     {
         $this->init();
 
@@ -124,15 +133,17 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
             return;
         }
 
-        if (false === $this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+
+        if (false === $session->isStarted()) {
+            $session->start();
         }
 
-        if ($this->session->has(static::SESSION_KEY_TOKEN_IDENTIFIER)) {
-            $tokenIdentifier = $this->session->get(static::SESSION_KEY_TOKEN_IDENTIFIER);
+        if ($session->has(static::SESSION_KEY_TOKEN_IDENTIFIER)) {
+            $tokenIdentifier = $session->get(static::SESSION_KEY_TOKEN_IDENTIFIER);
         } else {
-            $this->session->set(static::SESSION_KEY_TOKEN_IDENTIFIER, $tokenIdentifier = Uuid::uuid4()->toString());
-            $this->session->set(static::SESSION_KEY_TOKEN_KEYS, []);
+            $session->set(static::SESSION_KEY_TOKEN_IDENTIFIER, $tokenIdentifier = Uuid::uuid4()->toString());
+            $session->set(static::SESSION_KEY_TOKEN_KEYS, []);
         }
 
         $this->namespace = sprintf(static::TOKEN_TEMPLATE, $tokenIdentifier);
@@ -143,10 +154,11 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
      */
     private function trackTokenForRemoval(string $tokenKey): void
     {
-        $tokenKeys   = $this->session->get(static::SESSION_KEY_TOKEN_KEYS, []);
+        $session     = $this->getSession();
+        $tokenKeys   = $session->get(static::SESSION_KEY_TOKEN_KEYS, []);
         $tokenKeys[] = $tokenKey;
 
-        $this->session->set(static::SESSION_KEY_TOKEN_KEYS, $tokenKeys);
+        $session->set(static::SESSION_KEY_TOKEN_KEYS, $tokenKeys);
     }
 
     /**
@@ -157,14 +169,15 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
      */
     private function removeKnownTokens(): void
     {
-        $tokenKeys = (array) $this->session->get(static::SESSION_KEY_TOKEN_KEYS);
+        $session   = $this->getSession();
+        $tokenKeys = (array) $session->get(static::SESSION_KEY_TOKEN_KEYS);
 
         foreach ($tokenKeys as $tokenKey) {
             $this->cache->deleteItem($tokenKey);
         }
 
-        $this->session->remove(static::SESSION_KEY_TOKEN_KEYS);
-        $this->session->remove(static::SESSION_KEY_TOKEN_IDENTIFIER);
+        $session->remove(static::SESSION_KEY_TOKEN_KEYS);
+        $session->remove(static::SESSION_KEY_TOKEN_IDENTIFIER);
 
         $this->namespace = null;
     }
