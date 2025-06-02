@@ -26,7 +26,7 @@ class CsrfPass implements CompilerPassInterface
 
         $definition->setClass(CacheTokenStorage::class)
             ->setArguments([
-                new Reference('mautic.cache.provider'),
+                new Reference('mautic.cache.provider_tag_aware'),
                 new Reference('request_stack'),
             ]);
     }
