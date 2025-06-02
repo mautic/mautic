@@ -56,11 +56,13 @@ class DownloadRepository extends CommonRepository
             ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id');
 
         if ($leadId) {
-            $query->where('d.lead_id = '.(int) $leadId);
+            $query->where('d.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->like('a.title', $query->expr()->literal('%'.$options['search'].'%')));
+            $query->andWhere('a.title LIKE :search')
+                  ->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download'], null, 'd.id');
