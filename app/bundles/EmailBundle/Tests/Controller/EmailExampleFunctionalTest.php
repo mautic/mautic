@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -23,8 +24,18 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
     public function testSendExampleEmailWithContact(): void
     {
-        $lead  = $this->createLead();
+        $company = $this->createCompany('Mautic', 'hello@mautic.org');
+        $company->setCity('Pune');
+        $company->setCountry('India');
+
+        $this->em->persist($company);
+
+        $lead  = $this->createLead('John', 'Doe', 'test@domain.tld');
+        $this->createPrimaryCompanyForLead($lead, $company);
+
         $email = $this->createEmail();
+        $email->setCustomHtml('Contact emails is {contactfield=email}. Company details: {contactfield=companyname}, {contactfield=companycity}.');
+
         $this->em->flush();
         $this->em->clear();
 
@@ -43,7 +54,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString(
-            'Contact emails is test@domain.tld',
+            'Contact emails is test@domain.tld. Company details: Mautic, Pune.',
             $message->getBody()->toString()
         );
     }
@@ -51,6 +62,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
     public function testSendExampleEmailWithOutContact(): void
     {
         $email = $this->createEmail();
+        $email->setCustomHtml('Contact emails is {contactfield=email}. Company details: {contactfield=companyname}, {contactfield=companycity}.');
         $this->em->flush();
         $this->em->clear();
 
@@ -64,7 +76,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
-        Assert::assertStringContainsString('Contact emails is [Email]', $message->getBody()->toString());
+        Assert::assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
     }
 
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoContact(): void
@@ -331,14 +343,5 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         return $email;
-    }
-
-    private function createLead(): Lead
-    {
-        $lead = new Lead();
-        $lead->setEmail('test@domain.tld');
-        $this->em->persist($lead);
-
-        return $lead;
     }
 }
