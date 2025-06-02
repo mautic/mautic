@@ -169,7 +169,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function applySqlFromFile($file): void
     {
         $connectionParams = $this->connection->getParams();
-        $command = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" -p"${:db_password}" "${:db_name}" < "${:db_backup_file}"';
+        $command          = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" -p"${:db_password}" "${:db_name}" < "${:db_backup_file}"';
 
         $envVars = [
             'db_host'        => $connectionParams['host'],
@@ -269,7 +269,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connectionParams = $this->connection->getParams();
-        $command = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" -p"${:db_password}" "${:db_name}" > "${:db_backup_file}"';
+        $command          = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" -p"${:db_password}" "${:db_name}" > "${:db_backup_file}"';
 
         $envVars = [
             'db_host'        => $connectionParams['host'],
