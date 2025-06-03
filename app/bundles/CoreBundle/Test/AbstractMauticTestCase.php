@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
