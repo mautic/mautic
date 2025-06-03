@@ -10263,7 +10263,7 @@ lesshat-selector { -lh-property: 0 ;
   min-block-size: unset;
   position: relative;
   margin-inline: auto;
-  max-inline-size: 99rem;
+  max-inline-size: 1584px;
   display: flex;
   background-color: var(--cds-background, #ffffff);
 }
@@ -10272,7 +10272,7 @@ lesshat-selector { -lh-property: 0 ;
   flex-direction: column;
   justify-content: space-between;
   block-size: 100%;
-  margin-block-end: 2rem;
+  margin-block-end: 32px;
 }
 .leadspace .background-media {
   aspect-ratio: 4 / 3;
@@ -10282,7 +10282,7 @@ lesshat-selector { -lh-property: 0 ;
 }
 .leadspace .leadspace__overlay {
   margin-inline: auto;
-  padding-inline: 1rem;
+  padding-inline: 16px;
   position: relative;
   z-index: 1;
   display: flex;
@@ -10290,7 +10290,7 @@ lesshat-selector { -lh-property: 0 ;
   justify-content: space-between;
   inline-size: 100%;
   max-inline-size: none;
-  padding-block-start: 1rem;
+  padding-block-start: 16px;
 }
 .leadspace .leadspace__gradient {
   position: absolute;
@@ -10323,13 +10323,13 @@ lesshat-selector { -lh-property: 0 ;
 }
 .leadspace[size=tall] .leadspace__section {
   block-size: auto;
-  min-block-size: 35rem;
+  min-block-size: 560px;
 }
 .leadspace__action {
   --button-group--item-count: 3;
   display: grid;
   grid-auto-rows: 1fr;
-  grid-gap: 1rem;
+  grid-gap: 16px;
   grid-template-columns: 1fr;
 }
 .leadspace__container {
@@ -10404,8 +10404,8 @@ lesshat-selector { -lh-property: 0 ;
   }
   .leadspace .leadspace__overlay {
     inset-block-start: 0px;
-    padding-block-start: 2rem;
-    padding-inline: 2rem;
+    padding-block-start: 32px;
+    padding-inline: 32px;
   }
   .leadspace .leadspace__gradient {
     display: block;
@@ -10413,7 +10413,7 @@ lesshat-selector { -lh-property: 0 ;
   .leadspace .leadspace__section {
     position: relative;
     margin-inline: auto;
-    max-inline-size: 99rem;
+    max-inline-size: 1584px;
   }
   .leadspace__action {
     display: inline-grid;
@@ -11313,7 +11313,7 @@ code:hover > .copy-icon {
 }
 .contained-list-item__content,
 .contained-list-item--clickable .contained-list-item__content {
-  --temp-1lh: (var(--body-01-line-height, 1.42857)* 1em);
+  --temp-1lh: var(--body-01-line-height, 1.42857);
   font-weight: var(--body-01-font-weight, 400);
   line-height: var(--body-01-line-height, 1.42857);
   letter-spacing: var(--body-01-letter-spacing, 0.16px);
