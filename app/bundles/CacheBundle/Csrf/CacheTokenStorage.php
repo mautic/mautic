@@ -17,25 +17,10 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     public const SESSION_KEY_TOKEN_IDENTIFIER = 'csrf_token_identifier';
     public const SESSION_KEY_TOKEN_KEYS       = 'csrf_token_keys';
 
-    /**
-     * @var CacheProviderTagAwareInterface
-     */
-    private CacheProviderTagAwareInterface $cache;
+    private ?string $namespace = null;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var string|null
-     */
-    private $namespace;
-
-    public function __construct(CacheProviderTagAwareInterface $cacheProvider, RequestStack $requestStack)
+    public function __construct(private CacheProviderTagAwareInterface $cache, private RequestStack $requestStack)
     {
-        $this->cache        = $cacheProvider;
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -46,10 +31,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
         return $this->requestStack->getSession();
     }
 
-    /**
-     * @return void
-     */
-    public function clear()
+    public function clear(): void
     {
         $this->init();
 
@@ -75,10 +57,8 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
     /**
      * @param string $tokenId
      * @param string $token
-     *
-     * @return void
      */
-    public function setToken($tokenId, $token)
+    public function setToken($tokenId, $token): void
     {
         $this->init();
 
@@ -101,7 +81,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
 
         try {
             $token = $this->getToken($tokenId);
-        } catch (TokenNotFoundException $e) {
+        } catch (TokenNotFoundException) {
             return null;
         }
 
