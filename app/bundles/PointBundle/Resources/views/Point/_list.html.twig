@@ -106,5 +106,38 @@
         }) }}
     </div>
 {% else %}
-    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.action.noresults.tip'}) }}
+    {% if searchValue is not empty %}
+        {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.action.noresults.tip'}) }}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+            <div class="mb-md">
+                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    'pictogram': 'user--insights',
+                    'size': '80'
+                } %}
+            </div>
+
+            {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                type: 'default',
+                eyebrow: 'mautic.point.action.empty.understand',
+                heading: 'mautic.point.action.empty.what_are_point_actions',
+                copy: 'mautic.point.action.empty.what_are_point_actions_desc',
+            }) }}
+
+            {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                type: 'default',
+                eyebrow: 'mautic.point.action.empty.purpose',
+                heading: 'mautic.point.action.empty.score_contacts_heading',
+                copy: 'mautic.point.action.empty.score_contacts_desc',
+            }) }}
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.point.action.empty.heading',
+                subheading: 'mautic.point.action.empty.subheading',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

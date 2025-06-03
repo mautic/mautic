@@ -346,7 +346,12 @@ class CampaignSubscriber implements EventSubscriberInterface
             $tokenizedValues = [];
             foreach ($values as $field => $value) {
                 if (is_string($value)) {
-                    $tokenizedValues[$field] = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                    $tokenizedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                    $fieldEntity    = $this->leadFieldModel->getEntityByAlias($field);
+                    if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($tokenizedValue) > $charLimit) {
+                        $tokenizedValue = mb_substr($tokenizedValue, 0, $charLimit);
+                    }
+                    $tokenizedValues[$field] = $tokenizedValue;
                 } else {
                     $tokenizedValues[$field] = $value;
                 }
