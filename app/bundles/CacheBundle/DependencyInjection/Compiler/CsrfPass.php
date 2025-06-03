@@ -17,10 +17,8 @@ class CsrfPass implements CompilerPassInterface
      * to just replace an existing service, so this seems the best way - here we
      * overwrite the class name for the security.csrf.token_storage and then set
      * the constructor arguments to what our class requires.
-     *
-     * @return void
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $definition = $container->findDefinition('security.csrf.token_storage');
 

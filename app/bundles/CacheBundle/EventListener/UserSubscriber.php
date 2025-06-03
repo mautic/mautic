@@ -11,14 +11,8 @@ use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 
 class UserSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ClearableTokenStorageInterface
-     */
-    private $tokenStorage;
-
-    public function __construct(ClearableTokenStorageInterface $tokenStorage)
+    public function __construct(private ClearableTokenStorageInterface $tokenStorage)
     {
-        $this->tokenStorage = $tokenStorage;
     }
 
     /**

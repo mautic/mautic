@@ -10,10 +10,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MauticCacheBundle extends Bundle
 {
-    /**
-     * @return void
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new CsrfPass());
     }
