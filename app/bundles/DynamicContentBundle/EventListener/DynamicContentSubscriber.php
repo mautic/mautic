@@ -4,6 +4,7 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
@@ -12,8 +13,10 @@ use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -32,6 +35,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
+    public const TOKEN_REGEX = '/{([^=}]+)(?:=([^}]+))?}/';
+
     public function __construct(
         private TrackableModel $trackableModel,
         private PageTokenHelper $pageTokenHelper,
@@ -44,6 +49,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private ContactTracker $contactTracker,
         private CompanyLeadRepository $companyLeadRepository,
+        private EmailModel $emailModel,
     ) {
     }
 
@@ -55,6 +61,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
             DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
             PageEvents::PAGE_ON_DISPLAY             => ['decodeTokens', 254],
+            EntityValidateEvent::class              => ['validateDWCTokens', 0],
             EmailEvents::EMAIL_ON_SEND              => ['onEmailGenerate', 255],
             EmailEvents::EMAIL_ON_DISPLAY           => ['onEmailDisplay', 255],
         ];
@@ -208,6 +215,44 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
     }
 
+    public function validateDWCTokens(EntityValidateEvent $event): void
+    {
+        $allowedTokenNames = array_unique(
+            $this->extractTokenNamesFromTokens(
+                array_keys($this->emailModel->getBuilderComponents(
+                    null, ['tokens'])['tokens']
+                )
+            )
+        );
+
+        $entity           = $event->getEntity();
+        if (!$entity instanceof Email) {
+            return;
+        }
+
+        $content = $entity->getCustomHtml();
+
+        if (is_null($content)) {
+            return;
+        }
+
+        $slotNames         = $this->getDWCSlotNames($content);
+
+        foreach ($slotNames as $slotName) {
+            $dwcs = $this->dynamicContentModel->getRepository()->getDynamicContentBySlotName($slotName);
+            foreach ($dwcs as $dwc) {
+                $extractedTokenNames = $this->findTokenNames($dwc['content']);
+                $invalidTokenNames   = array_values(array_diff($extractedTokenNames, $allowedTokenNames));
+                if (!empty($extractedTokenNames) && !empty($invalidTokenNames)) {
+                    $event->getContext()->buildViolation('mautic.dynamicContent.error.token_disallowed', [
+                        '%invalidTokens%' => implode(', ', $invalidTokenNames),
+                        '%dwcId%'         => $dwc['id'],
+                    ])->addViolation();
+                }
+            }
+        }
+    }
+
     public function decodeTokens(PageDisplayEvent $event): void
     {
         if (!$lead = $event->getLead()) {
@@ -291,5 +336,64 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $event->addTokens(
             $this->dynamicContentHelper->getDwcTokensWithContent($emailContentWithoutTitle, $lead, $event)
         );
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getDWCSlotNames(string $content): array
+    {
+        $tokens = array_keys($this->dynamicContentHelper->findDwcTokens($content));
+
+        return $this->extractTokenValuesFromTokens($tokens);
+    }
+
+    /**
+     * @param array<string> $tokens
+     *
+     * @return array<string>
+     */
+    private function extractTokenValuesFromTokens(array $tokens): array
+    {
+        return array_map(function ($token) {
+            $matches         = [];
+            $tokenValueRegex = strpos($token, '=') ? '/=(.*?)}/' : '/{([^}]+)}/';
+            preg_match($tokenValueRegex, $token, $matches);
+
+            return $matches[1];
+        }, $tokens);
+    }
+
+    /**
+     * @param array<string> $tokens
+     *
+     * @return array<string>
+     */
+    private function extractTokenNamesFromTokens(array $tokens): array
+    {
+        return array_map(function ($token) {
+            $matches         = [];
+            $tokenValueRegex = strpos($token, '=') ? '/{(.*?)=/' : '/{([^}]+)}/';
+            preg_match($tokenValueRegex, $token, $matches);
+
+            return $matches[1];
+        }, $tokens);
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function findTokenNames(mixed $content): array
+    {
+        $tokens = [];
+        preg_match_all(self::TOKEN_REGEX, strip_tags($content), $matches);
+
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                $tokens[] = trim($match);
+            }
+        }
+
+        return $tokens;
     }
 }

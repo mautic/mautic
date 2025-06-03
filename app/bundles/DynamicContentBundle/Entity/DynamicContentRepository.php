@@ -251,7 +251,7 @@ class DynamicContentRepository extends CommonRepository
     public function getDynamicContentBySlotName(string $slotName): array
     {
         return $this->_em->getConnection()->createQueryBuilder()
-            ->select('id, name, display_order')
+            ->select('id, name, display_order', 'content')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content')
             ->where('slot_name = :slot_name')
             ->andWhere('is_campaign_based = :false')
