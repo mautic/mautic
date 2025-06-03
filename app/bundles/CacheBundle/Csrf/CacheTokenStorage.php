@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 
@@ -31,9 +30,7 @@ class CacheTokenStorage implements ClearableTokenStorageInterface
         try {
             return $this->requestStack->getSession();
         } catch (SessionNotFoundException) {
-            return new Session(
-                new MockArraySessionStorage()
-            );
+            return new Session();
         }
     }
 
