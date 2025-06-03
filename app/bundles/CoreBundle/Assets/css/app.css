@@ -1674,9 +1674,6 @@
     transform: rotate(359deg);
   }
 }
-html {
-  font-size: 100%;
-}
 html,
 body {
   width: 100%;
@@ -2483,7 +2480,7 @@ h6,
   color: var(--link-primary);
 }
 .fs-base {
-  font-size: 0.875rem;
+  font-size: 13px;
 }
 .fs-2 {
   font-size: 2px !important;
@@ -4528,7 +4525,7 @@ fieldset[disabled] .btn-ghost.btn-icon.focus i {
   margin-left: 5px;
 }
 .alert-growl .close {
-  font-size: 0.875rem;
+  font-size: 13px;
   color: var(--text-inverse);
   margin-left: 10px;
   font-weight: normal;
@@ -5969,7 +5966,7 @@ ul.dropdown-menu-form {
 .nav > li > a .text,
 .nav > li > a .icon,
 .nav > li > a .arrow {
-  line-height: 1rem;
+  line-height: 18px;
 }
 .nav .open > a,
 .nav .open > a:hover,
@@ -6627,7 +6624,7 @@ fieldset[disabled] .form-control {
   padding-left: 48px;
 }
 .form-control-icon .form-control.input-lg + .the-icon {
-  font-size: 1rem;
+  font-size: 16px;
   line-height: 48px;
   width: 48px;
 }
@@ -6635,7 +6632,7 @@ fieldset[disabled] .form-control {
   padding-left: 32px;
 }
 .form-control-icon .form-control.input-sm + .the-icon {
-  font-size: 0.75rem;
+  font-size: 12px;
   line-height: 32px;
   width: 32px;
 }
@@ -7311,7 +7308,7 @@ ul.line-legend li {
 }
 .table-responsive-force {
   width: 100%;
-  margin-bottom: 0.75rem;
+  margin-bottom: 13.5px;
   overflow-y: hidden;
   overflow-x: auto;
   -ms-overflow-style: -ms-autohiding-scrollbar;
@@ -7388,16 +7385,16 @@ ul.line-legend li {
   box-shadow: none;
 }
 .progress.progress-md {
-  height: -5rem;
+  height: 12px;
   border-radius: 0px;
 }
 .progress.progress-sm {
-  height: -9rem;
+  height: 8px;
   border-radius: 0px;
   margin-top: 2px;
 }
 .progress.progress-xs {
-  height: -13rem;
+  height: 4px;
   border-radius: 0px;
 }
 .progress-bar {
@@ -7464,7 +7461,7 @@ ul.line-legend li {
   clear: both;
 }
 .panel-heading .panel-title {
-  padding: 16.0625rem 0;
+  padding: 10px 0;
   display: table-cell;
   vertical-align: middle;
   font-weight: 600;
