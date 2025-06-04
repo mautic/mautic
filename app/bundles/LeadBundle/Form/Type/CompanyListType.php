@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CompanyListType extends AbstractType
 {
-    public const DEFAULT_LIMIT = 100;
+    public const DEFAULT_LIMIT = 0;
 
     public function configureOptions(OptionsResolver $resolver): void
     {
