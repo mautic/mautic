@@ -24,21 +24,13 @@ class CampaignActionAnonymizeUserDataSubscriberTest extends TestCase
         $leadModelMock                                   = $this->createMock(LeadModel::class);
         $fieldModelMock                                  = $this->createMock(FieldModel::class);
         $companyModelMock                                = $this->createMock(CompanyModel::class);
-        $logMock                                         = $this->createMock(\Psr\Log\LoggerInterface::class);
-        $emailStatsModelMock                             = $this->createMock(EmailStatModel::class);
-        $entityManagerMock                               = $this->createMock(\Doctrine\ORM\EntityManager::class);
-        $auditLogModelMock                               = $this->createMock(\Mautic\CoreBundle\Model\AuditLogModel::class);
-        $submissionModelMock                             = $this->createMock(\Mautic\FormBundle\Model\SubmissionModel::class);
+        $anonymizeContactCompanyDataMock                 = $this->createMock(\Mautic\LeadBundle\Services\AnonymizeContactCompanyData::class);
 
         $this->campaignActionAnonymizeUserDataSubscriber = new CampaignActionAnonymizeUserDataSubscriber(
             $leadModelMock,
             $fieldModelMock,
             $companyModelMock,
-            $logMock,
-            $emailStatsModelMock,
-            $entityManagerMock,
-            $auditLogModelMock,
-            $submissionModelMock
+            $anonymizeContactCompanyDataMock
         );
     }
 
