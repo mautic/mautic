@@ -497,18 +497,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.lead.anonymize.contact_company' => [
-                'class'     => Mautic\LeadBundle\Services\AnonymizeContactCompanyData::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'monolog.logger.mautic',
-                    'mautic.email.model.email',
-                    'mautic.form.model.submission',
-                    'doctrine.orm.entity_manager',
-                    'mautic.core.model.auditlog',
-                    'mautic.lead.model.company',
-                ],
-            ],
             'mautic.lead.model.lead_segment_filter_factory' => [
                 'class'     => Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class,
                 'arguments' => [

@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\LeadBundle\EventListener\CampaignActionAnonymizeUserDataSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;

@@ -67,5 +67,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.helper.contact_request_helper', Mautic\LeadBundle\Helper\ContactRequestHelper::class);
     $services->alias('mautic.tracker.contact', Mautic\LeadBundle\Tracker\ContactTracker::class);
     $services->alias('mautic.lead.field.settings.background_service', Mautic\LeadBundle\Field\BackgroundService::class);
+    $services->alias('mautic.lead.anonymize.contact_company_service', Mautic\LeadBundle\Services\AnonymizeContactCompanyData::class);
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };

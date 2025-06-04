@@ -2,7 +2,8 @@
 
 namespace Mautic\LeadBundle\Services;
 
-use Mautic\CampaignBundle\Event\PendingEvent;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Submission;
@@ -15,12 +16,9 @@ use Mautic\LeadBundle\Helper\AnonymizeHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Psr\Log\LoggerInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class AnonymizeContactCompanyData
 {
-
     public const COLUMNS_NOT_ACCEPTED = ['submission_id', 'form_id'];
     /**
      * @var array<string, string>
@@ -55,10 +53,8 @@ class AnonymizeContactCompanyData
         private readonly EntityManagerInterface $entityManager,
         private readonly AuditLogModel $auditLogModel,
         private readonly CompanyModel $companyModel,
-    )
-    {
+    ) {
     }
-
 
     /**
      * @param array<Lead>|array<Company> $leadsCompanies

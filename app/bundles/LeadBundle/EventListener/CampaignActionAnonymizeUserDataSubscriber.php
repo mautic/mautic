@@ -62,7 +62,6 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
         $properties       = $event->getEvent()->getProperties();
         $pseudonymize     = $properties['pseudonymize'] ?? false;
         $leads            = $this->leadModel->getRepository()->findBy(['id' => $event->getContactIds()]);
-//        dd($leads,$event->getContacts());
         $companies        = $this->getCompaniesByLeads($event->getContactIds());
 
         $idFields                     = array_merge($properties['fieldsToAnonymize'], $properties['fieldsToDelete']);
@@ -146,5 +145,4 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
             $this->anonymizeContactCompanyData->setHashes($companies, $field, $pseudonymize),
         ];
     }
-
 }
