@@ -1,6 +1,6 @@
-{# description.html.twig #}
+{# @MauticCore/Helper/description--expanded.html.twig #}
 {% if description is defined and description is not empty %}
-    {% set isCollapsed = description|striptags|length > 70 %}
+    {% set isCollapsed = description|striptags|length > 110 %}
 
     <div class="row-no-gutters ml-md">
         <div class="well description pa-0">

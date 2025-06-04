@@ -177,6 +177,14 @@ abstract class AbstractMauticTestCase extends WebTestCase
         if ($command) {
             // Register the command
             $application->add($command);
+        } else {
+            $command = $application->find($name);
+        }
+
+        $bypassLockingOption = 'bypass-locking';
+
+        if ($command->getDefinition()->hasOption($bypassLockingOption)) {
+            $params["--$bypassLockingOption"] = true;
         }
 
         $command       = $application->find($name);

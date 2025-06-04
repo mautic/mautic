@@ -138,11 +138,9 @@
                             ) }}">
                                 {{ item.getName() }}
                             </a>
-                            {% if item.getDescription() is defined and item.getDescription() is not empty %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ item.getDescription()|purify }}</small>
-                            </div>
-                            {% endif %}
+                            {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                'description': item.getDescription()
+                            }) }}
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
