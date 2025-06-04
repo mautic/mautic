@@ -6,9 +6,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class CommonRepositoryTest extends MauticMysqlTestCase
 {
-    /**
-     * @testdox Test that is:mine does not throw an exception due to bad DQL
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that is:mine does not throw an exception due to bad DQL')]
     public function testIsMineSearchCommandDoesntCauseExceptionDueToBadDQL(): void
     {
         $this->client->request('GET', 's/contacts?search=is:mine');

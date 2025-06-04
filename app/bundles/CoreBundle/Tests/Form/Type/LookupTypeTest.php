@@ -12,9 +12,8 @@ class LookupTypeTest extends TypeTestCase
     /**
      * @param array<string, string> $attributes
      * @param array<string, string> $expected
-     *
-     * @dataProvider provideLookupAttributes
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideLookupAttributes')]
     public function testCreateViewAddsAttributesWithoutOverride(array $attributes, array $expected): void
     {
         $form = $this->factory->create(LookupType::class, null, ['attr' => $attributes]);

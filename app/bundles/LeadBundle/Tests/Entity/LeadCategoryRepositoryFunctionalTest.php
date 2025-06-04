@@ -9,11 +9,8 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
- */
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

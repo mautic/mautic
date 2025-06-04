@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -32,6 +33,7 @@ use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -45,7 +47,7 @@ class PublicController extends AbstractFormController
      * @return Response
      *
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function indexAction(
         Request $request,
@@ -316,59 +318,53 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return mixed[]|JsonResponse|RedirectResponse|Response
      *
-     * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id, string $objectType = null)
     {
-        $model        = $this->getModel('page');
-        $entity       = $model->getEntity($id);
-        $draftEnabled = $pageConfig->isDraftEnabled();
-        $contactId    = (int) $request->query->get('contactId');
-
-        if ($contactId) {
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead.lead');
-            /** @var Lead $contact */
-            $contact = $leadModel->getEntity($contactId);
-        }
-
         /** @var PageModel $model */
         $model = $this->getModel('page');
         /** @var Page $page */
         $page = $model->getEntity($id);
 
-        if (!$page->getId()) {
+        if (!$page || !$page->getId()) {
             return $this->notFound();
         }
 
-        $analytics = $analyticsHelper->getCode();
-
-        $BCcontent = $page->getContent();
-        $content   = $page->getCustomHtml();
-
-        if ('draft' === $objectType && $draftEnabled && $entity->hasDraft()) {
-            $content = $entity->getDraftContent();
+        $contactId = (int) $request->query->get('contactId');
+        if ($contactId) {
+            /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead.lead');
+            $contact   = $leadModel->getEntity($contactId);
         }
-        if (!$security->isAdmin()
-            && (
-                (!$page->isPublished())
-                || (!$security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
-                    $page->getCreatedBy()
-                )))
-        ) {
+        $draftEnabled = $pageConfig->isDraftEnabled();
+        $analytics    = $analyticsHelper->getCode();
+
+        $BCcontent     = $page->getContent();
+        $content       = $page->getCustomHtml();
+        $publicPreview = $page->isPublicPreview();
+
+        if ('draft' === $objectType && $draftEnabled && $page->hasDraft()) {
+            $content       = $page->getDraftContent();
+            $publicPreview = $page->getDraft()->isPublicPreview();
+        }
+
+        if (($security->isAnonymous() && (!$page->isPublished() || !$publicPreview)) || (!$security->isAnonymous(
+        ) && !$security->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $page->getCreatedBy()
+        ))) {
             return $this->accessDenied();
         }
 
-        if ($contactId && (
-            !$security->isAdmin()
-            || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-        )
-        ) {
+        if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother'
+        ))) {
+            // disallow displaying contact information
             return $this->accessDenied();
         }
 
@@ -485,7 +481,7 @@ class PublicController extends AbstractFormController
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
         $redirectId,
-    ): \Symfony\Component\HttpFoundation\RedirectResponse {
+    ): RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */

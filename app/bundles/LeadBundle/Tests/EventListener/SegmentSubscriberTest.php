@@ -91,7 +91,7 @@ class SegmentSubscriberTest extends TestCase
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
-            ->will($this->returnValue($ip));
+            ->willReturn($ip);
 
         $this->auditLogModel->expects($this->once())
             ->method('writeToLog')
@@ -103,12 +103,12 @@ class SegmentSubscriberTest extends TestCase
         $segment->deletedId = $segmentId;
         $segment->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($segmentName));
+            ->willReturn($segmentName);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())
             ->method('getList')
-            ->will($this->returnValue($segment));
+            ->willReturn($segment);
 
         $subscriber->onSegmentDelete($event);
     }
@@ -136,7 +136,7 @@ class SegmentSubscriberTest extends TestCase
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
-            ->will($this->returnValue($ip));
+            ->willReturn($ip);
 
         $auditLogModel = $this->createMock(AuditLogModel::class);
         $auditLogModel->expects($this->once())
@@ -148,18 +148,18 @@ class SegmentSubscriberTest extends TestCase
         $segment = $this->createMock(LeadList::class);
         $segment->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue($segmentId));
+            ->willReturn($segmentId);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())
             ->method('getList')
-            ->will($this->returnValue($segment));
+            ->willReturn($segment);
         $event->expects($this->once())
             ->method('getChanges')
-            ->will($this->returnValue($changes));
+            ->willReturn($changes);
         $event->expects($this->once())
             ->method('isNew')
-            ->will($this->returnValue($isNew));
+            ->willReturn($isNew);
 
         $subscriber->onSegmentPostSave($event);
     }

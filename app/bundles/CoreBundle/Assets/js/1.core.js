@@ -795,7 +795,7 @@ var Mautic = {
      * @param textStatus
      * @param errorThrown
      */
-    processAjaxError: function (request, textStatus, errorThrown, mainContent) {
+    processAjaxError: function (request, textStatus, errorThrown, mainContent, target) {
         if (textStatus == 'abort') {
             Mautic.stopPageLoadingBar();
             Mautic.stopCanvasLoadingBar();
@@ -850,6 +850,11 @@ var Mautic = {
                 mQuery('.modal.in .modal-body-content').removeClass('hide');
                 if (mQuery('.modal.in  .loading-placeholder').length) {
                     mQuery('.modal.in  .loading-placeholder').addClass('hide');
+                }
+            } else if (response.closeModal) {
+                if (typeof target !== "undefined") {
+                    mQuery('body').removeClass('noscroll');
+                    mQuery(target).modal('hide');
                 }
             } else if (inDevMode) {
                 console.log(response);

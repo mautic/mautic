@@ -66,11 +66,10 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider requestProvider
-     *
      * @param mixed[] $parameters
      * @param mixed[] $settings
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('requestProvider')]
     public function testMakeRequest(string $uri, array $parameters, string $method, array $settings, object $assertRequest): void
     {
         /**

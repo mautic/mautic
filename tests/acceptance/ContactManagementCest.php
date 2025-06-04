@@ -231,6 +231,7 @@ class ContactManagementCest
         $I->amOnPage(CampaignPage::$URL);
 
         // Click on the "Contacts" tab in the campaign page
+        $I->waitForElementClickable(CampaignPage::$contactsTab, 5);
         $I->click(CampaignPage::$contactsTab);
 
         // Verify that the first and second contacts are not in the campaign yet
@@ -252,10 +253,11 @@ class ContactManagementCest
 
         // Navigate back to the campaign page and click on the "Contacts" tab
         $I->amOnPage(CampaignPage::$URL);
+        $I->waitForElementClickable(CampaignPage::$contactsTab, 5);
         $I->click(CampaignPage::$contactsTab);
 
         // Verify that the first and second contacts are now in the campaign
-        $I->waitForElementVisible(CampaignPage::$firstContactFromContactsTab);
+        $I->waitForElementVisible(CampaignPage::$firstContactFromContactsTab, 30);
         $I->see($contactName1, CampaignPage::$firstContactFromContactsTab);
         $I->see($contactName2, CampaignPage::$secondContactFromContactsTab);
     }

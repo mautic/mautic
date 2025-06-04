@@ -2,6 +2,7 @@
 
 namespace Mautic\DashboardBundle\Dashboard;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,8 +13,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class Widget
 {
     public const FORMAT_HUMAN = 'M j, Y';
-
-    public const FORMAT_MYSQL = 'Y-m-d';
 
     public function __construct(
         private DashboardModel $dashboardModel,
@@ -63,12 +62,12 @@ class Widget
 
         if (!empty($dateRangeFilter['date_from'])) {
             $from = new \DateTime($dateRangeFilter['date_from']);
-            $this->requestStack->getSession()->set('mautic.daterange.form.from', $from->format(self::FORMAT_MYSQL));
+            $this->requestStack->getSession()->set('mautic.daterange.form.from', $from->format(DateTimeHelper::FORMAT_DB_DATE_ONLY));
         }
 
         if (!empty($dateRangeFilter['date_to'])) {
             $to = new \DateTime($dateRangeFilter['date_to']);
-            $this->requestStack->getSession()->set('mautic.daterange.form.to', $to->format(self::FORMAT_MYSQL));
+            $this->requestStack->getSession()->set('mautic.daterange.form.to', $to->format(DateTimeHelper::FORMAT_DB_DATE_ONLY));
         }
 
         $this->dashboardModel->clearDashboardCache();

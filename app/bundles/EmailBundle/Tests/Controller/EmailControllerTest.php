@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -146,8 +146,8 @@ class EmailControllerTest extends TestCase
     {
         $this->containerMock->expects($this->once())
             ->method('get')
-            ->withConsecutive(['router'])
-            ->willReturnOnConsecutiveCalls($this->routerMock);
+            ->with('router')
+            ->willReturn($this->routerMock);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -179,8 +179,8 @@ class EmailControllerTest extends TestCase
     {
         $this->containerMock->expects($this->once())
             ->method('get')
-            ->withConsecutive(['router'])
-            ->willReturnOnConsecutiveCalls($this->routerMock);
+            ->with('router')
+            ->willReturn($this->routerMock);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -269,6 +269,6 @@ class EmailControllerTest extends TestCase
 
         $request = new Request();
         $this->requestStack->push($request);
-        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FieldModel::class));
+        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FakeContactHelper::class));
     }
 }

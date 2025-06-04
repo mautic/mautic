@@ -6,9 +6,9 @@ a = current major release
 b = current minor release
 c = future major release
 
-* a.x for any features and enhancements (e.g. 5.x)
-* a.b for any bug fixes (e.g. 4.4, 5.1)
-* c.x for any features, enhancements or bug fixes with backward compatibility breaking changes (e.g. 5.x) -->
+* a.x for any features and enhancements (e.g. 7.x)
+* a.b for any bug fixes (e.g. 5.2, 6.0)
+* c.x for any bug fixes, features, enhancements or bug fixes with backward compatibility breaking changes (e.g. 7.x) -->
 
 | Q                                      | A
 | -------------------------------------- | ---

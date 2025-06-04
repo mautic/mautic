@@ -6,6 +6,8 @@ use Mautic\ConfigBundle\Exception\BadFormConfigException;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(BadFormConfigException::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(ConfigMapper::class)]
 class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 {
     private $forms = [
@@ -132,12 +134,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /**
-     * @testdox Exception should be thrown if parameters key is not found in a form config
-     *
-     * @covers  \Mautic\ConfigBundle\Exception\BadFormConfigException
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Exception should be thrown if parameters key is not found in a form config')]
     public function testExceptionIsThrownOnBadFormConfig(): void
     {
         $this->expectException(BadFormConfigException::class);
@@ -150,26 +147,17 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameterHelper = $this->createMock(CoreParametersHelper::class);
 
         $mapper = new ConfigMapper($parameterHelper, []);
 
         $mapper->bindFormConfigsWithRealValues($forms);
     }
 
-    /**
-     * @testdox Defaults should be bound when local config has no values
-     *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Defaults should be bound when local config has no values')]
     public function testParametersAreBoundToDefaults(): void
     {
-        $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameterHelper = $this->createMock(CoreParametersHelper::class);
 
         $mapper = new ConfigMapper($parameterHelper, []);
 
@@ -178,17 +166,10 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->forms, $processedForms);
     }
 
-    /**
-     * @testdox Defaults should be merged with local config values
-     *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Defaults should be merged with local config values')]
     public function testParametersAreBoundToDefaultsWithLocalConfig(): void
     {
-        $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameterHelper = $this->createMock(CoreParametersHelper::class);
 
         $parameterHelper->method('get')
             ->willReturnCallback(
@@ -245,17 +226,10 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($forms, $processedForms);
     }
 
-    /**
-     * @testdox Defaults should be merged with local config values but restricted fields should be removed
-     *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Defaults should be merged with local config values but restricted fields should be removed')]
     public function testParametersAreBoundToDefaultsWithLocalConfigAndRestrictionsAppied(): void
     {
-        $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameterHelper = $this->createMock(CoreParametersHelper::class);
 
         $parameterHelper->method('get')
             ->willReturnCallback(

@@ -13,9 +13,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         'folder'    => 'folder',
     ];
 
-    /**
-     * @testdox All getters return appropriate values
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('All getters return appropriate values')]
     public function testGetters(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
@@ -26,9 +24,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->config['folder'], $configAccessor->getFolder());
     }
 
-    /**
-     * @testdox Key is formatted appropriately
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Key is formatted appropriately')]
     public function testKeyIsPathAndUser(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
@@ -36,9 +32,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('path_user', $configAccessor->getKey());
     }
 
-    /**
-     * @testdox Test its considered configured if we have a host and a folder
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test its considered configured if we have a host and a folder')]
     public function testIsConfigured(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
@@ -46,9 +40,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($configAccessor->isConfigured());
     }
 
-    /**
-     * @testdox Test its considered not configured if folder is missing
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test its considered not configured if folder is missing')]
     public function testIsNotConfiguredIfFolderIsMissing(): void
     {
         $config = $this->config;
@@ -57,9 +49,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($configAccessor->isConfigured());
     }
 
-    /**
-     * @testdox Test its considered not configured if host is missing
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test its considered not configured if host is missing')]
     public function testIsNotConfiguredIfHostIsMissing(): void
     {
         $config = $this->config;

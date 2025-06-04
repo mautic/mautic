@@ -12,9 +12,9 @@
           {{ form_row(form.email_to_owner) }}
           {{ form_row(form.copy_lead) }}
           <label class="control-label">{{ 'mautic.form.action.sendemail.dragfield'|trans }}</label>
-          <div id="formFieldTokens" class="list-group" style="max-height: 250px; overflow-y: auto;">
+          <div id="formFieldTokens" class="list-group field-tokens" style="max-height: 250px; overflow-y: auto;">
               {% for token, field in formFields %}
-                <a class="list-group-item ellipsis" href="#" onclick="Mautic.insertTextInEditor(mQuery('#formaction_properties_message'), '{{ token }}');">{{ field }}</a>
+                <a class="list-group-item ellipsis" onclick="Mautic.insertHtmlInEditor(mQuery('#formaction_properties_message'), '<strong>{{ field }}</strong>: {{ token }}');">{{ field }}</a>
               {% endfor %}
           </div>
       </div>

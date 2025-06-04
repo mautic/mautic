@@ -13,17 +13,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetLeadColumns(): void
     {
-        $fieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldModel = $this->createMock(FieldModel::class);
 
-        $listModel = $this->getMockBuilder(ListModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $listModel = $this->createMock(ListModel::class);
 
-        $userModel = $this->getMockBuilder(UserModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userModel = $this->createMock(UserModel::class);
 
         $leadModel = $this->createMock(LeadModel::class);
 
@@ -105,17 +99,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLeadFilter(): void
     {
-        $fieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldModel = $this->createMock(FieldModel::class);
 
-        $listModel = $this->getMockBuilder(ListModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $listModel = $this->createMock(ListModel::class);
 
-        $userModel = $this->getMockBuilder(UserModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userModel = $this->createMock(UserModel::class);
 
         $fieldModel->expects($this->once())
         ->method('getLeadFields')
@@ -280,17 +268,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCompanyColumns(): void
     {
-        $fieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldModel = $this->createMock(FieldModel::class);
 
-        $listModel = $this->getMockBuilder(ListModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $listModel = $this->createMock(ListModel::class);
 
-        $userModel = $this->getMockBuilder(UserModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userModel = $this->createMock(UserModel::class);
 
         $fieldModel->expects($this->exactly(2)) // We have 2 asserts
         ->method('getCompanyFields')

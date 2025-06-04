@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -84,6 +85,8 @@ class FormType extends AbstractType
                 'bundle' => 'form',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         $builder->add('template', ThemeListType::class, [
             'include_code_mode' => false,

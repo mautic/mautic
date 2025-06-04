@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(CookieHelper::class)]
 class CookieHelperTest extends TestCase
 {
     /**
@@ -34,12 +35,7 @@ class CookieHelperTest extends TestCase
             ->willReturn($this->requestMock);
     }
 
-    /**
-     * @testdox The helper is instantiated correctly when secure and contains samesite=lax
-     *
-     * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
-     * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]
     public function testSetCookieWhenSecure(): void
     {
         $cookiePath   = '/';
@@ -70,12 +66,7 @@ class CookieHelperTest extends TestCase
         $cookieHelper->onResponse($event);
     }
 
-    /**
-     * @testdox The helper is instantiated correctly when not secure and contain samesite=lax
-     *
-     * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
-     * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when not secure and contain samesite=lax')]
     public function testSetCookieWhenNotSecure(): void
     {
         $cookiePath   = '/';

@@ -1,9 +1,9 @@
-<li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" id="admin-menu" href="#">
-        <i class="ri-settings-5-line ri-xl"></i>
-    </a>
-    <ul class="dropdown-menu dropdown-menu-right">
-        {% if item.hasChildren() and (options.depth is not same as 0) and item.getDisplayChildren() %}
+{% if item.hasChildren() and (options.depth is not same as 0) and item.getDisplayChildren() %}
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" id="admin-menu" href="#">
+            <i class="ri-settings-5-line ri-xl"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right">
             {% for child in item.getChildren() %}
                 {% if child.isDisplayed() %}
                     <li>
@@ -50,6 +50,6 @@
                     </li>
                 {% endif %}
             {% endfor %}
-        {% endif %}
-    </ul>
-</li>
+        </ul>
+    </li>
+{% endif %}

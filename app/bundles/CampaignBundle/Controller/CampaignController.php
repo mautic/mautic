@@ -191,6 +191,78 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
+    public function EventStatsAction(int $objectId, string $dateFromValue, string $dateToValue): JsonResponse
+    {
+        $response        = [];
+        $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($objectId);
+        $dateFrom        = null;
+        $dateTo          = null;
+        $dateToPlusOne   = null;
+        if ($this->coreParametersHelper->get('campaign_by_range')) {
+            $dateFrom      = new \DateTimeImmutable($dateFromValue);
+            $dateTo        = new \DateTimeImmutable($dateToValue);
+            $dateToPlusOne = $dateTo->modify('+1 day');
+        }
+
+        $leadCount = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($objectId);
+        $logCounts = $this->processCampaignLogCounts($objectId, $dateFrom, $dateToPlusOne);
+
+        $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
+        $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
+
+        $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
+        $sortedEvents           = $this->processCampaignEventsFromParentCondition($events);
+
+        $sourcesList     = $this->getCampaignModel()->getSourceLists();
+        $campaign        = $this->getCampaignModel()->getEntity($objectId);
+        $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
+
+        $response['preview']    = trim(
+            $this->renderView(
+                '@MauticCampaign/Campaign/_preview.html.twig',
+                [
+                    'campaignId'      => $objectId,
+                    'campaign'        => $campaign,
+                    'campaignEvents'  => $events,
+                    'campaignSources' => $this->campaignSources,
+                    'eventSettings'   => $this->eventCollector->getEventsArray(),
+                    'canvasSettings'  => $campaign->getCanvasSettings(),
+                ]
+            )
+        );
+        $response['decisions']  = trim($this->renderView('@MauticCampaign/Campaign/_events.html.twig', ['events' => $sortedEvents['decision']]));
+        $response['actions']    = trim($this->renderView('@MauticCampaign/Campaign/_events.html.twig', ['events' => $sortedEvents['action']]));
+        $response['conditions'] = trim($this->renderView('@MauticCampaign/Campaign/_events.html.twig', ['events' => $sortedEvents['condition']]));
+
+        return new JsonResponse(array_filter($response));
+    }
+
+    public function GraphAction(Request $request, int $objectId, string $dateFrom, string $dateTo): Response
+    {
+        $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
+        $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+        $stats           = $this->getCampaignModel()->getCampaignMetricsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+            ['campaign_id' => $objectId]
+        );
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Campaign/graph.html.twig',
+                'viewParameters'  => [
+                    'campiagnId'    => $objectId,
+                    'stats'         => $stats,
+                    'dateRangeForm' => $dateRangeForm->createView(),
+                ],
+            ]
+        );
+    }
+
     /**
      * Deletes the entity.
      *
@@ -897,42 +969,9 @@ class CampaignController extends AbstractStandardFormController
                 $entity   = $args['entity'];
                 $objectId = $args['objectId'];
                 // Init the date range filter form
-                $dateRangeValues = $this->requestStack->getCurrentRequest()->get('daterange', []);
-                $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-                $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-                $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
-                $dateFrom        = null;
-                $dateTo          = null;
-                $dateToPlusOne   = null;
-
-                if ($this->coreParametersHelper->get('campaign_by_range')) {
-                    $dateFrom      = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
-                    $dateTo        = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
-                    $dateToPlusOne = $dateTo->modify('+1 day');
-                }
-
-                $leadCount = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
-                $logCounts = $this->processCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
-
-                $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
-                $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
-
-                $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
-                $sortedEvents = $this->processCampaignEventsFromParentCondition($events);
-
-                $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
-                    null,
-                    new \DateTime($dateRangeForm->get('date_from')->getData()),
-                    new \DateTime($dateRangeForm->get('date_to')->getData()),
-                    null,
-                    ['campaign_id' => $objectId]
-                );
-
-                $sourcesList = $this->getCampaignModel()->getSourceLists();
-
-                $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
-                $this->prepareCampaignEventsForEdit($entity, $objectId, true);
-
+                $dateRangeValues     = $this->requestStack->getCurrentRequest()->get('daterange', []);
+                $action              = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+                $dateRangeForm       = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
                 $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);
                 $showEmailStats      = $isEmailStatsEnabled && $entity->isEmailCampaign();
 
@@ -940,14 +979,9 @@ class CampaignController extends AbstractStandardFormController
                     $args['viewParameters'],
                     [
                         'campaign'        => $entity,
-                        'stats'           => $stats,
-                        'events'          => $sortedEvents,
-                        'eventSettings'   => $this->eventCollector->getEventsArray(),
                         'sources'         => $this->getCampaignModel()->getLeadSources($entity),
-                        'dateRangeForm'   => $dateRangeForm->createView(),
-                        'campaignSources' => $this->campaignSources,
-                        'campaignEvents'  => $events,
                         'showEmailStats'  => $showEmailStats,
+                        'dateRangeForm'   => $dateRangeForm->createView(),
                     ]
                 );
                 break;
@@ -1084,8 +1118,8 @@ class CampaignController extends AbstractStandardFormController
         } else {
             /** @var LeadEventLogRepository $eventLogRepo */
             $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateToPlusOne);
         }
 
         return [

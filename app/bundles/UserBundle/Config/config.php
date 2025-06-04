@@ -6,6 +6,7 @@ return [
             'mautic.user_management' => [
                 'id'        => 'mautic_user_management_root',
                 'priority'  => 17,
+                'access'    => ['user:users:view', 'user:roles:view'],
             ],
             'mautic.user.users' => [
                 'access'    => 'user:users:view',

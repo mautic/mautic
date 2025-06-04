@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
 class TokenHelper
 {
@@ -27,10 +28,11 @@ class TokenHelper
         }
 
         // Search for bracket or bracket encoded
-        $tokenList    = [];
-        $foundMatches = preg_match_all('/({|%7B)contactfield=(.*?)(}|%7D)/', $content, $matches);
+        $tokenList        = [];
+        $foundMatches     = preg_match_all('/({|%7B)contactfield=(.*?)(}|%7D)/', $content, $matches);
+        $foundDateMatches = preg_match_all('/({|%7B)datetime=(.*?)(}|%7D)/', $content, $dateMatches);
 
-        if ($foundMatches) {
+        if ($foundMatches || $foundDateMatches) {
             foreach ($matches[2] as $key => $match) {
                 $token = $matches[0][$key];
 
@@ -41,6 +43,17 @@ class TokenHelper
                 $alias             = self::getFieldAlias($match);
                 $defaultValue      = self::getTokenDefaultValue($match);
                 $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue);
+            }
+
+            foreach ($dateMatches[2] as $key => $match) {
+                $token = $dateMatches[0][$key];
+
+                if (isset($tokenList[$token])) {
+                    continue;
+                }
+
+                $dt                = new DateTimeHelper($match);
+                $tokenList[$token] = $dt->toLocalString(DateTimeHelper::FORMAT_DB);
             }
 
             if ($replace) {
@@ -84,9 +97,11 @@ class TokenHelper
                 }
             }
         }
-
         if ('' !== $value) {
             switch ($defaultValue) {
+                case 'label':
+                    $value = self::getNormalizeValue($alias, $value);
+                    break;
                 case 'true':
                     $value = urlencode($value);
                     break;
@@ -114,7 +129,7 @@ class TokenHelper
                     break;
             }
         }
-        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
+        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime', 'label'])) {
             return $value;
         } else {
             return '' !== $value ? $value : $defaultValue;
@@ -150,5 +165,17 @@ class TokenHelper
         }
 
         return self::$parameters[$parameter];
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed|string
+     */
+    private static function getNormalizeValue(string $alias, $value)
+    {
+        $field = array_merge(LeadRepository::getLeadFieldRepository()->getFields()[$alias], ['value' => $value]);
+
+        return CustomFieldValueHelper::normalizeValue($field);
     }
 }

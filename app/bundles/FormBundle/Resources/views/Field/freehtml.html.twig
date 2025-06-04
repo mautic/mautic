@@ -68,6 +68,7 @@
           'mauticform-' ~ containerClass,
           'mauticform-field-' ~ order,
         ]),
+        'style': 'width: ' ~ field.fieldWidth
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
@@ -99,6 +100,7 @@
   }) %}
   {% if field.properties.multiple is not empty %}
     {% set containerAttributes = containerAttributes|merge({
+
             'data-validate-multiple': 'true',
     }) %}
   {% endif %}

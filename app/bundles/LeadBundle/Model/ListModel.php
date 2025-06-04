@@ -132,13 +132,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
         // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+        $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+            $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -510,8 +510,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
-        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+        } else {
+            $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
+            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        }
 
         return $leadsProcessed;
     }
@@ -631,7 +635,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            }
         }
 
         if (!empty($persistLists)) {
@@ -749,7 +757,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            }
 
             unset($listLead);
         }

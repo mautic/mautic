@@ -256,8 +256,8 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($queryBuilderMock);
 
         $queryBuilderMock->method('leftJoin')
-            ->withConsecutive(['dev', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dev.lead_id'])
-            ->willReturn($queryBuilderMock);
+            ->with('dev', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dev.lead_id')
+            ->willReturnSelf();
 
         return $queryBuilderMock;
     }

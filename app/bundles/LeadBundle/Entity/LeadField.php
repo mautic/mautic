@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
+use Mautic\LeadBundle\Validator\LeadFieldMinimumLength;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -39,7 +40,16 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
-    public const CACHE_NAMESPACE    = 'LeadField';
+
+    public const MAX_VARCHAR_LENGTH      = 191;
+    public const CACHE_NAMESPACE         = 'LeadField';
+    public const TYPES_SUPPORTING_LENGTH = [
+        'text',
+        'select',
+        'phone',
+        'url',
+        'email',
+    ];
 
     /**
      * @var int
@@ -287,6 +297,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
                 }
             },
         ]));
+
+        $metadata->addConstraint(new LeadFieldMinimumLength());
     }
 
     /**
@@ -873,5 +885,10 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     public function setIsIndex(?bool $indexable): void
     {
         $this->isIndex = $indexable ?? false;
+    }
+
+    public function supportsLength(): bool
+    {
+        return in_array($this->type, self::TYPES_SUPPORTING_LENGTH);
     }
 }

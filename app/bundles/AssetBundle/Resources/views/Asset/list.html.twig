@@ -10,7 +10,7 @@
 
 {% block content %}
 	{% if isIndex %}
-		<div id="page-list-wrapper" class="panel panel-default">
+		<div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
 
 			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
@@ -203,15 +203,13 @@
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ description|purify }}</small>
-                            </div>
+                            {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                'description': description
+                            }) }}
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName, color = (category) ? category.getTitle() : 'mautic.core.form.uncategorized'|trans, (category) ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.getDownloadCount() }}</td>
                     <td class="visible-md visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
@@ -239,7 +237,27 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.asset.noresults.tip'}) -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.asset.noresults.tip'}) -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'cloud--assets',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+    
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.asset.onboarding.heading',
+                subheading: 'mautic.asset.onboarding.subheading',
+                copy: 'mautic.asset.onboarding.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}
 
 {{- include('@MauticCore/Helper/modal.html.twig', {
