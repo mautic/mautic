@@ -208,21 +208,11 @@ SQL;
             ->method('eq')
             ->with('l.manually_removed', ':false')
             ->willReturnSelf();
-        $matcher = self::once();
 
-        $this->queryBuilderMock->expects($matcher)
+        $this->queryBuilderMock->expects(self::once())
             ->method('setParameter')
-            ->willReturnCallback(
-                function (...$parameters) use ($matcher) {
-                    if (1 === $matcher->getInvocationCount()) {
-                        $this->assertSame('false', $parameters[0]);
-                        $this->assertFalse($parameters[1]);
-                        $this->assertSame('boolean', $parameters[2]);
-                    }
-
-                    return $this->queryBuilderMock;
-                }
-            );
+            ->with('false', false, 'boolean')
+            ->willReturnSelf();
 
         self::assertSame(array_combine($listIds, $counts), $this->repository->getLeadCount($listIds));
     }
@@ -254,13 +244,13 @@ SQL;
 
         $this->queryBuilderMock->expects($matcher)
             ->method('from')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $parameters[0]);
                     $this->assertSame('l', $parameters[1]);
 
                     return $this->queryBuilderMock;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $parameters[0]);
                     $this->assertSame('l USE INDEX ('.MAUTIC_TABLE_PREFIX.'manually_removed)', $parameters[1]);
 
@@ -271,11 +261,11 @@ SQL;
 
         $this->expressionMock->expects($matcher)
             ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.leadlist_id', $parameters[0]);
                     $this->assertSame($listIds[0], $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.manually_removed', $parameters[0]);
                     $this->assertSame(':false', $parameters[1]);
                 }

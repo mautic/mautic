@@ -33,7 +33,7 @@ class PointSubscriberTest extends TestCase
         $matcher           = self::exactly(2);
 
         $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper) {
-            if (1 === $matcher->getInvocationCount()) {
+            if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('page.hit', $parameters[0]);
                 $this->assertSame([
                     'group'       => 'mautic.page.point.action',
@@ -43,7 +43,7 @@ class PointSubscriberTest extends TestCase
                     'formType'    => \Mautic\PageBundle\Form\Type\PointActionPageHitType::class,
                 ], $parameters[1]);
             }
-            if (2 === $matcher->getInvocationCount()) {
+            if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame('url.hit', $parameters[0]);
                 $this->assertSame([
                     'group'       => 'mautic.page.point.action',

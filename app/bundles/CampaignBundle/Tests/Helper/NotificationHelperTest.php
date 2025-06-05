@@ -42,25 +42,15 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->userModel = $this->getMockBuilder(UserModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->userModel = $this->createMock(UserModel::class);
 
-        $this->notificationModel = $this->getMockBuilder(NotificationModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->notificationModel = $this->createMock(NotificationModel::class);
 
-        $this->router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->router = $this->createMock(Router::class);
 
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(Translator::class);
 
-        $this->coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testContactOwnerIsNotified(): void
@@ -69,12 +59,10 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $campaign = new Campaign();
         $event->setCampaign($campaign);
 
-        $user = $this->getMockBuilder(User::class)
-            ->getMock();
+        $user = $this->createMock(User::class);
         $user->method('getId')
             ->willReturn('1');
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())
             ->method('getOwner')
             ->willReturn($user);
@@ -107,12 +95,10 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(1);
 
-        $user = $this->getMockBuilder(User::class)
-            ->getMock();
+        $user = $this->createMock(User::class);
         $user->method('getId')
             ->willReturn('1');
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())
             ->method('getOwner')
             ->willReturn(null);
@@ -146,12 +132,10 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
 
-        $user = $this->getMockBuilder(User::class)
-            ->getMock();
+        $user = $this->createMock(User::class);
         $user->method('getId')
             ->willReturn('1');
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())
             ->method('getOwner')
             ->willReturn(null);
@@ -186,8 +170,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
 
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())
             ->method('getOwner')
             ->willReturn(null);
@@ -209,8 +192,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToAuthor(): void
     {
         $event    = new Event();
-        $user     = $this->getMockBuilder(User::class)
-            ->getMock();
+        $user     = $this->createMock(User::class);
         $this->prepareCommonMocks($event, $user);
 
         $this->coreParametersHelper
@@ -231,7 +213,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
         $event = new Event();
-        $user  = $this->getMockBuilder(User::class)->getMock();
+        $user  = $this->createMock(User::class);
         $this->prepareCommonMocks($event, $user);
 
         $emails = 'a@test.co, b@test.co';
@@ -258,11 +240,9 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
 
-        $user = $this->getMockBuilder(User::class)
-            ->getMock();
+        $user = $this->createMock(User::class);
 
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->any())
             ->method('getOwner')
             ->willReturn(null);

@@ -27,9 +27,7 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 
 final class FieldAliasToFqcnMapTest extends TestCase
 {
-    /**
-     * @dataProvider aliasFqcnProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('aliasFqcnProvider')]
     public function testGetFqcn(string $alias, string $fcqn): void
     {
         $this->assertSame(FieldAliasToFqcnMap::getFqcn($alias), $fcqn);
@@ -46,7 +44,7 @@ final class FieldAliasToFqcnMapTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function aliasFqcnProvider(): array
+    public static function aliasFqcnProvider(): array
     {
         return [
             ['boolean', BooleanType::class],

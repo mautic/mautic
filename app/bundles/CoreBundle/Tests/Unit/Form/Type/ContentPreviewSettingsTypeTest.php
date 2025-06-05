@@ -115,12 +115,12 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -133,7 +133,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ->method('add')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder) {
-                    if (1 === $matcher->getInvocationCount()) {
+                    if (1 === $matcher->numberOfInvocations()) {
                         self::assertEquals($this->contactFieldDefinition, $parameters);
                     }
 
@@ -210,12 +210,12 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -228,7 +228,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ->method('add')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder) {
-                    if (1 === $matcher->getInvocationCount()) {
+                    if (1 === $matcher->numberOfInvocations()) {
                         self::assertEquals($this->contactFieldDefinition, $parameters);
                     }
 
@@ -274,12 +274,12 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -292,7 +292,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ->method('add')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder) {
-                    if (1 === $matcher->getInvocationCount()) {
+                    if (1 === $matcher->numberOfInvocations()) {
                         self::assertEquals($this->contactFieldDefinition, $parameters);
                     }
 
@@ -368,22 +368,22 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.form.chooseone', $parameters[0]);
 
                     return 'chooseone';
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.form.chooseone', $parameters[0]);
 
                     return 'chooseone';
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -394,7 +394,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $matcher     = self::exactly(3);
         $formBuilder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $expectedTranslationChoices, $parentEmailId, $expectedVariantChoices, $formBuilder) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('translation', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
                     $this->assertSame([
@@ -406,7 +406,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
                         'data'         => (string) $parentEmailId,
                     ], $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('variant', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
                     $this->assertSame([
@@ -418,7 +418,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
                         'data'         => (string) $parentEmailId,
                     ], $parameters[2]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     self::assertEquals($this->contactFieldDefinition, $parameters);
                 }
 

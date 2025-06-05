@@ -14,9 +14,7 @@ class ReportSchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
         $report = new Report();
         $event  = new ReportEvent($report);
 
-        $schedulerPlanner = $this->getMockBuilder(SchedulerPlanner::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerPlanner = $this->createMock(SchedulerPlanner::class);
 
         $schedulerPlanner->expects($this->once())
             ->method('computeScheduler')

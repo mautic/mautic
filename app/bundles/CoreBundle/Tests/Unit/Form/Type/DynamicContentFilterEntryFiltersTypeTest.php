@@ -44,7 +44,7 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
         $matcher = self::exactly(4);
         $builder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('glue', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
                     $this->assertSame([
@@ -59,15 +59,15 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
                         ],
                     ], $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('field', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('object', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('type', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
                 }
@@ -78,11 +78,11 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 
         $builder->expects($matcher)
             ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
                     $this->assertIsCallable($parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
                     $this->assertIsCallable($parameters[1]);
                 }

@@ -4,15 +4,10 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(LeadTimelineEvent::class)]
 class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets
-     *
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::addEvent
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::getEvents
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::generateEventId
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets')]
     public function testEventIdIsGeneratedIfNotSetBySubscriber(): void
     {
         $payload = [

@@ -9,6 +9,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(Fetcher::class)]
 class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     protected $mailboxes = [
@@ -47,18 +48,10 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /**
-     * @testdox Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::fetch
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getMessages
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getConfigs
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages')]
     public function testMessagesAreFetchedAndEventDispatched(): void
     {
-        $mailbox = $this->getMockBuilder(Mailbox::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mailbox = $this->createMock(Mailbox::class);
         $mailbox->method('getMailboxSettings')
             ->willReturnCallback(
                 fn ($mailbox) => $this->mailboxes[$mailbox]
@@ -69,16 +62,12 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Message());
 
         $event      = new ParseEmailEvent();
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturn($event);
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
         $fetcher = new Fetcher($mailbox, $dispatcher, $translator);
         $fetcher->setMailboxes(array_keys($this->mailboxes))

@@ -81,7 +81,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return parent::getEntity($id);
     }
 
-    public function checkEntityBySlotName(string $slotName, ?string $type = null, string $typeCondition = '='): bool
+    public function checkEntityBySlotName(string $slotName, ?string $type = null, string $typeCondition = '=',
+        int $skipId = null): bool
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
@@ -98,6 +99,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
             $qb->andWhere("type {$typeCondition} :type");
             $qb->setParameter('type', $type);
+        }
+
+        if (null !== $skipId) {
+            $qb->andWhere('id != :id');
+            $qb->setParameter('id', $skipId);
         }
 
         return (bool) $qb->executeQuery()->fetchOne();

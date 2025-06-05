@@ -265,7 +265,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->saveEntity($entity);
 
         $this->assertNull($entity->getCompany());
-        $this->assertTrue(empty($entity->getUpdatedFields()['company']));
+        $this->assertArrayNotHasKey('company', $entity->getUpdatedFields());
     }
 
     public function testIpLookupAddsCompanyIfDoesNotExistInEntity(): void
@@ -414,9 +414,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     public function testImportWillNotSetLeadToLeadEventLogWhenLeadSaveFails(): void
     {
         $leadEventLog  = new LeadEventLog();
-        $mockUserModel = $this->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockUserModel = $this->createMock(UserHelper::class);
 
         $mockUserModel->method('getUser')
             ->willReturn(new User());
@@ -457,9 +455,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $leadEventLog  = new LeadEventLog();
         $lead          = new Lead();
 
-        $mockUserModel = $this->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockUserModel = $this->createMock(UserHelper::class);
 
         $mockUserModel->method('getUser')
             ->willReturn(new User());
@@ -496,9 +492,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testImportWithTagsInCsvFile(): void
     {
-        $mockUserModel = $this->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockUserModel = $this->createMock(UserHelper::class);
 
         $mockUserModel->method('getUser')
             ->willReturn(new User());
@@ -536,9 +530,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead          = new Lead();
         $lead->setId(21);
 
-        $mockUserModel = $this->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockUserModel = $this->createMock(UserHelper::class);
 
         $mockUserModel->method('getUser')
             ->willReturn(new User());
@@ -593,12 +585,12 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManagerMock->expects($matcher)
             ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(StagesChangeLog::class, $parameters[0]);
 
                     return $stagesChangeLogRepo;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Stage::class, $parameters[0]);
 
                     return $stageRepositoryMock;
@@ -633,12 +625,12 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManagerMock->expects($matcher)
             ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(StagesChangeLog::class, $parameters[0]);
 
                     return $stagesChangeLogRepo;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Stage::class, $parameters[0]);
 
                     return $stageRepositoryMock;
@@ -721,12 +713,10 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityManagerMock->expects($this->any())
             ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [Lead::class, $this->leadRepositoryMock],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    [Lead::class, $this->leadRepositoryMock],
+                ]
             );
     }
 

@@ -60,8 +60,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoContactsResultInEmptyResults(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('getRootEvents')
             ->willReturn(new ArrayCollection());

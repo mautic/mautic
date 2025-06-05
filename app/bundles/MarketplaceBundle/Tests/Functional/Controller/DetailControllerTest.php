@@ -13,9 +13,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class DetailControllerTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider dataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
         /** @var MockHandler $handlerStack */

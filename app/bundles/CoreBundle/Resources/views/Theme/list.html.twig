@@ -32,6 +32,7 @@
                         {% set hasThumbnail = (item['dir'] ~ '/thumbnail.png') is file %}
                         {% set visibilityButton = [] %}
                         {% set visibilityCss = '' %}
+                        {% set customButtons = [] %}
 
                         {% if item.visibility is defined %}
                             {% set btnText         = 'mautic.core.theme.hide' %}
@@ -74,11 +75,29 @@
                                     'btnText': 'mautic.asset.asset.preview'|trans,
                                     'iconClass': 'ri-image-line',
                                     } %}
-                                {% set previewButton = hasThumbnail ? previewButtonSettings : [] %}
+                                {% set customButtons = hasThumbnail 
+                                    ? customButtons|merge([previewButtonSettings]) 
+                                    : customButtons 
+                                %}
                                 {% set deleteButton = {
                                     'delete': permissions['core:themes:delete']
                                 } %}
                                 {% set templateButtons = (k not in defaultThemes) ? deleteButton : {} %}
+                                {% set downloadButton = {
+                                    'attr': {
+                                        'href': path('mautic_themes_action', {
+                                            objectAction: 'download',
+                                            objectId: k
+                                        }),
+                                        'data-toggle': '0',
+                                    },
+                                    'btnText': 'mautic.core.download'|trans,
+                                    'iconClass': 'ri-download-line',
+                                } %}
+                                {% set customButtons = customButtons|merge([downloadButton]) %}
+                                {% if visibilityButton is not empty %}
+                                    {% set customButtons = customButtons|merge([visibilityButton]) %}
+                                {% endif %}
 
                                 {{ include ('@MauticCore/Helper/list_actions.html.twig',
                                     {
@@ -86,21 +105,7 @@
                                         'templateButtons': templateButtons,
                                         'routeBase': 'themes',
                                         'langVar': 'core.theme',
-                                        'customButtons': [
-                                            {
-                                                'attr': {
-                                                    'href': path('mautic_themes_action', {
-                                                        objectAction: 'download',
-                                                        objectId: k
-                                                    }),
-                                                    'data-toggle': '0',
-                                                },
-                                                'btnText': 'mautic.core.download'|trans,
-                                                'iconClass': 'ri-download-line',
-                                            },
-                                            previewButton,
-                                            visibilityButton,
-                                        ],
+                                        'customButtons': customButtons,
                                     }
                                 ) }}
 

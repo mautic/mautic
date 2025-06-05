@@ -9,9 +9,7 @@ use PHPUnit\Framework\Assert;
 
 class PageTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider setIsPreferenceCenterDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
     public function testSetIsPreferenceCenter($value, $expected, array $changes): void
     {
         $page = new Page();
@@ -31,9 +29,7 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, ['isPreferenceCenter' => [null, true]]];
     }
 
-    /**
-     * @dataProvider setNoIndexDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setNoIndexDataProvider')]
     public function testSetNoIndex($value, $expected, array $changes): void
     {
         $page = new Page();

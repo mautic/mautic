@@ -303,10 +303,9 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider dataProvider
-     *
      * @param array<string, int> $properties
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
     public function testHasChoices(string $type, array $properties, bool $result): void
     {
         $field = new Field();

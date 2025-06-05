@@ -10,9 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class FulltextKeywordTest extends TestCase
 {
-    /**
-     * @dataProvider dataDefault
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataDefault')]
     public function testDefault(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value);
@@ -24,7 +22,7 @@ class FulltextKeywordTest extends TestCase
     /**
      * @return iterable<array<string>>
      */
-    public function dataDefault(): iterable
+    public static function dataDefault(): iterable
     {
         yield ['some word', '(+some* +word*) >"some word"'];
         yield ['another', '(+another*) >"another"'];
@@ -32,9 +30,7 @@ class FulltextKeywordTest extends TestCase
         yield ['', ''];
     }
 
-    /**
-     * @dataProvider dataInflectingEnabled
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataInflectingEnabled')]
     public function testInflectingEnabled(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value, true, true, true);
@@ -46,7 +42,7 @@ class FulltextKeywordTest extends TestCase
     /**
      * @return iterable<array<string>>
      */
-    public function dataInflectingEnabled(): iterable
+    public static function dataInflectingEnabled(): iterable
     {
         yield ['some word', '(+(some* <som*) +(word* <wor*)) >"some word"'];
         yield ['another', '(+(another* <anothe*)) >"another"'];
@@ -54,9 +50,7 @@ class FulltextKeywordTest extends TestCase
         yield ['', ''];
     }
 
-    /**
-     * @dataProvider dataWordSearchDisabled
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataWordSearchDisabled')]
     public function testWordSearchDisabled(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value, true, false);
@@ -68,7 +62,7 @@ class FulltextKeywordTest extends TestCase
     /**
      * @return iterable<array<string>>
      */
-    public function dataWordSearchDisabled(): iterable
+    public static function dataWordSearchDisabled(): iterable
     {
         yield ['some word', '"some word"'];
         yield ['another', '"another"'];
@@ -76,9 +70,7 @@ class FulltextKeywordTest extends TestCase
         yield ['', ''];
     }
 
-    /**
-     * @dataProvider dataBooleanModeDisabled
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataBooleanModeDisabled')]
     public function testBooleanModeDisabled(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value, false);
@@ -90,7 +82,7 @@ class FulltextKeywordTest extends TestCase
     /**
      * @return iterable<array<string>>
      */
-    public function dataBooleanModeDisabled(): iterable
+    public static function dataBooleanModeDisabled(): iterable
     {
         yield ['some word', 'some word'];
         yield ['another', 'another'];

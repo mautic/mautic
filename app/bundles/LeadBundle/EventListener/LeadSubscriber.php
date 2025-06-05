@@ -15,13 +15,16 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
+use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
@@ -54,20 +57,25 @@ class LeadSubscriber implements EventSubscriberInterface
         private EntityManager $entityManager,
         private TranslatorInterface $translator,
         RouterInterface $router,
-        ModelFactory $modelFactory,
+        private LeadListRepository $leadListRepository,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
         private CoreParametersHelper $coreParametersHelper,
         private CompanyLeadRepository $companyLeadRepository,
+        ModelFactory $modelFactory = null,
         private $isTest = false,
     ) {
-        $this->router              = $router;
+        $this->router = $router;
 
-        $this->setModelFactory($modelFactory);
+        if ($modelFactory) {
+            $this->setModelFactory($modelFactory);
+        }
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
+            LeadEvents::LEAD_PRE_DELETE      => ['onLeadPreDelete', 0],
             LeadEvents::LEAD_POST_DELETE     => ['onLeadDelete', 0],
             LeadEvents::LEAD_PRE_MERGE       => ['preLeadMerge', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
@@ -83,7 +91,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a lead entry to the audit log.
      */
-    public function onLeadPostSave(Events\LeadEvent $event): void
+    public function onLeadPostSave(LeadEvent $event): void
     {
         $lead = $event->getLead();
 
@@ -160,7 +168,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a lead delete entry to the audit log.
      */
-    public function onLeadDelete(Events\LeadEvent $event): void
+    public function onLeadDelete(LeadEvent $event): void
     {
         $lead = $event->getLead();
         $log  = [
@@ -172,6 +180,22 @@ class LeadSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Find lead linked segment ids to update post delete.
+     */
+    public function onLeadPreDelete(LeadEvent $event): void
+    {
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            return;
+        }
+        $leadId     = (int) $event->getLead()->getId();
+        $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
+
+        foreach ($segmentIds as $segmentId) {
+            $this->segmentCountCacheHelper->decrementSegmentContactCount($segmentId);
+        }
     }
 
     /**

@@ -39,17 +39,16 @@ class ProcessSignalServiceTest extends TestCase
     /**
      * @return iterable<string, array{int, int[]}>
      */
-    public function dataSignals(): iterable
+    public static function dataSignals(): iterable
     {
         yield 'SIGUSR1' => [SIGUSR1, [SIGUSR1, SIGUSR2]];
         yield 'SIGUSR2' => [SIGUSR2, [SIGUSR1, SIGUSR2]];
     }
 
     /**
-     * @dataProvider dataSignals
-     *
      * @param int[] $signals
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
     public function testRegisterSignalHandler(int $signal, array $signals): void
     {
         $beforeCallbackCalled = false;
@@ -65,10 +64,9 @@ class ProcessSignalServiceTest extends TestCase
     }
 
     /**
-     * @dataProvider dataSignals
-     *
      * @param int[] $signals
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
     public function testRestoreSignalHandler(int $signal, array $signals): void
     {
         $this->processSignalService->registerSignalHandler(null, $signals);
@@ -79,10 +77,9 @@ class ProcessSignalServiceTest extends TestCase
     }
 
     /**
-     * @dataProvider dataSignals
-     *
      * @param int[] $signals
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
     public function testIsSignalCaught(int $signal, array $signals): void
     {
         Assert::assertFalse($this->processSignalService->isSignalCaught());
@@ -95,10 +92,9 @@ class ProcessSignalServiceTest extends TestCase
     }
 
     /**
-     * @dataProvider dataSignals
-     *
      * @param int[] $signals
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
     public function testThrowExceptionIfSignalIsCaught(int $signal, array $signals): void
     {
         $this->processSignalService->registerSignalHandler(null, $signals);

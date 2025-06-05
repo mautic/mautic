@@ -16,9 +16,8 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
     /**
      * @param array<string, bool|null> $data
      * @param array<string, string>    $expected
-     *
-     * @dataProvider dataForReadOnlyConfigurationSetting
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForReadOnlyConfigurationSetting')]
     public function testFieldConfiguration(array $data, array $expected): void
     {
         // Create a form
@@ -53,7 +52,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<int, array<string, bool|string|null>>>
      */
-    public function dataForReadOnlyConfigurationSetting(): iterable
+    public static function dataForReadOnlyConfigurationSetting(): iterable
     {
         yield 'When no behaviour configured' => [
             // given

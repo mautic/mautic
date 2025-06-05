@@ -17,9 +17,7 @@ final class LeadEventLogRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
-    /**
-     * @dataProvider isLastFailedDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('isLastFailedDataProvider')]
     public function testIsLastFailed(?LeadEventLog $leadEventLog, bool $expectedResult): void
     {
         $emMock                 = $this->createMock(EntityManager::class);
@@ -45,7 +43,7 @@ final class LeadEventLogRepositoryTest extends TestCase
     /**
      * @return array<string,array<mixed>>
      */
-    public function isLastFailedDataProvider(): array
+    public static function isLastFailedDataProvider(): array
     {
         $leadEventLogNoFail = new LeadEventLog();
         $failedLeadEvent    = new FailedLeadEventLog();
