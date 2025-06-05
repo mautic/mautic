@@ -1889,6 +1889,43 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Get number of saved contacts.
+     */
+    public function getNumberContacts(): int
+    {
+        $anonymous = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine      = $this->translator->trans('mautic.core.searchcommand.ismine');
+
+        $filter = [
+            'force' => " !$anonymous",
+        ];
+
+        if (!$this->security->isGranted('lead:leads:viewother')) {
+            $filter['force'] .= " $mine";
+        }
+
+        $results = $this->getEntities([
+            'start'          => 0,
+            'limit'          => 1,
+            'filter'         => $filter,
+            'withTotalCount' => true,
+        ]);
+
+        return $results['count'] ?? 0;
+    }
+
+    /**
+     * Get number of DNC contacts.
+     */
+    public function getNumberDNC(): int
+    {
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository(DNC::class);
+
+        return $dncRepo->getNumberEntries();
+    }
+
+    /**
      * Get pie chart data of dwell times.
      *
      * @param string $dateFrom
