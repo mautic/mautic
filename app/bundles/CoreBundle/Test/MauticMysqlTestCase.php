@@ -169,11 +169,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function applySqlFromFile($file): void
     {
         $connectionParams = $this->connection->getParams();
-        $password = $connectionParams['password'] ? '-p' . escapeshellarg($connectionParams['password']) : '';
-        $command = sprintf(
+        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+        $command          = sprintf(
             'mysql -h%s -P%s -u%s %s %s < %s',
             escapeshellarg($connectionParams['host']),
-            escapeshellarg($connectionParams['port']),
+            escapeshellarg((string) $connectionParams['port']),
             escapeshellarg($connectionParams['user']),
             $password,
             escapeshellarg($connectionParams['dbname']),
@@ -269,11 +269,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connectionParams = $this->connection->getParams();
-        $password = $connectionParams['password'] ? '-p' . escapeshellarg($connectionParams['password']) : '';
-        $command = sprintf(
+        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+        $command          = sprintf(
             'mysqldump --opt -h%s -P%s -u%s %s %s > %s',
             escapeshellarg($connectionParams['host']),
-            escapeshellarg($connectionParams['port']),
+            escapeshellarg((string) $connectionParams['port']),
             escapeshellarg($connectionParams['user']),
             $password,
             escapeshellarg($connectionParams['dbname']),
