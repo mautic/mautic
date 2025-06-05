@@ -2,6 +2,12 @@
 {% set userColumnPrefs = userColumnPrefs|default([]) %}
 {% set contactColPrefs = contactColPrefs|default([]) %}
 {% set companyColPrefs = companyColPrefs|default([]) %}
+{% set showColumnsButton = false %}
+{% if app.request.pathinfo starts with '/s/contacts' or
+      app.request.pathinfo starts with '/s/companies' or
+      app.request.pathinfo starts with '/s/emails' %}
+    {% set showColumnsButton = true %}
+{% endif %}
 
 <style>
   /* Compact styling for column picker with bigger text and checkboxes */
@@ -82,6 +88,7 @@
         {{ include('@MauticCore/Helper/toolbar_page_actions.html.twig', page_actions|default({})) }}
 
         {# Added Columns button #}
+        {% if showColumnsButton %}
         <button
             type="button"
             class="btn btn-default ml-2"
@@ -92,6 +99,7 @@
         >
             <i class="fa fa-columns"></i> {{ 'Columns'|trans }}
         </button>
+        {% endif %}
     </div>
 
 </div>
@@ -160,6 +168,7 @@ function renderColumnModal(config) {
 <script>
   function setupColumnPreferences({
   preferenceKey,
+  preferenceVar,
   columnPrefs,
   allColumns,
   tableSelector,
@@ -191,10 +200,9 @@ function renderColumnModal(config) {
       })
     }).then(response => {
       if (response.ok) {
-        window.userColumnPrefs = selected;
+        window[preferenceVar] = selected;
         window.applyColumnPrefs(selected, tableSelector, columnPrefix, allColumns);
         $('#column-config-modal').modal('hide');
-        location.reload(); // or callback instead of reload
       } else {
         alert('Failed to save column preferences.');
       }
@@ -239,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
           setupColumnPreferences({
             preferenceKey: tableConfig.preferenceKey,
+            preferenceVar: tableConfig.preferenceVar,
             columnPrefs: prefsVar,
             allColumns: tableConfig.allColumns,
             tableSelector: tableConfig.tableSelector,

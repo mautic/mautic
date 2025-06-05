@@ -89,6 +89,9 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
 
         mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
     });
+    if (typeof window.applyColumnPrefsForRoute === 'function') {
+        window.applyColumnPrefsForRoute();
+    }
 });
 
 // Force stop the page loading bar when no more requests are being in progress
