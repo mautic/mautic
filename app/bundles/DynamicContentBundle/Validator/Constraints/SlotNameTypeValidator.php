@@ -32,7 +32,7 @@ class SlotNameTypeValidator extends ConstraintValidator
         }
 
         $existingContents = $this->dynamicContentModel->
-            checkEntityBySlotName($slotName, $value->getType(), '!=');
+            checkEntityBySlotName($slotName, $value->getType(), '!=', $value->getId());
         if ($existingContents) {
             $this->context->buildViolation($constraint->message)
                 ->atPath('type')

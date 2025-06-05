@@ -13,6 +13,8 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\ProjectBundle\Entity\Project;
+use Mautic\ProjectBundle\Model\ProjectModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -132,6 +134,43 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertGreaterThan(0, $crawler->filter('#leadlist_filters_0_operator option')->count());
+    }
+
+    public function testSegmentWithProject(): void
+    {
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+
+        $segment = $this->saveSegment('Segment with Project', 'st1', $filters);
+
+        $project = new Project();
+        $project->setName('Test Project');
+
+        $projectModel = self::getContainer()->get(ProjectModel::class);
+        \assert($projectModel instanceof ProjectModel);
+        $projectModel->saveEntity($project);
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedSegment = $this->listRepo->find($segment->getId());
+        Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList

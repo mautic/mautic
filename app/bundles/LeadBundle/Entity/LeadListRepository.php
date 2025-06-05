@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -18,6 +19,7 @@ class LeadListRepository extends CommonRepository
 
     use ExpressionHelperTrait;
     use RegexTrait;
+    use ProjectRepositoryTrait;
 
     /**
      * @var bool
@@ -427,6 +429,17 @@ class LeadListRepository extends CommonRepository
                 $expr            = $q->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'leadlist_id',
+                    'lead_list_projects_xref',
+                    'l',
+                    $unique,
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if (!empty($forceParameters)) {
@@ -454,6 +467,7 @@ class LeadListRepository extends CommonRepository
             'mautic.core.searchcommand.name',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

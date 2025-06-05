@@ -310,11 +310,9 @@ class ImportModel extends FormModel
                     continue;
                 }
 
-                $data = array_combine($headers, $data);
-
+                $data  = array_combine($headers, $data);
+                $event = new ImportProcessEvent($import, $eventLog, $data);
                 try {
-                    $event = new ImportProcessEvent($import, $eventLog, $data);
-
                     $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_PROCESS);
 
                     if ($event->wasMerged()) {
@@ -342,6 +340,11 @@ class ImportModel extends FormModel
                 // This should be called only if the entity manager is open
                 $this->logImportRowError($eventLog, $errorMessage);
             } else {
+                // adding warning logs for partial imports.
+                if ($event->getWarnings()) {
+                    $eventLog->addProperty('error', implode('\n', $event->getWarnings()))
+                        ->setAction('failed');
+                }
                 $this->leadEventLogRepo->saveEntity($eventLog);
             }
 

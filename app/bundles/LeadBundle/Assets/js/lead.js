@@ -446,6 +446,9 @@ Mautic.attachJsUiOnFilterForms = function() {
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
         }
+        mQuery('.chosen-search-input').on('keypress', function (event) {
+            if ( event.which === 13 ) event.preventDefault();
+        })
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -547,9 +550,7 @@ Mautic.convertLeadFilterInput = function(el) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
 
-        mQuery('#leadlist_filters_' + filterNum + '_properties_filter').on('keypress', function (event) {
-            if ( event.which === 13 ) event.preventDefault();
-        })
+        Mautic.ajaxifyForm('leadlist');
 
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });

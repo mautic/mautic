@@ -72,16 +72,18 @@
             {% endfor %}
           </div>
         </div>
-      </div>
-      <hr />
-      <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
-        {{ include('@MauticLead/KeyboardShortcuts/lead_shortcuts.html.twig', ignore_missing = true) }}
-        {{ include('@MauticEmail/KeyboardShortcuts/emails_shortcuts.html.twig', ignore_missing = true) }}
-      </ul>
-      <div class="alert alert-info col-xs-12">
-        <div class="d-flex jc-space-between ai-center small">
-          <div> <strong class="mr-xs">{{ 'mautic.keyboard.tip'|trans }}</strong><kbd>⌘</kbd> <i
-              class="ri-arrow-right-line"></i> <kbd>Ctrl</kbd></div>
+        <div class="row">
+          <hr />
+          <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+            {{ include('@MauticLead/KeyboardShortcuts/lead_shortcuts.html.twig', ignore_missing = true) }}
+            {{ include('@MauticEmail/KeyboardShortcuts/emails_shortcuts.html.twig', ignore_missing = true) }}
+          </ul>
+          <div class="alert alert-info col-xs-12">
+            <div class="d-flex jc-space-between ai-center small">
+              <div> <strong class="mr-xs">{{ 'mautic.keyboard.tip'|trans }}</strong><kbd>⌘</kbd> <i
+                  class="ri-arrow-right-line"></i> <kbd>Ctrl</kbd></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">

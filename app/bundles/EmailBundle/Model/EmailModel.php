@@ -2128,24 +2128,30 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $results;
     }
 
-    private function getContactCompanies(array &$sendTo): void
+    /**
+     * @param array<int|string, int|string|array<int|string, mixed>|null> $contact
+     *
+     * @return array<int|string, int|string|array<int|string, mixed>|null>
+     */
+    public function enrichedContactWithCompanies(array $contact): array
     {
-        $fetchCompanies = [];
-        foreach ($sendTo as $key => $contact) {
-            if (!isset($contact['companies'])) {
-                $fetchCompanies[$contact['id']] = $key;
-                $sendTo[$key]['companies']      = [];
-            }
+        if (!isset($contact['id']) || isset($contact['companies'])) {
+            return $contact;
         }
 
-        if (!empty($fetchCompanies)) {
-            // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
-            $companies = $this->companyModel->getRepository()->getCompaniesForContacts(array_keys($fetchCompanies));
+        $companies = $this->companyModel
+            ->getRepository()
+            ->getCompaniesForContacts([$contact['id']]);
 
-            foreach ($companies as $contactId => $contactCompanies) {
-                $key                       = $fetchCompanies[$contactId];
-                $sendTo[$key]['companies'] = $contactCompanies;
-            }
+        $contact['companies'] = $companies[$contact['id']] ?? [];
+
+        return $contact;
+    }
+
+    private function getContactCompanies(array &$sendTo): void
+    {
+        foreach ($sendTo as $key => $contact) {
+            $sendTo[$key] = $this->enrichedContactWithCompanies($contact);
         }
     }
 
