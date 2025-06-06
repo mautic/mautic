@@ -53,6 +53,7 @@
             modalsDismissed: {},
             ignoreConverted: {% if 'notification' is not same as focus.type and props.stop_after_conversion is defined and props.stop_after_conversion is not empty %}true{% else %}false{% endif %},
             ignoreClosed: {% if props.stop_after_close is defined and props.stop_after_close is not empty %}true{% else %}false{% endif %},
+            isLinkClicked: false,
 
             // Initialize the focus
             initialize: function () {
@@ -224,16 +225,49 @@
                     console.log('timeout event registered');
 
                 setTimeout(function () {
-                    document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+                    document.documentElement.addEventListener('mouseleave', function(mouseLeaveEvent) {
+                        if (Focus.isLinkClicked) {
+                            if (Focus.debug) console.log('Mautic Focus: Exit intent on mouseleave suppressed due to recent link click.');
+                            // Flag will be reset by timeout or on next mousedown
+                            return;
+                        }
+                        Focus.engageVisitor(mouseLeaveEvent);
+                    });
                 }, {{ timeout }});
 
                 {% else %}
 
-                document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+                document.documentElement.addEventListener('mouseleave', function(mouseLeaveEvent) {
+                    if (Focus.isLinkClicked) {
+                        if (Focus.debug) console.log('Mautic Focus: Exit intent on mouseleave suppressed due to recent link click.');
+                        // Flag will be reset by timeout or on next mousedown
+                        return;
+                    }
+                    Focus.engageVisitor(mouseLeaveEvent);
+                });
 
                 {% endif %}
 
-                // Add a listener to every link
+                // Add mousedown listeners to all relevant links to set the isLinkClicked flag
+                var allPageLinks = document.getElementsByTagName('a');
+                for (var i = 0, len = allPageLinks.length; i < len; i++) {
+                    var linkHref = allPageLinks[i].getAttribute('href');
+                    // Ensure it's a real navigational link, not target=_blank (which doesn't unload current page)
+                    if (linkHref && linkHref.indexOf('#') !== 0 && linkHref.indexOf('javascript:') !== 0 && allPageLinks[i].getAttribute('target') !== '_blank') {
+                        allPageLinks[i].addEventListener('mousedown', function() {
+                            Focus.isLinkClicked = true;
+                            if (Focus.debug) console.log('Mautic Focus: Link mousedown, isLinkClicked = true.');
+                            // Set a timeout to reset the flag. If navigation occurs, this script context will be gone.
+                            // If not (e.g., JS prevents navigation, or it's a download not causing unload), the flag resets.
+                            setTimeout(function() {
+                                if (Focus.isLinkClicked && Focus.debug) console.log('Mautic Focus: Resetting isLinkClicked flag after timeout.');
+                                Focus.isLinkClicked = false;
+                            }, 300); // 300ms should be enough for navigation to begin or for other click handlers
+                        });
+                    }
+                }
+
+                // Add a listener to every link (this is the existing linkActivation logic)
                 {% if linkActivation %}
 
                 var elements = document.getElementsByTagName('a');
