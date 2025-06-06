@@ -400,7 +400,7 @@ Mautic.focusCreateIframe = function (url) {
 
     // Not catching empty iframe
     try {
-        mQuery('#websiteCanvas').html('<iframe src="'+url+'" scrolling="no" frameBorder="0"></iframe>');
+        mQuery('#websiteCanvas').html('<iframe src="'+url+'" title="Focus Item Preview" scrolling="no" frameBorder="0" allow="fullscreen"></iframe>');
         mQuery('#websiteCanvas iframe').css(builderCss);
     } catch(err) {
         alert(err.toString());
