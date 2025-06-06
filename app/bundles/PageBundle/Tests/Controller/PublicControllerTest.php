@@ -272,13 +272,14 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->request->attributes->set('ignore_mismatch', true);
 
-        $router               = $this->createMock(RouterInterface::class);
-        $doctrine             = $this->createMock(ManagerRegistry::class);
-        $userHelper           = $this->createMock(UserHelper::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $translator           = $this->createMock(Translator::class);
-        $flashBag             = $this->createMock(FlashBag::class);
-        $themeHelper          = $this->createMock(ThemeHelper::class);
+        $router                = $this->createMock(RouterInterface::class);
+        $doctrine              = $this->createMock(ManagerRegistry::class);
+        $userHelper            = $this->createMock(UserHelper::class);
+        $coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
+        $translator            = $this->createMock(Translator::class);
+        $flashBag              = $this->createMock(FlashBag::class);
+        $themeHelper           = $this->createMock(ThemeHelper::class);
+        $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
         $requestStack         = new RequestStack();
@@ -305,6 +306,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $themeHelper,
             $this->createMock(Tracking404Model::class),
             $router,
+            $deviceTrackingService,
             '/page/a',
         );
 
