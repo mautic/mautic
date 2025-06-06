@@ -189,13 +189,42 @@ trait CustomFieldsApiControllerTrait
             // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
             $parameters = array_filter(
                 $parameters,
-                function ($value): bool {
-                    if (is_numeric($value)) {
-                        return 0 !== (int) $value;
+                function ($value, $key) use ($form): bool {
+                    // Allow 0 for numeric fields.
+                    // We need to check the original field type if possible,
+                    // but $form might not contain all custom fields directly as named children.
+                    // A safer approach is to allow 0 if the value IS numeric and is 0.
+                    // Other empty values (null, false, empty string) will be handled by array_filter's default behavior
+                    // or by subsequent processing in LeadModel::setFieldValues if `overwriteWithBlank` is false.
+                    if (is_numeric($value) && (int) $value === 0) {
+                        return true; // Keep '0' or 0 or 0.0
                     }
 
+                    // Original behavior for other cases (e.g. truly empty strings for non-numeric fields might be filtered by default array_filter if no callback,
+                    // but here we explicitly keep non-empty or non-zero numeric values).
+                    // For POST/PATCH, the general idea is to prevent accidental overwrite with "empty" if field is not submitted.
+                    // However, if a field *is* submitted with an explicit empty string, null, or specific 0, it should be processed.
+                    // The current filter is a bit aggressive for '0'.
+                    // The below ensures that if a key is present in parameters, we keep it unless it's truly empty (null, '').
+                    // This revised filter is more about ensuring that if a field is present in the payload,
+                    // its value (even if "empty" like an empty string or 0) is considered for processing by setFieldValues.
+                    // The `overwriteWithBlank` flag in `setFieldValues` will then determine if an empty string overwrites existing data.
+                    // This change focuses on not losing the '0' for numeric types.
+
+                    // If a field is explicitly passed with an empty string or null, let setFieldValues decide based on $overwriteWithBlank
+                    // The main concern is not losing '0' for numerics.
+                    // Other empty values (empty string, null) for non-numeric fields:
+                    // If $value is '', (bool)$value is false. If $value is null, (bool)$value is false.
+                    // The original filter `return true` for non-numerics meant they were kept if non-empty.
+                    // We should keep any explicitly passed value to let setFieldValues handle it with overwriteWithBlank.
+                    // The only thing this array_filter was doing was removing numeric 0.
+                    // So, if we allow numeric 0, the filter becomes less critical for other types unless specific 'empty'
+                    // values (that are not null or '') should also be removed here.
+                    // For now, let's ensure 0 is kept and other non-null values are kept.
+                    // If a parameter is provided, it should be processed.
                     return true;
-                }
+                },
+                ARRAY_FILTER_USE_BOTH
             );
         }
 
