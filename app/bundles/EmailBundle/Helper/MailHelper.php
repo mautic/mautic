@@ -349,9 +349,10 @@ class MailHelper
                 // Replace token content
                 $tokens = $this->getTokens();
 
-                if ($ownerSignature = $this->fromEmailHelper->getSignature()) {
-                    $tokens['{signature}'] = $ownerSignature;
-                }
+                // Always set the signature token for replacement, even if the signature is empty.
+                // This prevents the raw {signature} token from appearing in emails.
+                $ownerSignature = $this->fromEmailHelper->getSignature();
+                $tokens['{signature}'] = $ownerSignature;
 
                 if ($brandName = $this->coreParametersHelper->get('brand_name')) {
                     $tokens['{brand=name}'] = $brandName;

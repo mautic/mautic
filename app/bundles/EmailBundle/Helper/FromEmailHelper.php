@@ -108,26 +108,77 @@ class FromEmailHelper
     public function getSignature(): string
     {
         if (!$this->lastOwner) {
+            // No owner context, so no owner signature can be used.
+            // Fallback to a global signature if one is defined.
+            // Assuming 'mautic.default_signature' is the configuration parameter for the global signature.
+            $globalSignature = (string) $this->coreParametersHelper->get('default_signature', '');
+            if (!empty(trim($globalSignature))) {
+                // For a truly global signature, there's no specific owner context for |USER_...| tokens.
+                // We can pass an empty owner array to replaceSignatureTokens or handle it specifically.
+                // Here, we pass a minimal owner array containing only what might be relevant for |FROM_NAME| if used in global.
+                $fromName = $this->defaultFrom ? $this->defaultFrom->getName() : $this->getSystemDefaultFrom()->getName();
+                $minimalOwnerContext = ['first_name' => '', 'last_name' => $fromName]; // Or derive from default mailer settings
+                return $this->replaceSignatureTokens($minimalOwnerContext, $globalSignature, true);
+            }
             return '';
         }
 
-        return $this->replaceSignatureTokens($this->lastOwner);
+        // Owner context exists, try to use their signature
+        $ownerSignatureTemplate = $this->lastOwner['signature'] ?? '';
+
+        if (empty(trim($ownerSignatureTemplate))) {
+            // Owner's signature is empty or only whitespace, try global fallback
+            $globalSignature = (string) $this->coreParametersHelper->get('default_signature', '');
+            if (!empty(trim($globalSignature))) {
+                // Process global signature, but still with the context of the current $this->lastOwner
+                // so |USER_...| tokens and |FROM_NAME| (as owner's name) can be used if the global sig contains them.
+                return $this->replaceSignatureTokens($this->lastOwner, $globalSignature);
+            }
+            return ''; // No owner signature and no global signature
+        }
+
+        // Process the owner's specific signature using their own signature template
+        return $this->replaceSignatureTokens($this->lastOwner, $ownerSignatureTemplate);
     }
 
     /**
      * @param mixed[] $owner
+     * @param string  $signatureTemplate The signature string to process (either owner's or global default)
+     * @param bool    $isGlobalContext   Indicates if the signatureTemplate is a global one without specific owner context for USER tokens
      */
-    private function replaceSignatureTokens(array $owner): string
+    private function replaceSignatureTokens(array $owner, string $signatureTemplate, bool $isGlobalContext = false): string
     {
-        $signature = nl2br($owner['signature'] ?? '');
-        $signature = str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], $signature);
+        $processedSignature = nl2br($signatureTemplate);
 
-        foreach ($owner as $key => $value) {
-            $token     = sprintf('|USER_%s|', strtoupper($key));
-            $signature = str_replace($token, (string) $value, (string) $signature);
+        // |FROM_NAME| should use the owner's name if available, otherwise mailer default from name if it's a global signature
+        $ownerFullName = trim(($owner['first_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''));
+        if (!empty($ownerFullName)) {
+            $processedSignature = str_replace('|FROM_NAME|', $ownerFullName, $processedSignature);
+        } elseif ($isGlobalContext) {
+            // For a global signature with no specific owner, |FROM_NAME| might refer to the general sender name
+            $globalFromName = $this->defaultFrom ? $this->defaultFrom->getName() : $this->getSystemDefaultFrom()->getName();
+            $processedSignature = str_replace('|FROM_NAME|', $globalFromName ?: '', $processedSignature);
+        } else {
+            // Fallback for |FROM_NAME| if owner details are somehow empty but it's not strictly a global context
+            $processedSignature = str_replace('|FROM_NAME|', '', $processedSignature);
         }
 
-        return $signature;
+        // Process |USER_...| tokens with owner's data only if not a global context being minimally processed
+        // or if it's a global template but we still want to try filling owner details if they exist for some reason
+        if (!$isGlobalContext || !empty($owner)) {
+            foreach ($owner as $key => $value) {
+                $token     = sprintf('|USER_%s|', strtoupper($key));
+                $processedSignature = str_replace($token, (string) $value, $processedSignature);
+            }
+        }
+
+        // Example of a truly global static token that could be added
+        // if ($isGlobalContext || $isOwnerSignatureEmptyAndGlobalUsed) {
+        //    $siteUrl = $this->coreParametersHelper->get('site_url');
+        //    $processedSignature = str_replace('|MAUTIC_URL|', $siteUrl ?: '', $processedSignature);
+        // }
+
+        return $processedSignature;
     }
 
     public function getFrom(?Email $email): AddressDTO
