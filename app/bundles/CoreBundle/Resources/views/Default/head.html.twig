@@ -1,10 +1,32 @@
 <head>
     <meta charset="UTF-8" />
     <title>
+        {# Process headerTitle #}
+        {% set finalHeaderTitle = '' %}
         {% if headerTitle is defined and headerTitle is not empty %}
-            {{ headerTitle|replace({'<': ' <'})|striptags|purify }} |
+            {% set _tempHeaderTitle = headerTitle|replace({'<': ' <'})|striptags|purify %}
+            {% if _tempHeaderTitle is not empty %}
+                {% set finalHeaderTitle = _tempHeaderTitle %}
+            {% endif %}
         {% endif %}
-        {{ pageTitle|default('Mautic') }}
+
+        {# Process pageTitle, ensuring it defaults to 'Mautic' if empty #}
+        {% set finalPageTitle = pageTitle|default('Mautic') %}
+        {% if finalPageTitle is empty or finalPageTitle|trim == '' %}
+            {% set finalPageTitle = 'Mautic' %}
+        {% endif %}
+
+        {# Construct the title, ensuring 'Mautic' is always present if both are empty #}
+        {% if finalHeaderTitle is not empty and finalPageTitle is not empty and finalPageTitle != 'Mautic' %}
+            {{ finalHeaderTitle }} | {{ finalPageTitle }}
+        {% elseif finalHeaderTitle is not empty %}
+            {{ finalHeaderTitle }}
+        {% else %}
+            {{ finalPageTitle }} {# This will be 'Mautic' if pageTitle was originally empty #}
+        {% endif %}
+        {# Example: Append a globally configured company name - keep this commented block if present #}
+        {# {% set company_name = mautic_company_name() %} #}
+        {# {% if company_name is defined and company_name is not empty %} | {{ company_name }} {% endif %} #}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="{{ getOverridableUrl('images/favicon.ico') }}" />

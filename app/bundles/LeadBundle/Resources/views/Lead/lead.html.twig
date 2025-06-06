@@ -23,6 +23,21 @@
     {{ lead.secondaryIdentifier|purify }}</span></div>
 {% endblock %}
 
+{% block pageTitle %}
+    {# Sets the main title part for this page. headerTitle will be prepended. #}
+    {# Conceptual: Access company name. This needs to be available in the Twig context.
+       For example, if a 'company' object related to the 'lead' is passed:
+       lead.companyName or lead.company.name
+       For demonstration, we'll use a placeholder.
+    #}
+    {% set company_name_placeholder = "Lead's Company" %} {# Replace with actual variable e.g., lead.getCompany().getName() if available #}
+    {% if company_name_placeholder is not empty and company_name_placeholder != 'N/A' %}
+        {{ company_name_placeholder }}
+    {% else %}
+        {{ 'mautic.lead.lead.title.details'|trans }} {# Fallback if no company name #}
+    {% endif %}
+{% endblock %}
+
 {% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
