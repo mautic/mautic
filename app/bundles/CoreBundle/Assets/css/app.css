@@ -10857,12 +10857,25 @@ code:hover > .copy-icon {
 .modal.fade .modal-dialog {
   animation: modal-fade var(--duration-productive) var(--easing-standard-productive);
 }
-.contact-status__label {
-  padding: 8px 12px;
+.contact-status {
   display: inline-flex;
+  flex-direction: column;
+  padding: 8px 0;
   border: 1px solid var(--border-subtle);
   border-radius: 4px;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 4px;
+}
+.contact-status__label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 3px;
+}
+.contact-status__divider {
+  width: 100%;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 6px;
+  margin-bottom: 8px;
 }
 .toggle {
   display: inline-block;
