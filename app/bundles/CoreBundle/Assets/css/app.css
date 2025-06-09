@@ -2823,117 +2823,69 @@ h6,
 .text-secondary {
   color: var(--text-secondary);
 }
+a.text-muted:hover,
+a.text-secondary:hover {
+  color: color-mix(in oklab, var(--text-secondary), black 20%);
+}
 .text-placeholder {
   color: var(--text-placeholder);
+}
+a.text-placeholder:hover {
+  color: color-mix(in oklab, var(--text-placeholder), black 20%);
 }
 .text-white {
   color: #fff;
 }
 a.text-white:hover {
-  color: #e6e6e6;
-}
-.text-white.light-xs {
-  color: #ffffff;
-}
-a.text-white.light-xs:hover {
-  color: #ffffff;
-}
-.text-white.dark-xs {
-  color: #d9d9d9;
-}
-a.text-white.dark-xs:hover {
-  color: #cccccc;
-}
-.text-white.dark-sm {
-  color: #b3b3b3;
-}
-a.text-white.dark-sm:hover {
-  color: #a6a6a6;
-}
-.text-white.dark-md {
-  color: #8c8c8c;
-}
-a.text-white.dark-md:hover {
-  color: #808080;
-}
-.text-white.dark-lg {
-  color: #666666;
-}
-a.text-white.dark-lg:hover {
-  color: #595959;
+  color: color-mix(in oklab, #fff, black 20%);
 }
 .text-primary {
   color: var(--text-primary);
 }
+a.text-primary:hover {
+  color: color-mix(in oklab, var(--text-primary), black 20%);
+}
 .text-interactive {
   color: var(--interactive);
 }
+a.text-interactive:hover {
+  color: color-mix(in oklab, var(--interactive), black 20%);
+}
 .text-success {
-  color: #00B49C;
+  color: var(--support-success);
 }
 a.text-success:hover {
-  color: #008170;
-}
-.text-success.light-xs {
-  color: #01ffdd;
-}
-a.text-success.light-xs:hover {
-  color: #00e7c8;
-}
-.text-success.dark-xs {
-  color: #00685a;
-}
-a.text-success.dark-xs:hover {
-  color: #004e44;
-}
-.text-success.dark-sm {
-  color: #001b17;
-}
-a.text-success.dark-sm:hover {
-  color: #000201;
-}
-.text-success.dark-md {
-  color: #000000;
-}
-a.text-success.dark-md:hover {
-  color: #000000;
-}
-.text-success.dark-lg {
-  color: #000000;
-}
-a.text-success.dark-lg:hover {
-  color: #000000;
+  color: color-mix(in oklab, var(--support-success), black 20%);
 }
 .text-warning {
-  color: #FDB933;
+  color: var(--support-warning);
 }
-a.text-warning:hover,
-a.text-warning:focus {
-  color: #fba702;
+a.text-warning:hover {
+  color: color-mix(in oklab, var(--support-warning), black 20%);
 }
 .text-danger {
-  color: #F86B4F;
+  color: var(--support-error);
 }
-a.text-danger:hover,
-a.text-danger:focus {
-  color: #f6421e;
+a.text-danger:hover {
+  color: color-mix(in oklab, var(--support-error), black 20%);
 }
 .text-info {
   color: var(--support-info);
 }
+a.text-info:hover {
+  color: color-mix(in oklab, var(--support-info), black 20%);
+}
 .text-twitter {
   color: #55acee;
 }
-a.text-twitter:hover,
-a.text-twitter:focus {
-  color: #2795e9;
+a.text-twitter:hover {
+  color: color-mix(in oklab, #55acee, black 20%);
 }
 .text-facebook {
   color: #3b5998;
 }
-a.text-facebook:hover,
-a.text-facebook:focus {
-  color: #2d4373;
+a.text-facebook:hover {
+  color: color-mix(in oklab, #3b5998, black 20%);
 }
 .text-google {
   color: #dd4b39;
@@ -2945,8 +2897,14 @@ a.text-google:focus {
 .text-disabled {
   color: var(--text-disabled);
 }
+a.text-disabled:hover {
+  color: color-mix(in oklab, var(--text-disabled), black 20%);
+}
 .text-helper {
   color: var(--text-helper);
+}
+a.text-helper:hover {
+  color: color-mix(in oklab, var(--text-helper), black 20%);
 }
 .text-help {
   color: var(--text-helper);
