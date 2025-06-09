@@ -589,10 +589,25 @@ code:hover > .copy-icon {
 .contact-status {
   display: inline-flex;
   flex-direction: column;
-  padding: 8px 0;
   border: 1px solid var(--border-subtle);
   border-radius: 4px;
-  box-shadow: rgb(0 0 0 / 5%) 0px 1px 4px;
+  cursor: pointer;
+  transition: var(--transition-all-productive);
+  .outline();
+  
+  &:hover {
+    box-shadow: rgb(0 0 0 / 5%) 0px 1px 4px;
+  }
+}
+
+.contact-status__heading {
+  padding: 8px 12px 6px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.contact-status__heading--expanded {
+  background-color: var(--layer);
 }
 
 .contact-status__label {
@@ -605,7 +620,6 @@ code:hover > .copy-icon {
 .contact-status__divider {
   width: 100%;
   border-top: 1px solid var(--border-subtle);
-  margin-top: 6px;
   margin-bottom: 8px;
 }
   

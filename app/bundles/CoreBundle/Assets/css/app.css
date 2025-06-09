@@ -203,6 +203,10 @@
   --label-color-green: #0e6027;
   --label-background-hover-green: #74e792;
   --label-border-green: #42be65;
+  --label-background-yellow: #fcf4d6;
+  --label-color-yellow: #684e00;
+  --label-background-hover-yellow: #f8e6a0;
+  --label-border-yellow: #d2a106;
   --label-background-brand: var(--primary-20);
   --label-color-brand: var(--primary-60);
   --label-background-hover-brand: var(--primary-30);
@@ -356,6 +360,10 @@
   --label-color-green: #5a6800;
   --label-background-hover-green: #c6e787;
   --label-border-green: #859900;
+  --label-background-yellow: #f9e8a0;
+  --label-color-yellow: #7c6200;
+  --label-background-hover-yellow: #f0dc85;
+  --label-border-yellow: #b58900;
   --label-background-primary: #268bd2;
   --label-color-primary: #fdf6e3;
   --label-background-hover-primary: #1e6ea7;
@@ -513,6 +521,10 @@
   --label-color-green: #a7f0ba;
   --label-background-hover-green: #11742f;
   --label-border-green: #24a148;
+  --label-background-yellow: #483800;
+  --label-color-yellow: #f0e68c;
+  --label-background-hover-yellow: #3d3000;
+  --label-border-yellow: #b58900;
 }
 :root[theme="solarized-dark"] {
   --background: #002b36;
@@ -662,6 +674,10 @@
   --label-color-green: #fdf6e3;
   --label-background-hover-green: #96ac00;
   --label-border-green: #b58900;
+  --label-background-yellow: #b58900;
+  --label-color-yellow: #fdf6e3;
+  --label-background-hover-yellow: #d19f00;
+  --label-border-yellow: #cb4b16;
 }
 :root[theme="freire"] {
   --background: #1C1C2E;
@@ -811,6 +827,10 @@
   --label-color-green: #1C1C2E;
   --label-background-hover-green: #66BB6A;
   --label-border-green: #80C783;
+  --label-background-yellow: #FFE566;
+  --label-color-yellow: #1C1C2E;
+  --label-background-hover-yellow: #FFEA80;
+  --label-border-yellow: #FFEF99;
   --label-background-brand: #F7B84B;
   --label-color-brand: #1C1C2E;
   --label-background-hover-brand: #F9C46A;
@@ -6250,25 +6270,17 @@ a.label:focus,
   font-size: calc(1em + 2px);
   font-weight: normal;
 }
-.label:has(.label-close) {
-  padding-right: var(--layout-size-height-local);
-}
 .label .label-close {
-  display: flex;
-  position: absolute;
-  right: 0;
-  flex-shrink: 0;
+  display: inline-flex;
+  background-color: transparent;
+  border: none;
+  margin-right: -8px;
+  border-radius: 100%;
+  height: 18px;
+  aspect-ratio: 1 / 1;
+  padding: 0;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  margin: 0 0 0 0.125rem;
-  background-color: rgba(0, 0, 0, 0);
-  block-size: var(--layout-size-height-local);
-  color: currentColor;
-  cursor: pointer;
-  inline-size: var(--layout-size-height-local);
   transition: var(--transition-all-productive);
 }
 .label-gray {
@@ -6286,6 +6298,10 @@ a.label:focus,
 .label-red {
   background-color: var(--label-background-red);
   color: var(--label-color-red);
+}
+.label-yellow {
+  background-color: var(--label-background-yellow);
+  color: var(--label-color-yellow);
 }
 .label-magenta {
   background-color: var(--label-background-magenta);
@@ -6339,6 +6355,45 @@ a.label:focus,
   background-color: var(--background-inverse);
   color: var(--text-inverse);
 }
+.label-gray .label-close:hover {
+  background-color: var(--label-background-hover-gray);
+}
+.label-cool-gray .label-close:hover {
+  background-color: var(--label-background-hover-cool-gray);
+}
+.label-warm-gray .label-close:hover {
+  background-color: var(--label-background-hover-warm-gray);
+}
+.label-red .label-close:hover {
+  background-color: var(--label-background-hover-red);
+}
+.label-yellow .label-close:hover {
+  background-color: var(--label-background-hover-yellow);
+}
+.label-magenta .label-close:hover {
+  background-color: var(--label-background-hover-magenta);
+}
+.label-purple .label-close:hover {
+  background-color: var(--label-background-hover-purple);
+}
+.label-blue .label-close:hover {
+  background-color: var(--label-background-hover-blue);
+}
+.label-cyan .label-close:hover {
+  background-color: var(--label-background-hover-cyan);
+}
+.label-teal .label-close:hover {
+  background-color: var(--label-background-hover-teal);
+}
+.label-green .label-close:hover {
+  background-color: var(--label-background-hover-green);
+}
+.label-primary .label-close:hover {
+  background-color: var(--label-background-hover-primary);
+}
+.label-brand .label-close:hover {
+  background-color: var(--label-background-hover-brand);
+}
 .label[href],
 .label:has(> a) {
   border: 1px solid #00000017;
@@ -6378,6 +6433,15 @@ a.label:focus,
 .label[href].label-red:hover,
 .label:has(> a).label-red:hover {
   background-color: var(--label-background-hover-red);
+}
+.label[href].label-yellow,
+.label:has(> a).label-yellow {
+  border: 1px solid var(--label-border-yellow);
+  color: var(--label-color-yellow);
+}
+.label[href].label-yellow:hover,
+.label:has(> a).label-yellow:hover {
+  background-color: var(--label-background-hover-yellow);
 }
 .label[href].label-magenta,
 .label:has(> a).label-magenta {
@@ -10860,10 +10924,31 @@ code:hover > .copy-icon {
 .contact-status {
   display: inline-flex;
   flex-direction: column;
-  padding: 8px 0;
   border: 1px solid var(--border-subtle);
   border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-all-productive);
+  outline: 2px var(--outline-style) transparent;
+  outline-offset: -2px;
+}
+.contact-status:hover {
+  outline: 2px var(--outline-style) transparent;
+}
+.contact-status:focus,
+.contact-status.focus,
+.contact-status:focus-visible {
+  outline: 2px var(--outline-style) var(--focus);
+}
+.contact-status:hover {
   box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 4px;
+}
+.contact-status__heading {
+  padding: 8px 12px 6px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.contact-status__heading--expanded {
+  background-color: var(--layer);
 }
 .contact-status__label {
   display: inline-flex;
@@ -10874,7 +10959,6 @@ code:hover > .copy-icon {
 .contact-status__divider {
   width: 100%;
   border-top: 1px solid var(--border-subtle);
-  margin-top: 6px;
   margin-bottom: 8px;
 }
 .toggle {

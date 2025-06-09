@@ -61,24 +61,17 @@
     font-weight: normal;
   }
 
-  &:has(.label-close) { padding-right: var(--layout-size-height-local); }
-
   .label-close {
-    display: flex;
-    position: absolute;
-    right: 0;
-    flex-shrink: 0;
+    display: inline-flex;
+    background-color: transparent;
+    border: none;
+    margin-right: -8px;
+    border-radius: 100%;
+    height: 18px;
+    aspect-ratio: 1 / 1;
+    padding: 0;
     align-items: center;
     justify-content: center;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    margin: 0 0 0 .125rem;
-    background-color: rgba(0, 0, 0, 0);
-    block-size: var(--layout-size-height-local);
-    color: currentColor;
-    cursor: pointer;
-    inline-size: var(--layout-size-height-local);
     transition: var(--transition-all-productive);
   }
 }
@@ -104,6 +97,11 @@
 .label-red {
   background-color: var(--label-background-red);
   color: var(--label-color-red);
+}
+
+.label-yellow {
+  background-color: var(--label-background-yellow);
+  color: var(--label-color-yellow);
 }
 
 .label-magenta {
@@ -167,6 +165,20 @@
 
 // Interactive
 
+.label-gray .label-close:hover { background-color: var(--label-background-hover-gray); }
+.label-cool-gray .label-close:hover { background-color: var(--label-background-hover-cool-gray); }
+.label-warm-gray .label-close:hover { background-color: var(--label-background-hover-warm-gray); }
+.label-red .label-close:hover { background-color: var(--label-background-hover-red); }
+.label-yellow .label-close:hover { background-color: var(--label-background-hover-yellow); }
+.label-magenta .label-close:hover { background-color: var(--label-background-hover-magenta); }
+.label-purple .label-close:hover { background-color: var(--label-background-hover-purple); }
+.label-blue .label-close:hover { background-color: var(--label-background-hover-blue); }
+.label-cyan .label-close:hover { background-color: var(--label-background-hover-cyan); }
+.label-teal .label-close:hover { background-color: var(--label-background-hover-teal); }
+.label-green .label-close:hover { background-color: var(--label-background-hover-green); }
+.label-primary .label-close:hover { background-color: var(--label-background-hover-primary); }
+.label-brand .label-close:hover { background-color: var(--label-background-hover-brand); }
+
 .label[href], .label:has(> a) {
   border: 1px solid #00000017;
   &.label-gray {
@@ -188,6 +200,11 @@
     border: 1px solid var(--label-border-red);
     color: var(--label-color-red);
     &:hover { background-color: var(--label-background-hover-red); }
+  }
+  &.label-yellow {
+    border: 1px solid var(--label-border-yellow);
+    color: var(--label-color-yellow);
+    &:hover { background-color: var(--label-background-hover-yellow); }
   }
   &.label-magenta {
     border: 1px solid var(--label-border-magenta);
