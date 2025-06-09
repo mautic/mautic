@@ -29,7 +29,7 @@
 
     {# Wrapper element switching logic #}
     {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}
-    <{{ wrapper_tag }} id="{{ id }}" class="label label-{{ tag.color|default('gray') }}{% if iconOnly %} label-icon{% endif %} {{ className|default('') }}" aria-label="{{ translated_label }}" size="{{ tag.size|default('md') }}"
+    <{{ wrapper_tag }} id="{{ id }}" class="label label-{{ tag.color|default('gray') }}{% if iconOnly %} label-icon{% endif %} {{ tag.className|default('') }}" aria-label="{{ translated_label }}" size="{{ tag.size|default('md') }}"
         {% if wrapper_tag == 'a' %} href="{{ attributes.href }}" {% endif %}
         {% for attr_key, attr_value in other_attributes %}
             {{ attr_key }}="{{ attr_value }}"
@@ -45,7 +45,7 @@
                 <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-toggle="tooltip" tooltip-placement="top"{% endif %}>
                     {{ truncated_label }}
                 </span>
-                <button type="button" aria-label="{{ 'mautic.core.builder.storage.dismiss.button'|trans }}" title="{{ 'mautic.core.builder.storage.dismiss.button'|trans }}">
+                <button class="label-close label-{{ tag.color }} btn-nospin" type="button" aria-label="{{ tag.dismissTooltip|default('mautic.core.dismiss')|trans }}" title="{{ tag.dismissTooltip|default('mautic.core.dismiss')|trans }}" data-toggle="tooltip" onclick="{{ tag.onClick }}">
                     <i class="ri-close-line" aria-hidden="true" focusable="false"></i>
                 </button>
 
