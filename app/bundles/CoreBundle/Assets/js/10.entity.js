@@ -36,7 +36,7 @@ Mautic.getEntityId = function() {
 Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     if (typeof baseUrl == 'undefined') {
         baseUrl = window.location.pathname;
-    
+
         // Reset to first page by modifying the path
         baseUrl = baseUrl.replace(/\/\d+$/, '/1');
     }
@@ -57,6 +57,7 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     }
 
     var route = baseUrl + (params.length ? '?' + params.join('&') : '');
+
     Mautic.loadContent(route, '', 'POST', target, true, function () {
         // Auto-apply column preferences after reordering
         window.applyColumnPrefsForRoute();

@@ -2,53 +2,18 @@
 {% set userColumnPrefs = userColumnPrefs|default([]) %}
 {% set contactColPrefs = contactColPrefs|default([]) %}
 {% set companyColPrefs = companyColPrefs|default([]) %}
-{% set showColumnsButton = false %}
-{% if app.request.pathinfo starts with '/s/contacts' or
-      app.request.pathinfo starts with '/s/companies' or
-      app.request.pathinfo starts with '/s/emails' %}
-    {% set showColumnsButton = true %}
-{% endif %}
-
-<style>
-  /* Compact styling for column picker with bigger text and checkboxes */
-  #column-picker-form {
-    max-width: 400px;
-    margin: 0 auto;
-  }
-
-  #column-picker-form .form-check {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding: 6px 0;
-    font-size: 1.3rem;
-  }
-
-  #column-picker-form .form-check-label {
-    margin-bottom: 0;
-    flex-grow: 1;
-    cursor: pointer;
-    font-weight: 600;
-  }
-
-  #column-picker-form .form-check-input {
-    margin-left: 30px;
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-  }
-</style>
+{% set showColumnsButton = app.request.pathinfo starts with '/s/contacts'
+    or app.request.pathinfo starts with '/s/companies'
+    or app.request.pathinfo starts with '/s/emails' %}
 
 <div class="panel-heading pa-0 toolbar--table-toolbar">
 
     <div class="toolbar--batch-actions d-flex jc-space-between bg-primary fd-column fd-row-sm">
         <div class="toolbar--batch-summary d-flex">
-            <span class="toolbar--batch-summary__count" data-singular="{{ 'mautic.core.item_selected'|trans|lower }}"
-                  data-plural="{{ 'mautic.core.items_selected'|trans|lower }}">
-                0 {{ 'mautic.core.items_selected'|trans|lower }}
-            </span>
+            <span class="toolbar--batch-summary__count" data-singular="{{
+'mautic.core.item_selected'|trans|lower }}"
+                  data-plural="{{ 'mautic.core.items_selected'|trans|lower }}">0 {{
+'mautic.core.items_selected'|trans|lower }}</span>
         </div>
         <div class="toolbar--action-list d-flex fw-wrap fw-nowrap-sm">
             {{ include('@MauticCore/Helper/toolbar_bulk_actions.html.twig', bulk_actions|default({})) }}
@@ -105,7 +70,25 @@
 </div>
 
 <script>
+window.userColumnPrefs = {{ userColumnPrefs|json_encode|raw }};
+window.contactColPrefs = {{ contactColPrefs|json_encode|raw }};
+window.companyColPrefs = {{ companyColPrefs|json_encode|raw }};
+
+window.applyColumnPrefs = function(prefs, tableSelector, columnPrefix, allColumns) {
+  allColumns.forEach(col => {
+    const show = prefs.includes(col);
+    document.querySelectorAll(`${tableSelector} th.${columnPrefix}${col}, ${tableSelector} td.${columnPrefix}${col}`)
+      .forEach(el => el.style.setProperty('display', show ? '' : 'none', 'important'));
+  });
+};
+</script>
+
+{# Modal renderer #}
+<script>
 function renderColumnModal(config) {
+  const existing = document.getElementById('column-config-modal');
+  if (existing) existing.remove();
+
   const formHtml = config.allColumns.map(key => {
     const label = config.labels[key] || key;
     const isChecked = (window.userColumnPrefs || []).includes(key);
@@ -143,28 +126,6 @@ function renderColumnModal(config) {
 }
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  window.userColumnPrefs = {{ userColumnPrefs|default([])|json_encode|raw }};
-
-  window.contactColPrefs = {{ contactColPrefs|default([])|json_encode|raw }};
-  window.companyColPrefs = {{ companyColPrefs|default([])|json_encode|raw }};
-</script>
-
-<script>
-  window.applyColumnPrefs = function(prefs, tableSelector, columnPrefix, allColumns) {
-    allColumns.forEach(col => {
-      const show = prefs.includes(col);
-      const ths = document.querySelectorAll(`${tableSelector} th.${columnPrefix}${col}`);
-      const tds = document.querySelectorAll(`${tableSelector} td.${columnPrefix}${col}`);
-      ths.forEach(el => el.style.setProperty('display', show ? '' : 'none', 'important'));
-      tds.forEach(el => el.style.setProperty('display', show ? '' : 'none', 'important'));
-    });
-  };
-</script>
-
 <script>
   function setupColumnPreferences({
   preferenceKey,
@@ -175,6 +136,7 @@ function renderColumnModal(config) {
   columnPrefix,
   csrfToken
 }) {
+  const $ = window.jQuery;
 
   // Initial apply
   if (columnPrefs.length > 0) {
@@ -185,31 +147,34 @@ function renderColumnModal(config) {
   }
 
   // Save handler
-  document.getElementById('save-columns').addEventListener('click', function () {
-    const selected = Array.from(document.querySelectorAll('#column-picker-form input:checked')).map(cb => cb.value);
+  const saveButton = document.getElementById('save-columns');
+  if (saveButton) {
+    saveButton.addEventListener('click', function () {
+      const selected = Array.from(document.querySelectorAll('#column-picker-form input:checked')).map(cb => cb.value);
 
-    fetch('/s/user/set-preference', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': csrfToken
-      },
-      body: JSON.stringify({
-        preference: preferenceKey,
-        value: selected
-      })
-    }).then(response => {
-      if (response.ok) {
-        window[preferenceVar] = selected;
-        window.applyColumnPrefs(selected, tableSelector, columnPrefix, allColumns);
-        $('#column-config-modal').modal('hide');
-      } else {
-        alert('Failed to save column preferences.');
-      }
-    }).catch(err => {
-      console.error('Error saving preferences:', err);
+      fetch('/s/user/set-preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        },
+        body: JSON.stringify({
+          preference: preferenceKey,
+          value: selected
+        })
+      }).then(response => {
+        if (response.ok) {
+          window[preferenceVar] = selected;
+          window.applyColumnPrefs(selected, tableSelector, columnPrefix, allColumns);
+          $('#column-config-modal').modal('hide');
+        } else {
+          alert('Failed to save column preferences.');
+        }
+      }).catch(err => {
+        console.error('Error saving preferences:', err);
+      });
     });
-  });
+  }
 
   // Modal a11y handling
   $('#column-config-modal').on('hidden.bs.modal', function () {
@@ -229,36 +194,45 @@ function renderColumnModal(config) {
 </script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+function withjQuery(callback) {
   if (typeof window.jQuery !== 'undefined') {
-    (function($) {
-      const path = window.location.pathname;
-
-      // Loop through all defined columnConfigs
-      Object.entries(columnConfigs).forEach(([route, tableConfig]) => {
-        if (path.includes(route)) {
-          // Try to get a matching prefs variable from window
-          const prefsVar =
-            tableConfig.preferenceVar && window[tableConfig.preferenceVar]
-              ? window[tableConfig.preferenceVar]
-              : [];
-
-          renderColumnModal(tableConfig);
-
-          setupColumnPreferences({
-            preferenceKey: tableConfig.preferenceKey,
-            preferenceVar: tableConfig.preferenceVar,
-            columnPrefs: prefsVar,
-            allColumns: tableConfig.allColumns,
-            tableSelector: tableConfig.tableSelector,
-            columnPrefix: tableConfig.columnPrefix,
-            csrfToken: window.csrfToken || ''
-          });
-        }
-      });
-    })(window.jQuery);
+    callback(window.jQuery);
   } else {
-    console.error('jQuery not loaded yet.');
+    const interval = setInterval(() => {
+      if (typeof window.jQuery !== 'undefined') {
+        clearInterval(interval);
+        callback(window.jQuery);
+      }
+    }, 50);
   }
+}
+
+withjQuery(function($) {
+  const path = window.location.pathname;
+
+  // Loop through all defined columnConfigs
+  Object.entries(columnConfigs).forEach(([route, tableConfig]) => {
+    if (path.includes(route)) {
+      // Try to get a matching prefs variable from window
+      const prefsVar =
+        tableConfig.preferenceVar && window[tableConfig.preferenceVar]
+          ? window[tableConfig.preferenceVar]
+          : [];
+
+      renderColumnModal(tableConfig);
+
+      setTimeout(() => {
+        setupColumnPreferences({
+          preferenceKey: tableConfig.preferenceKey,
+          preferenceVar: tableConfig.preferenceVar,
+          columnPrefs: prefsVar,
+          allColumns: tableConfig.allColumns,
+          tableSelector: tableConfig.tableSelector,
+          columnPrefix: tableConfig.columnPrefix,
+          csrfToken: window.csrfToken || ''
+        });
+      }, 0);
+    }
+  });
 });
 </script>
