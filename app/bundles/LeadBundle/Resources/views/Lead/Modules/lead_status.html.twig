@@ -1,0 +1,82 @@
+{% set leadStatusesPopoverContent %}
+    {% set leadStatusesHelp = {
+        'mautic.lead.contact.status.unsubscribed': {
+            'description': 'mautic.lead.contact.status.unsubscribed.help',
+            'icon': 'ri-error-warning-fill text-danger'
+        },
+        'mautic.lead.contact.status.manual': {
+            'description': 'mautic.lead.contact.status.manual.help',
+            'icon': 'ri-close-circle-fill text-danger'
+        },
+        'mautic.lead.contact.status.bounced': {
+            'description': 'mautic.lead.contact.status.bounced.help',
+            'icon': 'ri-alert-fill text-warning'
+        },
+        'mautic.lead.contact.status.subscribed': {
+            'description': 'mautic.lead.contact.status.subscribed.help',
+            'icon': 'ri-checkbox-circle-fill text-success'
+        }
+    } %}
+
+    {% for status, config in leadStatusesHelp %}
+    <div class="d-flex ai-center mb-xs">
+        <i class="{{ config.icon }} mr-xs"></i>
+        <div class="type-heading-01">{{ status|trans }}</div>
+    </div>
+    <div class="{{ loop.last ? 'mb-md' : 'mb-32' }}">{{ config.description|trans }}</div>
+    {% endfor %}
+    <div class="row"><hr></div>
+    <div class="type-label-01">{{ 'mautic.lead.contact.status.note'|trans }}</div>
+{% endset %}
+
+<div class="pa-md">
+    <div class="contact-status" data-toggle="popover" data-content="{{ leadStatusesPopoverContent|escape }}"
+        data-html="true" data-title="{{ 'mautic.lead.contact.status.popover.title'|trans }}" data-container="body" data-placement="left"
+        tabindex="0">
+        {% if not doNotContactSms %}
+        {% if doNotContact %}
+        {% set statusConfig = {
+        (constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::UNSUBSCRIBED')): {
+        'class': 'text-danger',
+        'icon': 'ri-error-warning-fill',
+        'label': 'mautic.lead.contact.status.unsubscribed'|trans
+        },
+        (constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::MANUAL')): {
+        'class': 'text-danger',
+        'icon': 'ri-close-circle-fill',
+        'label': 'mautic.lead.contact.status.manual'|trans
+        },
+        (constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::BOUNCED')): {
+        'class': 'text-warning',
+        'icon': 'ri-alert-fill',
+        'label': 'mautic.lead.contact.status.bounced'|trans
+        }
+        } %}
+
+        {% set config = statusConfig[doNotContact.reason] %}
+        <div class="contact-status__heading {{ config.class }}">
+            <i class="contact-status__icon {{ config.icon }}"></i>
+            <span class="contact-status__text fw-sb">{{ config.label }}</span>
+        </div>
+        {% else %}
+        <div class="contact-status__heading text-success">
+            <i class="contact-status__icon ri-checkbox-circle-fill"></i>
+            <span class="contact-status__text fw-sb">{{ 'mautic.lead.contact.status.subscribed'|trans }}</span>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="contact-status__heading contact-status__heading--expanded">
+            <span class="contact-status__text fw-sb text-secondary">{{ 'mautic.lead.contact.status.custom'|trans }}</span>
+        </div>
+        <div class="contact-status__divider"></div>
+
+        <div class="contact-status__channels d-flex fd-column mb-xs">
+            {{ include('@MauticLead/Lead/Modules/lead_status__channel.html.twig', {'doNotContactFlag': doNotContact, 'channelLabel':
+            'mautic.lead.contact.channel.email'}) }}
+            {{ include('@MauticLead/Lead/Modules/lead_status__channel.html.twig', {'doNotContactFlag': doNotContactSms, 'channelLabel':
+            'mautic.lead.contact.channel.sms'}) }}
+        </div>
+
+        {% endif %}
+    </div>
+</div>

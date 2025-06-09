@@ -2,19 +2,19 @@
   {% set dncConfig = {
     (constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::UNSUBSCRIBED')): {
       icon: 'ri-error-warning-fill text-danger',
-      label: 'Unsubscribed',
+      label: 'mautic.lead.contact.status.unsubscribed'|trans,
       color: 'red',
       type: 'read-only'
     },
     (constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::MANUAL')): {
       icon: 'ri-close-circle-fill text-danger',
-      label: 'Manually unsubscribed',
+      label: 'mautic.lead.contact.status.manual'|trans,
       color: 'red',
       type: 'dismissible'
     },
     (constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::BOUNCED')): {
       icon: 'ri-alert-fill text-warning',
-      label: 'Bounced',
+      label: 'mautic.lead.contact.status.bounced'|trans,
       color: 'yellow',
       type: 'dismissible'
     }
@@ -24,7 +24,7 @@
   {% if config is defined %}
     <div class="contact-status__label mb-xs">
       <i class="contact-status__icon {{ config.icon }}"></i>
-      <span class="contact-status__text fw-sb">{{ channelLabel }}</span>
+      <span class="contact-status__text fw-sb">{{ channelLabel|trans }}</span>
       {% include '@MauticCore/Components/tag.html.twig' with {'tags': 
         [{
           label: config.label,
@@ -41,6 +41,6 @@
 {% else %}
   <div class="contact-status__label mb-xs">
     <i class="contact-status__icon ri-checkbox-circle-fill text-success"></i>
-    <span class="contact-status__text fw-sb">{{ channelLabel }}</span>
+    <span class="contact-status__text fw-sb">{{ channelLabel|trans }}</span>
   </div>
 {% endif %}
