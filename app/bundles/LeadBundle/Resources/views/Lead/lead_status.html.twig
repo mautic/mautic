@@ -1,0 +1,59 @@
+
+{% set allFalse = true %}
+{% set onlyDoNotContactTrue = true %}
+
+{# Check if all variables are false or only doNotContact is true #}
+{% for key, value in _context %}
+    {% if key starts with 'doNotContact' and value == true %}
+        {% set allFalse = false %}
+        {% if key != 'doNotContact' %}
+            {% set onlyDoNotContactTrue = false %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if allFalse == true %}
+<div class="pa-md">
+    <div class="contact-status">
+        <div class="contact-status__label text-success">
+            <i class="contact-status__icon ri-checkbox-circle-fill"></i>
+            <span class="contact-status__text fw-sb">Subscribed</span>
+        </div>
+    </div>
+</div>
+{% elseif onlyDoNotContactTrue == true %}
+<div class="pa-md">
+    <div class="contact-status">
+        <div class="contact-status__label text-danger">
+            <i class="contact-status__icon ri-error-warning-fill"></i>
+            <span class="contact-status__text fw-sb">Unsubscribed</span>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="pa-md">
+    <div class="contact-status">
+        <div class="contact-status__label">
+            <span class="contact-status__text fw-sb text-secondary">Custom preferences</span>
+        </div>
+        <div class="contact-status__divider"></div>
+
+        {% for key, value in _context %}
+            {% if key starts with 'doNotContact' %}
+                {% set channelName = key == 'doNotContact' ? 'Email' : key|replace({'doNotContact': ''}) %}
+                {% if value == true %}
+                    <div class="contact-status__label type-label-01">
+                        <i class="contact-status__icon ri-error-warning-fill text-danger"></i>
+                        <span class="contact-status__text fw-sb">{{ channelName }}</span>
+                    </div>
+                {% else %}
+                    <div class="contact-status__label type-label-01">
+                        <i class="contact-status__icon ri-checkbox-circle-fill text-success"></i>
+                        <span class="contact-status__text fw-sb">{{ channelName }}</span>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
