@@ -1695,11 +1695,28 @@ Mautic.initiateFileDownload = function (link) {
         return;
     }
 
-    //initialize download links
-    mQuery("<iframe/>").attr({
-        src: link,
-        style: "visibility:hidden;display:none"
-    }).appendTo(mQuery('body'));
+    // For direct downloads, use iframe with response checking
+    const iframe = mQuery("<iframe/>")
+        .attr({
+            src: link,
+            style: "visibility:hidden;display:none"
+        })
+        .appendTo(mQuery('body'));
+
+    iframe.on('load', function() {
+        try {
+            const iframeContent = iframe.contents().text();
+            const response = JSON.parse(iframeContent);
+
+            // If we get here, it's JSON error response
+            if (response.message) {
+                const flashMessage = Mautic.addErrorFlashMessage(response.message);
+                Mautic.setFlashes(flashMessage);
+            }
+        } catch (e) {
+            // If JSON.parse fails, it means we got a file download - this is expected
+        }
+    });
 };
 
 Mautic.processCsvContactExport = function (route) {

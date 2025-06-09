@@ -33,7 +33,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
         $this->assertEquals('core', $result['bundle']);
         $this->assertEquals('maintenance', $result['object']);
         $this->assertEquals('cleanup', $result['action']);
-        $this->assertEquals('a:2:{s:7:"options";a:4:{s:8:"days-old";i:180;s:9:"lock_mode";s:3:"pid";s:14:"no-interaction";b:1;s:3:"env";s:4:"test";}s:5:"stats";a:1:{s:8:"Visitors";i:1;}}', $result['details']);
+        $this->assertEquals('a:2:{s:7:"options";a:5:{s:8:"days-old";i:180;s:14:"bypass-locking";b:1;s:9:"lock_mode";s:3:"pid";s:14:"no-interaction";b:1;s:3:"env";s:4:"test";}s:5:"stats";a:1:{s:8:"Visitors";i:1;}}', $result['details']);
 
         $activeLead = $this->createLead('-170 days');
         $contactId  = $activeLead->getId();

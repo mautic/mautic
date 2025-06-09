@@ -294,6 +294,26 @@
           </tr>
         </tbody>
       </table>
+      
+      <div class="accordion-content">
+        <h4 class="mb-xs fw-sb">{{ 'mautic.placeholder_tokens.custom_fields.label'|trans }}</h4>
+        <p>{{ 'mautic.placeholder_tokens.custom_fields.label.description'|trans }}</p>
+      </div>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'mautic.placeholder_tokens.variable_name'|trans }}</th>
+            <th>{{ 'mautic.placeholder_tokens.variable_syntax'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ 'mautic.placeholder_tokens.custom_fields.label.field'|trans }}</td>
+            <td><code>{contactfield=aliasofyourselectfield|label}</code></td>
+          </tr>
+        </tbody>
+      </table>
+      
       <div class="accordion-content">
         <div class="alert alert-info">
           {{ 'mautic.placeholder_tokens.custom_fields.note'|trans }}
