@@ -10925,6 +10925,7 @@ code:hover > .copy-icon {
   display: inline-flex;
   flex-direction: column;
   border: 1px solid var(--border-subtle);
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 4px;
   border-radius: 4px;
   cursor: pointer;
   transition: var(--transition-all-productive);
@@ -10940,7 +10941,7 @@ code:hover > .copy-icon {
   outline: 2px var(--outline-style) var(--focus);
 }
 .contact-status:hover {
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 4px;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 10px;
 }
 .contact-status__heading {
   padding: 8px 12px 6px;
