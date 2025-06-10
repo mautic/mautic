@@ -49,6 +49,7 @@
 
 {% block publishStatus %}
   {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': list}) -}}
+  <div class="label__divider"></div>
     {# Dynamic/Static segment tag #}
     {% set segmentType = list.filters is defined and list.filters|length > 0 ? 'dynamic' : 'static' %}
     {% include '@MauticCore/Components/tag.html.twig' with {

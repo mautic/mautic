@@ -6,6 +6,7 @@
 
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+    <div class="label__divider"></div>
     {% if item.type is defined and item.type is not empty %}
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{

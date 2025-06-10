@@ -106,6 +106,7 @@
         'entity': email,
         'status': email.getPublishUp() is not null ? 'sending' : 'available'
     }) -}}
+    <div class="label__divider"></div>
 
         {% include '@MauticCore/Components/tag.html.twig' with { tags: [
             {
