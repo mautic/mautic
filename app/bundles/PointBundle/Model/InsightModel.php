@@ -7,6 +7,10 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Entity\PointInsightRepository;
 use Mautic\PointBundle\Form\Type\PointInsightType;
@@ -28,7 +32,8 @@ class InsightModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
+        private readonly LeadModel $leadModel
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -69,5 +74,80 @@ class InsightModel extends FormModel
         }
 
         return parent::getEntity($id);
+    }
+
+    public function executePointInsights(Lead $contact): void
+    {
+        // Hole alle aktiven Point Insights vom Typ "compare_point_groups"
+        $insights = $this->getRepository()->findBy([
+            'isPublished' => true,
+            'insightType' => 'compare_point_groups',
+            'insightAction' => 'set_custom_field',
+        ]);
+
+        foreach ($insights as $insight) {
+            $this->executePointInsight($insight, $contact);
+        }
+    }
+
+    private function executePointInsight(PointInsight $insight, Lead $contact): void
+    {
+        $pointGroupIds = $insight->getPointGroups();
+        $customField = $insight->getCustomField();
+        
+        if (empty($pointGroupIds) || empty($customField)) {
+            return;
+        }
+
+        // Ein einziger Query für alle Group Scores - sortiert nach Score (DESC) und ID (ASC)
+        $qb = $this->em->createQueryBuilder();
+        $results = $qb
+            ->select('g.id', 'g.name', 'COALESCE(s.score, 0) as score')
+            ->from(Group::class, 'g')
+            ->leftJoin(
+                GroupContactScore::class,
+                's', 
+                'WITH', 
+                'g.id = s.group AND s.contact = :contactId'
+            )
+            ->where('g.id IN (:groupIds)')
+            ->orderBy('score', 'DESC')
+            ->addOrderBy('g.id', 'ASC')  // Bei gleicher Score: niedrigste ID gewinnt
+            ->setParameter('contactId', $contact->getId())
+            ->setParameter('groupIds', $pointGroupIds)
+            ->getQuery()
+            ->getArrayResult();
+
+        if (empty($results)) {
+            return;
+        }
+
+        $winner = $results[0];
+        $maxScore = (int) $winner['score'];
+        
+        // Alle Gruppen sind 0 - nichts tun
+        if ($maxScore === 0) {
+            return;
+        }
+
+        // Check ob es mehrere Gewinner gibt (zweiter Eintrag hat gleiche Score)
+        $hasMultipleWinners = isset($results[1]) && (int) $results[1]['score'] === $maxScore;
+        
+        $currentValue = $contact->getFieldValue($customField);
+        
+        // Mehrere Gewinner - Custom Field nur setzen wenn leer
+        if ($hasMultipleWinners && !empty($currentValue)) {
+            return; // Bestehenden Wert beibehalten
+        }
+
+        // Gewinner setzen (Format: "12 (Name)")
+        $newValue = $winner['id'] . ' (' . $winner['name'] . ')';
+        $this->updateCustomField($contact, $customField, $newValue);
+    }
+
+    private function updateCustomField(Lead $contact, string $fieldAlias, string $value): void
+    {
+        $contact->addUpdatedField($fieldAlias, $value);
+        $this->leadModel->saveEntity($contact, false);
     }
 } 

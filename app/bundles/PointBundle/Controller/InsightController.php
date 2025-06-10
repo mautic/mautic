@@ -309,53 +309,124 @@ class InsightController extends FormController
         $model  = $this->getModel('point.insight');
         $entity = $model->getEntity($objectId);
 
-        if (null != $entity) {
-            if (!$this->security->isGranted('point:points:create')) {
-                return $this->accessDenied();
-            }
+        // Set the page we came from
+        $page = $request->getSession()->get('mautic.point.insight.page', 1);
 
-            $clone = clone $entity;
-            $clone->setName($entity->getName().' (copy)');
-            
-            // Save the clone
-            $model->saveEntity($clone);
-
-            // Redirect to the edit form
-            $this->addFlashMessage(
-                'mautic.core.notice.copied',
-                [
-                    '%name%'      => $entity->getName(),
-                    '%id%'        => $clone->getId(),
-                    '%menu_link%' => 'mautic_point.insights_index',
-                    '%url%'       => $this->generateUrl('mautic_point.insights_action', [
-                        'objectAction' => 'edit',
-                        'objectId'     => $clone->getId(),
-                    ]),
-                ]
-            );
-
-            return $this->redirectToRoute('mautic_point.insights_action', [
-                'objectAction' => 'edit',
-                'objectId'     => $clone->getId(),
-            ]);
-        }
-
-        return $this->postActionRedirect([
-            'returnUrl'       => $this->generateUrl('mautic_point.insights_index'),
+        $postActionVars = [
+            'returnUrl'       => $this->generateUrl('mautic_point.insights_index', ['page' => $page]),
+            'viewParameters'  => ['page' => $page],
             'contentTemplate' => 'Mautic\PointBundle\Controller\InsightController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point.insights_index',
                 'mauticContent' => 'pointInsight',
             ],
-            'flashes' => [
-                [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.point.insight.error.notfound',
-                    'msgVars' => ['%id%' => $objectId],
-                ],
+        ];
+
+        if (null === $entity) {
+            return $this->postActionRedirect(
+                array_merge($postActionVars, [
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.point.insight.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ])
+            );
+        }
+
+        if (!$this->security->isGranted('point:points:create')) {
+            return $this->accessDenied();
+        }
+
+        // Create a clone of the entity
+        $clone = clone $entity;
+        $clone->setName($entity->getName());
+
+        $action = $this->generateUrl('mautic_point.insights_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
+        $form   = $model->createForm($clone, $this->formFactory, $action);
+
+        // Check for a submitted form and process it
+        if ('POST' == $request->getMethod()) {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    // Form is valid so process the data
+                    $model->saveEntity($clone);
+
+                    $this->addFlashMessage(
+                        'mautic.core.notice.created',
+                        [
+                            '%name%'      => $clone->getName(),
+                            '%menu_link%' => 'mautic_point.insights_index',
+                            '%url%'       => $this->generateUrl('mautic_point.insights_action', [
+                                'objectAction' => 'edit',
+                                'objectId'     => $clone->getId(),
+                            ]),
+                        ]
+                    );
+
+                    if ($form->get('buttons')->get('save')->isClicked()) {
+                        return $this->postActionRedirect($postActionVars);
+                    }
+
+                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                        return $this->postActionRedirect([
+                            'returnUrl'       => $this->generateUrl('mautic_point.insights_action', [
+                                'objectAction' => 'edit',
+                                'objectId'     => $clone->getId(),
+                            ]),
+                            'viewParameters'  => [
+                                'objectAction' => 'edit',
+                                'objectId'     => $clone->getId(),
+                            ],
+                            'contentTemplate' => 'Mautic\PointBundle\Controller\InsightController::editAction',
+                            'passthroughVars' => [
+                                'activeLink'    => '#mautic_point.insights_index',
+                                'mauticContent' => 'pointInsight',
+                            ],
+                        ]);
+                    }
+
+                    return $this->postActionRedirect([
+                        'returnUrl'       => $this->generateUrl('mautic_point.insights_action', [
+                            'objectAction' => 'new',
+                        ]),
+                        'viewParameters'  => [
+                            'objectAction' => 'new',
+                        ],
+                        'contentTemplate' => 'Mautic\PointBundle\Controller\InsightController::newAction',
+                        'passthroughVars' => [
+                            'activeLink'    => '#mautic_point.insights_index',
+                            'mauticContent' => 'pointInsight',
+                        ],
+                    ]);
+                }
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                return $this->postActionRedirect($postActionVars);
+            }
+        }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+                'entity' => $clone,
+            ],
+            'contentTemplate' => '@MauticPoint/Insight/form.html.twig',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_point.insights_index',
+                'mauticContent' => 'pointInsight',
+                'route'         => $this->generateUrl('mautic_point.insights_action', [
+                    'objectAction' => 'clone',
+                    'objectId'     => $objectId,
+                ]),
             ],
         ]);
     }
+
 
     /**
      * Deletes a Point Insight.

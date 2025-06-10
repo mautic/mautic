@@ -82,6 +82,7 @@ class PointInsightType extends AbstractType
                 'attr'       => [
                     'class'                => 'form-control',
                     'data-toggle'          => 'multiselect',
+                    'tooltip'              => 'mautic.point.insight.action.set_custom_field.tooltip',
                 ],
                 'multiple'    => true,
                 'required'    => false,
