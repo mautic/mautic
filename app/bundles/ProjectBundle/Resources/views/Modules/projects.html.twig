@@ -9,7 +9,11 @@
         </header>
 
         <div class="project-popover__meta mb-md">
-            <span class="project-popover__meta-text type-label-01 text-secondary">{{ 'mautic.project.popover.updated.on'|trans({'%date%': project.dateModified.date|date}) }}</span>
+            {% if project.dateModified is not empty %}
+                <span class="project-popover__meta-text type-label-01 text-secondary">
+                    {{ 'mautic.project.popover.updated.on'|trans({'%date%': project.dateModified.date|date}) }}
+                </span>
+            {% endif %}
         </div>
 
         <p class="project-popover__description type-body-compact-01 mb-md">
