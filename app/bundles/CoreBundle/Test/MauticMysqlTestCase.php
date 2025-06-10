@@ -80,7 +80,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
 
         $isTransactionActive = false;
-        
+
         try {
             // Only check for active transaction if the connection is still open
             if ($this->connection->isConnected()) {
@@ -96,12 +96,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 }
             }
 
-
             $this->afterRollback();
 
             // Always reset the database to ensure a clean state
             $this->resetDatabase();
-
         } catch (\Exception $e) {
             // If there's an error, try to reset the database and rethrow
             try {
@@ -189,18 +187,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function applySqlFromFile($file): void
     {
         $params = $this->connection->getParams();
-        
+
         // Build the command with proper escaping
         $command = sprintf(
             'mysql -h%s -P%d -u%s %s %s < %s',
             escapeshellarg($params['host']),
             $params['port'],
             escapeshellarg($params['user']),
-            !empty($params['password']) ? '-p' . escapeshellarg($params['password']) : '',
+            !empty($params['password']) ? '-p'.escapeshellarg($params['password']) : '',
             escapeshellarg($params['dbname']),
             escapeshellarg($file)
         );
-        
+
         // Set the password as an environment variable for security
         $envVars = [
             'MYSQL_PWD' => $params['password'] ?? '',
@@ -213,11 +211,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         // Check if the command was successful
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException(sprintf(
-                'Failed to import SQL file. Command: %s, Error: %s',
-                $command,
-                $process->getErrorOutput()
-            ));
+            throw new \RuntimeException(sprintf('Failed to import SQL file. Command: %s, Error: %s', $command, $process->getErrorOutput()));
         }
     }
 
@@ -301,19 +295,19 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connection = $this->connection;
-        $params = $this->connection->getParams();
-        
+        $params     = $this->connection->getParams();
+
         // Build the command with proper escaping
         $command = sprintf(
             'mysqldump --opt -h%s -P%d -u%s %s %s > %s',
             escapeshellarg($params['host']),
             $params['port'],
             escapeshellarg($params['user']),
-            !empty($params['password']) ? '-p' . escapeshellarg($params['password']) : '',
+            !empty($params['password']) ? '-p'.escapeshellarg($params['password']) : '',
             escapeshellarg($params['dbname']),
             escapeshellarg($sqlDumpFile)
         );
-        
+
         // Set the password as an environment variable for security
         $envVars = [
             'MYSQL_PWD' => $params['password'] ?? '',
@@ -329,11 +323,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if (file_exists($sqlDumpFile)) {
                 @unlink($sqlDumpFile);
             }
-            throw new \RuntimeException(sprintf(
-                'Failed to create database dump. Command: %s, Error: %s',
-                $command,
-                $process->getErrorOutput()
-            ));
+            throw new \RuntimeException(sprintf('Failed to create database dump. Command: %s, Error: %s', $command, $process->getErrorOutput()));
         }
     }
 
@@ -404,11 +394,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function insertRollbackCheckData(): void
     {
         $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
-    }
-
-    private function wasRollbackSuccessful(): bool
-    {
-        return false === $this->connection->fetchOne("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
     }
 
     private function getTablePrefix(): string

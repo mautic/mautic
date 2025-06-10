@@ -737,7 +737,7 @@ EMAIL;
         // Primary company name should match
         $primaryCompanyName = $this->getLeadPrimaryCompany($leadId);
         $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
-        
+
         // Check the details page to verify the primary company is displayed
         $detailsCrawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/1');
         if ($detailsCrawler->filter('#lead-details')->count() > 0) {
