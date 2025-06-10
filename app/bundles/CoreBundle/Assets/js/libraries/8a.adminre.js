@@ -248,8 +248,41 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             BsPopover: function () {
+                // Store currently visible popover
+                var currentPopover = null;
+                
+                // Hide all popovers
+                var hideAllPopovers = function() {
+                    $("[data-toggle~=popover]").each(function() {
+                        var $this = $(this);
+                        var popover = $this.data('bs.popover');
+                        if (popover && popover.tip().hasClass('in')) {
+                            $this.popover('hide');
+                        }
+                    });
+                };
+                
+                // Initialize all popovers
                 $("[data-toggle~=popover]").popover({
                     sanitize: false
+                });
+                
+                // For hover-triggered popovers, hide all others before showing
+                $(document).on('mouseenter.bs.popover.data-api', '[data-toggle="popover"][data-trigger="hover"]', function() {
+                    hideAllPopovers();
+                });
+                
+                // When a popover is shown, store reference to it
+                $(document).on('shown.bs.popover', '[data-toggle="popover"]', function() {
+                    currentPopover = $(this);
+                });
+                
+                // Hide popovers when clicking outside
+                $(document).on('click', function(e) {
+                    if ($(e.target).closest('.popover').length === 0 && 
+                        $(e.target).closest('[data-toggle="popover"]').length === 0) {
+                        hideAllPopovers();
+                    }
                 });
             },
 
