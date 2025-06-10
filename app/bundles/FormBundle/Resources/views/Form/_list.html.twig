@@ -114,6 +114,7 @@
                                 {% endif %}
                             </a>
                             {{ customContent('form.name', _context) }}
+                            {{ include('@MauticProject/Modules/projects.html.twig') }}
                         </div>
                         {{ include('@MauticCore/Helper/description--inline.html.twig', {
                             'description': item.description
