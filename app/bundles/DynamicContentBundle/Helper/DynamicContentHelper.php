@@ -108,7 +108,7 @@ class DynamicContentHelper
                     continue;
                 }
 
-                $dwcs = $this->getDwcsBySlotName($slotName);
+                $dwcs = $this->getDwcsBySlotName($slotName, true);
 
                 /** @var DynamicContent $dwc */
                 foreach ($dwcs as $dwc) {
