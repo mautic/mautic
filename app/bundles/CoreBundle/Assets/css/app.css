@@ -1263,7 +1263,7 @@
 }
 :root[theme="light"]:root[accent="05"],
 :root[theme="dark"]:root[accent="05"] {
-  --primary-20: #f3a7cb;
+  --primary-20: #f9d4e6;
   --primary-30: #ed7ab1;
   --primary-40: #e64e96;
   --primary-50: #e0217c;
@@ -1295,7 +1295,7 @@
 }
 :root[theme="light"]:root[accent="07"],
 :root[theme="dark"]:root[accent="07"] {
-  --primary-20: #95ce8d;
+  --primary-20: #b6ddb1;
   --primary-30: #74bf69;
   --primary-40: #56ab4a;
   --primary-50: #44883a;
@@ -1343,7 +1343,7 @@
 }
 :root[theme="light"]:root[accent="10"],
 :root[theme="dark"]:root[accent="10"] {
-  --primary-20: #92f6ff;
+  --primary-20: #c5faff;
   --primary-30: #5ff1ff;
   --primary-40: #2cedff;
   --primary-50: #00e3f8;
@@ -1359,7 +1359,7 @@
 }
 :root[theme="light"]:root[accent="11"],
 :root[theme="dark"]:root[accent="11"] {
-  --primary-20: #59cfe6;
+  --primary-20: #b2e9f3;
   --primary-30: #2dc2df;
   --primary-40: #1ca2bd;
   --primary-50: #167c90;
@@ -1375,7 +1375,7 @@
 }
 :root[theme="light"]:root[accent="12"],
 :root[theme="dark"]:root[accent="12"] {
-  --primary-20: #50cd77;
+  --primary-20: #9fe4b5;
   --primary-30: #34b65c;
   --primary-40: #298e48;
   --primary-50: #1d6734;
@@ -1391,7 +1391,7 @@
 }
 :root[theme="light"]:root[accent="13"],
 :root[theme="dark"]:root[accent="13"] {
-  --primary-20: #8cffd7;
+  --primary-20: #bfffe9;
   --primary-30: #59ffc6;
   --primary-40: #26ffb4;
   --primary-50: #00f29e;
@@ -1407,7 +1407,7 @@
 }
 :root[theme="light"]:root[accent="14"],
 :root[theme="dark"]:root[accent="14"] {
-  --primary-20: #85d19f;
+  --primary-20: #cfedd9;
   --primary-30: #60c382;
   --primary-40: #42ae67;
   --primary-50: #348951;
@@ -1439,7 +1439,7 @@
 }
 :root[theme="light"]:root[accent="16"],
 :root[theme="dark"]:root[accent="16"] {
-  --primary-20: #feb993;
+  --primary-20: #ffdac5;
   --primary-30: #fe9860;
   --primary-40: #fe772d;
   --primary-50: #f75801;
@@ -1455,7 +1455,7 @@
 }
 :root[theme="light"]:root[accent="17"],
 :root[theme="dark"]:root[accent="17"] {
-  --primary-20: #fffafb;
+  --primary-20: #ffe1e6;
   --primary-30: #ffc7d1;
   --primary-40: #ff94a7;
   --primary-50: #ff617e;
@@ -1503,7 +1503,7 @@
 }
 :root[theme="light"]:root[accent="20"],
 :root[theme="dark"]:root[accent="20"] {
-  --primary-20: #e3a0ff;
+  --primary-20: #f2d3ff;
   --primary-30: #d36dff;
   --primary-40: #c43aff;
   --primary-50: #b507ff;
@@ -1535,7 +1535,7 @@
 }
 :root[theme="light"]:root[accent="22"],
 :root[theme="dark"]:root[accent="22"] {
-  --primary-20: #7c6bf0;
+  --primary-20: #e2dffc;
   --primary-30: #533cec;
   --primary-40: #3016df;
   --primary-50: #2612b0;
@@ -1567,7 +1567,7 @@
 }
 :root[theme="light"]:root[accent="24"],
 :root[theme="dark"]:root[accent="24"] {
-  --primary-20: #fef1f0;
+  --primary-20: #fcdbd8;
   --primary-30: #fbc5c0;
   --primary-40: #f79a91;
   --primary-50: #f46e61;
@@ -1583,7 +1583,7 @@
 }
 :root[theme="light"]:root[accent="25"],
 :root[theme="dark"]:root[accent="25"] {
-  --primary-20: #d470c3;
+  --primary-20: #f1d2ec;
   --primary-30: #c849b2;
   --primary-40: #aa3496;
   --primary-50: #832873;
@@ -1599,7 +1599,7 @@
 }
 :root,
 :root[accent="01"] {
-  --primary-20: #d0d5e8;
+  --primary-20: #f2f4f9;
   --primary-30: #aeb6d7;
   --primary-40: #8c98c6;
   --primary-50: #6a79b5;
