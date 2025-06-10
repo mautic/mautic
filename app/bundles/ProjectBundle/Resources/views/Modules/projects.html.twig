@@ -1,4 +1,5 @@
 {% if item.projects is not empty %}
+<div class="project-group d-inline-flex gap-3 mb-xs">
 {% for project in item.projects %}
 
     {% set projectPopover %}
@@ -73,7 +74,6 @@
                 ]
             } %}
         </div>
-
         {% endfor %}
-    </span>
+</div>
 {% endif %}

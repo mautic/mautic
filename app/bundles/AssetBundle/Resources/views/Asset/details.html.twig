@@ -19,6 +19,7 @@
         }
     ) -}}
     {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': activeAsset.category}) }}
+    {{ include('@MauticProject/Modules/projects.html.twig', {'item': activeAsset}) }}
 {% endblock %}
 
 {% block headerTitle %} {{ activeAsset.getTitle() }} {% endblock %}

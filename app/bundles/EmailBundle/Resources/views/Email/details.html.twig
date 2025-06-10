@@ -21,6 +21,7 @@
         }) -}}
     {% endif %}
     {{ include('@MauticCore/Helper/category--inline.html.twig', {'category': email.category}) }}
+    {{ include('@MauticProject/Modules/projects.html.twig', {'item': email}) }}
 {% endblock %}
 
 {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
