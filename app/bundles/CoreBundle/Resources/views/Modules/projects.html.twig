@@ -1,8 +1,3 @@
-
-{# 
-Variables
-    - project {name, createdByUser, modifiedByUser, description, dateModified {date, timezone}}
-#}
 {% if item.projects is not empty %}
 {% for project in item.projects %}
 
@@ -26,7 +21,7 @@ Variables
             {% if securityIsGranted('project:project:view') %}
                 {% set buttons = buttons|merge([
                     {
-                        label: 'View project',
+                        label: 'View details',
                         href: path('mautic_project_action', {'objectAction': 'view', 'objectId': project.id}),
                         icon: 'ri-arrow-right-line',
                         variant: 'tertiary',
@@ -63,10 +58,8 @@ Variables
         </div>
 
         <footer class="project-popover__footer type-label-01 text-helper mt-lg">
-            <span class="project-popover__footer-icon" aria-hidden="true"><i class="ri-archive-line"></i></span>
             <span class="project-popover__footer-text">Project</span>
         </footer>
-
     {% endset %}
 
         <div class="project-popover" data-toggle="popover" data-content='{{ projectPopover }}' data-html="true" data-container="body" data-placement="bottom" data-trigger="hover" data-delay='{"show": 300, "hide": 2000}'>
@@ -75,7 +68,7 @@ Variables
                     {
                         label: project.name,
                         color: 'blue',
-                        renderIcon: 'ri-archive-stack-line',
+                        size: 'sm',
                     }
                 ]
             } %}
