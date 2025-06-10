@@ -12,40 +12,57 @@ Variables
             <h2 class="project-popover__title type-heading-03 text-interactive">{{ project.name }}</h2>
         </header>
 
-        <div class="project-popover__meta mb-md">
+        <div class="project-popover__meta mb-lg">
             <span class="project-popover__meta-text type-label-01 text-secondary">Updated on {{ project.dateModified.date|date }}</span>
         </div>
 
-        <p class="project-popover__description type-body-compact-01">
+        <p class="project-popover__description type-body-compact-01 mb-md">
             {{ project.description|striptags|slice(0, 150) ~ (project.description|length > 150 ? '...' : '') }}
         </p>
 
         <div class="project-popover__actions">
-            {% include '@MauticCore/Components/button.html.twig' with {
-                buttons: [
+            {% set buttons = [] %}
+            
+            {% if securityIsGranted('project:project:view') %}
+                {% set buttons = buttons|merge([
                     {
                         label: 'View project',
                         href: path('mautic_project_action', {'objectAction': 'view', 'objectId': project.id}),
-                        icon: 'ri-eye-line',
+                        icon: 'ri-arrow-right-line',
                         variant: 'tertiary',
+                        size: 'sm',
+                        wide: true,
                         attributes: {
-                            class: 'project-popover__action'
+                            class: 'project-popover__action mb-xs'
                         }
-                    },
+                    }
+                ]) %}
+            {% endif %}
+            
+            {% if securityIsGranted('project:project:edit') %}
+                {% set buttons = buttons|merge([
                     {
                         label: 'Edit',
                         href: path('mautic_project_action', {'objectAction': 'edit', 'objectId': project.id}),
                         icon: 'ri-edit-line',
                         variant: 'tertiary',
+                        size: 'sm',
+                        wide: true,
                         attributes: {
                             class: 'project-popover__action'
                         }
                     }
-                ]
-            } %}
+                ]) %}
+            {% endif %}
+            
+            {% if buttons|length > 0 %}
+                {% include '@MauticCore/Components/button.html.twig' with {
+                    buttons: buttons
+                } %}
+            {% endif %}
         </div>
 
-        <footer class="project-popover__footer type-label-01 text-helper mt-32">
+        <footer class="project-popover__footer type-label-01 text-helper mt-lg">
             <span class="project-popover__footer-icon" aria-hidden="true"><i class="ri-archive-line"></i></span>
             <span class="project-popover__footer-text">Project</span>
         </footer>
