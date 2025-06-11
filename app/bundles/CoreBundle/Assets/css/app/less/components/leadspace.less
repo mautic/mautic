@@ -15,7 +15,7 @@
     margin-inline: auto;
     max-inline-size: 1584px;
     display: flex;
-    background-color: var(--cds-background, #ffffff);
+    background-color: var(--background, #ffffff);
   }
   
   .leadspace--content__container {
@@ -62,7 +62,7 @@
     }
     
     &__stops stop {
-      stop-color: var(--context-aware-color, var(--layer));
+      stop-color: var(--context-color, var(--layer));
       
       &:nth-of-type(1) {
         stop-opacity: 1;
@@ -120,7 +120,6 @@
     .leadspace__context-aware-color {
       color: var(--context-aware-color);
       border-color: var(--context-aware-color);
-      filter: invert(1) grayscale(1) contrast(5) brightness(30);
       &,
       &:active,
       &:hover,

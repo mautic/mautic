@@ -1,6 +1,18 @@
+{#
+Variables:
+- variant: short, medium, tall, super
+- heading: string
+- description: string
+- tags: array of tags
+- gradientStyleScheme: with-gradient, without-gradient
+- gradientStyleSchemeColor: hex color
+- media: { src: 'path/to/image', alt: 'image alt text' }
+- buttons: array of buttons    
+#}
+
 <div class="row">
     <div class="col-xs-12">
-        <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" {%  if gradientStyleSchemeColor is defined %}style="--context-aware-color:{{ gradientStyleSchemeColor }}"{% endif %} {% if media.alt is defined %}alt="{{ media.alt }}"{% endif %} id="leadspace"
+        <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" {% if gradientStyleSchemeColor is defined %}style="--context-color: {{ gradientStyleSchemeColor }}; --context-aware-color: {{ contrast_color(gradientStyleSchemeColor) }};"{% endif %} {% if media.alt is defined %}alt="{{ media.alt }}"{% endif %} id="leadspace"
             class="leadspace" type="left">
             <section part="section" class="leadspace__section">
                 <div part="container" class="leadspace__container">
