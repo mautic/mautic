@@ -79,37 +79,17 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             throw new \LogicException('You omitted invoking parent::setUp(). This may lead to side effects.');
         }
 
-        $isTransactionActive = false;
-        
-        try {
-            // Only check for active transaction if the connection is still open
-            if ($this->connection->isConnected()) {
-                $isTransactionActive = $this->connection->isTransactionActive();
+        $isTransactionActive = $this->connection->isTransactionActive();
 
-                if ($isTransactionActive && $this->useCleanupRollback) {
-                    $this->insertRollbackCheckData();
-                    try {
-                        $this->connection->rollback();
-                    } catch (\Exception $e) {
-                        // If rollback fails, we'll reset the database anyway
-                    }
-                }
-            }
+        if ($isTransactionActive && $this->useCleanupRollback) {
+            $this->insertRollbackCheckData();
+            $this->connection->rollback();
+        }
 
+        $this->afterRollback();
 
-            $this->afterRollback();
-
-            // Always reset the database to ensure a clean state
+        if (!$this->useCleanupRollback || !$isTransactionActive || $customFieldsReset || !$this->wasRollbackSuccessful()) {
             $this->resetDatabase();
-
-        } catch (\Exception $e) {
-            // If there's an error, try to reset the database and rethrow
-            try {
-                $this->resetDatabase();
-            } catch (\Exception $resetException) {
-                // Ignore reset errors to avoid masking the original exception
-            }
-            throw $e;
         }
 
         $this->restoreShellVerbosity();
@@ -188,36 +168,22 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function applySqlFromFile($file): void
     {
-        $params = $this->connection->getParams();
-        
-        // Build the command with proper escaping
-        $command = sprintf(
-            'mysql -h%s -P%d -u%s %s %s < %s',
-            escapeshellarg($params['host']),
-            $params['port'],
-            escapeshellarg($params['user']),
-            !empty($params['password']) ? '-p' . escapeshellarg($params['password']) : '',
-            escapeshellarg($params['dbname']),
-            escapeshellarg($file)
-        );
-        
-        // Set the password as an environment variable for security
+        $command = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
         $envVars = [
-            'MYSQL_PWD' => $params['password'] ?? '',
+            'MYSQL_PWD'      => $this->connection->getParams()['password'],
+            'db_host'        => $this->connection->getParams()['host'],
+            'db_port'        => $this->connection->getParams()['port'],
+            'db_user'        => $this->connection->getParams()['user'],
+            'db_name'        => $this->connection->getParams()['dbname'],
+            'db_backup_file' => $file,
         ];
 
-        // Execute the command
         $process = Process::fromShellCommandline($command);
-        $process->setTimeout(300); // 5 minutes timeout
         $process->run(null, $envVars);
 
-        // Check if the command was successful
+        // executes after the command finishes
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException(sprintf(
-                'Failed to import SQL file. Command: %s, Error: %s',
-                $command,
-                $process->getErrorOutput()
-            ));
+            throw new \Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
@@ -301,39 +267,25 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connection = $this->connection;
-        $params = $this->connection->getParams();
-        
-        // Build the command with proper escaping
-        $command = sprintf(
-            'mysqldump --opt -h%s -P%d -u%s %s %s > %s',
-            escapeshellarg($params['host']),
-            $params['port'],
-            escapeshellarg($params['user']),
-            !empty($params['password']) ? '-p' . escapeshellarg($params['password']) : '',
-            escapeshellarg($params['dbname']),
-            escapeshellarg($sqlDumpFile)
-        );
-        
-        // Set the password as an environment variable for security
-        $envVars = [
-            'MYSQL_PWD' => $params['password'] ?? '',
+        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
+        $envVars    = [
+            'MYSQL_PWD'      => $this->connection->getParams()['password'],
+            'db_host'        => $this->connection->getParams()['host'],
+            'db_port'        => $this->connection->getParams()['port'],
+            'db_user'        => $this->connection->getParams()['user'],
+            'db_name'        => $this->connection->getParams()['dbname'],
+            'db_backup_file' => $sqlDumpFile,
         ];
 
-        // Execute the command
         $process = Process::fromShellCommandline($command);
-        $process->setTimeout(300); // 5 minutes timeout
         $process->run(null, $envVars);
 
-        // Check if the command was successful
+        // executes after the command finishes
         if (!$process->isSuccessful()) {
             if (file_exists($sqlDumpFile)) {
-                @unlink($sqlDumpFile);
+                unlink($sqlDumpFile);
             }
-            throw new \RuntimeException(sprintf(
-                'Failed to create database dump. Command: %s, Error: %s',
-                $command,
-                $process->getErrorOutput()
-            ));
+            throw new \Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
