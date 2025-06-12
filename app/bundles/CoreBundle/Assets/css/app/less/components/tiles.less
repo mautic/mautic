@@ -1,5 +1,5 @@
 .tile {
-    --layout-density-padding-inline-local: 16px;
+    --layout-density-padding-inline-local: clamp(var(--layout-density-padding-inline-min), var(--layout-density-padding-inline, var(--layout-density-padding-inline-normal)), var(--layout-density-padding-inline-max));
     position: relative;
     display: flex;
     flex-grow: 1;

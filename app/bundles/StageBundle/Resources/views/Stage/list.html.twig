@@ -129,11 +129,9 @@
                             {{ customContent('stage.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
-                        {% if description %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ description|purify }}</small>
-                            </div>
-                        {% endif %}
+                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                            'description': description
+                        }) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}

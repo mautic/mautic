@@ -546,21 +546,36 @@
             {% endfor %}
             <div class="clearfix"></div>
         </div>
-        <div class="pa-sm panel-companies">
-            <div class="panel-title">
-                {{ 'mautic.lead.lead.companies'|trans }}
-            </div>
+        <div class="pa-sm panel-companies layout--size-0">
+            {% set companiesList = [] %}
             {% for key, company in companies %}
-            <h5 class="pull-left mt-xs mr-xs">
-                <span class="label label-success">
-                    <i id="company-{{ company.id }}" class="ri-check-line {% if 1 == company.is_primary %}primary{% endif %}" onclick="Mautic.setAsPrimaryCompany({{ company.id }}, {{ lead.id }});" title="{{ 'mautic.lead.company.set.primary'|trans }}"></i>
-                    <a href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax" style="color: white;">
-                        {{ company.companyname|purify }}
-                    </a>
-                </span>
-            </h5>
+                {% set companiesList = companiesList|merge([{
+                    'label': company.companyname|purify,
+                    'link': path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}),
+                    'icon': (company.is_primary == 1 ? 'ri-user-star-fill' : ''),
+                    'button': {
+                        'onclick': 'Mautic.setAsPrimaryCompany(' ~ company.id ~ ', ' ~ lead.id ~ ');',
+                        'icon': 'ri-check-line',
+                        'size': 'lg',
+                        'label': 'mautic.lead.company.set.primary'|trans
+                    }
+                }]) %}
             {% endfor %}
-            <div class="clearfix"></div>
+
+            {% set tileContent %}
+            <div class="ma-neg-local">
+                {{ include('@MauticCore/Components/contained-list--interactive-actions.html.twig', {
+                    'title': 'mautic.lead.lead.companies'|trans,
+                    'items': companiesList
+                }) }}
+            </div>
+            {% endset %}
+
+            {{ include('@MauticCore/Components/tile--base.html.twig', {
+                'tiles': [{
+                    'content': tileContent
+                }]
+            }) }}
         </div>
         {% if lists[lead.id] is defined %}
             <div class="pa-sm panel-segments">

@@ -7,6 +7,7 @@ use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Form\Type\AbstractFormStandardType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -61,6 +62,8 @@ class MessageType extends AbstractFormStandardType
                 ],
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

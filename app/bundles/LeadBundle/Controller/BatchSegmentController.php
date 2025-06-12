@@ -79,7 +79,7 @@ class BatchSegmentController extends AbstractFormController
         $items = [];
 
         foreach ($lists as $list) {
-            $items[$list['name']] = $list['id'];
+            $items[$list['name'].' ('.$list['id'].')'] = $list['id'];
         }
 
         return $this->delegateView(

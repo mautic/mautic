@@ -75,7 +75,7 @@ class BatchContactController extends AbstractFormController
         $items = [];
 
         foreach ($rows as $category) {
-            $items[$category['title']] = $category['id'];
+            $items[$category['title'].' ('.$category['id'].')'] = $category['id'];
         }
 
         return $this->delegateView(

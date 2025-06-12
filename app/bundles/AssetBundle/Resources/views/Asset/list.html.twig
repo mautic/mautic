@@ -172,7 +172,7 @@
                                             'data-target' : '#AssetPreviewModal',
                                             'href'        : path(
                                                 'mautic_asset_action',
-                                                {'objectAction' : 'preview', 'objectId' : item.getId()}
+                                                {'objectAction' : 'preview', 'objectId' : item.getId(), 'stream': 0}
                                             ),
                                         },
                                         'btnText'   : 'mautic.asset.asset.preview'|trans,
@@ -203,9 +203,9 @@
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ description|purify }}</small>
-                            </div>
+                            {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                'description': description
+                            }) }}
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">

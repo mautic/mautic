@@ -156,6 +156,21 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    public function testCheckDefaultBooleanFieldSetting(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        // Check if the radio button with value 0 is checked and value 1 is not
+        Assert::assertNotNull(
+            $crawler->filter('#leadfield_default_template_boolean_0')->attr('checked')
+        );
+        Assert::assertNull(
+            $crawler->filter('#leadfield_default_template_boolean_1')->attr('checked')
+        );
+    }
+
     /**
      * @param array<string, mixed> $parameters
      */

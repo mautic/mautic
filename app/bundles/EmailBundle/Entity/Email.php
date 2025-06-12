@@ -28,6 +28,7 @@ use Mautic\EmailBundle\Validator\TextOnlyDynamicContent;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
@@ -61,6 +62,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use TranslationEntityTrait;
     use DynamicContentEntityTrait;
     use UuidTrait;
+    use ProjectTrait;
 
     /**
      * @var int
@@ -339,6 +341,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->assetAttachments    = new ArrayCollection();
         $this->setDateAdded(new \DateTime());
         $this->setDateModified(new \DateTime());
+        $this->initializeProjects();
     }
 
     public function clearStats(): void
@@ -430,6 +433,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'email_projects_xref', 'email_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -572,6 +576,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'email');
     }
 
     protected function isChanged($prop, $val)

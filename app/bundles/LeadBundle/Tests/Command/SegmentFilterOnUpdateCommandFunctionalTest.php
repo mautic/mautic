@@ -9,31 +9,23 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Tester\ApplicationTester;
 
 final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testSegmentFilterOnUpdateCommand(): void
     {
-        $application = new Application(self::$kernel);
-        $application->setAutoExit(false);
-        $applicationTester = new ApplicationTester($application);
-
         $this->saveContacts();
         $segmentA   = $this->saveSegmentA();
         $segmentAId = $segmentA->getId();
 
         // Run segments update command.
-        $exitCode = $applicationTester->run(['command' => 'mautic:segments:update', '-i' => $segmentAId]);
-        self::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentAId]);
         self::assertCount(5, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentAId]));
 
         $segmentB   = $this->saveSegmentB($segmentAId);
         $segmentBId = $segmentB->getId();
         // Run segments update command.
-        $exitCode = $applicationTester->run(['command' => 'mautic:segments:update', '-i' => $segmentBId]);
-        self::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentBId]);
         self::assertCount(3, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentBId]));
     }
 

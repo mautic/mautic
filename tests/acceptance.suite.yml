@@ -1,6 +1,7 @@
 actor: AcceptanceTester
 modules:
   enabled:
+    - Asserts
     - \Helper\DbHelper
     - WebDriver:
         url: "https://web:443"

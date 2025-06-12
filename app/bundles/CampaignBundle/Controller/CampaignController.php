@@ -1118,8 +1118,8 @@ class CampaignController extends AbstractStandardFormController
         } else {
             /** @var LeadEventLogRepository $eventLogRepo */
             $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, true, $dateFrom, $dateToPlusOne);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateToPlusOne);
         }
 
         return [

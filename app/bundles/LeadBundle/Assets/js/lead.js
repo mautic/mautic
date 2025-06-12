@@ -446,6 +446,9 @@ Mautic.attachJsUiOnFilterForms = function() {
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
         }
+        mQuery('.chosen-search-input').on('keypress', function (event) {
+            if ( event.which === 13 ) event.preventDefault();
+        })
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -547,9 +550,7 @@ Mautic.convertLeadFilterInput = function(el) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
 
-        mQuery('#leadlist_filters_' + filterNum + '_properties_filter').on('keypress', function (event) {
-            if ( event.which === 13 ) event.preventDefault();
-        })
+        Mautic.ajaxifyForm('leadlist');
 
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
@@ -1634,13 +1635,9 @@ Mautic.updateFilterPositioning = function (el) {
 Mautic.setAsPrimaryCompany = function (companyId,leadId){
     Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
         if (response.success) {
-            if (response.oldPrimary == response.newPrimary && mQuery('#company-' + response.oldPrimary).hasClass('primary')) {
-                mQuery('#company-' + response.oldPrimary).removeClass('primary');
-            } else {
-                mQuery('#company-' + response.oldPrimary).removeClass('primary');
-                mQuery('#company-' + response.newPrimary).addClass('primary');
-            }
-
+            // Update the company icon
+            mQuery('.panel-companies .ri-user-star-fill').removeClass('ri-user-star-fill');
+            mQuery('.panel-companies .contained-list-item__content[href$="/' + response.newPrimary + '"]').find('i').addClass('ri-user-star-fill');
         }
     });
 };
