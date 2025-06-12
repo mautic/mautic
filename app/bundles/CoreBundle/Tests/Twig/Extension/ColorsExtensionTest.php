@@ -7,15 +7,16 @@ use PHPUnit\Framework\TestCase;
 
 class ColorsExtensionTest extends TestCase
 {
-    /**
-     * @dataProvider colorProvider
-     */
-    public function testGetContrastColor($input, $expected)
+    #[\PHPUnit\Framework\Attributes\DataProvider('colorProvider')]
+    public function testGetContrastColor(string $input, string $expected): void
     {
         $ext = new ColorsExtension();
         $this->assertSame($expected, $ext->getContrastColor($input));
     }
 
+    /**
+     * @return array<int, array{0: string, 1: string}>
+     */
     public static function colorProvider(): array
     {
         return [
