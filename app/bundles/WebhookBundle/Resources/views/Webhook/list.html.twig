@@ -54,6 +54,21 @@
         {{ block('listResults') }}
     </div>
 </div>
+{% if items|length > 0 and searchValue is empty %}
+<div class="mt-md">
+    {{ include('@MauticCore/Components/lead-space.html.twig', {
+    variant: 'medium',
+    heading: 'mautic.webhook.contentblock.heading',
+    description: 'mautic.webhook.contentblock.copy',
+    media: {
+    src: 'app/bundles/WebhookBundle/Assets/images/google-deepmind-erunoELfh50-unsplash.jpg',
+    alt: 'Image alt text',
+    },
+    gradientStyleScheme: 'with-gradient',
+    gradientStyleSchemeColor: '#ebe7f0',  
+    }) }}
+    </div>
+{% endif %}
 {% else %}
     {{ block('listResults') }}
 {% endif %}
