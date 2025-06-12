@@ -15,7 +15,9 @@ use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[\PHPUnit\Framework\Attributes\Group('saml')]
+/**
+ * @group saml
+ */
 class SamlTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
