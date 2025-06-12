@@ -1,40 +1,17 @@
-{{ include('@MauticCore/Components/lead-space.html.twig', {
-    variant: 'short',
-    heading: 'mautic.lead.list.contentblock.heading',
-    description: 'mautic.lead.list.contentblock.subheading',
-    media: {
-        src: 'app/bundles/LeadBundle/Resources/views/List/image.png',
-        alt: 'Image alt text',
-    },
-    gradientStyleScheme: 'with-gradient',
-    gradientStyleSchemeColor: '#000000',
-    buttons: [
-        {
-            'label': 'Create a new segment',
-            'icon': 'ri-add-line',
-            'href': '#',
-        },
-        {
-            'label': 'mautic.lead.list.contentblock.button',
-            'href': '#',
-        },
-    ],
-}) }}
-<div class="row">
-    <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
-        {% set childContainer %}
-            <div class="mt-32 mb-md">
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
-                    'pictogram': 'circle--packing',
-                    'size': '80'
-                } %}
-            </div>
-        {% endset %}
+<div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+    {% set childContainer %}
+        <div class="mt-32 mb-md">
+            {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                'pictogram': 'circle--packing',
+                'size': '80'
+            } %}
+        </div>
+    {% endset %}
 
-        {{ include('@MauticCore/Components/content-block.html.twig', {
-            subheading: 'mautic.lead.list.contentblock.copy',
-            childContainer: childContainer,
-        }) }}
-
-    </div>
+    {{ include('@MauticCore/Components/content-block.html.twig', {
+        heading: 'mautic.lead.list.contentblock.heading',
+        subheading: 'mautic.lead.list.contentblock.subheading',
+        copy: 'mautic.lead.list.contentblock.copy',
+        childContainer: childContainer,
+    }) }}
 </div>
