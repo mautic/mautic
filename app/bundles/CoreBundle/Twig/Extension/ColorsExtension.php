@@ -10,9 +10,8 @@ use Twig\TwigFunction;
 
 class ColorsExtension extends AbstractExtension
 {
-    public function __construct(
-        private ColorHelper $colorHelper
-    ) {
+    public function __construct()
+    {
     }
 
     public function getFunctions(): array
@@ -53,7 +52,7 @@ class ColorsExtension extends AbstractExtension
             
             // Return black for light colors, white for dark colors
             return $brightness > 125 ? 'black' : 'white';
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Return black as default if color parsing fails
             return 'black';
         }
