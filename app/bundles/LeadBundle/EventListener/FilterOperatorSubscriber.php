@@ -36,6 +36,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ['onGenerateSegmentFiltersAddStaticFields', 0],
                 ['onGenerateSegmentFiltersAddCustomFields', 0],
                 ['onGenerateSegmentFiltersAddBehaviors', 0],
+                ['onGenerateSegmentFiltersNormalizeOperatorLabels', -1000],
             ],
         ];
     }
@@ -610,5 +611,45 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
 
         $event->setChoices($choices);
+    }
+
+    public function onGenerateSegmentFiltersNormalizeOperatorLabels(LeadListFiltersChoicesEvent $event): void
+    {
+        $choices = $event->getChoices();
+
+        foreach ($choices as $groupKey => $group) {
+            foreach ($group as $fieldKey => $field) {
+                if (in_array($field['properties']['type'] ?? '', ['date', 'datetime'])) {
+                    $operators                                  = array_flip($field['operators'] ?? []);
+                    $operators                                  = $this->translateOperators($operators);
+                    $choices[$groupKey][$fieldKey]['operators'] = array_flip($operators);
+                }
+            }
+        }
+
+        $event->setChoices($choices);
+    }
+
+    /**
+     * @param array<string, string> $operators
+     *
+     * @return array<string, string>
+     */
+    private function translateOperators(array $operators): array
+    {
+        $translationKeys = [
+            'gt'  => 'mautic.lead.list.form.operator.greaterthan.date',
+            'gte' => 'mautic.lead.list.form.operator.greaterthanequals.date',
+            'lt'  => 'mautic.lead.list.form.operator.lessthan.date',
+            'lte' => 'mautic.lead.list.form.operator.lessthanequals.date',
+        ];
+
+        foreach ($operators as $operator => $string) {
+            if (isset($translationKeys[$operator])) {
+                $operators[$operator] = $this->translator->trans($translationKeys[$operator]);
+            }
+        }
+
+        return $operators;
     }
 }

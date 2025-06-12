@@ -1,9 +1,5 @@
 @import "../../libraries/bootstrap/bootstrap-mautic-custom-variables";
 
-@media (min-width: @screen-md-min) {
-  .modal-xl { width: 1140px; }
-}
-
 .label-as-badge {
   border-radius: @badge-border-radius !important;
 }
@@ -435,6 +431,26 @@ code:hover > .copy-icon {
   .transition(all 1.5s var(--easing-standard-expressive));
 }
 .description-content { width: 388px; }
+
+.description--full-width {
+  width: 100%;
+  max-width: 100%;
+
+  .description-content { 
+    width: 100%;
+    height: 0px;
+    opacity: 0;
+    overflow: hidden;
+    max-width: calc(100% - 20px);
+    animation: animationDescription var(--duration-expressive) forwards .3s;
+    transform-origin: top left;
+  }
+}
+
+@keyframes animationDescription {
+  from { transform: scale(0.95); opacity: 0; height: 0px; }
+  to   { transform: scale(1); opacity: 1; height: 100%; }
+}
 
 .builder-active {
   background-color: var(--background);

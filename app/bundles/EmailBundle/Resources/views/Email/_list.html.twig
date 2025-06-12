@@ -158,7 +158,7 @@
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
                           <i class="ri-mail-send-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
-                              {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
+                              {{ 'mautic.email.stat.queuedcount'|trans ({'%count%' : item.getQueuedCount()}) }}
                           </a>
                         </span>
                         <span class="mt-xs label label-blue" id="sent-count-{{ item.getId() }}">

@@ -9857,6 +9857,15 @@ lesshat-selector { -lh-property: 0 ;
     order: 5;
   }
 }
+.ar-16-9 {
+  aspect-ratio: 16 / 9;
+}
+.ar-2-1 {
+  aspect-ratio: 2 / 1;
+}
+.ar-1-1 {
+  aspect-ratio: 1 / 1;
+}
 .animation--slide-in-up {
   animation: animationSlideInUp var(--duration-expressive) forwards;
 }
@@ -10072,6 +10081,24 @@ lesshat-selector { -lh-property: 0 ;
 }
 .modal-body::-webkit-scrollbar-thumb:hover {
   background-color: var(--border-interactive);
+}
+.modal-scroll-content {
+  -webkit-border-after: 2px solid rgba(0, 0, 0, 0);
+  border-block-end: 2px solid rgba(0, 0, 0, 0);
+  -webkit-mask-image: linear-gradient(to bottom, var(--layer) calc(100% - 80px), transparent calc(100% - 8px), transparent 100%), linear-gradient(to left, var(--layer) 0, 16px, transparent 16px), linear-gradient(to right, var(--layer) 0, 2px, transparent 2px), linear-gradient(to top, var(--layer) 0, 2px, transparent 2px);
+  mask-image: linear-gradient(to bottom, var(--layer) calc(100% - 80px), transparent calc(100% - 8px), transparent 100%), linear-gradient(to left, var(--layer) 0, 16px, transparent 16px), linear-gradient(to right, var(--layer) 0, 2px, transparent 2px), linear-gradient(to top, var(--layer) 0, 2px, transparent 2px);
+}
+@media (min-width: 992px) {
+  .modal-xl {
+    width: 100%;
+    max-width: 1200px;
+  }
+}
+.modal-full-width {
+  width: 100%;
+}
+.modal-full-width .modal-body {
+  max-height: calc(100vh - 120px);
 }
 .accordion {
   --layout-density-padding-inline-local: 16px;
@@ -10291,11 +10318,6 @@ lesshat-selector { -lh-property: 0 ;
 .nav-tabs-contained + .tab-content .tile.tile-clickable:hover,
 .nav-tabs-contained + .tab-content .tile.tile-selectable:hover {
   background: var(--layer-hover-02);
-}
-@media (min-width: 992px) {
-  .modal-xl {
-    width: 1140px;
-  }
 }
 .label-as-badge {
   border-radius: 9px !important;
@@ -10663,6 +10685,31 @@ code:hover > .copy-icon {
 }
 .description-content {
   width: 388px;
+}
+.description--full-width {
+  width: 100%;
+  max-width: 100%;
+}
+.description--full-width .description-content {
+  width: 100%;
+  height: 0px;
+  opacity: 0;
+  overflow: hidden;
+  max-width: calc(100% - 20px);
+  animation: animationDescription var(--duration-expressive) forwards 0.3s;
+  transform-origin: top left;
+}
+@keyframes animationDescription {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+    height: 0px;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+    height: 100%;
+  }
 }
 .builder-active {
   background-color: var(--background);

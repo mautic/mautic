@@ -142,14 +142,6 @@
                         <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeForm}) }}
-                            <tr>
-                                <td width="20%">
-                                    <span class="fw-b">{{ 'mautic.form.stats.submission_counts'|trans }}</span>
-                                </td>
-                                <td>
-                                    {{ submissionCounts['unique'] }} / {{ submissionCounts['total'] }}
-                                </td>
-                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -173,6 +165,20 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.form.stats.submission_counts.total',
+                                'value': submissionCounts['total'],
+                                'tooltip': 'mautic.form.stats.submission_counts.total.desc',
+                                'link': path('mautic_form_action', {'objectAction': 'results', 'objectId': activeForm.id}),
+                            },
+                            {
+                                'title': 'mautic.form.stats.submission_counts.unique',
+                                'value': submissionCounts['unique'],
+                                'tooltip': 'mautic.form.stats.submission_counts.unique.desc',
+                                'icon': 'ri-user-6-line'
+                            }
+                        ]}) }}
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-6 va-m">
