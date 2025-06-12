@@ -3,19 +3,19 @@
     heading: 'mautic.lead.list.block.heading',
     description: 'mautic.lead.list.block.subheading',
     media: {
-        src: 'app/bundles/LeadBundle/Assets/images/gabrielle-henderson-DgCPTkDqhHg-unsplash.jpg',
+        src: 'app/bundles/LeadBundle/Assets/images/kim-carpenter-IHIgnhLvz5Q-unsplash.jpg',
     },
     gradientStyleScheme: 'with-gradient',
-    gradientStyleSchemeColor: '#FED039',
+    gradientStyleSchemeColor: '#812407',
     buttons: [
         permissions['lead:leads:create'] ? {
             'label': 'mautic.lead.action.add',
-            'icon': 'ri-add-line',
+            'icon': 'ri-arrow-right-line',
             'href': path('mautic_import_action', {'object': 'contacts', 'objectAction': 'new'}),
             'attributes': {'data-toggle': 'ajax'}
         } : null,
         permissions['lead:leads:create'] ? {
-            'label': 'Create a new contact',
+            'label': 'mautic.lead.action.create_new_contact',
             'icon': 'ri-add-line',
             'href': path('mautic_contact_action', {'objectAction': 'new'}),
             'attributes': {'data-toggle': 'ajax'}
