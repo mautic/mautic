@@ -28,6 +28,22 @@
                 {{ block('listResults') }}
             </div>
         </div>
+        {% if items|length > 0 and searchValue is empty %}
+        <div class="mt-md">
+            {{ include('@MauticCore/Components/lead-space.html.twig', {
+            variant: 'medium',
+            heading: 'mautic.api.client.contentblock.heading',
+            description: 'mautic.api.client.contentblock.copy',
+            media: {
+                src: 'app/bundles/ApiBundle/Assets/images/google-deepmind-4QVqSh4VvP4-unsplash.jpg',
+                alt: 'Image alt text',
+            },
+            gradientStyleScheme: 'with-gradient',
+            gradientStyleSchemeColor: '#f1edea',
+            
+        }) }}
+        </div>
+        {% endif %}
     {% else %}
 		{{ block('listResults') }}
 	{% endif %}
