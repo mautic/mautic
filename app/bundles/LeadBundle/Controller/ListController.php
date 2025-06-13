@@ -244,6 +244,9 @@ class ListController extends FormController
      */
     public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId, $ignorePost = false)
     {
+        if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
+            return $this->accessDenied();
+        }
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
