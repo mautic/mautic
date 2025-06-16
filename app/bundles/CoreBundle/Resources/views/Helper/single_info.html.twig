@@ -7,10 +7,10 @@ Expected variables:
 
 <div class="panel-body text-center">
     {% if title is defined %}
-        <h5 class="text-muted">{{ title }}</h5>
+        <h5 class="text-muted">{{ title|trans }}</h5>
     {% endif %}
     <span class="h1 d-block">{{ value }}</span>
     {% if subtitle is defined %}
-        <p class="text-muted mb-0">{{ subtitle }}</p>
+        <p class="text-muted mb-0">{{ subtitle|trans }}</p>
     {% endif %}
 </div>

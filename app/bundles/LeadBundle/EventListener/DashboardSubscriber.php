@@ -501,7 +501,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ('number.contacts' == $event->getType()) {
             $numContacts = $this->leadModel->getNumberContacts();
-            $subtitle    = $this->translator->trans('mautic.widget.number.contacts.description');
+            $subtitle    = 'mautic.widget.number.contacts.description';
 
             $event->setTemplateData([
                 'value'    => $numContacts,
@@ -516,17 +516,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ('segment.number.contacts' == $event->getType()) {
             $params    = $event->getWidget()->getParams();
-            $segmentId = $params['segmentId'] ?? null;
+            $segmentId = $params['segmentId'];
 
             $segmentRepository = $this->leadListModel->getRepository();
-            $segments          = $segmentRepository->getEntities();
-            $selectedSegment   = null;
-
-            foreach ($segments as $segment) {
-                if ((int) $segment->getId() === (int) $segmentId) {
-                    $selectedSegment = $segment;
-                }
-            }
+            $selectedSegment   = $segmentRepository->getEntity($segmentId);
 
             if (!empty($segmentId)) {
                 $leadCounts = $this->leadListModel->getSegmentContactCountFromCache([$segmentId]);
@@ -536,13 +529,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $count = $leadCounts[$segmentId] ?? 0;
 
-            $subtitle = $this->translator->trans('mautic.widget.segment.number.contacts.description');
-
-            if (null !== $selectedSegment) {
-                $title = $selectedSegment->getName();
-            } else {
-                $title = $this->translator->trans('Select a segment');
-            }
+            $title    = $selectedSegment->getName();
+            $subtitle = $this->translator->trans('mautic.widget.segment.number.contacts.description', ['%segment%' => $title]);
 
             $event->setTemplateData([
                 'title'    => $title,
@@ -558,7 +546,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ('number.dnc.contacts' == $event->getType()) {
             $value    = $this->leadModel->getNumberDNC();
-            $subtitle = $this->translator->trans('mautic.widget.number.dnc.contacts.description');
+            $subtitle = 'mautic.widget.number.dnc.contacts.description';
 
             $event->setTemplateData([
                 'value'    => $value,

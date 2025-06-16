@@ -1893,25 +1893,13 @@ class LeadModel extends FormModel
      */
     public function getNumberContacts(): int
     {
-        $anonymous = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $mine      = $this->translator->trans('mautic.core.searchcommand.ismine');
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) as contact_count')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->where('t.email IS NOT NULL')
+            ->andWhere("t.email != ''");
 
-        $filter = [
-            'force' => " !$anonymous",
-        ];
-
-        if (!$this->security->isGranted('lead:leads:viewother')) {
-            $filter['force'] .= " $mine";
-        }
-
-        $results = $this->getEntities([
-            'start'          => 0,
-            'limit'          => 1,
-            'filter'         => $filter,
-            'withTotalCount' => true,
-        ]);
-
-        return $results['count'] ?? 0;
+        return (int) $q->executeQuery()->fetchOne();
     }
 
     /**
@@ -1922,7 +1910,7 @@ class LeadModel extends FormModel
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository(DNC::class);
 
-        return $dncRepo->getNumberEntries();
+        return $dncRepo->count([]);
     }
 
     /**
