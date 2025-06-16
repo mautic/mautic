@@ -543,7 +543,7 @@
                     {% if lead.tags|length > 0 %}
                         {% for tag in lead.tags %}
                             <div id="tagLabel{{ tag.id }}">
-                                {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
+                                {% include '@MauticCore/Components/tag.html.twig' with {'tags': [{
                                     'label': tag.tag|purify,
                                     'attributes': {
                                         'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
@@ -579,7 +579,7 @@
                     <div class="d-flex fw-wrap gap-xs">
                     {% for tag in firstEightTags %}
                         <div id="tagLabel{{ tag.id }}">
-                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
+                            {% include '@MauticCore/Components/tag.html.twig' with {'tags': [{
                                 'label': tag.tag|purify,
                                 'attributes': {
                                     'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
@@ -598,7 +598,7 @@
                 <div class="d-flex fw-wrap gap-xs mt-xs">
                     {% for tag in remainingTags %}
                         <div id="tagLabel{{ tag.id }}">
-                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
+                            {% include '@MauticCore/Components/tag.html.twig' with {'tags': [{
                                 'label': tag.tag|purify,
                                 'attributes': {
                                     'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
@@ -673,7 +673,7 @@
                                     },
                                     'color': cycle(classes, key)
                                 } %}
-                                {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tag]} %}
+                                {% include '@MauticCore/Components/tag.html.twig' with {'tags': [tag]} %}
                             {% endfor %}
                         </div>
                     {% endset %}
@@ -695,7 +695,7 @@
                                 },
                                 'color': cycle(classes, key)
                             } %}
-                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tag]} %}
+                            {% include '@MauticCore/Components/tag.html.twig' with {'tags': [tag]} %}
                         {% endfor %}
                         </div>
                     {% endset %}
@@ -711,7 +711,7 @@
                                 },
                                 'color': cycle(classes, key + 8)
                             } %}
-                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tag]} %}
+                            {% include '@MauticCore/Components/tag.html.twig' with {'tags': [tag]} %}
                         {% endfor %}
                         </div>
                     {% endset %}

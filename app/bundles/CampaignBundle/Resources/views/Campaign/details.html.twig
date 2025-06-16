@@ -42,7 +42,7 @@
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
   
   {% if campaign.allowRestart is defined and campaign.allowRestart == 1 %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
+    {% include '@MauticCore/Components/tag.html.twig' with {
         tags: [{
             label: 'mautic.campaign.allow_restart'|trans,
             icon: 'ri-restart-fill',
