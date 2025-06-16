@@ -11,7 +11,7 @@
 {% block headerTitle %}
   {% if lead.id %}
     {{ 'mautic.lead.lead.header.edit'|trans({
-          '%name%': lead.primaryIdentifier|trans,
+          '%name%': floodlight_lead_name(lead) ?: lead.primaryIdentifier|trans,
     }) }}
   {% else %}
     {{ 'mautic.lead.lead.header.new'|trans }}

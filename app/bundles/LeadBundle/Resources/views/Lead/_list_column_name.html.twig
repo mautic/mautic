@@ -7,7 +7,7 @@
                 }) }}
             </div>
         {% endif %}
-        {% set primaryIdentifier = item.isAnonymous ? item.primaryIdentifier|trans : item.primaryIdentifier|purify %}
+        {% set primaryIdentifier = floodlight_lead_name(item) ?: (item.isAnonymous ? item.primaryIdentifier|trans : item.primaryIdentifier|purify) %}
         <div>
             {{ primaryIdentifier }}
         </div>

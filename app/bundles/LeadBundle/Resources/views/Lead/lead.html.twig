@@ -8,7 +8,7 @@
 {% block mauticContent %}lead{% endblock %}
 
 {% set isAnonymous = lead.isAnonymous %}
-{% set leadName = lead.isAnonymous ? lead.primaryIdentifier|trans : lead.primaryIdentifier %}
+{% set leadName = floodlight_lead_name(lead) ?: (lead.isAnonymous ? lead.primaryIdentifier|trans : lead.primaryIdentifier) %}
 {% set avatar %}
   {% if not isAnonymous %}
     <span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="{{ leadGetAvatar(lead) }}" alt="" /></span>
