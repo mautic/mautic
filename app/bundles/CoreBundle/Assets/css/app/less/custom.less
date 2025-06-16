@@ -561,3 +561,27 @@ code:hover > .copy-icon {
 
   i { opacity: 1; }
 }
+
+.modal.fade .modal-dialog {
+  -webkit-transform: scale(0.95);
+  -ms-transform: scale(0.95);
+  -o-transform: scale(0.95);
+  transform: scale(0.95);
+  .transition(transform var(--duration-productive) var(--easing-standard-productive));
+}
+
+.modal.in .modal-dialog {
+  -webkit-transform: translate(0, 0);
+  -ms-transform: translate(0, 0);
+  -o-transform: translate(0, 0);
+  transform: translate(0, 0) scale(1);
+}
+
+@keyframes modal-fade {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.modal.fade .modal-dialog {
+  animation: modal-fade var(--duration-productive) var(--easing-standard-productive);
+}
