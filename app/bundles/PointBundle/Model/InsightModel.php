@@ -124,23 +124,18 @@ class InsightModel extends FormModel
 
         $winner = $results[0];
         $maxScore = (int) $winner['score'];
-        
-        // Alle Gruppen sind 0 - nichts tun
+
         if ($maxScore === 0) {
             return;
         }
 
-        // Check ob es mehrere Gewinner gibt (zweiter Eintrag hat gleiche Score)
         $hasMultipleWinners = isset($results[1]) && (int) $results[1]['score'] === $maxScore;
-        
         $currentValue = $contact->getFieldValue($customField);
-        
-        // Mehrere Gewinner - Custom Field nur setzen wenn leer
+
         if ($hasMultipleWinners && !empty($currentValue)) {
-            return; // Bestehenden Wert beibehalten
+            return;
         }
 
-        // Gewinner setzen (Format: "12 (Name)")
         $newValue = $winner['id'] . ' (' . $winner['name'] . ')';
         $this->updateCustomField($contact, $customField, $newValue);
     }

@@ -90,6 +90,20 @@ return [
                 'controller' => 'Mautic\PointBundle\Controller\Api\PointGroupsApiController::adjustGroupPointsAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_pointinsight_types' => [
+                'path'       => '/points/insights/types',
+                'controller' => 'Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::getPointInsightTypesAction',
+            ],
+            'mautic_api_pointinsightsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'insights',
+                'path'            => '/points/insights',
+                'controller'      => Mautic\PointBundle\Controller\Api\PointInsightApiController::class,
+            ],
+            'mautic_api_getpointinsighttypes' => [
+                'path'       => '/points/insights/types',
+                'controller' => 'Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::getPointInsightTypesAction',
+            ],
         ],
     ],
 

@@ -99,6 +99,31 @@ class PointInsight extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage.
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
+    {
+        $metadata->setGroupPrefix('pointInsight')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'category',
+                    'description',
+                ]
+            )
+            ->addProperties(
+                [
+                    'insightType',
+                    'insightAction', 
+                    'customField',
+                    'pointGroups',
+                ]
+            )
+            ->build();
+    }
+
+    /**
      * @return int
      */
     public function getId()

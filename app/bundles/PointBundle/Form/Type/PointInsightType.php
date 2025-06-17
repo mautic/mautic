@@ -17,9 +17,16 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 
 class PointInsightType extends AbstractType
 {
+    public function __construct(
+        private FieldModel $fieldModel,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -75,6 +82,7 @@ class PointInsightType extends AbstractType
                 ],
                 'required'    => true,
                 'placeholder' => 'mautic.core.form.chooseone',
+                'data'        => 'compare_point_groups',
             ]
         );
 
@@ -112,12 +120,13 @@ class PointInsightType extends AbstractType
                 ],
                 'required'    => true,
                 'placeholder' => 'mautic.core.form.chooseone',
+                'data'        => 'set_custom_field',
             ]
         );
 
         $builder->add(
             'customField',
-            LeadFieldsType::class,
+            ChoiceType::class,
             [
                 'label'      => 'mautic.point.insight.customfield',
                 'label_attr' => ['class' => 'control-label'],
@@ -126,10 +135,16 @@ class PointInsightType extends AbstractType
                     'data-placeholder' => 'mautic.core.form.chooseone',
                 ],
                 'required'    => false,
-                'with_company_fields' => false,
-                'with_tags'   => false,
-                'with_utm'    => false,
                 'placeholder' => 'mautic.core.form.chooseone',
+                'choices'     => ArrayHelper::flipArray($this->fieldModel->getFieldList(
+                    true,
+                    true,
+                    [
+                        'isPublished' => true,
+                        'object'      => 'lead',
+                        'type'        => 'text'
+                    ]
+                )),
             ]
         );
 
