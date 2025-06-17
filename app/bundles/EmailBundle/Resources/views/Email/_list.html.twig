@@ -89,8 +89,19 @@
                             }) %}
                         {% endif %}
 
-                        {% set customButtons = ('list' == type) ? [sendButton] : [] %}
+                        {% set previewButton = {
+                            'attr': {
+                                'class': 'btn btn-ghost btn-sm btn-nospin',
+                                'href': url('mautic_email_preview', {'objectId': item.getId()}),
+                                'target': '_blank',
+                                'data-toggle': '',
+                            },
+                            'iconClass': 'ri-external-link-line',
+                            'btnText': 'mautic.core.open_link'|trans,
+                            'priority': 100
+                        } %}
 
+                        {% set customButtons = ('list' == type) ? [sendButton, previewButton] : [previewButton] %}
 
                         {{- include('@MauticCore/Helper/list_actions.html.twig', {
                             'item'            : item,

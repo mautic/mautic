@@ -236,13 +236,26 @@
       <div class="col-md-3 bdr-l height-auto">
           <!-- form HTML -->
           <div class="pa-md">
-              <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
-                  <div class="panel-body">
-                      <h5 class="fw-sb mb-sm">{{ 'mautic.focus.install.header'|trans }}</h5>
-                      <p class="mb-sm">{{ 'mautic.focus.install.description'|trans }}</p>
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
-                  </div>
-              </div>
+              {% set aboveFoldContent %}
+                  <h4 class="mb-lg fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
+                  {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                      pictogram: 'embed',
+                      size: 64,
+                      color: 'var(--icon-interactive)'
+                  } %}
+              {% endset %}
+
+              {% set belowFoldContent %}
+                  <p class="mt-lg mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
+                  <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
+              {% endset %}
+
+              {{ include('@MauticCore/Components/tile--expandable-interactive.html.twig', {
+                  'tiles': [{
+                      'aboveFoldContent': aboveFoldContent,
+                      'belowFoldContent': belowFoldContent
+                  }]
+              }) }}
           </div>
           <!--/ form HTML -->
 

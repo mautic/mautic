@@ -14,11 +14,14 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
+    use SegmentFilterIconTrait;
+
     public function __construct(
         private OperatorOptions $operatorOptions,
         private LeadFieldRepository $leadFieldRepository,
@@ -78,6 +81,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'properties' => $properties,
                     'object'     => $field->getObject(),
                     'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
+                    'iconClass'  => $this->getSegmentFilterIcon($field->getAlias()),
                 ]
             );
         });
@@ -96,6 +100,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
+                'iconClass'  => $this->getSegmentFilterIcon('leadlist'),
             ]
         );
 
@@ -310,6 +315,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($staticFields as $alias => $fieldOptions) {
+            $fieldOptions['iconClass'] = $this->getSegmentFilterIcon($alias);
             $event->addChoice('lead', $alias, $fieldOptions);
         }
     }
@@ -579,6 +585,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($choices as $alias => $fieldOptions) {
+            $fieldOptions['iconClass'] = $this->getSegmentFilterIcon($alias);
             $event->addChoice('behaviors', $alias, $fieldOptions);
         }
     }
