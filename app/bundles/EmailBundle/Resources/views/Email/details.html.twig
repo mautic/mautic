@@ -337,6 +337,39 @@
 
               <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
                   <div class="tab-pane active bdr-w-0" id="stats-container">
+                    {% if securityIsGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.email.stat.sent',
+                                'value': email.getSentCount(true),
+                                'tooltip': 'mautic.email.stat.sent.tooltip',
+                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_sent'|trans) ~ ':' ~ email.getId()}),
+                                'icon': 'ri-mail-unread-line'
+                            },
+                            {
+                                'title': 'mautic.email.stat.read',
+                                'value': email.getReadCount(true),
+                                'desc': email.getReadPercentage(true) ~ '%',
+                                'tooltip': 'mautic.email.stat.read.tooltip',
+                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_read'|trans) ~ ':' ~ email.getId()}),
+                                'icon': 'ri-mail-open-line'
+                            },
+                            {
+                                'title': 'mautic.email.stat.queued',
+                                'value': email.getQueuedCount(),
+                                'tooltip': 'mautic.email.stat.queued.tooltip',
+                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_queued'|trans) ~ ':' ~ email.getId()}),
+                                'icon': 'ri-mail-send-line'
+                            },
+                            {
+                                'title': 'mautic.email.stat.pending',
+                                'value': email.getPendingCount(),
+                                'tooltip': 'mautic.email.stat.leadcount.tooltip',
+                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_pending'|trans) ~ ':' ~ email.getId()}),
+                                'icon': 'ri-more-fill'
+                            }
+                        ]}) }}
+                    {% endif %}
                       <div id="emailGraphStats"
                            data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
                       >
@@ -528,37 +561,6 @@
 
           <!-- activity feed -->
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
-
-          <div class="mt-lg mb-lg">
-            {% if securityIsGranted('lead:leads:viewown') %}
-            {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
-              title: 'mautic.core.useful_links',
-              items: [
-                  {
-                      label: 'mautic.lead.lead.contacts.email_sent'|trans,
-                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_sent'|trans) ~ ':' ~ email.id}),
-                      icon: 'ri-mail-send-line'
-                  },
-                  {
-                      label: 'mautic.lead.lead.contacts.email_read'|trans,
-                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_read'|trans) ~ ':' ~ email.id}),
-                      icon: 'ri-mail-open-line'
-                  },
-                  {
-                      label: 'mautic.lead.lead.contacts.email_queued'|trans,
-                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_queued'|trans) ~ ':' ~ email.id}),
-                      icon: 'ri-time-line'
-                  },
-                  {
-                      label: 'mautic.lead.lead.contacts.email_pending'|trans,
-                      link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_pending'|trans) ~ ':' ~ email.id}),
-                      icon: 'ri-mail-unread-line'
-                  }
-              ]
-          } %}
-          {% endif %}
-        </div>
-
       </div>
       <!-- right section -->
       <input name="entityId" id="entityId" type="hidden" value="{{ email.id|escape }}"/>

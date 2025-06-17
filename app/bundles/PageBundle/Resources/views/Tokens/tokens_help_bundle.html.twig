@@ -1,4 +1,4 @@
-<h4 class="mt-lg fw-sb pa-md">{{'mautic.placeholder_tokens.landing_page_tokens'|trans}}</h4>
+{% set childContainer %}
 <p class="text-secondary pi-md">{{'mautic.placeholder_tokens.landing_page_tokens.explanation'|trans}}</p>
 <ul id="pageTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
   <!-- Landing Page tokens -->
@@ -133,3 +133,6 @@
     </div>
   </li>
 </ul>
+{% endset %}
+
+{% include '@MauticCore/Components/content-section.html.twig' with {'heading': 'mautic.placeholder_tokens.landing_page_tokens', 'childContainer': childContainer} %}
