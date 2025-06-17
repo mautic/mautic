@@ -21,23 +21,27 @@ This document contains a list of maintainers in this repo. See [mautic/.github/M
 
 ## Current maintainers
 
-| Maintainer | GitHub ID | Affiliation |
-| John Linhart | @escopecz | Acquia |
-| Zdeno Kuzmany | @kuzmany | Webmecanik |
-| Norman Pracht | @npracht | Webmecanik |
-| Martin Vooremäe | @matbcvo | UpScale |
-| Renato Castro | @cibero42 | Independent | 
+| Maintainer       | GitHub ID | Affiliation  |
+|------------------|-----------|--------------|
+| John Linhart     | @escopecz | Acquia       |
+| Zdeno Kuzmany    | @kuzmany  | Webmecanik   |
+| Norman Pracht    | @npracht  | Webmecanik   |
+| Martin Vooremäe  | @matbcvo  | UpScale      |
+| Renato Castro    | @cibero42 | Independent  |
+
 
 ## Honor roll
-| Maintainer | GitHub ID | Affiliation |
-| DB Hurley | @dbhurley | Mautic |
-| Don Gilbert | @dongilbert | Acquia |
-| Alan Hartless | @alanhartless | Acquia |
-| Abu Musa | @mabumusa1 | Steer Campaign |
-| Luiz Eduardo | @luizeof | Powertic |
-| Mattias Michaux | @mollux | Dropsolid |
-| Mohit Aghera | @mohit-rocks | Independent |
-| Dennis Ameling | @dennisameling | Independent |
+| Maintainer      | GitHub ID      | Affiliation     |
+|-----------------|----------------|-----------------|
+| DB Hurley       | @dbhurley      | Mautic          |
+| Don Gilbert     | @dongilbert    | Acquia          |
+| Alan Hartless   | @alanhartless  | Acquia          |
+| Abu Musa        | @mabumusa1     | Steer Campaign  |
+| Luiz Eduardo    | @luizeof       | Powertic        |
+| Mattias Michaux | @mollux        | Dropsolid       |
+| Mohit Aghera    | @mohit-rocks   | Independent     |
+| Dennis Ameling  | @dennisameling | Independent     |
+
 
 ## Contributors
 
