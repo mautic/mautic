@@ -54,6 +54,11 @@ class PointInsightType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'isPublished',
+            YesNoButtonGroupType::class
+        );
+
         $insightTypes = [
             'mautic.point.insight.compare_point_groups' => 'compare_point_groups',
         ];
