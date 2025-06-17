@@ -22,9 +22,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
     private $uploadDir = __DIR__.'/DummyFiles';
 
-    /**
-     * @testdox Uploader uploads files correctly
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUploadFiles(): void
     {
         $fileUploaderMock         = $this->createMock(FileUploader::class);
@@ -95,13 +93,13 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $fileUploaderMock->expects($matcher)
             ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($path1, $parameters[0]);
                     $this->assertSame($file1Mock, $parameters[1]);
 
                     return 'upload1.jpg';
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($path2, $parameters[0]);
                     $this->assertSame($file2Mock, $parameters[1]);
 
@@ -120,9 +118,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $submission->getResults());
     }
 
-    /**
-     * @testdox Uploader delete uploaded file if anz error occures
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Uploader delete uploaded file if anz error occures')]
     public function testUploadFilesWithError(): void
     {
         $fileUploaderMock         = $this->createMock(FileUploader::class);
@@ -185,13 +181,13 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $fileUploaderMock->expects($matcher)
             ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($path1, $parameters[0]);
                     $this->assertSame($file1Mock, $parameters[1]);
 
                     return 'upload1.jpg';
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($path2, $parameters[0]);
                     $this->assertSame($file2Mock, $parameters[1]);
                     throw new FileUploadException();
@@ -216,9 +212,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $submission->getResults());
     }
 
-    /**
-     * @testdox Uploader do nothing if no files for upload provided
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Uploader do nothing if no files for upload provided')]
     public function testNoFilesUploadFiles(): void
     {
         $fileUploaderMock = $this->createMock(FileUploader::class);
@@ -239,9 +233,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $formUploader->uploadFiles($filesToUpload, $submission);
     }
 
-    /**
-     * @testdox Uploader returs correct path for file
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Uploader returs correct path for file')]
     public function testGetCompleteFilePath(): void
     {
         $fileUploaderMock = $this->createMock(FileUploader::class);
@@ -278,9 +270,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->uploadDir.'/1/fieldId1/fileName', $actual);
     }
 
-    /**
-     * @testdox Uploader delete files correctly
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Uploader delete files correctly')]
     public function testDeleteAllFilesOfFormField(): void
     {
         $fileUploaderMock = $this->createMock(FileUploader::class);

@@ -13,9 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class EmailSubscriberTest extends TestCase
 {
-    /**
-     * @dataProvider onEmailAddressReplacementProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('onEmailAddressReplacementProvider')]
     public function testOnEmailAddressReplacement(string $value, string $expected): void
     {
         $contact = new Lead();

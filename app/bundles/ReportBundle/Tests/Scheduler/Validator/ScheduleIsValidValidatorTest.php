@@ -16,19 +16,13 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoSchedule(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
-        $report = $this->getMockBuilder(Report::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $report = $this->createMock(Report::class);
 
         $report->expects($this->once())
             ->method('isScheduled')
@@ -47,21 +41,13 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testNoEmailProvided(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
-        $executionContextInterfaceMock = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 
-        $constraintViolationBuilderInterfaceMock = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
         $executionContextInterfaceMock->expects($this->once())
             ->method('buildViolation')
@@ -91,13 +77,9 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidDailySchedule(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
@@ -123,13 +105,9 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidWeeklySchedule(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
@@ -155,13 +133,9 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidMonthlySchedule(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
@@ -187,21 +161,13 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidScheduler(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
-        $executionContextInterfaceMock = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 
-        $constraintViolationBuilderInterfaceMock = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
         $executionContextInterfaceMock->expects($this->once())
             ->method('buildViolation')
@@ -235,21 +201,13 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidEvent(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
-        $executionContextInterfaceMock = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 
-        $constraintViolationBuilderInterfaceMock = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
         $executionContextInterfaceMock->expects($this->once())
             ->method('buildViolation')
@@ -285,21 +243,13 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testNotSupportedScheduleType(): void
     {
-        $schedulerBuilderMock = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintMock = $this->createMock(Constraint::class);
 
-        $executionContextInterfaceMock = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 
-        $constraintViolationBuilderInterfaceMock = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
         $executionContextInterfaceMock->expects($this->once())
             ->method('buildViolation')

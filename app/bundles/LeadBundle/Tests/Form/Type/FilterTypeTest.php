@@ -71,7 +71,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
                 /** @var FormInterface<FormBuilderInterface>&MockObject $form */
                 $form = $this->createMock(FormInterface::class);
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
                     $callback = function (callable $formModifier) use ($form) {
                         $data = [
@@ -87,7 +87,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                     };
                     $callback($parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
                     $callback = function (callable $formModifier) use ($form) {
                         $data = [
@@ -143,7 +143,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
         // Adding a filter with an existing field:
         $builder->expects($matcher)
             ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
                     $callback = function (callable $formModifier) {
                         $form = new class extends Form {
@@ -208,7 +208,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                     };
                     $callback($parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
                 }
 

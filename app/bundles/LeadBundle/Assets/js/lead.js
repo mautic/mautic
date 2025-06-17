@@ -446,6 +446,9 @@ Mautic.attachJsUiOnFilterForms = function() {
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
         }
+        mQuery('.chosen-search-input').on('keypress', function (event) {
+            if ( event.which === 13 ) event.preventDefault();
+        })
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -547,9 +550,7 @@ Mautic.convertLeadFilterInput = function(el) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
 
-        mQuery('#leadlist_filters_' + filterNum + '_properties_filter').on('keypress', function (event) {
-            if ( event.which === 13 ) event.preventDefault();
-        })
+        Mautic.ajaxifyForm('leadlist');
 
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
@@ -637,7 +638,6 @@ Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, r
 Mautic.addLeadListFilter = function (elId, elObj) {
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
-    var label = filterOption.text();
 
     // Create a new filter
 
@@ -645,6 +645,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     var prototypeStr = mQuery('.available-filters').data('prototype');
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
+    var label = filterOption.data('field-label');
 
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
     prototypeStr = prototypeStr.replace(/__label__/g, label);
@@ -666,11 +667,9 @@ Mautic.addLeadListFilter = function (elId, elObj) {
         prototype.find(".panel-heading .panel-glue").addClass('hide');
     }
 
-    if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
-    } else {
-        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
-    }
+    const filterTypeIcon = filterOption.data('field-icon');
+    prototype.find('.object-icon').removeClass('ri-shapes-line').addClass(filterTypeIcon);
+
     prototype.find(".inline-spacer").append(fieldObject);
 
     Mautic.segmentFilter().attachEvents(prototype);
@@ -1634,13 +1633,9 @@ Mautic.updateFilterPositioning = function (el) {
 Mautic.setAsPrimaryCompany = function (companyId,leadId){
     Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
         if (response.success) {
-            if (response.oldPrimary == response.newPrimary && mQuery('#company-' + response.oldPrimary).hasClass('primary')) {
-                mQuery('#company-' + response.oldPrimary).removeClass('primary');
-            } else {
-                mQuery('#company-' + response.oldPrimary).removeClass('primary');
-                mQuery('#company-' + response.newPrimary).addClass('primary');
-            }
-
+            // Update the company icon
+            mQuery('.panel-companies .ri-user-star-fill').removeClass('ri-user-star-fill');
+            mQuery('.panel-companies .contained-list-item__content[href$="/' + response.newPrimary + '"]').find('i').addClass('ri-user-star-fill');
         }
     });
 };

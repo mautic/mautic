@@ -362,12 +362,12 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->validator->expects($matcher)->method('validate')->willReturnCallback(function (...$parameters) use ($matcher, $data, $mockValidation) {
-            if (1 === $matcher->getInvocationCount()) {
+            if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame($data['email'], $parameters[0]);
 
                 return new ConstraintViolationList([]);
             }
-            if (2 === $matcher->getInvocationCount()) {
+            if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame($data['password'], $parameters[0]);
 
                 return new ConstraintViolationList([$mockValidation]);

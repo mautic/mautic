@@ -35,9 +35,7 @@ class CreateCustomFieldCommandTest extends TestCase
         $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
     }
 
-    /**
-     * @dataProvider completeRunMethodProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('completeRunMethodProvider')]
     public function testCompleteRunMethodIsCalled(bool $checkRunStatusResult, int $completeRunExpected): void
     {
         $command = $this->getMockBuilder(CreateCustomFieldCommand::class)

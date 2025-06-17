@@ -132,7 +132,7 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- form detail header -->
-            {% include '@MauticCore/Helper/description.html.twig' with {'description': activeForm.description} %}
+            {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': activeForm.description} %}
             <!--/ form detail header -->
 
             <!-- form detail collapseable -->
@@ -142,14 +142,6 @@
                         <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeForm}) }}
-                            <tr>
-                                <td width="20%">
-                                    <span class="fw-b">{{ 'mautic.form.stats.submission_counts'|trans }}</span>
-                                </td>
-                                <td>
-                                    {{ submissionCounts['unique'] }} / {{ submissionCounts['total'] }}
-                                </td>
-                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -173,6 +165,20 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.form.stats.submission_counts.total',
+                                'value': submissionCounts['total'],
+                                'tooltip': 'mautic.form.stats.submission_counts.total.desc',
+                                'link': path('mautic_form_action', {'objectAction': 'results', 'objectId': activeForm.id}),
+                            },
+                            {
+                                'title': 'mautic.form.stats.submission_counts.unique',
+                                'value': submissionCounts['unique'],
+                                'tooltip': 'mautic.form.stats.submission_counts.unique.desc',
+                                'icon': 'ri-user-6-line'
+                            }
+                        ]}) }}
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-6 va-m">
@@ -281,37 +287,52 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
         <div class="pa-md">
-            <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
-                <div class="panel-body">
-                    <h5 class="fw-sb mb-sm">{{ 'mautic.form.form.header.copy'|trans }}</h5>
-                    <p class="mb-sm">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
-                    {% include '@MauticCore/Helper/button.html.twig' with {
-                        buttons: [
-                            {
-                                label: 'mautic.form.form.header.embedded',
-                                variant: 'info',
-                                size: 'sm',
-                                href: '#',
-                                attributes: {
-                                    'data-toggle': 'modal',
-                                    'data-target': '#modal-automatic-copy'
-                                }
-                            },
-                            {
-                                label: 'mautic.form.form.header.selfhosted',
-                                variant: 'info',
-                                size: 'sm',
-                                href: '#',
-                                attributes: {
-                                    'data-toggle': 'modal',
-                                    'data-target': '#modal-manual-copy'
-                                }
-                            }
-                        ]
-                    } %}
+            {% set aboveFoldContent %}
+                <h4 class="fw-b mb-lg">{{ 'mautic.form.form.header.copy'|trans }}</h4>
+                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    pictogram: 'embed',
+                    size: 64,
+                    color: 'var(--icon-interactive)'
+                } %}
+            {% endset %}
 
-                </div>
-            </div>
+            {% set belowFoldContent %}
+                <h5 class="mt-lg fw-b">{{ 'mautic.form.form.header.landingpages'|trans }}</h5>
+                <p class="mt-xs mb-lg">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
+                <h5 class="mt-lg mb-sm fw-b">{{ 'mautic.form.form.header.external_cms'|trans }}</h5>
+                {% include '@MauticCore/Helper/button.html.twig' with {
+                    buttons: [
+                        {
+                            label: 'mautic.form.form.header.embedded',
+                            variant: 'tertiary',
+                            size: 'sm',
+                            wide: true,
+                            attributes: {
+                                'data-toggle': 'modal',
+                                'data-target': '#modal-automatic-copy'
+                            }
+                        },
+                        {
+                            label: 'mautic.form.form.header.selfhosted',
+                            variant: 'tertiary',
+                            size: 'sm',
+                            wide: true,
+                            attributes: {
+                                'data-toggle': 'modal',
+                                'data-target': '#modal-manual-copy',
+                                'class': 'ml-0'
+                            }
+                        }
+                    ]
+                } %}
+            {% endset %}
+
+            {{ include('@MauticCore/Components/tile--expandable-interactive.html.twig', {
+                'tiles': [{
+                    'aboveFoldContent': aboveFoldContent,
+                    'belowFoldContent': belowFoldContent
+                }]
+            }) }}
         </div>
         <!--/ form HTML -->
 

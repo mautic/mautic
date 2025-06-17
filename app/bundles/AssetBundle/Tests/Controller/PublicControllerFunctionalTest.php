@@ -3,9 +3,9 @@
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Download;
-use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
+use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 
-class PublicControllerFunctionalTest extends AbstractAssetTest
+class PublicControllerFunctionalTest extends AbstractAssetTestCase
 {
     /**
      * Download action should return the file content.

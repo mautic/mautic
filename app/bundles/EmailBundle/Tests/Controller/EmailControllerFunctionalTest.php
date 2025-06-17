@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
@@ -453,9 +454,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($firstEmail->getId(), $secondEmail->getVariantParent()->getId());
     }
 
-    /**
-     * @dataProvider dwcTokenTypeDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dwcTokenTypeDataProvider')]
     public function testSaveEmailWithHtmlTypeDWC(string $type): void
     {
         $dwc            = $this->createDynamicContent($type);
@@ -483,10 +482,33 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, string[]>
      */
-    public function dwcTokenTypeDataProvider(): iterable
+    public static function dwcTokenTypeDataProvider(): iterable
     {
         yield 'text' => [TypeList::TEXT];
         yield 'html' => [TypeList::HTML];
+    }
+
+    public function testEmailWithProject(): void
+    {
+        $email = $this->createEmail('Email', 'Subject', 'template', 'blank', 'html');
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['emailform[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedEmail = $this->em->find(Email::class, $email->getId());
+        Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
     }
 
     private function createSegment(string $name, string $alias): LeadList

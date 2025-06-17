@@ -102,9 +102,7 @@ class PeakInteractionTimerTest extends TestCase
             ->willReturn(true);
     }
 
-    /**
-     * @dataProvider defaultDateTimeWithTimezoneProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('defaultDateTimeWithTimezoneProvider')]
     public function testGetDefaultOptimalTime(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
@@ -150,9 +148,7 @@ class PeakInteractionTimerTest extends TestCase
         yield ['2024-03-12 11:00:00', '2024-03-12 11:00:00', null];
     }
 
-    /**
-     * @dataProvider defaultDateTimeAndDayWithTimezoneProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('defaultDateTimeAndDayWithTimezoneProvider')]
     public function testGetDefaultOptimalTimeAndDay(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
@@ -210,9 +206,8 @@ class PeakInteractionTimerTest extends TestCase
      * @param array<int, array<string, string|\DateTime|\DateInterval>> $emailReads
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
      * @param array<int, array<string, string|\DateTime>>               $formSubmissions
-     *
-     * @dataProvider getOptimalTimeDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeDataProvider')]
     public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createMock(Lead::class);
@@ -307,9 +302,8 @@ class PeakInteractionTimerTest extends TestCase
      * @param array<int, array<string, string|\DateTime|\DateInterval>> $emailReads
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
      * @param array<int, array<string, string|\DateTime>>               $formSubmissions
-     *
-     * @dataProvider getOptimalTimeAndDayDataProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeAndDayDataProvider')]
     public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createMock(Lead::class);

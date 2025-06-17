@@ -43,7 +43,7 @@ final class FormFieldNumberTypeTest extends TypeTestCase
 
         $this->formBuilder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('placeholder', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
                     $this->assertSame([
@@ -53,7 +53,7 @@ final class FormFieldNumberTypeTest extends TypeTestCase
                         'required'   => false,
                     ], $parameters[2]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('precision', $parameters[0]);
                     $this->assertSame(IntegerType::class, $parameters[1]);
                     $this->assertSame([

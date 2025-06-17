@@ -11,9 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class TimezoneResolverTest extends TestCase
 {
-    /**
-     * @dataProvider dataTimezones
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataTimezones')]
     public function testTimezones(?string $configuredTimezone, string $expectedTimezone): void
     {
         $coreParametersHelper = new class($configuredTimezone) extends CoreParametersHelper {
@@ -39,7 +37,7 @@ final class TimezoneResolverTest extends TestCase
     /**
      * @return iterable<string, array<?string>>
      */
-    public function dataTimezones(): iterable
+    public static function dataTimezones(): iterable
     {
         yield 'Default timezone' => [null, 'UTC'];
         yield 'UTC timezone'     => ['UTC', 'UTC'];

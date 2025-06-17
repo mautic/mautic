@@ -12,25 +12,18 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(UploadFieldValidator::class)]
 class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox No Files given
-     *
-     * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('No Files given')]
     public function testNoFilesGiven(): void
     {
-        $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fileUploadValidatorMock = $this->createMock(FileUploadValidator::class);
 
         $fileUploadValidatorMock->expects($this->never())
             ->method('validate');
 
-        $parameterBagMock = $this->getMockBuilder(ParameterBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameterBagMock = $this->createMock(ParameterBag::class);
 
         $parameterBagMock->expects($this->once())
             ->method('get')
@@ -49,28 +42,18 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->processFileValidation($field, $request);
     }
 
-    /**
-     * @testdox Exception should be thrown when validation fails
-     *
-     * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Exception should be thrown when validation fails')]
     public function testValidationFailed(): void
     {
-        $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fileUploadValidatorMock = $this->createMock(FileUploadValidator::class);
 
         $fileUploadValidatorMock->expects($this->once())
             ->method('validate')
             ->willThrowException(new FileInvalidException('Validation failed'));
 
-        $parameterBagMock = $this->getMockBuilder(ParameterBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameterBagMock = $this->createMock(ParameterBag::class);
 
-        $fileMock = $this->getMockBuilder(UploadedFile::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fileMock = $this->createMock(UploadedFile::class);
 
         $files = [
             'file' => $fileMock,
@@ -99,27 +82,17 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->processFileValidation($field, $request);
     }
 
-    /**
-     * @testdox No validation error
-     *
-     * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('No validation error')]
     public function testFileIsValid(): void
     {
-        $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fileUploadValidatorMock = $this->createMock(FileUploadValidator::class);
 
         $fileUploadValidatorMock->expects($this->once())
             ->method('validate');
 
-        $parameterBagMock = $this->getMockBuilder(ParameterBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameterBagMock = $this->createMock(ParameterBag::class);
 
-        $fileMock = $this->getMockBuilder(UploadedFile::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fileMock = $this->createMock(UploadedFile::class);
 
         $files = [
             'file' => $fileMock,

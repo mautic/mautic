@@ -18,7 +18,7 @@
 
 {% block content %}
     {% if isIndex %}
-        <div id="page-list-wrapper" class="panel panel-default">
+        <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'searchHelp'  : 'mautic.api.client.help.searchcommands',
@@ -34,6 +34,7 @@
 {% endblock %}
 
 {% block listResults %}
+{% if items|length > 0 %}
 <div class="table-responsive panel-collapse pull out page-list">
     <table class="table table-hover client-list">
         <thead>
@@ -116,4 +117,27 @@
         }) -}}
     </div>
 </div>
+{% else %}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'api',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.api.client.contentblock.heading',
+                subheading: 'mautic.api.client.contentblock.subheading',
+                copy: 'mautic.api.client.contentblock.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
+{% endif %}
 {% endblock %}

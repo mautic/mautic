@@ -121,8 +121,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testMergeFieldDataWithLoserAsNewlyUpdated(): void
     {
-        $winner = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $winner = $this->createMock(Lead::class);
         $winner->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -133,8 +132,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $loser = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $loser = $this->createMock(Lead::class);
         $loser->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -194,8 +192,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testMergeFieldDataWithWinnerAsNewlyUpdated(): void
     {
-        $winner = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $winner = $this->createMock(Lead::class);
         $winner->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -206,8 +203,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $loser = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $loser = $this->createMock(Lead::class);
         $loser->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -267,8 +263,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testMergeFieldDataWithLoserAsNewlyCreated(): void
     {
-        $winner = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $winner = $this->createMock(Lead::class);
         $winner->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -279,8 +274,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $loser = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $loser = $this->createMock(Lead::class);
         $loser->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -345,8 +339,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testMergeFieldDataWithWinnerAsNewlyCreated(): void
     {
-        $winner = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $winner = $this->createMock(Lead::class);
         $winner->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -357,8 +350,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $loser = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $loser = $this->createMock(Lead::class);
         $loser->expects($this->once())
             ->method('getProfileFields')
             ->willReturn(
@@ -462,17 +454,17 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $winner->expects($matcher)
             ->method('getFieldValue')
             ->willReturnCallback(function ($parameter) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('email', $parameter);
 
                     return 'winner@test.com';
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('consent', $parameter);
 
                     return 'Yes';
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('boolean', $parameter);
 
                     return 1;
@@ -483,7 +475,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $winner->expects($matcher2)
             ->method('getField')
             ->willReturnCallback(function ($parameter) use ($matcher2) {
-                if (1 === $matcher2->getInvocationCount()) {
+                if (1 === $matcher2->numberOfInvocations()) {
                     $this->assertSame('email', $parameter);
 
                     return [
@@ -497,7 +489,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                         'default_value' => null,
                     ];
                 }
-                if (2 === $matcher2->getInvocationCount()) {
+                if (2 === $matcher2->numberOfInvocations()) {
                     $this->assertSame('consent', $parameter);
 
                     return [
@@ -511,7 +503,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                         'default_value' => 'No',
                     ];
                 }
-                if (3 === $matcher2->getInvocationCount()) {
+                if (3 === $matcher2->numberOfInvocations()) {
                     $this->assertSame('boolean', $parameter);
 
                     return [
@@ -530,15 +522,15 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winner->expects($matcher3)
             ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher3) {
-                if (1 === $matcher3->getInvocationCount()) {
+                if (1 === $matcher3->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('winner@test.com', $parameters[1]);
                 }
-                if (2 === $matcher3->getInvocationCount()) {
+                if (2 === $matcher3->numberOfInvocations()) {
                     $this->assertSame('consent', $parameters[0]);
                     $this->assertSame('Yes', $parameters[1]);
                 }
-                if (3 === $matcher3->getInvocationCount()) {
+                if (3 === $matcher3->numberOfInvocations()) {
                     $this->assertSame('boolean', $parameters[0]);
                     $this->assertSame(1, $parameters[1]);
                 }
@@ -600,14 +592,12 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testFullMergeThrowsSameContactException(): void
     {
-        $winner = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $winner = $this->createMock(Lead::class);
         $winner->expects($this->once())
             ->method('getId')
             ->willReturn(1);
 
-        $loser = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $loser = $this->createMock(Lead::class);
         $loser->expects($this->once())
             ->method('getId')
             ->willReturn(1);
@@ -619,8 +609,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testFullMerge(): void
     {
-        $winner = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $winner = $this->createMock(Lead::class);
         $winner->expects($this->any())
             ->method('getId')
             ->willReturn(1);
@@ -637,8 +626,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->method('getDateModified')
             ->willReturn(new \DateTime('-30 minutes'));
 
-        $loser = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $loser = $this->createMock(Lead::class);
         $loser->expects($this->any())
             ->method('getId')
             ->willReturn(2);

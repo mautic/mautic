@@ -411,6 +411,10 @@
 
 .pi-16, .pi-md { padding-inline: var(--spacing-05) !important; }
 .mi-16, .mi-md { margin-inline: var(--spacing-05) !important; }
+.pi-neg-local { padding-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.mi-neg-local { margin-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.ma-neg-local { margin: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+
 
 //fixed widths
 .w-44 {width: 44px;}
@@ -534,6 +538,16 @@
 .gap-2 { gap: 2px !important; }
 .gap-1 { gap: 1px !important; }
 .gap-0 { gap: 0px !important; }
+
+.row-gap-20, .row-gap-lg { row-gap: 20px !important; }
+.row-gap-15, .row-gap-md { row-gap: 15px !important; }
+.row-gap-10, .row-gap-sm { row-gap: 10px !important; }
+.row-gap-5, .row-gap-xs { row-gap: 5px !important; }
+
+.column-gap-20, .column-gap-lg { column-gap: 20px !important; }
+.column-gap-15, .column-gap-md { column-gap: 15px !important; }
+.column-gap-10, .column-gap-sm { column-gap: 10px !important; }
+.column-gap-5, .column-gap-xs { column-gap: 5px !important; }
 
 @media (min-width: @screen-sm-min) {
   .fd-row-sm { flex-direction: row; }
@@ -669,6 +683,11 @@
   .fo-4-lg { order: 4; }
   .fo-5-lg { order: 5; }
 }
+
+// Aspect ratio
+.ar-16-9 { aspect-ratio: 16 / 9; }
+.ar-2-1 { aspect-ratio: 2 / 1; }
+.ar-1-1 { aspect-ratio: 1 / 1; }
 
 // Animations
 // Slide in

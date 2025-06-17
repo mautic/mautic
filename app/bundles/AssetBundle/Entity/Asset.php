@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -44,6 +45,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+    use ProjectTrait;
 
     /**
      * @var int|null
@@ -217,6 +219,11 @@ class Asset extends FormEntity implements UuidInterface
      */
     private $disallow = true;
 
+    public function __construct()
+    {
+        $this->initializeProjects();
+    }
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -283,6 +290,7 @@ class Asset extends FormEntity implements UuidInterface
             ->build();
 
         static::addUuidField($builder);
+        self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
 
     /**
@@ -317,6 +325,8 @@ class Asset extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'asset');
     }
 
     /**

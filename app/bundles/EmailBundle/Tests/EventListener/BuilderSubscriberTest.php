@@ -46,13 +46,9 @@ class BuilderSubscriberTest extends TestCase
      */
     private $translator;
 
-    /**
-     * @param array<mixed> $data
-     * @param int|string   $dataName
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public function __construct(?string $name = null)
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct($name);
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
@@ -72,9 +68,7 @@ class BuilderSubscriberTest extends TestCase
         $this->translator->method('trans')->willReturn('some translation');
     }
 
-    /**
-     * @dataProvider fixEmailAccessibilityContent
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fixEmailAccessibilityContent')]
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
         $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
@@ -99,7 +93,7 @@ class BuilderSubscriberTest extends TestCase
     /**
      * @return iterable<array<int,string>>
      */
-    public function fixEmailAccessibilityContent(): iterable
+    public static function fixEmailAccessibilityContent(): iterable
     {
         yield [
             '<html><head></head></html>',
@@ -176,44 +170,35 @@ class BuilderSubscriberTest extends TestCase
 
         $this->coreParametersHelper->expects($matcher)
             ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $unsubscribeTokenizedText) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('unsubscribe_text', $parameters[0]);
 
                     return $unsubscribeTokenizedText;
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('webview_text', $parameters[0]);
 
                     return 'Just a text';
                 }
-                if (3 === $matcher->getInvocationCount()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('default_signature_text', $parameters[0]);
 
                     return 'Signature';
                 }
-                if (4 === $matcher->getInvocationCount()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mailer_from_name', $parameters[0]);
 
                     return 'jan.kozak@acquia.com';
                 }
-                if (5 === $matcher->getInvocationCount()) {
+                if (5 === $matcher->numberOfInvocations()) {
                     $this->assertSame('brand_name', $parameters[0]);
 
                     return 'ACME';
                 }
             });
-        $matcher = $this->never();
 
-        $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $unsubscribeTokenizedText) {
-                if (1 === $matcher->getInvocationCount()) {
-                    $this->assertSame($unsubscribeTokenizedText, $parameters[0]);
-                }
-                if (2 === $matcher->getInvocationCount()) {
-                }
-
-                return $unsubscribeTokenizedText;
-            });
+        $this->translator->expects($this->never())
+            ->method('trans');
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(

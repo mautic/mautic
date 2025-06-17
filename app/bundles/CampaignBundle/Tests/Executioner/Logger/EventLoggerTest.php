@@ -97,12 +97,14 @@ class EventLoggerTest extends TestCase
                 [1 => ['rotation' => 1, 'manually_removed' => 0]],
             );
 
+        /** @var MockObject&Campaign $campaign */
         $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')->willReturnOnConsecutiveCalls([1, 1, 2]);
+        $campaign->method('getId')->willReturnOnConsecutiveCalls(1, 1, 1, 1, 2, 2);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getCampaign')->willReturn($campaign);
+        $event = new Event();
+        $event->setCampaign($campaign);
 
+        /** @var MockObject&Lead $contact */
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')->willReturn(1);
 

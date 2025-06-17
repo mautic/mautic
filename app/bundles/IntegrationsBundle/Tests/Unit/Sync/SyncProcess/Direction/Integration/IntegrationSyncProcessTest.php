@@ -200,11 +200,11 @@ class IntegrationSyncProcessTest extends TestCase
         $matcher          = $this->exactly(2);
         $this->syncDateHelper->expects($matcher)
             ->method('getSyncFromDateTime')->willReturnCallback(function (...$parameters) use ($matcher, $fromSyncDateTime) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(self::INTEGRATION_NAME, $parameters[0]);
                     $this->assertSame('Contact', $parameters[1]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(self::INTEGRATION_NAME, $parameters[0]);
                     $this->assertSame('Lead', $parameters[1]);
                 }

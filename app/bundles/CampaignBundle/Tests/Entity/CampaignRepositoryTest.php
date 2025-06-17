@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Entity;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -81,10 +80,10 @@ class CampaignRepositoryTest extends TestCase
             ->with('e.channelId IS NOT NULL')
             ->willReturn($this->queryBuilder);
 
-        $query = $this->getMockBuilder(AbstractQuery::class)
+        $query = $this->getMockBuilder(Query::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['setHydrationMode', 'getResult'])
-            ->getMockForAbstractClass();
+            ->getMock();
 
         $query->expects(self::once())
             ->method('setHydrationMode')

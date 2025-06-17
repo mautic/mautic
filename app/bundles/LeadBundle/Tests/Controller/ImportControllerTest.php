@@ -58,9 +58,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Some required fields are missing. You must map the field "Phone."', $crawler->html());
     }
 
-    /**
-     *  @dataProvider validateDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
     public function testImportMappingAndImport(string $skipIfExist, string $expectedName): void
     {
         $this->createLead('john@doe.email', 'Johny');
@@ -322,7 +320,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     /**
      * @return mixed[]
      */
-    public function validateDataProvider(): iterable
+    public static function validateDataProvider(): iterable
     {
         yield ['0', 'John'];
         yield ['1', 'Johny'];

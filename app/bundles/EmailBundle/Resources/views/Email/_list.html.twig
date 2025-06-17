@@ -74,7 +74,7 @@
                                 'data-toggle': 'ajax',
                                 'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
                             },
-                            'iconClass': 'ri-send-plane-line-o',
+                            'iconClass': 'ri-send-plane-line',
                             'btnText': 'mautic.email.send'
                         } %}
 
@@ -89,8 +89,19 @@
                             }) %}
                         {% endif %}
 
-                        {% set customButtons = ('list' == type) ? [sendButton] : [] %}
+                        {% set previewButton = {
+                            'attr': {
+                                'class': 'btn btn-ghost btn-sm btn-nospin',
+                                'href': url('mautic_email_preview', {'objectId': item.getId()}),
+                                'target': '_blank',
+                                'data-toggle': '',
+                            },
+                            'iconClass': 'ri-external-link-line',
+                            'btnText': 'mautic.core.open_link'|trans,
+                            'priority': 100
+                        } %}
 
+                        {% set customButtons = ('list' == type) ? [sendButton, previewButton] : [previewButton] %}
 
                         {{- include('@MauticCore/Helper/list_actions.html.twig', {
                             'item'            : item,
@@ -158,7 +169,7 @@
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
                           <i class="ri-mail-send-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
-                              {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
+                              {{ 'mautic.email.stat.queuedcount'|trans ({'%count%' : item.getQueuedCount()}) }}
                           </a>
                         </span>
                         <span class="mt-xs label label-blue" id="sent-count-{{ item.getId() }}">
@@ -201,5 +212,25 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'mail--verse',
+                        'size': '80'
+                    } %}
+                </div>                
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.email.contentblock.heading',
+                subheading: 'mautic.email.contentblock.subheading',
+                copy: 'mautic.email.contentblock.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

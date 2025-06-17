@@ -106,7 +106,7 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -170,7 +170,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install', 'composer lock check']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Rector tests', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install', 'composer lock check']
         php-versions: ['8.2']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
@@ -189,6 +189,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
           ${{ runner.os }}-rector-
+
+    - name: Rector tests Cache
+      if: ${{matrix.commands == 'Rector tests'}}
+      uses: actions/cache@v4
+      with:
+        path: ./var/cache/rector-tests
+        key: ${{ runner.os }}-rector-tests-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-rector-tests-${{ hashFiles('**/composer.lock') }}
+          ${{ runner.os }}-rector-tests-
 
     - name: PHPStan Cache
       if: ${{matrix.commands == 'PHPSTAN'}}
@@ -236,6 +246,10 @@ jobs:
           export SYMFONY_ENV=test
           bin/console cache:warmup
           bin/rector --dry-run --ansi
+        elif [[ "${{ matrix.commands }}" == "Rector tests" ]]; then
+          export SYMFONY_ENV=test
+          bin/console cache:warmup
+          bin/rector --config=rector-tests.php --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
           bin/console lint:twig app plugins
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then

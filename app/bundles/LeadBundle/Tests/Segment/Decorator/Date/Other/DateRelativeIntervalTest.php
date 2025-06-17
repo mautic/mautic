@@ -10,11 +10,9 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(DateRelativeInterval::class)]
 class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getOperator
-     */
     public function testGetOperatorEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -31,9 +29,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('like', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getOperator
-     */
     public function testGetOperatorNotEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -50,9 +45,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('notLike', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getOperator
-     */
     public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -73,9 +65,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('==<<', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
-     */
     public function testGetParameterValuePlusDaysWithGreaterOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -98,9 +87,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2018-03-07', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
-     */
     public function testGetParameterValueMinusMonthWithNotEqualOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -123,9 +109,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2017-12-02%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
-     */
     public function testGetParameterValueDaysAgoWithNotEqualOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -148,9 +131,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2018-02-25%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
-     */
     public function testGetParameterValueYearsAgoWithGreaterOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -173,9 +153,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2016-03-02', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
-     */
     public function testGetParameterValueDaysWithEqualOperator(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
@@ -198,9 +175,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2018-03-07%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getWhere
-     */
     public function testGetWhereReturnsCompositeExpression(): void
     {
         $dateDecorator        = $this->createMock(DateDecorator::class);
@@ -222,9 +196,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($composite, $result);
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getWhere
-     */
     public function testGetWhereReturnsString(): void
     {
         $dateDecorator        = $this->createMock(DateDecorator::class);
@@ -242,9 +213,6 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedWhere, $decorator->getWhere($filterCrate));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getWhere
-     */
     public function testGetWhereReturnsNull(): void
     {
         $dateDecorator        = $this->createMock(DateDecorator::class);

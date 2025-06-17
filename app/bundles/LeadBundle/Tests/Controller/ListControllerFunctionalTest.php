@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\ProjectBundle\Entity\Project;
+use Mautic\ProjectBundle\Model\ProjectModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,10 +26,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private LeadListRepository $listRepo;
 
+    protected SegmentCountCacheHelper $segmentCountCacheHelper;
+
     private LeadRepository $leadRepo;
 
     protected function setUp(): void
     {
+        $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->name();
         parent::setUp();
         $this->listModel = static::getContainer()->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
@@ -33,7 +40,8 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         \assert($this->listRepo instanceof LeadListRepository);
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         \assert($leadModel instanceof LeadModel);
-        $this->leadRepo = $leadModel->getRepository();
+        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $this->leadRepo                = $leadModel->getRepository();
     }
 
     public function testUnpublishUsedSegment(): void
@@ -126,6 +134,43 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertGreaterThan(0, $crawler->filter('#leadlist_filters_0_operator option')->count());
+    }
+
+    public function testSegmentWithProject(): void
+    {
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+
+        $segment = $this->saveSegment('Segment with Project', 'st1', $filters);
+
+        $project = new Project();
+        $project->setName('Test Project');
+
+        $projectModel = self::getContainer()->get(ProjectModel::class);
+        \assert($projectModel instanceof ProjectModel);
+        $projectModel->saveEntity($project);
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedSegment = $this->listRepo->find($segment->getId());
+        Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
@@ -280,6 +325,112 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('Building (4 Contacts)', $response['content']['html']);
         self::assertSame('label label-info col-count', $response['content']['className']);
+        self::assertSame(4, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testSegmentCountInBackground(): void
+    {
+        // Save segment.
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+
+        $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        $segmentId = $segment->getId();
+        $this->segmentCountCacheHelper->deleteSegmentContactCount($segmentId);
+
+        // Check segment count UI for no contacts.
+        usleep(1000000);
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('No Contacts', $html);
+
+        // Add 4 contacts.
+        $contacts   = $this->saveContacts();
+        $contact1Id = $contacts[0]->getId();
+
+        // Rebuild segment - set current count to the cache.
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
+
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Check segment count UI for 4 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 4 Contacts', $html);
+
+        // Remove 1 contact from segment.
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
+        self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Check segment count UI for 3 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 3 Contacts', $html);
+
+        // Add 1 contact back to segment.
+        $parameters = ['ids' => [$contact1Id]];
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
+        self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Check segment count UI for 4 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 4 Contacts', $html);
+
+        // Check segment count AJAX for 4 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('View 4 Contacts', $response['content']['html']);
+        self::assertSame(4, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
+
+        // Remove 1 contact from segment.
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
+        self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
+
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Check segment count AJAX for 3 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('View 3 Contacts', $response['content']['html']);
+        self::assertSame(3, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
+
+        // Add 1 contact back to segment.
+        $parameters = ['ids' => [$contact1Id]];
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
+        self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
+
+        $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Check segment count AJAX for 4 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('View 4 Contacts', $response['content']['html']);
         self::assertSame(4, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
     }
@@ -547,9 +698,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertNull($segmentExistCheck);
     }
 
-    /**
-     * @dataProvider dateFieldProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateFieldProvider')]
     public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(

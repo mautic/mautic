@@ -111,14 +111,10 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
-    /**
-     * @testdox Test that webhook is queued for channel subscription changes
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that webhook is queued for channel subscription changes')]
     public function testChannelChangeIsPickedUpByWebhook(): void
     {
-        $this->mockModel = $this->getMockBuilder(WebhookModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockModel = $this->createMock(WebhookModel::class);
 
         $lead    = new Lead();
         $channel = 'email';
@@ -152,14 +148,10 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED);
     }
 
-    /**
-     * @testdox Test that webhook is queued for lead company changes
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that webhook is queued for lead company changes')]
     public function testLeadCompanyChangeIsPickedUpByWebhook(): void
     {
-        $this->mockModel = $this->getMockBuilder(WebhookModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockModel = $this->createMock(WebhookModel::class);
 
         $lead    = new Lead();
         $company = new Company();

@@ -13,13 +13,9 @@ class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided(): void
     {
-        $reportModelMock = $this->getMockBuilder(ReportModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $reportModelMock = $this->createMock(ReportModel::class);
 
-        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelperMock->expects($this->once())
             ->method('get')

@@ -150,10 +150,10 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->contactMock5->expects($matcher)
             ->method('addFrequencyRule')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($this->frequencyRuleEmailMock, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($this->frequencyRuleEmailMock, $parameters[0]);
                 }
             });
@@ -161,10 +161,10 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->frequencyRepoMock->expects($matcher)
             ->method('saveEntity')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+                if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->frequencyRuleEmailMock, $parameters[0]);
                 }
-                if (2 === $matcher->getInvocationCount()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->frequencyRuleSmsMock, $parameters[0]);
                 }
             });

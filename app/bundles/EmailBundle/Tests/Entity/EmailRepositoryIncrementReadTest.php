@@ -70,12 +70,10 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
         $this->connection
             ->expects($this->exactly(3))
             ->method('executeStatement')
-                ->will(
-                    $this->onConsecutiveCalls(
-                        $this->throwException(new DBALException()),
-                        $this->throwException(new DBALException()),
-                        1
-                    )
+                ->willReturnOnConsecutiveCalls(
+                    $this->throwException(new DBALException()),
+                    $this->throwException(new DBALException()),
+                    1
                 );
 
         $this->repo->incrementRead(45, '616');
