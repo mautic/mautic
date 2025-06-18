@@ -125,6 +125,7 @@ Mautic.widgetOnLoad = function(container, response) {
     Mautic.initWidgetRemoveEvents();
     Mautic.initWidgetSorting();
     Mautic.initDashboardFilter();
+    Mautic.initKeyboardWidgetReordering();
 };
 
 Mautic.initWidgetRemoveEvents = function () {
@@ -336,4 +337,37 @@ Mautic.formatDate = function(date) {
     ];
 
     return monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+};
+
+Mautic.initKeyboardWidgetReordering = function () {
+    const container = jQuery('#dashboard-widgets');
+
+    container.off('click', '.move-up');
+    container.off('click', '.move-down');
+    container.off('keydown', '.move-up, .move-down');
+
+    container.on('click', '.move-up', function () {
+        const widget = jQuery(this).closest('.widget');
+        const prev = widget.prev('.widget');
+        if (prev.length) {
+            widget.insertBefore(prev);
+            Mautic.saveWidgetSorting();
+        }
+    });
+
+    container.on('click', '.move-down', function () {
+        const widget = jQuery(this).closest('.widget');
+        const next = widget.next('.widget');
+        if (next.length) {
+            widget.insertAfter(next);
+            Mautic.saveWidgetSorting();
+        }
+    });
+
+    container.on('keydown', '.move-up, .move-down', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            jQuery(this).click();
+        }
+    });
 };
