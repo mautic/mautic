@@ -121,7 +121,7 @@ return [
                     ],
                     'mautic.point.insights.menu' => [
                         'route'  => 'mautic_point.insights_index',
-                        'access' => 'point:points:view',
+                        'access' => 'point:insights:view',
                     ],
                 ],
             ],
