@@ -32,6 +32,10 @@ class OperatorOptions
 
     public const NOT_IN                = '!in';
 
+    public const INCLUDING_ALL         = 'in_all';
+
+    public const EXCLUDING_ALL         = '!in_all';
+
     public const REGEXP                = 'regexp';
 
     public const NOT_REGEXP            = '!regexp';
@@ -119,6 +123,16 @@ class OperatorOptions
             'label'       => 'mautic.lead.list.form.operator.notin',
             'expr'        => 'notIn',
             'negate_expr' => 'in',
+        ],
+        self::INCLUDING_ALL => [
+            'label'       => 'mautic.lead.list.form.operator.in_all',
+            'expr'        => 'in_all',
+            'negate_expr' => 'notIn_all',
+        ],
+        self::EXCLUDING_ALL => [
+            'label'       => 'mautic.lead.list.form.operator.notin_all',
+            'expr'        => 'notIn_all',
+            'negate_expr' => 'in_all',
         ],
         self::REGEXP => [
             'label'       => 'mautic.lead.list.form.operator.regexp',

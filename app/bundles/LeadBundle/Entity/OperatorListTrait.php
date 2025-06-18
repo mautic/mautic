@@ -68,6 +68,8 @@ trait OperatorListTrait
             'include' => [
                 OperatorOptions::IN,
                 OperatorOptions::NOT_IN,
+                OperatorOptions::INCLUDING_ALL,
+                OperatorOptions::EXCLUDING_ALL,
                 OperatorOptions::EMPTY,
                 OperatorOptions::NOT_EMPTY,
             ],
