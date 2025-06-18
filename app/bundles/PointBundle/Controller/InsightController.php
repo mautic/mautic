@@ -13,7 +13,7 @@ class InsightController extends FormController
 {
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
     {
-        if (!$this->security->isGranted('point:points:view')) {
+        if (!$this->security->isGranted('point:insights:view')) {
             return $this->accessDenied();
         }
 
@@ -60,11 +60,11 @@ class InsightController extends FormController
 
         // Set permissions for action buttons
         $permissions = $this->security->isGranted([
-            'point:points:view',
-            'point:points:create',
-            'point:points:edit',
-            'point:points:delete',
-            'point:points:publish',
+            'point:insights:view',
+            'point:insights:create',
+            'point:insights:edit',
+            'point:insights:delete',
+            'point:insights:publish',
         ], 'RETURN_ARRAY');
 
         return $this->delegateView([
@@ -91,7 +91,7 @@ class InsightController extends FormController
         /** @var InsightModel $model */
         $model = $this->getModel('point.insight');
 
-        if (!$this->security->isGranted('point:points:create')) {
+        if (!$this->security->isGranted('point:insights:create')) {
             return $this->accessDenied();
         }
 
@@ -240,7 +240,7 @@ class InsightController extends FormController
         }
 
         // Access denied
-        if (!$this->security->isGranted('point:points:edit')) {
+        if (!$this->security->isGranted('point:insights:edit')) {
             return $this->accessDenied();
         }
 
@@ -336,7 +336,7 @@ class InsightController extends FormController
             );
         }
 
-        if (!$this->security->isGranted('point:points:create')) {
+        if (!$this->security->isGranted('point:insights:create')) {
             return $this->accessDenied();
         }
 
@@ -458,7 +458,7 @@ class InsightController extends FormController
                     'msg'     => 'mautic.point.insight.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->security->isGranted('point:points:delete')) {
+            } elseif (!$this->security->isGranted('point:insights:delete')) {
                 return $this->accessDenied();
             } else {
                 $model->deleteEntity($entity);
@@ -516,7 +516,7 @@ class InsightController extends FormController
                         'msg'     => 'mautic.point.insight.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->security->isGranted('point:points:delete')) {
+                } elseif (!$this->security->isGranted('point:insights:delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } else {
                     $deleteIds[] = $objectId;

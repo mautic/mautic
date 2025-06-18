@@ -13,7 +13,7 @@
             'action': currentRoute,
             'page_actions': {
                 'templateButtons': {
-                    'new': permissions['point:points:create']
+                    'new': permissions['point:insights:create']
                 },
                 'routeBase': 'point.insights',
                 'langVar': 'point.insight'
@@ -22,24 +22,24 @@
                 'langVar': 'point.insight',
                 'routeBase': 'point.insights',
                 'templateButtons': {
-                    'delete': permissions['point:points:delete'],
+                    'delete': permissions['point:insights:delete'],
                 },
             },
         }) -}}
-        <div class="page-list">
+            <div class="page-list">
             {% if items is defined and items is not empty %}
-                <div class="table-responsive">
+        <div class="table-responsive">
                     <table class="table table-hover" id="insightTable">
-                        <thead>
-                        <tr>
-                            {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                'checkall': 'true',
-                                'target': '#insightTable',
-                            }) }}
+                <thead>
+                <tr>
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#insightTable',
+                    }) }}
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {
-                                    'sessionVar': 'point.insight',
+                            'sessionVar': 'point.insight',
                                     'orderBy'   : 'pi.name',
                                     'text'      : 'mautic.core.name',
                                     'class'     : 'col-pointinsight-name',
@@ -50,7 +50,7 @@
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {
-                                    'sessionVar': 'point.insight',
+                            'sessionVar': 'point.insight',
                                     'orderBy'   : 'cat.title',
                                     'text'      : 'mautic.core.category',
                                     'class'     : 'visible-md visible-lg col-pointinsight-category',
@@ -60,7 +60,7 @@
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {
-                                    'sessionVar': 'point.insight',
+                            'sessionVar': 'point.insight',
                                     'orderBy'   : 'pi.insightAction',
                                     'text'      : 'mautic.core.type',
                                     'class'     : 'visible-md visible-lg col-pointinsight-type',
@@ -76,25 +76,25 @@
                                     'class'      : 'visible-md visible-lg col-pointinsight-id',
                                 }
                             ) }}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for item in items %}
-                            <tr>
-                                <td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
                                     {{- include('@MauticCore/Helper/list_actions.html.twig', {
                                         item: item,
                                         templateButtons: {
-                                            edit: permissions['point:points:edit'],
-                                            clone: permissions['point:points:create'],
-                                            delete: permissions['point:points:delete'],
-                                        },
+                                            edit: permissions['point:insights:edit'],
+                                            clone: permissions['point:insights:create'],
+                                            delete: permissions['point:insights:delete'],
+                                    },
                                         routeBase: 'point.insights',
                                         langVar: 'point.insight',
                                     }) -}}
-                                </td>
-                                <td>
-                                    <div>
+                        </td>
+                        <td>
+                            <div>
                                         {{- include(
                                             '@MauticCore/Helper/publishstatus_icon.html.twig',
                                             {
@@ -102,34 +102,34 @@
                                             }
                                         )}}
 
-                                        {% if permissions['point:points:edit'] %}
+                                {% if permissions['point:insights:edit'] %}
                                             <a href="{{ path('mautic_point.insights_action', {
                                                 objectAction: 'edit',
                                                 objectId: item.id
                                             }) }}" data-toggle="ajax">
-                                                {{ item.name }}
-                                            </a>
-                                        {% else %}
-                                            {{ item.name }}
-                                        {% endif %}
-                                    </div>
-                                    {% if item.description is not empty %}
-                                        <div class="text-secondary mt-4">
-                                            <small>{{ item.description|purify }}</small>
-                                        </div>
-                                    {% endif %}
-                                </td>
-                                <td class="visible-md visible-lg">
-                                    {% if item.category %}
-                                        {{ item.category.title }}
-                                    {% endif %}
-                                </td>
+                                        {{ item.name }}
+                                    </a>
+                                {% else %}
+                                    {{ item.name }}
+                                {% endif %}
+                            </div>
+                            {% if item.description is not empty %}
+                                <div class="text-secondary mt-4">
+                                    <small>{{ item.description|purify }}</small>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="visible-md visible-lg">
+                            {% if item.category %}
+                                {{ item.category.title }}
+                            {% endif %}
+                        </td>
                                 <td class="visible-md visible-lg">{{ item.insightAction }}</td>
-                                <td class="visible-md visible-lg">{{ item.id }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                        <td class="visible-md visible-lg">{{ item.id }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
                     <div class="panel-footer">
                         {{- include('@MauticCore/Helper/pagination.html.twig', {
                             'totalItems' : items|length,
@@ -138,11 +138,11 @@
                             'baseUrl'    : path('mautic_point.insights_index'),
                             'sessionVar' : 'point.insight',
                         }) -}}
-                    </div>
-                </div>
-            {% else %}
+        </div>
+        </div>
+    {% else %}
                 {{ include('@MauticCore/Helper/noresults.html.twig') }}
-            {% endif %}
+    {% endif %}
         </div>
     </div>
 {% endblock %} 

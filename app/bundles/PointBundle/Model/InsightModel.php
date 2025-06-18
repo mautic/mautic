@@ -48,7 +48,7 @@ class InsightModel extends FormModel
 
     public function getPermissionBase(): string
     {
-        return 'point:points';
+        return 'point:insights';
     }
 
     /**

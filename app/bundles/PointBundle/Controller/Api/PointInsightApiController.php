@@ -51,7 +51,7 @@ class PointInsightApiController extends CommonApiController
         $this->entityNameOne    = 'insight';
         $this->entityNameMulti  = 'insights';
         $this->serializerGroups = ['pointInsightDetails', 'categoryList'];
-        //$this->permissionBase   = 'point:points';
+        $this->permissionBase   = 'point:insights';
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
