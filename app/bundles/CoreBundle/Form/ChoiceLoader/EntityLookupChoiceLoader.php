@@ -143,10 +143,9 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
         // must be [$label => $id]
         $prepped      = $this->prepareChoices($this->choices[$modelName]);
-        $prepped_keys = array_keys($prepped);
 
-        array_multisort($prepped_keys, SORT_NATURAL | SORT_FLAG_CASE, $prepped);
-
+        uksort($prepped, 'strnatcasecmp');
+        
         if ($includeNew && $modalRoute) {
             $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
         }
