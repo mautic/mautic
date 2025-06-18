@@ -86,24 +86,6 @@ class PointInsightType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'pointGroups',
-            GroupListType::class,
-            [
-                'label'      => 'mautic.point.insight.pointgroups.compare',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'                => 'form-control',
-                    'data-toggle'          => 'multiselect',
-                    'tooltip'              => 'mautic.point.insight.action.set_custom_field.tooltip',
-                ],
-                'multiple'    => true,
-                'required'    => false,
-                'return_entity' => false,
-                'placeholder' => 'mautic.core.form.choosemultiple',
-            ]
-        );
-
         $insightActions = [
             'mautic.point.insight.action.set_custom_field' => 'set_custom_field',
         ];
@@ -121,6 +103,24 @@ class PointInsightType extends AbstractType
                 'required'    => true,
                 'placeholder' => 'mautic.core.form.chooseone',
                 'data'        => 'set_custom_field',
+            ]
+        );
+
+        $builder->add(
+            'pointGroups',
+            GroupListType::class,
+            [
+                'label'      => 'mautic.point.insight.pointgroups.compare',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'                => 'form-control',
+                    'data-toggle'          => 'multiselect',
+                    'tooltip'              => 'mautic.point.insight.action.set_custom_field.tooltip',
+                ],
+                'multiple'    => true,
+                'required'    => false,
+                'return_entity' => false,
+                'placeholder' => 'mautic.core.form.choosemultiple',
             ]
         );
 

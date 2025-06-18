@@ -480,4 +480,67 @@ class InsightController extends FormController
 
         return $this->postActionRedirect($postActionVars);
     }
+
+    /**
+     * Deletes a group of entities.
+     */
+    public function batchDeleteAction(Request $request): Response
+    {
+        $page      = $request->getSession()->get('mautic.point.insight.page', 1);
+        $returnUrl = $this->generateUrl('mautic_point.insights_index', ['page' => $page]);
+        $flashes   = [];
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'Mautic\PointBundle\Controller\InsightController::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_point.insights_index',
+                'mauticContent' => 'pointInsight',
+            ],
+        ];
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            /** @var InsightModel $model */
+            $model = $this->getModel('point.insight');
+            $ids       = json_decode($request->query->get('ids', '{}'));
+            $deleteIds = [];
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if (null === $entity) {
+                    $flashes[] = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.point.insight.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ];
+                } elseif (!$this->security->isGranted('point:points:delete')) {
+                    $flashes[] = $this->accessDenied(true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.point.insight.notice.batch_deleted',
+                    'msgVars' => [
+                        '%count%' => count($entities),
+                    ],
+                ];
+            }
+        } // else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, [
+                'flashes' => $flashes,
+            ])
+        );
+    }
 }

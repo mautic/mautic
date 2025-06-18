@@ -48,35 +48,11 @@ class PointInsightApiController extends CommonApiController
 
         $this->model            = $insightModel;
         $this->entityClass      = PointInsight::class;
-        $this->entityNameOne    = 'pointInsight';
-        $this->entityNameMulti  = 'pointInsights';
+        $this->entityNameOne    = 'insight';
+        $this->entityNameMulti  = 'insights';
         $this->serializerGroups = ['pointInsightDetails', 'categoryList'];
+        //$this->permissionBase   = 'point:points';
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
-    }
-
-    /**
-     * Return array of available point insight types and actions.
-     */
-    public function getPointInsightTypesAction(): Response
-    {
-        if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
-            return $this->accessDenied();
-        }
-
-        $insightTypes = [
-            'compare_point_groups' => $this->translator->trans('mautic.point.insight.type.compare_point_groups'),
-        ];
-
-        $insightActions = [
-            'set_custom_field' => $this->translator->trans('mautic.point.insight.action.set_custom_field'),
-        ];
-
-        $view = $this->view([
-            'insightTypes' => $insightTypes,
-            'insightActions' => $insightActions,
-        ]);
-
-        return $this->handleView($view);
     }
 }

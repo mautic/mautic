@@ -96,6 +96,14 @@ class PointInsight extends FormEntity
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
         ]));
+
+        $metadata->addPropertyConstraint('insightType', new Assert\NotBlank([
+            'message' => 'mautic.point.insight.type.required',
+        ]));
+
+        $metadata->addPropertyConstraint('insightAction', new Assert\NotBlank([
+            'message' => 'mautic.point.insight.action.required',
+        ]));
     }
 
     /**
