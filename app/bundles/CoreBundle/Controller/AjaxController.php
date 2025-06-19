@@ -142,7 +142,7 @@ class AjaxController extends CommonController
     public function globalSearchAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 1];
-        $searchStr = InputHelper::clean($request->query->get('global_search', ''));
+        $searchStr = $request->query->get('global_search', '');
         $request->getSession()->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->translator);

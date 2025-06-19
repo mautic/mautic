@@ -90,6 +90,7 @@
         </thead>
         <tbody>
         {% for item in items %}
+            {% set mauticTemplateVars = _context|merge({'item' : item}) %}
             <tr>
                 <td>
                     {{- include('@MauticCore/Helper/list_actions.html.twig',
@@ -109,6 +110,7 @@
                         <a href="{{ path('mautic_role_action',
                             {'objectAction' : 'edit', 'objectId' : item.getId()}) }}" data-toggle="ajax">
                             {{ item.getName() }}
+                            {{ customContent('role.name', mauticTemplateVars) }}
                         </a>
                     {% else %}
                         {{ item.getName() }}

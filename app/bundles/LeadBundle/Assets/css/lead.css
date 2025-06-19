@@ -239,14 +239,14 @@ ul.tag-cloud li {
 }
 
 .building::before {
-    content: "\f1ad";
-    font-family: "FontAwesome";
+    content: "\eb08";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 
 .user::before {
-    content: "\f007";
-    font-family: "FontAwesome";
+    content: "\f25b";
+    font-family: "RemixIcon";
     padding-right: 3px;
 }
 

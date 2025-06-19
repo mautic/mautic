@@ -28,7 +28,7 @@
 								{% endif %}
 							{% endfor %}
 							{% if log.details['username'][1] is defined and log.details['username'][1] is not empty %}
-								{% if emailIsMatch == true %}
+								{% if usernameIsMatch == true or  emailIsMatch == true  %}
 									{% set userPath = userPath|merge([user_id, log.details['username'][1]]) %}
 								{% endif %}
 							{% endif %}

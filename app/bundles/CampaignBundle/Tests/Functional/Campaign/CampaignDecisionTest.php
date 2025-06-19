@@ -11,11 +11,13 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use PHPUnit\Framework\Assert;
 
 class CampaignDecisionTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;
+    use LeadFieldTestTrait;
     protected $useCleanupRollback = false;
 
     /**
@@ -48,7 +50,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
                 ],
             ],
         ];
-        $this->makeField($fieldDetails);
+        $this->createField($fieldDetails);
 
         $segment  = $this->createSegment('seg1', []);
         $lead1    = $this->createLeadData($segment, $object, $fieldDetails, $additionalValue, 1);

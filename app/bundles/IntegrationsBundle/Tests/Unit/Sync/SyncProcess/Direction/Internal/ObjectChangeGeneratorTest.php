@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Internal;
 
+use Mautic\IntegrationsBundle\Exception\RequiredValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
@@ -11,6 +12,8 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectSyncSkippedException;
+use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
@@ -23,25 +26,31 @@ use PHPUnit\Framework\TestCase;
 class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var SyncJudgeInterface|MockObject
+     * @var SyncJudgeInterface&MockObject
      */
     private MockObject $syncJudge;
 
     /**
-     * @var ValueHelper|MockObject
+     * @var ValueHelper&MockObject
      */
     private MockObject $valueHelper;
 
     /**
-     * @var FieldHelper|MockObject
+     * @var FieldHelper&MockObject
      */
     private MockObject $fieldHelper;
 
+    /**
+     * @var MockObject&BulkNotification
+     */
+    private MockObject $bulkNotification;
+
     protected function setUp(): void
     {
-        $this->syncJudge   = $this->createMock(SyncJudgeInterface::class);
-        $this->valueHelper = $this->createMock(ValueHelper::class);
-        $this->fieldHelper = $this->createMock(FieldHelper::class);
+        $this->syncJudge        = $this->createMock(SyncJudgeInterface::class);
+        $this->valueHelper      = $this->createMock(ValueHelper::class);
+        $this->fieldHelper      = $this->createMock(FieldHelper::class);
+        $this->bulkNotification = $this->createMock(BulkNotification::class);
     }
 
     public function testFieldsAreAddedToObjectChangeAndIntegrationFirstNameWins(): void
@@ -67,7 +76,7 @@ class ObjectChangeGeneratorTest extends TestCase
                 fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $integrationInformationChangeRequest
             );
 
-        $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
+        $objectChangeDAO = $this->createObjectGenerator()->getSyncObjectChange(
             $syncReport,
             $mappingManual,
             $mappingManual->getObjectMapping(Contact::NAME, $objectName),
@@ -115,8 +124,18 @@ class ObjectChangeGeneratorTest extends TestCase
         $syncReport    = $this->getIntegrationSyncReport($integration, $objectName);
 
         $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
-        $internalReportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
-        $internalReportObject->addField(new ReportFieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
+        $internalReportObject->addField(
+            new ReportFieldDAO(
+                'email',
+                new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')
+            )
+        );
+        $internalReportObject->addField(
+            new ReportFieldDAO(
+                'firstname',
+                new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')
+            )
+        );
 
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
@@ -124,7 +143,7 @@ class ObjectChangeGeneratorTest extends TestCase
                 fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
             );
 
-        $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
+        $objectChangeDAO = $this->createObjectGenerator()->getSyncObjectChange(
             $syncReport,
             $mappingManual,
             $mappingManual->getObjectMapping(Contact::NAME, $objectName),
@@ -158,6 +177,192 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->assertEquals('Bob', $changedFields['firstname']->getValue()->getNormalizedValue());
     }
 
+    public function testRequiredValueRejected(): void
+    {
+        $exceptionMessage = 'exceptionMessage';
+
+        $this->valueHelper->method('getValueForMautic')
+            ->willThrowException(new RequiredValueException($exceptionMessage));
+
+        $integrationName  = 'Test';
+        $objectName       = 'Contact';
+
+        $mappingManual = $this->getMappingManual($integrationName, $objectName);
+        $syncReport    = $this->getIntegrationSyncReport($integrationName, $objectName);
+
+        $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
+        $internalReportObject->addField(
+            new ReportFieldDAO(
+                'email',
+                new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, '')
+            )
+        );
+        $internalReportObject->addField(
+            new ReportFieldDAO(
+                'firstname',
+                new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')
+            )
+        );
+
+        $this->syncJudge->expects($this->exactly(2))
+            ->method('adjudicate')
+            ->willReturnCallback(
+                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
+                    return $internalInformationChangeRequest;
+                }
+            );
+
+        $this->bulkNotification->expects($this->exactly(2))
+            ->method('addNotification')
+            ->withConsecutive(
+                [
+                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email',
+                    $exceptionMessage,
+                    $integrationName,
+                    $objectName,
+                    Contact::NAME,
+                    0,
+                    "Field 'email' for object ID '2' mapped to internal 'email' with value 'test@test.com'",
+                ],
+                [
+                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-first_name',
+                    $exceptionMessage,
+                    $integrationName,
+                    $objectName,
+                    Contact::NAME,
+                    0,
+                    "Field 'first_name' for object ID '2' mapped to internal 'first_name' with value 'Robert'",
+                ]
+            );
+
+        $this->createObjectGenerator()->getSyncObjectChange(
+            $syncReport,
+            $mappingManual,
+            $mappingManual->getObjectMapping(Contact::NAME, $objectName),
+            $internalReportObject,
+            $syncReport->getObject($objectName, 2)
+        );
+    }
+
+    public function testRequiredValueRejectedForExistingObject(): void
+    {
+        $exceptionMessage = 'exceptionMessage';
+
+        $this->valueHelper->method('getValueForMautic')
+            ->willThrowException(new RequiredValueException($exceptionMessage));
+
+        $integrationName = 'Test';
+        $objectName      = 'Contact';
+
+        $mappingManual = $this->getMappingManual($integrationName, $objectName);
+        $syncReport    = $this->getIntegrationSyncReport($integrationName, $objectName);
+
+        $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
+        $internalReportObject->addField(
+            new ReportFieldDAO(
+                'email',
+                new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, '')
+            )
+        );
+        $internalReportObject->addField(
+            new ReportFieldDAO(
+                'firstname',
+                new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')
+            )
+        );
+
+        $this->syncJudge->expects($this->exactly(2))
+            ->method('adjudicate')
+            ->willReturnCallback(
+                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
+                    return $internalInformationChangeRequest;
+                }
+            );
+
+        $this->bulkNotification->expects($this->exactly(2))
+            ->method('addNotification')
+            ->withConsecutive(
+                [
+                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email',
+                    $exceptionMessage,
+                    $integrationName,
+                    $objectName,
+                    Contact::NAME,
+                    0,
+                    "Field 'email' for object ID '2' mapped to internal 'email' with value 'test@test.com'",
+                ],
+                [
+                    'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-first_name',
+                    $exceptionMessage,
+                    $integrationName,
+                    $objectName,
+                    Contact::NAME,
+                    0,
+                    "Field 'first_name' for object ID '2' mapped to internal 'first_name' with value 'Robert'",
+                ]
+            );
+
+        $this->createObjectGenerator()->getSyncObjectChange(
+            $syncReport,
+            $mappingManual,
+            $mappingManual->getObjectMapping(Contact::NAME, $objectName),
+            $internalReportObject,
+            $syncReport->getObject($objectName, 2)
+        );
+    }
+
+    public function testRequiredValueRejectedForNewObject(): void
+    {
+        $exceptionMessage = 'exceptionMessage';
+
+        $this->valueHelper->method('getValueForMautic')
+            ->willThrowException(new RequiredValueException($exceptionMessage));
+
+        $integrationName = 'Test';
+        $objectName      = 'Contact';
+
+        $mappingManual = $this->getMappingManual($integrationName, $objectName);
+        $syncReport    = $this->getIntegrationSyncReport($integrationName, $objectName);
+
+        $internalReportObject = new ReportObjectDAO(Contact::NAME, null);
+        $internalReportObject->addField(
+            new ReportFieldDAO(
+                'email',
+                new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, '')
+            )
+        );
+
+        $this->syncJudge->expects($this->exactly(1))
+            ->method('adjudicate')
+            ->willReturnCallback(
+                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
+                    return $internalInformationChangeRequest;
+                }
+            );
+
+        $this->bulkNotification->expects($this->exactly(1))
+            ->method('addNotification')
+            ->with(
+                'Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email',
+                $exceptionMessage.' New object sync skipped.',
+                $integrationName,
+                $objectName,
+                Contact::NAME,
+                0,
+                "Field 'email' for object ID '2' mapped to internal 'email' with value 'test@test.com'"
+            );
+
+        $this->expectException(ObjectSyncSkippedException::class);
+
+        $this->createObjectGenerator()->getSyncObjectChange(
+            $syncReport,
+            $mappingManual,
+            $mappingManual->getObjectMapping(Contact::NAME, $objectName),
+            $internalReportObject,
+            $syncReport->getObject($objectName, 2)
+        );
+    }
+
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
@@ -182,6 +387,11 @@ class ObjectChangeGeneratorTest extends TestCase
                     Assert::assertSame(Contact::NAME, $object);
 
                     return ['email' => []];
+                }
+            },
+            new class extends BulkNotification {
+                public function __construct()
+                {
                 }
             }
         );
@@ -216,40 +426,54 @@ class ObjectChangeGeneratorTest extends TestCase
         Assert::assertSame($integrationName, $objectChange->getIntegration());
     }
 
-    /**
-     * @return MappingManualDAO
-     */
-    private function getMappingManual(string $integration, string $objectName)
+    private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
-        $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
-        $objectMapping->addFieldMapping('firstname', 'first_name');
+        $objectMapping->addFieldMapping(
+            'email',
+            'email',
+            ObjectMappingDAO::SYNC_BIDIRECTIONALLY,
+            true);
+        $objectMapping->addFieldMapping(
+            'firstname',
+            'first_name'
+        );
         $mappingManual->addObjectMapping($objectMapping);
 
         return $mappingManual;
     }
 
-    /**
-     * @return ReportDAO
-     */
-    private function getIntegrationSyncReport(string $integration, string $objectName)
+    private function getIntegrationSyncReport(string $integration, string $objectName): ReportDAO
     {
         $syncReport   = new ReportDAO($integration);
         $reportObject = new ReportObjectDAO($objectName, 2);
-        $reportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'), ReportFieldDAO::FIELD_REQUIRED));
-        $reportObject->addField(new ReportFieldDAO('first_name', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Robert')));
+        $reportObject->addField(
+            new ReportFieldDAO(
+                'email',
+                new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'),
+                ReportFieldDAO::FIELD_REQUIRED
+            )
+        );
+        $reportObject->addField(
+            new ReportFieldDAO(
+                'first_name',
+                new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Robert')
+            )
+        );
 
         $syncReport->addObject($reportObject);
 
         return $syncReport;
     }
 
-    /**
-     * @return ObjectChangeGenerator
-     */
-    private function getObjectGenerator()
+    private function createObjectGenerator(): ObjectChangeGenerator
     {
-        return new ObjectChangeGenerator($this->syncJudge, $this->valueHelper, $this->fieldHelper);
+        return new ObjectChangeGenerator(
+            $this->syncJudge,
+            $this->valueHelper,
+            $this->fieldHelper,
+            $this->bulkNotification
+        );
     }
 }

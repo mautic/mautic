@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 trait TranslationEntityTrait
 {
@@ -12,11 +13,15 @@ trait TranslationEntityTrait
      * Set by AbstractCommonModel::getEntityBySlugs() if a language slug was used to fetch the entity.
      *
      * @var string
+     *
+     * @Groups({"page:read", "download:read", "email:read"})
      */
     public $languageSlug;
 
     /**
      * @var mixed
+     *
+     * @Groups({"page:read", "download:read", "email:read"})
      **/
     private $translationChildren;
 
@@ -27,6 +32,8 @@ trait TranslationEntityTrait
 
     /**
      * @var string
+     *
+     * @Groups({"page:read", "download:read", "email:read"})
      */
     private $language = 'en';
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\CoreBundle\EventListener\OptimisticLockSubscriber;
+use Mautic\CoreBundle\EventListener\UUIDListener;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -67,5 +68,8 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$ormConfiguration', service('doctrine.orm.default_configuration'))
         ->tag('doctrine.event_subscriber');
     $services->get(OptimisticLockSubscriber::class)
+        ->tag('doctrine.event_subscriber');
+    $services->set(UUIDListener::class)
+        ->arg('$em', service('doctrine.orm.entity_manager'))
         ->tag('doctrine.event_subscriber');
 };

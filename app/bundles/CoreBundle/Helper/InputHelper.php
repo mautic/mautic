@@ -417,11 +417,8 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
-            try {
-                $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
-            } catch (\ErrorException) {
-                $hasUnicode = 'UTF-8"' === mb_detect_encoding($value);
-            }
+            // Check for non-ASCII characters
+            $hasUnicode = mb_check_encoding($value, 'UTF-8') && preg_match('/[^\x00-\x7F]/', $value);
 
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 
