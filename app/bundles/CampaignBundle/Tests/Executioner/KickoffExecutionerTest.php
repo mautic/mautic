@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -21,33 +23,49 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|KickoffContactFinder
+     * @var MockObject&KickoffContactFinder
      */
     private MockObject $kickoffContactFinder;
 
     /**
-     * @var MockObject|Translator
+     * @var MockObject&Translator
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|EventExecutioner
+     * @var MockObject&EventExecutioner
      */
     private MockObject $executioner;
 
     /**
-     * @var MockObject|EventScheduler
+     * @var MockObject&EventScheduler
      */
     private MockObject $scheduler;
 
     /**
-     * @var CoreParametersHelper&MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
+
+    /**
+     * @var MockObject&EventRedirectionHelper
+     */
+    private $redirectionHelper;
+
+    /**
+     * @var MockObject&EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -56,6 +74,9 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->executioner          = $this->createMock(EventExecutioner::class);
         $this->scheduler            = $this->createMock(EventScheduler::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->redirectionHelper    = $this->createMock(EventRedirectionHelper::class);
+        $this->entityManager        = $this->createMock(EntityManagerInterface::class);
+        $this->eventDispatcher      = $this->createMock(EventDispatcherInterface::class);
     }
 
     public function testNoContactsResultInEmptyResults(): void
@@ -145,8 +166,11 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->executioner,
             $this->scheduler,
+            $this->coreParametersHelper,
             $this->createMock(ProcessSignalService::class),
-            $this->coreParametersHelper
+            $this->redirectionHelper,
+            $this->entityManager,
+            $this->eventDispatcher,
         );
     }
 }

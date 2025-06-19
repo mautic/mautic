@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
@@ -55,6 +56,10 @@ class EventModelTest extends TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
+        $this->entityManagerMock
+            ->method('getRepository')
+            ->with(Event::class)
+            ->willReturn($this->eventRepositoryMock);
     }
 
     public function testThatClonedEventsDoNotAttemptNullingParentInDeleteEvents(): void
@@ -64,6 +69,12 @@ class EventModelTest extends TestCase
             ->with(Event::class)
             ->willReturn($this->eventRepositoryMock);
 
+        $this->eventRepositoryMock->expects($this->never())
+            ->method('nullEventRelationships');
+
+        $this->eventRepositoryMock->expects($this->never())
+            ->method('setEventsAsDeletedWithRedirect');
+
         $currentEvents = [
             'new1',
             'new2',
@@ -71,7 +82,7 @@ class EventModelTest extends TestCase
         ];
 
         $deletedEvents = [
-            'new1',
+            ['id' => 'new1', 'redirectEvent' => null],
         ];
 
         $this->eventModel->deleteEvents($currentEvents, $deletedEvents);
@@ -86,26 +97,78 @@ class EventModelTest extends TestCase
         ];
 
         $deletedEvents = [
-            'new1',
-            $idToDelete,
+            ['id' => 'new1', 'redirectEvent' => null],
+            ['id' => $idToDelete, 'redirectEvent' => null],
         ];
 
-        $this->entityManagerMock->method('getRepository')
-            ->with(Event::class)
-            ->willReturn($this->eventRepositoryMock);
+        $eventRepositoryMock = $this->createMock(EventRepository::class);
+        $entityManagerMock   = $this->createMock(EntityManager::class);
 
-        $this->eventRepositoryMock->expects($this->once())
+        $entityManagerMock->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($eventRepositoryMock);
+
+        $eventRepositoryMock->expects($this->once())
             ->method('nullEventRelationships')
             ->with([$idToDelete]);
 
-        $this->eventRepositoryMock->expects($this->once())
-            ->method('setEventsAsDeleted')
-            ->with([1 => $idToDelete]);
+        $eventRepositoryMock->expects($this->once())
+            ->method('setEventsAsDeletedWithRedirect')
+            ->with([
+                [
+                    'id'              => $idToDelete,
+                    'redirectEvent'   => null,
+                ],
+            ]);
 
         $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
             ->with(new DeleteEvent([$idToDelete]), CampaignEvents::ON_EVENT_DELETE);
 
+        // Use our local mocks instead of the class properties
+        $this->eventModel->setEntityManager($entityManagerMock);
+        $this->eventModel->setDispatcher($dispatcherMock);
+        $this->eventModel->deleteEvents($currentEvents, $deletedEvents);
+    }
+
+    public function testThatItDeletesEventLogsWithNewFormat(): void
+    {
+        $currentEvents = [
+            'new1',
+        ];
+
+        $redirectEvent = $this->createMock(Event::class);
+        $redirectEvent->method('getId')->willReturn(123);
+
+        $deletedEvents = [
+            ['id' => 'new1', 'redirectEvent' => null],
+            [
+                'id'                => 'old1',
+                'redirectEvent'     => $redirectEvent,
+            ],
+        ];
+
+        $this->eventRepositoryMock->expects($this->once())
+            ->method('nullEventRelationships')
+            ->with(['old1']);
+
+        $this->eventRepositoryMock->expects($this->once())
+            ->method('setEventsAsDeletedWithRedirect')
+            ->with([
+                [
+                    'id'              => 'old1',
+                    'redirectEvent'   => 123,
+                ],
+            ]);
+
+        $dispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $dispatcherMock
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(CampaignEvents::ON_EVENT_DELETE, new DeleteEvent(['old1']));
+
+        $this->eventModel->setEntityManager($this->entityManagerMock);
+        $this->eventModel->setDispatcher($dispatcherMock);
         $this->eventModel->deleteEvents($currentEvents, $deletedEvents);
     }
 

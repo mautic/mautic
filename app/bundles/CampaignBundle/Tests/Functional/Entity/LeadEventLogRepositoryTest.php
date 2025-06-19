@@ -11,18 +11,19 @@ use PHPUnit\Framework\Assert;
 
 class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 {
-    public function testThatRemoveEventLogsMethodRemovesLogs(): void
+    public function testThatRemoveEventLogsByCampaignIdMethodRemovesLogs(): void
     {
-        $eventId    = random_int(200, 2000);
+        $campaignId = random_int(200, 2000);
+        $eventId    = random_int(300, 3000);
         $connection = $this->em->getConnection();
 
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
         \assert($leadEventLogRepository instanceof LeadEventLogRepository);
 
-        $insertStatement = $connection->prepare('INSERT INTO `'.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log` (`event_id`, `lead_id`, `rotation`, `is_scheduled`, `system_triggered`) VALUES (?, ?, ?, ?, ?);');
+        $insertStatement = $connection->prepare('INSERT INTO `'.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log` (`campaign_id`, `event_id`, `lead_id`, `rotation`, `is_scheduled`, `system_triggered`) VALUES (?, ?, ?, ?, ?, ?);');
 
         $connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
-        foreach ($this->getLeadCampaignEventData($eventId) as $row) {
+        foreach ($this->getLeadCampaignEventData($campaignId, $eventId) as $row) {
             $insertStatement->executeQuery($row);
         }
         $connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
@@ -34,12 +35,12 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         Assert::assertCount(0, $leadEventLogRepository->findAll());
     }
 
-    private function getLeadCampaignEventData(int $eventId): array
+    private function getLeadCampaignEventData(int $campaignId, int $eventId): array
     {
         return [
-            [$eventId, 100, 200, 1, 1],
-            [$eventId, 101, 201, 1, 1],
-            [$eventId, 102, 202, 1, 1],
+            [$campaignId, $eventId, 100, 200, 1, 1],
+            [$campaignId, $eventId, 101, 201, 1, 1],
+            [$campaignId, $eventId, 102, 202, 1, 1],
         ];
     }
 }

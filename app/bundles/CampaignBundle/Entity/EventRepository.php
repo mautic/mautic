@@ -4,7 +4,10 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * @extends CommonRepository<Event>
@@ -92,7 +95,6 @@ class EventRepository extends CommonRepository
                     ),
                     $q->expr()->isNull('c.deleted'),
                     $q->expr()->eq('e.type', ':type'),
-                    $q->expr()->isNull('e.deleted'),
                     $q->expr()->eq('IDENTITY(l.lead)', ':contactId'),
                     $q->expr()->eq('l.manuallyRemoved', 0),
                     $q->expr()->notIn('e.id', $eventQb->getDQL()),
@@ -145,12 +147,11 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param int  $campaignId
-     * @param bool $ignoreDeleted
+     * @param int $campaignId
      *
      * @return array<int,mixed[]>
      */
-    public function getCampaignEvents($campaignId, $ignoreDeleted = true): array
+    public function getCampaignEvents($campaignId, bool $ignoreDeleted = true): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
@@ -284,6 +285,61 @@ class EventRepository extends CommonRepository
                 $qb->expr()->in('id', $eventIds)
             )
             ->executeStatement();
+    }
+
+    /**
+     * Sets events as deleted and updates their redirectEvent in a single operation.
+     *
+     * @param array<int, array{id: int, redirectEvent: ?int}> $eventData Array of event data
+     *
+     * @throws Exception|\Doctrine\DBAL\Driver\Exception
+     */
+    public function setEventsAsDeletedWithRedirect(array $eventData): void
+    {
+        if (empty($eventData)) {
+            return;
+        }
+
+        $dateTime = (new \DateTime())->format(DateTimeHelper::FORMAT_DB);
+        $conn     = $this->getEntityManager()->getConnection();
+
+        // First, get all events current state in one query
+        $eventIds = array_column($eventData, 'id');
+        $qbSelect = $conn->createQueryBuilder();
+        $qbSelect->select('id, deleted')
+            ->from(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
+            ->where($qbSelect->expr()->in('id', ':eventIds'))
+            ->setParameter('eventIds', $eventIds, Connection::PARAM_INT_ARRAY);
+
+        $eventStates = [];
+        foreach ($qbSelect->execute()->fetchAllAssociative() as $row) {
+            $eventStates[$row['id']] = $row['deleted'];
+        }
+
+        foreach ($eventData as $eventInfo) {
+            $eventId       = $eventInfo['id'];
+            $redirectEvent = $eventInfo['redirectEvent'] ?? null;
+
+            $isAlreadyDeleted = !empty($eventStates[$eventId]);
+
+            if ($isAlreadyDeleted) {
+                continue;
+            }
+
+            $qb = $conn->createQueryBuilder();
+            $qb->update(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
+                ->set('deleted', ':deleted')
+                ->setParameter('deleted', $dateTime);
+
+            if (null !== $redirectEvent) {
+                $qb->set('redirect_event_id', ':redirectEvent')
+                   ->setParameter('redirectEvent', $redirectEvent);
+            }
+
+            $qb->where($qb->expr()->eq('id', ':eventId'))
+               ->setParameter('eventId', $eventId)
+               ->execute();
+        }
     }
 
     public function getTableAlias(): string

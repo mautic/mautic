@@ -5,44 +5,52 @@ namespace Mautic\CampaignBundle\Tests\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveContactFinder
+     * @var MockObject&InactiveContactFinder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $inactiveContactFinder;
+    private $inactiveContactFinder;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
+     * @var MockObject&Translator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private $translator;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
+     * @var MockObject&EventScheduler
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
+    private $eventScheduler;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveHelper
+     * @var MockObject&InactiveHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $inactiveHelper;
+    private $inactiveHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
+     * @var MockObject&EventExecutioner
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventExecutioner;
+    private $eventExecutioner;
+
+    /**
+     * @var MockObject&EventRedirectionHelper
+     */
+    private $redirectionHelper;
 
     protected function setUp(): void
     {
@@ -55,6 +63,12 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
         $this->eventExecutioner = $this->createMock(EventExecutioner::class);
+
+        $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
+
+        // Configure the redirection helper mock to return the event it receives
+        $this->redirectionHelper->method('handleEventRedirection')
+            ->willReturnCallback(fn (Event $event) => $event);
     }
 
     public function testNoContactsFoundResultsInNothingExecuted(): void
@@ -198,7 +212,9 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventScheduler,
             $this->inactiveHelper,
             $this->eventExecutioner,
-            $this->createMock(ProcessSignalService::class)
+            $this->createMock(ProcessSignalService::class),
+            $this->redirectionHelper,
+            $this->createMock(LeadRepository::class)
         );
     }
 }

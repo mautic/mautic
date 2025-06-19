@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
@@ -62,6 +63,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
     private DecisionHelper $decisionHelper;
 
+    private EventRedirectionHelper $redirectionHelper;
+
     protected function setUp(): void
     {
         $this->leadModel = $this->createMock(LeadModel::class);
@@ -80,7 +83,12 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository = $this->createMock(LeadRepository::class);
 
-        $this->decisionHelper = new DecisionHelper($this->leadRepository);
+        $this->decisionHelper    = new DecisionHelper($this->leadRepository);
+        $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
+
+        // Configure the redirection helper mock to return the event it receives
+        $this->redirectionHelper->method('handleEventRedirection')
+            ->willReturnCallback(fn (Event $event) => $event);
     }
 
     public function testContactNotFoundResultsInEmptyResponses(): void
@@ -381,7 +389,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->eventScheduler,
             $this->contactTracker,
-            $this->decisionHelper
+            $this->decisionHelper,
+            $this->redirectionHelper
         );
     }
 }

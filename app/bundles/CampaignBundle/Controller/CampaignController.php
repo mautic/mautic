@@ -194,7 +194,10 @@ class CampaignController extends AbstractStandardFormController
     public function EventStatsAction(int $objectId, string $dateFromValue, string $dateToValue): JsonResponse
     {
         $response        = [];
-        $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($objectId);
+        // CRITICAL: Always include deleted events in individual tabs by setting ignoreDeleted=false
+        // This ensures deleted events appear in the action/decision/condition tabs
+        $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($objectId, false);
+
         $dateFrom        = null;
         $dateTo          = null;
         $dateToPlusOne   = null;
@@ -532,7 +535,19 @@ class CampaignController extends AbstractStandardFormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        return $this->viewStandard($request, $objectId, $this->getModelName(), null, null, 'campaign');
+        // For the preview/visual view, get only non deleted events.
+        // but the action/decision/condition tabs can show deleted events with the proper labeling
+        $result = $this->viewStandard($request, $objectId, $this->getModelName(), null, null, 'campaign');
+
+        // If the response contains events and is a form view, make sure deleted events are marked
+        if ($result instanceof Response && $this->campaignEvents) {
+            // Pre-filter the campaign events for the preview tab (in case something was missed)
+            $this->campaignEvents = array_filter($this->campaignEvents, fn ($event) => empty($event['deleted']));
+
+            $this->campaignElements['campaignEvents'] = $this->campaignEvents;
+        }
+
+        return $result;
     }
 
     /**
@@ -894,6 +909,18 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $args;
+    }
+
+    protected function filterDeletedEvents(): void
+    {
+        $this->modifiedEvents = (array) ($this->campaignElements['modifiedEvents'] ?? []);
+        $this->deletedEvents  = (array) ($this->campaignElements['deletedEvents'] ?? []);
+
+        // Extract IDs from deleted events and use as keys for filtering
+        $deletedEventIds = array_column($this->deletedEvents, 'id');
+        $deletedEventIds = $deletedEventIds ? array_fill_keys($deletedEventIds, true) : [];
+
+        $this->campaignEvents = array_diff_key($this->modifiedEvents, $deletedEventIds);
     }
 
     /**
