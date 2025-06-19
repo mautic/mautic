@@ -79,6 +79,18 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {% if security.isGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.lead.contacts.web_sent',
+                                'value': notification.getSentCount(true),
+                                'link': path('mautic_contact_index', {
+                                    'search': ('mautic.lead.lead.searchcommand.web_sent'|trans) ~ ':' ~ notification.id
+                                }),
+                                'icon': 'ri-notification-3-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 va-m">
@@ -139,21 +151,6 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
-
-        {% if security.isGranted('lead:leads:viewown') %}
-        {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
-            title: 'mautic.core.useful_links',
-            items: [
-                {
-                    label: 'mautic.lead.lead.contacts.web_sent'|trans,
-                    link: path('mautic_contact_index', {
-                        'search': ('mautic.lead.lead.searchcommand.web_sent'|trans) ~ ':' ~ notification.id
-                    }),
-                    icon: 'ri-notification-3-line'
-                }
-            ]
-        } %}
-        {% endif %}
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ notification.id|e }}" />

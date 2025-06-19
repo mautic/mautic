@@ -411,6 +411,10 @@
 
 .pi-16, .pi-md { padding-inline: var(--spacing-05) !important; }
 .mi-16, .mi-md { margin-inline: var(--spacing-05) !important; }
+.pi-neg-local { padding-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.mi-neg-local { margin-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+.ma-neg-local { margin: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
+
 
 //fixed widths
 .w-44 {width: 44px;}
@@ -679,6 +683,11 @@
   .fo-4-lg { order: 4; }
   .fo-5-lg { order: 5; }
 }
+
+// Aspect ratio
+.ar-16-9 { aspect-ratio: 16 / 9; }
+.ar-2-1 { aspect-ratio: 2 / 1; }
+.ar-1-1 { aspect-ratio: 1 / 1; }
 
 // Animations
 // Slide in

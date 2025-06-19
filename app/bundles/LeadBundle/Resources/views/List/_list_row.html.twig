@@ -22,16 +22,17 @@
                 },
                 'routeBase': 'segment',
                 'langVar': 'lead.list',
-                'custom': [
-                    {
+                'customButtons': {
+                    'viewcontacts': {
                         'attr': {
                             'data-toggle': 'ajax',
                             'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias}),
                         },
-                        'icon': 'ri-team-line',
-                        'label': 'mautic.lead.list.view_contacts',
-                    },
-                ],
+                        'iconClass': 'ri-team-line',
+                        'btnText': 'mautic.lead.list.view_contacts'|trans,
+                        'priority': 100
+                    }
+                },
         }) }}
     </td>
     <td>

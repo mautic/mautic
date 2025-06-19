@@ -1,0 +1,20 @@
+<div class="contained-list contained-list--on-page">
+  {% if title is defined %}
+  <div class="contained-list__header">
+    <div id="contained-list-header" class="contained-list__label">{{ title|trans }}</div>
+    <div class="contained-list__action layout-constraint--size__min-sm layout-constraint--size__max-xl"></div>
+  </div>
+  {% endif %}
+  <ul role="list" aria-labelledby="contained-list-header">
+    {% for item in items %}
+    <li class="contained-list-item">
+      <div class="contained-list-item__content">
+        <div class="d-flex ai-center">
+          <div>{{ item.label|trans }}</div>
+          <i class="{{ item.icon }} ml-sm" aria-hidden="true"></i>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>

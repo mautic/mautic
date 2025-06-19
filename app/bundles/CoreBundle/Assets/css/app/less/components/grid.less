@@ -115,3 +115,33 @@
 @media (min-width: @screen-lg-min) {
   .make-grid(lg);
 }
+
+.layout--size-xs {
+  --layout-size-height-context: var(--layout-size-height-xs, 1.5rem);
+  --layout-size-height: var(--layout-size-height-context);
+}
+
+.layout--size-sm {
+  --layout-size-height-context: var(--layout-size-height-sm, 2rem);
+  --layout-size-height: var(--layout-size-height-context);
+}
+
+.layout--size-md {
+  --layout-size-height-context: var(--layout-size-height-md, 2.5rem);
+  --layout-size-height: var(--layout-size-height-context);
+}
+
+.layout--size-lg {
+  --layout-size-height-context: var(--layout-size-height-lg, 3rem);
+  --layout-size-height: var(--layout-size-height-context);
+}
+
+.layout--size-xl {
+  --layout-size-height-context: var(--layout-size-height-xl, 4rem);
+  --layout-size-height: var(--layout-size-height-context);
+}
+
+.layout--size-2xl {
+  --layout-size-height-context: var(--layout-size-height-2xl, 5rem);
+  --layout-size-height: var(--layout-size-height-context);
+}
