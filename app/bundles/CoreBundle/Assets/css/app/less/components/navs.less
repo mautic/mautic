@@ -5,6 +5,12 @@
 // Base class
 // --------------------------------------------------
 
+.tabs-container {
+  display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
 .nav {
   > li {
     > a {
@@ -64,6 +70,8 @@
 
 // Wrapper for scrollable tabs
 .nav-tabs-wrapper {
+  display: flex;
+  flex-shrink: 0;
   position: relative;
   overflow: hidden;
   margin-bottom: -1px;
@@ -118,6 +126,7 @@
 .nav-tabs {
   //background-color: @body-bg;
   display: flex;
+  flex-grow: 1;
   flex-wrap: nowrap;
   overflow: hidden;
   position: relative;
@@ -256,10 +265,15 @@
     }
   }
 }
+.tabs-container--vertical {
+  flex-direction: row;
+}
 
 // Vertical variant
 .nav-tabs--vertical {
   flex-direction: column;
+  flex-grow: 0;
+  background-color: var(--layer);
 
   > li {
     > a {
@@ -276,6 +290,8 @@
       &:hover {
         background-color: var(--layer-hover);
         border-color: var(--border-subtle);
+        border-right-color: var(--border-subtle);
+
 
         &:after {
           background-color: var(--border-strong);
@@ -296,13 +312,17 @@
         &,
         &:hover {
           border-bottom-color: var(--border-subtle);
-          border-right-color: var(--border-subtle);
+          border-right-color: transparent;
 
           &:after {
             background-color: var(--border-interactive);
           }
         }
       }
+    }
+
+    &:has(+ li.active) > a {
+      border-right-color: var(--border-subtle);
     }
   }
 }
