@@ -770,6 +770,13 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                         }
 
                         if (response.success) {
+                            if (response.hideform) {
+                                this.fadeOut(document.getElementsByClassName('mauticform-innerform')[0]);
+                                if (response.hideform_text) {
+                                    this.setMessage(response.hideform_text, 'message');
+                                }
+                            }
+
                             if (response.successMessage) {
                                 this.setMessage(response.successMessage, 'message');
                             }
@@ -788,6 +795,17 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                         Form.customCallbackHandler(formId, 'onResponseEnd', response);
                     }
+                },
+
+                fadeOut: function(el) {
+                    el.style.opacity = 1;
+                    (function fade() {
+                        if ((el.style.opacity -= .1) < 0) {
+                            el.style.display = 'none';
+                        } else {
+                            requestAnimationFrame(fade);
+                        }
+                    })();
                 },
 
                 setMessage: function (message, type) {
