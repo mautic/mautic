@@ -6071,6 +6071,10 @@ ul.dropdown-menu-form {
     flex-wrap: nowrap;
   }
 }
+.tabs__nav-item-icon {
+  font-size: 16px;
+  font-weight: 400;
+}
 .tab-content.contained {
   background-color: var(--layer);
 }
