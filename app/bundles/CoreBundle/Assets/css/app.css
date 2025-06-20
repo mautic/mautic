@@ -6089,6 +6089,11 @@ ul.dropdown-menu-form {
   font-size: 16px;
   font-weight: 400;
 }
+.tabs__nav-item-label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .nav-tabs--line > li > a {
   background-color: transparent;
   padding: 6px 16px;
