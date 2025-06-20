@@ -172,6 +172,7 @@ class FormType extends AbstractType
                 'mautic.form.form.postaction.message'  => 'message',
                 'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.return'   => 'return',
+                'mautic.form.form.postaction.hideform' => 'hideform',
             ],
             'label'             => 'mautic.form.form.postaction',
             'label_attr'        => ['class' => 'control-label'],

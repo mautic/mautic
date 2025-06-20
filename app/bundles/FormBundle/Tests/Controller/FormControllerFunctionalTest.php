@@ -73,6 +73,65 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
     }
 
+    public function testNewActionCheckDisplayMessageOptionsForm(): void
+    {
+        $this->client->request('GET', '/s/forms/new');
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseStatusCodeSame(Response::HTTP_OK, $clientResponse->getContent());
+        $this->assertStringContainsString('Hide form', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Redirect URL', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Remain at form', $clientResponse->getContent(), $clientResponse->getContent());
+    }
+
+    public function testErrorValidationWithHideFormTypeWithoutMessage(): void
+    {
+        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
+
+        $this->assertEquals('message', $selectedValue);
+
+        $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+
+        $form->setValues(
+            [
+                'mauticform[name]'       => 'Test',
+                'mauticform[postAction]' => 'hideform',
+            ]
+        );
+
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
+        $this->assertStringContainsString('has-error', $divClass, $crawler->html());
+    }
+
+    public function testSuccessWithHideForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
+
+        $this->assertEquals('message', $selectedValue);
+
+        $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+
+        $form->setValues(
+            [
+                'mauticform[name]'               => 'Test',
+                'mauticform[postAction]'         => 'hideform',
+                'mauticform[postActionProperty]' => 'message',
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
+        $this->assertStringNotContainsString('has-error', $divClass, $crawler->html());
+    }
+
     public function testSuccessfulSubmitActionForm(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');

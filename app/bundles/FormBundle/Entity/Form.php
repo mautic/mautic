@@ -244,6 +244,11 @@ class Form extends FormEntity
             'groups'  => ['urlRequired'],
         ]));
 
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
+            'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
+            'groups'  => ['hideformRequired'],
+        ]));
+
         $metadata->addPropertyConstraint('postActionProperty', new Assert\Url([
             'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
             'groups'  => ['urlRequiredPassTwo'],
@@ -269,6 +274,8 @@ class Form extends FormEntity
 
         if ('message' == $postAction) {
             $groups[] = 'messageRequired';
+        } elseif ('hideform' == $postAction) {
+            $groups[] = 'hideformRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
         }

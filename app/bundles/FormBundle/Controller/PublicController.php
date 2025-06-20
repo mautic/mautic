@@ -152,6 +152,9 @@ class PublicController extends CommonFormController
 
                 if ('redirect' == $postAction) {
                     $data['redirect'] = $postActionProperty;
+                } elseif ('hideform' === $postAction) {
+                    $data['hideform']      = true;
+                    $data['hideform_text'] = $postActionProperty;
                 } elseif (!empty($postActionProperty)) {
                     $data['successMessage'] = [$postActionProperty];
                 }
