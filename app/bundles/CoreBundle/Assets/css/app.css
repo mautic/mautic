@@ -6052,6 +6052,7 @@ ul.dropdown-menu-form {
   line-height: 20px;
   color: var(--text-secondary);
   margin-right: unset;
+  height: 100%;
   outline: 2px var(--outline-style) transparent;
   outline-offset: -2px;
 }
