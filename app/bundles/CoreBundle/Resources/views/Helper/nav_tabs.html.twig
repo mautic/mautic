@@ -1,33 +1,99 @@
 {# nav_tabs.html.twig #}
+{# 
+Variables:
+    tabs: Array of tabs { 
+        as (optional|default 'button'), 
+        id (optional), 
+        label, 
+        secondaryLabel (optional), 
+        className, 
+        disabled, 
+        renderIcon (optional), 
+        layer, 
+        content 
+    }
+    variant: line, contained, iconOnly, vertical
+    selectedIndex: (optional) Index of the tab that should be active
+    isDismissable: (optional) Boolean to show dismiss button (default: false)
+    iconSize: (optional) Size of the icon when variant is iconOnly (default: lg)
+#}
+
 {% macro generateTabId(translationKey) -%}
     {%- set parts = translationKey|split('.') -%}
     {%- set lastParts = parts|slice(-2) -%}
     {{- lastParts|join('-')|lower -}}
 {%- endmacro %}
 
+{% if variant == 'line' %}
 <div class="tabs-container">
     {# Nav tabs #}
-    <ul class="nav nav-tabs {% if style|default('line') == 'line' %}nav-tabs-line{% else %}nav-tabs-contained{% endif %}" role="tablist">
+    <ul class="nav nav-tabs nav-tabs--line tab--list" role="tablist">
         {% for tab in tabs %}
-            {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
-            <li role="presentation"{% if loop.first %} class="active"{% endif %}>
-                <a href="#{{ tabId }}"
-                   aria-controls="{{ tabId }}"
-                   role="tab"
-                   data-toggle="tab">{{ tab.title|trans }}</a>
+            {%- set tabId = tab.id|default(_self.generateTabId(tab.label)) -%}
+            {%- set isActive = (active is defined and active == tabId) or (active is not defined and loop.first) -%}
+            <li role="presentation" class="{% if isActive %}active{% endif %}{% if tab.disabled is defined and tab.disabled %} disabled{% endif %}">
+                {% if isDismissable is defined and isDismissable %}
+                    <a href="#{{ tabId }}"
+                       aria-controls="{{ tabId }}"
+                       role="tab"
+                       data-toggle="tab"
+                       class="tabs__nav-item tabs__nav-link">
+                       <div class="tabs__nav-item-label-wrapper">
+                            {% if tab.renderIcon is defined and tab.renderIcon %}
+                                <i class="tabs__nav-item-icon mr-sm {{ tab.renderIcon }}"></i>
+                            {% endif %}
+                            <span class="tabs__nav-item-label">{{ tab.label|trans }}</span>
+                            <!-- dismiss button -->
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="#{{ tabId }}"
+                       aria-controls="{{ tabId }}"
+                       role="tab"
+                       data-toggle="tab"
+                       class="tabs__nav-item tabs__nav-link">
+                       <div class="tabs__nav-item-label-wrapper">
+                           <span class="tabs__nav-item-label">{{ tab.label|trans }}</span>
+                           {% if tab.renderIcon is defined and tab.renderIcon %}
+                               <i class="tabs__nav-item-icon ml-sm {{ tab.renderIcon }}"></i>
+                           {% endif %}
+                        </div>
+                    </a>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
 
     {# Tab content #}
-    <div class="tab-content {% if style|default('') == 'contained' %}contained{% endif %}">
+    <div class="tab-content">
         {% for tab in tabs %}
-            {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
+            {%- set tabId = tab.id|default(_self.generateTabId(tab.label)) -%}
+            {%- set isActive = (active is defined and active == tabId) or (active is not defined and loop.first) -%}
             <div role="tabpanel"
-                 class="tab-pane fade{% if loop.first %} in active{% endif %}{% if style|default('line') == 'contained' %} layer-{{ layer|default('two') }}{% endif %}"
+                 class="tab-pane fade{% if isActive %} in active{% endif %}"
                  id="{{ tabId }}">
                 {{ tab.content|raw }}
             </div>
         {% endfor %}
     </div>
 </div>
+
+
+
+{% elseif variant == 'contained' %}
+<!-- contained -->
+
+
+
+
+{% elseif variant == 'iconOnly' %}
+<!-- iconOnly -->
+
+
+
+
+
+{% elseif variant == 'vertical' %}
+<!-- vertical -->
+
+{% endif %}
