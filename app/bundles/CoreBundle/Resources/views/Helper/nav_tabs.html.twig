@@ -6,7 +6,7 @@
 
 {% macro tabContent(tab, tabId, isActive, variant) %}
     <div role="tabpanel"
-         class="tab-pane {% if tab.className is defined and tab.className %} {{ tab.className }} {% endif %} fade{% if isActive %} in active{% endif %}{% if variant == 'contained' or variant == 'vertical' %} layer-two{% endif %}"
+         class="tab-pane {% if tab.className is defined and tab.className %} {{ tab.className }} {% endif %} fade{% if isActive %} in active{% endif %}{% if variant == 'contained' or variant == 'vertical' %} fg-1 layer-two{% endif %}"
          id="{{ tabId }}">
         {{ tab.content|raw }}
     </div>
