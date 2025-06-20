@@ -30,7 +30,7 @@ Variables:
     <ul class="nav nav-tabs nav-tabs--line tab--list" role="tablist">
         {% for tab in tabs %}
             {%- set tabId = tab.id|default(_self.generateTabId(tab.label)) -%}
-            {%- set isActive = (active is defined and active == tabId) or (active is not defined and loop.first) -%}
+            {%- set isActive = (selectedIndex is defined and loop.index0 == selectedIndex) or (selectedIndex is not defined and loop.first) -%}
             <li role="presentation" class="{% if isActive %}active{% endif %}{% if tab.disabled is defined and tab.disabled %} disabled{% endif %}">
                 {% if isDismissable is defined and isDismissable %}
                     <a href="#{{ tabId }}"
@@ -68,7 +68,7 @@ Variables:
     <div class="tab-content">
         {% for tab in tabs %}
             {%- set tabId = tab.id|default(_self.generateTabId(tab.label)) -%}
-            {%- set isActive = (active is defined and active == tabId) or (active is not defined and loop.first) -%}
+            {%- set isActive = (selectedIndex is defined and loop.index0 == selectedIndex) or (selectedIndex is not defined and loop.first) -%}
             <div role="tabpanel"
                  class="tab-pane fade{% if isActive %} in active{% endif %}"
                  id="{{ tabId }}">
