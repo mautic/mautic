@@ -129,7 +129,7 @@ Variables:
             {%- set tabId = tab.id|default(_self.generateTabId(tab.label)) -%}
             {%- set isActive = (selectedIndex is defined and loop.index0 == selectedIndex) or (selectedIndex is not defined and loop.first) -%}
             <div role="tabpanel"
-                 class="tab-pane {% if tab.className is defined and tab.className %} {{ tab.className }} {% endif %} fade{% if isActive %} in active{% endif %}"
+                 class="tab-pane {% if tab.className is defined and tab.className %} {{ tab.className }} {% endif %} fade{% if isActive %} in active{% endif %} layer-two"
                  id="{{ tabId }}">
                 {{ tab.content|raw }}
             </div>
@@ -204,7 +204,7 @@ Variables:
             {%- set tabId = tab.id|default(_self.generateTabId(tab.label)) -%}
             {%- set isActive = (selectedIndex is defined and loop.index0 == selectedIndex) or (selectedIndex is not defined and loop.first) -%}
             <div role="tabpanel"
-                 class="tab-pane {% if tab.className is defined and tab.className %} {{ tab.className }} {% endif %} fade{% if isActive %} in active{% endif %}"
+                 class="tab-pane {% if tab.className is defined and tab.className %} {{ tab.className }} {% endif %} fade{% if isActive %} in active{% endif %} layer-two"
                  id="{{ tabId }}">
                 {{ tab.content|raw }}
             </div>
