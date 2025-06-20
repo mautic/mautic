@@ -13,11 +13,6 @@ use PHPUnit\Framework\Assert;
 
 class LeadModelTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testImportLeadWithCompanyDataAndSkipIfExists(): void
     {
         // 1. Create a company first that should be detected as duplicate
