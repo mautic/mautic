@@ -273,7 +273,6 @@ class CampaignRepository extends CommonRepository
                 'campaign_id',
                 'campaign_projects_xref',
                 $this->getTableAlias(),
-                $this->generateRandomParameterName(),
                 $filter->string,
                 $filter->not
             ),

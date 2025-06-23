@@ -25,7 +25,7 @@ use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1479,7 +1479,7 @@ class EmailController extends FormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FieldModel $fieldModel): Response
+    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FakeContactHelper $fakeLeadHelper): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -1535,18 +1535,12 @@ class EmailController extends FormController
                 if ($previewForContactId) {
                     // We have one from request parameter
                     $fields = $leadModel->getRepository()->getLead($previewForContactId);
+                    $fields = $model->enrichedContactWithCompanies($fields);
                 }
 
                 if (!isset($fields)) {
-                    // Prepare a fake lead
-                    $fields = $fieldModel->getFieldList(false, false);
-                    array_walk(
-                        $fields,
-                        function (&$field): void {
-                            $field = "[$field]";
-                        }
-                    );
-                    $fields['id'] = 0;
+                    // Prepare a fake contact
+                    $fields = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
                 }
 
                 $errors = [];

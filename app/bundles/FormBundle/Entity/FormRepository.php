@@ -158,7 +158,6 @@ class FormRepository extends CommonRepository
                     'form_id',
                     'form_projects_xref',
                     $this->getTableAlias(),
-                    $unique,
                     $filter->string,
                     $filter->not
                 );

@@ -151,7 +151,6 @@ class SmsRepository extends CommonRepository
                     'sms_id',
                     'sms_projects_xref',
                     $this->getTableAlias(),
-                    $unique,
                     $filter->string,
                     $filter->not
                 );

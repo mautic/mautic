@@ -436,7 +436,6 @@ class LeadListRepository extends CommonRepository
                     'leadlist_id',
                     'lead_list_projects_xref',
                     'l',
-                    $unique,
                     $filter->string,
                     $filter->not
                 );

@@ -132,32 +132,16 @@
       <div class="col-md-9 height-auto">
           <div>
               <!-- form detail header -->
-              {% include '@MauticCore/Helper/description.html.twig' with {'description': item.description} %}
+              {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': item.description} %}
               <!--/ form detail header -->
 
               <!-- form detail collapseable -->
               <div class="collapse pr-md pl-md" id="focus-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-hover mb-0" data-view-table data-entity-id="{{ item.id }}>
+                          <table class="table table-hover mb-0" data-view-table data-entity-id="{{ item.id }}">
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
-                              <tr>
-                                  <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.focus.details.views'|trans }}</span>
-                                  </td>
-                                  <td data-focus-total-views-cell>
-                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.focus.details.unique_views'|trans }}</span>
-                                  </td>
-                                  <td data-focus-total-unique-views-cell>
-                                      <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
-                                  </td>
-                              </tr>
                               </tbody>
                           </table>
                       </div>
@@ -181,6 +165,22 @@
               <div class="pa-md">
                   <div class="row">
                       <div class="col-sm-12">
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.focus.details.views',
+                                'value_attr': 'data-focus-total-views-cell',
+                                'value': '<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>',
+                                'tooltip': 'mautic.focus.details.views.tooltip',
+                                'icon': 'ri-eye-line',
+                            },
+                            {
+                                'title': 'mautic.focus.details.unique_views',
+                                'value_attr': 'data-focus-total-unique-views-cell',
+                                'value': '<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>',
+                                'tooltip': 'mautic.focus.details.unique_views.tooltip',
+                                'icon': 'ri-user-6-line',
+                            }
+                        ]}) }}
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-xs-4 va-m">
@@ -236,13 +236,26 @@
       <div class="col-md-3 bdr-l height-auto">
           <!-- form HTML -->
           <div class="pa-md">
-              <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
-                  <div class="panel-body">
-                      <h5 class="fw-sb mb-sm">{{ 'mautic.focus.install.header'|trans }}</h5>
-                      <p class="mb-sm">{{ 'mautic.focus.install.description'|trans }}</p>
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
-                  </div>
-              </div>
+              {% set aboveFoldContent %}
+                  <h4 class="mb-lg fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
+                  {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                      pictogram: 'embed',
+                      size: 64,
+                      color: 'var(--icon-interactive)'
+                  } %}
+              {% endset %}
+
+              {% set belowFoldContent %}
+                  <p class="mt-lg mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
+                  <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
+              {% endset %}
+
+              {{ include('@MauticCore/Components/tile--expandable-interactive.html.twig', {
+                  'tiles': [{
+                      'aboveFoldContent': aboveFoldContent,
+                      'belowFoldContent': belowFoldContent
+                  }]
+              }) }}
           </div>
           <!--/ form HTML -->
 

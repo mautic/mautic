@@ -104,7 +104,7 @@
         <div>
             <!-- page detail header -->
             <!-- segment detail collapseable toggler -->
-            {% include '@MauticCore/Helper/description.html.twig' with {'description': list.description} %}
+            {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': list.description} %}
             <div class="collapse pr-md pl-md" id="segment-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
@@ -144,6 +144,16 @@
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
+                        {% if securityIsGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.segments.contacts.view',
+                                'value': segmentCount,
+                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias}),
+                                'icon': 'ri-user-6-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 va-m">
@@ -260,21 +270,6 @@
 
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
-
-        <div class="mt-lg mb-lg">
-            {% if securityIsGranted('lead:leads:viewown') %}
-            {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
-                title: 'mautic.core.useful_links',
-                items: [
-                    {
-                        label: 'mautic.lead.segments.contacts.view',
-                        link: path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias}),
-                        icon: 'ri-user-6-line'
-                    }
-                ]
-            } %}
-            {% endif %}
-        </div>
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ list.id|e }}" />

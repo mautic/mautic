@@ -38,7 +38,7 @@ class PageApiController extends CommonApiController
         $this->entityClass      = Page::class;
         $this->entityNameOne    = 'page';
         $this->entityNameMulti  = 'pages';
-        $this->serializerGroups = ['pageDetails', 'categoryList', 'publishDetails'];
+        $this->serializerGroups = ['pageDetails', 'categoryList', 'publishDetails', 'projectList'];
         $this->dataInputMasks   = ['customHtml' => 'html'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);

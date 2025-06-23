@@ -182,9 +182,9 @@
                                     </a>
                                 </div>
                                 {% if attribute(item, 'getDescription') is defined and item.getDescription() %}
-                                    <div class="text-secondary mt-4">
-                                        <small>{{ item.getDescription()|purify }}</small>
-                                    </div>
+                                    {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                        'description': item.getDescription()
+                                    }) }}
                                 {% endif %}
                             </td>
                             {% if attribute(item, 'getCategory') is defined %}
