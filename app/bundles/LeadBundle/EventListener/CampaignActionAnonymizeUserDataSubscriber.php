@@ -60,7 +60,7 @@ class CampaignActionAnonymizeUserDataSubscriber implements EventSubscriberInterf
         }
 
         $properties       = $event->getEvent()->getProperties();
-        $pseudonymize     = $properties['pseudonymize'] ?? false;
+        $pseudonymize     = isset($properties['pseudonymize']) && (bool) $properties['pseudonymize'];
         $leads            = $this->leadModel->getRepository()->findBy(['id' => $event->getContactIds()]);
         $companies        = $this->getCompaniesByLeads($event->getContactIds());
 

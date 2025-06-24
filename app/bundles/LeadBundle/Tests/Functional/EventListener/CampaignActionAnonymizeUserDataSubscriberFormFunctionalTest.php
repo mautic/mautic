@@ -288,9 +288,6 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $this->addLeadToList([$lead1, $lead2, $lead3], $list);
 
         $resultForms = $this->createFormWithSubmissions([$lead1, $lead2, $lead3], 'Test Form 11', true);
-        //        $resultForms2 = $this->createFormWithSubmissions([$lead3, $lead4],'Test Form 22', true);
-        //        $resultForms2 = $this->createFormWithSubmissions([$lead1, $lead2, $lead3],true);
-        //        dd($resultForms2);
 
         $campaign    = $this->createCampaign($list);
 
@@ -429,6 +426,80 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $this->assertNotSame($companyLead1->getAddress1(), $company1->getAddress1());
         $this->assertNotNull($company1->getAddress2());
         $this->assertNull($companyLead1->getAddress2());
+    }
+
+    public function testPseudonymizeDataWithPseudonymizeInt1(): void
+    {
+        $this->runCampaignToValidateError(1);
+    }
+
+    public function testPseudonymizeDataWithPseudonymize0(): void
+    {
+        $this->runCampaignToValidateError(0);
+    }
+
+    public function testPseudonymizeDataWithPseudonymizeTrue(): void
+    {
+        $this->runCampaignToValidateError(true);
+    }
+
+    public function testPseudonymizeDataWithPseudonymizeFalse(): void
+    {
+        $this->runCampaignToValidateError(false);
+    }
+
+    private function runCampaignToValidateError($psendonymizeEvent): void
+    {
+        $auditLogModel = static::getContainer()->get('mautic.core.model.auditlog');
+        assert($auditLogModel instanceof \Mautic\CoreBundle\Model\AuditLogModel);
+        $checkAuditLog = $auditLogModel->getRepository()->findAll();
+        Assert::assertEmpty($checkAuditLog);
+        // Set email field as unique to duplicate the email
+        $this->setEmailUnique();
+        $email1   = 'foo@baa.com';
+        $lead1    = $this->createLead('Test1', 'Lastname1', $email1);
+        $company1 = $this->createCompany('Company 1', 'company2@email.com');
+
+        $lead1->setCompany($company1);
+        $lead1->setPrimaryCompany($company1);
+        $this->em->persist($lead1);
+        $this->em->flush();
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        assert($leadModel instanceof LeadModel);
+        $leadModel->getRepository()->saveEntity($lead1);
+
+        $this->addCompanyOnLead($lead1, $company1);
+
+        $list   = $this->createLeadList('Test List');
+
+        $this->addLeadToList([$lead1], $list);
+
+        $resultForms = $this->createFormWithSubmissions([$lead1, $lead1, $lead1], 'Test Form 11', true);
+
+        $campaign    = $this->createCampaign($list);
+
+        $emailEntity = new Email();
+        $emailEntity->setSubject('Test Email');
+        $emailEntity->setFromName('Test');
+        $emailEntity->setName('Test Email');
+        $this->em->persist($emailEntity);
+        $this->em->flush();
+
+        $emailStat1       = $this->addEmailStat($lead1, $emailEntity, $email1);
+        $getFieldChoices  = $this->getFieldChoices(false);
+
+        // Fields Anonymize: First Name, Last Name, Email, Company Address 1
+        // Fields to deleted: Primary Company, Position, Address Line 1, Company Address 2
+        $event = $this->createCampaignEvent($campaign, 'Anonymize User Data Test', ['2', '3', '6', '29'], ['4', '5', '11', '30'], $psendonymizeEvent);
+
+        // add event
+        $campaign->addEvent('lead.action_anonymizeuserdata', $event);
+        $this->em->flush();
+        $this->em->clear();
+
+        $resultRunCommandCampaign1 = $this->testSymfonyCommand('mautic:campaigns:update');
+        $resultRunCommandCampaign2 = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        self::assertStringContainsString('1 total event was executed', $resultRunCommandCampaign2->getDisplay());
     }
 
     private function createCompany(string $name = 'Company', string $email='company@foobaa.com'): Company
@@ -740,11 +811,12 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
     /**
      * @param array <string> $fieldsToAnonymize
      * @param array <string> $fieldsToDelete
+     * @param bool|int       $pseudonymize
      *
      * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function createCampaignEvent(Campaign $campaign, string $name, array $fieldsToAnonymize, array $fieldsToDelete, bool $pseudonymize = false): Event
+    private function createCampaignEvent(Campaign $campaign, string $name, array $fieldsToAnonymize, array $fieldsToDelete, $pseudonymize): Event
     {
         $campaignEvent = new Event();
         $campaignEvent->setCampaign($campaign);
@@ -950,7 +1022,7 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
     private function getDefaultValuesForm(array $fieldsToAnonymize, array $fieldsToDelete, bool $pseudonymize = false): array
     {
         return [
-            'campaignevent[properties][pseudonymize]'      => ($pseudonymize) ? '1' : '0',
+            'campaignevent[properties][pseudonymize]'      => ($pseudonymize) ? 1 : 0,
             'campaignevent[properties][fieldsToAnonymize]' => $fieldsToAnonymize,
             'campaignevent[properties][fieldsToDelete]'    => $fieldsToDelete,
             'campaignevent[type]'                          => self::EVENT_LEAD_TYPE,
