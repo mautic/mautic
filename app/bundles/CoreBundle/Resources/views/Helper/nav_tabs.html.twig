@@ -14,7 +14,16 @@
 
 {% macro iconContent(tab, variant, isDismissable) %}
     {% if tab.renderIcon is defined and tab.renderIcon %}
-        <i class="tabs__nav-item-icon{% if variant == 'line' and isDismissable %} mr-8{% elseif variant == 'line' %} ml-8{% elseif variant == 'contained' %} ml-16{% endif %} {{ tab.renderIcon }}"></i>
+        <i class="tabs__nav-item-icon fs-b-e{% if variant == 'line' and isDismissable %} mr-8{% elseif variant == 'line' %} ml-8{% elseif variant == 'contained' %} ml-12{% endif %} {{ tab.renderIcon }}"></i>
+    {% endif %}
+{% endmacro %}
+
+{% macro tagContent(tab, variant, isDismissable) %}
+    {% if tab.renderTag is defined and tab.renderTag %}
+        {% set tagData = tab.renderTag|merge({'color': 'primary', 'size': 'sm'}) %}
+        <div class="tabs__nav-item-tag{% if variant == 'line' and isDismissable %} mr-8{% elseif variant == 'line' %} ml-8{% elseif variant == 'contained' %} ml-12{% endif %}">
+            {% include '@MauticCore/Components/tag.html.twig' with {'tags': [tagData]} %}
+        </div>
     {% endif %}
 {% endmacro %}
 
@@ -34,7 +43,11 @@
                 {% if variant == 'iconOnly' %}
                     <a href="#{{ tabId }}" aria-controls="{{ tabId }}" role="tab" data-toggle="tab" class="tabs__nav-item tabs__nav-item--icon-only {% if iconSize is defined and iconSize == 'lg' %}tabs__nav-item--icon-only__20{% endif %} tabs__nav-link">
                        <div class="tabs__nav-item-label-wrapper">
-                           <i class="tabs__nav-item-icon {{ tab.renderIcon }}"></i>
+                           {% if tab.renderTag is defined and tab.renderTag %}
+                               {{ _self.tagContent(tab, variant, false) }}
+                           {% else %}
+                               <i class="tabs__nav-item-icon {{ tab.renderIcon }}"></i>
+                           {% endif %}
                        </div>
                     </a>
                 {% elseif variant == 'vertical' %}
@@ -47,11 +60,19 @@
                     <a href="#{{ tabId }}" aria-controls="{{ tabId }}" role="tab" data-toggle="tab" class="tabs__nav-item tabs__nav-link">
                        <div class="tabs__nav-item-label-wrapper">
                             {% if isDismissable is defined and isDismissable %}
-                                {{ _self.iconContent(tab, variant, isDismissable|default(false)) }}
+                                {% if tab.renderTag is defined and tab.renderTag %}
+                                    {{ _self.tagContent(tab, variant, isDismissable|default(false)) }}
+                                {% else %}
+                                    {{ _self.iconContent(tab, variant, isDismissable|default(false)) }}
+                                {% endif %}
                                 <span class="tabs__nav-item-label">{{ tab.label|trans }}</span>
                             {% else %}
                                 <span class="tabs__nav-item-label">{{ tab.label|trans }}</span>
-                                {{ _self.iconContent(tab, variant, isDismissable|default(false)) }}
+                                {% if tab.renderTag is defined and tab.renderTag %}
+                                    {{ _self.tagContent(tab, variant, isDismissable|default(false)) }}
+                                {% else %}
+                                    {{ _self.iconContent(tab, variant, isDismissable|default(false)) }}
+                                {% endif %}
                             {% endif %}
                         </div>
                         {% if variant == 'contained' %}
