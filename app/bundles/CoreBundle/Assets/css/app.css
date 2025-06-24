@@ -6147,7 +6147,8 @@ ul.dropdown-menu-form {
 .nav-tabs--contained > li.active > a {
   background-color: var(--layer);
 }
-.nav-tabs--contained > li:has(+ li.active) > a {
+.nav-tabs--contained > li:has(+ li.active) > a,
+.nav-tabs--contained > li:last-child > a {
   border-right-color: transparent;
 }
 .nav-tabs--contained > li.disabled {

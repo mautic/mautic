@@ -255,10 +255,11 @@
       > a { background-color: var(--layer); }
     }
     
-    &:has(+ li.active) > a {
+    &:has(+ li.active) > a,
+    &:last-child > a {
       border-right-color: transparent;
     }
-    
+
     &.disabled {
       cursor: not-allowed;
       color: var(--text-disabled);
