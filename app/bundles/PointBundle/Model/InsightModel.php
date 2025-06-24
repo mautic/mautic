@@ -2,11 +2,12 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
@@ -15,25 +16,25 @@ use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Entity\PointInsightRepository;
 use Mautic\PointBundle\Form\Type\PointInsightType;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InsightModel extends FormModel
+/**
+ * @extends CommonFormModel<PointInsight>
+ */
+class InsightModel extends CommonFormModel
 {
     public function __construct(
-        EntityManager $em,
+        protected LeadModel $leadModel,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
-        TranslatorInterface $translator,
+        Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly RequestStack $requestStack,
-        private readonly LeadModel $leadModel
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -52,6 +53,8 @@ class InsightModel extends FormModel
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -80,8 +83,8 @@ class InsightModel extends FormModel
     {
         // Hole alle aktiven Point Insights vom Typ "compare_point_groups"
         $insights = $this->getRepository()->findBy([
-            'isPublished' => true,
-            'insightType' => 'compare_point_groups',
+            'isPublished'   => true,
+            'insightType'   => 'compare_point_groups',
             'insightAction' => 'set_custom_field',
         ]);
 
@@ -93,21 +96,21 @@ class InsightModel extends FormModel
     private function executePointInsight(PointInsight $insight, Lead $contact): void
     {
         $pointGroupIds = $insight->getPointGroups();
-        $customField = $insight->getCustomField();
-        
+        $customField   = $insight->getCustomField();
+
         if (empty($pointGroupIds) || empty($customField)) {
             return;
         }
 
         // Ein einziger Query für alle Group Scores - sortiert nach Score (DESC) und ID (ASC)
-        $qb = $this->em->createQueryBuilder();
+        $qb      = $this->em->createQueryBuilder();
         $results = $qb
             ->select('g.id', 'g.name', 'COALESCE(s.score, 0) as score')
             ->from(Group::class, 'g')
             ->leftJoin(
                 GroupContactScore::class,
-                's', 
-                'WITH', 
+                's',
+                'WITH',
                 'g.id = s.group AND s.contact = :contactId'
             )
             ->where('g.id IN (:groupIds)')
@@ -122,21 +125,21 @@ class InsightModel extends FormModel
             return;
         }
 
-        $winner = $results[0];
+        $winner   = $results[0];
         $maxScore = (int) $winner['score'];
 
-        if ($maxScore === 0) {
+        if (0 === $maxScore) {
             return;
         }
 
         $hasMultipleWinners = isset($results[1]) && (int) $results[1]['score'] === $maxScore;
-        $currentValue = $contact->getFieldValue($customField);
+        $currentValue       = $contact->getFieldValue($customField);
 
         if ($hasMultipleWinners && !empty($currentValue)) {
             return;
         }
 
-        $newValue = $winner['id'] . ' (' . $winner['name'] . ')';
+        $newValue = $winner['id'].' ('.$winner['name'].')';
         $this->updateCustomField($contact, $customField, $newValue);
     }
 
@@ -145,4 +148,4 @@ class InsightModel extends FormModel
         $contact->addUpdatedField($fieldAlias, $value);
         $this->leadModel->saveEntity($contact, false);
     }
-} 
+}

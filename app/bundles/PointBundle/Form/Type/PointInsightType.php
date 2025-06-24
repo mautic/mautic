@@ -5,25 +5,22 @@ namespace Mautic\PointBundle\Form\Type;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\LeadBundle\Form\Type\LeadFieldsType;
+use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\PointBundle\Entity\PointInsight;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 
 class PointInsightType extends AbstractType
 {
     public function __construct(
-        private FieldModel $fieldModel,
+        private FieldList $fieldList,
     ) {
     }
 
@@ -117,10 +114,10 @@ class PointInsightType extends AbstractType
                     'data-toggle'          => 'multiselect',
                     'tooltip'              => 'mautic.point.insight.action.set_custom_field.tooltip',
                 ],
-                'multiple'    => true,
-                'required'    => false,
+                'multiple'      => true,
+                'required'      => false,
                 'return_entity' => false,
-                'placeholder' => 'mautic.core.form.choosemultiple',
+                'placeholder'   => 'mautic.core.form.choosemultiple',
             ]
         );
 
@@ -136,13 +133,13 @@ class PointInsightType extends AbstractType
                 ],
                 'required'    => false,
                 'placeholder' => 'mautic.core.form.chooseone',
-                'choices'     => ArrayHelper::flipArray($this->fieldModel->getFieldList(
+                'choices'     => ArrayHelper::flipArray($this->fieldList->getFieldList(
                     true,
                     true,
                     [
                         'isPublished' => true,
                         'object'      => 'lead',
-                        'type'        => 'text'
+                        'type'        => 'text',
                     ]
                 )),
             ]
@@ -167,4 +164,4 @@ class PointInsightType extends AbstractType
     {
         return 'pointinsight';
     }
-} 
+}

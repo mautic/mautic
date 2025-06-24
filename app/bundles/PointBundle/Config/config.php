@@ -23,11 +23,11 @@ return [
                 'path'       => '/points/groups/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\GroupController::executeAction',
             ],
-            'mautic_point.insights_index' => [
+            'mautic_point.insight_index' => [
                 'path'       => '/points/insights/{page}',
                 'controller' => 'Mautic\PointBundle\Controller\InsightController::indexAction',
             ],
-            'mautic_point.insights_action' => [
+            'mautic_point.insight_action' => [
                 'path'       => '/points/insights/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\InsightController::executeAction',
             ],
@@ -120,7 +120,7 @@ return [
                         'access' => 'point:groups:view',
                     ],
                     'mautic.point.insights.menu' => [
-                        'route'  => 'mautic_point.insights_index',
+                        'route'  => 'mautic_point.insight_index',
                         'access' => 'point:insights:view',
                     ],
                 ],

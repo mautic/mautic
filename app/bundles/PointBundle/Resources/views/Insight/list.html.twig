@@ -15,12 +15,12 @@
                 'templateButtons': {
                     'new': permissions['point:insights:create']
                 },
-                'routeBase': 'point.insights',
+                'routeBase': 'point.insight',
                 'langVar': 'point.insight'
             },
             'bulk_actions': {
                 'langVar': 'point.insight',
-                'routeBase': 'point.insights',
+                'routeBase': 'point.insight',
                 'templateButtons': {
                     'delete': permissions['point:insights:delete'],
                 },
@@ -89,7 +89,7 @@
                                             clone: permissions['point:insights:create'],
                                             delete: permissions['point:insights:delete'],
                                     },
-                                        routeBase: 'point.insights',
+                                        routeBase: 'point.insight',
                                         langVar: 'point.insight',
                                     }) -}}
                         </td>
@@ -103,7 +103,7 @@
                                         )}}
 
                                 {% if permissions['point:insights:edit'] %}
-                                            <a href="{{ path('mautic_point.insights_action', {
+                                            <a href="{{ path('mautic_point.insight_action', {
                                                 objectAction: 'edit',
                                                 objectId: item.id
                                             }) }}" data-toggle="ajax">
@@ -135,7 +135,7 @@
                             'totalItems' : items|length,
                             'page'       : page,
                             'limit'      : limit,
-                            'baseUrl'    : path('mautic_point.insights_index'),
+                            'baseUrl'    : path('mautic_point.insight_index'),
                             'sessionVar' : 'point.insight',
                         }) -}}
         </div>

@@ -26,4 +26,4 @@ class PointInsightRepository extends CommonRepository
     {
         return 'pi';
     }
-} 
+}

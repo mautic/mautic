@@ -29,7 +29,7 @@ final class InsightControllerTest extends MauticMysqlTestCase
     public function testInsightNewAction(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/points/insights/new');
-        
+
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertStringContainsString('New Point Insight', $crawler->filter('h1')->text());
     }
@@ -39,8 +39,8 @@ final class InsightControllerTest extends MauticMysqlTestCase
         $insight = $this->createTestInsight();
         $this->em->flush();
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/points/insights/edit/' . $insight->getId());
-        
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/points/insights/edit/'.$insight->getId());
+
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertStringContainsString('Edit Insight', $crawler->filter('h1')->text());
     }
@@ -49,22 +49,22 @@ final class InsightControllerTest extends MauticMysqlTestCase
     {
         /** @var InsightModel $insightModel */
         $insightModel = self::getContainer()->get('mautic.point.model.insight');
-        
+
         $insight = $this->createTestInsight();
         $this->em->flush();
-        
+
         $insightId = $insight->getId();
-        
+
         $this->assertNotNull($insightModel->getEntity($insightId));
-        
-        $this->client->request(Request::METHOD_POST, '/s/points/insights/delete/' . $insightId);
-        
+
+        $this->client->request(Request::METHOD_POST, '/s/points/insights/delete/'.$insightId);
+
         $response = $this->client->getResponse();
         $this->assertTrue(
             $response->isRedirect() || $response->isSuccessful(),
-            'Expected redirect or success response, got: ' . $response->getStatusCode()
+            'Expected redirect or success response, got: '.$response->getStatusCode()
         );
-        
+
         $this->em->clear();
         $this->assertNull($insightModel->getEntity($insightId));
     }
@@ -73,21 +73,21 @@ final class InsightControllerTest extends MauticMysqlTestCase
     {
         /** @var InsightModel $insightModel */
         $insightModel = self::getContainer()->get('mautic.point.model.insight');
-        
+
         $insightRepo = $insightModel->getRepository();
-        
+
         $insight = $this->createTestInsight();
         $this->em->flush();
         $this->em->clear();
-        
+
         $this->assertCount(1, $insightRepo->findAll());
-        
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/points/insights/clone/' . $insight->getId());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/points/insights/clone/'.$insight->getId());
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        
+
         $form = $crawler->selectButton('Save')->form();
         $this->client->submit($form);
-        
+
         $this->assertCount(2, $insightRepo->findAll());
     }
 
@@ -95,28 +95,28 @@ final class InsightControllerTest extends MauticMysqlTestCase
     {
         /** @var InsightModel $insightModel */
         $insightModel = self::getContainer()->get('mautic.point.model.insight');
-        
+
         $insightRepo = $insightModel->getRepository();
-        
+
         $insight1 = $this->createTestInsight('Test Insight 1');
         $insight2 = $this->createTestInsight('Test Insight 2');
         $this->em->flush();
-        
+
         $this->assertCount(2, $insightRepo->findAll());
-        
+
         $ids = json_encode([$insight1->getId(), $insight2->getId()]);
-        
+
         $this->client->request(
-            Request::METHOD_POST, 
-            '/s/points/insights/batchDelete?ids=' . urlencode($ids)
+            Request::METHOD_POST,
+            '/s/points/insights/batchDelete?ids='.urlencode($ids)
         );
-        
+
         $response = $this->client->getResponse();
         $this->assertTrue(
             $response->isRedirect() || $response->isSuccessful(),
-            'Expected redirect or success response, got: ' . $response->getStatusCode()
+            'Expected redirect or success response, got: '.$response->getStatusCode()
         );
-        
+
         $this->em->clear();
         $this->assertCount(0, $insightRepo->findAll());
     }
@@ -131,9 +131,9 @@ final class InsightControllerTest extends MauticMysqlTestCase
         $insight->setCustomField('test_field');
         $insight->setPointGroups([1, 2]);
         $insight->setIsPublished(true);
-        
+
         $this->em->persist($insight);
-        
+
         return $insight;
     }
 }

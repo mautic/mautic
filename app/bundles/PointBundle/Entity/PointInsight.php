@@ -2,7 +2,6 @@
 
 namespace Mautic\PointBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -13,15 +12,13 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class PointInsight extends FormEntity
 {
-    /**
-     * @var int
-     */
-    private $id;
+
+    private ?int $id = null;
 
     /**
      * @var string
      */
-    private $name;
+    private string $name = '';
 
     /**
      * @var string|null
@@ -44,7 +41,7 @@ class PointInsight extends FormEntity
     private $customField;
 
     /**
-     * @var array
+     * @var array<int>
      */
     private $pointGroups = [];
 
@@ -123,7 +120,7 @@ class PointInsight extends FormEntity
             ->addProperties(
                 [
                     'insightType',
-                    'insightAction', 
+                    'insightAction',
                     'customField',
                     'pointGroups',
                 ]
@@ -132,7 +129,7 @@ class PointInsight extends FormEntity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -245,7 +242,7 @@ class PointInsight extends FormEntity
     }
 
     /**
-     * @return array
+     * @return array<int>
      */
     public function getPointGroups()
     {
@@ -253,7 +250,7 @@ class PointInsight extends FormEntity
     }
 
     /**
-     * @param array $pointGroups
+     * @param array<int> $pointGroups
      *
      * @return PointInsight
      */
@@ -295,7 +292,7 @@ class PointInsight extends FormEntity
     }
 
     /**
-     * Alias of isActive()
+     * Alias of isActive().
      *
      * @return bool
      */
@@ -313,4 +310,4 @@ class PointInsight extends FormEntity
     {
         return $this->setIsPublished($active);
     }
-} 
+}

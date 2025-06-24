@@ -8,18 +8,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PointInsightApiControllerTest extends MauticMysqlTestCase
 {
-
     public function testPointInsightCRUDActions(): void
     {
         /** @var Translator $translator */
         $translator = static::getContainer()->get('translator');
 
         $this->client->request('POST', '/api/points/insights/new', [
-            'name'        => 'New Point Insight',
-            'description' => 'Description of the new point insight',
-            "insightType" => "compare_point_groups",
-            "insightAction" => "set_custom_field"
-
+            'name'          => 'New Point Insight',
+            'description'   => 'Description of the new point insight',
+            'insightType'   => 'compare_point_groups',
+            'insightAction' => 'set_custom_field',
         ]);
 
         $createResponse = $this->client->getResponse();
@@ -49,9 +47,9 @@ class PointInsightApiControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $allData);
 
         $updatePayload = [
-            'name'        => 'Updated Point Insight',
-            "insightType" => "compare_point_groups",
-            "insightAction" => "set_custom_field"
+            'name'          => 'Updated Point Insight',
+            'insightType'   => 'compare_point_groups',
+            'insightAction' => 'set_custom_field',
         ];
 
         $this->client->request('PATCH', "/api/points/insights/{$createdData['id']}/edit", $updatePayload);
