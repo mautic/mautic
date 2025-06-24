@@ -87,7 +87,7 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $values       = $form->getValues();
         $nameEvent    = 'Anonymize Event Name';
-        $values       = array_merge($values, $this->getDefaultValuesForm(['11', '2'], ['3', '5'],$nameEvent));
+        $values       = array_merge($values, $this->getDefaultValuesForm(['11', '2'], ['3', '5'], $nameEvent));
         $form->setValues($values);
         $this->client->submit($form, [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
@@ -114,8 +114,8 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $crawler                       = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form                          = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $values                        = $form->getValues();
-        $nameEvent = 'Anonymize User Data Updated Test';
-        $values                        = array_merge($values, $this->getDefaultValuesForm(['2', '5'], ['4'],$nameEvent));
+        $nameEvent                     = 'Anonymize User Data Updated Test';
+        $values                        = array_merge($values, $this->getDefaultValuesForm(['2', '5'], ['4'], $nameEvent));
         $values['campaignevent[name]'] = 'Anonymize User Data Updated Test';
         $form->setValues($values);
         $this->client->submit($form, [], $this->createAjaxHeaders());
@@ -154,7 +154,7 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $fieldsToAnonymize = ['2', '3', '11'];
         // Fields: First Name, Position, Address Line 2 and Last Name.
         $fieldsToDelete = ['2', '5', '12', '3'];
-        $nameEvent = 'Event Anonymize Data With Invalid Fields';
+        $nameEvent      = 'Event Anonymize Data With Invalid Fields';
         $values         = array_merge($values, $this->getDefaultValuesForm($fieldsToAnonymize, $fieldsToDelete, $nameEvent));
         $form->setValues($values);
         $this->client->submit($form, [], $this->createAjaxHeaders());
@@ -170,10 +170,10 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
 
     public function testAnonymizeUserDataActionInvalidWithEmptyFields(): void
     {
-        $form   = $this->baseRequest();
-        $values = $form->getValues();
+        $form      = $this->baseRequest();
+        $values    = $form->getValues();
         $nameEvent = 'Anonymize Invalid User Data Test';
-        $values = array_merge($values, $this->getDefaultValuesForm([], [],$nameEvent));
+        $values    = array_merge($values, $this->getDefaultValuesForm([], [], $nameEvent));
         $form->setValues($values);
         $this->client->submit($form, [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
@@ -233,8 +233,8 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         assert($fieldModel instanceof FieldModel);
         $getFieldChoices  = $this->getFieldChoices(false, true);
-        $nameEvent = 'Anonymize User Data Test';
-        $values       = array_merge($values, $this->getDefaultValuesForm(array_values($getFieldChoices), [], $nameEvent));
+        $nameEvent        = 'Anonymize User Data Test';
+        $values           = array_merge($values, $this->getDefaultValuesForm(array_values($getFieldChoices), [], $nameEvent));
         $form->setValues($values);
         $this->client->submit($form, [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
@@ -501,7 +501,7 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $this->em->flush();
         $this->em->clear();
 
-        $resultCommands = $this->runCampaignUpdateTrigger($campaign->getId());
+        $resultCommands            = $this->runCampaignUpdateTrigger($campaign->getId());
         $resultRunCommandCampaign2 = $resultCommands['resultRunCommandCampaign2'];
         self::assertStringContainsString('1 total event was executed', $resultRunCommandCampaign2->getDisplay());
     }
@@ -967,8 +967,8 @@ class CampaignActionAnonymizeUserDataSubscriberFormFunctionalTest extends Mautic
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         assert($fieldModel instanceof FieldModel);
         $getFieldToDeleteTrue = $this->getFieldChoices();
-        $nameEvent = 'Anonymize User Data Test';
-        $values       = array_merge($values, $this->getDefaultValuesForm([], array_values($getFieldToDeleteTrue),$nameEvent));
+        $nameEvent            = 'Anonymize User Data Test';
+        $values               = array_merge($values, $this->getDefaultValuesForm([], array_values($getFieldToDeleteTrue), $nameEvent));
         $form->setValues($values);
         $this->client->submit($form, [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
