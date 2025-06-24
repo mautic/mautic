@@ -6086,7 +6086,7 @@ ul.dropdown-menu-form {
   background-color: var(--border-interactive);
 }
 .nav-tabs .tabs__nav-item-icon {
-  font-size: 16px;
+  font-size: var(--typography-body-expressive);
   font-weight: 400;
 }
 .tabs__nav-item-label-wrapper {
