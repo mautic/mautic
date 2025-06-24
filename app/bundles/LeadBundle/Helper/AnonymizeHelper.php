@@ -23,7 +23,7 @@ class AnonymizeHelper
         }
         $emailParts = explode('@', $email);
 
-        $toEncrypt= $emailParts[0].time().rand(0, 999999);
+        $toEncrypt= $emailParts[0].time().random_int(0, 999999);
 
         if ($pseudonymized) {
             $toEncrypt = $emailParts[0];
@@ -44,7 +44,7 @@ class AnonymizeHelper
         }
 
         if (!$pseudonymize) {
-            $text = $text.time().rand(0, 999999);
+            $text = $text.time().random_int(0, 999999);
         }
 
         return hash('sha256', $text);
