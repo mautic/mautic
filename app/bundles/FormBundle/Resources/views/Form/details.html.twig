@@ -205,25 +205,9 @@
 
             {{ customContent('details.stats.graph.below', _context) }}
 
-            <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained">
-                {% if showActions %}
-                    <li class="active">
-                        <a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a>
-                    </li>
-                {% endif %}
-                <li class="{% if not showActions %}active{% endif %}">
-                    <a href="#fields-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.fields'|trans }}</a>
-                </li>
-            </ul>
-            <!--/ tabs controls -->
-        </div>
-
-        <!-- start: tab-content -->
-        <div class="tab-content pa-md">
+            {% set tabs = [] %}
             {% if showActions %}
-                <!-- #actions-container -->
-                <div class="tab-pane active fade in bdr-w-0" id="actions-container">
+                {% set actionsContent %}
                     {% for group, groupActions in activeFormActions %}
                         <h5 class="fw-sb mb-xs">{{ group|title }}</h5>
                         <ul class="list-group">
@@ -254,12 +238,15 @@
                             {% endfor %}
                         </ul>
                     {% endfor %}
-                </div>
-                <!--/ #actions-container -->
+                {% endset %}
+                {% set tabs = tabs|merge([{
+                    'label': 'mautic.form.tab.actions',
+                    'content': actionsContent,
+                    'className': 'pa-md'
+                }]) %}
             {% endif %}
 
-            <!-- #fields-container -->
-            <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
+            {% set fieldsContent %}
                 <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
                 <ul class="list-group mb-xs">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
@@ -279,10 +266,19 @@
                       {% endfor %}
                     {% endfor %}
                 </ul>
-            </div>
-            <!--/ #fields-container -->
+            {% endset %}
+            {% set tabs = tabs|merge([{
+                'label': 'mautic.form.tab.fields',
+                'content': fieldsContent,
+                'className': 'pa-md'
+            }]) %}
+
+            {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
+                'tabs': tabs,
+                'variant': 'contained',
+                'selectedIndex': showActions ? 0 : 0
+            }) }}
         </div>
-        <!--/ end: tab-content -->
     </div>
     <!--/ left section -->
 
