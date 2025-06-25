@@ -54,20 +54,18 @@ class CampaignActionAnonymizeUserDataSubscriberFunctionalTest extends MauticMysq
         $this->assertNotNull($newCompany1);
 
         $lead1              = $this->createLead($preDefLead1);
-        $resultCompanyLead1 = $this->addCompanyOnLead($lead1, $company1, true);
-        $resultCompanyLead2 = $this->addCompanyOnLead($lead1, $company2, false);
+        $this->addCompanyOnLead($lead1, $company1, true);
+        $this->addCompanyOnLead($lead1, $company2, false);
 
         $lead2              = $this->createLead($preDefLead2);
-        $resultCompanyLead3 = $this->addCompanyOnLead($lead2, $company2, true);
+        $this->addCompanyOnLead($lead2, $company2, true);
 
-        $campaignLead       = [
-            $this->createLeadCampaign($campaign, $lead1),
-            $this->createLeadCampaign($campaign, $lead2),
-        ];
+        $this->createLeadCampaign($campaign, $lead1);
+        $this->createLeadCampaign($campaign, $lead2);
 
         // Execute the campaign.
-        $resultRunCommandCampaign1 = $this->testSymfonyCommand('mautic:campaigns:update');
-        $resultRunCommandCampaign2 = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $this->testSymfonyCommand('mautic:campaigns:update');
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
     }
 
     private function createCampaign(): Campaign
