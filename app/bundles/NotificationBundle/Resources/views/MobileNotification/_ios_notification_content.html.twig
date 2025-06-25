@@ -1,0 +1,26 @@
+{#
+  Variables
+    - form
+    - integrationSettings
+#}
+<div class="row">
+    <div class="col-md-6">
+        {{ form_row(form.mobileSettings.ios_subtitle) }}
+        {{ form_row(form.mobileSettings.ios_media) }}
+    </div>
+    <div class="col-md-6">
+        <div class="well">
+            <div class="layer-one">
+                <h4>{{ 'Advanced Settings'|trans }}</h4>
+                <hr />
+                {{ form_row(form.mobileSettings.ios_badges) }}
+                {{ form_row(form.mobileSettings.ios_badgeCount) }}
+                {{ form_row(form.mobileSettings.ios_sound) }}
+                {{ form_label(form.mobileSettings.ios_contentAvailable) }}
+                {{ form_row(form.mobileSettings.ios_contentAvailable) }}
+                {{ form_label(form.mobileSettings.ios_mutableContent) }}
+                {{ form_row(form.mobileSettings.ios_mutableContent) }}
+            </div>
+        </div>
+    </div>
+</div> 
