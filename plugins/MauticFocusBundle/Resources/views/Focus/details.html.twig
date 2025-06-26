@@ -207,27 +207,28 @@
               {{ customContent('details.stats.graph.below', _context) }}
 
               {% if trackables is defined and trackables is not empty %}
-                  <!-- tabs controls -->
-                  <ul class="nav nav-tabs nav-tabs-contained">
-                      <li class="active">
-                          <a href="#clicks-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.trackable.click_counts'|trans }}
-                          </a>
-                      </li>
-                  </ul>
-                  <!--/ tabs controls -->
+                  {% set clicksContent %}
+                      {{ include('@MauticPage/Trackable/click_counts.html.twig', {
+                              'trackables': trackables,
+                              'entity': item,
+                              'channel': 'focus',
+                      }) }}
+                  {% endset %}
 
-                  <!-- start: tab-content -->
-                  <div class="tab-content pa-md">
-                      <div class="tab-pane active bdr-w-0" id="clicks-container">
-                          {{ include('@MauticPage/Trackable/click_counts.html.twig', {
-                                  'trackables': trackables,
-                                  'entity': item,
-                                  'channel': 'focus',
-                          }) }}
-                      </div>
-                  </div>
-                  <!-- end: tab-content -->
+                  {% set tabs = [
+                      {
+                          'label': 'mautic.trackable.click_counts',
+                          'id': 'clicks-container',
+                          'content': clicksContent,
+                          'className': 'bdr-w-0 pa-md'
+                      }
+                  ] %}
+
+                  {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
+                      'tabs': tabs,
+                      'variant': 'contained',
+                      'selectedIndex': 0
+                  }) }}
               {% endif %}
 
           </div>
