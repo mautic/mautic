@@ -17,7 +17,7 @@ This document lists the maintainers of the Mautic project, their roles, and how 
 
 ## Overview
 
-This document contains a list of maintainers in this repo. See [mautic/.github/MAINTAINING.md](https://github.com/mautic/.github/blob/7.x/MAINTAINING.md#maintainer-responsibilities) that explains what the role of maintainer means, what maintainers do in this and other repos, and how they should be doing it. If you're interested in contributing, and becoming a maintainer, see [CONTRIBUTING](CONTRIBUTING.md).
+This document contains a list of maintainers in this repo. See [Maintainer Responsibilities](https://contribute.mautic.org/governance/governance#6-2-1-expectations-and-duties-of-maintainers) that explains what the role of maintainer means, what maintainers do in this and other repos, and how they should be doing it. If you're interested in contributing, and becoming a maintainer, see [CONTRIBUTING](CONTRIBUTING.md).
 
 ## Current maintainers
 
