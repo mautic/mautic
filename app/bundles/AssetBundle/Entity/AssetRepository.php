@@ -7,12 +7,15 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Asset>
  */
 class AssetRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * Get a list of entities.
      *
@@ -101,6 +104,16 @@ class AssetRepository extends CommonRepository
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'asset_id',
+                    'asset_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -131,6 +144,7 @@ class AssetRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
