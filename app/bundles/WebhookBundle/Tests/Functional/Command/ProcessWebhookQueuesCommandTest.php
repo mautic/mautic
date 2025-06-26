@@ -65,6 +65,13 @@ final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
         Assert::assertCount(4, $this->em->getRepository(WebhookQueue::class)->findBy(['webhook' => $webhook]));
     }
 
+    public function testCommandWhenNoWebhooksFound(): void
+    {
+        $output = $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
+
+        Assert::assertStringContainsString('There are no published webhooks to process.', $output->getDisplay());
+    }
+
     private function createWebhook(string $name, string $url, string $secret): Webhook
     {
         $webhook = new Webhook();
