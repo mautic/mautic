@@ -31,7 +31,7 @@ class ProjectSelectBox {
         const newProjectNames = [];
         const existingProjectIds = [];
         const $projectSelect = mQuery(el);
-        mQuery('#' + $projectSelect.attr('id') + ' :selected').each(function(_, selected) {
+        mQuery('#' + $projectSelect.attr('id') + ' :selected').each(function (_, selected) {
             const $option = mQuery(selected);
             const selectedId = $option.val();
 
@@ -48,7 +48,7 @@ class ProjectSelectBox {
 
         Mautic.activateLabelLoadingIndicator($projectSelect.attr('id'));
 
-        Mautic.ajaxActionRequest('project:addProjects', {newProjectNames: JSON.stringify(newProjectNames), existingProjectIds: JSON.stringify(existingProjectIds)}, function(response) {
+        Mautic.ajaxActionRequest('project:addProjects', { newProjectNames: JSON.stringify(newProjectNames), existingProjectIds: JSON.stringify(existingProjectIds) }, function (response) {
             if (response.projects) {
                 mQuery('#' + $projectSelect.attr('id')).html(response.projects).trigger('chosen:updated');
             }
@@ -61,19 +61,19 @@ class ProjectSelectBox {
 /**
  * Handle project batch form submission
  */
-Mautic.projectBatchSubmit = function() {
+Mautic.projectBatchSubmit = function () {
     if (Mautic.batchActionPrecheck()) {
         if (mQuery('#project_batch_add_to').val() || mQuery('#project_batch_remove_from').val()) {
             var ids = Mautic.getCheckedListIds(false, true);
-            
+
             if (mQuery('#project_batch_ids').length) {
                 mQuery('#project_batch_ids').val(ids);
             }
-            
+
             return true;
         }
     }
-    
+
     mQuery('#MauticSharedModal').modal('hide');
     return false;
 };
@@ -81,15 +81,8 @@ Mautic.projectBatchSubmit = function() {
 /**
  * Handle project batch form submission callback
  */
-Mautic.projectBatchSubmitCallback = function(response) {
-    if (response.affected && response.affected.length) {
-        // Reload the page or update affected rows
-        if (typeof Mautic.refreshListContent !== 'undefined') {
-            Mautic.refreshListContent();
-        } else {
-            location.reload();
-        }
-    }
+Mautic.projectBatchSubmitCallback = function (response) {
+    mQuery('#MauticSharedModal').modal('hide');
 };
 
 // Listen for the 'chosen:no_results' event on all select elements
