@@ -19,41 +19,61 @@ class BatchProjectController extends AbstractFormController
      */
     public function execAction(Request $request, ProjectModel $projectModel, ProjectActionModel $projectActionModel): JsonResponse
     {
-        $params = $request->get('project_batch');
+        $params   = $request->get('project_batch', []);
+        $affected = [];
 
         // Handle entity IDs - they come as JSON string from the frontend
         $ids = [];
         if (!empty($params['ids'])) {
             $ids = is_string($params['ids']) ? json_decode($params['ids'], true) : $params['ids'];
-            $ids = is_array($ids) ? $ids : [];
+            $ids = is_array($ids) ? array_map('intval', array_filter($ids)) : [];
         }
-        if (!empty($ids)) {
-            // Handle project arrays - they come as arrays from the form
-            $addToProjects      = !empty($params['add_to']) && is_array($params['add_to']) ? $params['add_to'] : [];
-            $removeFromProjects = !empty($params['remove_from']) && is_array($params['remove_from']) ? $params['remove_from'] : [];
 
-            // Convert string IDs to integers
-            $addToProjects      = array_map('intval', array_filter($addToProjects));
-            $removeFromProjects = array_map('intval', array_filter($removeFromProjects));
-            $ids                = array_map('intval', array_filter($ids));
-
-            // Get the entity type from the request to know which entity we're working with
-            $entityType = $request->get('entityType', 'email'); // default to email for backwards compatibility
-
-            $affected = [];
-
-            // Only process if we have projects to add or remove
-            if (!empty($addToProjects) || !empty($removeFromProjects)) {
-                $affected = $projectActionModel->modifyProjectsOnEntities($ids, $addToProjects, $removeFromProjects, $entityType);
-
-                $this->addFlashMessage('mautic.project.batch_entities_affected', [
-                    '%count%' => count($affected),
-                ]);
-            } else {
-                $this->addFlashMessage('mautic.project.no_changes_selected');
-            }
-        } else {
+        if (empty($ids)) {
             $this->addFlashMessage('mautic.core.error.ids.missing');
+
+            return new JsonResponse([
+                'closeModal'  => true,
+                'flashes'     => $this->getFlashContent(),
+                'affected'    => [],
+                'callback'    => 'projectBatchSubmitCallback',
+            ]);
+        }
+
+        // Handle project arrays - they come as arrays from the form
+        $addToProjects      = [];
+        $removeFromProjects = [];
+
+        // Process add_to parameter (can be single value or array)
+        if (!empty($params['add_to'])) {
+            if (is_array($params['add_to'])) {
+                $addToProjects = array_map('intval', array_filter($params['add_to']));
+            } else {
+                $addToProjects = [intval($params['add_to'])];
+            }
+        }
+
+        // Process remove_from parameter (can be single value or array)
+        if (!empty($params['remove_from'])) {
+            if (is_array($params['remove_from'])) {
+                $removeFromProjects = array_map('intval', array_filter($params['remove_from']));
+            } else {
+                $removeFromProjects = [intval($params['remove_from'])];
+            }
+        }
+
+        // Get the entity type from the request to know which entity we're working with
+        $entityType = $request->get('entityType', 'email'); // default to email for backwards compatibility
+
+        // Only process if we have projects to add or remove
+        if (!empty($addToProjects) || !empty($removeFromProjects)) {
+            $affected = $projectActionModel->modifyProjectsOnEntities($ids, $addToProjects, $removeFromProjects, $entityType);
+
+            $this->addFlashMessage('mautic.project.batch_entities_affected', [
+                '%count%' => count($affected),
+            ]);
+        } else {
+            $this->addFlashMessage('mautic.project.no_changes_selected');
         }
 
         return new JsonResponse([
