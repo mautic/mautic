@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
@@ -107,6 +109,32 @@ class CompanyLeadRepository extends CommonRepository
             fn (array $company) => (string) $company['company_id'],
             $q->executeQuery()->fetchAllAssociative()
         );
+    }
+
+    /**
+     * @param int[] $ids
+     *
+     * @return array<string,mixed>
+     */
+    public function getPrimaryCompaniesByLeadIds(array $ids): array
+    {
+        $ids = array_filter($ids);
+
+        if (!$ids) {
+            return [];
+        }
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('comp.*')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->join('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
+            ->andWhere('cl.is_primary = 1')
+            ->andWhere('cl.lead_id IN (:ids)')
+            ->andWhere($q->expr()->isNull('comp.deleted'))
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
+
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**

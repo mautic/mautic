@@ -10,8 +10,11 @@ use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -35,6 +38,8 @@ class DynamicContentHelper
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
         protected LeadModel $leadModel,
+        private CompanyLeadRepository $companyLeadRepository,
+        private TagRepository $tagRepository,
     ) {
     }
 
@@ -224,8 +229,8 @@ class DynamicContentHelper
 
             $event = new ContactFiltersEvaluateEvent($filters, $contact);
             $this->dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE);
-            if ($event->isMatch()) {
-                return true;
+            if ($event->isEvaluated()) {
+                return $event->isMatch();
             }
         }
 
@@ -242,17 +247,24 @@ class DynamicContentHelper
         array|Lead $lead,
         PageDisplayEvent|EmailSendEvent $event,
     ): array {
-        $tokens    = $this->findDwcTokens($content);
-        $leadArray = is_array($lead) ? $lead : [];
-        if ($lead instanceof Lead) {
-            $leadArray = $this->convertLeadToArray($lead);
+        $result = [];
+        $tokens = $this->findDwcTokens($content);
+
+        if (!$tokens) {
+            return $result;
         }
 
-        $result = [];
+        if ($lead instanceof Lead) {
+            $lead = $lead->getProfileFields();
+        }
+
+        $lead = $this->loadLeadPrimaryCompanyIfNeeded($lead, $tokens);
+        $lead = $this->loadLeadTagIdsIfNeeded($lead, $tokens);
+
         foreach ($tokens as $token => $dwcs) {
             $result[$token] = '';
             foreach ($dwcs as $dwc) {
-                if ($this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
+                if ($this->filtersMatchContact($dwc->getFilters(), $lead)) {
                     $result[$token] = $lead ? $this->getRealDynamicContent($lead, $dwc, $event) : '';
                     break;
                 }
@@ -276,5 +288,56 @@ class DynamicContentHelper
         $event->setIsSubject(false);
 
         return $getSubject;
+    }
+
+    /**
+     * @param mixed[] $lead
+     * @param mixed[] $tokens
+     *
+     * @return mixed[]
+     */
+    private function loadLeadPrimaryCompanyIfNeeded(array $lead, array $tokens): array
+    {
+        if (isset($lead['companies']) || !$this->doFiltersContainCompanyFilter($this->flattenTokenFilters($tokens))) {
+            return $lead;
+        }
+
+        $lead['companies'] = array_values($this->companyLeadRepository->getPrimaryCompaniesByLeadIds([$lead['id']]));
+
+        return $lead;
+    }
+
+    /**
+     * @param mixed[] $lead
+     * @param mixed[] $tokens
+     *
+     * @return mixed[]
+     */
+    private function loadLeadTagIdsIfNeeded(array $lead, array $tokens): array
+    {
+        if (isset($lead['tags']) || !$this->doFiltersContainTagsFilter($this->flattenTokenFilters($tokens))) {
+            return $lead;
+        }
+
+        $lead['tags'] = $this->tagRepository->getTagIdsByLeadId($lead['id']);
+
+        return $lead;
+    }
+
+    /**
+     * @param mixed[] $tokens
+     *
+     * @return iterable<mixed[]>
+     */
+    private function flattenTokenFilters(array $tokens): iterable
+    {
+        foreach ($tokens as $dwcs) {
+            foreach ($dwcs as $dwc) {
+                \assert($dwc instanceof DynamicContent);
+                foreach ($dwc->getFilters() as $filter) {
+                    yield $filter;
+                }
+            }
+        }
     }
 }

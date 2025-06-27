@@ -67,6 +67,8 @@ return [
                     'event_dispatcher',
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.lead_list',
+                    'mautic.lead.repository.company_lead',
+                    'mautic.lead.repository.tag',
                 ],
             ],
         ],

@@ -15,7 +15,6 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -33,8 +32,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    use MatchFilterForLeadTrait;
-
     public const TOKEN_REGEX = '/{([^=}]+)(?:=([^}]+))?}/';
 
     public function __construct(

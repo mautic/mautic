@@ -377,8 +377,6 @@ class DynamicContentType extends AbstractType
 
     private function filterFieldChoices(): void
     {
-        unset($this->fieldChoices['company']);
-
         $customFields = $this->leadModel->getRepository()->getCustomFieldList('lead');
 
         $this->fieldChoices['lead'] = array_filter(
