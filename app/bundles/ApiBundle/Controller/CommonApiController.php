@@ -322,8 +322,6 @@ class CommonApiController extends FetchCommonApiController
     public function newEntityAction(Request $request)
     {
         $parameters = $request->request->all();
-        $jsonContent = $request->getContent(); // ← BREAKPOINT: Was ist hier?
-        $contentType = $request->headers->get('Content-Type'); // ← Und hier?
         $entity     = $this->getNewEntity($parameters);
 
         if (!$this->checkEntityAccess($entity, 'create')) {
