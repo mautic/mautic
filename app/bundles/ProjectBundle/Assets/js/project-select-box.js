@@ -31,7 +31,7 @@ class ProjectSelectBox {
         const newProjectNames = [];
         const existingProjectIds = [];
         const $projectSelect = mQuery(el);
-        mQuery('#' + $projectSelect.attr('id') + ' :selected').each(function (_, selected) {
+        mQuery('#' + $projectSelect.attr('id') + ' :selected').each(function(i, selected) {
             const $option = mQuery(selected);
             const selectedId = $option.val();
 
@@ -48,7 +48,7 @@ class ProjectSelectBox {
 
         Mautic.activateLabelLoadingIndicator($projectSelect.attr('id'));
 
-        Mautic.ajaxActionRequest('project:addProjects', { newProjectNames: JSON.stringify(newProjectNames), existingProjectIds: JSON.stringify(existingProjectIds) }, function (response) {
+        Mautic.ajaxActionRequest('project:addProjects', {newProjectNames: JSON.stringify(newProjectNames), existingProjectIds: JSON.stringify(existingProjectIds)}, function(response) {
             if (response.projects) {
                 mQuery('#' + $projectSelect.attr('id')).html(response.projects).trigger('chosen:updated');
             }

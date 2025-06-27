@@ -6,7 +6,6 @@ namespace Mautic\ProjectBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\ProjectBundle\Form\Type\BatchProjectType;
-use Mautic\ProjectBundle\Model\ProjectActionModel;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,10 +16,9 @@ class BatchProjectController extends AbstractFormController
     /**
      * Assigns projects to multiple entities defined by entity ID.
      */
-    public function execAction(Request $request, ProjectModel $projectModel, ProjectActionModel $projectActionModel): JsonResponse
+    public function execAction(Request $request, ProjectModel $projectModel): JsonResponse
     {
-        $params   = $request->get('project_batch', []);
-        $affected = [];
+        $params = $request->get('project_batch', []);
 
         // Handle entity IDs - they come as JSON string from the frontend
         $ids = [];
@@ -33,10 +31,10 @@ class BatchProjectController extends AbstractFormController
             $this->addFlashMessage('mautic.core.error.ids.missing');
 
             return new JsonResponse([
-                'closeModal'  => true,
-                'flashes'     => $this->getFlashContent(),
-                'affected'    => [],
-                'callback'    => 'projectBatchSubmitCallback',
+                'closeModal' => true,
+                'flashes'    => $this->getFlashContent(),
+                'affected'   => [],
+                'callback'   => 'projectBatchSubmitCallback',
             ]);
         }
 
@@ -62,25 +60,20 @@ class BatchProjectController extends AbstractFormController
             }
         }
 
-        // Get the entity type from the request to know which entity we're working with
-        $entityType = $request->get('entityType', 'email'); // default to email for backwards compatibility
-
         // Only process if we have projects to add or remove
         if (!empty($addToProjects) || !empty($removeFromProjects)) {
-            $affected = $projectActionModel->modifyProjectsOnEntities($ids, $addToProjects, $removeFromProjects, $entityType);
-
             $this->addFlashMessage('mautic.project.batch_entities_affected', [
-                '%count%' => count($affected),
+                '%count%' => count($ids),
             ]);
         } else {
             $this->addFlashMessage('mautic.project.no_changes_selected');
         }
 
         return new JsonResponse([
-            'closeModal'  => true,
-            'flashes'     => $this->getFlashContent(),
-            'affected'    => !empty($affected) ? array_keys($affected) : [],
-            'callback'    => 'projectBatchSubmitCallback',
+            'closeModal' => true,
+            'flashes'    => $this->getFlashContent(),
+            'affected'   => $ids,
+            'callback'   => 'projectBatchSubmitCallback',
         ]);
     }
 
