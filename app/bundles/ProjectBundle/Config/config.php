@@ -11,6 +11,14 @@ return [
                 'path'       => '/projects/{objectAction}/{objectId}',
                 'controller' => 'Mautic\ProjectBundle\Controller\ProjectController::executeAction',
             ],
+            'mautic_project_batch_view' => [
+                'path'       => '/projects/batch/entity/view',
+                'controller' => 'Mautic\ProjectBundle\Controller\BatchProjectController::indexAction',
+            ],
+            'mautic_project_batch_set' => [
+                'path'       => '/projects/batch/entity/set',
+                'controller' => 'Mautic\ProjectBundle\Controller\BatchProjectController::execAction',
+            ],
         ],
     ],
     'menu' => [

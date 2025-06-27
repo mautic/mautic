@@ -24,6 +24,19 @@
             'templateButtons': {
                 'delete': permissions['project:project:delete'],
             },
+            'customButtons': [
+                {
+                    'attr': {
+                        'class': 'btn btn-default btn-sm btn-nospin',
+                        'data-toggle': 'ajaxmodal',
+                        'data-target': '#MauticSharedModal',
+                        'href': path('mautic_project_batch_view'),
+                        'data-header': 'mautic.project.batch.projects'|trans,
+                    },
+                    'btnText': 'mautic.project.batch.projects'|trans,
+                    'iconClass': 'ri-folder-line',
+                },
+            ]
         },
         'quickFilters': [
             {
