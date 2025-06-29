@@ -231,6 +231,7 @@ class EmailController extends FormController
         }
         $session->set('mautic.email.page', $page);
 
+        /** @var UserModel $userModel */
         $userModel   = $this->getModel('user');
         $columnPrefs = $userModel->getPreference('user_column_visibility_emails', null, $this->user);
 

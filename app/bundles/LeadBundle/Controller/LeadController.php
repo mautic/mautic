@@ -212,6 +212,7 @@ class LeadController extends FormController
         \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
 
+        /** @var UserModel $userModel */
         $userModel            = $this->getModel('user');
         $columnPrefs_contacts = $userModel->getPreference('user_column_visibility_contacts', null, $this->user);
 

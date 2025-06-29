@@ -96,6 +96,7 @@ class CompanyController extends FormController
         $companyIds = array_keys($companies);
         $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : [];
 
+        /** @var \Mautic\UserBundle\Model\UserModel $userModel */
         $userModel           = $this->getModel('user');
         $columnPrefs_company = $userModel->getPreference('user_column_visibility_company', null, $this->user);
 
