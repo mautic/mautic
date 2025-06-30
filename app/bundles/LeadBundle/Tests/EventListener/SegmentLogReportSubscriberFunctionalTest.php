@@ -68,6 +68,7 @@ class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $report->setName('Segment Log Report');
         $report->setSource(SegmentLogReportSubscriber::SEGMENT_LOG);
         $report->setColumns(['l.id', 'l.email', 'l.firstname', 'l.lastname', 'log_added.object_id', 'log_added.date_added', 'log_removed.date_added']);
+        $report->setGroupBy(['l.id', 'log_added.object_id', 'log_added.date_added', 'log_removed.date_added']);
 
         $this->em->persist($report);
 
