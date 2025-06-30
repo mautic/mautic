@@ -1192,4 +1192,38 @@ class MailHelperTest extends TestCase
         $this->assertEquals($email, $to[0]->getAddress());
         $this->assertEquals('', $to[0]->getName()); // Name should be empty due to length limit
     }
+
+    public function testClearMetadataAfterSend(): void
+    {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
+        $transport     = new BatchTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $email = new Email();
+        $email->setSubject('Test Subject');
+        $email->setCustomHtml('Test content');
+        $mailer->setEmail($email);
+
+        // Add metadata to the message by setting lead and body
+        $contact = $this->contacts[0];
+        $mailer->addTo($contact['email']);
+        $mailer->setLead($contact);
+        $mailer->setBody('Test email body with {firstname} token');
+
+        // Manually add metadata to verify clearing functionality
+        $mailer->message->addMetadata($contact['email'], ['test' => 'metadata']);
+
+        // Verify metadata exists before sending
+        $metadataBeforeSend = $mailer->message->getMetadata();
+        $this->assertCount(1, $metadataBeforeSend, 'Metadata should exist before sending');
+
+        // Send the email
+        $mailer->send();
+
+        // Verify metadata is cleared after sending
+        $metadataAfterSend = $mailer->message->getMetadata();
+        $this->assertCount(0, $metadataAfterSend, 'Metadata should be cleared after sending to prevent memory leaks');
+    }
 }

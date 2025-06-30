@@ -3,8 +3,10 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -18,6 +20,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
@@ -459,14 +462,25 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
-    {
+    public function previewAction(
+        AnalyticsHelper $analyticsHelper,
+        ThemeHelper $themeHelper,
+        AssetsHelper $assetsHelper,
+        EmailConfig $emailConfig,
+        EmailModel $model,
+        Request $request,
+        LeadModel $leadModel,
+        FakeContactHelper $fakeLeadHelper,
+        string $objectId,
+        string $objectType = null,
+    ) {
         $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
 
         if (null === $emailEntity) {
             return $this->notFound();
         }
+
         $publicPreview = $emailEntity->isPublicPreview();
         $draftEnabled  = $emailConfig->isDraftEnabled();
         if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
@@ -509,8 +523,6 @@ class PublicController extends CommonFormController
             $template = $emailEntity->getTemplate();
             $slots    = $this->factory->getTheme($template)->getSlots('email');
 
-            $assetsHelper = $this->factory->getHelper('template.assets');
-
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
 
             $this->processSlots($slots, $emailEntity);
@@ -540,24 +552,13 @@ class PublicController extends CommonFormController
         if ($contactId) {
             // We have one from request parameter
             /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead.lead');
-            $contact   = $leadModel->getRepository()->getLead($contactId);
+            $contact = $leadModel->getRepository()->getLead($contactId);
+            $contact = $model->enrichedContactWithCompanies($contact);
         } else {
-            // Generate faked one
-            /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-            $fieldModel = $this->getModel('lead.field');
-            $contact    = $fieldModel->getFieldList(false, false);
-
-            array_walk(
-                $contact,
-                function (&$field): void {
-                    $field = "[$field]";
-                }
-            );
-
-            $contact['id'] = 0;
+            // Make fake contact.
+            /** @var FakeContactHelper $fakeLeadHelper */
+            $contact = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
         }
-
         // Generate and replace tokens
         $event = new EmailSendEvent(
             null,
