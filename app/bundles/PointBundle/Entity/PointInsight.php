@@ -12,12 +12,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class PointInsight extends FormEntity
 {
-
     private ?int $id = null;
 
-    /**
-     * @var string
-     */
     private string $name = '';
 
     /**
