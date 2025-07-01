@@ -12,7 +12,7 @@
         'status': 'available'
     }) -}}
     {% if report.source is defined and report.source is not empty %}
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [{
                 label: 'mautic.report.source.'~report.source,
                 icon: 'ri-database-2-line',
@@ -27,7 +27,7 @@
     {% endif %}
     
     {% if report.system is defined and report.system == 1 %}
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [{
                 label: 'mautic.report.report.form.issystem',
                 icon: 'ri-group-2-fill',

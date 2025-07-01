@@ -3,7 +3,7 @@
 {% set footerContent %}
     {% if action.properties.score is defined %}
         <!-- Add to company points -->
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             'tags': [{
                 'label': 'mautic.form.form.change_points_by'|trans({'%value%': action.properties.score}),
                 'color': action.properties.score < 0 ? 'red' : (action.properties.score == 0 ? 'warm-gray' : 'green'),
@@ -28,7 +28,7 @@
 
         {% set color = action.properties.operator in ['plus', 'times'] ? 'green' : 'red' %}
 
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
                     label: label,

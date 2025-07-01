@@ -52,7 +52,7 @@
   <div class="label__divider"></div>
     {# Dynamic/Static segment tag #}
     {% set segmentType = list.filters is defined and list.filters|length > 0 ? 'dynamic' : 'static' %}
-    {% include '@MauticCore/Components/tag.html.twig' with {
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [
             {
                 label: ('mautic.lead.tag.' ~ segmentType ~ '_segment')|trans,
@@ -69,7 +69,7 @@
 
     {# Tag for visible to other users #}
     {% if list.isGlobal is defined and list.isGlobal == 1 %}
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
                     label: 'mautic.lead.list.form.isglobal'|trans,
@@ -83,7 +83,7 @@
 
     {# Tag for available in Preference Center #}
     {% if list.isPreferenceCenter is defined and list.isPreferenceCenter == 1 %}
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
                 {
                     label: 'mautic.lead.list.form.isPreferenceCenter'|trans,

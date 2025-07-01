@@ -1,7 +1,7 @@
 {% extends '@MauticForm/Action/base_form_action.html.twig' %}
 
 {% block action_label %}
-    {% include '@MauticCore/Components/tag.html.twig' with {
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [
             {
                 label: action.properties.integration,

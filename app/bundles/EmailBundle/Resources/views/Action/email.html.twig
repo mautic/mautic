@@ -4,7 +4,7 @@
     {% if action.properties.email is defined and securityIsGranted('email:emails:view') %}
         <!-- Email to send to contact -->
         {% set email = getEntity('Mautic\\EmailBundle\\Entity\\Email', action.properties.email) %}
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             'tags': [{
                 'label': email.name,
                 'icon': 'ri-mail-line',
@@ -19,7 +19,7 @@
     {% if action.properties.useremail is defined and action.properties.useremail.email is defined and securityIsGranted('email:emails:view') %}
         <!-- Email to send to user -->
         {% set email = getEntity('Mautic\\EmailBundle\\Entity\\Email', action.properties.useremail.email) %}
-        {% include '@MauticCore/Components/tag.html.twig' with {
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
             'tags': [{
                 'label': email.name,
                 'icon': 'ri-mail-line',
@@ -37,7 +37,7 @@
         {% for user in users %}
             {% if user.firstName is defined %}
                 {% if securityIsGranted('user:users:edit') %}
-                    {% include '@MauticCore/Components/tag.html.twig' with {
+                    {% include '@MauticCore/Helper/_tag.html.twig' with {
                         'tags': [{
                             'label': user.firstName,
                             'icon': 'ri-account-circle-line',
@@ -48,7 +48,7 @@
                         }]
                     } %}
                 {% else %}
-                    {% include '@MauticCore/Components/tag.html.twig' with {
+                    {% include '@MauticCore/Helper/_tag.html.twig' with {
                         'tags': [{
                             'label': user.firstName,
                             'icon': 'ri-account-circle-line',
