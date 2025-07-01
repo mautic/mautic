@@ -252,7 +252,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     sanitize: false
                 });
                 
-                // Hide all popovers
                 var hideAllPopovers = function() {
                     $("[data-toggle~=popover]").each(function() {
                         var popover = $(this).data('bs.popover');
@@ -262,7 +261,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     });
                 };
                 
-                // Hide popovers when clicking outside
                 $(document).on('click', function(e) {
                     if (!$(e.target).closest('.popover').length && 
                         !$(e.target).closest('[data-toggle="popover"]').length) {
@@ -270,7 +268,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     }
                 });
                 
-                // Handle hover-triggered popovers
                 $(document).on('mouseenter', '[data-toggle="popover"][data-trigger="hover"]', function() {
                     hideAllPopovers();
                 });
