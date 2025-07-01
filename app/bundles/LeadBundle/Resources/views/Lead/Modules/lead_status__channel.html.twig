@@ -25,7 +25,7 @@
     <div class="contact-status__label mb-xs">
       <i class="contact-status__icon {{ config.icon }}"></i>
       <span class="contact-status__text fw-sb">{{ channelLabel|trans }}</span>
-      {% include '@MauticCore/Components/tag.html.twig' with {'tags': 
+      {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': 
         [{
           label: config.label,
           type: config.type,
