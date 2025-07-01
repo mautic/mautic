@@ -23,8 +23,7 @@
                     {% endif %}
                     <h4 class="fw-sb mb-xs ellipsis">
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
-                            {% set contactName = floodlight_lead_name(contact) ?: (contact.isAnonymous ? contact.primaryIdentifier|trans : contact.primaryIdentifier) %}
-                            <span>{{ contactName }}</span>
+                            <span>{{ contact.primaryIdentifier }}</span>
                         </a>
                     </h4>
                     <div class="text-muted mb-1 ellipsis">
