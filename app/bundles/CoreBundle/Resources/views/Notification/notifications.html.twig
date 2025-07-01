@@ -10,7 +10,7 @@
                 <div class="panel-title notification notification-title">
                     <h6 class="fw-sb d-flex jc-space-between ai-center">{{ 'mautic.core.notifications'|trans }}
                         {% if notifications is not empty %}
-                            {% include '@MauticCore/Components/button.html.twig' with {
+                            {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
                                     {
                                         label: 'mautic.core.notifications.clearall',

@@ -5,7 +5,7 @@
 {% set id = searchId|default('list-search') %}
 {% set tmpl = tmpl|default('list') %}
 
-{% include '@MauticCore/Components/button.html.twig' with {
+{% include '@MauticCore/Helper/button.html.twig' with {
     buttons: [
         {
             label: 'mautic.core.search.clear',
@@ -50,7 +50,7 @@
 </div>
 <div class="row">
     <div class="footer-buttons d-flex fw-nowrap gap-1 mt-lg">
-        {% include '@MauticCore/Components/button.html.twig' with {
+        {% include '@MauticCore/Helper/button.html.twig' with {
             buttons: [
                 {
                     label: 'mautic.core.reset_filter',
@@ -70,7 +70,7 @@
 </div>
 {% endset %}
 
-{% include '@MauticCore/Components/button.html.twig' with {
+{% include '@MauticCore/Helper/button.html.twig' with {
     buttons: [
     {
         variant: 'ghost',

@@ -17,7 +17,7 @@
                         <span class="text-white dark-sm">
                             {{ email.event_name }}
                             {{'mautic.core.send.email.to'|trans|lower}}
-                            {% include '@MauticCore/Components/button.html.twig' with {
+                            {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
                                     {
                                         label: email.lead_name ?: ('mautic.lead.lead'|trans ~ ' #' ~ email.lead_id),

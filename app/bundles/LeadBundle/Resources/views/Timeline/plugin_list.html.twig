@@ -160,7 +160,7 @@
               <span class="timeline-row-lead-id hide">{% if event.leadId is defined %}{{ event.leadId }}{% endif %}</span>
               <div class="btn-group" role="group" style="float: right;">
                   <span class="timeline-icon">
-                    {% include '@MauticCore/Components/button.html.twig' with {
+                    {% include '@MauticCore/Helper/button.html.twig' with {
                         buttons: [
                             {
                                 label: 'mautic.lead.timeline.toggle_details',

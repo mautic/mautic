@@ -16,7 +16,7 @@
 
 {% if update is not defined or update is empty %}
   <div class="campaign-event-buttons hide">
-    {% include '@MauticCore/Components/button.html.twig' with {
+    {% include '@MauticCore/Helper/button.html.twig' with {
       buttons: [
           {
               href: path('mautic_campaignsource_action', {

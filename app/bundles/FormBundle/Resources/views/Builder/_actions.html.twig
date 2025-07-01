@@ -8,7 +8,7 @@
 {% set route = route|default('mautic_formfield_action') %}
 
 <div class="form-buttons btn-group" role="group" aria-label="Field options">
-  {% include '@MauticCore/Components/button.html.twig' with {
+  {% include '@MauticCore/Helper/button.html.twig' with {
       buttons: [
           {
               variant: 'ghost',
@@ -27,7 +27,7 @@
   } %}
 
   {% if disallowDelete is not defined or (disallowDelete is defined and false == disallowDelete) %}
-    {% include '@MauticCore/Components/button.html.twig' with {
+    {% include '@MauticCore/Helper/button.html.twig' with {
         buttons: [
             {
                 label: 'mautic.form.builder.formfield.remove_row',

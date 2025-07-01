@@ -10,7 +10,7 @@
         <div class="toolbar--action-list d-flex fw-wrap fw-nowrap-sm">
             {{ include('@MauticCore/Helper/toolbar_bulk_actions.html.twig', bulk_actions|default({})) }}
             <span class="toolbar--batch-summary__divider">|</span>
-            {% include '@MauticCore/Components/button.html.twig' with {
+            {% include '@MauticCore/Helper/button.html.twig' with {
                 buttons: [
                     {
                         label: 'mautic.core.form.cancel',

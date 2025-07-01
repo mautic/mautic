@@ -33,7 +33,7 @@
 {% set dropdownButtons = buttonsRender() %}
 {% if dropdownButtons is not empty %}
     <div class="dropdown ml-xs">
-        {% include '@MauticCore/Components/button.html.twig' with {
+        {% include '@MauticCore/Helper/button.html.twig' with {
             buttons: [
                 {
                     label: 'mautic.core.options',

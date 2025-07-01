@@ -13,7 +13,7 @@
         </div>
         <div class="col-xs-2">
             {% if 'emailform_dynamicContent_0_content' is not same as id %}
-            {% include '@MauticCore/Components/button.html.twig' with {
+            {% include '@MauticCore/Helper/button.html.twig' with {
                 buttons: [
                     {
                         label: 'mautic.dwc.delete_new',
@@ -67,7 +67,7 @@
             {{ form_errors(form.display) }}
           </div>
           <div class="col-xs-2 col-sm-1">
-            {% include '@MauticCore/Components/button.html.twig' with {
+            {% include '@MauticCore/Helper/button.html.twig' with {
                 buttons: [
                     {
                         label: 'mautic.report.report.label.removefilter',

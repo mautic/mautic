@@ -226,7 +226,7 @@
           {% elseif allowAbTest %}
           <div class="pa-md">
               <div class="text-center">
-                    {% include '@MauticCore/Components/button.html.twig' with {
+                    {% include '@MauticCore/Helper/button.html.twig' with {
                         buttons: [
                             {
                                 label: 'mautic.core.ab_test.create',
@@ -260,7 +260,7 @@
                              readonly
                              value="{{ pageUrl|e }}"/>
                       <span class="input-group-btn">
-                        {% include '@MauticCore/Components/button.html.twig' with {
+                        {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [
                                 {
                                     label: 'mautic.core.open_link',
@@ -326,7 +326,7 @@
                                      readonly
                                      value="{{ previewUrl|e }}"/>
                               <span class="input-group-btn">
-                                {% include '@MauticCore/Components/button.html.twig' with {
+                                {% include '@MauticCore/Helper/button.html.twig' with {
                                     buttons: [
                                         {
                                             label: 'mautic.core.open_link',
