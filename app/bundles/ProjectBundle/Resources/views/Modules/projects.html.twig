@@ -56,7 +56,7 @@
             {% endif %}
             
             {% if buttons|length > 0 %}
-                {% include '@MauticCore/Components/button.html.twig' with {
+                {% include '@MauticCore/Helper/button.html.twig' with {
                     buttons: buttons
                 } %}
             {% endif %}
@@ -68,7 +68,7 @@
     {% endset %}
 
         <div class="project-popover" data-toggle="popover" data-content='{{ projectPopover }}' data-html="true" data-container="body" data-placement="bottom" data-trigger="hover" data-delay='{"show": 300, "hide": 2000}'>
-            {% include '@MauticCore/Components/tag.html.twig' with {
+            {% include '@MauticCore/Helper/_tag.html.twig' with {
                 tags: [
                     {
                         label: project.name,
