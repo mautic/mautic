@@ -23,7 +23,7 @@
                 {% set button = button|merge({'attributes': {'class': 'mt-md'}}) %}
             {% endif %}
 
-            {% include '@MauticCore/Components/button.html.twig' with {'buttons': [button]} %}
+            {% include '@MauticCore/Helper/button.html.twig' with {'buttons': [button]} %}
         {% endif %}
     </div>
 {% endfor %}
