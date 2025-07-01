@@ -11,7 +11,7 @@
                 tags: [
                     {
                         label: 'mautic.form.field.asset.use_category'|trans({'%category_name%': categoryName}),
-                        renderIcon: 'ri-folder-line',
+                        icon: 'ri-folder-line',
                         color: 'warm-gray',
                         attributes: {
                         href: path('mautic_asset_index'),
@@ -28,7 +28,7 @@
                     tags: [
                         {
                             label: asset.title,
-                            renderIcon: 'ri-file-line',
+                            icon: 'ri-file-line',
                             color: 'warm-gray',
                             attributes: securityIsGranted('asset:assets:viewother') ? {
                             href: path('mautic_asset_action', {'objectAction': 'view', 'objectId': asset.id}),

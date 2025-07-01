@@ -7,7 +7,7 @@
             'tags': [{
                 'label': 'mautic.form.form.change_points_by'|trans({'%value%': action.properties.score}),
                 'color': action.properties.score < 0 ? 'red' : (action.properties.score == 0 ? 'warm-gray' : 'green'),
-                'renderIcon': 'ri-bar-chart-2-fill'
+                'icon': 'ri-bar-chart-2-fill'
             }]
         } %}
     {% endif %}
@@ -32,7 +32,7 @@
             tags: [
                 {
                     label: label,
-                    renderIcon: 'ri-bar-chart-2-fill',
+                    icon: 'ri-bar-chart-2-fill',
                     color: color
                 }
             ]

@@ -15,7 +15,7 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: 'mautic.report.source.'~report.source,
-                renderIcon: 'ri-database-2-line',
+                icon: 'ri-database-2-line',
                 color: 'high-contrast',
                 attributes: {
                     'data-toggle': 'tooltip',
@@ -30,9 +30,9 @@
         {% include '@MauticCore/Components/tag.html.twig' with {
             tags: [{
                 label: 'mautic.report.report.form.issystem',
-                renderIcon: 'ri-group-2-fill',
+                icon: 'ri-group-2-fill',
                 color: 'blue',
-                iconOnly: true
+                icon_only: true
             }]
         } %}
     {% endif %}

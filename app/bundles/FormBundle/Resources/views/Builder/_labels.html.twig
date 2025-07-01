@@ -30,7 +30,7 @@
             tags: [
                 {
                     label: 'mautic.form.field.type.' ~ field.type,
-                    renderIcon: typeIcons[field.type] ?? 'ri-input-field',
+                    icon: typeIcons[field.type] ?? 'ri-input-field',
                     color: isConditional ? 'warm-gray' : 'high-contrast',
                     attributes: {
                         'data-toggle': 'tooltip',
@@ -48,7 +48,7 @@
     {% include '@MauticCore/Components/tag.html.twig' with {
         'tags': [{
             'color': 'green',
-            'renderIcon': field.mappedObject == 'company' ? 'ri-building-3-line' : (field.mappedObject == 'contact' ? 'ri-contacts-book-line' : 'ri-shape-line'),
+            'icon': field.mappedObject == 'company' ? 'ri-building-3-line' : (field.mappedObject == 'contact' ? 'ri-contacts-book-line' : 'ri-shape-line'),
             'label': fieldCollection[field.mappedField] is defined ? fieldCollection[field.mappedField].name :
                     (field.mappedObject == 'contact' ? ('mautic.lead.field.' ~ field.mappedField) :
                     (field.mappedObject == 'company' ? ('mautic.lead.field.' ~ field.mappedField) : field.mappedField)),
@@ -66,8 +66,8 @@
             tags: [
                 {
                     label: 'mautic.form.field.form.multiple',
-                    renderIcon: 'ri-list-check-2',
-                    iconOnly: true,
+                    icon: 'ri-list-check-2',
+                    icon_only: true,
                     color: 'blue'
                 }
             ]
@@ -81,8 +81,8 @@
             tags: [
                 {
                     label: 'mautic.form.field.form.always_display',
-                    renderIcon: 'ri-eye-fill',
-                    iconOnly: true,
+                    icon: 'ri-eye-fill',
+                    icon_only: true,
                     color: 'blue'
                 }
             ]
@@ -95,8 +95,8 @@
             tags: [
                 {
                     label: 'mautic.form.field.form.hide_when_value_exists',
-                    renderIcon: 'ri-eye-close-fill',
-                    iconOnly: true,
+                    icon: 'ri-eye-close-fill',
+                    icon_only: true,
                     color: 'blue'
                 }
             ]
@@ -109,7 +109,7 @@
             tags: [
                 {
                     label: field.showAfterXSubmissions,
-                    renderIcon: 'ri-forward-end-mini-fill',
+                    icon: 'ri-forward-end-mini-fill',
                     color: 'blue',
                     'attributes': {
                         'data-toggle': 'tooltip',
@@ -127,8 +127,8 @@
         tags: [
             {
                 label: 'mautic.form.field.form.auto_fill',
-                renderIcon: 'ri-sparkling-fill',
-                iconOnly: true,
+                icon: 'ri-sparkling-fill',
+                icon_only: true,
                 color: 'blue'
             }
         ]
@@ -141,8 +141,8 @@
             tags: [
                 {
                     label: 'mautic.form.field.file.public',
-                    renderIcon: 'ri-global-fill',
-                    iconOnly: true,
+                    icon: 'ri-global-fill',
+                    icon_only: true,
                     color: 'blue'
                 }
             ]
@@ -155,8 +155,8 @@
             tags: [
                 {
                     label: 'mautic.form.field.file.set_as_profile_image',
-                    renderIcon: 'ri-user-smile-fill',
-                    iconOnly: true,
+                    icon: 'ri-user-smile-fill',
+                    icon_only: true,
                     color: 'blue'
                 }
             ]
@@ -169,8 +169,8 @@
             tags: [
                 {
                     label: 'mautic.form.field.type.tel.international',
-                    renderIcon: 'ri-earth-fill',
-                    iconOnly: true,
+                    icon: 'ri-earth-fill',
+                    icon_only: true,
                     color: 'blue'
                 }
             ]
@@ -183,9 +183,9 @@
         tags: [
             {
                 label: 'mautic.core.required',
-                renderIcon: 'ri-asterisk',
+                icon: 'ri-asterisk',
                 color: 'red',
-                iconOnly: true,
+                icon_only: true,
                 className: 'ml-a'
             }
         ]

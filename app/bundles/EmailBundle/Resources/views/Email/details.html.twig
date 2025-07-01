@@ -119,7 +119,7 @@
 
         {% if email.isVariant and not email.isVariant(true) %}
             {% include '@MauticCore/Components/tag.html.twig' with { tags: [
-                { color: 'blue', label: 'mautic.email.icon_tooltip.abtest', renderIcon: 'ri-a-b', iconOnly: true }
+                { color: 'blue', label: 'mautic.email.icon_tooltip.abtest', icon: 'ri-a-b', icon_only: true }
             ] } %}
         {% endif %}
         {% if email.isVariant(true) %}
@@ -127,7 +127,7 @@
                 {
                     color: 'warm-gray',
                     label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}),
-                    renderIcon: 'ri-organization-chart',
+                    icon: 'ri-organization-chart',
                     attributes: {
                         href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id})
                     }
@@ -137,7 +137,7 @@
 
         {% if email.isTranslation and not email.isTranslation(true) %}
             {% include '@MauticCore/Components/tag.html.twig' with { tags: [
-                { color: 'blue', label: 'mautic.core.icon_tooltip.translation', renderIcon: 'ri-translate', iconOnly: true }
+                { color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon: 'ri-translate', icon_only: true }
             ] } %}
         {% endif %}
         {% if email.isTranslation(true) %}
@@ -145,7 +145,7 @@
                 {
                     color: 'warm-gray',
                     label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}),
-                    renderIcon: 'ri-translate',
+                    icon: 'ri-translate',
                     attributes: {
                         href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id})
                     }
@@ -157,7 +157,7 @@
             {% include '@MauticCore/Components/tag.html.twig' with {
                 tags: [{
                     label: email.language|language_name,
-                    renderIcon: 'ri-translate-2',
+                    icon: 'ri-translate-2',
                     color: 'warm-gray',
                     attributes: {
                         'data-toggle': 'tooltip',
