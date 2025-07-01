@@ -1,4 +1,4 @@
-<h4 class="mt-lg fw-sb pa-md">{{'mautic.form.forms'|trans}}</h4>
+{% set childContainer %}
 <p class="pi-md text-helper">{{'mautic.placeholder_tokens.form.redirect_url'|trans}}</p>
 
 <ul id="formTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
@@ -34,3 +34,6 @@
         </div>
     </li>
 </ul>
+{% endset %}
+
+{% include '@MauticCore/Components/content-section.html.twig' with {'heading': 'mautic.form.forms', 'childContainer': childContainer} %}

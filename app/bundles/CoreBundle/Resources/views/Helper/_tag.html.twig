@@ -58,7 +58,7 @@
                 <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-toggle="tooltip" tooltip-placement="top"{% endif %}>
                     {{ truncated_label }}
                 </span>
-                <button type="button" aria-label="{{ 'mautic.core.builder.storage.dismiss.button'|trans }}" title="{{ 'mautic.core.builder.storage.dismiss.button'|trans }}">
+                <button type="button" class="label-close" onclick="{{ attributes.onclick|default('') }}" aria-label="{{ 'mautic.core.dismiss'|trans }}" title="{{ 'mautic.core.dismiss'|trans }}" data-toggle="tooltip" tooltip-placement="top">
                     <i class="ri-close-line" aria-hidden="true" focusable="false"></i>
                 </button>
 
