@@ -10,9 +10,11 @@
 
 {% block headerTitle %}
   {% if lead.id %}
+    {% set primaryIdentifier = lead.isAnonymous ? lead.primaryIdentifier|trans : lead.primaryIdentifier %}
     {{ 'mautic.lead.lead.header.edit'|trans({
-          '%name%': floodlight_lead_name(lead) ?: lead.primaryIdentifier|trans,
-    }) }}
+          '%name%': primaryIdentifier,
+    }) }}<br>
+    {{ customContent('lead.form.name', _context) }}
   {% else %}
     {{ 'mautic.lead.lead.header.new'|trans }}
   {% endif %}

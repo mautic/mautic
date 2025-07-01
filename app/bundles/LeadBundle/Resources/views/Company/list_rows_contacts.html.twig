@@ -192,8 +192,11 @@
                     </td>
                     <td>
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
-                            {% set contactName = floodlight_lead_name(contact) ?: (contact.isAnonymous ? contact.primaryIdentifier|trans : contact.primaryIdentifier) %}
-                            <div>{{ contactName|purify }}</div>
+                            {% set primaryIdentifier = contact.isAnonymous ? contact.primaryIdentifier|trans : contact.primaryIdentifier|purify %}
+                            <div>
+                                <span>{{ primaryIdentifier }}</span><br>
+                                {{ customContent('lead.company.list.name', _context) }}
+                            </div>
                             <div class="small">{{ contact.secondaryIdentifier|purify }}</div>
                         </a>
                     </td>
