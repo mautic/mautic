@@ -3,8 +3,32 @@
         <h4 class="fw-sb">{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="widget-reorder-controls d-flex">
-                <button class="btn btn-ghost move-up" aria-label="Move widget up">↑</button>
-                <button class="btn btn-ghost move-down" aria-label="Move widget down">↓</button>
+                {% include '@MauticCore/Helper/button.html.twig' with {
+                    buttons: [
+                        {
+                            label: '',
+                            icon: 'arrow-up',
+                            variant: 'ghost',
+                            size: 'xs',
+                            attributes: {
+                                class: 'move-up',
+                                'aria-label': 'Move widget up',
+                                tabindex: '0'
+                            }
+                        },
+                        {
+                            label: '',
+                            icon: 'arrow-down',
+                            variant: 'ghost',
+                            size: 'xs',
+                            attributes: {
+                                class: 'move-down',
+                                'aria-label': 'Move widget down',
+                                tabindex: '0'
+                            }
+                        }
+                    ]
+                } %}
             </div>
             <div class="dropdown">
                 <a class="btn btn-ghost btn-icon btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
@@ -62,3 +86,27 @@
         <i class="ri-drag-drop-fill ri-4x text-interactive"></i>
     </div>
 </div>
+
+<script>
+// Keyboard and mouse support for nudge buttons
+(function() {
+    function triggerMove(btn, direction) {
+        // Find the closest widget container
+        var widget = btn.closest('.tile');
+        if (!widget) return;
+        // Find the actual move button (if using AJAX or backend action)
+        var realBtn = btn;
+        // Simulate click or trigger AJAX as needed
+        // For now, just trigger the click event
+        realBtn.click();
+    }
+    document.querySelectorAll('.nudge-btn').forEach(function(btn) {
+        btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                btn.click();
+            }
+        });
+    });
+})();
+</script>
