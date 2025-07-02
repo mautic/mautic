@@ -203,17 +203,18 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         ];
 
         if ($event instanceof PageDisplayEvent || $event instanceof EmailSendEvent) {
-            $detail['tokenPlacement'] = 'body';
+            $tokenPlacement = 'body';
             if ($event instanceof EmailSendEvent) {
                 $stat->setSource('email');
                 $stat->setSourceId($event->getEmail()->getId());
                 if ($event->getIsSubject()) {
-                    $detail['tokenPlacement'] = 'subject';
+                    $tokenPlacement = 'subject';
                 }
             } else {
                 $stat->setSource('page');
                 $stat->setSourceId($event->getPage()->getId());
             }
+            $stat->setTokenPlacement($tokenPlacement);
         }
 
         $stat->setSentDetails($detail);

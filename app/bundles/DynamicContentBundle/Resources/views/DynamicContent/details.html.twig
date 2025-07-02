@@ -41,7 +41,7 @@
             'close' : securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:viewown'], permissions['dynamiccontent:dynamiccontents:viewother'], entity.createdBy),
         },
         'routeBase'       : 'dynamicContent',
-        'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
+        'targetLabel'     : 'mautic.dynamicContent.dynamicContent'|trans
     }
 ) -}}
 {{ include('@MauticCore/Modules/category--inline.html.twig', {'category': entity.category}) }}
