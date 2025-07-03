@@ -302,7 +302,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->method('getReference');
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, new EventDispatcher(), $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $this->requestStack, $this->emailStatModel, new SlotsHelper()])
+            ->setConstructorArgs([$mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, new EventDispatcher(), $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $this->requestStack, $this->emailStatModel])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -406,7 +406,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         /** @var MailHelper&MockObject $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $mockDispatcher, $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $this->requestStack, $this->emailStatModel, new SlotsHelper()])
+            ->setConstructorArgs([$mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, $mockDispatcher, $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $this->requestStack, $this->emailStatModel])
             ->onlyMethods([])
             ->getMock();
 
@@ -475,7 +475,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         /** @var MailHelper&MockObject $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, new EventDispatcher(), $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $requestStack, $this->emailStatModel, new SlotsHelper()])
+            ->setConstructorArgs([$mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, new EventDispatcher(), $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $requestStack, $this->emailStatModel])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -570,10 +570,30 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->method('getReference');
 
         $requestStack = new RequestStack();
+        $routerMock   = $this->createMock(Router::class);
+
 
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock, new EventDispatcher(), $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $requestStack, $this->emailStatModel, new SlotsHelper()])
+            ->setConstructorArgs([
+                $mailer,
+                $this->fromEmaiHelper,
+                $this->coreParametersHelper,
+                $this->mailbox,
+                $this->loggerMock,
+                $this->mailHashHelper,
+                $routerMock,
+                $this->environment,
+                $this->themeHelper,
+                $this->pathsHelper,
+                new EventDispatcher(),
+                $requestStack,
+                $this->entityManager,
+                $this->assetModel,
+                $this->trackableModel,
+                $this->redirectModel,
+                $this->emailStatModel
+            ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -660,13 +680,30 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+        $this->entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
             ->method('getReference');
 
-        $requestStack = new RequestStack();
+        $mailer     = new Mailer(new BatchTransport());
+        $mailHelper = new MailHelper(
+            $mailer,
+            $fromEmailHelper,
+            $coreParametersHelper,
+            $mailbox,
+            $logger,
+            $this->mailHashHelper,
+            $router,
+            $this->environment,
+            $this->themeHelper,
+            $this->pathsHelper,
+            new EventDispatcher(),
+            $this->requestStack,
+            $this->entityManager,
+            $this->assetModel,
+            $this->trackableModel,
+            $this->redirectModel,
+            $this->emailStatModel
+        );
 
-        $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, new EventDispatcher(), $this->pathsHelper, $this->environment, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $this->requestStack, $this->emailStatModel, new SlotsHelper());
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(TranslatorInterface::class);
         $model          = new SendEmailToContact($mailHelper, $this->statHelper, $dncModel, $translator);

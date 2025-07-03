@@ -202,7 +202,7 @@ class PublicController extends CommonFormController
                 }
 
                 $action          = $this->generateUrl('mautic_email_unsubscribe', $params);
-                $viewParameters  = $this->getViewParams($lead, $idHash);
+                $viewParameters  = $this->getViewParams($lead, $idHash, $params);
                 $form            = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
 
                 if ($session->get($successSessionName)) {
@@ -258,11 +258,15 @@ class PublicController extends CommonFormController
                         if (!$session->has($successSessionName)) {
                             $successMessageData       = ['class="pref-successmessage"'];
                             $successMessageDataHidden = [];
-                            foreach ($successMessageData as $successMessageData) {
-                                $successMessageDataHidden[] = $successMessageData.' style=display:none';
+                            foreach ($successMessageData as $successMessageDatum) {
+                                $successMessageDataHidden[] = $successMessageDatum.' style=display:none';
                             }
 
-                            $html = str_replace($successMessageDataSlots, $successMessageDataSlotsHidden, $html);
+                            $html = str_replace(
+                                $successMessageData,
+                                $successMessageDataHidden,
+                                $html
+                            );
                         } else {
                             $session->remove($successSessionName);
                         }
@@ -789,9 +793,11 @@ class PublicController extends CommonFormController
     }
 
     /**
+     * @param array<mixed> $params
+     *
      * @return array<mixed>
      */
-    private function getViewParams(Lead $lead, string $idHash): array
+    private function getViewParams(Lead $lead, string $idHash, array $params): array
     {
         return [
             'lead'                         => $lead,

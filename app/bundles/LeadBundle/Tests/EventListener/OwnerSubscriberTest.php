@@ -336,7 +336,25 @@ class OwnerSubscriberTest extends TestCase
 
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $dispatcher, $pathsHelper, $environment, $assetModel, $themeHelper, $trackableModel, $redirectModel, $entityManager, $requestStack, $emailStatModel, new SlotsHelper());
+        $mailerHelper = new MailHelper(
+            $mailer,
+            $fromEmaiHelper,
+            $coreParametersHelper,
+            $mailbox,
+            $logger,
+            $this->mailHashHelper,
+            $router,
+            $environment,
+            $themeHelper,
+            $pathsHelper,
+            $dispatcher,
+            $requestStack,
+            $entityManager,
+            $assetModel,
+            $trackableModel,
+            $redirectModel,
+            $emailStatModel
+        );
 
         $mailerHelper->setLead($lead);
 

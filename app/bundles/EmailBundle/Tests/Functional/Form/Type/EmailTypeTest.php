@@ -87,7 +87,7 @@ class EmailTypeTest extends MauticMysqlTestCase
     /**
      * @return iterable<array{bool, int}>
      */
-    public function provideSendToDncValue(): iterable
+    public static function provideSendToDncValue(): iterable
     {
         // this should honor Contact's DNC and unsubscribed category, hence email sent count should be 2
         yield [false, 2];

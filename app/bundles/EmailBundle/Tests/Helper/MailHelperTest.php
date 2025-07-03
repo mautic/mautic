@@ -244,7 +244,25 @@ class MailHelperTest extends TestCase
                 ]
             );
 
-        $singleMailHelper = new MailHelper(new Mailer(new BcInterfaceTokenTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router, $this->dispatcher, $this->pathsHelper, $this->twig, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $this->requestStack, $this->emailStatModel, new SlotsHelper());
+        $singleMailHelper = new MailHelper(
+            new Mailer(new BcInterfaceTokenTransport()),
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->pathsHelper,
+            $this->dispatcher,
+            $this->requestStack,
+            $this->entityManager,
+            $this->assetModel,
+            $this->trackableModel,
+            $this->redirectModel,
+            $this->emailStatModel
+        );
 
         try {
             $singleMailHelper->addTo('somebody@somewhere.com');
@@ -753,7 +771,25 @@ class MailHelperTest extends TestCase
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
-        $mailer        = new MailHelper($symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router, $this->dispatcher, $this->pathsHelper, $this->twig, $this->assetModel, $this->themeHelper, $this->trackableModel, $this->redirectModel, $this->entityManager, $this->requestStack, $this->emailStatModel, new SlotsHelper());
+        $mailer        = new MailHelper(
+            $symfonyMailer,
+            $this->fromEmailHelper,
+            $this->coreParametersHelper,
+            $this->mailbox,
+            $this->logger,
+            $this->mailHashHelper,
+            $this->router,
+            $this->twig,
+            $this->themeHelper,
+            $this->pathsHelper,
+            $this->dispatcher,
+            $this->requestStack,
+            $this->entityManager,
+            $this->assetModel,
+            $this->trackableModel,
+            $this->redirectModel,
+            $this->emailStatModel
+        );
         $email         = new Email();
 
         // From address is set

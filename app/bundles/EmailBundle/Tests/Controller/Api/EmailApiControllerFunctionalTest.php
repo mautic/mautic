@@ -30,7 +30,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['mailer_from_name']       = 'Mautic Admin';
         $this->configParams['default_signature_text'] = 'Best regards, |FROM_NAME|';
 
-        if ('testCreateEmailWithoutSendToDncPermission' === $this->getName()) {
+        if ('testCreateEmailWithoutSendToDncPermission' === $this->name()) {
             $this->clientServer = [
                 'PHP_AUTH_USER' => 'sales',
                 'PHP_AUTH_PW'   => 'Maut1cR0cks!',
@@ -640,7 +640,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function setPermission(Role $role, array $permissions): void
     {
-        $roleModel = self::$container->get('mautic.user.model.role');
+        $roleModel = static::getContainer()->get('mautic.user.model.role');
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();

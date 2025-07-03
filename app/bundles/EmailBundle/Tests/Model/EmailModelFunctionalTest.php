@@ -361,7 +361,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, null[]>
      */
-    public function dataFrequencyRules(): iterable
+    public static function dataFrequencyRules(): iterable
     {
         yield 'Custom Frequency Rules' => [null];
         yield 'Default Frequency Rules' => [null];
