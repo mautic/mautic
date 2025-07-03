@@ -36,7 +36,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->useDefaultFrequencyRules = ' with data set "Default Frequency Rules"' === $this->getDataSetAsString(false);
+        $this->useDefaultFrequencyRules = str_contains($this->nameWithDataSet(), 'with data set "Default Frequency Rules"');
 
         $this->configParams['email_frequency_number'] = $this->useDefaultFrequencyRules ? self::EMAILS_A_MONTH : 0;
         $this->configParams['email_frequency_time']   = 'MONTH';
