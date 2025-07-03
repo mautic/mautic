@@ -73,7 +73,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
             $this->stageModel,
             $this->coreParametersHelper,
             $this->themeHelper,
-            $this->createMock(CorePermissions::class)
+            $this->createMock(CorePermissions::class),
             $this->emailConfig
         );
 

@@ -279,7 +279,6 @@ class OwnerSubscriberTest extends TestCase
 
     protected function getMockMailer(array $lead): MailHelper
     {
-
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];

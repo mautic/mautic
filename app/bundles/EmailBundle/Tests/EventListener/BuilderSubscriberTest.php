@@ -168,7 +168,7 @@ class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
         $matcher                  = $this->exactly(5);
-      
+
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
 
@@ -196,7 +196,7 @@ class BuilderSubscriberTest extends TestCase
                 }
                 if (5 === $matcher->numberOfInvocations()) {
                     $this->assertSame('brand_name', $parameters[0]);
-                  
+
                     return 'ACME';
                 }
             });

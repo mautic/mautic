@@ -190,7 +190,6 @@ class MailHelperTest extends TestCase
 
         $this->entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
             ->method('getReference');
-
     }
 
     public function testQueueModeThrowsExceptionWhenBatchLimitHit(): void
@@ -224,9 +223,9 @@ class MailHelperTest extends TestCase
             $this->assetModel,
             $this->trackableModel,
             $this->redirectModel,
-            $this->emailStatModel,
+            $this->emailStatModel
         );
-      
+
         $batchMailHelper->enableQueue();
         $batchMailHelper->addTo('somebody@somewhere.com');
         $batchMailHelper->addTo('somebodyelse@somewhere.com');
@@ -278,7 +277,7 @@ class MailHelperTest extends TestCase
             $this->redirectModel,
             $this->emailStatModel,
         );
-      
+
         $singleMailHelper->enableQueue();
 
         $email = new Email();
@@ -1042,7 +1041,7 @@ class MailHelperTest extends TestCase
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
-        $mailer = new MailHelper(
+        $mailer        = new MailHelper(
             $symfonyMailer,
             $this->fromEmailHelper,
             $this->coreParametersHelper,
@@ -1476,7 +1475,7 @@ class MailHelperTest extends TestCase
 
         $this->router->method('generate')->willReturn('http://tracking.url');
         $transport = new BatchTransport();
-        $mailer = new MailHelper(new Mailer($transport),
+        $mailer    = new MailHelper(new Mailer($transport),
             $this->fromEmailHelper,
             $this->coreParametersHelper,
             $this->mailbox,

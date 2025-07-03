@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
@@ -13,7 +12,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -340,31 +338,28 @@ CONTENT,
                 ]
             );
 
-        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
             ->method('getReference');
 
-        $mailer       = new Mailer(new BatchTransport());
-        $requestStack = new RequestStack();
-        $mailHelper  = new MailHelper(
-          $mailer,
-          $fromEmailHelper,
-          $coreParametersHelper,
-          $mailbox,
-          new NullLogger(),
-          new MailHashHelper($coreParametersHelper),
-          $router,
-          $twig,
-          $themeHelper, 
-          $pathsHelper, 
-          $dispatcher, 
-          $requestStack,
-          $entityManager,
-          $assetModel,
-          $trackableModel, 
-          $redirectModel,
-          $emailStatModel, 
-          new SlotsHelper(),
+        $mailer     = new Mailer(new BatchTransport());
+        $mailHelper = new MailHelper(
+            $mailer,
+            $fromEmailHelper,
+            $coreParametersHelper,
+            $mailbox,
+            new NullLogger(),
+            new MailHashHelper($coreParametersHelper),
+            $router,
+            $twig,
+            $themeHelper,
+            $pathsHelper,
+            $dispatcher,
+            $requestStack,
+            $entityManager,
+            $assetModel,
+            $trackableModel,
+            $redirectModel,
+            $emailStatModel
         );
 
         $email = new Email();

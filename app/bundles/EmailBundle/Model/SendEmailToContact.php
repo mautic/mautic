@@ -92,7 +92,7 @@ class SendEmailToContact
         Email $email,
         array $channel = [],
         array $customHeaders = [],
-        array $assetAttachments = []
+        array $assetAttachments = [],
     ): SendEmailToContact {
         // Flush anything that's pending from a previous email
         $this->flush();

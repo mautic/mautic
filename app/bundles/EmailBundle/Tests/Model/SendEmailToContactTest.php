@@ -9,7 +9,6 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -35,7 +34,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -467,12 +465,12 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
-        
+
         $this->themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
         $this->entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
             ->method('getReference');
-        
+
         $requestStack = new RequestStack();
 
         /** @var MailHelper&MockObject $mailHelper */
