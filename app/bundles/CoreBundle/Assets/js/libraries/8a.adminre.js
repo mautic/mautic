@@ -48,7 +48,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
     // Create the defaults once
     // ================================
     var pluginName  = "Core",
-        isMinimize  = false,
         isScreenlg  = false,
         isScreenmd  = false,
         isScreensm  = false,
@@ -134,9 +133,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = false;
                     isScreensm  = false;
                     isScreenxs  = false;
-
-                    // reset sidebar minimize
-                    isMinimize = !!$(element).hasClass("sidebar-minimized");
                 }
 
                 // screen-md
@@ -145,9 +141,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = true;
                     isScreensm  = false;
                     isScreenxs  = false;
-
-                    // reset sidebar minimize
-                    isMinimize = !!$(element).hasClass("sidebar-minimized");
                 }
 
                 // screen-sm
@@ -156,9 +149,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = false;
                     isScreensm  = true;
                     isScreenxs  = false;
-
-                    // reset sidebar minimize
-                    isMinimize = false;
                 }
 
                 // screen-xs
@@ -167,9 +157,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = false;
                     isScreensm  = false;
                     isScreenxs  = true;
-
-                    // reset sidebar minimize
-                    isMinimize = false;
                 }
             });
         },
@@ -261,7 +248,9 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             BsPopover: function () {
-                $("[data-toggle~=popover]").popover();
+                $("[data-toggle~=popover]").popover({
+                    sanitize: false
+                });
             },
 
             // @MISC: IE9 input placeholder support
@@ -367,12 +356,16 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     toggler     = "[data-toggle~=selectrow]",
                     target      = $(toggler).data("target");
 
+                // Track the last clicked checkbox for shift-click functionality
+                var lastCheckedBox = null;
+
                 // check on DOM ready
                 $(toggler).each(function () {
                     if($(this).is(":checked")) {
                         selectrow(this, "checked");
                     }
                 });
+                updateToolbarState();
 
                 // clicker
                 $(document).on("change", toggler, function () {
@@ -383,6 +376,34 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     } else {
                         selectrow(this, "unchecked");
                     }
+                    updateToolbarState();
+                });
+
+                // Add shift-click functionality for range selection
+                $(document).on("click", toggler, function(e) {
+                    if (e.shiftKey && lastCheckedBox !== null) {
+                        var checkboxes = $(toggler);
+                        var startIndex = checkboxes.index(lastCheckedBox);
+                        var endIndex = checkboxes.index(this);
+
+                        // Determine the range of checkboxes to check/uncheck
+                        var start = Math.min(startIndex, endIndex);
+                        var end = Math.max(startIndex, endIndex);
+
+                        // Get the checked state from the clicked checkbox
+                        var isChecked = $(this).is(":checked");
+
+                        // Apply the same state to all checkboxes in range
+                        checkboxes.slice(start, end + 1).each(function() {
+                            // Only change if the current state is different
+                            if ($(this).prop("checked") !== isChecked) {
+                                $(this).prop("checked", isChecked).trigger("change");
+                            }
+                        });
+                    }
+
+                    // Update the last checked box reference
+                    lastCheckedBox = this;
                 });
 
                 // Core SelectRow function
@@ -405,6 +426,28 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         $(element).trigger(settings.eventPrefix+".selectrow.unselected", { "element": $($this).parentsUntil(target) });
                     }
                 }
+
+                // Check if any checkbox is selected and update toolbar state
+                function updateToolbarState() {
+                    var checkedBoxes = $(toggler + ":checked").length;
+                    $(".toolbar--batch-actions").toggleClass("toolbar--batch-actions--active", checkedBoxes > 0);
+
+                    var $summaryCount = $(".toolbar--batch-summary__count");
+                    var singularText = $summaryCount.data('singular');
+                    var pluralText = $summaryCount.data('plural');
+
+                    var itemText = checkedBoxes === 1 ? singularText : pluralText;
+                    $summaryCount.text(checkedBoxes + " " + itemText);
+                }
+
+                $(document).on("click", ".pagination a[data-toggle='ajax']", function() {
+                    // Reset toolbar state
+                    $(".toolbar--batch-actions").removeClass("toolbar--batch-actions--active");
+                    $(".toolbar--batch-summary__count").text("0");
+
+                    // Uncheck main toggle checkbox if it exists
+                    $("[data-toggle=checkall]").prop("checked", false);
+                });
 
                 // Event console
                 MAIN.prototype.HELPER.Console(settings.eventPrefix+".selectrow.selected");
@@ -435,6 +478,19 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     } else {
                         unchecked(target);
                     }
+                });
+
+                // Add this new handler right here
+                $(document).on("click", "[data-toggle=cancel-checkall]", function() {
+                    // Uncheck the main toggle checkbox
+                    $(toggler).prop("checked", false);
+
+                    // Uncheck all row checkboxes
+                    $("input[data-toggle=selectrow]").each(function() {
+                        $(this)
+                            .prop("checked", false)
+                            .trigger("change");
+                    });
                 });
 
                 // Core CheckAll function
@@ -613,51 +669,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 MAIN.prototype.HELPER.Console(settings.eventPrefix+".panelremove.remove");
             })();
 
-            // @PLUGIN: SidebarMinimize
-            // Self invoking
-            // ================================
-            (function () {
-                // define variable
-                var minimizeHandler = "[data-toggle~=minimize]";
-
-                // core minimize function
-                function toggleMinimize (e) {
-                    var backgroundImage = /^url\(.+$/.test($('.mautic-brand').css('background-image'));
-
-                    // toggle class
-                    if($(element).hasClass("sidebar-minimized")) {
-                        isMinimize = false;
-                        $(element).removeClass("sidebar-minimized");
-                        $(this).removeClass("active");
-                        if (backgroundImage) {
-                            $('.mautic-brand, .sidebar-header').removeClass('minimized');
-                        }
-
-                        // publish event
-                        $(element).trigger(settings.eventPrefix+".sidebar.maximize", { "element": $(element) });
-                    } else {
-                        isMinimize = true;
-                        $(element).addClass("sidebar-minimized");
-                        $(this).addClass("active");
-                        if (backgroundImage) {
-                            $('.mautic-brand, .sidebar-header').addClass('minimized');
-                        }
-
-                        // publish event
-                        $(element).trigger(settings.eventPrefix+".sidebar.minimize", { "element": $(element) });
-                    }
-
-                    // prevent default
-                    e.preventDefault();
-                }
-
-                $(element).on("click", minimizeHandler, toggleMinimize);
-
-                // Event console
-                MAIN.prototype.HELPER.Console(settings.eventPrefix+".sidebar.minimize");
-                MAIN.prototype.HELPER.Console(settings.eventPrefix+".sidebar.maximize");
-            })();
-
             // @PLUGIN: SidebarMenu
             // Self invoking
             // utilize bootstrap collapse
@@ -694,37 +705,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                             $this.parent().addClass("open");
                         }
                     }
-
-                    // run only on tablet view and sidebar-menu collapse
-                    if((isScreensm) || (isMinimize)) {
-                        // if have target
-                        if(!!target === true) {
-                            // touch devices
-                            if($(element).hasClass("touch")) {
-                                // click event handler
-                                if(e.type === "click") {
-                                    if($this.parent().hasClass("hover")) {
-                                        // remove hover class and clear the `top` css attr val
-                                        $this.parent().removeClass("hover");
-                                        $(target).css("top", "");
-                                    } else {
-                                        // remove other opened submenus
-                                        if(!!parent) {
-                                            $(parent+" .hover").each(function (index, elem) {
-                                                $(elem).removeClass("hover");
-                                            });
-                                        }
-
-                                        // add hover class and calculate submenu offset
-                                        $this.parent().addClass("hover");
-                                        if($(target)[0].getBoundingClientRect().bottom >= Response.viewportH()) {
-                                            $(target).css("top", "-"+($(target)[0].getBoundingClientRect().bottom-Response.viewportH()+2)+"px");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
 
                 // core preserveSubmenu function
@@ -732,33 +712,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     var $this       = $(this),
                         parent      = $this.children(submenuHandler).data("parent"),
                         target      = $this.children(submenuHandler).data("target");
-
-                    // run only on tablet view and sidebar-menu collapse
-                    if((isScreensm) || (isMinimize)) {
-                        // if have target
-                        if(!!target === true) {
-                            // touch devices
-                            if(!$(element).hasClass("touch")) {
-
-                                // mouseenter event handler
-                                if(e.type === "mouseenter") {
-                                    // add hover class and calculate submenu offset
-                                    $this.addClass("hover");
-                                    if($(target)[0].getBoundingClientRect().bottom >= Response.viewportH()) {
-                                        $(target).css("top", "-"+($(target)[0].getBoundingClientRect().bottom-Response.viewportH()+2)+"px");
-                                    }
-                                }
-
-                                // mouseleave event handler
-                                if(e.type === "mouseleave") {
-                                    // remove hover class and clear the `top` css attr val
-                                    $this.removeClass("hover");
-                                    $(target).css("top", "");
-                                }
-
-                            }
-                        }
-                    }
                 }
 
                 $(document)

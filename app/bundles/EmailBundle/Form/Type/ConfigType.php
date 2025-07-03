@@ -27,7 +27,7 @@ class ConfigType extends AbstractType
     public const MINIFY_EMAIL_HTML = 'minify_email_html';
 
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -262,6 +262,21 @@ class ConfigType extends AbstractType
                     'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_address_length_limit',
+            NumberType::class,
+            [
+                'scale'      => 0,
+                'label'      => 'mautic.email.config.mailer.address.length.limit',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.config.mailer.address.length.limit.tooltip',
+                ],
+                'required'   => true,
             ]
         );
 
@@ -506,6 +521,21 @@ class ConfigType extends AbstractType
                 ],
                 'data'       => empty($options['data']['show_contact_preferred_channels']) ? false : true,
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'email_draft_enabled',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.enable.draft',
+                'label_attr' => ['class' => 'control-label'],
+                'data'       => $options['data']['email_draft_enabled'] ?? false,
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.enable.draft.tooltip',
+                ],
             ]
         );
     }

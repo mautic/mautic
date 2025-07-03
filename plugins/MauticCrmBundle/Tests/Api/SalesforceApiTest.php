@@ -12,11 +12,10 @@ use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(SalesforceApi::class)]
 class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that a locked record request is retried up to 3 times
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a locked record request is retried up to 3 times')]
     public function testRecordLockedErrorIsRetriedThreeTimes(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
@@ -44,9 +43,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @testdox Test that a locked record request is retried up to 3 times with last one being successful so no exception should be thrown
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a locked record request is retried up to 3 times with last one being successful so no exception should be thrown')]
     public function testRecordLockedErrorIsRetriedThreeTimesWithLastOneSuccessful(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
@@ -83,9 +80,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @testdox Test that a locked record request is retried 2 times with 3rd being successful
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a locked record request is retried 2 times with 3rd being successful')]
     public function testRecordLockedErrorIsRetriedTwoTimesWithThirdSuccess(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
@@ -116,9 +111,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @testdox Test that a session expired should attempt a refresh before failing
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a session expired should attempt a refresh before failing')]
     public function testSessionExpiredIsRefreshed(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
@@ -147,9 +140,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @testdox Test that a session expired should attempt a refresh but not throw an exception if successful on second request
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a session expired should attempt a refresh but not throw an exception if successful on second request')]
     public function testSessionExpiredIsRefreshedWithoutThrowingExceptionOnSecondRequestWithSuccess(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
@@ -182,15 +173,13 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @testdox Test that an exception is thrown for all other errors
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that an exception is thrown for all other errors')]
     public function testErrorDoesNotRetryRequest(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
         $message     = 'Fatal error';
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturn(
                 [
@@ -212,9 +201,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @testdox Test that a backslash and a single quote are escaped for SF queries
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a backslash and a single quote are escaped for SF queries')]
     public function testCompanyQueryIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
@@ -222,7 +209,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -232,7 +219,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
@@ -259,11 +246,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @testdox Test that a backslash and an html entity of single quote are escaped for SF queries
-     *
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a backslash and an html entity of single quote are escaped for SF queries')]
     public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
@@ -271,7 +254,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -281,7 +264,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
@@ -308,9 +291,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @testdox Test that a backslash and a single quote are escaped for SF queries
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a backslash and a single quote are escaped for SF queries')]
     public function testContactQueryIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
@@ -318,7 +299,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -328,11 +309,11 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('getFieldsForQuery')
             ->willReturn([]);
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
@@ -357,9 +338,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    /**
-     * @testdox Test that a backslash and a single quote are escaped for SF queries
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a backslash and a single quote are escaped for SF queries')]
     public function testLeadQueryIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
@@ -367,7 +346,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -377,11 +356,11 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('getFieldsForQuery')
             ->willReturn([]);
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
@@ -507,10 +486,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         $integration->expects($this->never())->method('upsertUnreadAdminsNotification');
 
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
         $entity = $this
             ->getMockBuilder(Integration::class)

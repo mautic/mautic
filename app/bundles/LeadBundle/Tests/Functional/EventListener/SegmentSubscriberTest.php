@@ -14,11 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SegmentSubscriberTest extends MauticMysqlTestCase
 {
     /**
-     * @dataProvider filterProvider
-     *
      * @param mixed[]  $filters
      * @param string[] $expectedTranslations
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('filterProvider')]
     public function testSegmentFilterAlertMessages(array $filters, array $expectedTranslations): void
     {
         $segment   = $this->saveSegment('Segment D', 'segment-d', $filters);
@@ -36,7 +35,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     /**
      * @return \Generator<array<mixed>>
      */
-    public function filterProvider(): \Generator
+    public static function filterProvider(): \Generator
     {
         yield [[
             [

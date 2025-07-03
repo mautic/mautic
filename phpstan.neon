@@ -5,16 +5,15 @@ parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
 	reportUnmatchedIgnoredErrors: false
-	checkGenericClassInNonGenericObjectType: false
+	treatPhpDocTypesAsCertain: false
 	parallel:
-		# maximumNumberOfProcesses: 4
+		maximumNumberOfProcesses: 2
 		processTimeout: 1000.0
 	paths:
 		- app/bundles
 		- app/migrations
 		- plugins
 	excludePaths:
-		- *.html.php
 		- *.js.php
 		- *.less.php
 		- *.inc.php
@@ -27,6 +26,10 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		- identifier: missingType.generics
+		# not all IDEs are as smart as PHPSTAN and need the type hint
+		- identifier: function.alreadyNarrowedType
+		- identifier: instanceof.alwaysTrue
 		- '/Variable \$\w+ might not be defined\./'
 		# resolve later with translator interface generics
 		- '#Method (.*?)::getTranslatedEntity\(\) return type has no value type specified in iterable type array#'
@@ -52,6 +55,8 @@ parameters:
 		- '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
 		# on purpose
 		- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
+		# can't figure out what the right type should be for FormBuilderInterface
+		- '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
 		# on purpose type check
 		-
 			message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
@@ -67,6 +72,7 @@ parameters:
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
+		- vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
 	doctrine:
 		objectManagerLoader: tests/object-manager.php
 		allowNullablePropertyForRequiredField: true

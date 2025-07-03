@@ -228,13 +228,11 @@ class ReportSubscriberTest extends TestCase
             ->method('trans')
             ->willReturnArgument(0);
 
-        $mockExprBuilder = $this->getMockBuilder(ExpressionBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockExprBuilder = $this->createMock(ExpressionBuilder::class);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['expr', 'execute'])
+            ->onlyMethods(['expr', 'executeQuery'])
             ->getMock();
 
         $mockStmt = $this->getMockBuilder(Result::class)
@@ -264,7 +262,7 @@ class ReportSubscriberTest extends TestCase
             ->willReturn($mockExprBuilder);
 
         $mockQueryBuilder->expects($this->any())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($mockStmt);
 
         $mockEvent->expects($this->once())

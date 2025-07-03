@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Field;
 
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
@@ -7,33 +9,19 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\CustomFieldIndex;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 
 final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|IndexSchemaHelper
-     */
-    private $indexSchemaHelperMock;
+    private MockObject&IndexSchemaHelper $indexSchemaHelperMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
-     */
-    private $loggerMock;
+    private MockObject&Logger $loggerMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifierMock;
+    private MockObject&FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifierMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadField
-     */
-    private $leadFieldMock;
+    private MockObject&LeadField $leadFieldMock;
 
-    /**
-     * @var CustomFieldIndex
-     */
-    private $customFieldIndex;
+    private CustomFieldIndex $customFieldIndex;
 
     protected function setUp(): void
     {
@@ -45,10 +33,9 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getHasMatchingUniqueIdentifierIndexProvider
-     *
      * Test getting unique identifier if object is lead or company.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getHasMatchingUniqueIdentifierIndexProvider')]
     public function testHasMatchingUniqueIdentifierIndex(string $object, string $field, string $fieldKey): void
     {
         $this->leadFieldMock->expects($this->once())
@@ -68,13 +55,11 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
     /**
      * Provides data for testHasMatchingUniqueIdentifierIndex.
      *
-     * @return array<mixed>>
+     * @return iterable<string, string[]>
      */
-    public function getHasMatchingUniqueIdentifierIndexProvider(): array
+    public static function getHasMatchingUniqueIdentifierIndexProvider(): iterable
     {
-        return [
-            'Lead object'    => ['lead', 'email', 'email_key'],
-            'Company object' => ['company', 'company_email', 'company_email_key'],
-        ];
+        yield 'Lead object'    => ['lead', 'email', 'email_key'];
+        yield 'Company object' => ['company', 'company_email', 'company_email_key'];
     }
 }

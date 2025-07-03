@@ -22,7 +22,7 @@ class PreferenceCenterListType extends AbstractType
 
     public function __construct(
         private PageModel $model,
-        CorePermissions $corePermissions
+        CorePermissions $corePermissions,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
@@ -64,7 +64,7 @@ class PreferenceCenterListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids']);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

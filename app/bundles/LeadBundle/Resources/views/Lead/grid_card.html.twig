@@ -26,10 +26,10 @@
                             <span>{{ contact.primaryIdentifier }}</span>
                         </a>
                     </h4>
-                    <div class="text-muted mb-1 ellipsis">
+                    <div class="text-secondary mb-1 ellipsis">
                         <i class="ri-fw ri-building-2-line mr-xs"></i>{{ fields.core.company.value|default('') }}
                     </div>
-                    <div class="text-muted mb-1 ellipsis">
+                    <div class="text-secondary mb-1 ellipsis">
                         <i class="ri-fw ri-map-pin-2-line mr-xs"></i>
                         {% set location = [] %}
                         {% if fields.core.city is defined %}
@@ -42,7 +42,7 @@
                         {% endif %}
                         {{ location|join(', ') }}
                     </div>
-                    <div class="text-muted mb-1 ellipsis">
+                    <div class="text-secondary mb-1 ellipsis">
                         <i class="ri-earth-line mr-xs"></i>{{ fields.core.country.value|default('') }}
                     </div>
                     {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}

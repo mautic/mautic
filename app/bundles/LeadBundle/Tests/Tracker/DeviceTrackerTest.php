@@ -68,11 +68,6 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $container = $this->createMock(ContainerInterface::class);
         $container
           ->expects($this->once())
-          ->method('has')
-          ->with($this->equalTo('mautic.cache.adapter.filesystem'))
-          ->willReturn(true);
-        $container
-          ->expects($this->once())
           ->method('get')
           ->with($this->equalTo('mautic.cache.adapter.filesystem'))
           ->willReturn($cacheAdapter);
@@ -80,13 +75,9 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $cacheProvider               = new CacheProvider($coreParametersHelper, $container);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
         $this->deviceCreatorService  = new DeviceCreatorService();
-        $this->deviceTrackingService = $this->getMockBuilder(DeviceTrackingServiceInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
 
-        $this->logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->logger = $this->createMock(Logger::class);
     }
 
     public function testDeviceCreatedByUserAgent(): void

@@ -6,17 +6,17 @@ a = current major release
 b = current minor release
 c = future major release
 
-* a.x for any features and enhancements (e.g. 5.x)
-* a.b for any bug fixes (e.g. 4.4, 5.1)
-* c.x for any features, enhancements or bug fixes with backward compatibility breaking changes (e.g. 5.x) -->
+* a.x for any features and enhancements (e.g. 7.x)
+* a.b for any bug fixes (e.g. 5.2, 6.0)
+* c.x for any bug fixes, features, enhancements or bug fixes with backward compatibility breaking changes (e.g. 7.x) -->
 
 | Q                                      | A
 | -------------------------------------- | ---
-| Bug fix? (use the a.b branch)          | 🔴🟢 <!-- Use emojis to indicate positive (green) or negative (red) for each item in the table. -->
-| New feature/enhancement? (use the a.x branch)      | 🔴🟢
-| Deprecations?                          | 🔴🟢
-| BC breaks? (use the c.x branch)        | 🔴🟢
-| Automated tests included?              | 🔴🟢 <!-- All PRs must maintain or improve code coverage -->
+| Bug fix? (use the a.b branch)          | ✔️❌ <!-- Use emojis to indicate positive (green) or negative (red) for each item in the table. -->
+| New feature/enhancement? (use the a.x branch)      | ✔️❌
+| Deprecations?                          | ✔️❌
+| BC breaks? (use the c.x branch)        | ✔️❌
+| Automated tests included?              | ✔️❌ <!-- All PRs must maintain or improve code coverage -->
 | Related user documentation PR URL      | mautic/user-documentation#... <!-- required for new features -->
 | Related developer documentation PR URL | mautic/developer-documentation-new#... <!-- required for developer-facing changes -->
 | Issue(s) addressed                     | Fixes #... <!-- prefix each issue number with "Fixes #", no need to create an issue if none exists, explain below instead -->

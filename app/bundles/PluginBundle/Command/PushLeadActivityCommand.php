@@ -13,7 +13,7 @@ class PushLeadActivityCommand extends Command
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private IntegrationHelper $integrationHelper
+        private IntegrationHelper $integrationHelper,
     ) {
         parent::__construct();
     }

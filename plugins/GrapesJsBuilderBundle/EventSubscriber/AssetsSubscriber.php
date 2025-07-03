@@ -16,7 +16,7 @@ class AssetsSubscriber implements EventSubscriberInterface
     public function __construct(
         private Config $config,
         private InstallService $installer,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 

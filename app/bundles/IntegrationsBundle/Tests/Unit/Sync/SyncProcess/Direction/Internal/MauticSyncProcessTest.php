@@ -16,12 +16,15 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectSyncSkippedException;
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MauticSyncProcessTest extends TestCase
@@ -29,29 +32,24 @@ class MauticSyncProcessTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var SyncDateHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
+    private MockObject $syncDateHelper;
 
     /**
-     * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
+     * @var ObjectChangeGenerator|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
+    private MockObject $objectChangeGenerator;
 
     /**
-     * @var MauticSyncDataExchange|\PHPUnit\Framework\MockObject\MockObject
+     * @var MauticSyncDataExchange|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
+    private MockObject $syncDataExchange;
 
     /**
      * @var InputOptionsDAO
      */
     private $inputOptionsDAO;
-
-    /**
-     * @var MauticSyncProcess
-     */
-    private $mauticSyncProcess;
 
     protected function setUp(): void
     {
@@ -59,7 +57,6 @@ class MauticSyncProcessTest extends TestCase
         $this->objectChangeGenerator = $this->createMock(ObjectChangeGenerator::class);
         $this->syncDataExchange      = $this->createMock(MauticSyncDataExchange::class);
         $this->inputOptionsDAO       = new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]);
-        $this->mauticSyncProcess     = new MauticSyncProcess($this->syncDateHelper, $this->objectChangeGenerator);
     }
 
     public function testThatMauticGetSyncReportIsCalledBasedOnRequest(): void
@@ -121,7 +118,7 @@ class MauticSyncProcessTest extends TestCase
         $this->assertEquals(MauticSyncDataExchange::NAME, $report->getIntegration());
     }
 
-    public function testOrderIsBuiltBasedOnMapping(): void
+    public function testGetSyncOrder(): void
     {
         $objectName    = 'Contact';
         $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
@@ -162,11 +159,74 @@ class MauticSyncProcessTest extends TestCase
         $this->assertEquals([Contact::NAME => [1 => $objectChangeDAO]], $syncOrder->getIdentifiedObjects());
     }
 
-    private function createMauticSyncProcess(MappingManualDAO $mappingManualDAO): MauticSyncProcess
+    public function testGetSyncOrderObjectDeleted(): void
     {
-        $this->mauticSyncProcess->setupSync($this->inputOptionsDAO, $mappingManualDAO, $this->syncDataExchange);
+        $objectName    = 'Contact';
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
+        $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
+        $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $objectMapping->addFieldMapping('firstname', 'first_name');
+        $mappingManual->addObjectMapping($objectMapping);
 
-        return $this->mauticSyncProcess;
+        $toSyncDateTime = new \DateTimeImmutable();
+        $this->syncDateHelper->expects($this->once())
+            ->method('getSyncDateTime')
+            ->willReturn($toSyncDateTime);
+
+        $syncReport       = new ReportDAO(self::INTEGRATION_NAME);
+        $reportObjectDAO  = new ReportObjectDAO($objectName, 2);
+        $reportObjectDAO->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
+        $reportObjectDAO->addField(new ReportFieldDAO('first_name', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
+        $syncReport->addObject($reportObjectDAO);
+
+        // Search for an internal object
+        $this->syncDataExchange->expects($this->once())
+            ->method('getConflictedInternalObject')
+            ->with($mappingManual, Contact::NAME, $reportObjectDAO)
+            ->willThrowException(new ObjectDeletedException());
+
+        $syncOrder = $this->createMauticSyncProcess($mappingManual)->getSyncOrder($syncReport);
+        self::assertEquals([], $syncOrder->getIdentifiedObjects());
+    }
+
+    public function testGetSyncOrderObjectSkipped(): void
+    {
+        $objectName    = 'Contact';
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
+        $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
+        $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $objectMapping->addFieldMapping('firstname', 'first_name');
+        $mappingManual->addObjectMapping($objectMapping);
+
+        $toSyncDateTime = new \DateTimeImmutable();
+        $this->syncDateHelper->expects($this->once())
+            ->method('getSyncDateTime')
+            ->willReturn($toSyncDateTime);
+
+        $syncReport       = new ReportDAO(self::INTEGRATION_NAME);
+        $reportObjectDAO  = new ReportObjectDAO($objectName, 2);
+        $reportObjectDAO->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
+        $reportObjectDAO->addField(new ReportFieldDAO('first_name', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
+        $syncReport->addObject($reportObjectDAO);
+
+        // Search for an internal object
+        $this->syncDataExchange->expects($this->once())
+            ->method('getConflictedInternalObject')
+            ->with($mappingManual, Contact::NAME, $reportObjectDAO)
+            ->willReturn(
+                new ReportObjectDAO(Contact::NAME, 1)
+            );
+
+        $objectChangeDAO = new ObjectChangeDAO(MauticSyncDataExchange::NAME, Contact::NAME, 1, $objectName, 2);
+        $objectChangeDAO->addField(new OrderFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
+        $objectChangeDAO->addField(new OrderFieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
+        $this->objectChangeGenerator->expects($this->once())
+            ->method('getSyncObjectChange')
+            ->willThrowException(new ObjectSyncSkippedException());
+
+        $syncOrder = $this->createMauticSyncProcess($mappingManual)->getSyncOrder($syncReport);
+
+        self::assertEquals([], $syncOrder->getIdentifiedObjects());
     }
 
     public function testThatItDoesntSyncOtherEntityTypesWhenIDsForSomeEntityAreSpecified(): void
@@ -218,5 +278,21 @@ class MauticSyncProcessTest extends TestCase
 
         $syncReport = $this->createMauticSyncProcess($mappingManual)->getSyncReport(1);
         $this->assertEquals(self::INTEGRATION_NAME, $syncReport->getIntegration());
+    }
+
+    private function createMauticSyncProcess(MappingManualDAO $mappingManualDAO): MauticSyncProcess
+    {
+        $mauticSyncProcess = new MauticSyncProcess(
+            $this->syncDateHelper,
+            $this->objectChangeGenerator,
+        );
+
+        $mauticSyncProcess->setupSync(
+            $this->inputOptionsDAO,
+            $mappingManualDAO,
+            $this->syncDataExchange
+        );
+
+        return $mauticSyncProcess;
     }
 }

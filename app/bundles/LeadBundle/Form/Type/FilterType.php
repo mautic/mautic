@@ -21,7 +21,7 @@ class FilterType extends AbstractType
 {
     public function __construct(
         private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
-        private ListModel $listModel
+        private ListModel $listModel,
     ) {
     }
 
@@ -39,7 +39,7 @@ class FilterType extends AbstractType
                     'mautic.lead.list.form.glue.or'  => 'or',
                 ],
                 'attr' => [
-                    'class'    => 'form-control not-chosen glue-select',
+                    'class'    => 'label label-warm-gray not-chosen glue-select',
                     'onchange' => 'Mautic.updateFilterPositioning(this)',
                 ],
             ]
@@ -123,10 +123,7 @@ class FilterType extends AbstractType
         $view->vars['fields'] = $this->listModel->getChoiceFields();
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadlist_filter';
     }

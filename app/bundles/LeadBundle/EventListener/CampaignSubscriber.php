@@ -3,15 +3,19 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
 use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
@@ -32,6 +36,7 @@ use Mautic\LeadBundle\Form\Type\UpdateCompanyActionType;
 use Mautic\LeadBundle\Form\Type\UpdateLeadActionType;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -39,6 +44,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -58,7 +64,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private DoNotContact $doNotContact,
         private PointGroupModel $groupModel,
-        private FilterOperatorProvider $filterOperatorProvider
+        private FilterOperatorProvider $filterOperatorProvider,
     ) {
     }
 
@@ -69,13 +75,15 @@ class CampaignSubscriber implements EventSubscriberInterface
             LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
                 ['onCampaignTriggerActionChangePoints', 0],
                 ['onCampaignTriggerActionChangeLists', 1],
-                ['onCampaignTriggerActionUpdateLead', 2],
                 ['onCampaignTriggerActionUpdateTags', 3],
                 ['onCampaignTriggerActionAddToCompany', 4],
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
                 ['onCampaignTriggerActionChangeOwner', 7],
                 ['onCampaignTriggerActionUpdateCompany', 8],
                 ['onCampaignTriggerActionSetManipulator', 100],
+            ],
+            LeadEvents::ON_CAMPAIGN_BATCH_ACTION => [
+                ['onCampaignTriggerActionUpdateLead', 0],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -104,11 +112,11 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('lead.changelist', $action);
 
         $action = [
-            'label'       => 'mautic.lead.lead.events.updatelead',
-            'description' => 'mautic.lead.lead.events.updatelead_descr',
-            'formType'    => UpdateLeadActionType::class,
-            'formTheme'   => '@MauticLead/FormTheme/ActionUpdateLead/_updatelead_action_widget.html.twig',
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'label'          => 'mautic.lead.lead.events.updatelead',
+            'description'    => 'mautic.lead.lead.events.updatelead_descr',
+            'formType'       => UpdateLeadActionType::class,
+            'formTheme'      => '@MauticLead/FormTheme/ActionUpdateLead/_updatelead_action_widget.html.twig',
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.updatelead', $action);
 
@@ -312,20 +320,57 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult($somethingHappened);
     }
 
-    public function onCampaignTriggerActionUpdateLead(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void
     {
+        $values = $event->getEvent()->getProperties();
         if (!$event->checkContext('lead.updatelead')) {
             return;
         }
 
-        $lead   = $event->getLead();
-        $values = $event->getConfig();
+        $logs = $event->getPending();
+
+        foreach ($logs as $log) {
+            $this->updateLead($log, $values, $event);
+        }
+    }
+
+    /**
+     * @param array<mixed> $values
+     */
+    private function updateLead(LeadEventLog $log, array $values, PendingEvent $event): void
+    {
+        $lead   = $log->getLead();
         $fields = $lead->getFields(true);
 
-        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $values), false);
-        $this->leadModel->saveEntity($lead);
+        try {
+            $tokenizedValues = [];
+            foreach ($values as $field => $value) {
+                if (is_string($value)) {
+                    $tokenizedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                    $fieldEntity    = $this->leadFieldModel->getEntityByAlias($field);
+                    if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($tokenizedValue) > $charLimit) {
+                        $tokenizedValue = mb_substr($tokenizedValue, 0, $charLimit);
+                    }
+                    $tokenizedValues[$field] = $tokenizedValue;
+                } else {
+                    $tokenizedValues[$field] = $value;
+                }
+            }
+            $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
+        } catch (ImportFailedException $e) {
+            $event->fail($log, $e->getMessage());
+        }
 
-        return $event->setResult(true);
+        foreach ($values as $alias => &$value) {
+            if (isset($fields[$alias]) && 'boolean' === $fields[$alias]['type'] && 0 === $value) {
+                // 0 is interpreted as 'don't change the bool field' instead of setting it to false, so we change the field manually in this step
+                $lead->addUpdatedField($alias, 0);
+            }
+        }
+
+        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
+        $this->leadModel->saveEntity($lead);
+        $event->pass($log);
     }
 
     public function onCampaignTriggerActionChangeOwner(CampaignExecutionEvent $event)
@@ -445,33 +490,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext('lead.device')) {
-            $deviceRepo = $this->leadModel->getDeviceRepository();
-            $result     = false;
-
-            $deviceType   = $event->getConfig()['device_type'];
-            $deviceBrands = $event->getConfig()['device_brand'];
-            $deviceOs     = $event->getConfig()['device_os'];
-
-            if (!empty($deviceType)) {
-                $result = false;
-                if (!empty($deviceRepo->getDevice($lead, $deviceType))) {
-                    $result = true;
-                }
-            }
-
-            if (!empty($deviceBrands)) {
-                $result = false;
-                if (!empty($deviceRepo->getDevice($lead, null, $deviceBrands))) {
-                    $result = true;
-                }
-            }
-
-            if (!empty($deviceOs)) {
-                $result = false;
-                if (!empty($deviceRepo->getDevice($lead, null, null, null, $deviceOs))) {
-                    $result = true;
-                }
-            }
+            $result = $this->validateContactDevice($event, $lead, $this->leadModel->getDeviceRepository());
         } elseif ($event->checkContext('lead.tags')) {
             $tagRepo = $this->leadModel->getTagRepository();
             $result  = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
@@ -505,7 +524,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                         $lead->getId(), $event->getConfig()['field'], $triggerDate);
                 }
             } else {
-                $operators = $this->leadModel->getFilterExpressionFunctions();
+                $operators = OperatorOptions::getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
                 $value     = $event->getConfig()['value'];
                 $fields    = $this->getFields($lead);
@@ -670,5 +689,20 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         return $this->fields;
+    }
+
+    /**
+     * It returns true if contact device matches
+     * device specified in the
+     * CampaignExecutionEvent's settings.
+     */
+    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact, LeadDeviceRepository $leadDeviceRepository): bool // @phpstan-ignore parameter.deprecatedClass
+    {
+        $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
+        $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];
+        $deviceBrands                 = empty($campaignExecutionEventConfig['device_brand']) ? null : $campaignExecutionEventConfig['device_brand'];
+        $deviceOs                     = empty($campaignExecutionEventConfig['device_os']) ? null : $campaignExecutionEventConfig['device_os'];
+
+        return !empty($leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
     }
 }

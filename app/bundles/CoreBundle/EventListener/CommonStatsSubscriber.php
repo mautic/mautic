@@ -29,7 +29,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
     public function __construct(
         protected CorePermissions $security,
-        protected EntityManager $entityManager
+        protected EntityManager $entityManager,
     ) {
     }
 

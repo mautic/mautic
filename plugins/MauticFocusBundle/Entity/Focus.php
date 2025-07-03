@@ -6,73 +6,131 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Focus extends FormEntity
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "focus:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "focus:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Focus extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+    use ProjectTrait;
+
     /**
      * @var int
+     *
+     * @Groups("focus:read")
      */
     private $id;
 
     /**
      * @var string|null
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $description;
 
     /**
      * @var string|null
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $editor;
 
     /**
      * @var string|null
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $html;
 
     /**
      * @var string|null
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $htmlMode;
 
     /**
      * @var string
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $name;
 
+    /**
+     * @Groups({"focus:read", "focus:write"})
+     */
     private $category;
 
     /**
      * @var string
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $type;
 
     /**
      * @var string|null
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $website;
 
     /**
      * @var string
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $style;
 
     /**
      * @var \DateTimeInterface
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $publishDown;
 
+    /**
+     * @var array<mixed>
+     *
+     * @Groups({"focus:read", "focus:write"})
+     */
     private $properties = [];
 
     /**
      * @var array
+     *
+     * @Groups({"focus:read", "focus:write"})
      */
     private $utmTags = [];
 
@@ -85,6 +143,11 @@ class Focus extends FormEntity
      * @var string|null
      */
     private $cache;
+
+    public function __construct()
+    {
+        $this->initializeProjects();
+    }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
@@ -161,6 +224,9 @@ class Focus extends FormEntity
         $builder->addNullableField('editor', 'text');
 
         $builder->addNullableField('html', 'text');
+
+        static::addUuidField($builder);
+        self::addProjectsField($builder, 'focus_projects_xref', 'focus_id');
     }
 
     /**
@@ -168,7 +234,7 @@ class Focus extends FormEntity
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
-        $metadata
+        $metadata->setGroupPrefix('focus')
             ->addListProperties(
                 [
                     'id',
@@ -194,6 +260,8 @@ class Focus extends FormEntity
                 ]
             )
             ->build();
+
+        self::addProjectsInLoadApiMetadata($metadata, 'focus');
     }
 
     public function toArray(): array
@@ -380,7 +448,7 @@ class Focus extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return array<mixed>
      */
     public function getProperties()
     {
@@ -388,7 +456,7 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $properties
+     * @param array<mixed> $properties
      *
      * @return Focus
      */

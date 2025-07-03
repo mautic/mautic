@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -49,7 +50,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadList>
  */
-class ListModel extends FormModel
+class ListModel extends FormModel implements GlobalSearchInterface
 {
     use OperatorListTrait;
 
@@ -71,7 +72,7 @@ class ListModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -131,13 +132,13 @@ class ListModel extends FormModel
         // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+        $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists(null, $testAlias, $entity->getId());
+            $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -161,8 +162,6 @@ class ListModel extends FormModel
      * @param array       $options
      *
      * @return FormInterface<LeadList>
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
@@ -511,8 +510,12 @@ class ListModel extends FormModel
             }
         }
 
-        $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
-        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+        } else {
+            $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
+            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        }
 
         return $leadsProcessed;
     }
@@ -632,7 +635,11 @@ class ListModel extends FormModel
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            }
         }
 
         if (!empty($persistLists)) {
@@ -750,7 +757,11 @@ class ListModel extends FormModel
                 $dispatchEvents[] = $listId;
             }
 
-            $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
+            }
 
             unset($listLead);
         }
@@ -810,10 +821,8 @@ class ListModel extends FormModel
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true)
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -833,7 +842,7 @@ class ListModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1103,10 +1112,8 @@ class ListModel extends FormModel
 
     /**
      * @param $segmentId *
-     *
-     * @return array
      */
-    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name'): array
     {
         $filter = [
             'force'  => [
@@ -1238,9 +1245,9 @@ class ListModel extends FormModel
                     continue;
                 }
 
-                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
                 $bcFilterValue     = $eachFilter['filter'] ?? [];
                 $filterValue       = $eachFilter['properties']['filter'] ?? $bcFilterValue;
+                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $filterValue));
                 foreach ($filterValue as $val) {
                     if (!empty($dependency[$val])) {
                         $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);

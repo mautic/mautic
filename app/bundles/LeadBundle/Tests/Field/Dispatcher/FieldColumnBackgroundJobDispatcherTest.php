@@ -8,160 +8,160 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher;
 use Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent;
+use Mautic\LeadBundle\Field\Event\DeleteColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
+use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
+    private MockObject $dispatcher;
+
+    protected function setUp(): void
+    {
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        parent::setUp();
+    }
+
     public function testNoListener(): void
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(false);
-        $dispatcher
-            ->expects($this->never())
-            ->method('dispatch');
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(false);
+        $this->dispatcher->expects($this->never())->method('dispatch');
 
-        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
-
-        $leadField = new LeadField();
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(NoListenerException::class);
         $this->expectExceptionMessage('There is no Listener for this event');
 
-        $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
+        $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent(new LeadField());
     }
 
     public function testNoListenerUpdate(): void
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(false);
-        $dispatcher
-            ->expects($this->never())
-            ->method('dispatch');
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(false);
+        $this->dispatcher->expects($this->never())->method('dispatch');
 
-        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
-
-        $leadField = new LeadField();
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(NoListenerException::class);
         $this->expectExceptionMessage('There is no Listener for this event');
 
-        $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent($leadField);
+        $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent(new LeadField());
+    }
+
+    public function testNoListenerDelete(): void
+    {
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(false);
+        $this->dispatcher->expects($this->never())->method('dispatch');
+
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
+
+        $this->expectException(NoListenerException::class);
+        $this->expectExceptionMessage('There is no Listener for this event');
+
+        $fieldColumnBackgroundJobDispatcher->dispatchPreDeleteColumnEvent(new LeadField());
     }
 
     public function testNormalProcess(): void
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('dispatch')->with(
+            $this->isInstanceOf(AddColumnBackgroundEvent::class),
+            LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB,
+        );
 
-        $dispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                $this->isInstanceOf(AddColumnBackgroundEvent::class),
-                'mautic.lead_field_pre_add_column_background_job',
-            );
-
-        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
-
-        $leadField = new LeadField();
-
-        $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
+        $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent(new LeadField());
     }
 
     public function testNormalProcessUpdate(): void
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('dispatch')->with(
+            $this->isInstanceOf(UpdateColumnBackgroundEvent::class),
+            LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB,
+        );
 
-        $dispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                $this->isInstanceOf(UpdateColumnBackgroundEvent::class),
-                'mautic.lead_field_pre_update_column_background_job',
-            );
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
+        $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent(new LeadField());
+    }
 
-        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
+    public function testNormalProcessDelete(): void
+    {
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('dispatch')->with(
+            $this->isInstanceOf(DeleteColumnBackgroundEvent::class),
+            LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN_BACKGROUND_JOB,
+        );
 
-        $leadField = new LeadField();
-
-        $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent($leadField);
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
+        $fieldColumnBackgroundJobDispatcher->dispatchPreDeleteColumnEvent(new LeadField());
     }
 
     public function testStopPropagation(): void
     {
-        $leadField = new LeadField();
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('dispatch')->with(
+            $this->callback(function (AddColumnBackgroundEvent $event) {
+                $event->stopPropagation();
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
+                return $event instanceof AddColumnBackgroundEvent;
+            }),
+            LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB,
+        );
 
-        $dispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                $this->callback(function ($event) {
-                    /* @var AddColumnBackgroundEvent $event */
-                    $event->stopPropagation();
-
-                    return $event instanceof AddColumnBackgroundEvent;
-                }),
-                'mautic.lead_field_pre_add_column_background_job'
-            );
-
-        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(AbortColumnCreateException::class);
         $this->expectExceptionMessage('Column cannot be created now');
 
-        $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
+        $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent(new LeadField());
     }
 
     public function testStopPropagationUpdate(): void
     {
-        $leadField = new LeadField();
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('dispatch')->with(
+            $this->callback(function (UpdateColumnBackgroundEvent $event) {
+                $event->stopPropagation();
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
+                return true;
+            }),
+            LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB,
+        );
 
-        $dispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                $this->callback(function ($event) {
-                    /* @var AddColumnBackgroundEvent $event */
-                    $event->stopPropagation();
-
-                    return $event instanceof UpdateColumnBackgroundEvent;
-                }),
-                'mautic.lead_field_pre_update_column_background_job',
-            );
-
-        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(AbortColumnUpdateException::class);
         $this->expectExceptionMessage('Column cannot be updated now');
 
-        $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent($leadField);
+        $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent(new LeadField());
+    }
+
+    public function testStopPropagationDelete(): void
+    {
+        $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
+        $this->dispatcher->expects($this->once())->method('dispatch')->with(
+            $this->callback(function (DeleteColumnBackgroundEvent $event) {
+                $event->stopPropagation();
+
+                return $event instanceof DeleteColumnBackgroundEvent;
+            }),
+            LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN_BACKGROUND_JOB,
+        );
+
+        $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
+
+        $this->expectException(AbortColumnUpdateException::class);
+        $this->expectExceptionMessage('Column cannot be deleted now');
+
+        $fieldColumnBackgroundJobDispatcher->dispatchPreDeleteColumnEvent(new LeadField());
     }
 }

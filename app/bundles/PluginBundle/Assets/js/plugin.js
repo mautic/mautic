@@ -256,10 +256,7 @@ Mautic.getIntegrationFields = function(settings, page, el) {
             if (inModal) {
                 Mautic.stopModalLoadingBar(modalId);
             }
-        },
-        false,
-        false,
-        "GET"
+        }
     );
 };
 
@@ -316,29 +313,6 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
             }
 
             Mautic.integrationConfigOnLoad('.integration-campaigns-status');
-            Mautic.removeLabelLoadingIndicator();
-        },
-        false,
-        false,
-        "GET"
-    );
-};
-
-Mautic.getIntegrationCampaigns = function (el, settings) {
-    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
-
-    var data = {integration: mQuery(el).val()};
-
-    mQuery('.integration-campaigns').html('');
-
-    Mautic.ajaxActionRequest('plugin:getIntegrationCampaigns', data,
-        function (response) {
-            if (response.success) {
-                mQuery('.integration-campaigns').html(response.html);
-                Mautic.onPageLoad('.integration-campaigns', response);
-            }
-
-            Mautic.integrationConfigOnLoad('.integration-campaigns');
             Mautic.removeLabelLoadingIndicator();
         },
         false,

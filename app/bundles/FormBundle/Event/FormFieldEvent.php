@@ -11,7 +11,7 @@ final class FormFieldEvent extends Event
 {
     public function __construct(
         private Field $entity,
-        private bool $isNew = false
+        private bool $isNew = false,
     ) {
     }
 

@@ -93,8 +93,8 @@ trait MatchFilterForLeadTrait
                     }
                     break;
                 case 'number':
-                    $leadVal   = (int) $leadVal;
-                    $filterVal = (int) $filterVal;
+                    $leadVal   = (float) $leadVal;
+                    $filterVal = (float) $filterVal;
                     break;
                 case 'select':
                     if (!is_array($filterVal)) {

@@ -59,7 +59,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     private $author;
 
     /**
-     * @var ArrayCollection<int, \Mautic\PluginBundle\Entity\Integration>
+     * @var ArrayCollection<int, Integration>
      */
     private $integrations;
 

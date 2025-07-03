@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -29,13 +30,13 @@ class ListType extends AbstractType
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private ListModel $listModel
+        private ListModel $listModel,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html', 'name' => 'clean', 'publicName' => 'clean', 'filter' => 'raw']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html', 'name' => 'string', 'publicName' => 'string', 'filter' => 'raw']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
 
         $builder->add(
@@ -106,6 +107,7 @@ class ListType extends AbstractType
                 'attr'       => [
                     'tooltip' => 'mautic.lead.list.form.isglobal.tooltip',
                 ],
+                'no_label'   => 'mautic.lead.list.form.isglobal.no',
             ]
         );
 
@@ -120,6 +122,7 @@ class ListType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object' => 'lead']);
@@ -167,10 +170,7 @@ class ListType extends AbstractType
         $view->vars['fields'] = $this->listModel->getChoiceFields();
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadlist';
     }

@@ -1,0 +1,8 @@
+{% if tip is defined %}
+<div class="alert bdr-c-info text-secondary mb-0">
+    {{ tip|trans }}
+    {% if link is defined and (href is defined or onclick is defined) %}
+    <a class="ml-a" href="{{href}}" onclick="{{onclick}}">{{link|trans}}</a>
+    {% endif %}
+</div>
+{% endif %}

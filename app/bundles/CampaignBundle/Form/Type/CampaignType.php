@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -26,7 +27,7 @@ class CampaignType extends AbstractType
 {
     public function __construct(
         private CorePermissions $security,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -75,7 +76,7 @@ class CampaignType extends AbstractType
                 'data-confirm-callback' => 'dismissConfirmation',
                 'data-cancel-text'      => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
                 'data-cancel-callback'  => 'setPublishedButtonToYes',
-                'class'                 => 'btn btn-default',
+                'class'                 => 'btn btn-ghost',
             ];
         } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
             $readonly = true;
@@ -103,13 +104,15 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
+        $builder->add('projects', ProjectType::class);
+
         $builder->add('buttons', FormButtonsType::class, [
             'pre_extra_buttons' => [
                 [
                     'name'  => 'builder',
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-default btn-dnd',
+                        'class'   => 'btn btn-ghost btn-dnd',
                         'icon'    => 'ri-organization-chart',
                         'onclick' => 'Mautic.launchCampaignEditor();',
                     ],

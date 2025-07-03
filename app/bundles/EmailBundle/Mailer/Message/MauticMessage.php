@@ -9,7 +9,7 @@ use Symfony\Component\Mime\Email;
 class MauticMessage extends Email
 {
     /**
-     * @var array<string, array<string, string>>
+     * @var array<string, array<string, mixed[]>>
      */
     protected $metadata = [];
 
@@ -24,9 +24,7 @@ class MauticMessage extends Email
     }
 
     /**
-     * Get the metadata.
-     *
-     * @return array<string, array<string, string>>
+     * @return array<string, array<string, mixed[]>>
      */
     public function getMetadata(): array
     {

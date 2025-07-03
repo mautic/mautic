@@ -4,18 +4,20 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 
 class JsController extends CommonController
 {
-    public function indexAction(): Response
-    {
+    public function indexAction(
+        #[Autowire(param: 'kernel.debug')]
+        bool $kernelDebug,
+    ): Response {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
         $dispatcher = $this->dispatcher;
-        $debug      = $this->factory->getKernel()->isDebug();
-        $event      = new BuildJsEvent($this->getJsHeader(), $debug);
+        $event      = new BuildJsEvent($this->getJsHeader(), $kernelDebug);
 
         if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
             $dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);

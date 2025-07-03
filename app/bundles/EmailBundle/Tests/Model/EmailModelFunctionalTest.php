@@ -11,6 +11,7 @@ use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -23,12 +24,15 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     private const EMAILS_A_MONTH = 2;
     private bool $useDefaultFrequencyRules;
-    private EmailModel $emailModel;
+    private EmailModel|ContainerInterface $emailModel;
 
     protected function setUp(): void
     {
@@ -503,5 +507,61 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($email->getId(), $queuedMessage->getChannelId());
         Assert::assertSame($contact, $queuedMessage->getLead());
         Assert::assertSame($queuedMessage::STATUS_PENDING, $queuedMessage->getStatus());
+    }
+
+    public function testReturnsContactAsIsIfNoId(): void
+    {
+        $contact = ['email' => 'test@example.com'];
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contact);
+
+        $this->assertSame($contact, $result);
+    }
+
+    public function testReturnsContactAsIsIfCompaniesAlreadySet(): void
+    {
+        $contact = [
+            'id'        => 1,
+            'companies' => ['company1'],
+        ];
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contact);
+
+        $this->assertSame($contact, $result);
+    }
+
+    public function testEnrichesContactWithCompanies(): void
+    {
+        $company = $this->createCompany('Mautic', 'hello@mautic.org');
+        $company->setCity('Pune');
+        $company->setCountry('India');
+
+        $this->em->persist($company);
+
+        $contact = $this->createLead('John', 'Doe', 'test@domain.tld');
+        $this->createPrimaryCompanyForLead($contact, $company);
+        $this->em->flush();
+
+        $contactArray = $contact->convertToArray();
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contactArray);
+
+        $this->assertArrayHasKey('companies', $result);
+        $this->assertSame($company->getName(), $result['companies'][0]['companyname']);
+        $this->assertSame($company->getCity(), $result['companies'][0]['companycity']);
+        $this->assertSame($company->getCountry(), $result['companies'][0]['companycountry']);
+    }
+
+    public function testEnrichesContactWithEmptyCompaniesIfNoneFound(): void
+    {
+        $contact = $this->createLead('John', 'Doe', 'test@domain.tld');
+        $this->em->flush();
+
+        $contactArray = $contact->convertToArray();
+
+        $result = $this->emailModel->enrichedContactWithCompanies($contactArray);
+
+        $this->assertArrayHasKey('companies', $result);
+        $this->assertEmpty($result['companies']);
     }
 }

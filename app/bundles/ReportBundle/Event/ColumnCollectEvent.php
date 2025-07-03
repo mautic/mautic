@@ -18,7 +18,7 @@ final class ColumnCollectEvent extends Event
      */
     public function __construct(
         private string $object,
-        private array $properties = []
+        private array $properties = [],
     ) {
         $this->columns = [];
     }

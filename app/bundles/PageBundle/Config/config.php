@@ -45,12 +45,9 @@ return [
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
             ],
             'mautic_page_preview' => [
-                'path'       => '/page/preview/{id}',
+                'path'       => '/page/preview/{id}/{objectType}',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::previewAction',
-            ],
-            'mautic_gated_video_hit' => [
-                'path'       => '/video/hit',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::hitVideoAction',
+                'defaults'   => ['objectType' => null],
             ],
         ],
         'api' => [
@@ -86,7 +83,9 @@ return [
     ],
 
     'categories' => [
-        'page' => null,
+        'page' => [
+            'class' => Mautic\PageBundle\Entity\Page::class,
+        ],
     ],
 
     'services' => [

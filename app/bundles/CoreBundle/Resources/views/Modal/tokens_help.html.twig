@@ -1,0 +1,41 @@
+{% set modalHeader %}
+{{ "mautic.placeholder_tokens.placeholder_tokens.header" | trans }}
+{% endset %}
+
+{% set modalBody %}
+<div class="row">
+  <div class="col-md-9 col-xs-12">
+    {% include '@MauticCore/Components/content-block.html.twig' with {
+      'heading': 'mautic.placeholder_tokens.introducing_tokens.title',
+      'subheading': 'mautic.placeholder_tokens.introducing_tokens.description',
+    } %}
+  </div>
+</div>
+
+{{ include ('@MauticLead/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+{{ include ('@MauticEmail/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+{{ include ('@MauticPage/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+{{ include ('@MauticForm/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+
+{% set otherTokens %}
+<ul id="otherTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
+  {{ include ('@MauticDynamicContent/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+  {{ include ('@MauticSocial/Tokens/tokens_help_bundle.html.twig', ignore_missing="true") }}
+</ul>
+{% endset %}
+
+{% include '@MauticCore/Components/content-section.html.twig' with {'heading': 'mautic.placeholder_tokens.other_tokens', 'childContainer': otherTokens} %}
+
+<div class="alert alert-success mt-lg mb-0">
+  <span>{{ 'mautic.placeholder_tokens.fallback_text_info'|trans|raw }}</span>
+</div>
+{% endset %}
+
+{% include '@MauticCore/Components/modal.html.twig' with {
+  'id': 'tokenPlaceholdersModal',
+  'type': 'expressive',
+  'modalAriaLabel': modalHeader,
+  'modalContent': modalBody,
+  'hasScrollingContent': true,
+  'size': 'xl'
+} %}

@@ -3,9 +3,9 @@
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -88,7 +88,7 @@ class DBALMocker
         if (null === $this->mockEm) {
             $mock = $this->testCase->getMockBuilder(EntityManager::class)
                 ->disableOriginalConstructor()
-                ->setMethods(
+                ->onlyMethods(
                     [
                         'getConnection',
                         'getReference',
@@ -125,7 +125,7 @@ class DBALMocker
         if (null === $this->mockConnection) {
             $mock = $this->testCase->getMockBuilder(Connection::class)
                 ->disableOriginalConstructor()
-                ->setMethods([
+                ->onlyMethods([
                     'createQueryBuilder',
                     'quote',
                     'update',
@@ -164,7 +164,7 @@ class DBALMocker
         if (null === $this->mockQueryBuilder) {
             $mock = $this->testCase->getMockBuilder(QueryBuilder::class)
                 ->disableOriginalConstructor()
-                ->setMethods(
+                ->onlyMethods(
                     [
                         'select',
                         'from',
@@ -172,7 +172,7 @@ class DBALMocker
                         'where',
                         'andWhere',
                         'setParameter',
-                        'execute',
+                        'executeQuery',
                     ]
                 )
                 ->getMock();
@@ -234,7 +234,7 @@ class DBALMocker
                 );
 
             $mock->expects($this->testCase->any())
-                ->method('execute')
+                ->method('executeQuery')
                 ->willReturnCallback([$this, 'getMockResultStatement']);
 
             $this->mockQueryBuilder = $mock;
@@ -247,7 +247,7 @@ class DBALMocker
     {
         $mock = $this->testCase->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'fetchNumeric',
                 'fetchAssociative',
                 'fetchOne',

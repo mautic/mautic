@@ -19,7 +19,7 @@ class UniqueCustomFieldValidator extends ConstraintValidator
     public function __construct(
         private LeadModel $leadModel,
         private CompanyModel $companyModel,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 

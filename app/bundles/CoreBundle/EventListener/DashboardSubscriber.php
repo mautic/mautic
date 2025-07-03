@@ -42,7 +42,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         private RouterInterface $router,
         private CorePermissions $security,
         private EventDispatcherInterface $dispatcher,
-        protected ModelFactory $modelFactory
+        protected ModelFactory $modelFactory,
     ) {
     }
 

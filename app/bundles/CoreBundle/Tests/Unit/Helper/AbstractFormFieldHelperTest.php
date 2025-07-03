@@ -7,14 +7,14 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use PHPUnit\Framework\Assert;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(AbstractFormFieldHelper::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\BarListParser::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\JsonListParser::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ValueListParser::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ArrayListParser::class)]
 class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox The string is parsed correctly into a choice array
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\BarListParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testBarFormatConvertedToArray(): void
     {
         $this->assertEquals(
@@ -27,12 +27,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @testdox The string is parsed correctly into a choice array
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\BarListParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testBarLabelValueFormatConvertedToArray(): void
     {
         $this->assertEquals(
@@ -45,12 +40,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @testdox The string is parsed correctly into a choice array
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\JsonListParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testJsonEncodedFormatConvertedToArray(): void
     {
         $this->assertEquals(
@@ -63,23 +53,13 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @testdox The string is parsed correctly into a choice array
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ValueListParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testSingleSelectedValueDoesNotGoIntoJson(): void
     {
         $this->assertEquals(['1' => '1'], AbstractFormFieldHelper::parseList('1'));
     }
 
-    /**
-     * @testdox The string is parsed correctly into a choice array
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testLabelValuePairsAreFlattened(): void
     {
         $this->assertEquals(
@@ -108,11 +88,10 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider provideChoices
-     *
      * @param mixed[] $inputOptions
      * @param mixed[] $expectedOptions
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideChoices')]
     public function testParseList(array $inputOptions, array $expectedOptions): void
     {
         $this->assertEquals($expectedOptions, AbstractFormFieldHelper::parseList($inputOptions));
@@ -121,7 +100,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<mixed[]>>
      */
-    public function provideChoices(): iterable
+    public static function provideChoices(): iterable
     {
         yield [
             [
@@ -199,12 +178,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @testdox The string is parsed correctly into a choice array
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testLabelValuePairsAreFlattenedWithOptGroup(): void
     {
         $array['optGroup1'] = [
@@ -252,9 +226,6 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
-     */
     public function testNumericalArrayConvertedToKeyLabelPairs(): void
     {
         $array = [
@@ -273,9 +244,6 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
-     */
     public function testBooleanArrayList(): void
     {
         $array = [
@@ -293,10 +261,6 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\BarListParser::parse
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
-     */
     public function testBooleanBarStringList(): void
     {
         $string   = 'no|yes||0|1';
@@ -310,10 +274,6 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\JsonListParser::parse
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
-     */
     public function testBooleanJsonStringList(): void
     {
         $string   = '["no", "yes"]';
@@ -327,10 +287,6 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\JsonListParser::parse
-     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
-     */
     public function testNumericalJsonStringList(): void
     {
         $string   = '["no", "yes"]';

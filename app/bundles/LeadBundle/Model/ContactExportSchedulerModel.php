@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -34,7 +33,6 @@ class ContactExportSchedulerModel extends AbstractCommonModel
     private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
 
     public function __construct(
-        private SessionInterface $session,
         private RequestStack $requestStack,
         private LeadModel $leadModel,
         private ExportHelper $exportHelper,
@@ -46,7 +44,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -66,10 +64,10 @@ class ContactExportSchedulerModel extends AbstractCommonModel
      */
     public function prepareData(array $permissions): array
     {
-        $search     = $this->session->get('mautic.lead.filter', '');
-        $orderBy    = $this->session->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->session->get('mautic.lead.orderbydir', 'DESC');
-        $indexMode  = $this->session->get('mautic.lead.indexmode', 'list');
+        $search     = $this->requestStack->getSession()->get('mautic.lead.filter', '');
+        $orderBy    = $this->requestStack->getSession()->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->requestStack->getSession()->get('mautic.lead.orderbydir', 'DESC');
+        $indexMode  = $this->requestStack->getSession()->get('mautic.lead.indexmode', 'list');
 
         $anonymous = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
 

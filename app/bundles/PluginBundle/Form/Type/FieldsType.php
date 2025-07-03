@@ -25,10 +25,7 @@ class FieldsType extends AbstractType
         $this->configureFieldOptions($resolver, 'lead');
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'integration_fields';
     }

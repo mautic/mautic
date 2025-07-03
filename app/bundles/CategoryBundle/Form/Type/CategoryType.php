@@ -11,7 +11,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CategoryType extends AbstractType
 {
     public function __construct(
-        private SessionInterface $session
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -34,7 +34,7 @@ class CategoryType extends AbstractType
             // Do not allow custom bundle
             if (true == $options['show_bundle_select']) {
                 // Create new category from category bundle - let user select the bundle
-                $selected = $this->session->get('mautic.category.type', 'category');
+                $selected = $this->requestStack->getSession()->get('mautic.category.type', 'category');
                 $builder->add(
                     'bundle',
                     CategoryBundlesType::class,
@@ -119,7 +119,10 @@ class CategoryType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class);
+        $builder->add('buttons', FormButtonsType::class,
+            [
+                'apply_text' => false,
+            ]);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -143,10 +146,7 @@ class CategoryType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'category_form';
     }

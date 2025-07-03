@@ -19,7 +19,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
     public function __construct(
         private MembershipManager $membershipManager,
         private CampaignModel $campaignModel,
-        private InfiniteLoopValidator $infiniteLoopValidator
+        private InfiniteLoopValidator $infiniteLoopValidator,
     ) {
     }
 

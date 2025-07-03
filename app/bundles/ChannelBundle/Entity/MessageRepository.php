@@ -4,12 +4,15 @@ namespace Mautic\ChannelBundle\Entity;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Message>
  */
 class MessageRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
@@ -96,5 +99,40 @@ class MessageRepository extends CommonRepository
             ->andWhere($q->expr()->eq('is_enabled', true));
 
         return $q->executeQuery()->fetchAssociative();
+    }
+
+    /**
+     * @param object $filter
+     *
+     * @return mixed[]
+     */
+    protected function addSearchCommandWhereClause($q, $filter): array
+    {
+        return match ($filter->command) {
+            $this->translator->trans('mautic.project.searchcommand.name'),
+            $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'message_id',
+                'message_projects_xref',
+                $this->getTableAlias(),
+                $filter->string,
+                $filter->not
+            ),
+            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+        };
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSearchCommands(): array
+    {
+        return array_merge([
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.core.searchcommand.ismine',
+            'mautic.core.searchcommand.isuncategorized',
+            'mautic.project.searchcommand.name',
+        ], parent::getSearchCommands());
     }
 }

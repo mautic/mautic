@@ -12,7 +12,7 @@
 {% set validationMessage = '' %}
 {% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
 {% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
-{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+{% set containerAttributes = htmlAttributesStringToArray(formFieldCleanInputAttributes(field.containerAttributes|default(''))) %}
 {% if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) %}
   {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
   {% if field.properties.multiple is defined %}
@@ -43,7 +43,7 @@
 {% endif %}
 {% if inForm is defined and (true == inForm or inForm is not empty) %}
   {% if field.type in ['button', 'pagebreak'] %}
-    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-ghost' %}
   {% endif %}
 
   {% set labelAttributes = labelAttributes|merge({
@@ -68,6 +68,7 @@
           'mauticform-' ~ containerClass,
           'mauticform-field-' ~ order,
         ]),
+        'style': 'width: ' ~ field.fieldWidth
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
@@ -99,6 +100,7 @@
   }) %}
   {% if field.properties.multiple is not empty %}
     {% set containerAttributes = containerAttributes|merge({
+
             'data-validate-multiple': 'true',
     }) %}
   {% endif %}

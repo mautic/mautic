@@ -6,11 +6,35 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-class TriggerEvent
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "trigger_event:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "trigger_event:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class TriggerEvent implements UuidInterface
 {
+    use UuidTrait;
+
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
@@ -45,7 +69,7 @@ class TriggerEvent
     private $trigger;
 
     /**
-     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadTriggerLog>
+     * @var ArrayCollection<int,LeadTriggerLog>
      */
     private $log;
 
@@ -53,6 +77,11 @@ class TriggerEvent
      * @var array
      */
     private $changes;
+
+    public function __clone(): void
+    {
+        $this->id = null;
+    }
 
     public function __construct()
     {
@@ -90,6 +119,8 @@ class TriggerEvent
             ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
+
+        static::addUuidField($builder);
     }
 
     /**

@@ -21,9 +21,6 @@ mkdir(__DIR__.'/packaging');
 echo "Copying files\n";
 system("rsync -az --exclude-from 'excludefiles.txt' ../ packaging > /dev/null");
 
-// Generate the bootstrap.php.cache file
-system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php', $result);
-
 // Common steps
 include_once __DIR__.'/processfiles.php';
 
@@ -32,9 +29,6 @@ echo "Packaging Mautic\n";
 chdir(__DIR__.'/packaging');
 
 system('zip -r ../packages/mautic-head.zip . > /dev/null');
-
-// Copy over upgrade.php
-system('cp '.__DIR__.'/../upgrade.php '.__DIR__.'/packaging');
 
 chdir(__DIR__.'/packaging');
 echo "Packaging Mautic Update Package\n";

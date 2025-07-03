@@ -8,15 +8,14 @@ use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This test must run in a separate process because it sets the global constant
  * MAUTIC_INSTALLER which breaks other tests.
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class Oauth2Test extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
@@ -26,6 +25,32 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->useCleanupRollback = false;
 
         parent::setUp();
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideMethods')]
+    public function testAuthorize(string $method): void
+    {
+        // Disable the default logging in via username and password.
+        $this->clientServer = [];
+        $this->setUpSymfony($this->configParams);
+        $this->client->followRedirects(false);
+
+        $this->client->request(
+            $method,
+            '/oauth/v2/authorize'
+        );
+
+        $this->client->followRedirects(true);
+
+        $response = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode(), $response->getContent());
+        Assert::assertSame('https://localhost/oauth/v2/authorize_login', $response->headers->get('Location'));
+    }
+
+    public static function provideMethods(): \Generator
+    {
+        yield 'GET' => [Request::METHOD_GET];
+        yield 'POST' => [Request::METHOD_POST];
     }
 
     public function testAuthWithInvalidCredentials(): void
@@ -47,7 +72,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(400, $response->getStatusCode(), $response->getContent());
+        self::assertResponseStatusCodeSame(400, $response->getContent());
         Assert::assertSame(
             '{"errors":[{"message":"The client credentials are invalid","code":400,"type":"invalid_client"}]}',
             $response->getContent()
@@ -73,7 +98,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(401, $response->getStatusCode(), $response->getContent());
+        self::assertResponseStatusCodeSame(401, $response->getContent());
         Assert::assertSame('{"errors":[{"message":"The access token provided is invalid.","code":401,"type":"invalid_grant"}]}', $response->getContent());
     }
 
@@ -89,14 +114,12 @@ final class Oauth2Test extends MauticMysqlTestCase
         $form['client[redirectUris]']->setValue('https://test.org');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $clientPublicKey = $crawler->filter('input#client_publicId')->attr('value');
         $clientSecretKey = $crawler->filter('input#client_secret')->attr('value');
 
-        // Disable the default logging in via username and password.
-        $this->clientServer = [];
-        $this->setUpSymfony($this->configParams);
+        $this->logoutUser();
 
         // Get the access token.
         $this->client->request(
@@ -109,9 +132,8 @@ final class Oauth2Test extends MauticMysqlTestCase
             ],
         );
 
-        $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
-        $payload     = json_decode($response->getContent(), true);
+        self::assertResponseIsSuccessful();
+        $payload     = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $accessToken = $payload['access_token'];
         Assert::assertNotEmpty($accessToken);
 
@@ -126,8 +148,7 @@ final class Oauth2Test extends MauticMysqlTestCase
             ],
         );
 
-        $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
-        Assert::assertStringContainsString('"users":[', $response->getContent());
+        self::assertResponseIsSuccessful();
+        Assert::assertStringContainsString('"users":[', $this->client->getResponse()->getContent());
     }
 }

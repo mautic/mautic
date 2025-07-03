@@ -25,8 +25,11 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
+    private string $previousTimeZone;
+
     protected function setUp(): void
     {
+        $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->dateHelper           = new DateHelper(
@@ -38,6 +41,11 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
             $this->coreParametersHelper
         );
         $this->formatterHelper               = new FormatterHelper($this->dateHelper, $this->translator);
+    }
+
+    protected function tearDown(): void
+    {
+        date_default_timezone_set($this->previousTimeZone);
     }
 
     public function testStrictHtmlFormatIsRemovingScriptTags(): void
@@ -53,10 +61,20 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testBooleanFormat(): void
     {
-        $this->translator->expects($this->exactly(2))
-            ->method('trans')
-            ->withConsecutive(['mautic.core.yes'], ['mautic.core.no'])
-            ->willReturnOnConsecutiveCalls('yes', 'no');
+        $matcher = $this->exactly(2);
+        $this->translator->expects($matcher)
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.core.yes', $parameters[0]);
+
+                    return 'yes';
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('mautic.core.no', $parameters[0]);
+
+                    return 'no';
+                }
+            });
 
         $result = $this->formatterHelper->_(1, 'bool');
         $this->assertEquals('yes', $result);
@@ -82,11 +100,10 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider stringProvider
-     *
      * @param mixed $input
      * @param mixed $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stringProvider')]
     public function testNormalizeStringValue($input, $expected): void
     {
         date_default_timezone_set('Europe/Paris');
@@ -118,5 +135,101 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
             \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
             \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
         ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('urlFormatProvider')]
+    public function testUrlFormat(string $url, string $expected): void
+    {
+        $result = $this->formatterHelper->_($url, 'url');
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array<string, array<string>>
+     */
+    public static function urlFormatProvider(): array
+    {
+        return [
+            'normal url' => [
+                'http://example.com',
+                '<a href="http://example.com" target="_blank">http://example.com</a>',
+            ],
+            'malicious url' => [
+                'http://example.com"><script>alert("XSS")</script>',
+                '<a href="http://example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;" target="_blank">http://example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;</a>',
+            ],
+            'malicious url2' => [
+                'http://example.com?a="<b>test</b>',
+                '<a href="http://example.com?a=%22%3Cb%3Etest%3C%2Fb%3E" target="_blank">http://example.com?a=%22%3Cb%3Etest%3C%2Fb%3E</a>',
+            ],
+            'url with single GET parameter' => [
+                'http://example.com/page?param=value',
+                '<a href="http://example.com/page?param=value" target="_blank">http://example.com/page?param=value</a>',
+            ],
+            'url with multiple GET parameters' => [
+                'http://example.com/search?q=test&page=1&sort=desc',
+                '<a href="http://example.com/search?q=test&page=1&sort=desc" target="_blank">http://example.com/search?q=test&page=1&sort=desc</a>',
+            ],
+            'url with encoded GET parameters' => [
+                'http://example.com/search?q=hello+world&lang=en',
+                '<a href="http://example.com/search?q=hello+world&lang=en" target="_blank">http://example.com/search?q=hello+world&lang=en</a>',
+            ],
+            'url with special characters in GET parameters' => [
+                'http://example.com/path?param=value&special=!@#$%^&*()',
+                '<a href="http://example.com/path?param=value&special=%21%40#$%^&*()" target="_blank">http://example.com/path?param=value&special=%21%40#$%^&*()</a>',
+            ],
+            'https url' => [
+                'https://secure.example.com',
+                '<a href="https://secure.example.com" target="_blank">https://secure.example.com</a>',
+            ],
+            'url with port number' => [
+                'http://example.com:8080/path',
+                '<a href="http://example.com:8080/path" target="_blank">http://example.com:8080/path</a>',
+            ],
+            'url with username and password' => [
+                'http://user:pass@example.com',
+                '<a href="http://user:pass@example.com" target="_blank">http://user:pass@example.com</a>',
+            ],
+            'url with fragment identifier' => [
+                'http://example.com/page#section',
+                '<a href="http://example.com/page#section" target="_blank">http://example.com/page#section</a>',
+            ],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('emailFormatProvider')]
+    public function testEmailFormat(string $email, string $expected): void
+    {
+        $result = $this->formatterHelper->_($email, 'email');
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array<string, array<string>>
+     */
+    public static function emailFormatProvider(): array
+    {
+        return [
+            'normal email' => [
+                'user@example.com',
+                '<a href="mailto:user@example.com">user@example.com</a>',
+            ],
+            'email with alias' => [
+                'user.one+test@example.com',
+                '<a href="mailto:user.one+test@example.com">user.one+test@example.com</a>',
+            ],
+            'malicious email' => [
+                'user@example.com"><script>alert("XSS")</script>',
+                '<a href="mailto:user@example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;">user@example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;</a>',
+            ],
+        ];
+    }
+
+    public function testArrayFormat(): void
+    {
+        $input    = ['<script>alert("XSS")</script>'];
+        $result   = $this->formatterHelper->_($input, 'array');
+        $expected = '&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;';
+        $this->assertEquals($expected, $result);
     }
 }

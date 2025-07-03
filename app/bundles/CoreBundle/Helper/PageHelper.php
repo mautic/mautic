@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 final class PageHelper implements PageHelperInterface
 {
     public function __construct(
-        private SessionInterface $session,
+        private RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         private string $sessionPrefix,
-        private int $page
+        private int $page,
     ) {
     }
 
     public function getLimit(): int
     {
-        return (int) $this->session->get(
+        return (int) $this->requestStack->getSession()->get(
             "{$this->sessionPrefix}.limit",
             $this->coreParametersHelper->get('default_pagelimit')
         );
@@ -44,6 +44,6 @@ final class PageHelper implements PageHelperInterface
 
     public function rememberPage(int $page): void
     {
-        $this->session->set("{$this->sessionPrefix}.page", $page);
+        $this->requestStack->getSession()->set("{$this->sessionPrefix}.page", $page);
     }
 }

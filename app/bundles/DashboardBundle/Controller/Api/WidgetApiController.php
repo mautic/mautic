@@ -5,7 +5,6 @@ namespace Mautic\DashboardBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -34,7 +33,7 @@ class WidgetApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
     {
         $dashboardModel = $modelFactory->getModel('dashboard');
         \assert($dashboardModel instanceof DashboardModel);
@@ -45,7 +44,7 @@ class WidgetApiController extends CommonApiController
         $this->entityNameMulti  = 'widgets';
         $this->serializerGroups = [];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
@@ -79,7 +78,7 @@ class WidgetApiController extends CommonApiController
         $to         = InputHelper::clean($request->get('dateTo', null));
         $dataFormat = InputHelper::clean($request->get('dataFormat', null));
         $unit       = InputHelper::clean($request->get('timeUnit', 'Y'));
-        $dataset    = InputHelper::clean($request->get('dataset', []));
+        $dataset    = InputHelper::clean($request->query->all()['dataset'] ?? $request->request->all()['dataset'] ?? []);
         $response   = ['success' => 0];
 
         try {
@@ -102,7 +101,7 @@ class WidgetApiController extends CommonApiController
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
             'limit'      => (int) $request->get('limit', null),
-            'filter'     => InputHelper::clean($request->get('filter', [])),
+            'filter'     => InputHelper::clean($request->query->all()['filter'] ?? $request->request->all()['filter'] ?? []),
             'dataset'    => $dataset,
         ];
 

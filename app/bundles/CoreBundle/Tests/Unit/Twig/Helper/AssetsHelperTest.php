@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use PHPUnit\Framework\Assert;
@@ -15,12 +14,7 @@ use Symfony\Component\Asset\Packages;
 class AssetsHelperTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
-     * @var PathsHelper|MockObject
+     * @var PathsHelper&MockObject
      */
     private MockObject $pathsHelper;
 
@@ -28,9 +22,8 @@ class AssetsHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
-        $this->assetHelper          = new AssetsHelper($this->createPackagesMock(), $this->coreParametersHelper);
+        $this->pathsHelper = $this->createMock(PathsHelper::class);
+        $this->assetHelper = new AssetsHelper($this->createPackagesMock());
 
         $this->assetHelper->setPathsHelper($this->pathsHelper);
     }
@@ -45,23 +38,14 @@ class AssetsHelperTest extends TestCase
 
         Assert::assertStringContainsString('app.css', $head);
 
-        $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
-            ->addStylesheet('/builder.css')
-            ->setContext();
-
-        $head = $this->assetHelper->getHeadDeclarations();
-        Assert::assertStringNotContainsString('builder.css', $head);
-
         $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        Assert::assertStringContainsString('builder.css', $head);
         Assert::assertStringNotContainsString('app.css', $head);
 
         $version = $this->setVersion($this->assetHelper);
 
         $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        Assert::assertStringContainsString('builder.css?v'.$version, $head);
         Assert::assertStringNotContainsString('app.css?v'.$version, $head);
     }
 
@@ -160,7 +144,7 @@ class AssetsHelperTest extends TestCase
         $packagesMock = $this->createMock(Packages::class);
 
         $packagesMock->method('getUrl')
-            ->will($this->returnCallback(fn (string $path) => $path));
+            ->willReturnCallback(fn (string $path) => $path);
 
         return $packagesMock;
     }

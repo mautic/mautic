@@ -43,7 +43,7 @@ class BcInterfaceTokenTransport implements TransportInterface
      */
     public function __construct(
         private $validate = false,
-        $numberToFail = 1
+        $numberToFail = 1,
     ) {
         $this->numberToFail       = (int) $numberToFail;
         $this->transports['main'] = $this;

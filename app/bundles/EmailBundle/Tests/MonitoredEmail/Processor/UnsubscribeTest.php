@@ -17,21 +17,11 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 
 class UnsubscribeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @testdox Test that the transport interface processes the message appropriately
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void
     {
         $transport     = new TestTransport();
-        $contactFinder = $this->getMockBuilder(ContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
                 function ($email) {
@@ -56,17 +46,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $logger = $this->createMock(Logger::class);
 
-        $doNotContact = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doNotContact = $this->createMock(DoNotContact::class);
 
         $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 
@@ -74,21 +58,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($processor->process($message));
     }
 
-    /**
-     * @testdox Test that the message is processed appropriately
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         $transport     = new NullTransport();
-        $contactFinder = $this->getMockBuilder(ContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
                 function ($email) {
@@ -113,17 +87,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $logger = $this->createMock(Logger::class);
 
-        $doNotContact = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doNotContact = $this->createMock(DoNotContact::class);
 
         $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 

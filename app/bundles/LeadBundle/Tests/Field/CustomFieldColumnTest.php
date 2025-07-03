@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\CustomFieldIndex;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
@@ -145,7 +146,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->method('addColumn');
 
         $dbalException = new class('message', 1118) extends \Exception implements \Doctrine\DBAL\Driver\Exception {
-            public function getSQLState()
+            public function getSQLState(): string
             {
                 return 'some SQL state';
             }
@@ -411,5 +412,172 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->with($leadField);
 
         $this->customFieldColumn->processCreateLeadColumn($leadField);
+    }
+
+    public function testDeleteLeadColumnInBacground(): void
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setId(42);
+        $leadField->setObject('lead');
+
+        $fieldColumnDispatcher->expects($this->once())
+            ->method('dispatchPreDeleteColumnEvent')
+            ->with($leadField)
+            ->willThrowException(new AbortColumnUpdateException());
+
+        $columnSchemaHelper->expects($this->never())
+            ->method('dropColumn');
+
+        $customFieldColumn->deleteLeadColumn($leadField);
+    }
+
+    public function testDeleteLeadColumnNow(): void
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setId(42);
+        $leadField->setObject('lead');
+        $leadField->setAlias('IamAlias');
+
+        $fieldColumnDispatcher->expects($this->once())
+            ->method('dispatchPreDeleteColumnEvent')
+            ->with($leadField);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('setName')
+            ->with('leads')
+            ->willReturnSelf();
+        $matcher = $this->exactly(2);
+
+        $columnSchemaHelper->expects($matcher)
+            ->method('dropColumn')->willReturnCallback(function (...$parameters) use ($matcher, $columnSchemaHelper) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('IamAlias', $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('leads', $parameters[0]);
+                }
+
+                return $columnSchemaHelper;
+            });
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('executeChanges');
+
+        $customFieldColumn->deleteLeadColumn($leadField);
+    }
+
+    public function testUpdateLeadColumnInBackground(): void
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setId(42);
+        $leadField->setObject('lead');
+        $leadField->setAlias('IamAlias');
+
+        $fieldColumnDispatcher->expects($this->once())
+            ->method('dispatchPreUpdateColumnEvent')
+            ->with($leadField)
+            ->willThrowException(new AbortColumnUpdateException());
+
+        $columnSchemaHelper->expects($this->never())
+            ->method('updateColumnLength');
+
+        $customFieldColumn->updateLeadColumn($leadField);
+    }
+
+    public function testUpdateLeadColumnNow(): void
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setId(42);
+        $leadField->setObject('lead');
+        $leadField->setAlias('IamAlias');
+
+        $fieldColumnDispatcher->expects($this->once())
+            ->method('dispatchPreUpdateColumnEvent')
+            ->with($leadField);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('setName')
+            ->with('leads')
+            ->willReturn($columnSchemaHelper);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('updateColumnLength')
+            ->with('IamAlias', 64)
+            ->willReturn($columnSchemaHelper);
+
+        $customFieldColumn->updateLeadColumn($leadField);
+    }
+
+    public function testProcessUpdateLeadColumnLength(): void
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setId(42);
+        $leadField->setObject('lead');
+        $leadField->setAlias('IamAlias');
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('setName')
+            ->with('leads')
+            ->willReturn($columnSchemaHelper);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('updateColumnLength')
+            ->with('IamAlias', 64)
+            ->willReturn($columnSchemaHelper);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('executeChanges');
+
+        $customFieldColumn->processUpdateLeadColumnLength($leadField);
     }
 }

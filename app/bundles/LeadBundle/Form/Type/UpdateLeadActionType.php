@@ -16,7 +16,7 @@ class UpdateLeadActionType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        private FieldModel $fieldModel
+        private FieldModel $fieldModel,
     ) {
     }
 
@@ -39,14 +39,12 @@ class UpdateLeadActionType extends AbstractType
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
         $options['ignore_date_type']            = true;
+        $options['use_nullable_yes_no_type']    = true;
 
         $this->getFormFields($builder, $options);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'updatelead_action';
     }

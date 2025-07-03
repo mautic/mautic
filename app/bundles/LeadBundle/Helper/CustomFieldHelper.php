@@ -31,9 +31,9 @@ class CustomFieldHelper
         }
 
         return match ($type) {
-            self::TYPE_NUMBER  => (float) $value,
+            self::TYPE_NUMBER  => is_numeric($value) || '' === $value ? (float) $value : $value,
             self::TYPE_BOOLEAN => (bool) $value,
-            self::TYPE_SELECT  => (string) $value,
+            self::TYPE_SELECT  => is_scalar($value) ? (string) $value : $value,
             default            => $value,
         };
     }
@@ -43,7 +43,7 @@ class CustomFieldHelper
      *
      * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, $value)
+    public static function fieldValueTransfomer(array $field, $value, DateTimeHelper $dateTimeHelper = null)
     {
         if (null === $value) {
             // do not transform null values
@@ -60,7 +60,13 @@ class CustomFieldHelper
                     return null;
                 }
 
-                $dtHelper = new DateTimeHelper($value, null, 'local');
+                if (!($value instanceof \DateTimeInterface) && !is_string($value)) {
+                    throw new \InvalidArgumentException('Wrong type given. String or DateTimeInterface expected.');
+                }
+
+                $dtHelper = $dateTimeHelper ?: new DateTimeHelper($value, null, 'local');
+                $dtHelper->setDateTime($value);
+
                 switch ($type) {
                     case 'datetime':
                         $value = $dtHelper->toLocalString('Y-m-d H:i:s');
@@ -86,11 +92,11 @@ class CustomFieldHelper
      *
      * @return mixed[]
      */
-    public static function fieldsValuesTransformer(array $fields, array $values): array
+    public static function fieldsValuesTransformer(array $fields, array $values, DateTimeHelper $dateTimeHelper = null): array
     {
         foreach ($values as $alias => &$value) {
-            if (!empty($fields[$alias])) {
-                $value = self::fieldValueTransfomer($fields[$alias], $value);
+            if (!empty($fields[$alias]) && is_array($fields[$alias])) {
+                $value = self::fieldValueTransfomer($fields[$alias], $value, $dateTimeHelper);
             }
         }
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -21,6 +23,7 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -76,7 +79,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator);
+        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->createMock(EntityManager::class), $this->createMock(EmailDraftModel::class));
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void
@@ -93,7 +96,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoStat(): void
     {
-        $message = new class() extends MauticMessage {
+        $message = new class extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -115,7 +118,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoRetry(): void
     {
-        $message = new class() extends MauticMessage {
+        $message = new class extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -182,7 +185,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWith4Retry(): void
     {
-        $message = new class() extends MauticMessage {
+        $message = new class extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -302,8 +305,8 @@ CONTENT,
         /** @var MockObject&PathsHelper $pathsHelper */
         $pathsHelper = $this->createMock(PathsHelper::class);
 
-        /** @var MockObject&Environment $environment */
-        $environment = $this->createMock(Environment::class);
+        /** @var MockObject&Environment $twig */
+        $twig = $this->createMock(Environment::class);
 
         /** @var MockObject&AssetModel $assetModel */
         $assetModel = $this->createMock(AssetModel::class);
@@ -326,6 +329,9 @@ CONTENT,
         /** @var MockObject&EmailStatModel $emailStatModel */
         $emailStatModel = $this->createMock(EmailStatModel::class);
 
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -333,8 +339,33 @@ CONTENT,
                     ['mailer_from_name', null, 'No Body'],
                 ]
             );
-        $mailer      = new Mailer(new BatchTransport());
-        $mailHelper  = new MailHelper($mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, new NullLogger(), new MailHashHelper($coreParametersHelper), $router, $dispatcher, $pathsHelper, $environment, $assetModel, $themeHelper, $trackableModel, $redirectModel, $entityManager, $requestStack, $emailStatModel, new SlotsHelper());
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+            ->method('getReference');
+
+        $mailer       = new Mailer(new BatchTransport());
+        $requestStack = new RequestStack();
+        $mailHelper  = new MailHelper(
+          $mailer,
+          $fromEmailHelper,
+          $coreParametersHelper,
+          $mailbox,
+          new NullLogger(),
+          new MailHashHelper($coreParametersHelper),
+          $router,
+          $twig,
+          $themeHelper, 
+          $pathsHelper, 
+          $dispatcher, 
+          $requestStack,
+          $entityManager,
+          $assetModel,
+          $trackableModel, 
+          $redirectModel,
+          $emailStatModel, 
+          new SlotsHelper(),
+        );
 
         $email = new Email();
         $email->setCustomHtml($html);

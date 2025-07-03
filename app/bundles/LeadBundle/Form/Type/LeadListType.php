@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class LeadListType extends AbstractType
 {
     public function __construct(
-        private ListModel $segmentModel
+        private ListModel $segmentModel,
     ) {
     }
 
@@ -28,9 +28,9 @@ class LeadListType extends AbstractType
                 $choices = [];
                 foreach ($lists as $l) {
                     if (empty($options['preference_center_only'])) {
-                        $choices[$l['name']] = $l['id'];
+                        $choices[$l['name'].' ('.$l['id'].')'] = $l['id'];
                     } else {
-                        $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
+                        $choices[empty($l['publicName']) ? $l['name'].' ('.$l['id'].')' : $l['publicName'].' ('.$l['id'].')'] = $l['id'];
                     }
                 }
 
@@ -42,18 +42,12 @@ class LeadListType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadlist_choices';
     }

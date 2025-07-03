@@ -16,7 +16,7 @@ class UpdateCompanyActionType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        protected FieldModel $fieldModel
+        protected FieldModel $fieldModel,
     ) {
     }
 
@@ -38,14 +38,12 @@ class UpdateCompanyActionType extends AbstractType
 
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
+        $options['use_nullable_yes_no_type']    = true;
 
         $this->getFormFields($builder, $options, 'company');
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'updatecompany_action';
     }

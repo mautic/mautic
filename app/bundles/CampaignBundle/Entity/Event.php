@@ -8,12 +8,35 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Event implements ChannelInterface
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "event:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "event:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Event implements ChannelInterface, UuidInterface
 {
+    use UuidTrait;
+
     public const TABLE_NAME = 'campaign_events';
 
     public const TYPE_DECISION  = 'decision';
@@ -31,6 +54,8 @@ class Event implements ChannelInterface
     public const TRIGGER_MODE_INTERVAL  = 'interval';
 
     public const TRIGGER_MODE_IMMEDIATE = 'immediate';
+
+    public const TRIGGER_MODE_OPTIMIZED = 'optimized';
 
     public const CHANNEL_EMAIL = 'email';
 
@@ -104,6 +129,8 @@ class Event implements ChannelInterface
      */
     private $triggerRestrictedDaysOfWeek = [];
 
+    private ?int $triggerWindow;
+
     /**
      * @var string|null
      */
@@ -115,7 +142,7 @@ class Event implements ChannelInterface
     private $campaign;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
+     * @var ArrayCollection<int, Event>
      **/
     private $children;
 
@@ -135,7 +162,7 @@ class Event implements ChannelInterface
     private $tempId;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog>
+     * @var ArrayCollection<int, LeadEventLog>
      */
     private $log;
 
@@ -247,6 +274,11 @@ class Event implements ChannelInterface
             ->nullable()
             ->build();
 
+        $builder->createField('triggerWindow', 'integer')
+            ->columnName('trigger_window')
+            ->nullable()
+            ->build();
+
         $builder->createField('triggerMode', 'string')
             ->columnName('trigger_mode')
             ->length(10)
@@ -298,6 +330,8 @@ class Event implements ChannelInterface
         $builder->createField('failedCount', 'integer')
             ->columnName('failed_count')
             ->build();
+
+        static::addUuidField($builder);
     }
 
     /**
@@ -827,6 +861,18 @@ class Event implements ChannelInterface
         return $this;
     }
 
+    public function getTriggerWindow(): ?int
+    {
+        return $this->triggerWindow;
+    }
+
+    public function setTriggerWindow(?int $triggerWindow): Event
+    {
+        $this->triggerWindow = $triggerWindow;
+
+        return $this;
+    }
+
     /**
      * @return mixed
      */
@@ -915,7 +961,7 @@ class Event implements ChannelInterface
     /**
      * Used by the API.
      *
-     * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
+     * @return LeadEventLog[]|Collection|static
      */
     public function getContactLog(Contact $contact = null)
     {

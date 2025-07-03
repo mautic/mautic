@@ -84,64 +84,64 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'display_name' => 'mautic.lead.report.segment.membership',
                 'columns'      => [
                     'xx.yyy' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'yyy',
                     ],
                     'lll.manually_removed' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'manually_removed',
                     ],
                     'lll.manually_added' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'manually_added',
                     ],
                     's.id' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'int',
                         'alias' => 's_id',
                     ],
                     's.name' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_name',
                     ],
                     's.created_by_user' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_created_by_user',
                     ],
                     's.date_added' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'datetime',
                         'alias' => 's_date_added',
                     ],
                     's.modified_by_user' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_modified_by_user',
                     ],
                     's.date_modified' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'datetime',
                         'alias' => 's_date_modified',
                     ],
                     's.description' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'string',
                         'alias' => 's_description',
                     ],
                     's.is_published' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 's_is_published',
                     ],
                 ],
                 'filters' => [
                     'filter' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'text',
                         'alias' => 'filter',
                     ],
@@ -180,14 +180,25 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('from')
             ->with(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
             ->willReturn($queryBuilder);
+        $matcher = $this->exactly(2);
 
-        $queryBuilder->expects($this->exactly(2))
-            ->method('leftJoin')
-            ->withConsecutive(
-                ['lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lll.lead_id'],
-                ['lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id']
-            )
-            ->willReturn($queryBuilder);
+        $queryBuilder->expects($matcher)
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilder) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('lll', $parameters[0]);
+                    $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);
+                    $this->assertSame('l', $parameters[2]);
+                    $this->assertSame('l.id = lll.lead_id', $parameters[3]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('lll', $parameters[0]);
+                    $this->assertSame(MAUTIC_TABLE_PREFIX.'lead_lists', $parameters[1]);
+                    $this->assertSame('s', $parameters[2]);
+                    $this->assertSame('s.id = lll.leadlist_id', $parameters[3]);
+                }
+
+                return $queryBuilder;
+            });
 
         $reportGeneratorEvent = new ReportGeneratorEvent($reportMock, [], $queryBuilder, $channelListHelperMock);
         $segmentReportSubscriber->onReportGenerate($reportGeneratorEvent);

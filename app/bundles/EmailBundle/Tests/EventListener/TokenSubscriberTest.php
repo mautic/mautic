@@ -50,14 +50,15 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+
         /** @var MockObject&EventDispatcherInterface $dispatcher */
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         /** @var MockObject&PathsHelper $pathsHelper */
         $pathsHelper = $this->createMock(PathsHelper::class);
 
-        /** @var MockObject&Environment $environment */
-        $environment = $this->createMock(Environment::class);
+        /** @var MockObject&Environment $twig */
+        $twig = $this->createMock(Environment::class);
 
         /** @var MockObject&AssetModel $assetModel */
         $assetModel = $this->createMock(AssetModel::class);
@@ -80,6 +81,11 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&EmailStatModel $emailStatModel */
         $emailStatModel = $this->createMock(EmailStatModel::class);
 
+        $requestStack = new RequestStack();
+
+        $themeHelper->expects(self::never())
+            ->method('checkForTwigTemplate');
+
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
         $coreParametersHelper->method('get')
@@ -90,9 +96,32 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never()) // Never to make sure that the mock is properly tested if needed.
+            ->method('getReference');
+
         $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper(new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper, $router, $dispatcher, $pathsHelper, $environment, $assetModel, $themeHelper, $trackableModel, $redirectModel, $entityManager, $requestStack, $emailStatModel, new SlotsHelper());
+        $mailHelper  = new MailHelper(
+          $mailer,
+          $fromEmailHelper,
+          $coreParametersHelper,
+          $mailbox,
+          new NullLogger(),
+          new MailHashHelper($coreParametersHelper),
+          $router,
+          $twig,
+          $themeHelper, 
+          $pathsHelper, 
+          $dispatcher,
+          $requestStack,
+          $entityManager,
+          $assetModel,
+          $trackableModel,
+          $redirectModel,
+          $emailStatModel,
+          new SlotsHelper()
+        );
         $mailHelper->setTokens($tokens);
 
         $email = new Email();

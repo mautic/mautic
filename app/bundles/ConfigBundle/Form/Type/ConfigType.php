@@ -17,7 +17,7 @@ class ConfigType extends AbstractType
 {
     public function __construct(
         private RestrictionHelper $restrictionHelper,
-        private EscapeTransformer $escapeTransformer
+        private EscapeTransformer $escapeTransformer,
     ) {
     }
 

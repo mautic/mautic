@@ -4,11 +4,7 @@
             <thead>
             <tr>
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
-                    'checkall'        : 'true',
-                    'routeBase'       : 'email',
-                    'templateButtons' : {
-                        'delete' : permissions['email:emails:deleteown'] or permissions['email:emails:deleteother']
-                    },
+                    'checkall'        : 'true'
                 }) -}}
 
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
@@ -63,8 +59,9 @@
                 {% set hasVariants  = item.isVariant() %}
                 {% set hasTranslations  = item.isTranslation() %}
                 {% set type = item.getEmailType() %}
+                {% set hasDraft  = item.hasDraft() %}
                 {% set mauticTemplateVars = _context|merge({'item' : item}) %}
-                <tr>
+                <tr id="row_email_{{ item.id }}">
                     <td>
                         {% set edit = securityHasEntityAccess(
                             permissions['email:emails:editown'],
@@ -77,7 +74,7 @@
                                 'data-toggle': 'ajax',
                                 'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
                             },
-                            'iconClass': 'ri-send-plane-line-o',
+                            'iconClass': 'ri-send-plane-line',
                             'btnText': 'mautic.email.send'
                         } %}
 
@@ -92,8 +89,19 @@
                             }) %}
                         {% endif %}
 
-                        {% set customButtons = ('list' == type) ? [sendButton] : [] %}
+                        {% set previewButton = {
+                            'attr': {
+                                'class': 'btn btn-ghost btn-sm btn-nospin',
+                                'href': url('mautic_email_preview', {'objectId': item.getId()}),
+                                'target': '_blank',
+                                'data-toggle': '',
+                            },
+                            'iconClass': 'ri-external-link-line',
+                            'btnText': 'mautic.core.open_link'|trans,
+                            'priority': 100
+                        } %}
 
+                        {% set customButtons = ('list' == type) ? [sendButton, previewButton] : [previewButton] %}
 
                         {{- include('@MauticCore/Helper/list_actions.html.twig', {
                             'item'            : item,
@@ -129,28 +137,30 @@
                                 {% if 'list' == type %}
                                   <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="ri-pie-chart-line fs-14"></i></span>
                                 {% endif %}
+                                {% if isDraftEnabled and hasDraft %}
+                                <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                    <i class="fa fa-fw fa-file"></i>
+                                </span>
+                                {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>
                         </div>
                         {% if item.getDescription() is not empty %}
-                            <div class="text-muted mt-4">
+                            <div class="text-secondary mt-4">
                                 <small>{{ item.getDescription()|purify }}</small>
                             </div>
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName  = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color = (category) ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}
-                        <span class="mt-xs label label-red{{ (item.getPendingCount() > 0 and 'list' == item.getEmailType()) ? '' : ' hide' }}"
+                        <span class="mt-xs label label-warm-gray{{ (item.getPendingCount() > 0 and 'list' == item.getEmailType()) ? '' : ' hide' }}"
                               id="pending-{{ item.getId() }}"
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.leadcount.tooltip'|trans }}">
-                          <i class="ri-mail-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
+                          <i class="ri-more-fill"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
                               {{ 'mautic.email.stat.leadcount'|trans ({'%count%' : item.getPendingCount()}) }}
                           </a>
                         </span>
@@ -159,7 +169,7 @@
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
                           <i class="ri-mail-send-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
-                              {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
+                              {{ 'mautic.email.stat.queuedcount'|trans ({'%count%' : item.getQueuedCount()}) }}
                           </a>
                         </span>
                         <span class="mt-xs label label-blue" id="sent-count-{{ item.getId() }}">
@@ -175,7 +185,7 @@
                                 ({{ item.getReadPercentage(true) }}%)
                             </span>
                         </span>
-                        
+
                         {{ customContent('email.stats', mauticTemplateVars) }}
                         {{ customContent('email.stats.below', mauticTemplateVars) }}
                     </td>
@@ -202,5 +212,25 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'mail--verse',
+                        'size': '80'
+                    } %}
+                </div>                
+            {% endset %}
+
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.email.contentblock.heading',
+                subheading: 'mautic.email.contentblock.subheading',
+                copy: 'mautic.email.contentblock.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}

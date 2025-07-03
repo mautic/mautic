@@ -9,9 +9,7 @@ use PHPUnit\Framework\Assert;
 
 class UtmTagTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider setUtmTag
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('setUtmTag')]
     public function testSetUtmContent(string $utmContent, int $expected): void
     {
         $utmTag = new UtmTag();
@@ -23,15 +21,13 @@ class UtmTagTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<int,int|string>>
      */
-    public function setUtmTag(): iterable
+    public static function setUtmTag(): iterable
     {
         yield ['custom', 6];
         yield ['UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 ', 191];
     }
 
-    /**
-     * @dataProvider utmTagsDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('utmTagsDataProvider')]
     public function testHasUtmTags(?string $utmCampaign, ?string $utmSource, ?string $utmMedium, ?string $utmContent, ?string $utmTerm, bool $expectedResult): void
     {
         $utmTag = new UtmTag();

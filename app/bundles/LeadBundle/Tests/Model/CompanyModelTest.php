@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
@@ -9,6 +10,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\AbstractFormFieldHelper::class)]
 class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -39,11 +41,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $this->companyDeduper = $this->createMock(CompanyDeduper::class);
     }
 
-    /**
-     * @testdox Ensure that an array value is flattened before saving
-     *
-     * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
-     */
+    #[\PHPUnit\Framework\Attributes\TestDox('Ensure that an array value is flattened before saving')]
     public function testArrayValueIsFlattenedBeforeSave(): void
     {
         /** @var CompanyModel $companyModel */
@@ -99,7 +97,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
-        $duplicatedCompany->expects($this->exactly(1))->method('addUpdatedField');
+        $duplicatedCompany->expects($this->once())->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, false);
     }
 
@@ -120,6 +118,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $companyModel->method('getFieldData')->willReturn(['companyfield' => 'xxx']);
+        $this->setSecurity($companyModel);
 
         return $companyModel;
     }
@@ -157,11 +156,11 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $companyModel->method('fetchCompanyFields')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['alias' => 'companyname'],
                 ['alias' => 'companyemail'],
                 ['alias' => 'companyindustry'],
-            ]));
+            ]);
 
         $fields = [
             'email'           => 'i_contact_email',
@@ -191,5 +190,19 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame($expectedCompanyFields, $companyFields);
         $this->assertSame($expectedCompanyData, $companyData);
+    }
+
+    private function setSecurity(CompanyModel $companyModel): void
+    {
+        $security = $this->createMock(CorePermissions::class);
+        $security->method('hasEntityAccess')
+            ->willReturn(true);
+        $security->method('isGranted')
+            ->willReturn(true);
+
+        $reflection = new \ReflectionClass($companyModel);
+        $property   = $reflection->getProperty('security');
+        $property->setAccessible(true);
+        $property->setValue($companyModel, $security);
     }
 }

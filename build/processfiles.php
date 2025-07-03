@@ -95,18 +95,6 @@ system('rm -f vendor/phpoffice/phpexcel/install.txt');
 system('rm -rf vendor/rackspace/php-opencloud/docs');
 system('rm -rf vendor/rackspace/php-opencloud/samples');
 
-// sensio/distribution-bundle
-system('rm -rf vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin');
-
-// sensio/framework-extra-bundle
-system('rm -rf vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/Resources/doc');
-// sensio/generator-bundle
-system('rm -rf vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/Resources/doc');
-// swiftmailer/swiftmailer
-system('rm -rf vendor/swiftmailer/swiftmailer/doc');
-system('rm -rf vendor/swiftmailer/swiftmailer/notes');
-system('rm -f vendor/swiftmailer/swiftmailer/CHANGES');
-
 // symfony
 system('rm -rf vendor/symfony/console/Symfony/Console/Resources');
 

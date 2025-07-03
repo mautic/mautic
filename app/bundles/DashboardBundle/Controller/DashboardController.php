@@ -4,6 +4,7 @@ namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\PhpVersionHelper;
@@ -21,13 +22,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
      */
-    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
+    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper, RouterInterface $urlGenerator): Response
     {
         $model   = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
@@ -35,22 +38,22 @@ class DashboardController extends AbstractFormController
 
         // Apply the default dashboard if no widget exists
         if (!count($widgets) && $this->user->getId()) {
-            return $this->applyDashboardFileAction($request, $pathsHelper, 'global.default');
+            return $this->applyDashboardFileAction($request, $pathsHelper, $urlGenerator, 'global.default');
         }
 
         $action          = $this->generateUrl('mautic_dashboard_index');
-        $dateRangeFilter = $request->get('daterange', []);
+        $dateRangeFilter = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
 
         // Set new date range to the session
         if ($request->isMethod(Request::METHOD_POST)) {
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
-                $request->getSession()->set('mautic.daterange.form.from', $from->format(WidgetService::FORMAT_MYSQL));
+                $request->getSession()->set('mautic.daterange.form.from', $from->format(DateTimeHelper::FORMAT_DB_DATE_ONLY));
             }
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $request->getSession()->set('mautic.daterange.form.to', $to->format(WidgetService::FORMAT_MYSQL.' 23:59:59'));
+                $request->getSession()->set('mautic.daterange.form.to', $to->format(DateTimeHelper::FORMAT_DB_DATE_ONLY.' 23:59:59'));
             }
 
             $model->clearDashboardCache();
@@ -91,7 +94,7 @@ class DashboardController extends AbstractFormController
         ]);
     }
 
-    public function widgetAction(Request $request, WidgetService $widgetService, $widgetId): JsonResponse
+    public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');
@@ -104,7 +107,7 @@ class DashboardController extends AbstractFormController
             throw new NotFoundHttpException('Not found.');
         }
 
-        $content = $this->get('twig')->render(
+        $content = $twig->render(
             '@MauticDashboard/Dashboard/widget.html.twig',
             ['widget' => $widget]
         );
@@ -247,10 +250,8 @@ class DashboardController extends AbstractFormController
      * Deletes entity if exists.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$request->isXmlHttpRequest()) {
             throw new BadRequestHttpException();
@@ -384,7 +385,7 @@ class DashboardController extends AbstractFormController
      *
      * @param string|null $file
      */
-    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, $file = null): RedirectResponse
+    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, RouterInterface $urlGenerator, $file = null): RedirectResponse
     {
         if (!$file) {
             $file = $request->get('file');
@@ -429,7 +430,7 @@ class DashboardController extends AbstractFormController
             }
         }
 
-        return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
+        return $this->redirect($urlGenerator->generate('mautic_dashboard_index'));
     }
 
     public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
@@ -552,11 +553,9 @@ class DashboardController extends AbstractFormController
     /**
      * Gets name from request and defaults it to the timestamp if not provided.
      *
-     * @return string
-     *
      * @throws \Exception
      */
-    private function getNameFromRequest(Request $request)
+    private function getNameFromRequest(Request $request): string
     {
         return $request->get('name', (new \DateTime())->format('Y-m-dTH:i:s'));
     }

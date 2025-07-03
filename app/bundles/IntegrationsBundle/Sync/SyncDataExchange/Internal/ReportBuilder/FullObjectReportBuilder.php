@@ -29,7 +29,7 @@ class FullObjectReportBuilder
     public function __construct(
         private FieldBuilder $fieldBuilder,
         private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

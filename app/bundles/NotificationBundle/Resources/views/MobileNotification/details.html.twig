@@ -15,16 +15,29 @@
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
+{% block preHeader %}
+{{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'item'            : notification,
+        'templateButtons' : {
+            'close' : securityHasEntityAccess(permissions['notification:mobile_notifications:viewown'], permissions['notification:mobile_notifications:viewother'], notification.createdBy),
+        },
+        'routeBase'       : 'mobile_notification',
+        'targetLabel'     : 'mautic.notification.mobile_notifications'|trans
+    }
+) -}}
+{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': notification.category}) }}
+{% endblock %}
+
 {% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item': notification,
             'templateButtons': {
                 'edit': securityHasEntityAccess(permissions['notification:mobile_notifications:editown'], permissions['notification:mobile_notifications:editother'], notification.createdBy),
                 'delete': permissions['notification:mobile_notifications:create'],
-                'close': securityHasEntityAccess(permissions['notification:mobile_notifications:viewown'], permissions['notification:mobile_notifications:viewother'], notification.createdBy),
             },
             'routeBase': 'mobile_notification',
-    }) }}
+    }) -}}
 {% endblock %}
 
 {% block publishStatus %}
@@ -54,7 +67,7 @@
               <!-- notification detail collapseable toggler -->
               <div class="hr-expand nm">
                   <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                      <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#notification-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#notification-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                   </span>
               </div>
               <!--/ notification detail collapseable toggler -->
@@ -63,6 +76,18 @@
               <div class="pa-md">
                   <div class="row">
                       <div class="col-sm-12">
+                        {% if security.isGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.lead.contacts.mobile_sent',
+                                'value': notification.getSentCount(true),
+                                'link': path('mautic_contact_index', {
+                                    'search': ('mautic.lead.lead.searchcommand.mobile_sent'|trans) ~ ':' ~ notification.id
+                                }),
+                                'icon': 'ri-smartphone-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 va-m">
@@ -114,6 +139,8 @@
                   {{ contacts|raw }}
               </div>
           </div>
+          <!--/ tab-content -->
+
       </div>
       <!--/ left section -->
 

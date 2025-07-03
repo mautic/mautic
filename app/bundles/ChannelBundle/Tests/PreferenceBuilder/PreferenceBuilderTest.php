@@ -15,8 +15,7 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelsArePrioritized(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())
             ->method('getChannelRules')
             ->willReturn(
@@ -30,15 +29,13 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $log = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log = $this->createMock(LeadEventLog::class);
         $log->method('getLead')
             ->willReturn($lead);
         $log->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->expects($this->once())
             ->method('getChannelRules')
             ->willReturn(
@@ -52,8 +49,7 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $log2 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log2 = $this->createMock(LeadEventLog::class);
         $log2->method('getLead')
             ->willReturn($lead2);
         $log2->method('getId')
@@ -104,8 +100,7 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testLogIsRemovedFromAllChannels(): void
     {
-        $lead = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())
             ->method('getChannelRules')
             ->willReturn(
@@ -119,8 +114,7 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $log = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log = $this->createMock(LeadEventLog::class);
         $log->method('getLead')
             ->willReturn($lead);
         $log->method('getId')

@@ -13,17 +13,14 @@ class Fetcher
 {
     private ?array $mailboxes = null;
 
-    /**
-     * @var array
-     */
-    private $log = [];
+    private array $log = [];
 
     private int $processedMessageCounter = 0;
 
     public function __construct(
         private Mailbox $imapHelper,
         private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 

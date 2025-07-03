@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 class VersionExtension extends AbstractExtension
 {
     public function __construct(
-        private AppVersion $appVersion
+        private AppVersion $appVersion,
     ) {
     }
 

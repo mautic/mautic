@@ -18,7 +18,7 @@ final class PageHitNotification
         private bool $isRedirect,
         private ?int $pageId = null,
         private ?int $leadId = null,
-        ?\DateTimeInterface $eventTime = null
+        ?\DateTimeInterface $eventTime = null,
     ) {
         $this->setEventTime($eventTime ?? new \DateTimeImmutable());
     }

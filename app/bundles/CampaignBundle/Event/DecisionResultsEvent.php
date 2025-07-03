@@ -11,12 +11,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 class DecisionResultsEvent extends Event
 {
     /**
-     * @param ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog> $eventLogs
+     * @param ArrayCollection<int, LeadEventLog> $eventLogs
      */
     public function __construct(
         private AbstractEventAccessor $eventConfig,
         private ArrayCollection $eventLogs,
-        private EvaluatedContacts $evaluatedContacts
+        private EvaluatedContacts $evaluatedContacts,
     ) {
     }
 

@@ -80,16 +80,14 @@ class InstagramIntegration extends SocialIntegration
 
                         if (!empty($m->caption->text)) {
                             preg_match_all("/#(\w+)/", $m->caption->text, $tags);
-                            if (!empty($tags[1])) {
-                                foreach ($tags[1] as $tag) {
-                                    if (isset($socialCache['activity']['tags'][$tag])) {
-                                        ++$socialCache['activity']['tags'][$tag]['count'];
-                                    } else {
-                                        $socialCache['activity']['tags'][$tag] = [
-                                            'count' => 1,
-                                            'url'   => 'http://searchinstagram.com/'.$tag,
-                                        ];
-                                    }
+                            foreach ($tags[1] as $tag) {
+                                if (isset($socialCache['activity']['tags'][$tag])) {
+                                    ++$socialCache['activity']['tags'][$tag]['count'];
+                                } else {
+                                    $socialCache['activity']['tags'][$tag] = [
+                                        'count' => 1,
+                                        'url'   => 'http://searchinstagram.com/'.$tag,
+                                    ];
                                 }
                             }
                         }
@@ -135,7 +133,7 @@ class InstagramIntegration extends SocialIntegration
         return false;
     }
 
-    public function getFormType()
+    public function getFormType(): null
     {
         return null;
     }

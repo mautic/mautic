@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -21,7 +20,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
@@ -60,12 +58,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $routerMock;
 
     /**
-     * @var MockObject|Session
-     */
-    private MockObject $sessionMock;
-
-    /**
-     * @var MockObject|FlashBag
+     * @var MockObject&FlashBag
      */
     private MockObject $flashBagMock;
 
@@ -83,11 +76,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->requestMock        = $this->createMock(Request::class);
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
-        $this->sessionMock        = $this->createMock(Session::class);
         $this->containerMock      = $this->createMock(Container::class);
 
         $doctrine                 = $this->createMock(ManagerRegistry::class);
-        $factory                  = $this->createMock(MauticFactory::class);
         $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
@@ -100,7 +91,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
             $doctrine,
-            $factory,
             $this->modelFactoryMock,
             $userHelper,
             $coreParametersHelper,
@@ -111,14 +101,12 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             $this->securityMock
         );
         $this->controller->setContainer($this->containerMock);
-        $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
     }
 
     public function testSaveWithGetWillCallAccessDenied(): void
     {
         $this->requestMock->expects($this->once())
             ->method('isMethod')
-            ->willReturn(Request::METHOD_POST)
             ->willReturn(true);
 
         $this->requestMock->expects(self::once())
@@ -133,7 +121,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->requestMock->expects($this->once())
             ->method('isMethod')
-            ->willReturn('POST')
             ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
@@ -151,26 +138,17 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->requestMock->expects($this->once())
             ->method('isMethod')
-            ->willReturn('POST')
             ->willReturn(true);
 
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(true);
-
-        $this->requestMock->method('get')
-            ->withConsecutive(['name'])
-            ->willReturnOnConsecutiveCalls('mockName');
+        $this->requestMock->method('isXmlHttpRequest')->willReturn(true);
+        $this->requestMock->method('get')->willReturn('mockName');
 
         $this->containerMock->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['router'],
-                ['router']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->routerMock,
-                $this->routerMock
-            );
+            ->method('get')->willReturnCallback(function (...$parameters) {
+                $this->assertSame('router', $parameters[0]);
+
+                return $this->routerMock;
+            });
 
         $this->routerMock->expects($this->any())
             ->method('generate')
@@ -189,8 +167,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.notice.save');
 
-        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
-        $this->expectException(\LogicException::class);
         $this->controller->saveAction($this->requestMock);
     }
 
@@ -198,7 +174,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->requestMock->expects($this->once())
             ->method('isMethod')
-            ->willReturn('POST')
             ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
@@ -208,9 +183,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->willReturn('https://some.url');
 
-        $this->requestMock->method('get')
-            ->withConsecutive(['name'])
-            ->willReturnOnConsecutiveCalls('mockName');
+        $this->requestMock->method('get')->willReturn('mockName');
 
         $this->containerMock->expects($this->once())
             ->method('get')
@@ -230,8 +203,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.error.save');
 
-        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
-        $this->expectException(\LogicException::class);
         $this->controller->saveAction($this->requestMock);
     }
 
@@ -241,12 +212,13 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $this->createMock(Widget::class), 1);
+        $this->controller->widgetAction($this->requestMock, $this->createMock(Widget::class), $this->createMock(Environment::class), 1);
     }
 
     public function testWidgetNotFound(): void
     {
         $widgetId = '1';
+        $twig     = $this->createMock(Environment::class);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
@@ -264,7 +236,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('get');
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $widgetService, $widgetId);
+        $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
     }
 
     public function testWidget(): void
@@ -290,12 +262,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with('twig')
-            ->willReturn($twig);
-
-        $response = $this->controller->widgetAction($this->requestMock, $widgetService, $widgetId);
+        $response = $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
 
         self::assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
     }

@@ -6,10 +6,33 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 
-class Tag
+/**
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "leadfield:read"
+ *        },
+ *       "swagger_definition_name"="Read"
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "leadfield:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Tag implements UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
@@ -42,6 +65,7 @@ class Tag
         $builder->addId();
         $builder->addField('tag', Types::STRING);
         $builder->addNamedField('description', Types::TEXT, 'description', true);
+        static::addUuidField($builder);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

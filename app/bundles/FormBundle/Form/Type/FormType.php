@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -85,10 +86,13 @@ class FormType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
+
         $builder->add('template', ThemeListType::class, [
-            'feature'     => 'form',
-            'placeholder' => ' ',
-            'attr'        => [
+            'include_code_mode' => false,
+            'feature'           => 'form',
+            'placeholder'       => ' ',
+            'attr'              => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.form.template.help',
             ],
@@ -119,10 +123,12 @@ class FormType extends AbstractType
         ]);
 
         $builder->add('inKioskMode', YesNoButtonGroupType::class, [
-            'label' => 'mautic.form.form.kioskmode',
-            'attr'  => [
+            'label'     => 'mautic.form.form.kioskmode',
+            'attr'      => [
                 'tooltip' => 'mautic.form.form.kioskmode.tooltip',
             ],
+            'yes_label' => 'mautic.form.form.kioskmode.yes',
+            'no_label'  => 'mautic.form.form.kioskmode.no',
         ]);
 
         $builder->add(
@@ -188,6 +194,7 @@ class FormType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'         => 'form-control',
+                'tooltip'       => 'mautic.form.form.postactionproperty.tooltip',
                 'data-hide-on'  => '{"mauticform_postAction":"return"}',
             ],
             'required'   => $required,
@@ -216,7 +223,7 @@ class FormType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'mauticform';
     }

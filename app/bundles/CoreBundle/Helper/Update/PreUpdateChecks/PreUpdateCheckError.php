@@ -14,7 +14,7 @@ class PreUpdateCheckError
      */
     public function __construct(
         public string $key,
-        public array $parameters = []
+        public array $parameters = [],
     ) {
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Entity;
 
-trait UpsertTrait
+trait UpsertTrait // @phpstan-ignore trait.unused (prepared for future use)
 {
     /*
      * This file has been added to the list of excluded files in phpstan.neon, since it is (currently) not being used in a entity.

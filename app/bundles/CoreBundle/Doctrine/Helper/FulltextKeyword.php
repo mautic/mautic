@@ -10,7 +10,7 @@ class FulltextKeyword implements \Stringable
         private string $value,
         private bool $booleanMode = true,
         private bool $wordSearch = true,
-        private bool $wordInflecting = false
+        private bool $wordInflecting = false,
     ) {
     }
 

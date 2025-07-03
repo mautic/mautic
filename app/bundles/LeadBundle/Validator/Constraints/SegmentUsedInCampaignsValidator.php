@@ -17,7 +17,7 @@ class SegmentUsedInCampaignsValidator extends ConstraintValidator
     {
     }
 
-    public function validate($segment, Constraint $constraint): void
+    public function validate(mixed $segment, Constraint $constraint): void
     {
         try {
             /** @var LeadList $segment */

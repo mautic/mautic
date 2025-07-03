@@ -15,7 +15,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private PointModel $pointModel
+        private PointModel $pointModel,
+        private PointActionHelper $pointActionHelper,
     ) {
     }
 
@@ -43,7 +44,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.page.point.action',
             'label'       => 'mautic.page.point.action.urlhit',
             'description' => 'mautic.page.point.action.urlhit_descr',
-            'callback'    => [PointActionHelper::class, 'validateUrlHit'],
+            'callback'    => [$this->pointActionHelper, 'validateUrlHit'],
             'formType'    => PointActionUrlHitType::class,
             'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
         ];

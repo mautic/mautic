@@ -30,7 +30,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         \DateTime $dateFrom,
         \DateTime $dateTo,
         private array $filters = [],
-        $unit = null
+        $unit = null,
     ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;

@@ -3,7 +3,9 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
@@ -12,6 +14,11 @@ use Mautic\CoreBundle\Helper\InputHelper;
  */
 class LeadFieldRepository extends CommonRepository
 {
+    /**
+     * @var array<int|string, array<string,mixed>>|null
+     */
+    private ?array $fields = null;
+
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields.
      *
@@ -61,6 +68,26 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function getFields(): array
+    {
+        if (!isset($this->fields)) {
+            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->where('f.is_published = :published')
+                ->setParameter('published', true, 'boolean')
+                ->addOrderBy('f.field_order', 'asc');
+            $results = $fq->executeQuery()->fetchAllAssociative();
+
+            $this->fields = array_column($results, null, 'alias');
+        }
+
+        return $this->fields;
+    }
+
+    /**
      * @return LeadField[]
      */
     public function getFieldsForObject(string $object): array
@@ -77,19 +104,25 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return array<int|string, array<string, mixed>>
+     * Retrieves the aliases of searchable fields that are indexed and published.
+     *
+     * @return string[]
      */
-    public function getFields(): array
+    public function getSearchableFieldAliases(string $object = null): array
     {
-        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-            ->where('f.is_published = :published')
-            ->setParameter('published', true, 'boolean')
-            ->addOrderBy('f.field_order', 'asc');
-        $results = $fq->executeQuery()->fetchAllAssociative();
+        $fq = $this->createQueryBuilder($this->getTableAlias());
+        $fq->select($this->getTableAlias().'.alias')
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isIndex', true))
+            ->andWhere($fq->expr()->eq($this->getTableAlias().'.isPublished', true));
 
-        return array_column($results, null, 'alias');
+        if (!empty($object)) {
+            $fq->andWhere($fq->expr()->eq($this->getTableAlias().'.object', ':object'))
+                ->setParameter('object', $object, ParameterType::STRING);
+        }
+
+        $results = $fq->getQuery()->getResult();
+
+        return array_column($results, 'alias');
     }
 
     public function getTableAlias(): string
@@ -263,43 +296,34 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $property  = $this->getPropertyByField($field, $q);
-                $fieldType = $this->findOneBy(['alias' => $field])->getType();
-                $values    = (!is_array($value)) ? [$value] : $value;
+                $values   = (!is_array($value)) ? [$value] : $value;
+                $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
+                $expr     = $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead')
+                );
 
-                if ('multiselect' == $fieldType) {
-                    // multiselect field values are separated by `|` and must be queried using regexp
-                    $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
-
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead')
+                $innerExpr = [];
+                foreach ($values as $v) {
+                    $v = $q->expr()->literal(
+                        InputHelper::clean($v)
                     );
 
-                    // require all multiselect values in condition
-                    $andExpr = [];
-                    foreach ($value as $v) {
-                        $v = $q->expr()->literal(
-                            InputHelper::clean($v)
-                        );
-
-                        $v         = trim($v, "'");
-                        $andExpr[] = $property." $operator '\\\\|?$v\\\\|?'";
-                    }
-
-                    $expr = $expr->with($q->expr()->and(...$andExpr));
-
-                    $q->where($expr)
-                        ->setParameter('lead', (int) $lead);
-                } else {
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead'),
-                        'in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values')
-                    );
-
-                    $q->where($expr)
-                        ->setParameter('lead', (int) $lead)
-                        ->setParameter('values', $values, ArrayParameterType::STRING);
+                    $v           = trim($v, "'");
+                    $innerExpr[] = $property." $operator '\\\\|?$v\\\\|?'";
                 }
+
+                if (str_starts_with($operatorExpr, 'not')) {
+                    $expr = $expr->with($q->expr()->or(
+                        $q->expr()->isNull($property),
+                        $q->expr()->and(...$innerExpr)
+                    ));
+                } else {
+                    $expr = $expr->with($q->expr()->or(...$innerExpr));
+                }
+
+                $q->where($expr)
+                    ->setParameter('lead', (int) $lead)
+                    ->setParameter('values', $values, ArrayParameterType::STRING);
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
@@ -409,7 +433,7 @@ class LeadFieldRepository extends CommonRepository
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
         $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
-        $qb->orderBy("{$this->getTableAlias()}.dateAdded", \Doctrine\Common\Collections\Criteria::ASC);
+        $qb->orderBy("{$this->getTableAlias()}.dateAdded", Order::Ascending->value);
         $qb->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();

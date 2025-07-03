@@ -8,7 +8,7 @@ class FieldAliasKeyword extends Constraint
 {
     public $message = 'mautic.lead.field.keyword.invalid';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return FieldAliasKeywordValidator::class;
     }

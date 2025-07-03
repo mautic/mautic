@@ -62,27 +62,60 @@
                 <p class="small"><span class="imported-count">{{ progress.done }}</span> / <span class="total-count">{{ progress.total }}</span></p>
                 {% if not complete %}
                     <div>
-                        <a class="btn btn-danger" href="{{ path('mautic_import_action', {'objectAction': 'cancel', 'object': object}) }}" data-toggle="ajax">
-                            {{ 'mautic.core.form.cancel'|trans }}
-                        </a>
-                        <a class="btn btn-primary" href="{{ path('mautic_import_action', {'objectAction': 'queue', 'object': object}) }}" data-toggle="ajax">
-                            {{ 'mautic.lead.import.queue.btn'|trans }}
-                        </a>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.core.form.cancel',
+                                    variant: 'danger',
+                                    href: path('mautic_import_action', {'objectAction': 'cancel', 'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                },
+                                {
+                                    label: 'mautic.lead.import.queue.btn',
+                                    variant: 'primary',
+                                    href: path('mautic_import_action', {'objectAction': 'queue', 'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                }
+                            ]
+                        } %}
                     </div>
                 {% else %}
                     <div>
                         {% set indexRouteParams = indexRouteParams|merge({
                             'search': 'mautic.lead.lead.searchcommand.import_id'|trans ~ ':' ~ import.id
                         }) %}
-                        <a class="btn btn-success" href="{{ path(indexRoute, indexRouteParams) }}" data-toggle="ajax">
-                            {{ 'mautic.lead.list.view'|trans({'%objects%': objectName}) }}
-                        </a>
-                        <a class="btn btn-success" href="{{ path('mautic_import_index', {'object': object}) }}" data-toggle="ajax">
-                            {{ 'mautic.lead.view.imports'|trans }}
-                        </a>
-                        <a class="btn btn-success" href="{{ path('mautic_import_action', {'objectAction': 'view', 'objectId': import.id, 'object': object}) }}" data-toggle="ajax">
-                            {{ 'mautic.lead.import.result.info'|trans({'%import%': import.name()}) }}
-                        </a>
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [
+                                {
+                                    label: 'mautic.lead.list.view'|trans({'%objects%': objectName}),
+                                    variant: 'secondary',
+                                    href: path(indexRoute, indexRouteParams),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                },
+                                {
+                                    label: 'mautic.lead.view.imports',
+                                    variant: 'secondary',
+                                    href: path('mautic_import_index', {'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                },
+                                {
+                                    label: 'mautic.lead.import.result.info'|trans({'%import%': import.name()}),
+                                    variant: 'secondary',
+                                    href: path('mautic_import_action', {'objectAction': 'view', 'objectId': import.id, 'object': object}),
+                                    attributes: {
+                                        'data-toggle': 'ajax'
+                                    }
+                                }
+                            ]
+                        } %}
                     </div>
                 {% endif %}
             </div>

@@ -19,7 +19,7 @@ final class GravatarHelper
     public function __construct(
         private DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');

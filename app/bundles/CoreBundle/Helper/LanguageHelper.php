@@ -28,7 +28,7 @@ class LanguageHelper
         private LoggerInterface $logger,
         private CoreParametersHelper $coreParametersHelper,
         private Client $client,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
@@ -358,7 +358,7 @@ class LanguageHelper
             // Check config exists
             $configFile = $dir->getRealpath().'/config.json';
             if (!file_exists($configFile)) {
-                return;
+                continue;
             }
 
             $config                            = json_decode(file_get_contents($configFile), true);

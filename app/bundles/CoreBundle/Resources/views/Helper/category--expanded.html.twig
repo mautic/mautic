@@ -1,0 +1,4 @@
+<div class="d-flex ai-center gap-xs">
+    <span class="label label-gray label-category" style="background: {% if category.color is defined and category.color %}#{{ category.color }}{% else %}var(--label-background-gray){% endif %};"> </span> 
+    {{ category.title|default('mautic.core.form.uncategorized'|trans) }}
+</div>

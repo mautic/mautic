@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
+use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,34 +20,39 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
     /**
-     * @var MockObject|StageModel
+     * @var MockObject&StageModel
      */
     private MockObject $stageModel;
 
     /**
-     * @var MockObject|FormBuilderInterface
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
     private EmailType $form;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var CoreParametersHelper&MockObject
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var ThemeHelperInterface|MockObject
+     * @var EmailConfigInterface&MockObject
+     */
+    private MockObject $emailConfig;
+
+    /**
+     * @var ThemeHelperInterface&MockObject
      */
     private MockObject $themeHelper;
 
@@ -60,6 +66,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
+        $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
         $this->form                 = new EmailType(
             $this->translator,
             $this->entityManager,
@@ -67,6 +74,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
             $this->coreParametersHelper,
             $this->themeHelper,
             $this->createMock(CorePermissions::class)
+            $this->emailConfig
         );
 
         $this->formBuilder->method('create')->willReturnSelf();

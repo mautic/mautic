@@ -21,9 +21,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Segment #999999 does not exist', $output->getDisplay());
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
     public function testCommandRebuildingAllSegments(callable $getCommandParams, callable $assert): void
     {
         $contact = new Lead();
@@ -68,7 +66,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
         Assert::assertSame(
-            '1',
+            1,
             $leadListRepository->getLeadCount([$segment->getId()])
         );
     }

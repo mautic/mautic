@@ -15,7 +15,7 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
 {
     public function __construct(
         private NotificationModel $notificationModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -34,9 +34,9 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
 
         $this->notificationModel->addNotification(
             $message,
-            null,
+            'info',
             false,
-            null,
+            'mautic.lead.export.being.prepared.header',
             null,
             null,
             $user

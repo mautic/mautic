@@ -176,7 +176,7 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
         array $clientInfo,
         string $trackingId,
         ?string $deviceBrand,
-        ?string $deviceModel
+        ?string $deviceModel,
     ): LeadDevice {
         $device = new LeadDevice();
         $device->setDateAdded(new \DateTime($date));

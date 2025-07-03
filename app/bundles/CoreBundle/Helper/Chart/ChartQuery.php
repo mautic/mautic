@@ -64,7 +64,7 @@ class ChartQuery extends AbstractChart
         protected Connection $connection,
         \DateTime $dateFrom,
         \DateTime $dateTo,
-        $unit = null
+        $unit = null,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
@@ -537,11 +537,11 @@ class ChartQuery extends AbstractChart
     /**
      * Count how many rows is between a range of date diff in seconds.
      *
-     * @param string $query
+     * @param QueryBuilder $query
      */
     public function fetchCountDateDiff($query): int
     {
-        $data = $query->execute()->fetchAssociative();
+        $data = $query->executeQuery()->fetchAssociative();
 
         return (int) $data['count'];
     }

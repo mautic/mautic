@@ -74,7 +74,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->createDoNotContact($contact2, $email, DoNotContact::BOUNCED);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$email->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$email->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([
@@ -129,7 +129,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$emailEn->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$emailEn->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([
@@ -172,7 +172,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->emulateLinkClick($email, $trackables[1], $contacts[1]);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:heatmap&id={$email->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:heatmap&id={$email->getId()}");
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $content = json_decode($response->getContent(), true);
@@ -226,7 +226,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             'email'      => $emailName,
         ];
 
-        $this->client->request(Request::METHOD_GET, '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 

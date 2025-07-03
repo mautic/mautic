@@ -18,28 +18,79 @@
 
 {% block headerTitle %}{{ 'mautic.notification.notifications'|trans }}{% endblock %}
 
-{% block actions %}
-    {{ include('@MauticCore/Helper/page_actions.html.twig', {
-            'templateButtons': {
-                'new': permissions['notification:notifications:create'],
-            },
-            'routeBase': 'notification',
-    }) }}
-{% endblock %}
-
 {% block content %}
   {% if isIndex %}
-    <div id="page-list-wrapper">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-                'searchValue': searchValue,
-                'searchHelp': 'mautic.notification.help.searchcommands',
-                'searchId': 'notification-search',
-                'action': currentRoute,
+            'searchValue': searchValue,
+            'searchId': 'notification-search',
+            'action': currentRoute,
+            'page_actions': {
+                'templateButtons': {
+                    'new': permissions['notification:notifications:create'],
+                },
+                'routeBase': 'notification',
+            },
+            'bulk_actions': {
+                'routeBase': 'notification',
+                'templateButtons': {
+                    'delete': permissions['notification:notifications:deleteown'] or permissions['notification:notifications:deleteother'],
+                },
+            },
+            'quickFilters': [
+                {
+                    'search': 'mautic.core.searchcommand.ispublished',
+                    'label': 'mautic.core.form.available',
+                    'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                    'icon': 'ri-check-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isunpublished',
+                    'label': 'mautic.core.form.unavailable',
+                    'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                    'icon': 'ri-close-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isuncategorized',
+                    'label': 'mautic.core.form.uncategorized',
+                    'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                    'icon': 'ri-folder-unknow-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.ismine',
+                    'label': 'mautic.core.searchcommand.ismine.label',
+                    'tooltip': 'mautic.core.searchcommand.ismine.description',
+                    'icon': 'ri-user-line'
+                }
+            ]
         }) }}
         <div class="page-list">
   {% endif %}
 
-  {{ include('@MauticNotification/Notification/_list.html.twig') }}
+  {% if items|length > 0 %}
+    {{ include('@MauticNotification/Notification/_list.html.twig') }}
+  {% else %}
+    {% if searchValue is not empty %}
+      {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.category.noresults.tip'}) -}}
+    {% else %}
+      <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+        {% set childContainer %}
+          <div class="mt-32 mb-md">
+            {% include '@MauticCore/Helper/pictogram.html.twig' with {
+              'pictogram': 'websites',
+              'size': '80'
+            } %}
+          </div>
+        {% endset %}
+        {{ include('@MauticCore/Components/content-block.html.twig', {
+          heading: 'mautic.notification.contentblock.heading',
+          subheading: 'mautic.notification.contentblock.subheading',
+          copy: 'mautic.notification.contentblock.copy',
+          childContainer: childContainer
+        }) }}
+      </div>
+    {% endif %}
+  {% endif %}
 
   {% if isIndex %}
         </div>

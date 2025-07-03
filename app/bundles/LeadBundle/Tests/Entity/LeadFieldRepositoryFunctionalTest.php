@@ -148,6 +148,9 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
                     ], [
                         'label' => 'Blue',
                         'value' => 'blue',
+                    ], [
+                        'label' => 'Yellow',
+                        'value' => 'yellow',
                     ],
                 ],
             ]
@@ -166,7 +169,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $repository = $fieldModel->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'colors', ['green', 'blue'], 'in'));
-        $this->assertFalse($repository->compareValue($lead->getId(), 'colors', ['red', 'green'], 'in'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'colors', ['red', 'yellow'], 'in'));
     }
 
     public function testExcludeUnpublishedField(): void

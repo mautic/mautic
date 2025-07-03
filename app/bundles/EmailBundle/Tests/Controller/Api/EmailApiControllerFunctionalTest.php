@@ -19,6 +19,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -349,11 +350,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         // Get the email reply that was just created from the stat API.
         $statReplyQuery = ['where' => [['col' => 'stat_id', 'expr' => 'eq', 'val' => $stat->getId()]]];
         $this->client->request('GET', '/api/stats/email_stat_replies', $statReplyQuery);
+        $this->assertResponseIsSuccessful();
         $fetchedReplyData = json_decode($this->client->getResponse()->getContent(), true);
 
         // Check that the email reply was created correctly.
         $this->assertSame('1', $fetchedReplyData['total']);
-        $this->assertSame($stat->getId(), (int) $fetchedReplyData['stats'][0]['stat_id']);
+        $this->assertSame($stat->getId(), $fetchedReplyData['stats'][0]['stat_id']);
         $this->assertMatchesRegularExpression('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
 
         // Get the email stat that was just updated from the stat API.
@@ -363,7 +365,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check that the email stat was updated correctly/
         $this->assertSame('1', $fetchedStatData['total']);
-        $this->assertSame($stat->getId(), (int) $fetchedStatData['stats'][0]['id']);
+        $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
         $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
     }
@@ -383,9 +385,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
 
-        $user->setPassword($encoder->encodePassword('password', null));
+        $user->setPassword($hasher->hash('password'));
         $this->em->persist($user);
 
         // Create a contact:
@@ -460,6 +463,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmail('{custom-token}');
 
         // Send to contact:
+        $email = $createEmail();
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
 
         $clientResponse = $this->client->getResponse();
@@ -478,7 +485,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
         $emailId = $email->getId();
-
         // Send to segment:
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
@@ -500,6 +506,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Send to contact:
+        $email = $createEmail();
+        $email->setUseOwnerAsMailer(true);
+        $email->setReplyToAddress(null);
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
@@ -511,9 +523,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Test Custom Reply-To Address
+        $email = $createEmail();
+        $email->setUseOwnerAsMailer(true);
         $email->setReplyToAddress('reply@email.domain');
         $this->em->persist($email);
         $this->em->flush();
+        $emailId = $email->getId();
 
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();

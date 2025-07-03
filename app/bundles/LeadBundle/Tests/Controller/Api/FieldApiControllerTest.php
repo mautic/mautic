@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -32,11 +31,8 @@ class FieldApiControllerTest extends TestCase
 
     public function testgetWhereFromRequestWithNoWhere(): void
     {
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request], $request);
+        $request = new Request();
+        $result  = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request], $request);
 
         $this->assertEquals($this->defaultWhere, $result);
     }
@@ -51,17 +47,8 @@ class FieldApiControllerTest extends TestCase
             ],
         ];
 
-        $request = $this->getMockBuilder(Request::class)
-            ->onlyMethods(['get'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $request->method('get')
-            ->willReturnMap([
-                ['where', [], $where],
-            ]);
-
-        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request], $request);
+        $request = new Request(['where' => $where]);
+        $result  = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request], $request);
 
         $this->assertEquals(array_merge($where, $this->defaultWhere), $result);
     }
@@ -77,9 +64,6 @@ class FieldApiControllerTest extends TestCase
         $fieldModel->method('getRepository')
             ->willReturn($fieldRepository);
         $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')
-            ->with('lead.field')
-            ->willReturn($fieldModel);
         $controller   = new FieldApiController(
             $this->createMock(CorePermissions::class),
             $this->createMock(Translator::class),
@@ -92,7 +76,7 @@ class FieldApiControllerTest extends TestCase
             $modelFactory,
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(CoreParametersHelper::class),
-            $this->createMock(MauticFactory::class),
+            $fieldModel,
         );
 
         $controllerReflection = new \ReflectionClass(FieldApiController::class);

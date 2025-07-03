@@ -34,7 +34,7 @@ class FocusSubscriber implements EventSubscriberInterface
         private PageTokenHelper $pageTokenHelper,
         private AssetTokenHelper $assetTokenHelper,
         private FocusModel $focusModel,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 

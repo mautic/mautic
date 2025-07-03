@@ -2,10 +2,10 @@
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
+use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTest
+final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTestCase
 {
     public function testCreateCampaignPageShouldNotContainConformation(): void
     {

@@ -6,7 +6,7 @@ return [
             // OAuth2
             'fos_oauth_server_token' => [
                 'path'       => '/oauth/v2/token',
-                'controller' => 'fos_oauth_server.controller.token:tokenAction',
+                'controller' => 'fos_oauth_server.controller.token::tokenAction',
                 'method'     => 'GET|POST',
             ],
             'fos_oauth_server_authorize' => [
@@ -100,9 +100,5 @@ return [
         'api_oauth2_access_token_lifetime'  => 60,
         'api_oauth2_refresh_token_lifetime' => 14,
         'api_batch_max_limit'               => 200,
-        'api_rate_limiter_limit'            => 0,
-        'api_rate_limiter_cache'            => [
-            'adapter' => 'cache.adapter.filesystem',
-        ],
     ],
 ];

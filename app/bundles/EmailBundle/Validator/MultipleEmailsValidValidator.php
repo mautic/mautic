@@ -11,7 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class MultipleEmailsValidValidator extends ConstraintValidator
 {
     public function __construct(
-        private EmailValidator $emailValidator
+        private EmailValidator $emailValidator,
     ) {
     }
 

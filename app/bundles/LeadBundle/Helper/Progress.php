@@ -28,7 +28,7 @@ class Progress
     protected $bar;
 
     public function __construct(
-        protected ?OutputInterface $output = null
+        protected ?OutputInterface $output = null,
     ) {
     }
 

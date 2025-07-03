@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class DoNotContactSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private DoNotContact $doNotContact
+        private DoNotContact $doNotContact,
     ) {
     }
 
@@ -44,7 +44,7 @@ final class DoNotContactSubscriber implements EventSubscriberInterface
             );
         } else {
             $this->doNotContact->addDncForContact(
-                $doNotContactAddEvent->getLead()->getId(),
+                $doNotContactAddEvent->getLead(),
                 $doNotContactAddEvent->getChannel(),
                 $doNotContactAddEvent->getReason(),
                 $doNotContactAddEvent->getComments(),

@@ -1,0 +1,57 @@
+<!-- Batch actions: always visible -->
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+{{ restore('action_button_helper') }}
+
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_TOOLBAR_BULK_ACTIONS')
+) }}
+
+{% if templateButtons.delete is defined and templateButtons.delete is not empty %}
+    {{ buttonAdd({
+        confirm: {
+            message: translatorHasId(translationBase ~ '.form.confirmbatchdelete')
+                ? (translationBase ~ '.form.confirmbatchdelete')|trans
+                : 'mautic.core.form.confirmbatchdelete'|trans,
+            confirmAction: path(actionRoute, query|filter((v, k) => k != 'tmpl')|merge({objectAction: 'batchDelete'})),
+            template: 'batchdelete'
+        },
+        priority: 1
+    }) }}
+{% endif %}
+
+{{ buttonsRender() }}
+
+<!-- Batch actions: others, within the dropdown -->
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
+    ) }}
+
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+{{ restore('action_button_helper') }}
+
+{% set dropdownButtons = buttonsRender() %}
+{% if dropdownButtons is not empty %}
+    <div class="dropdown ml-xs">
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.options',
+                    size: 'lg',
+                    variant: 'primary',
+                    icon: 'ri-more-2-line',
+                    icon_only: true,
+                    spin: false,
+                    attributes: {
+                        'class': 'dropdown-toggle bdr-rds-0 pa-0',
+                        'data-toggle': 'dropdown',
+                        'type': 'button',
+                    }
+                }
+            ]
+        } %}
+        <ul class="pull-{{ pull }} page-list-actions dropdown-menu dropdown-menu-right" role="menu">
+            {{ dropdownButtons|raw }}
+        </ul>
+    </div>
+{% endif %}

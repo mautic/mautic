@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Update\Step\PreUpdateChecksStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PreUpdateChecksStepTest extends AbstractStepTest
+class PreUpdateChecksStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject|TranslatorInterface
@@ -71,7 +71,6 @@ class PreUpdateChecksStepTest extends AbstractStepTest
 
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);
-            $this->assertTrue(true);
         } catch (UpdateFailedException) {
             $this->fail('UpdateFailedException should not have been thrown');
         }

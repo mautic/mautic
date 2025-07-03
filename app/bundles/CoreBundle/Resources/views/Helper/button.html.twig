@@ -1,0 +1,83 @@
+{% set default_variants = [] %}
+{% if buttons|length == 2 %}
+    {% set default_variants = ['primary', 'secondary'] %}
+{% else %}
+    {% set default_variants = ['primary'] %}
+    {% for i in 1..(buttons|length - 1) %}
+        {% set default_variants = default_variants|merge(['tertiary']) %}
+    {% endfor %}
+{% endif %}
+
+{% for button in buttons %}
+    {% set variant = button.variant is defined ? button.variant : default_variants[loop.index0] %}
+    {% set icon_only = button.icon_only is defined and button.icon_only ? 'btn-icon' : '' %}
+    {% set danger_modifier = button.danger is defined and button.danger ? 'btn-danger' : '' %}
+    {% set wide_modifier = button.wide is defined and button.wide ? 'btn-block' : '' %}
+    {% set spin = button.spin is defined and button.spin ? '' : 'btn-nospin' %}
+    {% set button_classes = ['btn', 'btn-' ~ variant] %}
+
+    {% if icon_only %}
+        {% set button_classes = button_classes|merge([icon_only]) %}
+    {% endif %}
+    {% if danger_modifier %}
+        {% set button_classes = button_classes|merge([danger_modifier]) %}
+    {% endif %}
+    {% if wide_modifier %}
+        {% set button_classes = button_classes|merge([wide_modifier]) %}
+    {% endif %}
+    {% if spin %}
+        {% set button_classes = button_classes|merge([spin]) %}
+    {% endif %}
+
+    {% set extra_classes = button.attributes.class is defined ? button.attributes.class|split(' ') : [] %}
+    {% set button_classes = button_classes|merge(extra_classes) %}
+    {% set custom_attributes = '' %}
+
+    {% if button.attributes is defined %}
+        {% for attribute, value in button.attributes %}
+            {% if attribute != 'class' %}
+                {% set custom_attributes = custom_attributes ~ ' ' ~ attribute ~ '="' ~ value|e('html_attr') ~ '"' %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {# Add generated ID if not defined in attributes #}
+    {% if button.attributes is not defined or button.attributes.id is not defined %}
+        {% set label_split = button.label|split('.') %}
+        {% set last_two = label_split|slice(-2, 2) %}
+        {% set id = last_two|join('-')|replace({'_': '-'}) %}
+        {% set custom_attributes = custom_attributes ~ ' id="' ~ id ~ '"' %}
+    {% endif %}
+
+    {% if button.size is defined %}
+        {% set custom_attributes = custom_attributes ~ ' size="' ~ button.size ~ '"' %}
+    {% endif %}
+
+    {% if button.icon_only is defined and button.icon_only %}
+        {% set tooltip_placement = button.tooltip_placement is defined ? button.tooltip_placement : 'top' %}
+        {% set icon_attributes = ' data-toggle="tooltip" title="' ~ button.label|trans ~ '" data-placement="' ~ tooltip_placement ~ '"' %}
+    {% else %}
+        {% set icon_attributes = '' %}
+    {% endif %}
+
+    {% if button.href is defined %}
+        <a class="{{ button_classes|join(' ') }}" aria-label="{{ button.label|trans }}" href="{{ button.href }}"{{ custom_attributes|raw }}>
+            {% if button.icon is defined %}
+                <i class="{{ button.icon }}" aria-hidden="true" focusable="false" {{ icon_attributes|raw }}></i>
+            {% endif %}
+            {% if button.label is defined and not (button.icon_only is defined and button.icon_only) %}
+                <span>{{ button.label|trans }}</span>
+            {% endif %}
+        </a>
+    {% else %}
+        {% set button_type = button.attributes.type is defined ? button.attributes.type : (button.onclick is defined and button.onclick != '' ? 'button' : 'submit') %}
+        <button type="{{ button_type }}" aria-label="{{ button.label|trans }}" class="{{ button_classes|join(' ') }}" onclick="{{ button.onclick is defined ? button.onclick|e('html_attr') : '' }}"{{ custom_attributes|raw }}>
+            {% if button.icon is defined %}
+                <i class="{{ button.icon }}" aria-hidden="true" focusable="false" {{ icon_attributes|raw }}></i>
+            {% endif %}
+            {% if button.label is defined and not (button.icon_only is defined and button.icon_only) %}
+                <span>{{ button.label|trans }}</span>
+            {% endif %}
+        </button>
+    {% endif %}
+{% endfor %}

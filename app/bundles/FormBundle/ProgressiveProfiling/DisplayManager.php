@@ -11,15 +11,12 @@ class DisplayManager
 
     public function __construct(
         private Form $form,
-        private array $viewOnlyFields = []
+        private array $viewOnlyFields = [],
     ) {
         $this->displayCounter = new DisplayCounter($form);
     }
 
-    /**
-     * @return bool
-     */
-    public function showForField(Field $field)
+    public function showForField(Field $field): bool
     {
         if (in_array($field->getType(), $this->viewOnlyFields)) {
             return true;

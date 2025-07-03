@@ -1,0 +1,92 @@
+.gsearch--toolbar {
+    border: 2px solid var(--interactive);
+    overflow: hidden;
+    border-radius: 12px;
+    outline: 3px solid rgb(from var(--background-brand) r g b / 35%);
+    box-shadow: rgb(from var(--background-brand) r g b / 15%) 0px 0px 20px 10px, rgb(255 255 255) 1px 0px 40px 50px;
+    z-index: 1;
+}
+
+.gsearch--field {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    box-shadow: rgb(from var(--background-brand) r g b / 25%) 0px 20px 20px -20px, rgb(0 0 0 / 30%) 0px 20px 60px -30px, rgb(from var(--background-brand) r g b / 35%) 0px -2px 6px 0px inset;
+}
+.gsearch--search-magnifier {
+    color: var(--interactive);
+}
+.gsearch--field-addon__icon {}
+.gsearch--field__input {
+    background-color: transparent;
+    border-width: 0;
+    &:focus { outline-color: transparent; }
+    &:hover { background-color: transparent; }
+}
+
+.gsearch--field-addon {}
+
+.gsearch--interaction-helper {
+    background-color: var(--primary-20);
+}
+.gsearch--interaction-navigate {}
+.gsearch--interaction-close {}
+
+.gsearch--results {
+    overflow: hidden;
+    box-shadow: rgb(100 100 111 / 33%) 0px 7px 50px 0px;
+    border: 1px solid var(--primary-20);
+    border-radius: 12px;
+    z-index: 1;
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1; /* Places the pseudo-element behind the main element */
+        background: inherit; /* Matches the background of the parent */
+        filter: blur(10px); /* Applies the blur effect */
+    }
+}
+
+.gsearch--results-scroll {
+    max-height: 70vh;
+
+    &:has(.content-overlay) { max-height: 55px; }
+    hr { border-color: var(--primary-20); }
+}
+
+.gsearch--results-common__icon {
+    padding: 6px;
+    background-color: var(--layer);
+    border-radius: 4px;
+    border: 1px solid var(--border-subtle);
+    vertical-align: -1px;
+}
+
+.gsearch--results-profile__img {
+    --gsearch--profile__img-width: 36px;
+    width: var(--gsearch--profile__img-width);
+    aspect-ratio: 1/1;
+    border-radius: var(--gsearch--profile__img-width);
+}
+
+.gsearch--results-profile__img--sm {
+    --gsearch--profile__img-width: 26px;
+}
+
+.gsearch--results-item {
+    border: 0;
+    padding: 8px 16px;
+
+    &,
+    a { color: var(--text-secondary); }
+
+    &:hover,
+    a:hover { color: var(--text-primary); }
+
+    &:has(a:focus) { outline: 2px solid var(--focus); outline-offset: -2px; }
+}

@@ -14,7 +14,7 @@ class BulkNotification
     public function __construct(
         private BulkNotificationInterface $bulkNotification,
         private UserNotificationBuilder $userNotificationBuilder,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -25,7 +25,7 @@ class BulkNotification
         string $objectDisplayName,
         string $mauticObject,
         int $id,
-        string $linkText
+        string $linkText,
     ): void {
         $link    = $this->userNotificationBuilder->buildLink($mauticObject, $id, $linkText);
         $userIds = $this->userNotificationBuilder->getUserIds($mauticObject, $id);

@@ -14,7 +14,7 @@ class MenuRenderer implements RendererInterface
     public function __construct(
         private MatcherInterface $matcher,
         private Environment $twig,
-        array $defaultOptions = []
+        array $defaultOptions = [],
     ) {
         $this->defaultOptions = array_merge(
             [

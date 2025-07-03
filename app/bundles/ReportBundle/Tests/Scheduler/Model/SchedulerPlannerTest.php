@@ -14,17 +14,11 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 {
     public function testComputeSchedule(): void
     {
-        $dateBuilder = $this->getMockBuilder(DateBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dateBuilder = $this->createMock(DateBuilder::class);
 
-        $schedulerRepository = $this->getMockBuilder(SchedulerRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerRepository = $this->createMock(SchedulerRepository::class);
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
         $entityManager->expects($this->once())
             ->method('getRepository')
@@ -68,17 +62,11 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoSchedule(): void
     {
-        $dateBuilder = $this->getMockBuilder(DateBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dateBuilder = $this->createMock(DateBuilder::class);
 
-        $schedulerRepository = $this->getMockBuilder(SchedulerRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerRepository = $this->createMock(SchedulerRepository::class);
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
         $entityManager->expects($this->once())
             ->method('getRepository')
@@ -114,17 +102,11 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoRemoveNoSchedule(): void
     {
-        $dateBuilder = $this->getMockBuilder(DateBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dateBuilder = $this->createMock(DateBuilder::class);
 
-        $schedulerRepository = $this->getMockBuilder(SchedulerRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerRepository = $this->createMock(SchedulerRepository::class);
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
         $entityManager->expects($this->once())
             ->method('getRepository')

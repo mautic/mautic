@@ -14,6 +14,8 @@ use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -42,18 +44,23 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $scheduler;
 
+    /**
+     * @var CoreParametersHelper&MockObject
+     */
+    private MockObject $coreParametersHelper;
+
     protected function setUp(): void
     {
         $this->kickoffContactFinder = $this->createMock(KickoffContactFinder::class);
         $this->translator           = $this->createMock(Translator::class);
         $this->executioner          = $this->createMock(EventExecutioner::class);
         $this->scheduler            = $this->createMock(EventScheduler::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testNoContactsResultInEmptyResults(): void
     {
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->once())
             ->method('getRootEvents')
             ->willReturn(new ArrayCollection());
@@ -81,7 +88,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $event    = new Event();
         $event2   = new Event();
-        $campaign = new class() extends Campaign {
+        $campaign = new class extends Campaign {
             /**
              * @var ArrayCollection<int,Event>
              */
@@ -118,19 +125,11 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->executioner->expects($this->exactly(1))
-            ->method('executeEventsForContacts')
-            ->withConsecutive(
-                [
-                    $this->countOf(2),
-                    $this->isInstanceOf(ArrayCollection::class),
-                    $this->isInstanceOf(Counter::class),
-                ],
-                [
-                    $this->countOf(1),
-                    $this->isInstanceOf(ArrayCollection::class),
-                    $this->isInstanceOf(Counter::class),
-                ]
-            );
+            ->method('executeEventsForContacts')->willReturnCallback(function (...$parameters) {
+                $this->assertCount(2, $parameters[0]);
+                $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
+                $this->assertInstanceOf(Counter::class, $parameters[2]);
+            });
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
@@ -145,7 +144,9 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->kickoffContactFinder,
             $this->translator,
             $this->executioner,
-            $this->scheduler
+            $this->scheduler,
+            $this->createMock(ProcessSignalService::class),
+            $this->coreParametersHelper
         );
     }
 }

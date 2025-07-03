@@ -44,7 +44,7 @@ class SyncProcess
         private MauticSyncDataExchange $internalSyncDataExchange,
         private SyncDataExchangeInterface $integrationSyncDataExchange,
         private InputOptionsDAO $inputOptionsDAO,
-        private SyncServiceInterface $syncService
+        private SyncServiceInterface $syncService,
     ) {
     }
 

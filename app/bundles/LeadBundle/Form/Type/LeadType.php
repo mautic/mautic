@@ -33,7 +33,7 @@ class LeadType extends AbstractType
         private TranslatorInterface $translator,
         private CompanyModel $companyModel,
         private EntityManager $entityManager,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -103,10 +103,18 @@ class LeadType extends AbstractType
             [
                 'by_reference' => false,
                 'attr'         => [
+                    'id'                   => 'lead_tags',
                     'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
                     'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
+                    'autocomplete'         => 'off',
+                    'multiple'             => 'multiple',
+                    'aria-label'           => $this->translator->trans('mautic.lead.tags.aria.label'),
+                    'aria-describedby'     => 'lead_tags_help',
+                    'aria-expanded'        => 'false',
+                    'role'                 => 'combobox',
+                    'aria-multiselectable' => 'true',
                 ],
             ]
         );

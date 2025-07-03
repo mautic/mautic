@@ -20,13 +20,11 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait EntityFieldsBuildFormTrait
@@ -206,7 +204,11 @@ trait EntityFieldsBuildFormTrait
                     ];
 
                     $emptyValue = '';
-                    if (in_array($type, [SelectType::class, MultiselectType::class]) && !empty($properties['list'])) {
+
+                    if (array_key_exists('use_nullable_yes_no_type', $options) && true === $options['use_nullable_yes_no_type'] && BooleanType::class === $type) {
+                        $type       = NullableYesNoButtonGroupType::class;
+                        $emptyValue = 'mautic.core.form.no_change';
+                    } elseif (in_array($type, [SelectType::class, MultiselectType::class]) && !empty($properties['list'])) {
                         $typeProperties['choices']      = array_flip(FormFieldHelper::parseList($properties['list']));
                         $cleaningRules[$field['alias']] = 'raw';
                     }
@@ -268,12 +270,6 @@ trait EntityFieldsBuildFormTrait
 
                         case MultiselectType::class:
                             $constraints[] = new Length(['max' => 65535]);
-                            break;
-
-                        case TextareaType::class:
-                            if (!empty($properties['allowHtml'])) {
-                                $cleaningRules[$field['alias']] = 'html';
-                            }
                             break;
                         case HtmlType::class:
                             $cleaningRules[$field['alias']] = 'html';

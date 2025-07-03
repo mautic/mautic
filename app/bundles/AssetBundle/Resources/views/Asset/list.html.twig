@@ -7,25 +7,55 @@
 {% block headerTitle %}
 	{% trans %}mautic.asset.assets{% endtrans %}
 {% endblock %}
-{% block actions %}
-	{{- include('@MauticCore/Helper/page_actions.html.twig', {
-         'templateButtons' : {
-                'new' : permissions['asset:assets:create'],
-         },
-            'routeBase' : 'asset',
-            'langVar'   : 'asset.asset',
-    }) -}}
-{% endblock %}
 
 {% block content %}
 	{% if isIndex %}
-		<div id="page-list-wrapper">
+		<div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
 
 			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-        'searchValue' : searchValue,
-        'action'      : currentRoute,
-        'searchHelp'  : 'mautic.asset.asset.help.searchcommands',
-    }) -}}
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'page_actions': {
+                    'templateButtons': {
+                        'new': permissions['asset:assets:create'],
+                    },
+                    'routeBase': 'asset',
+                    'langVar': 'asset.asset',
+                },
+                'bulk_actions': {
+                    'langVar': 'asset.asset',
+                    'routeBase': 'asset',
+                    'templateButtons': {
+                        'delete': permissions['asset:assets:deleteown'] or permissions['asset:assets:deleteother'],
+                    },
+                },
+                'quickFilters': [
+                    {
+                        'search': 'mautic.core.searchcommand.isuncategorized',
+                        'label': 'mautic.core.form.uncategorized',
+                        'tooltip': 'mautic.core.search.quickfilter.is_uncategorized',
+                        'icon': 'ri-folder-unknow-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.available',
+                        'tooltip': 'mautic.core.search.quickfilter.is_published',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.unavailable',
+                        'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+                        'icon': 'ri-close-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
+            }) -}}
 			<div class="page-list">
 				{{ block('listResults') }}
 			</div>
@@ -41,18 +71,10 @@
         <table class="table table-hover asset-list" id="assetTable">
             <thead>
             <tr>
-                {{- include(
-                    '@MauticCore/Helper/tableheader.html.twig',
-                    {
-                        'checkall'        : 'true',
-                        'target'          : '#assetTable',
-                        'langVar'         : 'asset.asset',
-                        'routeBase'       : 'asset',
-                        'templateButtons' : {
-                            'delete' : permissions['asset:assets:deleteown'] or permissions['asset:assets:deleteother'],
-                    },
-                    }
-                ) -}}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#assetTable',
+                }) }}
                 {{- include(
                     '@MauticCore/Helper/tableheader.html.twig',
                     {
@@ -150,7 +172,7 @@
                                             'data-target' : '#AssetPreviewModal',
                                             'href'        : path(
                                                 'mautic_asset_action',
-                                                {'objectAction' : 'preview', 'objectId' : item.getId()}
+                                                {'objectAction' : 'preview', 'objectId' : item.getId(), 'stream': 0}
                                             ),
                                         },
                                         'btnText'   : 'mautic.asset.asset.preview'|trans,
@@ -177,18 +199,17 @@
                                 {{ item.getTitle() }} ({{ item.getAlias() }})
                             </a>
                             <i class="{{ item.getIconClass() }}"></i>
+                            {{ customContent('asset.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
                         {% if description %}
-                            <div class="text-muted mt-4">
-                                <small>{{ description|purify }}</small>
-                            </div>
+                            {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                'description': description
+                            }) }}
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName, color = (category) ? category.getTitle() : 'mautic.core.form.uncategorized'|trans, (category) ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.getDownloadCount() }}</td>
                     <td class="visible-md visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
@@ -216,11 +237,35 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.asset.noresults.tip'}) -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.asset.noresults.tip'}) -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'cloud--assets',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+    
+            {{ include('@MauticCore/Components/content-block.html.twig', {
+                heading: 'mautic.asset.onboarding.heading',
+                subheading: 'mautic.asset.onboarding.subheading',
+                copy: 'mautic.asset.onboarding.copy',
+                childContainer: childContainer,
+            }) }}
+        </div>
+    {% endif %}
 {% endif %}
 
 {{- include('@MauticCore/Helper/modal.html.twig', {
         'id'     : 'AssetPreviewModal',
         'header' : false,
 }) -}}
+
+{{ include('@MauticCore/Helper/protip.html.twig', {
+    tip: random(['mautic.protip.assets.gating', 'mautic.protip.assets.naming', 'mautic.protip.assets.repurpose', 'mautic.protip.assets.track'])
+}) }}
 {% endblock %}

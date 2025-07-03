@@ -31,7 +31,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private ObjectMappingRepository $objectMappingRepository,
         private VariableExpresserHelperInterface $variableExpressor,
         private SyncIntegrationsHelper $syncIntegrationsHelper,
-        private EventDispatcherInterface $dispatcher
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

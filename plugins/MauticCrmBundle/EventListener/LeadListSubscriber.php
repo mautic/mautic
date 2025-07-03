@@ -18,7 +18,7 @@ class LeadListSubscriber implements EventSubscriberInterface
     public function __construct(
         private IntegrationHelper $helper,
         private ListModel $listModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -56,6 +56,10 @@ class LeadListSubscriber implements EventSubscriberInterface
                     }
                     $integrationChoices                      = FormFieldHelper::parseListForChoices($integrationChoices);
                     $choices[$integration->getDisplayName()] = $integrationChoices;
+                    $choices[$integration->getDisplayName()] = array_combine(
+                        array_column($integrationChoices, 'label'),
+                        array_column($integrationChoices, 'value')
+                    );
                 }
             }
         }

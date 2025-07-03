@@ -18,7 +18,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
     public function __construct(
         private VersionProviderInterface $versionProvider,
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private Connection $connection
+        private Connection $connection,
     ) {
     }
 

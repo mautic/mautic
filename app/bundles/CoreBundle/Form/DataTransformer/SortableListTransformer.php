@@ -16,7 +16,7 @@ class SortableListTransformer implements DataTransformerInterface
      */
     public function __construct(
         private $withLabels = true,
-        private $useKeyValuePairs = false
+        private $useKeyValuePairs = false,
     ) {
     }
 
@@ -54,6 +54,9 @@ class SortableListTransformer implements DataTransformerInterface
         if (null === $array || !isset($array['list'])) {
             return ['list' => []];
         }
+
+        // Reindex the array before processing
+        $array['list'] = array_values($array['list']);
 
         $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
 

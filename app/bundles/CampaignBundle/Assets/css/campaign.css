@@ -26,11 +26,13 @@
 }
 
 #CampaignEventPanel {
+    display: flex;
+    height: auto;
+    flex-direction: column;
     position: absolute;
     padding: 10px 20px;
-    background-color: #ededed;
-    border: 1px solid #cdcdcd;
-    border-radius: 4px;
+    background-color: var(--background);
+    border-radius: var(--border-radius-lg);
     z-index:1035;
 }
 
@@ -47,7 +49,6 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-top: 10px;
 }
 #CampaignPasteContainer::before {
     content: "";
@@ -105,6 +106,18 @@
     cursor:pointer;
     z-index: 1004;
     color: #47535f;
+}
+
+.jtk-label--success {
+    border-color: var(--support-success);
+    background-color: var(--support-success);
+    color: var(--text-inverse);
+}
+
+.jtk-label--error {
+    border-color: var(--support-error);
+    background-color: var(--support-error);
+    color: var(--text-inverse);
 }
 
 .jtk-connector {
@@ -165,10 +178,11 @@
 
 .campaign-source-title {
     position: absolute;
-    top: -20px;
+    top: -32px;
     color: var(--text-primary);
     left: 50%;
     transform: translateX(-50%);
+    white-space: nowrap;
 }
 
 .live .list-campaign-event:hover, .live .list-campaign-source:hover, .live .list-campaign-event:active {
@@ -182,24 +196,8 @@
     right: -10px;
 }
 
-.campaign-event-buttons .btn {
-    border-radius: 20px;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    font-weight: normal;
-    line-height: 20px;
-    transition: var(--transition-all-productive);
-}
-
 .campaign-event-buttons .btn:hover {
     transform: scale(1.2);
-}
-
-.campaign-event-buttons .btn-edit,
-.campaign-event-buttons .btn-clone {
-    background: var(--button-secondary);
-    color: var(--icon-on-color);
 }
 
 .campaign-event-icon {
@@ -242,9 +240,8 @@
     border-color: var(--support-info);
 }
 
-.list-campaign-decision, 
+.list-campaign-decision,
 .list-campaign-condition {
-    padding: var(--spacing-05);
     line-height: 1em;
 }
 
@@ -258,16 +255,16 @@
 .list-campaign-action { border-radius: clamp(4px, var(--border-radius-md), 8px); }
 
 .list-campaign-action .campaign-event-content {
-    background-color: var(--background-brand-primary);
-    border: solid 2px var(--background-brand-primary);
+    background-color: var(--background-brand);
+    border: solid 2px var(--background-brand);
     border-radius: clamp(4px, var(--border-radius-md), 8px);
     overflow: hidden;
     padding: 0 var(--spacing-05) 0 0;
     color: var(--text-on-color);
 }
-.list-campaign-action .campaign-event-icon { 
+.list-campaign-action .campaign-event-icon {
     background-color: var(--background);
-    color: var(--icon-interactive); 
+    color: var(--icon-interactive);
     aspect-ratio: 1/1;
     height: 60px;
     display: inline-flex;
@@ -283,10 +280,10 @@
     align-items: center;
     justify-content: center;
 }
-.list-campaign-condition .campaign-event-icon { 
+.list-campaign-condition .campaign-event-icon {
     color: var(--support-warning);
 }
-.list-campaign-decision .campaign-event-icon { 
+.list-campaign-decision .campaign-event-icon {
     color: var(--support-info);
 }
 
@@ -370,7 +367,8 @@
     position: relative;
 }
 
-.preview .jtk-endpoint {
+.preview .jtk-endpoint,
+.preview .jtk-label {
     cursor: default;
 }
 
@@ -413,12 +411,60 @@
   left: 0;
 }
 
-#leads-container .spinner {
+#leads-container .spinner,
+#decisions-container .spinner,
+#actions-container .spinner,
+#conditions-container .spinner,
+#campaign-graph-div .spinner
+{
     text-align: center;
     line-height: 250px;
     font-size: 24px;
 }
+
 .label.dnc-status-text {
     padding: 10px;
     font-size: 18px;
+=======
+
+.campaign-event-stat-divider {
+    padding: 0 4px;
+}
+
+:root {
+    --small-col-width: 120px;
+    --medium-col-width: 280px;
+}
+
+.campaign-changelog {
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 0 25px;
+}
+
+.campaign-changelog .table-responsive {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.campaign-changelog table {
+    width: 100%;
+}
+
+.campaign-changelog th:first-child {
+    width: var(--small-col-width);
+    white-space: nowrap;
+}
+
+.campaign-changelog th:nth-child(2),
+.campaign-changelog th:nth-child(3) {
+    width: var(--medium-col-width);
+}
+
+.campaign-changelog pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
 }

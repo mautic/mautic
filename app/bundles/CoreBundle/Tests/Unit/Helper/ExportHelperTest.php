@@ -8,13 +8,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends TestCase
@@ -59,15 +59,22 @@ class ExportHelperTest extends TestCase
      */
     private MockObject $filePathResolver;
 
+    /**
+     * @var ProcessSignalService|MockObject
+     */
+    private $processSignalService;
+
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
+        $this->processSignalService     = $this->createMock(ProcessSignalService::class);
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
-            $this->filePathResolver
+            $this->filePathResolver,
+            $this->processSignalService
         );
     }
 
@@ -88,9 +95,8 @@ class ExportHelperTest extends TestCase
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo-file.csv');
 
-        $this->assertInstanceOf(StreamedResponse::class, $stream);
         $this->assertSame(200, $stream->getStatusCode());
-        $this->assertSame(false, $stream->isEmpty());
+        $this->assertFalse($stream->isEmpty());
 
         ob_start();
         $stream->sendContent();
@@ -111,9 +117,8 @@ class ExportHelperTest extends TestCase
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo-file.xlsx');
 
-        $this->assertInstanceOf(StreamedResponse::class, $stream);
         $this->assertSame(200, $stream->getStatusCode());
-        $this->assertSame(false, $stream->isEmpty());
+        $this->assertFalse($stream->isEmpty());
 
         ob_start();
         $stream->sendContent();

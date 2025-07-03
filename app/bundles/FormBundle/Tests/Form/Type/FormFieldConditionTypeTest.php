@@ -51,14 +51,14 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->propertiesAccessor->expects($this->never())
             ->method('getChoices');
+        $matcher = $this->exactly(3);
 
-        $this->formBuilder->expects($this->exactly(3))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'values',
-                    ChoiceType::class,
-                    [
+        $this->formBuilder->expects($matcher)
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('values', $parameters[0]);
+                    $this->assertSame(ChoiceType::class, $parameters[1]);
+                    $this->assertSame([
                         'choices'  => [],
                         'multiple' => true,
                         'label'    => false,
@@ -67,23 +67,23 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                             'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
                         ],
                         'required' => false,
-                    ],
-                ],
-                [
-                    'any',
-                    YesNoButtonGroupType::class,
-                    [
+                    ], $parameters[2]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('any', $parameters[0]);
+                    $this->assertSame(YesNoButtonGroupType::class, $parameters[1]);
+                    $this->assertSame([
                         'label' => 'mautic.form.field.form.condition.any_value',
                         'attr'  => [
                             'data-show-on' => '{"formfield_conditions_expr": "in"}',
                         ],
                         'data' => false,
-                    ],
-                ],
-                [
-                    'expr',
-                    ChoiceType::class,
-                    [
+                    ], $parameters[2]);
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('expr', $parameters[0]);
+                    $this->assertSame(ChoiceType::class, $parameters[1]);
+                    $this->assertSame([
                         'choices'  => [
                             'mautic.core.operator.in'    => 'in',
                             'mautic.core.operator.notin' => 'notIn',
@@ -94,9 +94,11 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                             'class' => 'form-control',
                         ],
                         'required' => false,
-                    ],
-                ]
-            );
+                    ], $parameters[2]);
+                }
+
+                return $this->formBuilder;
+            });
 
         $this->form->buildForm($this->formBuilder, $options);
     }
@@ -122,23 +124,28 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
             ->method('getChoices')
             ->with(['some_choice_here' => 'Some choice here'])
             ->willReturn(['some_choice_here' => 'Some choice here']);
+        $matcher = $this->any();
 
-        $this->formBuilder->method('add')
-            ->withConsecutive(
-                [
-                    'values',
-                    ChoiceType::class,
-                    [
-                        'choices'  => ['some_choice_here' => 'Some choice here'],
-                        'multiple' => true,
-                        'label'    => false,
-                        'attr'     => [
-                            'class'        => 'form-control',
-                            'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
-                        ],
-                        'required' => false,
-                    ],
-                ]
+        $this->formBuilder->expects($matcher)->method('add')
+            ->willReturnCallback(
+                function (...$parameters) use ($matcher) {
+                    if (1 === $matcher->numberOfInvocations()) {
+                        $this->assertSame('values', $parameters[0]);
+                        $this->assertSame(ChoiceType::class, $parameters[1]);
+                        $this->assertSame([
+                            'choices'  => ['some_choice_here' => 'Some choice here'],
+                            'multiple' => true,
+                            'label'    => false,
+                            'attr'     => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
+                            ],
+                            'required' => false,
+                        ], $parameters[2]);
+                    }
+
+                    return $this->formBuilder;
+                }
             );
 
         $this->form->buildForm($this->formBuilder, $options);

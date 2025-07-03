@@ -8,9 +8,11 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
@@ -26,29 +28,31 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $choices = [];
 
     /**
-     * @param ModelFactory<object> $modelFactory
-     * @param array                $options
+     * @param ModelFactory<object>               $modelFactory
+     * @param Options<array<mixed>>|array<mixed> $options
      */
     public function __construct(
         protected ModelFactory $modelFactory,
         protected TranslatorInterface $translator,
         protected Connection $connection,
-        protected $options = []
+        protected $options = [],
     ) {
+        if (is_array($options)) {
+            $options = (new OptionsResolver())->setDefaults($options);
+        }
+
+        $this->options = $options;
     }
 
     /**
-     * @param Options|array $options
+     * @param Options<array<mixed>>|array<mixed> $options
      */
     public function setOptions($options): void
     {
         $this->options = $options;
     }
 
-    /**
-     * @return ArrayChoiceList
-     */
-    public function loadChoiceList($value = null)
+    public function loadChoiceList($value = null): ChoiceListInterface
     {
         return new ArrayChoiceList($this->getChoices(null, true));
     }
@@ -57,20 +61,16 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      * Validate submitted values.
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
-     *
-     * @return array
      */
-    public function loadChoicesForValues(array $values, $value = null)
+    public function loadChoicesForValues(array $values, $value = null): array
     {
         return $values;
     }
 
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
-     *
-     * @return array
      */
-    public function loadValuesForChoices(array $choices, $value = null)
+    public function loadValuesForChoices(array $choices, $value = null): array
     {
         return $choices;
     }
@@ -212,8 +212,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         // Default to 100 records if no data is populated
-        if (empty($data) && isset($args['limit'])) {
-            $args['limit'] = 100;
+        if (!isset($args['limit'])) {
+            $args['limit'] = empty($data) ? 100 : count($data);
+        } elseif (0 !== $args['limit']) {
+            $args['limit'] = max($args['limit'], count($data));
         }
 
         // Check if the method exists in the model
@@ -226,18 +228,9 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = null;
-
-            $limit = 100;
-            if ($data) {
-                $composite = CompositeExpression::and($expr->in($alias.'.id', $data));
-
-                if (count($data) > $limit) {
-                    $limit = count($data);
-                }
-            }
-
-            $choices = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
+            $composite = $data ? CompositeExpression::and($expr->in($alias.'.id', $data)) : null;
+            $limit     = max(100, count($data));
+            $choices   = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
         }
 
         return $choices;

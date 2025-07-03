@@ -7,9 +7,9 @@ namespace Mautic\LeadBundle\Tests\Segment;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
+use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
-use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
@@ -21,7 +21,7 @@ class ContactSegmentFilterTest extends TestCase
     private ContactSegmentFilterCrate $contactSegmentFilterCrate;
 
     /**
-     * @var BaseDecorator|MockObject
+     * @var FilterDecoratorInterface&MockObject
      */
     private MockObject $filterDecorator;
 
@@ -143,14 +143,21 @@ class ContactSegmentFilterTest extends TestCase
 
     public function testIsContactSegmentReference(): void
     {
-        $filter = $this->createContactSegmentFilter();
+        $filter  = $this->createContactSegmentFilter();
+        $matcher = $this->exactly(2);
 
-        $this->filterDecorator->method('getField')
-            ->withConsecutive(
-                [$this->contactSegmentFilterCrate],
-                [$this->contactSegmentFilterCrate]
-            )
-            ->willReturnOnConsecutiveCalls('leadlist', 'something');
+        $this->filterDecorator->expects($matcher)->method('getField')->willReturnCallback(function (...$parameters) use ($matcher) {
+            if (1 === $matcher->numberOfInvocations()) {
+                $this->assertSame($this->contactSegmentFilterCrate, $parameters[0]);
+
+                return 'leadlist';
+            }
+            if (2 === $matcher->numberOfInvocations()) {
+                $this->assertSame($this->contactSegmentFilterCrate, $parameters[0]);
+
+                return 'something';
+            }
+        });
 
         self::assertTrue($filter->isContactSegmentReference());
         self::assertFalse($filter->isContactSegmentReference());
@@ -179,7 +186,6 @@ class ContactSegmentFilterTest extends TestCase
 
         $parts = $filter->getIntegrationCampaignParts();
 
-        self::assertInstanceOf(IntegrationCampaignParts::class, $parts);
         self::assertEquals($value, $parts->getCampaignId());
     }
 
@@ -204,9 +210,7 @@ class ContactSegmentFilterTest extends TestCase
 
         self::assertNull($filter->getRelationJoinTable());
 
-        $this->filterDecorator = $this->getMockBuilder(FilterDecoratorInterface::class)
-            ->addMethods(['getRelationJoinTable'])
-            ->getMockForAbstractClass();
+        $this->filterDecorator = $this->createMock(CompanyDecorator::class);
         $this->filterDecorator->expects(self::once())
             ->method('getRelationJoinTable')
             ->willReturn($table);
@@ -318,9 +322,7 @@ class ContactSegmentFilterTest extends TestCase
 
         self::assertNull($filter->getRelationJoinTableField());
 
-        $this->filterDecorator = $this->getMockBuilder(FilterDecoratorInterface::class)
-            ->addMethods(['getRelationJoinTableField'])
-            ->getMockForAbstractClass();
+        $this->filterDecorator = $this->createMock(CompanyDecorator::class);
         $this->filterDecorator->expects(self::once())
             ->method('getRelationJoinTableField')
             ->willReturn($field);
@@ -405,9 +407,7 @@ class ContactSegmentFilterTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider dataDoesColumnSupportEmptyValue
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataDoesColumnSupportEmptyValue')]
     public function testDoesColumnSupportEmptyValue(string $type, bool $doesColumnSupportEmptyValue): void
     {
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => $type]);
@@ -437,7 +437,7 @@ class ContactSegmentFilterTest extends TestCase
     /**
      * @return iterable<array<bool|string>>
      */
-    public function dataDoesColumnSupportEmptyValue(): iterable
+    public static function dataDoesColumnSupportEmptyValue(): iterable
     {
         yield ['boolean', true];
         yield ['date', false];

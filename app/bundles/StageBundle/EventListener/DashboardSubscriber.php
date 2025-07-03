@@ -35,7 +35,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected StageModel $stageModel
+        protected StageModel $stageModel,
     ) {
     }
 

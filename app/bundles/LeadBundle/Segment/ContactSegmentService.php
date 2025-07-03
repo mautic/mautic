@@ -14,7 +14,7 @@ class ContactSegmentService
     public function __construct(
         private ContactSegmentFilterFactory $contactSegmentFilterFactory,
         private ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
-        private \Psr\Log\LoggerInterface $logger
+        private \Psr\Log\LoggerInterface $logger,
     ) {
     }
 

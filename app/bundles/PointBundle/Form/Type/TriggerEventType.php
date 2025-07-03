@@ -16,6 +16,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TriggerEventType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface<array<mixed>|null> $builder
+     * @param array<string, mixed>                    $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks = ['description' => 'html'];
@@ -103,7 +107,7 @@ class TriggerEventType extends AbstractType
         $resolver->setRequired(['settings']);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'pointtriggerevent';
     }

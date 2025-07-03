@@ -3,37 +3,62 @@
 {% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{ 'mautic.sms.smses'|trans }}{% endblock %}
-{% block actions %}
-{{- include('@MauticCore/Helper/page_actions.html.twig',
-    {
-        'templateButtons' : {
-            'new' : permissions['sms:smses:create'],
-        },
-        'routeBase' : 'sms',
-    }
-) -}}
-{% endblock %}
 {% block content %}
     {% if isIndex %}
-    <div id="page-list-wrapper">
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
-            'searchValue' : searchValue,
-            'searchHelp'  : 'mautic.sms.help.searchcommands',
-            'searchId'    : 'sms-search',
-            'action'      : currentRoute,
+            'searchValue': searchValue,
+            'searchId': 'sms-search',
+            'action': currentRoute,
+            'page_actions': {
+                'templateButtons': {
+                    'new': permissions['sms:smses:create']
+                },
+                'routeBase': 'sms'
+            },
+            'quickFilters': [
+                {
+                    'search': 'mautic.core.searchcommand.ispublished',
+                    'label': 'mautic.core.form.available',
+                    'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                    'icon': 'ri-check-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isunpublished',
+                    'label': 'mautic.core.form.unavailable',
+                    'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                    'icon': 'ri-close-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.isuncategorized',
+                    'label': 'mautic.core.form.uncategorized',
+                    'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                    'icon': 'ri-folder-unknow-line'
+                },
+                {
+                    'search': 'mautic.core.searchcommand.ismine',
+                    'label': 'mautic.core.searchcommand.ismine.label',
+                    'tooltip': 'mautic.core.searchcommand.ismine.description',
+                    'icon': 'ri-user-line'
+                }
+            ]
         }) -}}
 
         <div class="page-list">
             {{ block('listResults') }}
         </div>
     </div>
+
+    {{ include('@MauticCore/Helper/protip.html.twig', {
+        tip: random(['mautic.protip.sms.concise', 'mautic.protip.sms.timesensitive', 'mautic.protip.sms.compliance'])
+    }) }}
     {% else %}
 		{{ block('listResults') }}
 	{% endif %}
 {% endblock %}
 
 {% block listResults %}
-{% if items|length %}
+{% if items|length > 0 %}
     <div class="table-responsive">
         <table class="table table-hover sms-list">
             <thead>
@@ -144,10 +169,7 @@
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set category = item.getCategory() %}
-                        {% set catName  = category is not empty ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
-                        {% set color    = category is not empty ? '#' ~ category.getColor() : '' %}
-                        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                         {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item }) -}}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
@@ -168,6 +190,25 @@
 {% elseif not configured %}
     {{- include('@MauticCore/Helper/noresults.html.twig', { 'header' : 'mautic.sms.disabled', 'message' : 'mautic.sms.enable.in.configuration' }) -}}
 {% else %}
-    {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'mautic.sms.create.in.campaign.builder'}) -}}
+    {% if searchValue is not empty %}
+        {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.category.noresults.tip'}) -}}
+    {% else %}
+        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+            {% set childContainer %}
+                <div class="mt-32 mb-md">
+                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        'pictogram': 'mobile--chat',
+                        'size': '80'
+                    } %}
+                </div>
+            {% endset %}
+            {% include '@MauticCore/Components/content-block.html.twig' with {
+                heading: 'mautic.sms.contentblock.heading',
+                subheading: 'mautic.sms.contentblock.subheading',
+                copy: 'mautic.sms.contentblock.copy',
+                childContainer: childContainer
+            } %}
+        </div>
+    {% endif %}
 {% endif %}
 {% endblock %}

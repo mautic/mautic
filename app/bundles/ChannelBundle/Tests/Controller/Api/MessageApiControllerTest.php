@@ -31,16 +31,15 @@ JSON;
 
         $this->client->request('POST', '/api/messages/new', $payloadArray);
         $responseJson = $this->client->getResponse()->getContent();
-        Assert::assertSame(201, $this->client->getResponse()->getStatusCode(), $responseJson);
+        self::assertResponseStatusCodeSame(201, $responseJson);
         $this->assertMessagePayload($payloadArray, json_decode($responseJson, true)['message'], $responseJson);
     }
 
     /**
-     * @dataProvider patchProvider
-     *
      * @param mixed[] $payload
      * @param mixed[] $expectedResponsePayload
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('patchProvider')]
     public function testEditMessageWithPatch(array $payload, array $expectedResponsePayload): void
     {
         $channel = new Channel();
@@ -61,7 +60,7 @@ JSON;
         $patchPayload = ['id' => $message->getId()] + $payload;
         $this->client->request('PATCH', "/api/messages/{$message->getId()}/edit", $patchPayload);
         $responseJson = $this->client->getResponse()->getContent();
-        Assert::assertSame(200, $this->client->getResponse()->getStatusCode(), $responseJson);
+        self::assertResponseIsSuccessful($responseJson);
         $this->assertMessagePayload(
             ['id' => $message->getId()] + $expectedResponsePayload,
             json_decode($responseJson, true)['message'],
@@ -154,7 +153,7 @@ JSON;
         ];
         $this->client->request('PATCH', '/api/messages/batch/edit', $patchPayload);
         $responseJson = $this->client->getResponse()->getContent();
-        Assert::assertSame(200, $this->client->getResponse()->getStatusCode(), $responseJson);
+        self::assertResponseIsSuccessful($responseJson);
         $responseArray = json_decode($responseJson, true);
         $this->assertMessagePayload(
             [
