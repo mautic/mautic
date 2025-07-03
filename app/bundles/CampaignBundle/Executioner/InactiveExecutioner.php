@@ -338,6 +338,6 @@ class InactiveExecutioner implements ExecutionerInterface
         );
 
         $eventCollection = new ArrayCollection([$redirectEvent]);
-        $this->executioner->executeEventsForContacts($eventCollection, $contacts, $this->counter, true);
+        $this->executioner->executeEventsForContacts($eventCollection, $contacts, $this->counter);
     }
 }
