@@ -176,4 +176,23 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertNotEmpty($response['dynamicContent']);
         Assert::assertSame($dwcName, $response['dynamicContent']['name']);
     }
+
+    public function testHtmlContentIsNotStrippedForHtmlType(): void
+    {
+        $payload = [
+            'name'            => 'API Test Dynamic Content',
+            'isPublished'     => true,
+            'isCampaignBased' => 1,
+            'type'            => 'html',
+            'language'        => 'en',
+            'content'         => '<p>Test content</p>',
+        ];
+        $this->client->request('POST', '/api/dynamiccontents/new', $payload);
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertResponseIsSuccessful();
+        $dynamicContent = $response['dynamicContent'] ?? null;
+        $this->assertNotNull($dynamicContent);
+        $this->assertSame('<p>Test content</p>', $dynamicContent['content']);
+        $this->assertSame('html', $dynamicContent['type']);
+    }
 }

@@ -48,6 +48,11 @@ class DynamicContentApiController extends CommonApiController
         }
 
         $entity->setSlotName($parameters['slotName'] ?? null);
+
+        if (isset($parameters['type'])) {
+            $entity->setType($parameters['type']);
+        }
+
         $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
 
         return $this->processForm($request, $entity, $parameters, 'POST');

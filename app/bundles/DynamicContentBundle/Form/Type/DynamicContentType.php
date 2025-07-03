@@ -17,6 +17,7 @@ use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
+use Mautic\LeadBundle\Form\Type\HtmlType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -400,8 +401,9 @@ class DynamicContentType extends AbstractType
     {
         $enableEditor = TypeList::HTML === $type;
         $editorClass  = 'editor editor-advanced editor-builder-tokens';
+        $typeClass    = $enableEditor ? HtmlType::class : TextareaType::class;
 
-        $form->add('content', TextareaType::class, [
+        $form->add('content', $typeClass, [
             'label'      => 'mautic.dynamicContent.form.content',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
