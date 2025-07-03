@@ -235,34 +235,52 @@ class BuilderSubscriberTest extends TestCase
         $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
 
         $this->coreParametersHelper->method('get')
-            ->withConsecutive(['secret_key'], ['unsubscribe_text'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
-            ->willReturnOnConsecutiveCalls('secret', $unsubscribeTokenizedText, 'Just a text', 'Signature', 'jan.kozak@acquia.com');
+            ->willReturnCallback(function (string $key) use (
+                $unsubscribeTokenizedText
+            ) {
+                return match ($key) {
+                    'secret_key'             => 'secret',
+                    'unsubscribe_text'       => $unsubscribeTokenizedText,
+                    'webview_text'           => 'Just a text',
+                    'default_signature_text' => 'Signature',
+                    'mailer_from_name'       => 'jan.kozak@acquia.com',
+                    default                  => throw new \InvalidArgumentException("Unexpected core parameter: $key"),
+                };
+            });
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
-            ->withConsecutive(
-                [
-                    'mautic_email_unsubscribe',
-                    ['idHash' => 'hash', 'urlEmail' => 'lukas.sykora@acquia.com', 'secretHash' => $emailHash],
-                ],
-                [
-                    'mautic_email_webview',
-                    ['idHash' => 'hash'],
-                ],
-                [
-                    'mautic_email_preview',
-                    ['objectId' => 111],
-                ]
-            )->willReturnOnConsecutiveCalls(
-                '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
-                '/email/webview/'.$emailHash,
-                '/email/preview/111'
-            );
+            ->willReturnCallback(function (string $route, array $params) use ($emailHash) {
+                if (
+                    'mautic_email_unsubscribe' === $route
+                    && $params === [
+                        'idHash'    => 'hash',
+                        'urlEmail'  => 'lukas.sykora@acquia.com',
+                        'secretHash'=> $emailHash,
+                    ]
+                ) {
+                    return '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash;
+                }
+
+                if (
+                    'mautic_email_webview' === $route
+                    && $params === ['idHash' => 'hash']
+                ) {
+                    return '/email/webview/'.$emailHash;
+                }
+
+                if (
+                    'mautic_email_preview' === $route
+                    && $params === ['objectId' => 111]
+                ) {
+                    return '/email/preview/111';
+                }
+
+                throw new \LogicException("Unexpected call to buildUrl with route '$route' and params ".json_encode($params));
+            });
 
         $this->translator->expects($this->never())
-            ->method('trans')
-            ->withConsecutive([$unsubscribeTokenizedText], [])
-            ->willReturn($unsubscribeTokenizedText);
+            ->method('trans');
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(

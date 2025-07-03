@@ -572,7 +572,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $requestStack = new RequestStack();
         $routerMock   = $this->createMock(Router::class);
 
-
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([
@@ -592,7 +591,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->assetModel,
                 $this->trackableModel,
                 $this->redirectModel,
-                $this->emailStatModel
+                $this->emailStatModel,
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();

@@ -10,6 +10,7 @@ use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -46,10 +47,21 @@ final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $helper->expects($this->exactly(2))
             ->method('addCustomHeader')
-            ->withConsecutive(
-                ['List-Unsubscribe', '<https://example.com/email/unsubscribe/65cf64d8cb367903848157>, <mailto:unsubscribe@example.com>'],
-                ['List-Unsubscribe-Post', 'List-Unsubscribe=One-Click']
-            );
+            ->willReturnCallback(function (string $name, string $value) {
+                static $callCount = 0;
+                ++$callCount;
+
+                if (1 === $callCount) {
+                    Assert::assertSame('List-Unsubscribe', $name);
+                    Assert::assertSame(
+                        '<https://example.com/email/unsubscribe/65cf64d8cb367903848157>, <mailto:unsubscribe@example.com>',
+                        $value
+                    );
+                } elseif (2 === $callCount) {
+                    Assert::assertSame('List-Unsubscribe-Post', $name);
+                    Assert::assertSame('List-Unsubscribe=One-Click', $value);
+                }
+            });
 
         $event = new EmailSendEvent($helper);
         $this->subscriber->onEmailSend($event);

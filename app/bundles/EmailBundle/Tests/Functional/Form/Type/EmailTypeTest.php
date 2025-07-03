@@ -172,7 +172,7 @@ class EmailTypeTest extends MauticMysqlTestCase
     private function addContactToDnc(array $contactIds): void
     {
         /** @var DoNotContactModel $dncModel */
-        $dncModel = self::$container->get('mautic.lead.model.dnc');
+        $dncModel = self::getContainer()->get('mautic.lead.model.dnc');
 
         foreach ($contactIds as $contactId) {
             $dncModel->addDncForContact($contactId, 'email', DoNotContact::MANUAL, 'Some comment');

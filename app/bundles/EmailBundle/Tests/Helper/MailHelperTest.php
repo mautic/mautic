@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -274,7 +273,7 @@ class MailHelperTest extends TestCase
 
     public function testQueuedEmailFromOverride(): void
     {
-        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+        $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
 
         $singleMailHelper = new MailHelper(
             new Mailer(new BcInterfaceTokenTransport()), // MailerInterface
@@ -1145,17 +1144,32 @@ class MailHelperTest extends TestCase
 
         $emailSecret      = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $unsubscribeUrl   = 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret;
-        $trackingPixelUrl = '/tracking.gif';
 
-        $this->router->method('generate')
-            ->withConsecutive([
-                'mautic_email_unsubscribe',
-                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            ], [
-                'mautic_email_tracker', ['idHash' => 'hash'], UrlGeneratorInterface::ABSOLUTE_URL,
-            ])
-            ->willReturnOnConsecutiveCalls($unsubscribeUrl, $trackingPixelUrl);
+        $this->router->expects($this->exactly(2))
+            ->method('generate')
+            ->willReturnCallback(function ($route, $parameters, $referenceType) use (
+                $unsubscribeUrl,
+                $emailSecret
+            ) {
+                $trackingPixelUrl = '/tracking.gif';
+                if (
+                    'mautic_email_unsubscribe' === $route
+                    && $parameters === ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret]
+                    && UrlGeneratorInterface::ABSOLUTE_URL === $referenceType
+                ) {
+                    return $unsubscribeUrl;
+                }
+
+                if (
+                    'mautic_email_tracker' === $route
+                    && $parameters === ['idHash' => 'hash']
+                    && UrlGeneratorInterface::ABSOLUTE_URL === $referenceType
+                ) {
+                    return $trackingPixelUrl;
+                }
+
+                throw new \UnexpectedValueException("Unexpected generate() call with route: $route");
+            });
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
@@ -1216,20 +1230,31 @@ class MailHelperTest extends TestCase
         $this->coreParametersHelper->method('get')->willReturnMap($params);
 
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
-        $this->router->method('generate')
-            ->withConsecutive(
-                [
-                    'mautic_email_unsubscribe',
-                    ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
-                    UrlGeneratorInterface::ABSOLUTE_URL,
-                ],
-                [
-                    'mautic_email_tracker',
-                    ['idHash' => 'hash'],
-                    UrlGeneratorInterface::ABSOLUTE_URL,
-                ]
-            )
-            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+        $this->router->expects($this->exactly(2))
+            ->method('generate')
+            ->willReturnCallback(function (string $route, array $params, int $type) use ($emailSecret) {
+                if (
+                    'mautic_email_unsubscribe' === $route
+                    && $params === [
+                        'idHash'     => 'hash',
+                        'urlEmail'   => 'someemail@email.test',
+                        'secretHash' => $emailSecret,
+                    ]
+                    && UrlGeneratorInterface::ABSOLUTE_URL === $type
+                ) {
+                    return 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret;
+                }
+
+                if (
+                    'mautic_email_tracker' === $route
+                    && ['idHash' => 'hash'] === $params
+                    && UrlGeneratorInterface::ABSOLUTE_URL === $type
+                ) {
+                    return 'http://www.somedomain.cz/email/track.gif';
+                }
+
+                throw new \LogicException('Unexpected arguments passed to router->generate()');
+            });
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
@@ -1430,18 +1455,15 @@ class MailHelperTest extends TestCase
 
     public function testHeadersAreTokenized(): void
     {
-        $this->coreParametersHelper->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['mailer_custom_headers', [], ['X-Mautic-Test-1' => '{tracking_pixel}']],
-                        ['mailer_reply_to_email', false, '{tracking_pixel}'],
-                        ['mailer_from_email', null, 'nobody@nowhere.com'],
-                        ['mailer_from_name', null, 'No Body'],
-                        ['disable_unsubscribe_link_header', null, false],
-                    ]
-                )
-            );
+        $this->coreParametersHelper->method('get')->willReturnMap(
+            [
+                ['mailer_custom_headers', [], ['X-Mautic-Test-1' => '{tracking_pixel}']],
+                ['mailer_reply_to_email', false, '{tracking_pixel}'],
+                ['mailer_from_email', null, 'nobody@nowhere.com'],
+                ['mailer_from_name', null, 'No Body'],
+                ['disable_unsubscribe_link_header', null, false],
+            ]
+        );
 
         $smtpMailHelper = new MailHelper(new Mailer(new SmtpTransport()),
             $this->fromEmailHelper,
@@ -1852,9 +1874,6 @@ class MailHelperTest extends TestCase
                 ]
             );
 
-        $unsubscribeUrl   = '/unsubscribe';
-        $trackingPixelUrl = '/tracking.gif';
-
         $mailer = new MailHelper(
             new Mailer(new SmtpTransport()),
             $this->fromEmailHelper,
@@ -1880,12 +1899,9 @@ class MailHelperTest extends TestCase
         $initialHtml = 'Text <a href="https://mautic.com">Mautic</a> <img src="cid:abc" /> <img src="{ token }" /> <img src="https://mautic.com/app/assets/images/flags/{ country }.png"/> <img src="https://mautic.com/fake.jpg">';
         $trackedHtml = $initialHtml.'{unsubscribe_url}<img height="1" width="1" src="{tracking_pixel}" alt="" />';
 
-        $this->dispatcher->method('dispatch')
-            ->withConsecutive(
-                [new EmailSendEvent($mailer), EmailEvents::EMAIL_PRE_SEND],
-                [new EmailSendEvent($mailer), EmailEvents::EMAIL_ON_SEND]
-            )
-            ->willReturnCallback(function (EmailSendEvent $event, string $eventName): EmailSendEvent {
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function ($event, $eventName) {
                 if (EmailEvents::EMAIL_ON_SEND === $eventName) {
                     $event->addToken('{ token }', 'https://mautic.com/app/assets/images/flags/Venezuela.png');
                     $event->addToken('{ country }', 'Venezuela');
@@ -1896,14 +1912,29 @@ class MailHelperTest extends TestCase
 
         $this->router->expects(self::exactly(5))
             ->method('generate')
-            ->withConsecutive(
-                ['mautic_email_unsubscribe', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL],
-                ['mautic_email_tracker', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL],
-                ['mautic_email_tracker', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL],
-                ['mautic_email_tracker', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL],
-                ['mautic_email_tracker', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL]
-            )
-            ->willReturnOnConsecutiveCalls($unsubscribeUrl, $trackingPixelUrl, $trackingPixelUrl);
+            ->willReturnCallback(function (string $route, array $params, int $refType) use (
+                $mailer,
+            ) {
+                $trackingPixelUrl = '/tracking.gif';
+                $unsubscribeUrl   = '/unsubscribe';
+                if (
+                    'mautic_email_unsubscribe' === $route
+                    && ['idHash' => $mailer->getIdHash()] === $params
+                    && UrlGeneratorInterface::ABSOLUTE_URL === $refType
+                ) {
+                    return $unsubscribeUrl;
+                }
+
+                if (
+                    'mautic_email_tracker' === $route
+                    && ['idHash' => $mailer->getIdHash()] === $params
+                    && UrlGeneratorInterface::ABSOLUTE_URL === $refType
+                ) {
+                    return $trackingPixelUrl;
+                }
+
+                throw new \RuntimeException("Unexpected router->generate() call with route: {$route}");
+            });
 
         $email = new Email();
         $email->setSubject('Test');
