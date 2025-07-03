@@ -158,7 +158,7 @@
                                     'model' : 'sms',
                                 }
                             ) -}}
-                            <a href="{{ path('mautic_sms_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}">
+                            <a href="{{ path('mautic_sms_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}" data-toggle="ajax">
                                 {{ item.getName() }}
                                 {% if 'list' == type %}
                                     <span data-toggle="tooltip" title="{{ 'mautic.sms.icon_tooltip.list_sms'|trans }}">
