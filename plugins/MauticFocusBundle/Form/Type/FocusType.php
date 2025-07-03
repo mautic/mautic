@@ -22,6 +22,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends AbstractType<Focus>
@@ -30,6 +32,8 @@ class FocusType extends AbstractType
 {
     public function __construct(
         private CorePermissions $security,
+        private CoreParametersHelper $coreParametersHelper,
+        private RouterInterface $router,
     ) {
     }
 
@@ -123,6 +127,10 @@ class FocusType extends AbstractType
             ]
         );
 
+        $websiteValue = $options['data']->getWebsite();
+        if (empty($websiteValue)) {
+            $websiteValue = $this->coreParametersHelper->get('site_url') . $this->router->generate('mautic_focus_index', ['page' => 1]);
+        }
         $builder->add(
             'website',
             UrlType::class,
@@ -134,6 +142,7 @@ class FocusType extends AbstractType
                     'tooltip' => 'mautic.focus.form.website.tooltip',
                 ],
                 'required' => false,
+                'data'     => $websiteValue,
             ]
         );
 
