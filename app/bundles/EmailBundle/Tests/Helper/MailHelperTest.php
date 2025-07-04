@@ -1910,13 +1910,15 @@ class MailHelperTest extends TestCase
                 return $event;
             });
 
+        $trackingPixelUrl = '/tracking.gif';
+
         $this->router->expects(self::exactly(5))
             ->method('generate')
             ->willReturnCallback(function (string $route, array $params, int $refType) use (
-                $mailer,
+                $mailer, $trackingPixelUrl
             ) {
-                $trackingPixelUrl = '/tracking.gif';
-                $unsubscribeUrl   = '/unsubscribe';
+                $unsubscribeUrl = '/unsubscribe';
+
                 if (
                     'mautic_email_unsubscribe' === $route
                     && ['idHash' => $mailer->getIdHash()] === $params
@@ -1952,7 +1954,7 @@ class MailHelperTest extends TestCase
         $mailer->send(true);
 
         Assert::assertSame(
-            'Text <a href="https://mautic.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic.com/fake.jpg">{unsubscribe_url}<img height="1" width="1" src="" alt="" />',
+            'Text <a href="https://mautic.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic.com/fake.jpg">{unsubscribe_url}<img height="1" width="1" src="'.$trackingPixelUrl.'" alt="" />',
             $mailer->message->getHtmlBody()
         );
         Assert::assertSame($trackedHtml, $mailer->getBody());
