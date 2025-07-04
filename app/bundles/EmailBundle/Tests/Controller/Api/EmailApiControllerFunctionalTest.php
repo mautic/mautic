@@ -312,6 +312,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user       = $this->getUser($this->clientServer['PHP_AUTH_USER']);
         $permission = ['email:emails' => ['create']];
         $this->setPermission($user->getRole(), $permission);
+
+        $this->client->setServerParameter('PHP_AUTH_USER', $this->clientServer['PHP_AUTH_USER']);
+        $this->client->setServerParameter('PHP_AUTH_PW', $this->clientServer['PHP_AUTH_PW']);
+
         $payload = [
             'name'       => 'API email',
             'subject'    => 'Email created via API test',
