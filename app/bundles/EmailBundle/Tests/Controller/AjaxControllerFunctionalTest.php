@@ -16,6 +16,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Email as EmailMime;
@@ -233,6 +234,75 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(200, $clientResponse->getStatusCode());
         $this->assertNotEmpty($response);
         $this->assertEquals($emailName, $response[0]['items'][$email->getId()]);
+    }
+
+    #[TestDox('GetEmailSendToDncStatusAction: Returns "Yes" and true when sendToDnc is true')]
+    public function testReturnsYesAndTrueWhenSendToDncIsTrue(): void
+    {
+        $email = (new Email())
+            ->setName('Email in DNC')
+            ->setSubject('Subject')
+            ->setEmailType('template')
+            ->setSendToDnc(true);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'email:getEmailSendToDncStatus',
+            'id'     => $email->getId(),
+        ]);
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertTrue($response['sendToDncStatus']);
+        self::assertSame('Yes', $response['sendToDncText']);
+    }
+
+    #[TestDox('GetEmailSendToDncStatusAction: Returns "No" and false when sendToDnc is false')]
+    public function testReturnsNoAndFalseWhenSendToDncIsFalse(): void
+    {
+        $email = (new Email())
+            ->setName('Email not in DNC')
+            ->setSubject('Subject')
+            ->setEmailType('template')
+            ->setSendToDnc(false);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'email:getEmailSendToDncStatus',
+            'id'     => $email->getId(),
+        ]);
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertFalse($response['sendToDncStatus']);
+        self::assertSame('No', $response['sendToDncText']);
+    }
+
+    #[TestDox('GetEmailSendToDncStatusAction: Returns an empty array when the ID is invalid')]
+    public function testReturnsEmptyArrayForInvalidEmailId(): void
+    {
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'email:getEmailSendToDncStatus',
+            'id'     => 999999,
+        ]);
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        self::assertSame([], $response);
+    }
+
+    #[TestDox('GetEmailSendToDncStatusAction: Returns an empty array when the ID is missing')]
+    public function testReturnsEmptyArrayWhenEmailIdIsMissing(): void
+    {
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'email:getEmailSendToDncStatus',
+        ]);
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        self::assertSame([], $response);
     }
 
     private function createContact(string $email): Lead
