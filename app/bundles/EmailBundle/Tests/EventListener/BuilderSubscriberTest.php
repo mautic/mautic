@@ -244,6 +244,7 @@ class BuilderSubscriberTest extends TestCase
                     'webview_text'           => 'Just a text',
                     'default_signature_text' => 'Signature',
                     'mailer_from_name'       => 'jan.kozak@acquia.com',
+                    'brand_name'             => 'Mautic',
                     default                  => throw new \InvalidArgumentException("Unexpected core parameter: $key"),
                 };
             });
@@ -251,32 +252,50 @@ class BuilderSubscriberTest extends TestCase
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
             ->willReturnCallback(function (string $route, array $params) use ($emailHash) {
-                if (
-                    'mautic_email_unsubscribe' === $route
-                    && $params === [
-                        'idHash'    => 'hash',
-                        'urlEmail'  => 'lukas.sykora@acquia.com',
-                        'secretHash'=> $emailHash,
-                    ]
-                ) {
-                    return '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash;
+                $idHash   = 'hash';
+                $email    = 'lukas.sykora@acquia.com';
+                $objectId = 111;
+
+                $expected = [
+                    'mautic_email_unsubscribe' => [
+                        'params' => [
+                            'idHash'     => $idHash,
+                            'urlEmail'   => $email,
+                            'secretHash' => $emailHash,
+                        ],
+                        'url' => "/email/unsubscribe/hash/{$email}/{$emailHash}",
+                    ],
+                    'mautic_email_webview' => [
+                        'params' => ['idHash' => $idHash],
+                        'url' => "/email/webview/{$emailHash}",
+                    ],
+                    'mautic_email_resubscribe' => [
+                        'params' => ['idHash' => $idHash],
+                        'url' => "/email/resubscribe/{$idHash}",
+                    ],
+                    'mautic_email_preview' => [
+                        'params' => ['objectId' => $objectId],
+                        'url' => "/email/preview/{$objectId}",
+                    ],
+                    'mautic_email_unsubscribe_all' => [
+                        'params' => [
+                            'idHash'     => $idHash,
+                            'urlEmail'   => $email,
+                            'secretHash' => $emailHash,
+                        ],
+                        'url' => "/email/dnc/{$idHash}/{$email}/{$emailHash}",
+                    ],
+                ];
+
+                if (isset($expected[$route]) && $params === $expected[$route]['params']) {
+                    return $expected[$route]['url'];
                 }
 
-                if (
-                    'mautic_email_webview' === $route
-                    && $params === ['idHash' => 'hash']
-                ) {
-                    return '/email/webview/'.$emailHash;
-                }
-
-                if (
-                    'mautic_email_preview' === $route
-                    && $params === ['objectId' => 111]
-                ) {
-                    return '/email/preview/111';
-                }
-
-                throw new \LogicException("Unexpected call to buildUrl with route '$route' and params ".json_encode($params));
+                throw new \LogicException(sprintf(
+                    'Unexpected call to buildUrl with route "%s" and params %s',
+                    $route,
+                    json_encode($params)
+                ));
             });
 
         $this->translator->expects($this->never())
