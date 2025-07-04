@@ -223,12 +223,8 @@ class RestrictionHelperTest extends TypeTestCase
         $bouncer    = $this->createMock(Bounce::class);
         $dispatcher->addSubscriber(new ProcessBounceSubscriber($bouncer));
 
-        $unsubscriber = $this->getMockBuilder(Unsubscribe::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $looper = $this->getMockBuilder(FeedbackLoop::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $unsubscriber = $this->createMock(Unsubscribe::class);
+        $looper = $this->createMock(FeedbackLoop::class);
         $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper, $this->createMock(CoreParametersHelper::class)));
 
         // This is what we're really testing here

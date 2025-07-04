@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,9 +51,7 @@ class EmailTypeTest extends MauticMysqlTestCase
         ],
     ];
 
-    /**
-     * @dataProvider provideSendToDncValue
-     */
+    #[DataProvider('provideSendToDncValue')]
     public function testCampaignEmailSendWithSendToDnc(bool $sendToDnc, int $expectedEmailCopiesCount): void
     {
         $category   = $this->createCategory();
