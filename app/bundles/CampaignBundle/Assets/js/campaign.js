@@ -2286,11 +2286,19 @@ Mautic.highlightJumpTarget = function(event, el) {
     if (highlightedAlready) {
         parentEventElement.data('highlighted', false);
         overlay.hide();
+        overlay.off('click.closejump');
         parentEventElement.css("z-index", 1010);
         jumpTarget.css("z-index", 1010);
     } else {
+        if (mQuery('[data-highlighted="true"]').length) {
+            mQuery('[data-highlighted="true"]').find('.highlight-jump-target').click();
+        }
+
         parentEventElement.data('highlighted', true);
         overlay.show();
+        overlay.on('click.closejump', function() {
+            element.click();
+        });
         parentEventElement.css("z-index", 2010);
         jumpTarget.css("z-index", 2010);
     }
