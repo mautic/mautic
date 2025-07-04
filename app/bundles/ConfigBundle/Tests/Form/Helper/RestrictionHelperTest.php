@@ -224,7 +224,7 @@ class RestrictionHelperTest extends TypeTestCase
         $dispatcher->addSubscriber(new ProcessBounceSubscriber($bouncer));
 
         $unsubscriber = $this->createMock(Unsubscribe::class);
-        $looper = $this->createMock(FeedbackLoop::class);
+        $looper       = $this->createMock(FeedbackLoop::class);
         $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper, $this->createMock(CoreParametersHelper::class)));
 
         // This is what we're really testing here

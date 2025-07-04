@@ -267,15 +267,15 @@ class BuilderSubscriberTest extends TestCase
                     ],
                     'mautic_email_webview' => [
                         'params' => ['idHash' => $idHash],
-                        'url' => "/email/webview/{$emailHash}",
+                        'url'    => "/email/webview/{$emailHash}",
                     ],
                     'mautic_email_resubscribe' => [
                         'params' => ['idHash' => $idHash],
-                        'url' => "/email/resubscribe/{$idHash}",
+                        'url'    => "/email/resubscribe/{$idHash}",
                     ],
                     'mautic_email_preview' => [
                         'params' => ['objectId' => $objectId],
-                        'url' => "/email/preview/{$objectId}",
+                        'url'    => "/email/preview/{$objectId}",
                     ],
                     'mautic_email_unsubscribe_all' => [
                         'params' => [
@@ -291,11 +291,7 @@ class BuilderSubscriberTest extends TestCase
                     return $expected[$route]['url'];
                 }
 
-                throw new \LogicException(sprintf(
-                    'Unexpected call to buildUrl with route "%s" and params %s',
-                    $route,
-                    json_encode($params)
-                ));
+                throw new \LogicException(sprintf('Unexpected call to buildUrl with route "%s" and params %s', $route, json_encode($params)));
             });
 
         $this->translator->expects($this->never())
