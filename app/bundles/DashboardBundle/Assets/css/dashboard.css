@@ -166,3 +166,8 @@ body:has(.s-dashboard) {
     line-height: 250px;
     font-size: 24px;
 }
+.report-footer{
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+}
