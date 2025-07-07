@@ -69,19 +69,14 @@
 
 </div>
 
-<script>
-window.userColumnPrefs = {{ userColumnPrefs|json_encode|raw }};
-window.contactColPrefs = {{ contactColPrefs|json_encode|raw }};
-window.companyColPrefs = {{ companyColPrefs|json_encode|raw }};
-
-window.applyColumnPrefs = function(prefs, tableSelector, columnPrefix, allColumns) {
-  allColumns.forEach(col => {
-    const show = prefs.includes(col);
-    document.querySelectorAll(`${tableSelector} th.${columnPrefix}${col}, ${tableSelector} td.${columnPrefix}${col}`)
-      .forEach(el => el.style.setProperty('display', show ? '' : 'none', 'important'));
-  });
-};
-</script>
+{% block scripts %}
+    {{ parent() }}
+    <script>
+        window.userColumnPrefs = {{ userColumnPrefs|default([])|json_encode|raw }};
+        window.contactColPrefs = {{ contactColPrefs|default([])|json_encode|raw }};
+        window.companyColPrefs = {{ companyColPrefs|default([])|json_encode|raw }};
+    </script>
+{% endblock %}
 
 {# Modal renderer #}
 <script>
@@ -136,7 +131,7 @@ function renderColumnModal(config) {
   columnPrefix,
   csrfToken
 }) {
-  const $ = window.jQuery;
+  const $ = window.mQuery;
 
   // Initial apply
   if (columnPrefs.length > 0) {
@@ -177,19 +172,22 @@ function renderColumnModal(config) {
   }
 
   // Modal a11y handling
-  $('#column-config-modal').on('hidden.bs.modal', function () {
-    $('.modal-backdrop').remove();
-    $('body').removeClass('modal-open');
-    document.querySelectorAll('[aria-hidden="true"]').forEach(el => el.removeAttribute('aria-hidden'));
-  });
-
-  $('#column-config-modal').on('shown.bs.modal', function () {
-    this.querySelector('.modal-content').focus();
-    document.querySelectorAll('body > *:not(#column-config-modal)').forEach(el => {
-      el.setAttribute('aria-hidden', 'true');
+  $modal
+    .on('hidden.bs.modal', function() {
+      $('.modal-backdrop').remove();
+      $('body').removeClass('modal-open');
+      document.querySelectorAll('[aria-hidden="true"]').forEach(el =>
+        el.removeAttribute('aria-hidden')
+      );
+    })
+    .on('shown.bs.modal', function() {
+      const modalContent = this.querySelector('.modal-content');
+      modalContent.focus();
+      document.querySelectorAll('body > *:not(#column-config-modal)').forEach(el => {
+        el.setAttribute('aria-hidden', 'true');
+      });
+      this.removeAttribute('aria-hidden');
     });
-    this.removeAttribute('aria-hidden');
-  });
 }
 </script>
 

@@ -71,6 +71,8 @@ class LeadController extends FormController
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
         UserModel $userModel,
+        LeadModel $leadModel,
+        ListModel $listModel,
         $page = 1,
     ) {
         // set some permissions
@@ -95,8 +97,6 @@ class LeadController extends FormController
 
         $this->setListFilters();
 
-        /** @var LeadModel $model */
-        $model   = $this->getModel('lead');
         $session = $request->getSession();
         // set limits
         $limit = $session->get('mautic.lead.limit', $this->coreParametersHelper->get('default_pagelimit'));
@@ -136,7 +136,7 @@ class LeadController extends FormController
             $filter['force'] .= " $mine";
         }
 
-        $results = $model->getEntities([
+        $results = $leadModel->getEntities([
             'start'           => $start,
             'limit'           => $limit,
             'filter'          => $filter,
@@ -185,9 +185,7 @@ class LeadController extends FormController
             $listArgs['filter']['force'] = " $mine";
         }
 
-        $leadListModel = $this->getModel('lead.list');
-        \assert($leadListModel instanceof ListModel);
-        $lists = $leadListModel->getUserLists();
+        $lists = $listModel->getUserLists();
 
         // check to see if in a single list
         $inSingleList = (1 === substr_count($search, "$listCommand:")) ? true : false;
@@ -207,13 +205,11 @@ class LeadController extends FormController
         }
 
         // Get the max ID of the latest lead added
-        $maxLeadId = $model->getRepository()->getMaxLeadId();
+        $maxLeadId = $leadModel->getRepository()->getMaxLeadId();
 
         \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
 
-        /** @var UserModel $userModel */
-        $userModel            = $this->getModel('user');
         $columnPrefs_contacts = $userModel->getPreference('user_column_visibility_contacts', null, $this->user);
 
         return $this->delegateView(

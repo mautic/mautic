@@ -23,7 +23,7 @@ class CompanyController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, UserModel $userModel, CompanyModel $companyModel, $page = 1)
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -90,14 +90,10 @@ class CompanyController extends FormController
 
         $pageHelper->rememberPage($page);
 
-        $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $model = $this->getModel('lead.company');
-        \assert($model instanceof CompanyModel);
+        $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $companyIds = array_keys($companies);
-        $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : [];
+        $leadCounts = (!empty($companyIds)) ? $companyModel->getRepository()->getLeadCount($companyIds) : [];
 
-        /** @var \Mautic\UserBundle\Model\UserModel $userModel */
-        $userModel           = $this->getModel('user');
         $columnPrefs_company = $userModel->getPreference('user_column_visibility_company', null, $this->user);
 
         return $this->delegateView(

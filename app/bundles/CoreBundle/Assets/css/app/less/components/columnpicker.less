@@ -1,0 +1,34 @@
+// Column Picker Component
+.column-picker {
+  &-modal {
+    .modal-body {
+      padding: @padding-base-horizontal;
+    }
+  }
+
+  &-form {
+    max-width: 400px;
+    margin: 0 auto;
+
+    .form-check {
+      .clearfix();
+      padding: @padding-xs-vertical @padding-base-horizontal;
+      margin-bottom: @padding-base-vertical;
+      background: @white;
+      border-radius: @border-radius-base;
+      .box-shadow(0 1px 1px rgba(0,0,0,.05));
+
+      &-label {
+        float: left;
+        margin: 0;
+        font-weight: @font-weight-semi-bold;
+        cursor: pointer;
+      }
+
+      &-input {
+        float: right;
+        margin: 3px 0 0 @padding-base-horizontal;
+      }
+    }
+  }
+}

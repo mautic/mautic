@@ -11351,32 +11351,3 @@ code:hover > .copy-icon {
 .contained-list-item__action > * {
   pointer-events: all;
 }
-/* === Column Picker Modal Styles === */
-#column-picker-form {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-#column-picker-form .form-check {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding: 6px 0;
-  font-size: 1.3rem;
-}
-
-#column-picker-form .form-check-label {
-  margin-bottom: 0;
-  flex-grow: 1;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-#column-picker-form .form-check-input {
-  margin-left: 30px;
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-}

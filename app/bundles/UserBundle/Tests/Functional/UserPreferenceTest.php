@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
@@ -25,11 +24,10 @@ class UserPreferenceTest extends MauticMysqlTestCase
 {
     public function testUserCanSetPreference(): void
     {
-        $user = $this->createTestUser();
+        $user = static::getContainer()->get('mautic.user.provider')->getUser();
 
-        $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(
             Request::METHOD_POST,
@@ -45,9 +43,9 @@ class UserPreferenceTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
 
-        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertJson($response->getContent());
-        $this->assertStringContainsString('"success":true', $response->getContent());
+        $this->assertEquals([], json_decode($response->getContent(), true));
 
         $reloaded = $this->em->getRepository(User::class)->find($user->getId());
         $prefs    = $reloaded->getPreferences();

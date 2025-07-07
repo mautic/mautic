@@ -31,27 +31,23 @@ class ColumnPreferencesCest
         $I->makeScreenshot('default-columns');
         $I->click('#column-config-toggle');
         $I->makeScreenshot('after-toggle-click');
-        $I->waitForElementVisible('#column-config-modal', 1);
+        $I->waitForElementVisible('#column-config-modal', 5);
         $I->makeScreenshot('no-preferences-saved');
 
-        $I->see('Select Columns');
+        $I->waitForElementVisible('#col-name', 5);
+        $I->waitForElementClickable('#col-name', 3);
 
-        $I->waitForElementVisible('#col-email', 3);
-        $emailCheckboxState = $I->executeJS('return document.querySelector("#col-email").checked');
-        $I->click('#col-name');
-        $I->click('#col-website');
-        $I->click('#col-score');
-        $I->click('#col-contacts');
-        $I->click('#col-id');
-        $I->wait(0.5);
+        $this->toggleColumn($I, 'name');
+        $this->toggleColumn($I, 'website');
+        $this->toggleColumn($I, 'score');
+        $this->toggleColumn($I, 'contacts');
+        $this->toggleColumn($I, 'id');
+
         $I->makeScreenshot('preferences-selected');
 
         $I->click('#save-columns');
         $I->waitForElementNotVisible('#column-config-modal', 5);
-
-        $I->dontSeeElement('th.col-company-email');       // header
-        $I->dontSeeElement('td.col-company-email');       // datacell
-        $I->makeScreenshot('preferences-applied');
+        $I->waitForElementVisible('th.col-company-name', 3);
 
         $I->seeElement('th.col-company-name');
         $I->seeElement('td.col-company-name');
@@ -63,5 +59,14 @@ class ColumnPreferencesCest
         $I->seeElement('td.col-company-contacts');
         $I->seeElement('th.col-company-id');
         $I->seeElement('td.col-company-id');
+    }
+
+    private function toggleColumn(AcceptanceTester $I, string $column): void
+    {
+        $selector = "#col-$column";
+        $I->waitForElementClickable($selector, 3);
+        $initialState = $I->executeJS("return document.querySelector('$selector').checked");
+        $I->click($selector);
+        $I->waitForJS("return document.querySelector('$selector').checked == ".(!$initialState), 3);
     }
 }

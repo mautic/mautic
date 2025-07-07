@@ -251,6 +251,6 @@ class ProfileController extends FormController
 
         $userModel->setPreference($key, $value, $user);
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([]);
     }
 }
