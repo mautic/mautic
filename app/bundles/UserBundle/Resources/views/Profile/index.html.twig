@@ -12,14 +12,16 @@
         <div class="col-md-3 height-auto">
 
             {% if me.getId() %}
-            <div class="media">
+            <div class="d-flex fd-column">
                 <div class="pull-left">
                     <img class="img-circle mt-md mb-xs img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}"
                         alt="" width="65px">
                 </div>
-                <div class="media-body">
-                    <h3 class="fw-sb">{{ me.getName() }}</h3>
-                    <span class="text-secondary">{{ me.getPosition() }}</span>
+                <h3 class="fw-sb">{{ me.getName() }}</h3>
+                <div class="text-secondary mt-xs">
+                    {% if me.getPosition() %}
+                        <span>{{ me.getPosition() }}</span>
+                    {% endif %}
                 </div>
             </div>
             <hr />
