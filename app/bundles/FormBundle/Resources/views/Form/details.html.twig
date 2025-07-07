@@ -126,6 +126,7 @@
 
 {% block content %}
 {% set showActions = activeFormActions|length %}
+{% set previewUrl = url('mautic_form_action', {'objectAction': 'preview', 'objectId': activeForm.id}) %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
@@ -335,6 +336,44 @@
             }) }}
         </div>
         <!--/ form HTML -->
+
+        <!-- preview URL -->
+        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
+                <div class="panel-title">{{ 'mautic.form.form.preview'|trans }}</div>
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="row">
+                    <div class="form-group col-xs-12">
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly 
+                                   aria-label="{{ 'mautic.page.preview.url'|trans }}"
+                                   value="{{ previewUrl|escape }}"
+                                   onclick="this.setSelectionRange(0, this.value.length);"
+                                   onfocus="this.setSelectionRange(0, this.value.length);"/>
+                            <span class="input-group-btn">
+                                {% include '@MauticCore/Helper/button.html.twig' with {
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.open_link',
+                                            variant: 'ghost',
+                                            size: 'md',
+                                            icon_only: true,
+                                            icon: 'ri-external-link-line',
+                                            attributes: {
+                                                'type': 'button'
+                                            },
+                                            onclick: 'window.open("' ~ previewUrl|e('js') ~ '", "_blank");'
+                                        }
+                                    ]
+                                } %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/ preview URL -->
 
         <hr class="hr-w-2" style="width:50%">
 
