@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * Functional tests for user preference functionality.
@@ -24,7 +22,7 @@ class UserPreferenceTest extends MauticMysqlTestCase
 {
     public function testUserCanSetPreference(): void
     {
-        $user = static::getContainer()->get('mautic.user.provider')->getUser();
+        $user = static::getContainer()->get('mautic.user.model.user')->getEntity(1);
 
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
@@ -52,26 +50,5 @@ class UserPreferenceTest extends MauticMysqlTestCase
 
         $this->assertArrayHasKey('user_column_visibility_contacts', $prefs);
         $this->assertEquals(['name', 'email', 'id'], $prefs['user_column_visibility_contacts']);
-    }
-
-    private function createTestUser(): User
-    {
-        $role = $this->em->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
-
-        $user = new User();
-        $user->setUsername('pref_user');
-        $user->setEmail('pref_user@example.com');
-        $user->setFirstName('Pref');
-        $user->setLastName('User');
-        $user->setRole($role);
-
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
-        $user->setPassword($hasher->hash('Maut1cR0cks!'));
-
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return $user;
     }
 }

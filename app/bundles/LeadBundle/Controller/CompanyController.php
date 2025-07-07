@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,8 +24,13 @@ class CompanyController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, UserModel $userModel, CompanyModel $companyModel, $page = 1)
-    {
+    public function indexAction(
+        Request $request,
+        PageHelperFactoryInterface $pageHelperFactory,
+        UserModel $userModel,
+        CompanyModel $companyModel,
+        $page = 1,
+    ) {
         // set some permissions
         $permissions = $this->security->isGranted(
             [

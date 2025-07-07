@@ -70,7 +70,6 @@
 </div>
 
 {% block scripts %}
-    {{ parent() }}
     <script>
         window.userColumnPrefs = {{ userColumnPrefs|default([])|json_encode|raw }};
         window.contactColPrefs = {{ contactColPrefs|default([])|json_encode|raw }};
