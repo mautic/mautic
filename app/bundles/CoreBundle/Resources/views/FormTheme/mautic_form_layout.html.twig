@@ -587,19 +587,24 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
                    value="{{ choice.value }}"
                    {% if value == choice.value %}checked{% endif %}
                    style="display: none;"
+                   {% if disabled %}disabled="disabled"{% endif %}
                    {% for attrname, attrvalue in attr %}
                        {{ attrname }}="{{ attrvalue }}"
                    {% endfor %}>
         {% endfor %}
 
         <label id="{{ id }}_label"
-               class="toggle__label"
+               class="toggle__label{% if disabled %} disabled{% endif %}"
                data-yes-id="{{ id }}_{{ yes_choice.value }}"
                data-no-id="{{ id }}_{{ no_choice.value }}"
+               {% if not disabled %}
                onclick="Mautic.toggleYesNo(this);"
                role="switch"
                tabindex="0"
                onkeydown="Mautic.handleKeyDown(event, this)"
+               {% else %}
+               tabindex="-1"
+               {% endif %}
                aria-checked="{{ value == yes_choice.value ? 'true' : 'false' }}">
             <div class="toggle__appearance" {% if size %}size="{{ size }}"{% endif %}>
                 <div class="toggle__switch {% if value == yes_choice.value %}toggle__switch--checked{% endif %}">

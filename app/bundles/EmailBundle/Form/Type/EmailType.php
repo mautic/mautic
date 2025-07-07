@@ -183,9 +183,9 @@ class EmailType extends AbstractType
                     'data-cancel-callback'   => 'setSendToDncToNo',
                     'data-confirm-btn-class' => 'btn btn-success',
                     'tooltip'                => 'mautic.email.send.dnc.tooltip',
-                    'readonly'               => !$this->corePermissions->isGranted('email:emails:sendtodnc'),
                 ],
                 'required' => false,
+                'disabled' => !$this->corePermissions->isGranted('email:emails:sendtodnc'),
             ]
         );
 
