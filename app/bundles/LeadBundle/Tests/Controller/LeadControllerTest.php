@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
@@ -33,6 +34,8 @@ use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
@@ -1037,5 +1040,39 @@ class LeadControllerTest extends MauticMysqlTestCase
             ],
             $auditLog->getDetails()['args']
         );
+    }
+
+    public function testEmailSendToContactHasCompany(): void
+    {
+        $company = $this->createCompany('Mautic', 'hello@mautic.org');
+        $company->setCity('Pune');
+        $company->setCountry('India');
+        $this->em->persist($company);
+
+        $contact     = $this->createContact('contact@an.email');
+        $this->createPrimaryCompanyForLead($contact, $company);
+        $this->em->flush();
+
+        $replyTo     = 'reply@mautic-community.test';
+
+        $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
+
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $form    = $crawler->selectButton('Send')->form();
+        $form->setValues(
+            [
+                'lead_quickemail[subject]'        => 'Ahoy {contactfield=email}',
+                'lead_quickemail[body]'           => 'Your email is <b>{contactfield=email}</b>. Company details: {contactfield=companyname}, {contactfield=companycity}.',
+                'lead_quickemail[replyToAddress]' => $replyTo,
+            ]
+        );
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(1);
+
+        $email      = $this->getMailerMessage();
+
+        Assert::assertSame('Ahoy contact@an.email', $email->getSubject());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b>. Company details: Mautic, Pune.<img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
     }
 }
