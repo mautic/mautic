@@ -663,7 +663,7 @@
   --label-background-hover-green: #96ac00;
   --label-border-green: #b58900;
 }
-:root[theme="freire"] {
+:root[theme="dark-freire"] {
   --background: #1C1C2E;
   --background-hover: #232336;
   --background-active: #2A2A40;
