@@ -258,10 +258,9 @@ class PublicController extends CommonFormController
                         if (!$session->has($successSessionName)) {
                             $successMessageData       = ['class="pref-successmessage"'];
                             $successMessageDataHidden = [];
-                            foreach ($successMessageData as $successMessageDatum) {
-                                $successMessageDataHidden[] = $successMessageDatum.' style=display:none';
+                            foreach ($successMessageData as $successMessageData) {
+                                $successMessageDataHidden[] = $successMessageData.' style=display:none';
                             }
-
                             $html = str_replace(
                                 $successMessageData,
                                 $successMessageDataHidden,
