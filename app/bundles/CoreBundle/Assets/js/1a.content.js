@@ -400,6 +400,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
         mQuery(document).ready(callback(this));
     });
 
+    mQuery(container + " *[data-copy]").off('click.copy').on('click.copy', function (event) {
+        event.preventDefault();
+        Mautic.copyToClipboard(mQuery(this).data('copy'));
+    });
 
     mQuery(container + " input[data-toggle='color']").each(function() {
         Mautic.activateColorPicker(this);
@@ -1739,10 +1743,25 @@ Mautic.processCsvContactExport = function (route) {
 };
 
 /**
- * Quick Filters
- * This module handles the quick filtering functionality in Mautic's list views.
- * Includes initialization, toggling, applying, and resetting.
- * @namespace Mautic
+ * Copies text to the clipboard.
+ *
+ * @param {string} text
+ */
+Mautic.copyToClipboard = function (text) {
+    navigator.clipboard.writeText(text).then(function () {
+        var message = Mautic.translate('mautic.core.notice.copiedtoclipboard');
+        var flashMessage = Mautic.addInfoFlashMessage(message);
+        Mautic.setFlashes(flashMessage);
+    }).catch(function (err) {
+        console.error('Clipboard write error:', err);
+        var message = Mautic.translate('mautic.core.error.copyfailed');
+        var flashMessage = Mautic.addErrorFlashMessage(message);
+        Mautic.setFlashes(flashMessage);
+    });
+};
+
+/**
+ * Quick filters for list views
  */
 
 /**

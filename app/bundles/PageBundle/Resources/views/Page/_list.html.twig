@@ -115,7 +115,17 @@
                                         'btnText': 'mautic.form.form.results'|trans,
                                         'priority': 80
                                     }
-                                }
+                                }|merge(not item.isPreferenceCenter ? {
+                                    'copy': {
+                                        'attr': {
+                                            'data-copy': url('mautic_page_public', {'slug': item.alias}),
+                                            'data-toggle': 'none',
+                                        },
+                                        'btnText': 'mautic.core.copy_page_link'|trans,
+                                        'iconClass': 'ri-clipboard-line',
+                                        'priority': 90
+                                    }
+                                } : {})
                         }) }}
                     </td>
                     <td>
