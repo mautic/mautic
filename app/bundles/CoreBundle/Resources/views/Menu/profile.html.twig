@@ -10,7 +10,7 @@
                 <span class="d-flex fd-column jc-center ml-sm info">
                     <span class="text text-nowrap fw-sb">{{ app.getUser().getName() }}</span>
                     {% if app.getUser().getPosition() %}
-                        <span class="text-nowrap small">{{ app.getUser().getPosition() }}</span>
+                        <span class="text-nowrap small">{{ app.getUser().getPosition()|length > 30 ? (app.getUser().getPosition()|slice(0, 30) ~ '...') : app.getUser().getPosition() }}</span>
                     {% endif %}
                 </span>
             </div>
