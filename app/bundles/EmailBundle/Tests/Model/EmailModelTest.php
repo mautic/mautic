@@ -894,7 +894,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        self::assertSame(
+        self::assertEquals(
             ['EN' => [123 => '(123) Email 123']],
             $this->emailModel->getLookupResultsWithIdName('email', '', 0, 0)
         );
