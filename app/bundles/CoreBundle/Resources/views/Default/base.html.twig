@@ -6,6 +6,13 @@
         })
     }}
     <body class="header-fixed pr-0">
+        <a id="top"></a>
+        <nav aria-label="Skip links" class="skip-links">
+            <a href="#app-content" class="skip-link">Skip to main content</a>
+            <a href="#app-header" class="skip-link">Skip to settings</a>
+            <a href="#app-sidebar" class="skip-link">Skip to navigation</a>
+            <a href="#app-footer" class="skip-link">Skip to footer</a>
+        </nav>
         <section id="app-wrapper">
             {{ outputScripts('bodyOpen') }}
 
@@ -15,7 +22,7 @@
             {{ include('@MauticCore/Modal/search_commands.html.twig') }}
             {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
 
-            <aside class="app-sidebar sidebar-left">
+            <aside id="app-sidebar" class="app-sidebar sidebar-left">
                 {{ include('@MauticCore/LeftPanel/index.html.twig') }}
             </aside>
 
