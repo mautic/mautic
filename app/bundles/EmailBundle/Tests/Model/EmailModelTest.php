@@ -868,7 +868,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLookupResultsIdTextWithWithDefaultOptions()
+    public function testGetLookupResultsIdTextWithWithDefaultOptions(): void
     {
         $this->entityManager->expects($this->once())
             ->method('getRepository')
@@ -894,7 +894,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['EN' => [123 => '(123) Email 123']],
             $this->emailModel->getLookupResultsWithIdName('email', '', 0, 0)
         );
