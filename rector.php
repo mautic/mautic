@@ -82,6 +82,12 @@ return static function (RectorConfig $rectorConfig): void {
             '*/Entity/*',
         ],
 
+        Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
+            '*/Entity/*',
+            __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
+            __DIR__.'app/bundles/EmailBundle/Helper/MailHelper.php',
+        ],
+
         Rector\Php81\Rector\Array_\FirstClassCallableRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Config/config.php',
             __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Compiler/TestPass.php',

@@ -37,7 +37,7 @@ class HubspotApi extends CrmApi
         }
 
         if (isset($request['error']) && 401 == $request['error']['code']) {
-            $response = json_decode((string) $request['error']['message'] ?? null, true);
+            $response = json_decode((string) ($request['error']['message'] ?? ''), true);
 
             if (isset($response)) {
                 throw new ApiErrorException($response['message'], $request['error']['code']);

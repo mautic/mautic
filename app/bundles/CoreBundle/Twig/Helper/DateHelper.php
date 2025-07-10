@@ -13,7 +13,7 @@ final class DateHelper
      */
     private array $formats;
 
-    private readonly DateTimeHelper $helper;
+    private DateTimeHelper $helper;
 
     /**
      * @param string $dateFullFormat

@@ -86,7 +86,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         $form    = $crawler->selectButton('Apply Draft')->form();
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
 
