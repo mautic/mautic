@@ -64,9 +64,9 @@ class AjaxController extends CommonController
         }
 
         if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            if (str_contains($action, ':')) {
+            if (str_contains((string) $action, ':')) {
                 // call the specified bundle's ajax action
-                $parts     = explode(':', $action);
+                $parts     = explode(':', (string) $action);
                 $namespace = 'Mautic';
 
                 if (3 == count($parts) && 'plugin' == $parts['0']) {

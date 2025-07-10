@@ -16,23 +16,23 @@ class PathsHelper
      */
     private $theme;
 
-    private string $imagePath;
+    private readonly string $imagePath;
 
-    private string $dashboardImportDir;
+    private readonly string $dashboardImportDir;
 
-    private string $dashboardUserImportDir;
+    private readonly string $dashboardUserImportDir;
 
-    private string $kernelCacheDir;
+    private readonly string $kernelCacheDir;
 
-    private string $kernelLogsDir;
+    private readonly string $kernelLogsDir;
 
-    private string $kernelRootDir;
+    private readonly string $kernelRootDir;
 
-    private string $temporaryDir;
+    private readonly string $temporaryDir;
 
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?\Mautic\UserBundle\Entity\User $user;
 
-    private string $importLeadsDir;
+    private readonly string $importLeadsDir;
 
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {

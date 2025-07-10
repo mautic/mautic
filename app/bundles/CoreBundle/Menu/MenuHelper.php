@@ -17,7 +17,7 @@ class MenuHelper
     public function __construct(
         protected CorePermissions $security,
         protected RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
         protected IntegrationHelper $integrationHelper,
     ) {
     }

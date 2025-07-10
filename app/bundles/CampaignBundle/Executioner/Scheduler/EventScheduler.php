@@ -24,14 +24,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class EventScheduler
 {
     public function __construct(
-        private LoggerInterface $logger,
-        private EventLogger $eventLogger,
-        private IntervalScheduler $intervalScheduler,
-        private DateTimeScheduler $dateTimeScheduler,
-        private OptimizedScheduler $optimizedScheduler,
-        private EventCollector $collector,
-        private EventDispatcherInterface $dispatcher,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly LoggerInterface $logger,
+        private readonly EventLogger $eventLogger,
+        private readonly IntervalScheduler $intervalScheduler,
+        private readonly DateTimeScheduler $dateTimeScheduler,
+        private readonly OptimizedScheduler $optimizedScheduler,
+        private readonly EventCollector $collector,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -338,7 +338,7 @@ class EventScheduler
 
             // lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
+                'CAMPAIGN: '.ucfirst((string) $event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
                 .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:i:s T')
             );
 

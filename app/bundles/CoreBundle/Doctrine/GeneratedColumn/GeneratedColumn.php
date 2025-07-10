@@ -11,7 +11,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
      */
     private $tablePrefix = '';
 
-    private string $columnName;
+    private readonly string $columnName;
 
     private ?string $originalDateColumn = null;
 
@@ -20,10 +20,10 @@ final class GeneratedColumn implements GeneratedColumnInterface
     private array $indexColumns = [];
 
     public function __construct(
-        private string $tableName,
+        private readonly string $tableName,
         string $columnName,
-        private string $columnType,
-        private string $as,
+        private readonly string $columnType,
+        private readonly string $as,
     ) {
         $this->indexColumns[] = $columnName;
         $this->tablePrefix    = MAUTIC_TABLE_PREFIX;

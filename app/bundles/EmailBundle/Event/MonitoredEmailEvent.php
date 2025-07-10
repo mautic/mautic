@@ -10,7 +10,7 @@ class MonitoredEmailEvent extends Event
     private array $folders = [];
 
     public function __construct(
-        private FormBuilderInterface $formBuilder,
+        private readonly FormBuilderInterface $formBuilder,
         private array $data,
     ) {
     }

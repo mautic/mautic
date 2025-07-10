@@ -36,8 +36,8 @@ class FormController extends CommonFormController
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
-        private MappedObjectCollector $mappedObjectCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private readonly MappedObjectCollector $mappedObjectCollector,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

@@ -50,7 +50,7 @@ abstract class ModeratedCommand extends Command
 
     public function __construct(
         protected PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }
@@ -152,8 +152,8 @@ abstract class ModeratedCommand extends Command
         $this->lockFile = sprintf(
             '%s/sf.%s.%s.lock',
             $this->runDirectory,
-            preg_replace('/[^a-z0-9\._-]+/i', '-', $this->moderationKey),
-            hash('sha256', $this->moderationKey)
+            preg_replace('/[^a-z0-9\._-]+/i', '-', (string) $this->moderationKey),
+            hash('sha256', (string) $this->moderationKey)
         );
 
         // Check if the PID is still running

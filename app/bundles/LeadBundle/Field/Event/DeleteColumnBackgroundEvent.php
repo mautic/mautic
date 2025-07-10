@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class DeleteColumnBackgroundEvent extends Event
 {
-    public function __construct(private LeadField $leadField)
+    public function __construct(private readonly LeadField $leadField)
     {
     }
 

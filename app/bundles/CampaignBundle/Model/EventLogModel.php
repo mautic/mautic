@@ -176,7 +176,7 @@ class EventLogModel extends AbstractCommonModel
                     $metadata = $log->getMetadata();
                     if (is_array($value)) {
                         $newMetadata = $value;
-                    } elseif ($jsonDecoded = json_decode($value, true)) {
+                    } elseif ($jsonDecoded = json_decode((string) $value, true)) {
                         $newMetadata = $jsonDecoded;
                     } else {
                         $newMetadata = (array) $value;

@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class EmailDraft
 {
-    private int $id;
+    private readonly int $id;
 
     public function __construct(private Email $email, private ?string $html, private ?string $template, private ?bool $publicPreview = true)
     {

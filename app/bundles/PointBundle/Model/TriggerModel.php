@@ -45,7 +45,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         protected TriggerEventModel $pointTriggerEventModel,
-        private ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -252,7 +252,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                     continue;
                 }
 
-                $func = 'set'.ucfirst($f);
+                $func = 'set'.ucfirst((string) $f);
                 if (method_exists($event, $func)) {
                     $event->$func($v);
                 }
@@ -366,8 +366,8 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         if (is_array($settings['callback'])) {
             $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (str_contains($settings['callback'], '::')) {
-            $parts      = explode('::', $settings['callback']);
+        } elseif (str_contains((string) $settings['callback'], '::')) {
+            $parts      = explode('::', (string) $settings['callback']);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {
             $reflection = new \ReflectionMethod(null, $settings['callback']);

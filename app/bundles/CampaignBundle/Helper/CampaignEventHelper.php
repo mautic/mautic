@@ -24,7 +24,7 @@ class CampaignEventHelper
         }
 
         // check against the selected action (was lead removed or added)
-        $func = 'was'.ucfirst($action);
+        $func = 'was'.ucfirst((string) $action);
         if (!method_exists($eventDetails, $func) || !$eventDetails->$func()) {
             return false;
         }

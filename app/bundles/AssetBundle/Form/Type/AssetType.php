@@ -33,8 +33,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AssetType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private AssetModel $assetModel,
+        private readonly TranslatorInterface $translator,
+        private readonly AssetModel $assetModel,
     ) {
     }
 
@@ -63,7 +63,7 @@ class AssetType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'required'    => false,
                 'constraints' => [
-                    new Callback([$this, 'validateExtension']),
+                    new Callback($this->validateExtension(...)),
                 ],
             ]
         );
@@ -74,7 +74,7 @@ class AssetType extends AbstractType
             [
                 'required'    => false,
                 'constraints' => [
-                    new Callback([$this, 'validateExtension']),
+                    new Callback($this->validateExtension(...)),
                 ],
             ],
         );

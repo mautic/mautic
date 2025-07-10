@@ -17,10 +17,10 @@ class MenuBuilder
     private $dispatcher;
 
     public function __construct(
-        private FactoryInterface $factory,
-        private MatcherInterface $matcher,
+        private readonly FactoryInterface $factory,
+        private readonly MatcherInterface $matcher,
         EventDispatcherInterface $dispatcher,
-        private MenuHelper $menuHelper,
+        private readonly MenuHelper $menuHelper,
     ) {
         $this->dispatcher = $dispatcher;
     }

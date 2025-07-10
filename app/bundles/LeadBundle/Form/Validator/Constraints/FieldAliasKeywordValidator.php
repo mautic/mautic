@@ -33,11 +33,11 @@ class FieldAliasKeywordValidator extends ConstraintValidator
     ];
 
     public function __construct(
-        private ListModel $listModel,
-        private FieldAliasHelper $aliasHelper,
-        private EntityManager $em,
-        private TranslatorInterface $translator,
-        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
+        private readonly ListModel $listModel,
+        private readonly FieldAliasHelper $aliasHelper,
+        private readonly EntityManager $em,
+        private readonly TranslatorInterface $translator,
+        private readonly ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
     ) {
     }
 

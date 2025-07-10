@@ -15,11 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FormModel $formModel,
-        private PageModel $pageModel,
-        private SubmissionRepository $submissionRepository,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
+        private readonly FormModel $formModel,
+        private readonly PageModel $pageModel,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
     ) {
     }
 

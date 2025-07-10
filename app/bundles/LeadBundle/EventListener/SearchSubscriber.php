@@ -23,17 +23,17 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
+    private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private CompanyModel $companyModel,
-        private ListModel $listModel,
-        private EmailRepository $emailRepository,
-        private TranslatorInterface $translator,
-        private CorePermissions $security,
-        private Environment $twig,
-        private GlobalSearch $globalSearch,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
+        private readonly ListModel $listModel,
+        private readonly EmailRepository $emailRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        private readonly Environment $twig,
+        private readonly GlobalSearch $globalSearch,
     ) {
         $this->leadRepo        = $leadModel->getRepository();
     }
@@ -225,7 +225,7 @@ class SearchSubscriber implements EventSubscriberInterface
             $nq->select('l.id'); // select only id
             $nsql = $nq->getSQL();
             foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, (string) $nsql);
             }
             $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
             $event->setSubQuery($query);

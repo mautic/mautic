@@ -8,7 +8,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 final class Config
 {
-    public function __construct(private IntegrationHelper $integrationsHelper)
+    public function __construct(private readonly IntegrationHelper $integrationsHelper)
     {
     }
 

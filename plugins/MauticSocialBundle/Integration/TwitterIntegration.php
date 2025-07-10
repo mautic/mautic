@@ -226,14 +226,14 @@ class TwitterIntegration extends SocialIntegration
 
     public function cleanIdentifier($identifier): string
     {
-        if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
+        if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', (string) $identifier, $match)) {
             // extract the handle
             $identifier = $match[1];
-        } elseif (str_starts_with($identifier, '@')) {
-            $identifier = substr($identifier, 1);
+        } elseif (str_starts_with((string) $identifier, '@')) {
+            $identifier = substr((string) $identifier, 1);
         }
 
-        return urlencode($identifier);
+        return urlencode((string) $identifier);
     }
 
     /**

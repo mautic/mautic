@@ -38,12 +38,12 @@ class ContactObjectHelper implements ObjectHelperInterface
     private array $contactsCreated = [];
 
     public function __construct(
-        private LeadModel $model,
-        private LeadRepository $repository,
-        private Connection $connection,
-        private DoNotContactModel $dncModel,
-        private FieldList $fieldList,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly LeadModel $model,
+        private readonly LeadRepository $repository,
+        private readonly Connection $connection,
+        private readonly DoNotContactModel $dncModel,
+        private readonly FieldList $fieldList,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 
@@ -379,7 +379,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         $contactKey = '';
         foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
             if (isset($fields[$uniqueIdentifierField])) {
-                $contactKey .= strtolower($fields[$uniqueIdentifierField]->getValue()->getNormalizedValue());
+                $contactKey .= strtolower((string) $fields[$uniqueIdentifierField]->getValue()->getNormalizedValue());
             }
         }
 

@@ -15,7 +15,7 @@ class TokenHelper
     {
         $tokens = [];
 
-        preg_match_all('/{assetlink=(.*?)}/', $content, $matches);
+        preg_match_all('/{assetlink=(.*?)}/', (string) $content, $matches);
         foreach ($matches[1] as $key => $assetId) {
             $token = $matches[0][$key];
 

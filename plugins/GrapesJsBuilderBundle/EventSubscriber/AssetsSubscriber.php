@@ -14,9 +14,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AssetsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Config $config,
-        private InstallService $installer,
-        private RequestStack $requestStack,
+        private readonly Config $config,
+        private readonly InstallService $installer,
+        private readonly RequestStack $requestStack,
     ) {
     }
 

@@ -38,8 +38,8 @@ class BuilderEvent extends Event
         uasort(
             $this->abTestWinnerCriteria,
             fn ($a, $b): int => strnatcasecmp(
-                $a['group'],
-                $b['group']
+                (string) $a['group'],
+                (string) $b['group']
             )
         );
         $array = ['criteria' => $this->abTestWinnerCriteria];
@@ -125,7 +125,7 @@ class BuilderEvent extends Event
         if (false === $withBC) {
             $tokens = [];
             foreach ($this->tokens as $key => $value) {
-                if (!str_starts_with($key, '{leadfield')) {
+                if (!str_starts_with((string) $key, '{leadfield')) {
                     $tokens[$key] = $value;
                 }
             }
@@ -152,7 +152,7 @@ class BuilderEvent extends Event
 
                 $found = false;
                 foreach ($tokenKeys as $token) {
-                    if (0 === stripos($token, $this->tokenFilter)) {
+                    if (0 === stripos((string) $token, $this->tokenFilter)) {
                         $found = true;
                         break;
                     }
@@ -197,7 +197,7 @@ class BuilderEvent extends Event
             // Do a search against the label
             $tokens = array_filter(
                 $tokens,
-                fn ($v): bool => 0 === stripos($v, $filter)
+                fn ($v): bool => 0 === stripos((string) $v, $filter)
             );
         } else {
             // Do a search against the token

@@ -13,8 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FetchLeadsCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private IntegrationHelper $integrationHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
         parent::__construct();
     }
@@ -91,8 +91,8 @@ class FetchLeadsCommand extends Command
         if (!$interval) {
             $interval = '15 minutes';
         }
-        $startDate = !$startDate ? date('c', strtotime('-'.$interval)) : date('c', strtotime($startDate));
-        $endDate   = !$endDate ? date('c') : date('c', strtotime($endDate));
+        $startDate = !$startDate ? date('c', strtotime('-'.$interval)) : date('c', strtotime((string) $startDate));
+        $endDate   = !$endDate ? date('c') : date('c', strtotime((string) $endDate));
 
         if (!$endDate) {
             $output->writeln(sprintf('<info>Invalid date rage given %s -> %s</info>', $startDate, $endDate));
@@ -142,7 +142,7 @@ class FetchLeadsCommand extends Command
                     $leadObjectName = 'Leads';
                 }
                 $contactObjectName = 'Contact';
-                if (in_array(strtolower('Contacts'), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
+                if (in_array(strtolower('Contacts'), array_map(fn ($i): string => strtolower((string) $i), $config['objects']), true)) {
                     $contactObjectName = 'Contacts';
                 }
 
@@ -158,7 +158,7 @@ class FetchLeadsCommand extends Command
                         $processed += (int) $results;
                     }
                 }
-                if (in_array(strtolower($contactObjectName), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
+                if (in_array(strtolower($contactObjectName), array_map(fn ($i): string => strtolower((string) $i), $config['objects']), true)) {
                     $output->writeln('');
                     $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                     $contactList = [];

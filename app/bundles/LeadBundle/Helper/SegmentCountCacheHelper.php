@@ -10,7 +10,7 @@ use Psr\Cache\InvalidArgumentException;
 class SegmentCountCacheHelper
 {
     public function __construct(
-        private CacheStorageHelper $cacheStorageHelper,
+        private readonly CacheStorageHelper $cacheStorageHelper,
     ) {
     }
 

@@ -118,7 +118,7 @@ class Redirect extends FormEntity
 
     public function getUrl(): string
     {
-        return trim($this->url);
+        return trim((string) $this->url);
     }
 
     /**

@@ -36,13 +36,13 @@ class FieldHelper
     private $eventDispatcher;
 
     public function __construct(
-        private FieldModel $fieldModel,
-        private FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
-        private VariableExpresserHelperInterface $variableExpresserHelper,
-        private ChannelListHelper $channelListHelper,
-        private TranslatorInterface $translator,
+        private readonly FieldModel $fieldModel,
+        private readonly FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
+        private readonly VariableExpresserHelperInterface $variableExpresserHelper,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        private ObjectProvider $objectProvider,
+        private readonly ObjectProvider $objectProvider,
     ) {
         $this->eventDispatcher         = $eventDispatcher;
     }

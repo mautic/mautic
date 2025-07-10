@@ -163,7 +163,7 @@ trait EntityFieldsBuildFormTrait
                                 $data = $event->getData();
 
                                 if (!empty($data[$alias])) {
-                                    if (false === ($timestamp = strtotime($data[$alias]))) {
+                                    if (false === ($timestamp = strtotime((string) $data[$alias]))) {
                                         $timestamp = null;
                                     }
                                     if ($timestamp) {

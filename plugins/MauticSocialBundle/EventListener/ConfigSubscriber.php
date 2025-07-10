@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config)
+    public function __construct(private readonly Config $config)
     {
     }
 
@@ -45,7 +45,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         // Manipulate the values
         if (!empty($values['social_config']['twitter_handle_field'])) {
-            $values['social_config']['twitter_handle_field'] = htmlspecialchars($values['social_config']['twitter_handle_field']);
+            $values['social_config']['twitter_handle_field'] = htmlspecialchars((string) $values['social_config']['twitter_handle_field']);
         }
 
         // Set updated values

@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Membership\Exception;
 
 class RunLimitReachedException extends \Exception
 {
-    private int $contactsProcessed;
+    private readonly int $contactsProcessed;
 
     public function __construct($contactsProcessed)
     {

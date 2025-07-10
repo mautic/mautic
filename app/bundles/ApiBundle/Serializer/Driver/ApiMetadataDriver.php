@@ -118,7 +118,7 @@ class ApiMetadataDriver implements DriverInterface
         $this->createProperty($name);
 
         if ($useGetter && !$this->properties[$name]->getter) {
-            $this->properties[$name]->getter = 'get'.ucfirst($name);
+            $this->properties[$name]->getter = 'get'.ucfirst((string) $name);
         }
 
         $this->properties[$name]->serializedName = $serializedName ?? $name;

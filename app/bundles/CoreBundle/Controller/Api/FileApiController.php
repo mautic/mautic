@@ -62,7 +62,7 @@ class FileApiController extends CommonApiController
                     $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
-                    if (str_starts_with($dir, 'images')) {
+                    if (str_starts_with((string) $dir, 'images')) {
                         $response[$this->entityNameOne]['link'] = $this->getMediaUrl($request).'/'.$fileName;
                     }
 
@@ -103,7 +103,7 @@ class FileApiController extends CommonApiController
                 }
             }
         } else {
-            return $this->returnError(ucfirst($dir).' dir is not readable');
+            return $this->returnError(ucfirst((string) $dir).' dir is not readable');
         }
 
         $view = $this->view([$this->entityNameMulti => $fnames]);
@@ -121,7 +121,7 @@ class FileApiController extends CommonApiController
         $response = ['success' => false];
 
         try {
-            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir).'/'.basename($file);
+            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir).'/'.basename((string) $file);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }

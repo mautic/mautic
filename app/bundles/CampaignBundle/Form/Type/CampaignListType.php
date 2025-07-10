@@ -21,7 +21,7 @@ class CampaignListType extends AbstractType
     private $canViewOther = false;
 
     public function __construct(
-        private CampaignModel $model,
+        private readonly CampaignModel $model,
         protected TranslatorInterface $translator,
         CorePermissions $security,
     ) {

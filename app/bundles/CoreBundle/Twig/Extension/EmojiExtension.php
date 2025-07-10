@@ -21,7 +21,7 @@ class EmojiExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('emoji_to_html', [$this, 'toHtml'], ['is_safe' => ['all']]),
+            new TwigFunction('emoji_to_html', $this->toHtml(...), ['is_safe' => ['all']]),
         ];
     }
 

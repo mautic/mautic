@@ -169,7 +169,7 @@ class InputHelper
 
             return $value;
         } elseif ($urldecode) {
-            $value = urldecode($value);
+            $value = urldecode((string) $value);
         }
 
         return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
@@ -214,7 +214,7 @@ class InputHelper
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
 
-        return trim(preg_replace($regex, '', (string) $value));
+        return trim((string) preg_replace($regex, '', (string) $value));
     }
 
     /**
@@ -231,7 +231,7 @@ class InputHelper
         $value = str_replace(' ', '_', $value);
 
         $sanitized = preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
-        $sanitized = preg_replace("/^\.\./", '', strtolower($sanitized));
+        $sanitized = preg_replace("/^\.\./", '', strtolower((string) $sanitized));
 
         if (null === $extension) {
             return $sanitized;
@@ -250,7 +250,7 @@ class InputHelper
     public static function raw($value, $urldecode = false)
     {
         if ($urldecode) {
-            $value = urldecode($value);
+            $value = urldecode((string) $value);
         }
 
         return $value;
@@ -270,7 +270,7 @@ class InputHelper
     public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], $ignoreFragment = false)
     {
         if ($urldecode) {
-            $value = urldecode($value);
+            $value = urldecode((string) $value);
         }
 
         if (empty($allowedProtocols)) {
@@ -333,10 +333,10 @@ class InputHelper
     public static function email($value, $urldecode = false): string
     {
         if ($urldecode) {
-            $value = urldecode($value);
+            $value = urldecode((string) $value);
         }
 
-        $value = substr($value, 0, 254);
+        $value = substr((string) $value, 0, 254);
         $value = filter_var($value, FILTER_SANITIZE_EMAIL);
 
         return trim($value);
@@ -412,7 +412,7 @@ class InputHelper
             $value = preg_replace_callback(
                 "/<script>(.*?)<\/script>/is",
                 fn ($matches): string => '<mscript>'.base64_encode($matches[0]).'</mscript>',
-                $value, -1, $needsScriptDecoding);
+                (string) $value, -1, $needsScriptDecoding);
 
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
@@ -426,7 +426,7 @@ class InputHelper
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 
             // After cleaning encode the value
-            $value = $hasUnicode ? rawurldecode($value) : $value;
+            $value = $hasUnicode ? rawurldecode((string) $value) : $value;
 
             // Was a doctype found?
             if ($doctypeFound && false === $hasUnicode) {
@@ -439,7 +439,7 @@ class InputHelper
 
             if (!empty($matches[0])) {
                 // Special handling for conditional blocks
-                $value = preg_replace("/<mconditionnonoutlook><mif>(.*?)<\/mif>(.*?)<\/mconditionnonoutlook>/is", '<!--[if$1]>$2<!--<![endif]-->', $value);
+                $value = preg_replace("/<mconditionnonoutlook><mif>(.*?)<\/mif>(.*?)<\/mconditionnonoutlook>/is", '<!--[if$1]>$2<!--<![endif]-->', (string) $value);
                 $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
             }
 
@@ -451,14 +451,14 @@ class InputHelper
                 $value = preg_replace_callback(
                     "/<mencoded>(.*?)<\/mencoded>/is",
                     fn ($matches): string => htmlspecialchars_decode($matches[1]),
-                    $value);
+                    (string) $value);
             }
 
             if ($needsScriptDecoding) {
                 $value = preg_replace_callback(
                     "/<mscript>(.*?)<\/mscript>/is",
                     fn ($matches): string => base64_decode($matches[1]),
-                    $value);
+                    (string) $value);
             }
         }
 
@@ -518,8 +518,8 @@ class InputHelper
             $matches[2]
         ).$matches[3].'>', str_replace("\r", '', $html));
         // Minify inline CSS declaration(s)
-        if (str_contains($html, ' style=')) {
-            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', fn ($matches): string => '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2], $html);
+        if (str_contains((string) $html, ' style=')) {
+            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', fn ($matches): string => '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2], (string) $html);
         }
 
         $html = preg_replace(
@@ -557,7 +557,7 @@ class InputHelper
                 '$1 ',
                 '$1',
             ],
-            $html
+            (string) $html
         );
 
         return str_replace(["\r", "\n"], ' ', $html);
@@ -565,19 +565,19 @@ class InputHelper
 
     private static function minifyCss(string $css): string
     {
-        $css = preg_replace('/\s*([:;{}])\s*/', '$1', preg_replace('/\s+/', ' ', $css));
+        $css = preg_replace('/\s*([:;{}])\s*/', '$1', (string) preg_replace('/\s+/', ' ', $css));
         // Remove comments
-        $css = preg_replace('/\/\*[^*]*\*+([^\/*][^*]*\*+)*\//', '', $css);
+        $css = preg_replace('/\/\*[^*]*\*+([^\/*][^*]*\*+)*\//', '', (string) $css);
         // Remove whitespace
-        $css = preg_replace('/\s+/', ' ', $css);
+        $css = preg_replace('/\s+/', ' ', (string) $css);
         // Remove leading and trailing whitespace
-        $css = trim($css);
+        $css = trim((string) $css);
         // Replace multiple semicolons with one
         $css = preg_replace('/;(?=;)/', '', $css);
         // Replace multiple whitespaces with one
-        $css = preg_replace('/(\s+)/', ' ', $css);
+        $css = preg_replace('/(\s+)/', ' ', (string) $css);
         // Replace 0(px,em,%, etc) with 0
-        $css = preg_replace('/(:| )0(\.\d+)?(%|em|ex|px|in|cm|mm|pt|pc)/i', '${1}0', $css);
+        $css = preg_replace('/(:| )0(\.\d+)?(%|em|ex|px|in|cm|mm|pt|pc)/i', '${1}0', (string) $css);
 
         return $css;
     }

@@ -95,7 +95,7 @@ class MessageQueueModel extends FormModel
         $queuedContacts = [];
         foreach ($dontSendTo as $frequencyRuleMet) {
             // We only deal with date intervals here (no time intervals) so it's safe to use 'P'
-            $scheduleInterval = new \DateInterval('P1'.substr($frequencyRuleMet['frequency_time'], 0, 1));
+            $scheduleInterval = new \DateInterval('P1'.substr((string) $frequencyRuleMet['frequency_time'], 0, 1));
             if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
                 $this->reschedule($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
             } else {

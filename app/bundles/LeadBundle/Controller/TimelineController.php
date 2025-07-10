@@ -95,7 +95,7 @@ class TimelineController extends CommonController
         $events = $this->getAllEngagements($leads, $filters, $order, $page, $limit);
 
         $str = $request->server->get('QUERY_STRING');
-        parse_str($str, $query);
+        parse_str((string) $str, $query);
 
         $tmpl = 'table';
         if (array_key_exists('from', $query) && 'iframe' === $query['from']) {
@@ -158,7 +158,7 @@ class TimelineController extends CommonController
         $events = $this->getEngagements($lead, $filters, $order, $page);
 
         $str = $request->server->get('QUERY_STRING');
-        parse_str($str, $query);
+        parse_str((string) $str, $query);
 
         $tmpl = 'table';
         if (array_key_exists('from', $query) && 'iframe' === $query['from']) {

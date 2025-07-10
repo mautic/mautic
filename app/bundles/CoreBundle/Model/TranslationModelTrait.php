@@ -62,7 +62,7 @@ trait TranslationModelTrait
             if (null !== $request) {
                 $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
                 if (!empty($browserLanguages)) {
-                    $browserLanguages = explode(',', $browserLanguages);
+                    $browserLanguages = explode(',', (string) $browserLanguages);
                     foreach ($browserLanguages as $language) {
                         if (($pos = strpos($language, ';q=')) !== false) {
                             // remove weights
@@ -132,8 +132,8 @@ trait TranslationModelTrait
      */
     protected function getTranslationLocaleCore($locale)
     {
-        if (str_contains($locale, '_')) {
-            $locale = substr($locale, 0, 2);
+        if (str_contains((string) $locale, '_')) {
+            $locale = substr((string) $locale, 0, 2);
         }
 
         return $locale;

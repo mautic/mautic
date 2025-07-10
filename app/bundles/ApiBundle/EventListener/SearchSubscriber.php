@@ -15,9 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private ClientModel $apiClientModel,
-        private CorePermissions $security,
-        private GlobalSearch $globalSearch,
+        private readonly ClientModel $apiClientModel,
+        private readonly CorePermissions $security,
+        private readonly GlobalSearch $globalSearch,
     ) {
     }
 

@@ -11,8 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AssetsHelper $assetsHelper,
-        private IntegrationHelper $integrationHelper,
+        private readonly AssetsHelper $assetsHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
     }
 

@@ -7,10 +7,10 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 class FulltextKeyword implements \Stringable
 {
     public function __construct(
-        private string $value,
-        private bool $booleanMode = true,
-        private bool $wordSearch = true,
-        private bool $wordInflecting = false,
+        private readonly string $value,
+        private readonly bool $booleanMode = true,
+        private readonly bool $wordSearch = true,
+        private readonly bool $wordInflecting = false,
     ) {
     }
 
@@ -25,7 +25,7 @@ class FulltextKeyword implements \Stringable
         $value  = mb_substr($this->value, 0, 255);
 
         if ($this->wordSearch) {
-            $words     = explode(' ', preg_replace('/[^\p{L}\p{N}_]+/u', ' ', $value));
+            $words     = explode(' ', (string) preg_replace('/[^\p{L}\p{N}_]+/u', ' ', $value));
             $wordCount = count($words);
 
             for ($i = 0; $i < $wordCount; ++$i) {

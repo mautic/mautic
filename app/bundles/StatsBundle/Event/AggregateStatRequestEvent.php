@@ -8,16 +8,16 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AggregateStatRequestEvent extends Event
 {
-    private StatCollection $statCollection;
+    private readonly StatCollection $statCollection;
 
     /**
      * @param string $statName
      */
     public function __construct(
         private $statName,
-        private \DateTimeInterface $fromDateTime,
-        private \DateTimeInterface $toDateTime,
-        private FetchOptions $options,
+        private readonly \DateTimeInterface $fromDateTime,
+        private readonly \DateTimeInterface $toDateTime,
+        private readonly FetchOptions $options,
     ) {
         $this->statCollection = new StatCollection();
     }
@@ -94,7 +94,7 @@ class AggregateStatRequestEvent extends Event
     public function checkContextPrefixes(array $prefixes): bool
     {
         foreach ($prefixes as $string) {
-            if (str_starts_with($this->statName, $string)) {
+            if (str_starts_with($this->statName, (string) $string)) {
                 return true;
             }
         }

@@ -12,10 +12,10 @@ final class FieldCrate
      * @param mixed[] $properties
      */
     public function __construct(
-        private string $key,
-        private string $name,
-        private string $type,
-        private array $properties,
+        private readonly string $key,
+        private readonly string $name,
+        private readonly string $type,
+        private readonly array $properties,
     ) {
     }
 

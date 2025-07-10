@@ -13,8 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TimelineSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LeadEventLogRepository $eventLogRepository,
-        private TranslatorInterface $translator,
+        private readonly LeadEventLogRepository $eventLogRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -59,7 +59,7 @@ class TimelineSubscriber implements EventSubscriberInterface
      */
     private function getEventEntry(array $log, string $eventType, string $eventTypeName): array
     {
-        $properties = json_decode($log['properties'], true);
+        $properties = json_decode((string) $log['properties'], true);
 
         return [
             'event'           => $eventType,

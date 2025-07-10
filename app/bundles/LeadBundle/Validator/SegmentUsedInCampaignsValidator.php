@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentUsedInCampaignsValidator
 {
-    public function __construct(private LeadListRepository $leadListRepository, private TranslatorInterface $translator)
+    public function __construct(private readonly LeadListRepository $leadListRepository, private readonly TranslatorInterface $translator)
     {
     }
 

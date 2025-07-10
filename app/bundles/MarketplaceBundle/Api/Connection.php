@@ -13,8 +13,8 @@ use Psr\Log\LoggerInterface;
 class Connection
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private LoggerInterface $logger,
+        private readonly ClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

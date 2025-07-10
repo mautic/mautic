@@ -17,7 +17,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
      * @param bool   $isArray
      */
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManager $em,
         private $repository = '',
         private $isArray = false,
     ) {

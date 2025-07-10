@@ -131,7 +131,7 @@ class ClearbitController extends FormController
             $ids = $data['ids'];
 
             if (!is_array($ids)) {
-                $ids = json_decode($ids, true);
+                $ids = json_decode((string) $ids, true);
             }
 
             if (is_array($ids) && count($ids)) {
@@ -310,7 +310,7 @@ class ClearbitController extends FormController
                     ]
                 );
             }
-            $parse = parse_url($website);
+            $parse = parse_url((string) $website);
 
             return $this->delegateView(
                 [
@@ -384,7 +384,7 @@ class ClearbitController extends FormController
             $ids = $data['ids'];
 
             if (!is_array($ids)) {
-                $ids = json_decode($ids, true);
+                $ids = json_decode((string) $ids, true);
             }
 
             if (is_array($ids) && count($ids)) {
@@ -411,7 +411,7 @@ class ClearbitController extends FormController
             foreach ($entities as $company) {
                 if ($company->getFieldValue('companywebsite')) {
                     $website = $company->getFieldValue('companywebsite');
-                    $parse   = parse_url($website);
+                    $parse   = parse_url((string) $website);
                     if (!isset($parse['host'])) {
                         continue;
                     }

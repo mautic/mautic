@@ -19,9 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TestHandler implements MessageSubscriberInterface
 {
     public function __construct(
-        private NotificationModel $notificationModel,
-        private EntityManagerInterface $entityManager,
-        private TranslatorInterface $translator,
+        private readonly NotificationModel $notificationModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

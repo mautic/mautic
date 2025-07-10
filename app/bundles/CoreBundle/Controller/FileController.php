@@ -83,7 +83,7 @@ class FileController extends AjaxController
     public function deleteAction(Request $request, PathsHelper $pathsHelper): JsonResponse
     {
         $src       = InputHelper::clean($request->request->get('src'));
-        $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.basename($src);
+        $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.basename((string) $src);
 
         if (!file_exists($imagePath)) {
             $this->response['error'] = 'File does not exist';

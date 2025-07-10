@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final class EmailConfig implements EmailConfigInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
+    public function __construct(private readonly CoreParametersHelper $coreParametersHelper)
     {
     }
 

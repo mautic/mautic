@@ -94,7 +94,7 @@ class LookupHelper
         if ($fullcontact = $this->getFullContact(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
-                    $parse                             = parse_url($website);
+                    $parse                             = parse_url((string) $website);
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['fullcontact'])) {
@@ -129,7 +129,7 @@ class LookupHelper
     public function validateRequest($oid)
     {
         // prefix#entityId#hour#userId#nonce
-        [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
+        [$w, $id, $hour, $uid, $nonce]     = explode('#', (string) $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
         $type                              = (str_starts_with($w, 'fullcontactcomp')) ? 'company' : 'person';
 

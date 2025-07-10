@@ -128,11 +128,11 @@ class EmailController extends FormController
 
             // Parse the selected values
             $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
+            $updatedFilters = json_decode((string) $updatedFilters, true);
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $filter] = explode(':', $updatedFilter);
+                    [$column, $filter] = explode(':', (string) $updatedFilter);
 
                     $newFilters[$column][] = $filter;
                 }
@@ -1102,7 +1102,7 @@ class EmailController extends FormController
         $model = $this->getModel('email');
 
         // permission check
-        if (str_contains($objectId, 'new')) {
+        if (str_contains((string) $objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
                 return $this->accessDenied();

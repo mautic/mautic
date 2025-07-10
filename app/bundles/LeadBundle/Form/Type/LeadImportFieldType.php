@@ -20,8 +20,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadImportFieldType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private EntityManager $entityManager,
+        private readonly TranslatorInterface $translator,
+        private readonly EntityManager $entityManager,
     ) {
     }
 
@@ -147,10 +147,7 @@ class LeadImportFieldType extends AbstractType
         $resolver->setRequired(['all_fields', 'import_fields', 'object']);
         $resolver->setDefaults([
             'line_count_limit'  => 0,
-            'validation_groups' => [
-                User::class,
-                'determineValidationGroups',
-            ],
+            'validation_groups' => User::determineValidationGroups(...),
         ]);
     }
 

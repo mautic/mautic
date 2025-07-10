@@ -11,7 +11,7 @@ final class AddressDTO
 {
     private ?string $name = null;
 
-    public function __construct(private string $email, ?string $name = null)
+    public function __construct(private readonly string $email, ?string $name = null)
     {
         $this->setName($name);
     }
@@ -72,7 +72,7 @@ final class AddressDTO
      */
     public function getNameTokenValue(array $contact): string
     {
-        if (!preg_match('/{contactfield=(.*?)}/', $this->name, $matches)) {
+        if (!preg_match('/{contactfield=(.*?)}/', (string) $this->name, $matches)) {
             throw new TokenNotFoundOrEmptyException();
         }
 

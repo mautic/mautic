@@ -259,7 +259,7 @@ class SalesforceApi extends CrmApi
                     $body = [
                         $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
                         $namespace.'Description__c'  => $record['description'],
-                        'Name'                       => substr($record['name'], 0, 80),
+                        'Name'                       => substr((string) $record['name'], 0, 80),
                         $namespace.'Mautic_url__c'   => $records['leadUrl'],
                         $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId,
                     ];
@@ -331,7 +331,7 @@ class SalesforceApi extends CrmApi
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
         $fields                  = $this->integration->getFieldsForQuery($object);
         if (!empty($fields) && isset($query['start'])) {
-            if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
+            if (strtotime((string) $query['start']) < strtotime((string) $organizationCreatedDate)) {
                 $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
 
@@ -427,7 +427,7 @@ class SalesforceApi extends CrmApi
             $queryUrl = $this->integration->getQueryUrl().'/query';
         }
 
-        $query = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
+        $query = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim((string) $campaignId)."'";
         if ($modifiedSince) {
             $query .= ' and SystemModStamp >= '.$modifiedSince;
         }
@@ -536,7 +536,7 @@ class SalesforceApi extends CrmApi
                 }
                 $lineItemForInvalidSession              = $lineItem;
                 $lineItemForInvalidSession['errorCode'] = 'INVALID_SESSION_ID';
-                if (!empty($lineItemForInvalidSession['message']) && str_contains($lineItemForInvalidSession['message'], '"errorCode":"INVALID_SESSION_ID"') && $error = $this->processError($lineItemForInvalidSession, $isRetry)) {
+                if (!empty($lineItemForInvalidSession['message']) && str_contains((string) $lineItemForInvalidSession['message'], '"errorCode":"INVALID_SESSION_ID"') && $error = $this->processError($lineItemForInvalidSession, $isRetry)) {
                     $errors[] = $error;
                     continue;
                 }

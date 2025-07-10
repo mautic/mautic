@@ -26,8 +26,8 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     }
 
     public function __construct(
-        private Unsubscribe $unsubscriber,
-        private FeedbackLoop $looper,
+        private readonly Unsubscribe $unsubscriber,
+        private readonly FeedbackLoop $looper,
     ) {
     }
 
@@ -60,7 +60,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
             $existing         = $headers['List-Unsubscribe'] ?? '';
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
             if ($existing) {
-                if (!str_contains($existing, $unsubscribeEmail)) {
+                if (!str_contains((string) $existing, $unsubscribeEmail)) {
                     $updatedHeader = $existing.', '.$unsubscribeEmail;
                 } else {
                     $updatedHeader = $existing;

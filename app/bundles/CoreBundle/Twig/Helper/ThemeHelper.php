@@ -11,9 +11,9 @@ use Mautic\CoreBundle\Helper\PathsHelper;
  */
 final class ThemeHelper
 {
-    private string $themeDir;
+    private readonly string $themeDir;
 
-    private string $themePath;
+    private readonly string $themePath;
 
     /**
      * @var mixed

@@ -17,7 +17,7 @@ class TokenHelper
     {
         $tokens = [];
 
-        preg_match_all('/{form=(.*?)}/', $content, $matches);
+        preg_match_all('/{form=(.*?)}/', (string) $content, $matches);
 
         if (count($matches[0])) {
             foreach ($matches[1] as $k => $id) {

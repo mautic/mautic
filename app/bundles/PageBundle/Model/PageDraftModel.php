@@ -13,8 +13,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class PageDraftModel
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private PageDraftRepository $pageDraftRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly PageDraftRepository $pageDraftRepository,
     ) {
     }
 

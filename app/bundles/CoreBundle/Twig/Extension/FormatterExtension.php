@@ -19,16 +19,16 @@ class FormatterExtension extends AbstractExtension
     public function getFilters()
     {
         return [
-            new TwigFilter('formatter_simple_array_to_html', [$this, 'simpleArrayToHtml'], ['is_safe' => ['html']]),
+            new TwigFilter('formatter_simple_array_to_html', $this->simpleArrayToHtml(...), ['is_safe' => ['html']]),
         ];
     }
 
     public function getFunctions()
     {
         return [
-            new TwigFunction('format', [$this, '_'], ['is_safe' => ['all']]),
-            new TwigFunction('normalizeStringValue', [$this, 'normalizeStringValue']),
-            new TwigFunction('formatter_simple_array_to_html', [$this, 'simpleArrayToHtml'], ['is_safe' => ['html']]),
+            new TwigFunction('format', $this->_(...), ['is_safe' => ['all']]),
+            new TwigFunction('normalizeStringValue', $this->normalizeStringValue(...)),
+            new TwigFunction('formatter_simple_array_to_html', $this->simpleArrayToHtml(...), ['is_safe' => ['html']]),
         ];
     }
 

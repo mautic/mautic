@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class TextOnlyDynamicContentValidator extends ConstraintValidator
 {
-    public function __construct(private DynamicContentModel $dynamicContentModel)
+    public function __construct(private readonly DynamicContentModel $dynamicContentModel)
     {
     }
 

@@ -12,10 +12,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CampaignAuditService
 {
     public function __construct(
-        private FlashBag $flashBag,
-        private UrlGeneratorInterface $urlGenerator,
-        private CampaignRepository $campaignRepository,
-        private EmailRepository $emailRepository,
+        private readonly FlashBag $flashBag,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly EmailRepository $emailRepository,
     ) {
     }
 

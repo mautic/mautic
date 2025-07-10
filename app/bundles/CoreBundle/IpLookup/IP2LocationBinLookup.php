@@ -24,7 +24,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
      */
     public function getRemoteDateStoreDownloadUrl()
     {
-        $usernamePass = explode(':', $this->auth);
+        $usernamePass = explode(':', (string) $this->auth);
         $data         = [];
 
         if (isset($usernamePass[0]) && isset($usernamePass[1])) {

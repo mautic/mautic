@@ -40,7 +40,7 @@ class ConfigEvent extends CommonEvent
      */
     public function __construct(
         private ?array $config,
-        private ParameterBag $post,
+        private readonly ParameterBag $post,
     ) {
     }
 
@@ -164,7 +164,7 @@ class ConfigEvent extends CommonEvent
 
     public function encodeFileContents($content): string
     {
-        return base64_encode($content);
+        return base64_encode((string) $content);
     }
 
     /**

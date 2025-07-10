@@ -27,14 +27,14 @@ use Symfony\Component\Routing\RouterInterface;
 class FocusSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private RouterInterface $router,
-        private IpLookupHelper $ipHelper,
-        private AuditLogModel $auditLogModel,
-        private TrackableModel $trackableModel,
-        private PageTokenHelper $pageTokenHelper,
-        private AssetTokenHelper $assetTokenHelper,
-        private FocusModel $focusModel,
-        private RequestStack $requestStack,
+        private readonly RouterInterface $router,
+        private readonly IpLookupHelper $ipHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly PageTokenHelper $pageTokenHelper,
+        private readonly AssetTokenHelper $assetTokenHelper,
+        private readonly FocusModel $focusModel,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -63,7 +63,7 @@ class FocusSubscriber implements EventSubscriberInterface
 
             if (str_contains($requestUri, $formGenerateUrl)) {
                 $id = InputHelper::_($this->requestStack->getCurrentRequest()->get('id'));
-                if (str_starts_with($id, 'mf-')) {
+                if (str_starts_with((string) $id, 'mf-')) {
                     $mfId             = str_replace('mf-', '', $id);
                     $focusGenerateUrl = $this->router->generate('mautic_focus_generate', ['id' => $mfId]);
 

@@ -72,7 +72,7 @@ class ConnectionBuilder
                 break;
             case 'anchor':
                 foreach ($restrictions as $anchor) {
-                    [$group, $anchor]                                               = explode('.', $anchor);
+                    [$group, $anchor]                                               = explode('.', (string) $anchor);
                     self::$connectionRestrictions[$restrictionType][$group][$key][] = $anchor;
                 }
 
@@ -103,7 +103,7 @@ class ConnectionBuilder
 
         if (isset($event['anchorRestrictions'])) {
             foreach ($event['anchorRestrictions'] as $restriction) {
-                [$group, $anchor]                                       = explode('.', $restriction);
+                [$group, $anchor]                                       = explode('.', (string) $restriction);
                 self::$connectionRestrictions['anchor'][$key][$group][] = $anchor;
             }
         }

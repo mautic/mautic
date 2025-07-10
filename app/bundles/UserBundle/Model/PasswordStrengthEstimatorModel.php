@@ -22,9 +22,9 @@ class PasswordStrengthEstimatorModel
         'company',
     ];
 
-    private PasswordStrengthEstimator $passwordStrengthEstimator;
+    private readonly PasswordStrengthEstimator $passwordStrengthEstimator;
 
-    public function __construct(private EventDispatcherInterface $dispatcher)
+    public function __construct(private readonly EventDispatcherInterface $dispatcher)
     {
         $this->passwordStrengthEstimator = new PasswordStrengthEstimator();
     }

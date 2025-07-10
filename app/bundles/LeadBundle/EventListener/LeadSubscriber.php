@@ -503,10 +503,10 @@ class LeadSubscriber implements EventSubscriberInterface
             foreach ($utmTags['results'] as $utmTag) {
                 $icon = 'ri-hashtag';
                 if (isset($utmTag['utm_medium'])) {
-                    switch (strtolower($utmTag['utm_medium'])) {
+                    switch (strtolower((string) $utmTag['utm_medium'])) {
                         case 'social':
                         case 'socialmedia':
-                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-line');
+                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower((string) $utmTag['utm_source']) : 'share-line');
                             break;
                         case 'email':
                         case 'newsletter':
@@ -523,7 +523,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             $icon = 'ri-map-pin-2-line';
                             break;
                         case 'device':
-                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet-line');
+                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower((string) $utmTag['utm_source']) : 'tablet-line');
                             break;
                     }
                 }
@@ -597,9 +597,9 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventId'    => $eventTypeKey.$row['id'],
                         'eventLabel' => (isset($row['itemName'])) ?
                             [
-                                'label' => ucfirst($row['channel']).' / '.$row['itemName'],
+                                'label' => ucfirst((string) $row['channel']).' / '.$row['itemName'],
                                 'href'  => $row['itemRoute'],
-                            ] : ucfirst($row['channel']),
+                            ] : ucfirst((string) $row['channel']),
                         'eventType' => $eventTypeName,
                         'timestamp' => $row['date_added'],
                         'extra'     => [

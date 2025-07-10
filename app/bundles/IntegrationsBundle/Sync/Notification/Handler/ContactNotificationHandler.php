@@ -21,10 +21,10 @@ class ContactNotificationHandler implements HandlerInterface
     private ?string $objectDisplayName = null;
 
     public function __construct(
-        private Writer $writer,
-        private LeadEventLogRepository $leadEventRepository,
-        private EntityManagerInterface $em,
-        private UserSummaryNotificationHelper $userNotificationHelper,
+        private readonly Writer $writer,
+        private readonly LeadEventLogRepository $leadEventRepository,
+        private readonly EntityManagerInterface $em,
+        private readonly UserSummaryNotificationHelper $userNotificationHelper,
     ) {
     }
 

@@ -13,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class FormConditionalSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FormModel $formModel,
-        private FieldModel $fieldModel,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $fieldModel,
     ) {
     }
 

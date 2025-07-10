@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ChartQuery extends AbstractChart
 {
-    private DateTimeHelper $dateTimeHelper;
+    private readonly DateTimeHelper $dateTimeHelper;
 
     private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
@@ -332,7 +332,7 @@ class ChartQuery extends AbstractChart
                          * format, so we transform it into d-M-Y.
                          */
                         if ('W' === $this->unit && isset($item['date'])) {
-                            [$year, $week]     = explode(' ', $item['date']);
+                            [$year, $week]     = explode(' ', (string) $item['date']);
                             $newDate           = new \DateTime();
                             $newDate->setISODate($year, $week);
                             $item['date'] = $newDate->format('d-M-Y');
@@ -551,11 +551,11 @@ class ChartQuery extends AbstractChart
      */
     protected function prepareTable($table)
     {
-        if (MAUTIC_TABLE_PREFIX && str_starts_with($table, MAUTIC_TABLE_PREFIX)) {
+        if (MAUTIC_TABLE_PREFIX && str_starts_with((string) $table, MAUTIC_TABLE_PREFIX)) {
             return $table;
         }
 
-        if (str_starts_with($table, '(')) {
+        if (str_starts_with((string) $table, '(')) {
             return $table;
         }
 

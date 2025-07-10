@@ -935,7 +935,7 @@ class Mailbox
                         ) {
                             break;
                         }
-                        $reportType = strtolower($params['report-type']);
+                        $reportType = strtolower((string) $params['report-type']);
                         switch ($reportType) {
                             case 'delivery-status':
                                 $mail->dsnMessage = trim($data);
@@ -1015,8 +1015,8 @@ class Mailbox
 
     protected function isUrlEncoded($string): bool
     {
-        $hasInvalidChars = preg_match('#[^%a-zA-Z0-9\-_\.\+]#', $string);
-        $hasEscapedChars = preg_match('#%[a-zA-Z0-9]{2}#', $string);
+        $hasInvalidChars = preg_match('#[^%a-zA-Z0-9\-_\.\+]#', (string) $string);
+        $hasEscapedChars = preg_match('#%[a-zA-Z0-9]{2}#', (string) $string);
 
         return !$hasInvalidChars && $hasEscapedChars;
     }
@@ -1028,7 +1028,7 @@ class Mailbox
      */
     protected function decodeRFC2231($string, $charset = 'utf-8')
     {
-        if (preg_match("/^(.*?)'.*?'(.*?)$/", $string, $matches)) {
+        if (preg_match("/^(.*?)'.*?'(.*?)$/", (string) $string, $matches)) {
             $encoding = $matches[1];
             $data     = $matches[2];
             if ($this->isUrlEncoded($data)) {

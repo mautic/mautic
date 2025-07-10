@@ -30,12 +30,12 @@ class TwitterCommandHelper
     private $twitterHandleField;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private FieldModel $fieldModel,
-        private MonitoringModel $monitoringModel,
-        private PostCountModel $postCountModel,
-        private Translator $translator,
-        private EntityManagerInterface $em,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
+        private readonly MonitoringModel $monitoringModel,
+        private readonly PostCountModel $postCountModel,
+        private readonly Translator $translator,
+        private readonly EntityManagerInterface $em,
         CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
@@ -121,7 +121,7 @@ class TwitterCommandHelper
             $usersByHandles[] = $expr->literal($status['user']['screen_name']);
 
             // Split the twitter user's name into its parts if we're matching to contacts by name
-            if ($monitorProperties['checknames'] && $status['user']['name'] && str_contains($status['user']['name'], ' ')) {
+            if ($monitorProperties['checknames'] && $status['user']['name'] && str_contains((string) $status['user']['name'], ' ')) {
                 [$firstName, $lastName] = $this->splitName($status['user']['name']);
 
                 if (!empty($firstName) && !empty($lastName)) {
@@ -153,7 +153,7 @@ class TwitterCommandHelper
             $twitterLeads = [];
             foreach ($leads as $lead) {
                 $fields                       = $lead->getFields();
-                $twitterHandle                = strtolower($fields[$handleFieldGroup][$this->twitterHandleField]['value']);
+                $twitterHandle                = strtolower((string) $fields[$handleFieldGroup][$this->twitterHandleField]['value']);
                 $twitterLeads[$twitterHandle] = $lead;
             }
 
@@ -200,7 +200,7 @@ class TwitterCommandHelper
 
         $processedLeads = [];
         foreach ($statusList as $status) {
-            $handle = strtolower($status['user']['screen_name']);
+            $handle = strtolower((string) $status['user']['screen_name']);
 
             /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {

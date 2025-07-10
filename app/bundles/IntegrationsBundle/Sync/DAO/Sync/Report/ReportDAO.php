@@ -16,7 +16,7 @@ class ReportDAO
 
     private array $remappedObjects = [];
 
-    private RelationsDAO $relationsDAO;
+    private readonly RelationsDAO $relationsDAO;
 
     /**
      * @param string $integration

@@ -24,7 +24,7 @@ class oAuthHelper
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
-        private ?Request $request = null,
+        private readonly ?Request $request = null,
         $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
@@ -74,7 +74,7 @@ class oAuthHelper
      */
     private function getCompositeKey(): string
     {
-        if (strlen($this->accessTokenSecret) > 0) {
+        if (strlen((string) $this->accessTokenSecret) > 0) {
             $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
         } else {
             $composite_key = $this->encode($this->clientSecret).'&';
@@ -104,7 +104,7 @@ class oAuthHelper
         }
 
         if (!empty($this->settings['append_callback']) && !empty($this->callback)) {
-            $oauth['oauth_callback'] = urlencode($this->callback);
+            $oauth['oauth_callback'] = urlencode((string) $this->callback);
         }
 
         return $oauth;
@@ -169,7 +169,7 @@ class oAuthHelper
      */
     public function encode($string): string
     {
-        return str_replace('%7E', '~', rawurlencode($string));
+        return str_replace('%7E', '~', rawurlencode((string) $string));
     }
 
     /**

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ValidatorInterface $validator;
+    private readonly ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [
@@ -177,14 +177,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 } else {
                     $sanitizedValue = $this->sanitizeValue($value);
                 }
-                if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', $formHtml, $match)) {
+                if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', (string) $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$sanitizedValue.'"'
                         .$match[4].$fieldAttributeReadOnly($field, $sanitizedValue).'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'textarea':
-                if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
+                if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', (string) $formHtml, $match)) {
                     $value    = $this->sanitizeValue($value);
                     $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].$fieldAttributeReadOnly($field, $value).'>'.$value.'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
@@ -202,7 +202,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     $val = $this->sanitizeValue($val);
                     if (preg_match(
                         '/<input(.*?)id="mauticform_checkboxgrp_checkbox_'.$alias.'(.*?)"(.*?)value="'.$val.'"(.*?)\/?>/i',
-                        $formHtml,
+                        (string) $formHtml,
                         $match
                     )) {
                         $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox_'.$alias.$match[2].'"'.$match[3].'value="'.$val.'"'
@@ -213,7 +213,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 break;
             case 'radiogrp':
                 $value = $this->sanitizeValue($value);
-                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio_'.$alias.'(.*?)"(.*?)value="'.$value.'"(.*?)\/?>/i', $formHtml, $match)) {
+                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio_'.$alias.'(.*?)"(.*?)value="'.$value.'"(.*?)\/?>/i', (string) $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio_'.$alias.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
                         .' checked />';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
@@ -222,7 +222,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'select':
             case 'country':
                 $regex = '/<select\s*id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)<\/select>/is';
-                if (preg_match($regex, $formHtml, $match)) {
+                if (preg_match($regex, (string) $formHtml, $match)) {
                     $origText = $match[0];
                     $replace  = str_replace(
                         '<option value="'.$this->sanitizeValue($value).'">',

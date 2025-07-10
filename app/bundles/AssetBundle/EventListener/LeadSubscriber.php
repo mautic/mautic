@@ -15,10 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AssetModel $assetModel,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private DownloadRepository $downloadRepository,
+        private readonly AssetModel $assetModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly DownloadRepository $downloadRepository,
     ) {
     }
 

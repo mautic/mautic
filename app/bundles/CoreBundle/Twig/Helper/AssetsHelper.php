@@ -47,7 +47,7 @@ final class AssetsHelper
     private InstallService $installService;
 
     public function __construct(
-        private Packages $packages,
+        private readonly Packages $packages,
     ) {
     }
 
@@ -564,7 +564,7 @@ final class AssetsHelper
         // Extract existing links and tags
         $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links): string {
             return '<'.array_push($links, $match[1]).'>';
-        }, $text);
+        }, (string) $text);
 
         // Extract text links for each protocol
         foreach ((array) $protocols as $protocol) {

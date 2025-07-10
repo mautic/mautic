@@ -11,8 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private HitRepository $hitRepository,
-        private TranslatorInterface $translator,
+        private readonly HitRepository $hitRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

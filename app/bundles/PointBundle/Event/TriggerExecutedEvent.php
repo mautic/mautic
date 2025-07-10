@@ -11,8 +11,8 @@ class TriggerExecutedEvent extends Event
     private ?bool $result = null;
 
     public function __construct(
-        private TriggerEventEntity $triggerEvent,
-        private Lead $lead,
+        private readonly TriggerEventEntity $triggerEvent,
+        private readonly Lead $lead,
     ) {
     }
 

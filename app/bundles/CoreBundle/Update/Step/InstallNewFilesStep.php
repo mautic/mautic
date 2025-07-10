@@ -17,9 +17,9 @@ final class InstallNewFilesStep implements StepInterface
     private ?InputInterface $input = null;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private UpdateHelper $updateHelper,
-        private PathsHelper $pathsHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly UpdateHelper $updateHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 
@@ -98,7 +98,7 @@ final class InstallNewFilesStep implements StepInterface
             throw new UpdateFailedException($this->translator->trans($package['message']));
         }
 
-        return $this->pathsHelper->getCachePath().'/'.basename($update['package']);
+        return $this->pathsHelper->getCachePath().'/'.basename((string) $update['package']);
     }
 
     /**

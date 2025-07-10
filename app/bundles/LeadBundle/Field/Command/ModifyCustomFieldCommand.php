@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ModifyCustomFieldCommand extends Command
 {
-    public function __construct(private FieldModel $fieldModel, private TranslatorInterface $translator)
+    public function __construct(private readonly FieldModel $fieldModel, private readonly TranslatorInterface $translator)
     {
         parent::__construct();
     }

@@ -15,7 +15,7 @@ class SiteUrlEnvVars implements EnvVarsInterface
             return;
         }
 
-        $parts = parse_url($siteUrl);
+        $parts = parse_url((string) $siteUrl);
 
         // Host
         if (empty($parts['host'])) {

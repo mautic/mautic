@@ -14,8 +14,8 @@ class Adder
     public const NAME = 'added';
 
     public function __construct(
-        private LeadRepository $leadRepository,
-        private LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
     }
 

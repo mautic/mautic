@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class WebhookRequestEvent extends Event
 {
     public function __construct(
-        private Lead $contact,
+        private readonly Lead $contact,
         private string $url,
         private array $headers,
         private array $payload,

@@ -10,10 +10,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UserNotificationBuilder
 {
     public function __construct(
-        private UserHelper $userHelper,
-        private OwnerProvider $ownerProvider,
-        private RouteHelper $routeHelper,
-        private TranslatorInterface $translator,
+        private readonly UserHelper $userHelper,
+        private readonly OwnerProvider $ownerProvider,
+        private readonly RouteHelper $routeHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

@@ -22,7 +22,7 @@ class LeadExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('leadGetAvatar', [$this, 'getAvatar']),
+            new TwigFunction('leadGetAvatar', $this->getAvatar(...)),
         ];
     }
 

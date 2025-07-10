@@ -562,8 +562,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         // remove control characters that will break json_decode from parsing
         $data = preg_replace('/[[:cntrl:]]/', '', $data);
-        if (!$parsed = json_decode($data, true)) {
-            parse_str($data, $parsed);
+        if (!$parsed = json_decode((string) $data, true)) {
+            parse_str((string) $data, $parsed);
         }
 
         return $parsed;
@@ -751,8 +751,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (is_array($parseHeaders)) {
             foreach ($parseHeaders as $key => $value) {
                 // Ignore string keys which assume it is already parsed and avoids splitting up a value that includes colons (such as a date/time)
-                if (!is_string($key) && str_contains($value, ':')) {
-                    [$key, $value]     = explode(':', $value);
+                if (!is_string($key) && str_contains((string) $value, ':')) {
+                    [$key, $value]     = explode(':', (string) $value);
                     $key               = trim($key);
                     $value             = trim($value);
                 }
@@ -1471,7 +1471,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 if ((is_array($details) && !empty($details['required'])) || 'email' === $field
                     || (isset($details['optionLabel'])
                         && 'email' == strtolower(
-                            $details['optionLabel']
+                            (string) $details['optionLabel']
                         ))
                 ) {
                     $requiredFields[$field] = $field;
@@ -2167,10 +2167,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if (is_array($identifier)) {
             foreach ($identifier as &$i) {
-                $i = urlencode($i);
+                $i = urlencode((string) $i);
             }
         } else {
-            $identifier = urlencode($identifier);
+            $identifier = urlencode((string) $identifier);
         }
 
         return $identifier;

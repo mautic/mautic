@@ -21,8 +21,8 @@ class OwnerSubscriber implements EventSubscriberInterface
     private ?array $owners = null;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private TranslatorInterface $translator,
+        private readonly LeadModel $leadModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

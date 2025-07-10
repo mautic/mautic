@@ -26,14 +26,14 @@ use Symfony\Component\Security\Http\SecurityEvents;
 class CoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private MenuHelper $menuHelper,
-        private UserHelper $userHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private AuthorizationCheckerInterface $securityContext,
-        private UserModel $userModel,
-        private EventDispatcherInterface $dispatcher,
-        private RequestStack $requestStack,
+        private readonly BundleHelper $bundleHelper,
+        private readonly MenuHelper $menuHelper,
+        private readonly UserHelper $userHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly AuthorizationCheckerInterface $securityContext,
+        private readonly UserModel $userModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -224,7 +224,7 @@ class CoreSubscriber implements EventSubscriberInterface
                     $this->menuHelper->createMenuStructure($items);
                     foreach ($items as $item) {
                         if (isset($item['iconClass']) && isset($item['id'])) {
-                            $id = explode('_', $item['id']);
+                            $id = explode('_', (string) $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
                                 if (str_ends_with($id[1], 's')) {
@@ -267,7 +267,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (str_contains($details['path'], '{page}')) {
+        if (str_contains((string) $details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -275,7 +275,7 @@ class CoreSubscriber implements EventSubscriberInterface
                 $requirements['page'] = '\d+';
             }
         }
-        if (str_contains($details['path'], '{objectId}')) {
+        if (str_contains((string) $details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -286,13 +286,13 @@ class CoreSubscriber implements EventSubscriberInterface
             }
         }
         if ('api' == $type) {
-            if (str_contains($details['path'], '{id}')) {
+            if (str_contains((string) $details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }
             }
 
-            if (preg_match_all('/\{(.*?Id)\}/', $details['path'], $matches)) {
+            if (preg_match_all('/\{(.*?Id)\}/', (string) $details['path'], $matches)) {
                 // Force digits for IDs
                 foreach ($matches[1] as $match) {
                     if (!isset($requirements[$match])) {

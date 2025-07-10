@@ -55,16 +55,16 @@ class CampaignSubscriber implements EventSubscriberInterface
     private ?array $fields = null;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private LeadModel $leadModel,
-        private FieldModel $leadFieldModel,
-        private ListModel $listModel,
-        private CompanyModel $companyModel,
-        private CampaignModel $campaignModel,
-        private CoreParametersHelper $coreParametersHelper,
-        private DoNotContact $doNotContact,
-        private PointGroupModel $groupModel,
-        private FilterOperatorProvider $filterOperatorProvider,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $leadFieldModel,
+        private readonly ListModel $listModel,
+        private readonly CompanyModel $companyModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly DoNotContact $doNotContact,
+        private readonly PointGroupModel $groupModel,
+        private readonly FilterOperatorProvider $filterOperatorProvider,
     ) {
     }
 
@@ -507,12 +507,12 @@ class CampaignSubscriber implements EventSubscriberInterface
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
-                $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
+                $interval    = substr((string) $event->getConfig()['value'], 1); // remove 1st character + or -
 
-                if (str_contains($event->getConfig()['value'], '+P')) { // add date
+                if (str_contains((string) $event->getConfig()['value'], '+P')) { // add date
                     $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
+                } elseif (str_contains((string) $event->getConfig()['value'], '-P')) { // subtract date
                     $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {
@@ -600,7 +600,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                     $pageId     = $hit['page_id'] ?? null;
 
                     if (!empty($url)) {
-                        $pageUrl = html_entity_decode($pageHitUrl);
+                        $pageUrl = html_entity_decode((string) $pageHitUrl);
                         if (fnmatch($url, $pageUrl)) {
                             if ($hit['dateLeft'] && $totalSpentTime) {
                                 $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -

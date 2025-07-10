@@ -40,10 +40,10 @@ class SendEmailToContact
     private array $contact = [];
 
     public function __construct(
-        private MailHelper $mailer,
-        private StatHelper $statHelper,
-        private DoNotContact $dncModel,
-        private TranslatorInterface $translator,
+        private readonly MailHelper $mailer,
+        private readonly StatHelper $statHelper,
+        private readonly DoNotContact $dncModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

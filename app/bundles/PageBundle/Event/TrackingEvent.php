@@ -11,11 +11,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TrackingEvent extends Event
 {
-    private ParameterBag $response;
+    private readonly ParameterBag $response;
 
     public function __construct(
-        private Lead $contact,
-        private Request $request,
+        private readonly Lead $contact,
+        private readonly Request $request,
         array $mtcSessionResponses,
     ) {
         $this->response = new ParameterBag($mtcSessionResponses);

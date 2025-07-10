@@ -12,16 +12,16 @@ class Release
      */
     private $version;
 
-    private string $downloadUrl;
+    private readonly string $downloadUrl;
 
     /**
      * @var string
      */
     private $announcementUrl;
 
-    private string $stability;
+    private readonly string $stability;
 
-    private Metadata $metadata;
+    private readonly Metadata $metadata;
 
     /**
      * @throws UpdatePackageNotFoundException
@@ -66,7 +66,7 @@ class Release
     private function parseUpdatePackage(array $assets): string
     {
         foreach ($assets as $asset) {
-            if (str_contains($asset['name'], 'update.zip')) {
+            if (str_contains((string) $asset['name'], 'update.zip')) {
                 return $asset['browser_download_url'];
             }
         }

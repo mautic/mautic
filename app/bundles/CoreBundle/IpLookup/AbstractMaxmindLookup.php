@@ -47,7 +47,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response)
     {
-        $data = json_decode($response);
+        $data = json_decode((string) $response);
 
         if ($data) {
             if (empty($data->error)) {

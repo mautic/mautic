@@ -106,7 +106,7 @@ class PageController extends FormController
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
         $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
-        if (!str_contains($search, "{$langSearchCommand}:")) {
+        if (!str_contains((string) $search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
 

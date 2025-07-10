@@ -12,8 +12,8 @@ class InternalObjectRouteEvent extends Event
     private ?string $route = null;
 
     public function __construct(
-        private ObjectInterface $object,
-        private int $id,
+        private readonly ObjectInterface $object,
+        private readonly int $id,
     ) {
     }
 

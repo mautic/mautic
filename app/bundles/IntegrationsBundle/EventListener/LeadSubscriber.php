@@ -27,11 +27,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FieldChangeRepository $fieldChangeRepo,
-        private ObjectMappingRepository $objectMappingRepository,
-        private VariableExpresserHelperInterface $variableExpressor,
-        private SyncIntegrationsHelper $syncIntegrationsHelper,
-        private EventDispatcherInterface $dispatcher,
+        private readonly FieldChangeRepository $fieldChangeRepo,
+        private readonly ObjectMappingRepository $objectMappingRepository,
+        private readonly VariableExpresserHelperInterface $variableExpressor,
+        private readonly SyncIntegrationsHelper $syncIntegrationsHelper,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

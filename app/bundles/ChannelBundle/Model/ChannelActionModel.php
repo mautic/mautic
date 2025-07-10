@@ -11,9 +11,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ChannelActionModel
 {
     public function __construct(
-        private LeadModel $contactModel,
-        private DoNotContact $doNotContact,
-        private TranslatorInterface $translator,
+        private readonly LeadModel $contactModel,
+        private readonly DoNotContact $doNotContact,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

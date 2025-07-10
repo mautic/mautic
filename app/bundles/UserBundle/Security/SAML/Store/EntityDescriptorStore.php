@@ -14,7 +14,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
     private $entityDescriptor;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -64,7 +64,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
 
     private function createEntityDescriptor(): void
     {
-        $xml = base64_decode($this->coreParametersHelper->get('saml_idp_metadata'));
+        $xml = base64_decode((string) $this->coreParametersHelper->get('saml_idp_metadata'));
 
         $this->entityDescriptor = EntityDescriptor::loadXml($xml);
     }

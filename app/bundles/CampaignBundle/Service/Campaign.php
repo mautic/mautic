@@ -11,8 +11,8 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 class Campaign
 {
     public function __construct(
-        private CampaignRepository $campaignRepository,
-        private EmailRepository $emailRepository,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly EmailRepository $emailRepository,
     ) {
     }
 

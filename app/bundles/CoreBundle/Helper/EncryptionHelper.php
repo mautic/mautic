@@ -58,7 +58,7 @@ class EncryptionHelper
         $initVector       = $encryptionCipher->getRandomInitVector();
         $encrypted        = $encryptionCipher->encrypt(serialize($data), $this->key, $initVector);
 
-        return base64_encode($encrypted).'|'.base64_encode($initVector);
+        return base64_encode((string) $encrypted).'|'.base64_encode((string) $initVector);
     }
 
     /**

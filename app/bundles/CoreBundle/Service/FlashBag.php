@@ -19,9 +19,9 @@ class FlashBag
     public const LEVEL_NOTICE    = 'notice';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private RequestStack $requestStack,
-        private NotificationModel $notificationModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RequestStack $requestStack,
+        private readonly NotificationModel $notificationModel,
     ) {
     }
 

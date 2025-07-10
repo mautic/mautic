@@ -8,7 +8,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 class Parser
 {
     public function __construct(
-        private Message $message,
+        private readonly Message $message,
     ) {
     }
 
@@ -19,7 +19,7 @@ class Parser
      */
     public function parse(): RepliedEmail
     {
-        if (!preg_match('/email\/([a-zA-Z0-9]+)\.gif/', $this->message->textHtml, $parts)) {
+        if (!preg_match('/email\/([a-zA-Z0-9]+)\.gif/', (string) $this->message->textHtml, $parts)) {
             throw new ReplyNotFound();
         }
 

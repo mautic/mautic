@@ -46,7 +46,7 @@ trait TimelineEventLogTrait
 
     private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate): array
     {
-        $properties = json_decode($log['properties'], true);
+        $properties = json_decode((string) $log['properties'], true);
 
         $entry = [
             'event'      => $eventType,
@@ -71,7 +71,7 @@ trait TimelineEventLogTrait
      */
     private function getSourceName(array $log, $eventType)
     {
-        $properties = json_decode($log['properties'], true);
+        $properties = json_decode((string) $log['properties'], true);
 
         if (!empty($properties['object_description'])) {
             $customString = 'mautic.lead.timeline.'.$eventType.'_by_object';

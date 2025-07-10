@@ -20,8 +20,8 @@ class ChannelListHelper
     private array $featureChannels = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private Translator $translator,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly Translator $translator,
     ) {
     }
 
@@ -90,7 +90,7 @@ class ChannelListHelper
         return match (true) {
             $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
             $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
-            default                                                   => ucfirst($channel),
+            default                                                   => ucfirst((string) $channel),
         };
     }
 

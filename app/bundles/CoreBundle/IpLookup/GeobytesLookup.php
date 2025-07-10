@@ -35,7 +35,7 @@ class GeobytesLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response)
     {
-        $data = json_decode($response);
+        $data = json_decode((string) $response);
         foreach ($data as $key => $value) {
             $key        = str_replace('geobytes', '', $key);
             $this->$key = $value;

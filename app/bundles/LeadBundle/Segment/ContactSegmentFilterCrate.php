@@ -40,7 +40,7 @@ class ContactSegmentFilterCrate
      */
     private $operator;
 
-    private array $sourceArray;
+    private readonly array $sourceArray;
 
     private $nullValue;
 
@@ -176,7 +176,7 @@ class ContactSegmentFilterCrate
         $operator = $filter['operator'] ?? null;
 
         if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = !str_contains($operator, '!') ? '' : '!';
+            $neg            = !str_contains((string) $operator, '!') ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;

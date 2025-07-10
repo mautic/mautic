@@ -24,7 +24,7 @@ abstract class AbstractFormController extends CommonController
             if (null !== $entity && null !== $entity->getCheckedOutBy()) {
                 $model->unlockEntity($entity);
             }
-            $returnUrl = urldecode($request->get('returnUrl'));
+            $returnUrl = urldecode((string) $request->get('returnUrl'));
             if (empty($returnUrl)) {
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
@@ -32,7 +32,7 @@ abstract class AbstractFormController extends CommonController
             $this->addFlashMessage(
                 'mautic.core.action.entity.unlocked',
                 [
-                    '%name%' => urldecode($request->get('name')),
+                    '%name%' => urldecode((string) $request->get('name')),
                 ]
             );
 
@@ -74,7 +74,7 @@ abstract class AbstractFormController extends CommonController
                             'objectModel'  => $model,
                             'objectId'     => $entity->getId(),
                             'returnUrl'    => $returnUrl,
-                            'name'         => urlencode($entity->$nameFunction()),
+                            'name'         => urlencode((string) $entity->$nameFunction()),
                         ]
                     ),
                 ]
@@ -231,10 +231,10 @@ abstract class AbstractFormController extends CommonController
         $returnUrl         = !empty($request->server->get('HTTP_REFERER')) ? $request->server->get('HTTP_REFERER') : '';
         $vars['returnUrl'] = $returnUrl;
 
-        $urlMatcher  = explode('/s/', $returnUrl);
+        $urlMatcher  = explode('/s/', (string) $returnUrl);
         $actionRoute = $this->container->get('router')->match('/s/'.$urlMatcher[1]);
         $objAction   = $actionRoute['objectAction'] ?? 'index';
-        $routeCtrlr  = explode('\\', $actionRoute['_controller']);
+        $routeCtrlr  = explode('\\', (string) $actionRoute['_controller']);
 
         $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
         $vars['contentTemplate'] ??= $defaultContentTemplate;

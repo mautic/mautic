@@ -9,17 +9,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class GravatarHelper
 {
-    private bool $devMode;
+    private readonly bool $devMode;
 
     /**
      * @var array<string>
      */
-    private array $devHosts;
+    private readonly array $devHosts;
 
     public function __construct(
-        private DefaultAvatarHelper $defaultAvatarHelper,
+        private readonly DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');

@@ -30,7 +30,7 @@ class ResultsPaginator
      * @param string $salesforceBaseUrl
      */
     public function __construct(
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
         private $salesforceBaseUrl,
     ) {
     }
@@ -64,7 +64,7 @@ class ResultsPaginator
             $this->retryCount     = 0;
             $this->nextRecordsUrl = $this->results['nextRecordsUrl'];
 
-            if (!str_contains($this->nextRecordsUrl, $this->salesforceBaseUrl)) {
+            if (!str_contains((string) $this->nextRecordsUrl, $this->salesforceBaseUrl)) {
                 $this->nextRecordsUrl = $this->salesforceBaseUrl.$this->nextRecordsUrl;
             }
 

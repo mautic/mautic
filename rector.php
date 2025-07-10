@@ -99,7 +99,7 @@ return static function (RectorConfig $rectorConfig): void {
     // Define what rule sets will be applied
     $rectorConfig->sets([
         SetList::DEAD_CODE,
-        SetList::PHP_80,
+        SetList::PHP_81,
         // SetList::TYPE_DECLARATION,
     ]);
 

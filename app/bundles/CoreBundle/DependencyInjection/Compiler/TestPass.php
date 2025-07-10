@@ -15,7 +15,7 @@ final class TestPass implements CompilerPassInterface
         // Stub Guzzle HTTP client to prevent accidental request to third parties
         $definition = $container->getDefinition('mautic.http.client');
         $definition->setPublic(true)
-            ->setFactory([\Mautic\CoreBundle\Test\Guzzle\ClientFactory::class, 'stub'])
+            ->setFactory(\Mautic\CoreBundle\Test\Guzzle\ClientFactory::stub(...))
             ->addArgument(new Reference(\GuzzleHttp\Handler\MockHandler::class));
 
         $container->removeAlias(\Symfony\Contracts\HttpClient\HttpClientInterface::class);

@@ -18,11 +18,11 @@ class ReportGenerator
     private ?string $contentTemplate = null;
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private Connection $db,
-        private Report $entity,
-        private ChannelListHelper $channelListHelper,
-        private ?FormFactoryInterface $formFactory = null,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly Connection $db,
+        private readonly Report $entity,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly ?FormFactoryInterface $formFactory = null,
     ) {
     }
 

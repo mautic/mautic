@@ -24,9 +24,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AjaxController extends CommonAjaxController
 {
     public function __construct(
-        private ComposerHelper $composer,
-        private CacheHelper $cacheHelper,
-        private LoggerInterface $logger,
+        private readonly ComposerHelper $composer,
+        private readonly CacheHelper $cacheHelper,
+        private readonly LoggerInterface $logger,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

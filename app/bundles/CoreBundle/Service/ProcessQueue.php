@@ -11,20 +11,20 @@ final class ProcessQueue
     /**
      * @var \SplQueue<Process>
      */
-    private \SplQueue $pending;
+    private readonly \SplQueue $pending;
 
     /**
      * @var \SplObjectStorage<Process,Process>
      */
-    private \SplObjectStorage $processing;
+    private readonly \SplObjectStorage $processing;
 
     /**
      * @var \SplObjectStorage<Process,Process>
      */
-    private \SplObjectStorage $processed;
+    private readonly \SplObjectStorage $processed;
 
     public function __construct(
-        private int $processLimit = 10,
+        private readonly int $processLimit = 10,
     ) {
         $this->pending      = new \SplQueue();
         $this->processing   = new \SplObjectStorage();

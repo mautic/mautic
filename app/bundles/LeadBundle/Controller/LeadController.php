@@ -124,10 +124,10 @@ class LeadController extends FormController
         $session->set('mautic.lead.indexmode', $indexMode);
 
         $anonymousShowing = false;
-        if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
+        if ('list' != $indexMode || ('list' == $indexMode && !str_contains((string) $search, $anonymous))) {
             // remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
-        } elseif (str_contains($search, $anonymous) && !str_contains($search, '!'.$anonymous)) {
+        } elseif (str_contains((string) $search, $anonymous) && !str_contains((string) $search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
@@ -189,10 +189,10 @@ class LeadController extends FormController
         $lists = $leadListModel->getUserLists();
 
         // check to see if in a single list
-        $inSingleList = (1 === substr_count($search, "$listCommand:")) ? true : false;
+        $inSingleList = (1 === substr_count((string) $search, "$listCommand:")) ? true : false;
         $list         = [];
         if ($inSingleList) {
-            preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
+            preg_match("/$listCommand:(.*?)(?=\s|$)/", (string) $search, $matches);
 
             if (!empty($matches[1])) {
                 $alias = $matches[1];
@@ -1445,7 +1445,7 @@ class LeadController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $email = $form->getData();
 
-                    $bodyCheck = trim(strip_tags($email['body']));
+                    $bodyCheck = trim(strip_tags((string) $email['body']));
                     if (!empty($bodyCheck)) {
                         $mailer      = $mailHelper->getMailer();
                         $emailEntity = null;
@@ -1593,7 +1593,7 @@ class LeadController extends FormController
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch'] ?? [];
-            $ids   = json_decode($data['ids'], true);
+            $ids   = json_decode((string) $data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1711,7 +1711,7 @@ class LeadController extends FormController
     {
         if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
-            $ids  = json_decode($data['ids'], true);
+            $ids  = json_decode((string) $data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1791,7 +1791,7 @@ class LeadController extends FormController
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
-            $ids   = json_decode($data['ids'], true);
+            $ids   = json_decode((string) $data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1901,7 +1901,7 @@ class LeadController extends FormController
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
-            $ids   = json_decode($data['ids'], true);
+            $ids   = json_decode((string) $data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -2037,11 +2037,11 @@ class LeadController extends FormController
                 [
                     'column' => 'l.id',
                     'expr'   => 'in',
-                    'value'  => json_decode($ids, true),
+                    'value'  => json_decode((string) $ids, true),
                 ],
             ];
         } else {
-            if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
+            if ('list' != $indexMode || ('list' == $indexMode && !str_contains((string) $search, $anonymous))) {
                 // remove anonymous leads unless requested to prevent clutter
                 $filter['force'] .= " !$anonymous";
             }

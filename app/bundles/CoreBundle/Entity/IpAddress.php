@@ -156,10 +156,10 @@ class IpAddress
     public function isTrackable(): bool
     {
         foreach ($this->doNotTrack as $ip) {
-            if (str_contains($ip, '/')) {
+            if (str_contains((string) $ip, '/')) {
                 // has a netmask range
                 // https://gist.github.com/tott/7684443
-                [$range, $netmask]     = explode('/', $ip, 2);
+                [$range, $netmask]     = explode('/', (string) $ip, 2);
                 $range_decimal         = ip2long($range);
                 $ip_decimal            = ip2long($this->ipAddress);
                 $wildcard_decimal      = 2 ** (32 - $netmask) - 1;
@@ -176,7 +176,7 @@ class IpAddress
                 return false;
             }
 
-            if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+            if (preg_match('/'.str_replace('.', '\\.', $ip).'/', (string) $this->ipAddress)) {
                 return false;
             }
         }

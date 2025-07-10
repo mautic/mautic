@@ -19,9 +19,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LeadModel $leadModel,
-        private TrackingHelper $trackingHelper,
-        private RealTimeExecutioner $realTimeExecutioner,
+        private readonly LeadModel $leadModel,
+        private readonly TrackingHelper $trackingHelper,
+        private readonly RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
 
@@ -176,8 +176,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['url']) && $config['url']) {
-            $pageUrl     = html_entity_decode($eventDetails->getUrl());
-            $limitToUrls = explode(',', $config['url']);
+            $pageUrl     = html_entity_decode((string) $eventDetails->getUrl());
+            $limitToUrls = explode(',', (string) $config['url']);
 
             foreach ($limitToUrls as $url) {
                 $url              = html_entity_decode(trim($url));
@@ -189,8 +189,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['referer']) && $config['referer']) {
-            $refererUrl      = html_entity_decode($eventDetails->getReferer());
-            $limitToReferers = explode(',', $config['referer']);
+            $refererUrl      = html_entity_decode((string) $eventDetails->getReferer());
+            $limitToReferers = explode(',', (string) $config['referer']);
 
             foreach ($limitToReferers as $referer) {
                 $referer                  = html_entity_decode(trim($referer));

@@ -34,16 +34,16 @@ class ContactRequestHelper
     private array $publiclyUpdatableFieldValues = [];
 
     public function __construct(
-        private LeadModel $leadModel,
-        private ContactTracker $contactTracker,
-        private CoreParametersHelper $coreParametersHelper,
-        private IpLookupHelper $ipLookupHelper,
-        private RequestStack $requestStack,
-        private LoggerInterface $logger,
-        private EventDispatcherInterface $eventDispatcher,
-        private ContactMerger $contactMerger,
-        private StatRepository $statRepository,
-        private BotRatioHelper $botRatioHelper,
+        private readonly LeadModel $leadModel,
+        private readonly ContactTracker $contactTracker,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly RequestStack $requestStack,
+        private readonly LoggerInterface $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ContactMerger $contactMerger,
+        private readonly StatRepository $statRepository,
+        private readonly BotRatioHelper $botRatioHelper,
     ) {
     }
 

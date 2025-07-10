@@ -110,7 +110,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $response = $this->makeRequest($url.'/system/members/', $parameters, 'GET', $settings);
 
             foreach ($response as $key => $r) {
-                $key = preg_replace('/[\r\n]+/', '', $key);
+                $key = preg_replace('/[\r\n]+/', '', (string) $key);
                 switch ($key) {
                     case '<!DOCTYPE_html_PUBLIC_"-//W3C//DTD_XHTML_1_0_Strict//EN"_"http://www_w3_org/TR/xhtml1/DTD/xhtml1-strict_dtd"><html_xmlns':
                         $error = '404 not found error';
@@ -220,7 +220,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if (in_array($field['type'], ['string', 'boolean', 'ref'])) {
                 $cwFields[$fieldName] = [
                     'type'     => $field['type'],
-                    'label'    => ucfirst($fieldName),
+                    'label'    => ucfirst((string) $fieldName),
                     'required' => $field['required'],
                 ];
             }

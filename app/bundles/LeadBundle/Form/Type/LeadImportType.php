@@ -54,7 +54,7 @@ class LeadImportType extends AbstractType
             ),
         ];
 
-        $default = (empty($options['data']['delimiter'])) ? ',' : htmlspecialchars($options['data']['delimiter']);
+        $default = (empty($options['data']['delimiter'])) ? ',' : htmlspecialchars((string) $options['data']['delimiter']);
         $builder->add(
             'delimiter',
             TextType::class,
@@ -70,7 +70,7 @@ class LeadImportType extends AbstractType
             ]
         );
 
-        $default = (empty($options['data']['enclosure'])) ? '"' : htmlspecialchars($options['data']['enclosure']);
+        $default = (empty($options['data']['enclosure'])) ? '"' : htmlspecialchars((string) $options['data']['enclosure']);
         $builder->add(
             'enclosure',
             TextType::class,

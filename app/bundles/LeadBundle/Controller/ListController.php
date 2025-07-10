@@ -879,11 +879,11 @@ class ListController extends FormController
 
             // Parse the selected values
             $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
+            $updatedFilters = json_decode((string) $updatedFilters, true);
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$clmn, $fltr] = explode(':', (string) $updatedFilter);
 
                     $newFilters[$clmn][] = $fltr;
                 }

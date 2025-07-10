@@ -73,7 +73,7 @@ class AjaxController extends CommonAjaxController
         foreach ($types as $type) {
             // takes an input like mautic.lead_on_something
             // converts to array pieces using _
-            $typePath = explode('_', $type);
+            $typePath = explode('_', (string) $type);
 
             // pull the prefix into its own variable
             $prefix = $typePath[0];

@@ -251,7 +251,7 @@ class PublicController extends CommonFormController
 
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
-                    if (str_contains($html, BuilderSubscriber::saveprefsRegex)) {
+                    if (str_contains((string) $html, BuilderSubscriber::saveprefsRegex)) {
                         // set custom tag to inject end form
                         // update show pref center tokens by looking for their presence in the html
                         $showParameters  = $this->buildShowParametersBasedOnContent($html, $viewParameters);
@@ -589,11 +589,11 @@ class PublicController extends CommonFormController
             return;
         }
 
-        if (str_starts_with($query_string, 'r=')) {
-            $query_string = substr($query_string, strpos($query_string, '?') + 1);
+        if (str_starts_with((string) $query_string, 'r=')) {
+            $query_string = substr((string) $query_string, strpos((string) $query_string, '?') + 1);
         } // remove route variable
 
-        parse_str($query_string, $query);
+        parse_str((string) $query_string, $query);
 
         // URL attr 'd' is encoded so let's decode it first.
         if (!isset($query['d'], $query['sig'])) {
@@ -614,10 +614,10 @@ class PublicController extends CommonFormController
 
         // generate signature
         $salt = $keys['secret'];
-        if (!str_contains($salt, '$1$')) {
+        if (!str_contains((string) $salt, '$1$')) {
             $salt = '$1$'.$salt;
         } // add MD5 prefix
-        $cr    = crypt(urlencode($query['d']), $salt);
+        $cr    = crypt(urlencode($query['d']), (string) $salt);
         $mySig = hash('crc32b', $cr); // this hash type is used in c#
 
         // compare signatures
@@ -701,7 +701,7 @@ class PublicController extends CommonFormController
             $mailer->setFrom($from, '');
 
             // Set Content
-            $body = htmlspecialchars(filter_var($query['body'], FILTER_FLAG_STRIP_HIGH));
+            $body = htmlspecialchars((string) filter_var($query['body'], FILTER_FLAG_STRIP_HIGH));
             $mailer->setBody($body);
             $mailer->parsePlainText($body);
 
@@ -709,7 +709,7 @@ class PublicController extends CommonFormController
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 
-            $subject = htmlspecialchars(filter_var($query['subject'], FILTER_FLAG_STRIP_HIGH));
+            $subject = htmlspecialchars((string) filter_var($query['subject'], FILTER_FLAG_STRIP_HIGH));
             $mailer->setSubject($subject);
 
             return $mailer->createEmailStat();

@@ -19,8 +19,8 @@ class PluginCollector
     private int $total = 0;
 
     public function __construct(
-        private Connection $connection,
-        private Allowlist $allowlist,
+        private readonly Connection $connection,
+        private readonly Allowlist $allowlist,
     ) {
     }
 

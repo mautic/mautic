@@ -8,7 +8,7 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalState;
 
 class SignalCaughtException extends \Exception
 {
-    public function __construct(int $signal, private ?ProcessSignalState $state = null)
+    public function __construct(int $signal, private readonly ?ProcessSignalState $state = null)
     {
         parent::__construct(sprintf('Signal received: "%d"', $signal), $signal);
     }

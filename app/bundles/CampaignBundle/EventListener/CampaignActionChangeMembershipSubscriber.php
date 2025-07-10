@@ -17,9 +17,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private MembershipManager $membershipManager,
-        private CampaignModel $campaignModel,
-        private InfiniteLoopValidator $infiniteLoopValidator,
+        private readonly MembershipManager $membershipManager,
+        private readonly CampaignModel $campaignModel,
+        private readonly InfiniteLoopValidator $infiniteLoopValidator,
     ) {
     }
 

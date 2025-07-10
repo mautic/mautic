@@ -25,12 +25,12 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_FORM_RESULT     = 'form.results';
 
     public function __construct(
-        private CompanyReportData $companyReportData,
-        private SubmissionRepository $submissionRepository,
-        private FormModel $formModel,
-        private ReportHelper $reportHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly CompanyReportData $companyReportData,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly FormModel $formModel,
+        private readonly ReportHelper $reportHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

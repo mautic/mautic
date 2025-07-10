@@ -13,7 +13,7 @@ use Mautic\PageBundle\Model\PageModel;
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private PageModel $pageModel,
+        private readonly PageModel $pageModel,
     ) {
     }
 
@@ -25,13 +25,13 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
             $hit = new Hit();
             foreach ($rows as $col => $val) {
                 if ('NULL' != $val) {
-                    $setter = 'set'.ucfirst($col);
+                    $setter = 'set'.ucfirst((string) $col);
                     if (in_array($col, ['page', 'ipAddress'])) {
                         $hit->$setter($this->getReference($col.'-'.$val));
                     } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
                         $hit->$setter(new \DateTime($val));
                     } elseif ('browserLanguages' == $col) {
-                        $val = Serializer::decode(stripslashes($val));
+                        $val = Serializer::decode(stripslashes((string) $val));
                         $hit->$setter($val);
                     } else {
                         $hit->$setter($val);

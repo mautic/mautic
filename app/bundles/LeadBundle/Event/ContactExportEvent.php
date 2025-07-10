@@ -12,8 +12,8 @@ class ContactExportEvent extends Event
      * @param array<string|int, int|string|array<string, mixed>> $args
      */
     public function __construct(
-        private array $args,
-        private string $object,
+        private readonly array $args,
+        private readonly string $object,
     ) {
     }
 

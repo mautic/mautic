@@ -11,7 +11,7 @@ use Mautic\NotificationBundle\Entity\Stat;
  */
 class NotificationClickEvent extends CommonEvent
 {
-    private Notification $notification;
+    private readonly Notification $notification;
 
     public function __construct(
         Stat $stat,

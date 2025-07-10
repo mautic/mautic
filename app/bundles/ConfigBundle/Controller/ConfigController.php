@@ -207,7 +207,7 @@ class ConfigController extends FormController
         $content  = $this->coreParametersHelper->get($objectId);
         $filename = $request->get('filename', $objectId);
 
-        if ($decoded = base64_decode($content)) {
+        if ($decoded = base64_decode((string) $content)) {
             $response = new Response($decoded);
             $response->headers->set('Content-Type', 'application/force-download');
             $response->headers->set('Content-Type', 'application/octet-stream');

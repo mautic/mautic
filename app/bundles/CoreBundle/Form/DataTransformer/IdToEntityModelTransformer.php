@@ -15,7 +15,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     /**
      * @param class-string $repository
      */
-    public function __construct(private EntityManagerInterface $em, private string $repository, private string $id = 'id', private bool $isArray = false)
+    public function __construct(private readonly EntityManagerInterface $em, private string $repository, private string $id = 'id', private readonly bool $isArray = false)
     {
     }
 

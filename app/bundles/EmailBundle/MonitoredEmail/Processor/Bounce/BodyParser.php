@@ -59,7 +59,7 @@ class BodyParser
              * The error that the other server returned was:
              * 550-5.1.1 The email account that you tried to reach does not exist.
              */
-            if (preg_match('/email.*?does not exist/i', $body, $match)) {
+            if (preg_match('/email.*?does not exist/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::UNKNOWN;
                 $result['rule_no']  = '0237';
             }
@@ -70,7 +70,7 @@ class BodyParser
              * The error that the other server returned was:
              * 553-5.1.2 We weren't able to find the recipient domain.
              */
-            elseif (preg_match('/find the recipient domain/i', $body, $match)) {
+            elseif (preg_match('/find the recipient domain/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::UNKNOWN;
                 $result['rule_no']  = '0237';
             }
@@ -81,7 +81,7 @@ class BodyParser
              * The error that the other server returned was:
              * 550 5.1.1 RESOLVER.ADR.RecipNotFound; not found
              */
-            elseif (preg_match('/RecipNotFound/i', $body, $match)) {
+            elseif (preg_match('/RecipNotFound/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::UNKNOWN;
                 $result['rule_no']  = '0237';
             }
@@ -92,7 +92,7 @@ class BodyParser
              * The error that the other server returned was:
              * 554 5.7.1 Your mail could not be delivered because the recipient is only accepting mail from specific email addresses.
              */
-            elseif (preg_match('/accepting mail from specific email addresses/i', $body, $match)) {
+            elseif (preg_match('/accepting mail from specific email addresses/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::USER_REJECT;
                 $result['rule_no']  = '0156';
             }
@@ -103,7 +103,7 @@ class BodyParser
              * The error that the other server returned was:
              * 550-5.2.1 The email account that you tried to reach is disabled.
              */
-            elseif (preg_match('/email.*?disabled/i', $body, $match)) {
+            elseif (preg_match('/email.*?disabled/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::INACTIVE;
                 $result['rule_no']  = '0171';
             }
@@ -114,7 +114,7 @@ class BodyParser
              * The error that the other server returned was:
              * 550-5.2.1 The user you are trying to contact is receiving mail at a rate that prevents additional messages from being delivered.
              */
-            elseif (preg_match('/user.*?rate that prevents/i', $body, $match)) {
+            elseif (preg_match('/user.*?rate that prevents/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::WARNING;
                 $result['rule_no']  = '0000';
             }
@@ -125,7 +125,7 @@ class BodyParser
             * The error that the other server returned was:
             * 550-5.7.1 Email quota exceeded.
             */
-            elseif (preg_match('/email quota exceeded/i', $body, $match)) {
+            elseif (preg_match('/email quota exceeded/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::FULL;
                 $result['rule_no']  = '0219';
             }
@@ -136,7 +136,7 @@ class BodyParser
             * The error that the other server returned was:
             * 552-5.2.2 The email account that you tried to reach is over quota.
             */
-            if (preg_match('/email.*?over quota/i', $body, $match)) {
+            if (preg_match('/email.*?over quota/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::FULL;
                 $result['rule_no']  = '0219';
             }
@@ -148,7 +148,7 @@ class BodyParser
             * 550-5.7.1 Our system has detected an unusual rate of unsolicited mail originating from your IP address. To protect our users from spam,
             * mail sent from your IP address has been blocked.
             */
-            elseif (preg_match('/unsolicited mail/i', $body, $match)) {
+            elseif (preg_match('/unsolicited mail/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::ANTISPAM;
                 $result['rule_no']  = '0230';
             }
@@ -159,7 +159,7 @@ class BodyParser
             * The error that the other server returned was:
             * 550-5.7.1 The user or domain that you are sending to (or from) has a policy that prohibited the mail that you sent.
             */
-            elseif (preg_match('/policy that prohibited/i', $body, $match)) {
+            elseif (preg_match('/policy that prohibited/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::ANTISPAM;
                 $result['rule_no']  = '0230';
             }
@@ -170,7 +170,7 @@ class BodyParser
             * The error that the other server returned was:
             * 552-5.2.3 Your message exceeded Google's message size limits.
             */
-            elseif (preg_match('/message size limits/i', $body, $match)) {
+            elseif (preg_match('/message size limits/i', (string) $body, $match)) {
                 $result['rule_cat'] = Category::OVERSIZE;
                 $result['rule_no']  = '0146';
             }
@@ -182,7 +182,7 @@ class BodyParser
         * xxxxx@yourdomain.com
         * no such address here
         */
-        if (preg_match("/(\S+@\S+\w).*\n?.*no such address here/i", $body, $match)) {
+        if (preg_match("/(\S+@\S+\w).*\n?.*no such address here/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0237';
             $result['email']    = $match[1];
@@ -193,7 +193,7 @@ class BodyParser
         * 111.111.111.111 does not like recipient.
         * Remote host said: 550 User unknown
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*user unknown/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*user unknown/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0236';
             $result['email']    = $match[1];
@@ -205,7 +205,7 @@ class BodyParser
          * <xxxxx@yourdomain.com>:
          * Sorry, no mailbox here by that name. vpopmail (#5.1.1)
          */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*no mailbox/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*no mailbox/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0157';
             $result['email']    = $match[1];
@@ -217,7 +217,7 @@ class BodyParser
          * xxxxx@yourdomain.com<br>
          * local: Sorry, can't find user's mailbox. (#5.1.1)<br>
          */
-        elseif (preg_match("/(\S+@\S+\w)<br>.*\n?.*\n?.*can't find.*mailbox/i", $body, $match)) {
+        elseif (preg_match("/(\S+@\S+\w)<br>.*\n?.*\n?.*can't find.*mailbox/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0164';
             $result['email']    = $match[1];
@@ -236,7 +236,7 @@ class BodyParser
         *     #        (expanded from: <xxxxx@yourdomain.com>)         #
         *     #                                                        #
         */
-        elseif (preg_match("/Can't create output.*\n?.*<(\S+@\S+\w)>/i", $body, $match)) {
+        elseif (preg_match("/Can't create output.*\n?.*<(\S+@\S+\w)>/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0169';
             $result['email']    = $match[1];
@@ -248,7 +248,7 @@ class BodyParser
         * ????????????????:
         * xxxxx@yourdomain.com : ????, ?????.
         */
-        elseif (preg_match("/(\S+@\S+\w).*=D5=CA=BA=C5=B2=BB=B4=E6=D4=DA/i", $body, $match)) {
+        elseif (preg_match("/(\S+@\S+\w).*=D5=CA=BA=C5=B2=BB=B4=E6=D4=DA/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0174';
             $result['email']    = $match[1];
@@ -260,7 +260,7 @@ class BodyParser
         * xxxxx@yourdomain.com
         * Unrouteable address
         */
-        elseif (preg_match("/(\S+@\S+\w).*\n?.*Unrouteable address/i", $body, $match)) {
+        elseif (preg_match("/(\S+@\S+\w).*\n?.*Unrouteable address/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0179';
             $result['email']    = $match[1];
@@ -272,7 +272,7 @@ class BodyParser
         * Delivery to the following recipients failed.
         * xxxxx@yourdomain.com
         */
-        elseif (preg_match("/delivery[^\n\r]+failed[ \S]*\s+(\S+@\S+\w)\s/is", $body, $match)) {
+        elseif (preg_match("/delivery[^\n\r]+failed[ \S]*\s+(\S+@\S+\w)\s/is", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0013';
             $result['email']    = $match[1];
@@ -284,7 +284,7 @@ class BodyParser
         * An error occurred while trying to deliver the mail to the following recipients:
         * xxxxx@yourdomain.com
         */
-        elseif (preg_match("/an\s+error\s+occurred\s+while\s+trying\s+to\s+deliver\s+the\s+mail\s+to\s+the\s+following\s+recipients:\r\n\s*(\S+@\S+\w)/is", $body, $match)) {
+        elseif (preg_match("/an\s+error\s+occurred\s+while\s+trying\s+to\s+deliver\s+the\s+mail\s+to\s+the\s+following\s+recipients:\r\n\s*(\S+@\S+\w)/is", (string) $body, $match)) {
             $result['rule_cat']    = Category::UNKNOWN;
             $result['rule_no']     = '0013';
             $result['bounce_type'] = Type::HARD;
@@ -302,7 +302,7 @@ class BodyParser
         * xxxxx@yourdomain.com^M
         * unknown local-part "xxxxx" in domain "yourdomain.com"^M
         */
-        elseif (preg_match("/(\S+@\S+\w).*\n?.*unknown local-part/i", $body, $match)) {
+        elseif (preg_match("/(\S+@\S+\w).*\n?.*unknown local-part/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0232';
             $result['email']    = $match[1];
@@ -315,7 +315,7 @@ class BodyParser
         * 111.111.111.11 does not like recipient.^M
         * Remote host said: 550 Invalid recipient: <xxxxx@yourdomain.com>^M
         */
-        elseif (preg_match("/Invalid.*(?:alias|account|recipient|address|email|mailbox|user).*<(\S+@\S+\w)>/i", $body, $match)) {
+        elseif (preg_match("/Invalid.*(?:alias|account|recipient|address|email|mailbox|user).*<(\S+@\S+\w)>/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0233';
             $result['email']    = $match[1];
@@ -331,7 +331,7 @@ class BodyParser
         * xxxxx@yourdomain.com^M
         * *****************     End of message     ***************^M
         */
-        elseif (preg_match("/\s(\S+@\S+\w).*[\r\n]*.*No such.*(?:alias|account|recipient|address|email|mailbox|user)/i", $body, $match)) {
+        elseif (preg_match("/\s(\S+@\S+\w).*[\r\n]*.*No such.*(?:alias|account|recipient|address|email|mailbox|user)/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0234';
             $result['email']    = $match[1];
@@ -343,7 +343,7 @@ class BodyParser
         * <xxxxx@yourdomain.com>:^M
         * This address no longer accepts mail.
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*(?:alias|account|recipient|address|email|mailbox|user).*no.*accept.*mail>/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*(?:alias|account|recipient|address|email|mailbox|user).*no.*accept.*mail>/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::UNKNOWN;
             $result['rule_no']  = '0235';
             $result['email']    = $match[1];
@@ -359,7 +359,7 @@ class BodyParser
         * Warning: undefined mail delivery mode: normal (ignored).
         * The users mailfolder is over the allowed quota (size). (#5.2.2)
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*over.*quota/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*over.*quota/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0182';
             $result['email']    = $match[1];
@@ -372,7 +372,7 @@ class BodyParser
         * mail.local: /var/mail/2b/10/kellen.lee: Disc quota exceeded
         * 554 <xxxxx@yourdomain.com>... Service unavailable
         */
-        elseif (preg_match("/quota exceeded.*\n?.*<(\S+@\S+\w)>/i", $body, $match)) {
+        elseif (preg_match("/quota exceeded.*\n?.*<(\S+@\S+\w)>/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0126';
             $result['email']    = $match[1];
@@ -385,7 +385,7 @@ class BodyParser
         * <xxxxx@yourdomain.com>:
         * - User disk quota exceeded. (#4.3.0)
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*quota exceeded/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*quota exceeded/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0158';
             $result['email']    = $match[1];
@@ -397,7 +397,7 @@ class BodyParser
         * xxxxx@yourdomain.com
         * mailbox is full (MTA-imposed quota exceeded while writing to file /mbx201/mbx011/A100/09/35/A1000935772/mail/.inbox):
         */
-        elseif (preg_match("/\s(\S+@\S+\w)\s.*\n?.*mailbox.*full/i", $body, $match)) {
+        elseif (preg_match("/\s(\S+@\S+\w)\s.*\n?.*mailbox.*full/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0166';
             $result['email']    = $match[1];
@@ -408,7 +408,7 @@ class BodyParser
         * name@domain.com
         * Delay reason: LMTP error after end of data: 452 4.2.2 <name@domain.com> Mailbox is full / Blocks limit exceeded / Inode limit exceeded
         */
-        } elseif (preg_match("/\s<(\S+@\S+\w)>\sMailbox.*full/i", $body, $match)) {
+        } elseif (preg_match("/\s<(\S+@\S+\w)>\sMailbox.*full/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0166';
             $result['email']    = $match[1];
@@ -419,7 +419,7 @@ class BodyParser
         * sample:
         * The message to xxxxx@yourdomain.com is bounced because : Quota exceed the hard limit
         */
-        elseif (preg_match("/The message to (\S+@\S+\w)\s.*bounce.*Quota exceed/i", $body, $match)) {
+        elseif (preg_match("/The message to (\S+@\S+\w)\s.*bounce.*Quota exceed/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0168';
             $result['email']    = $match[1];
@@ -431,7 +431,7 @@ class BodyParser
         * xxxxx@yourdomain.com<br>
         * 553 user is inactive (eyou mta)
         */
-        elseif (preg_match("/(\S+@\S+\w)<br>.*\n?.*\n?.*user is inactive/i", $body, $match)) {
+        elseif (preg_match("/(\S+@\S+\w)<br>.*\n?.*\n?.*user is inactive/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::INACTIVE;
             $result['rule_no']  = '0171';
             $result['email']    = $match[1];
@@ -442,7 +442,7 @@ class BodyParser
         * sample:
         * xxxxx@yourdomain.com [Inactive account]
         */
-        elseif (preg_match("/(\S+@\S+\w).*inactive account/i", $body, $match)) {
+        elseif (preg_match("/(\S+@\S+\w).*inactive account/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::INACTIVE;
             $result['rule_no']  = '0181';
             $result['email']    = $match[1];
@@ -454,7 +454,7 @@ class BodyParser
         * <xxxxx@yourdomain.com>:
         * Unable to switch to /var/vpopmail/domains/domain.com: input/output error. (#4.3.0)
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*input\/output error/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*input\/output error/i", (string) $body, $match)) {
             $result['rule_cat']    = Category::INTERNAL_ERROR;
             $result['rule_no']     = '0172';
             $result['bounce_type'] = Type::HARD;
@@ -468,7 +468,7 @@ class BodyParser
         * <xxxxx@yourdomain.com>:
         * can not open new email file errno=13 file=/home/vpopmail/domains/fromc.com/0/domain/Maildir/tmp/1155254417.28358.mx05,S=212350
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*can not open new email file/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*can not open new email file/i", (string) $body, $match)) {
             $result['rule_cat']    = Category::INTERNAL_ERROR;
             $result['rule_no']     = '0173';
             $result['bounce_type'] = Type::HARD;
@@ -483,7 +483,7 @@ class BodyParser
         * 111.111.111.111 failed after I sent the message.
         * Remote host said: 451 mta283.mail.scd.yahoo.com Resources temporarily unavailable. Please try again later [#4.16.5].
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*Resources temporarily unavailable/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*Resources temporarily unavailable/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::DEFER;
             $result['rule_no']  = '0163';
             $result['email']    = $match[1];
@@ -494,7 +494,7 @@ class BodyParser
         * sample:
         * AutoReply message from xxxxx@yourdomain.com
         */
-        elseif (preg_match("/^AutoReply message from (\S+@\S+\w)/i", $body, $match)) {
+        elseif (preg_match("/^AutoReply message from (\S+@\S+\w)/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::AUTOREPLY;
             $result['rule_no']  = '0167';
             $result['email']    = $match[1];
@@ -506,7 +506,7 @@ class BodyParser
         * <xxxxx@yourdomain.com>:
         * The user does not accept email in non-Western (non-Latin) character sets.
         */
-        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*does not accept[^\r\n]*non-Western/i", $body, $match)) {
+        elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*does not accept[^\r\n]*non-Western/i", (string) $body, $match)) {
             $result['rule_cat'] = Category::LATIN_ONLY;
             $result['rule_no']  = '0043';
             $result['email']    = $match[1];

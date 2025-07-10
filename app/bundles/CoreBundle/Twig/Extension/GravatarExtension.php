@@ -18,7 +18,7 @@ class GravatarExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('gravatarGetImage', [$this, 'getImage'], ['is_safe' => ['all']]),
+            new TwigFunction('gravatarGetImage', $this->getImage(...), ['is_safe' => ['all']]),
         ];
     }
 

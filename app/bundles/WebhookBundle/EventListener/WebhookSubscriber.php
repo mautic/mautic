@@ -12,9 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
-        private WebhookKillNotificator $webhookKillNotificator,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly WebhookKillNotificator $webhookKillNotificator,
     ) {
     }
 

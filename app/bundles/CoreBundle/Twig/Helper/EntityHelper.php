@@ -20,8 +20,8 @@ class EntityHelper extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getEntity', [$this, 'getEntity']),
-            new TwigFunction('getEntities', [$this, 'getEntities']),
+            new TwigFunction('getEntity', $this->getEntity(...)),
+            new TwigFunction('getEntities', $this->getEntities(...)),
         ];
     }
 

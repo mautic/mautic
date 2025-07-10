@@ -76,8 +76,8 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'datetime':
                 case 'time':
-                    $leadValCount   = substr_count($leadVal, ':');
-                    $filterValCount = substr_count($filterVal, ':');
+                    $leadValCount   = substr_count((string) $leadVal, ':');
+                    $filterValCount = substr_count((string) $filterVal, ':');
 
                     if (2 === $leadValCount && 1 === $filterValCount) {
                         $filterVal .= ':00';
@@ -86,10 +86,10 @@ trait MatchFilterForLeadTrait
                 case 'tags':
                 case 'multiselect':
                     if (!is_array($leadVal)) {
-                        $leadVal = explode('|', $leadVal);
+                        $leadVal = explode('|', (string) $leadVal);
                     }
                     if (!is_array($filterVal)) {
-                        $filterVal = explode('|', $filterVal);
+                        $filterVal = explode('|', (string) $filterVal);
                     }
                     break;
                 case 'number':
@@ -98,7 +98,7 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'select':
                     if (!is_array($filterVal)) {
-                        $filterVal = explode('|', $filterVal);
+                        $filterVal = explode('|', (string) $filterVal);
                     }
                     break;
             }
@@ -138,12 +138,12 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'like':
                     $filterVal         = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
-                    $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/', $leadVal);
+                    $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/', (string) $leadVal);
                     break;
                 case '!like':
                     $filterVal         = str_replace(['.', '*'], ['\.', '\*'], $filterVal);
                     $filterVal         = str_replace('%', '.*', $filterVal);
-                    $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
+                    $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', (string) $leadVal);
                     break;
 
                 case OperatorOptions::IN:
@@ -153,17 +153,17 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
                     break;
                 case 'regexp':
-                    $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
+                    $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', (string) $leadVal);
                     break;
                 case '!regexp':
-                    $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
+                    $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', (string) $leadVal);
                     break;
                 case 'startsWith':
-                    $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
+                    $groups[$groupNum] = str_starts_with((string) $leadVal, (string) $filterVal);
                     break;
                 case 'endsWith':
-                    $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
-                    $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
+                    $endOfString       = substr((string) $leadVal, strlen((string) $leadVal) - strlen((string) $filterVal));
+                    $groups[$groupNum] = 0 === strcmp($endOfString, (string) $filterVal);
                     break;
                 case 'contains':
                     $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);

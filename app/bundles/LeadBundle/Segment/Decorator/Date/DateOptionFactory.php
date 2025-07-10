@@ -25,9 +25,9 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 class DateOptionFactory
 {
     public function __construct(
-        private DateDecorator $dateDecorator,
-        private RelativeDate $relativeDate,
-        private TimezoneResolver $timezoneResolver,
+        private readonly DateDecorator $dateDecorator,
+        private readonly RelativeDate $relativeDate,
+        private readonly TimezoneResolver $timezoneResolver,
     ) {
     }
 

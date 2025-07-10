@@ -21,8 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BatchSegmentController extends AbstractFormController
 {
     public function __construct(
-        private SegmentActionModel $segmentActionModel,
-        private ListModel $segmentModel,
+        private readonly SegmentActionModel $segmentActionModel,
+        private readonly ListModel $segmentModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -42,7 +42,7 @@ class BatchSegmentController extends AbstractFormController
     public function setAction(Request $request): JsonResponse
     {
         $params     = $request->query->all()['lead_batch'] ?? $request->request->all()['lead_batch'] ?? [];
-        $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $contactIds = empty($params['ids']) ? [] : json_decode((string) $params['ids']);
 
         if ($contactIds && is_array($contactIds)) {
             $segmentsToAdd    = $params['add'] ?? [];

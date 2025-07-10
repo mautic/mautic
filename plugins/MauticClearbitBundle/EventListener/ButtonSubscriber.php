@@ -14,9 +14,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IntegrationHelper $helper,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
+        private readonly IntegrationHelper $helper,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -36,7 +36,7 @@ class ButtonSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (str_starts_with($event->getRoute(), 'mautic_contact_')) {
+        if (str_starts_with((string) $event->getRoute(), 'mautic_contact_')) {
             $event->addButton(
                 [
                     'attr' => [
@@ -88,7 +88,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                 );
             }
         } else {
-            if (str_starts_with($event->getRoute(), 'mautic_company_')) {
+            if (str_starts_with((string) $event->getRoute(), 'mautic_company_')) {
                 $event->addButton(
                     [
                         'attr' => [

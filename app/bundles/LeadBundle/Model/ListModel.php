@@ -262,7 +262,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
         // Order choices by label.
         foreach ($choices as $key => $choice) {
-            $cmp = fn ($a, $b): int => strcmp($a['label'], $b['label']);
+            $cmp = fn ($a, $b): int => strcmp((string) $a['label'], (string) $b['label']);
             uasort($choice, $cmp);
             $choices[$key] = $choice;
         }
@@ -981,7 +981,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $results = $q->executeQuery()->fetchAllAssociative();
 
         foreach ($results as $result) {
-            $data['labels'][] = substr($result['stage'], 0, 12);
+            $data['labels'][] = substr((string) $result['stage'], 0, 12);
             $data['values'][] = $result['leads'];
         }
         $data['xAxes'][] = ['display' => true];

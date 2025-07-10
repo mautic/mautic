@@ -234,23 +234,23 @@ class MailHelper
     private array $embedImagesReplaces = [];
 
     public function __construct(
-        private MailerInterface $mailer,
-        private FromEmailHelper $fromEmailHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private Mailbox $mailbox,
-        private LoggerInterface $logger,
-        private MailHashHelper $mailHashHelper,
-        private RouterInterface $router,
-        private Environment $twig,
-        private ThemeHelper $themeHelper,
-        private PathsHelper $pathsHelper,
-        private EventDispatcherInterface $dispatcher,
-        private RequestStack $requestStack,
-        private EntityManagerInterface $entityManager,
-        private ModelFactory $modelFactory, // Can not inject EmailModel due to circular reference between MailHelper and EmailModel (even through other classes, like UserModel, SendEmailToContact)
-        private AssetModel $assetModel,
-        private TrackableModel $trackableModel,
-        private RedirectModel $redirectModel,
+        private readonly MailerInterface $mailer,
+        private readonly FromEmailHelper $fromEmailHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Mailbox $mailbox,
+        private readonly LoggerInterface $logger,
+        private readonly MailHashHelper $mailHashHelper,
+        private readonly RouterInterface $router,
+        private readonly Environment $twig,
+        private readonly ThemeHelper $themeHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly RequestStack $requestStack,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ModelFactory $modelFactory, // Can not inject EmailModel due to circular reference between MailHelper and EmailModel (even through other classes, like UserModel, SendEmailToContact)
+        private readonly AssetModel $assetModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly RedirectModel $redirectModel,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -822,7 +822,7 @@ class MailHelper
 
                 $path = $match;
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
-                if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
+                if (str_starts_with($match, (string) $this->coreParametersHelper->get('site_url'))) {
                     $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
                     $path = $this->pathsHelper->getSystemPath('root', true).$path;
                 }
@@ -1234,7 +1234,7 @@ class MailHelper
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                $addresses = array_fill_keys(array_map('trim', explode(',', (string) $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
                     $this->addBcc($bccAddress, $name);
                 }
@@ -1321,7 +1321,7 @@ class MailHelper
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
             if (!empty($headers['List-Unsubscribe'])) {
-                if (!str_contains($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
+                if (!str_contains((string) $headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
                     // Ensure Mautic's is always part of this header
                     $headers['List-Unsubscribe'] = $listUnsubscribeHeader.','.$headers['List-Unsubscribe'];
                 }
@@ -1493,12 +1493,12 @@ class MailHelper
             $error            = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
 
             // Clean up the error message
-            $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
+            $errorMessage = trim((string) preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
 
             $this->fatal = true;
         } else {
             $exceptionContext = [];
-            $errorMessage     = trim($error);
+            $errorMessage     = trim((string) $error);
         }
 
         if ($context) {
@@ -1646,7 +1646,7 @@ class MailHelper
     public function getTrackableLink($url)
     {
         // Ensure a valid URL and that it has not already been found
-        if (!str_starts_with($url, 'http') && !str_starts_with($url, 'ftp')) {
+        if (!str_starts_with((string) $url, 'http') && !str_starts_with((string) $url, 'ftp')) {
             return null;
         }
 
@@ -1779,7 +1779,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
             // Append the bounce notation
-            [$email, $domain] = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', (string) $settings['address']);
             $email .= '+bounce';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -1801,7 +1801,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
             // Append the bounce notation
-            [$email, $domain] = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', (string) $settings['address']);
             $email .= '+unsubscribe';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -1823,7 +1823,7 @@ class MailHelper
             return $name;
         }
 
-        $name = trim(html_entity_decode($name, ENT_QUOTES));
+        $name = trim(html_entity_decode((string) $name, ENT_QUOTES));
 
         // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
         if (empty($name)) {
@@ -1923,7 +1923,7 @@ class MailHelper
      */
     public static function validateEmail($address): void
     {
-        $invalidChar = strpbrk($address, '\'^&*%');
+        $invalidChar = strpbrk((string) $address, '\'^&*%');
         if (false !== $invalidChar) {
             throw new InvalidEmailException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
         }

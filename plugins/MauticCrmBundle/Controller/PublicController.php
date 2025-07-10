@@ -26,7 +26,7 @@ class PublicController extends CommonController
         \assert($integrationObject instanceof HubspotIntegration);
 
         foreach ($data as $info) {
-            $object = explode('.', $info['subscriptionType']);
+            $object = explode('.', (string) $info['subscriptionType']);
             $id     = $info['objectId'];
 
             try {

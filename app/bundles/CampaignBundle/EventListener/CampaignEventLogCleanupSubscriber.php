@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CampaignEventLogCleanupSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FailedLeadEventLogRepository $failedLeadEventLogRepository)
+    public function __construct(private readonly FailedLeadEventLogRepository $failedLeadEventLogRepository)
     {
     }
 

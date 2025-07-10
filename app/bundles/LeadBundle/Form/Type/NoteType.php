@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class NoteType extends AbstractType
 {
-    private DateTimeHelper $dateHelper;
+    private readonly DateTimeHelper $dateHelper;
 
     public function __construct()
     {

@@ -13,7 +13,7 @@ final class DateHelper
      */
     private array $formats;
 
-    private DateTimeHelper $helper;
+    private readonly DateTimeHelper $helper;
 
     /**
      * @param string $dateFullFormat
@@ -26,8 +26,8 @@ final class DateHelper
         $dateShortFormat,
         $dateOnlyFormat,
         $timeOnlyFormat,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,

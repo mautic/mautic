@@ -14,7 +14,7 @@ class ProcessSignalState implements \Stringable
     /**
      * @param mixed[] $data
      */
-    public function __construct(private array $data)
+    public function __construct(private readonly array $data)
     {
     }
 

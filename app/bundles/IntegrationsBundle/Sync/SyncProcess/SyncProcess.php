@@ -33,18 +33,18 @@ class SyncProcess
     private ?int $syncIteration = null;
 
     public function __construct(
-        private SyncDateHelper $syncDateHelper,
-        private MappingHelper $mappingHelper,
-        private RelationsHelper $relationsHelper,
+        private readonly SyncDateHelper $syncDateHelper,
+        private readonly MappingHelper $mappingHelper,
+        private readonly RelationsHelper $relationsHelper,
         private IntegrationSyncProcess $integrationSyncProcess,
-        private MauticSyncProcess $mauticSyncProcess,
-        private EventDispatcherInterface $eventDispatcher,
-        private Notifier $notifier,
-        private MappingManualDAO $mappingManualDAO,
-        private MauticSyncDataExchange $internalSyncDataExchange,
-        private SyncDataExchangeInterface $integrationSyncDataExchange,
-        private InputOptionsDAO $inputOptionsDAO,
-        private SyncServiceInterface $syncService,
+        private readonly MauticSyncProcess $mauticSyncProcess,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly Notifier $notifier,
+        private readonly MappingManualDAO $mappingManualDAO,
+        private readonly MauticSyncDataExchange $internalSyncDataExchange,
+        private readonly SyncDataExchangeInterface $integrationSyncDataExchange,
+        private readonly InputOptionsDAO $inputOptionsDAO,
+        private readonly SyncServiceInterface $syncService,
     ) {
     }
 

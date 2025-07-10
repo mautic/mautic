@@ -16,10 +16,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignEventDeleteSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LeadEventLogRepository $leadEventLogRepository,
-        private CampaignConfig $campaignConfig,
-        private CampaignModel $campaignModel,
-        private EventModel $eventModel,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly CampaignConfig $campaignConfig,
+        private readonly CampaignModel $campaignModel,
+        private readonly EventModel $eventModel,
     ) {
     }
 

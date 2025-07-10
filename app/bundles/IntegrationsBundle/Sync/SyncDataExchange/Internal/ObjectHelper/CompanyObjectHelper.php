@@ -30,10 +30,10 @@ class CompanyObjectHelper implements ObjectHelperInterface
     private array $companiesCreated = [];
 
     public function __construct(
-        private CompanyModel $model,
-        private CompanyRepository $repository,
-        private Connection $connection,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly CompanyModel $model,
+        private readonly CompanyRepository $repository,
+        private readonly Connection $connection,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 
@@ -255,7 +255,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $companyKey = '';
         foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
             if (isset($fields[$uniqueIdentifierField])) {
-                $companyKey .= strtolower($fields[$uniqueIdentifierField]->getValue()->getNormalizedValue());
+                $companyKey .= strtolower((string) $fields[$uniqueIdentifierField]->getValue()->getNormalizedValue());
             }
         }
 

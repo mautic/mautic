@@ -18,7 +18,7 @@ class TwigExtension extends AbstractExtension
     public function getFilters()
     {
         return [
-            new TwigFilter('phpversion', [$this, 'phpversion']),
+            new TwigFilter('phpversion', $this->phpversion(...)),
         ];
     }
 

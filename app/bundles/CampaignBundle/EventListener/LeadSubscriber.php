@@ -21,11 +21,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EventCollector $eventCollector,
-        private TranslatorInterface $translator,
-        private EntityManagerInterface $entityManager,
-        private RouterInterface $router,
-        private EventRepository $eventRepository,
+        private readonly EventCollector $eventCollector,
+        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly RouterInterface $router,
+        private readonly EventRepository $eventRepository,
     ) {
     }
 
@@ -114,7 +114,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         $extra['parentDetails'] = $this->getParentDetails($parentEvent, $log);
 
                         $toolTipClass = 'yes' === $log['decision_path'] ? 'text-success' : 'text-danger';
-                        $toolTip      = $this->translator->trans('mautic.campaign.event.path.tooltip', ['%path%' => ucfirst($log['decision_path'])]);
+                        $toolTip      = $this->translator->trans('mautic.campaign.event.path.tooltip', ['%path%' => ucfirst((string) $log['decision_path'])]);
 
                         $label .= sprintf(' <i class="ri-node-tree %s" data-toggle="tooltip" title="%s"></i>', $toolTipClass, $toolTip);
                     }

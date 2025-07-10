@@ -35,11 +35,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailModel $emailModel,
-        private RealTimeExecutioner $realTimeExecutioner,
-        private SendEmailToUser $sendEmailToUser,
-        private TranslatorInterface $translator,
-        private LeadModel $leadModel,
+        private readonly EmailModel $emailModel,
+        private readonly RealTimeExecutioner $realTimeExecutioner,
+        private readonly SendEmailToUser $sendEmailToUser,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadModel $leadModel,
     ) {
     }
 

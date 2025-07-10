@@ -65,7 +65,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         IntegrationEntityModel $integrationEntityModel,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected DoNotContact $doNotContactModel,
-        private UserModel $userModel,
+        private readonly UserModel $userModel,
     ) {
         parent::__construct(
             $eventDispatcher,
@@ -285,7 +285,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         // Match Sugar object to Mautic's
                         $sObject = 'company';
                     }
-                    $sObject = trim($sObject);
+                    $sObject = trim((string) $sObject);
                     if ($this->isAuthorized()) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$sObject;
@@ -307,7 +307,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         )
                                         ) {
                                             $type      = 'string';
-                                            $fieldName = (!str_contains($fieldInfo['name'],
+                                            $fieldName = (!str_contains((string) $fieldInfo['name'],
                                                 'webtolead_email')) ? $fieldInfo['name'] : str_replace('webtolead_',
                                                     '', $fieldInfo['name']);
                                             // make these congruent as some come in with colons and some do not
@@ -350,7 +350,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $label);
 
-                                            $fieldName = (!str_contains($fieldInfo['name'], 'webtolead_email'))
+                                            $fieldName = (!str_contains((string) $fieldInfo['name'], 'webtolead_email'))
                                                 ? $fieldInfo['name']
                                                 : str_replace(
                                                     'webtolead_',
@@ -648,7 +648,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $loginParams = [
                 'user_auth' => [
                     'user_name' => $this->keys['username'],
-                    'password'  => md5($this->keys['password']),
+                    'password'  => md5((string) $this->keys['password']),
                     'version'   => '1',
                 ],
                 'application_name' => 'Mautic',
@@ -837,7 +837,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $detachClass           = Lead::class;
                         $company               = null;
                         $this->fetchDncToMautic($entity, $data);
-                        if ($entity && isset($dataObject['account_id'.$newName]) && '' != trim($dataObject['account_id'.$newName])) {
+                        if ($entity && isset($dataObject['account_id'.$newName]) && '' != trim((string) $dataObject['account_id'.$newName])) {
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
                                     'integration'         => 'Sugarcrm',
@@ -1159,7 +1159,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $leadFields = [];
 
         foreach ($keys as $key) {
-            if (strstr($key, '__'.$object)) {
+            if (strstr((string) $key, '__'.$object)) {
                 $newKey = str_replace('__'.$object, '', $key);
                 // $leadFields[$object][$newKey] = $fields['leadFields'][$key];
                 $leadFields[$newKey] = $fields['leadFields'][$key];
@@ -1221,7 +1221,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($records as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
                     $lead                                                       = $this->getCompoundMauticFields($lead);
-                    $checkEmailsInSugar[$object][mb_strtolower($lead['email'])] = $lead;
+                    $checkEmailsInSugar[$object][mb_strtolower((string) $lead['email'])] = $lead;
                 }
             }
         }
@@ -1236,7 +1236,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email'])) {
                     $lead                                                       = $this->getCompoundMauticFields($lead);
-                    $checkEmailsInSugar['Leads'][mb_strtolower($lead['email'])] = $lead;
+                    $checkEmailsInSugar['Leads'][mb_strtolower((string) $lead['email'])] = $lead;
                 }
             }
         }
@@ -1413,7 +1413,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         foreach ($sugarLeadRecords as $sugarLeadRecord) {
             if (isset($sugarLeadRecord) && $sugarLeadRecord) {
                 $email           = $sugarLeadRecord['email1'];
-                $key             = mb_strtolower($email);
+                $key             = mb_strtolower((string) $email);
                 $leadOwnerEmails = [];
                 if (!empty($checkEmailsInSugar)) {
                     foreach ($checkEmailsInSugar as $emailKey => $mauticRecord) {
@@ -1500,7 +1500,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    if (str_contains($lead[$mauticField], '|')) {
+                    if (str_contains((string) $lead[$mauticField], '|')) {
                         // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
                         $value = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
                     } else {
@@ -1547,7 +1547,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($response as $item) {
                 $contactId = $integrationEntityId = null;
                 if (!empty($item['reference_id'])) {
-                    $reference = explode('-', $item['reference_id']);
+                    $reference = explode('-', (string) $item['reference_id']);
                     if (3 === count($reference)) {
                         [$contactId, $object, $integrationEntityId] = $reference;
                     } else {
@@ -1677,7 +1677,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
 
             foreach ($keys as $key) {
-                if (strpos($key, '__'.$obj)) {
+                if (strpos((string) $key, '__'.$obj)) {
                     $newKey = str_replace('__'.$obj, '', $key);
                     if ('Id' === $newKey) {
                         // Don't map Id for push
@@ -1744,7 +1744,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function convertMauticToSuiteCrmMultiSelect($mauticMultiSelectStringToConvert): string
     {
         // $mauticMultiSelectStringToConvert = 'test|enhancedapi|dataservices';
-        $multiSelectArrayValues             = explode('|', $mauticMultiSelectStringToConvert);
+        $multiSelectArrayValues             = explode('|', (string) $mauticMultiSelectStringToConvert);
         $convertedSugarCrmMultiSelectString = '';
         foreach ($multiSelectArrayValues as $item) {
             $convertedSugarCrmMultiSelectString = $convertedSugarCrmMultiSelectString.'^'.$item.'^,';
@@ -1777,7 +1777,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     {
         // Mautic Multi Select format - 'choice1|choice2|choice_3'
         $regexString            = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
-        preg_match_all($regexString, $suiteCrmMultiSelectStringToConvert, $matches, PREG_SET_ORDER, 0);
+        preg_match_all($regexString, (string) $suiteCrmMultiSelectStringToConvert, $matches, PREG_SET_ORDER, 0);
         $convertedString        = '';
         foreach ($matches as $innerArray) {
             $convertedString     = $convertedString.$innerArray[2].'|';

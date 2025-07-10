@@ -12,9 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Connection $db,
-        private UserTokenRepositoryInterface $userTokenRepository,
-        private TranslatorInterface $translator,
+        private readonly Connection $db,
+        private readonly UserTokenRepositoryInterface $userTokenRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

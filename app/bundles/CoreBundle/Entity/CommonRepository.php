@@ -117,12 +117,12 @@ class CommonRepository extends ServiceEntityRepository
             if (is_array($args['order'])) {
                 foreach ($args['order'] as &$o) {
                     $alias = '';
-                    if (str_contains($o, '.')) {
-                        [$alias, $o] = explode('.', $o);
+                    if (str_contains((string) $o, '.')) {
+                        [$alias, $o] = explode('.', (string) $o);
                     }
 
                     if (in_array($o, $properties)) {
-                        $o = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', $o);
+                        $o = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', (string) $o);
                         $o = strtolower($o);
                     }
 
@@ -385,7 +385,7 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         if (isset($args['hydration_mode'])) {
-            $hydrationMode = constant('\\Doctrine\\ORM\\Query::'.strtoupper($args['hydration_mode']));
+            $hydrationMode = constant('\\Doctrine\\ORM\\Query::'.strtoupper((string) $args['hydration_mode']));
             $query->setHydrationMode($hydrationMode);
         } else {
             $hydrationMode = Query::HYDRATE_OBJECT;
@@ -474,8 +474,8 @@ class CommonRepository extends ServiceEntityRepository
                 }
                 $expr->add($groupExpr);
             }
-        } elseif (str_contains($filter['column'], ',')) {
-            $columns      = explode(',', $filter['column']);
+        } elseif (str_contains((string) $filter['column'], ',')) {
+            $columns      = explode(',', (string) $filter['column']);
             $expr         = $q->expr()->orX();
             $setParameter = false;
             foreach ($columns as $c) {
@@ -626,7 +626,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if ($select) {
             foreach ($select as &$column) {
-                if (!str_contains($column, '.')) {
+                if (!str_contains((string) $column, '.')) {
                     $column = $alias.'.'.$column;
                 }
             }
@@ -947,7 +947,7 @@ class CommonRepository extends ServiceEntityRepository
             $clause['dir'] = 'ASC';
         }
 
-        $clause['dir'] = $this->sanitize(strtoupper($clause['dir']));
+        $clause['dir'] = $this->sanitize(strtoupper((string) $clause['dir']));
         $clause['col'] = $this->sanitize($clause['col'], ['_.']);
 
         return $clause;
@@ -1310,7 +1310,7 @@ class CommonRepository extends ServiceEntityRepository
                 $indexAlias = $this->getTableAlias();
                 $indexBy    = $args['index_by'];
             }
-            if (!str_starts_with($indexBy, $indexAlias)) {
+            if (!str_starts_with((string) $indexBy, (string) $indexAlias)) {
                 $indexBy = $indexAlias.'.'.$indexBy;
             }
             $q->indexBy($indexAlias, $indexBy);
@@ -1351,7 +1351,7 @@ class CommonRepository extends ServiceEntityRepository
                 array_key_exists('orderByDir', $args) ? $args['orderByDir'] : ''
             );
             // add direction after each column
-            $parts = explode(',', $orderBy);
+            $parts = explode(',', (string) $orderBy);
             foreach ($parts as $order) {
                 $order = $this->sanitize($order, ['_', '.']);
 
@@ -1370,7 +1370,7 @@ class CommonRepository extends ServiceEntityRepository
     {
         foreach ($clauses as $clause) {
             $clause = $this->validateOrderByClause($clause);
-            $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+            $column = (!str_contains((string) $clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
             $query->addOrderBy($column, $clause['dir']);
         }
     }
@@ -1389,8 +1389,8 @@ class CommonRepository extends ServiceEntityRepository
 
             $selects = [];
             foreach ($args['select'] as $select) {
-                if (str_contains($select, '.')) {
-                    [$alias, $select] = explode('.', $select);
+                if (str_contains((string) $select, '.')) {
+                    [$alias, $select] = explode('.', (string) $select);
                 } else {
                     $alias = $this->getTableAlias();
                 }
@@ -1593,7 +1593,7 @@ class CommonRepository extends ServiceEntityRepository
                     }
                 } else {
                     $clause = $this->validateWhereClause($clause);
-                    $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                    $column = (!str_contains((string) $clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
 
                     $whereClause = null;
                     switch ($clause['expr']) {
@@ -1625,7 +1625,7 @@ class CommonRepository extends ServiceEntityRepository
                             break;
                         case 'in':
                         case 'notIn':
-                            $parsed = str_getcsv(html_entity_decode($clause['val']), ',', '"');
+                            $parsed = str_getcsv(html_entity_decode((string) $clause['val']), ',', '"');
 
                             $param = $this->generateRandomParameterName();
                             $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
@@ -1780,12 +1780,12 @@ class CommonRepository extends ServiceEntityRepository
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';
-            if (str_contains($col, '.')) {
-                [$alias, $col] = explode('.', $col);
+            if (str_contains((string) $col, '.')) {
+                [$alias, $col] = explode('.', (string) $col);
             }
 
             if (in_array($col, $properties)) {
-                $col = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', $col);
+                $col = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', (string) $col);
                 $col = strtolower($col);
             }
 

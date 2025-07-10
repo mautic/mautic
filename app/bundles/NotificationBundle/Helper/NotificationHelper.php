@@ -20,7 +20,7 @@ class NotificationHelper
         protected IntegrationHelper $integrationHelper,
         protected Router $router,
         protected RequestStack $requestStack,
-        private \Mautic\LeadBundle\Model\DoNotContact $doNotContact,
+        private readonly \Mautic\LeadBundle\Model\DoNotContact $doNotContact,
     ) {
     }
 
@@ -78,7 +78,7 @@ class NotificationHelper
             }
 
             $server        = $this->requestStack->getCurrentRequest()->server;
-            $https         = ('https' == parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME)) ? true : false;
+            $https         = ('https' == parse_url((string) $server->get('HTTP_REFERER'), PHP_URL_SCHEME)) ? true : false;
             $subdomainName = '';
 
             if (!$https && $notificationSubdomainName) {
@@ -166,7 +166,7 @@ JS;
             return false;
         }
 
-        if (!str_contains($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains((string) $server->get('HTTP_REFERER'), (string) $this->coreParametersHelper->get('site_url'))) {
             $landingPage = false;
         }
 

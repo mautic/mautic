@@ -103,7 +103,7 @@ class TokenHelper
                     $value = self::getNormalizeValue($alias, $value);
                     break;
                 case 'true':
-                    $value = urlencode($value);
+                    $value = urlencode((string) $value);
                     break;
                 case 'datetime':
                 case 'date':
@@ -138,7 +138,7 @@ class TokenHelper
 
     private static function getTokenDefaultValue($match): string
     {
-        $fallbackCheck = explode('|', $match);
+        $fallbackCheck = explode('|', (string) $match);
         if (!isset($fallbackCheck[1])) {
             return '';
         }
@@ -148,7 +148,7 @@ class TokenHelper
 
     private static function getFieldAlias($match): string
     {
-        $fallbackCheck = explode('|', $match);
+        $fallbackCheck = explode('|', (string) $match);
 
         return $fallbackCheck[0];
     }

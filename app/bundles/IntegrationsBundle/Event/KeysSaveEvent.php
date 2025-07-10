@@ -12,12 +12,12 @@ final class KeysSaveEvent extends Event
     /**
      * @var array<string,string>
      */
-    private array $newKeys;
+    private readonly array $newKeys;
 
     /**
      * @param array<string,string> $oldKeys
      */
-    public function __construct(private Integration $integrationConfiguration, private array $oldKeys)
+    public function __construct(private readonly Integration $integrationConfiguration, private readonly array $oldKeys)
     {
         $this->newKeys = $integrationConfiguration->getApiKeys();
     }

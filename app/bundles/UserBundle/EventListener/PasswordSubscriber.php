@@ -13,7 +13,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 final class PasswordSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
+    public function __construct(private readonly PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
     {
     }
 

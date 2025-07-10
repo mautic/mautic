@@ -20,9 +20,9 @@ class InactiveContactFinder
     private ?array $campaignMemberDatesAdded = null;
 
     public function __construct(
-        private LeadRepository $leadRepository,
-        private CampaignLeadRepository $campaignLeadRepository,
-        private LoggerInterface $logger,
+        private readonly LeadRepository $leadRepository,
+        private readonly CampaignLeadRepository $campaignLeadRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

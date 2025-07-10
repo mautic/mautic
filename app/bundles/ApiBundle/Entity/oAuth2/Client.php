@@ -118,7 +118,7 @@ class Client extends BaseClient
 
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
+        $getter  = 'get'.ucfirst((string) $prop);
         $current = $this->$getter();
         if ($current != $val) {
             $this->changes[$prop] = [$current, $val];

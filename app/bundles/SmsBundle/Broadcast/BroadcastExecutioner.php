@@ -16,10 +16,10 @@ class BroadcastExecutioner
     private ?BroadcastResult $result = null;
 
     public function __construct(
-        private SmsModel $smsModel,
-        private BroadcastQuery $broadcastQuery,
-        private TranslatorInterface $translator,
-        private LeadRepository $leadRepository,
+        private readonly SmsModel $smsModel,
+        private readonly BroadcastQuery $broadcastQuery,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 

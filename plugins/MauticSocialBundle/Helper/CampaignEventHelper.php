@@ -92,7 +92,7 @@ class CampaignEventHelper
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
-            '{twitter_handle}' => (str_contains($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
+            '{twitter_handle}' => (str_contains((string) $tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
         ];
 
         $tokens = array_merge(

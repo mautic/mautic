@@ -78,14 +78,14 @@ class SubmissionModel extends CommonFormModel
         protected LeadFieldModel $leadFieldModel,
         protected CompanyModel $companyModel,
         protected FormFieldHelper $fieldHelper,
-        private UploadFieldValidator $uploadFieldValidator,
-        private FormUploader $formUploader,
-        private DeviceTrackingServiceInterface $deviceTrackingService,
-        private FieldValueTransformer $fieldValueTransformer,
-        private DateHelper $dateHelper,
-        private ContactTracker $contactTracker,
-        private ContactMerger $contactMerger,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly UploadFieldValidator $uploadFieldValidator,
+        private readonly FormUploader $formUploader,
+        private readonly DeviceTrackingServiceInterface $deviceTrackingService,
+        private readonly FieldValueTransformer $fieldValueTransformer,
+        private readonly DateHelper $dateHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly ContactMerger $contactMerger,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -700,7 +700,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
+            $row[] = htmlspecialchars_decode((string) $r['value'], ENT_QUOTES);
             // free memory
             unset($values['results'][$k2]);
         }
@@ -946,7 +946,7 @@ class SubmissionModel extends CommonFormModel
             $conflicts = [];
             foreach ($potentialConflicts as $field) {
                 if (!empty($fieldSet1[$field]) && !empty($fieldSet2[$field])) {
-                    if (strtolower($fieldSet1[$field]) !== strtolower($fieldSet2[$field])) {
+                    if (strtolower((string) $fieldSet1[$field]) !== strtolower((string) $fieldSet2[$field])) {
                         $conflicts[] = $field;
                     }
                 }

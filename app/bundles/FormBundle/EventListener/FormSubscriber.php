@@ -24,15 +24,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private MailHelper $mailer;
+    private readonly MailHelper $mailer;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private LanguageHelper $languageHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -133,7 +133,7 @@ class FormSubscriber implements EventSubscriberInterface
         // replace line brakes with <br> for textarea values
         if ($tokens = $event->getTokens()) {
             foreach ($tokens as &$value) {
-                $value = nl2br(html_entity_decode($value, ENT_QUOTES));
+                $value = nl2br(html_entity_decode((string) $value, ENT_QUOTES));
             }
             unset($value);
         }
@@ -224,7 +224,7 @@ class FormSubscriber implements EventSubscriberInterface
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form
-            $payload[$key]       = html_entity_decode(htmlspecialchars_decode($value, ENT_QUOTES), ENT_QUOTES);
+            $payload[$key]       = html_entity_decode(htmlspecialchars_decode((string) $value, ENT_QUOTES), ENT_QUOTES);
         }
 
         $event->setPostSubmitPayload($payload);
@@ -234,13 +234,13 @@ class FormSubscriber implements EventSubscriberInterface
         ];
 
         if (!empty($config['authorization_header'])) {
-            if (str_contains($config['authorization_header'], ':')) {
-                [$key, $value] = explode(':', $config['authorization_header']);
+            if (str_contains((string) $config['authorization_header'], ':')) {
+                [$key, $value] = explode(':', (string) $config['authorization_header']);
             } else {
                 $key   = 'Authorization';
                 $value = $config['authorization_header'];
             }
-            $headers[trim($key)] = trim($value);
+            $headers[trim($key)] = trim((string) $value);
         }
 
         try {
@@ -384,7 +384,7 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private function getEmailsFromString($emailString): array
     {
-        return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
+        return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', (string) $emailString)), null) : [];
     }
 
     /**

@@ -37,7 +37,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
     private const DEFAULT_API_MODE = 'oauth2';
 
     public function __construct(
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

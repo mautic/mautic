@@ -34,7 +34,7 @@ class LeadEventLogRepository extends CommonRepository
         foreach ($entities as $key => $row) {
             if (
                 isset($row['properties']['error'])
-                && preg_match('/SQLSTATE\[\w+\]: (.*)/', $row['properties']['error'], $matches)
+                && preg_match('/SQLSTATE\[\w+\]: (.*)/', (string) $row['properties']['error'], $matches)
             ) {
                 $entities[$key]['properties']['error'] = $matches[1];
             }
@@ -133,7 +133,7 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (!empty($options['search'])) {
-            $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
+            $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower((string) $options['search']).'%')));
         }
 
         return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added'], null, $alias.'.id');

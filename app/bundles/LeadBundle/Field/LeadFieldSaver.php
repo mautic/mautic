@@ -12,8 +12,8 @@ use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 class LeadFieldSaver
 {
     public function __construct(
-        private LeadFieldRepository $leadFieldRepository,
-        private FieldSaveDispatcher $fieldSaveDispatcher,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly FieldSaveDispatcher $fieldSaveDispatcher,
     ) {
     }
 

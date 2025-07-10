@@ -16,8 +16,8 @@ use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 class SerializerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private GrapesJsBuilderModel $grapesJsBuilderModel,
-        private Config $config,
+        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
+        private readonly Config $config,
     ) {
     }
 

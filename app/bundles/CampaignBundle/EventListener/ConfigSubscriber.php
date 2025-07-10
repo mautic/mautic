@@ -38,7 +38,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         // Manipulate the values
         if (!empty($values['campaignconfig']['campaign_time_wait_on_event_false'])) {
-            $values['campaignconfig']['campaign_time_wait_on_event_false'] = htmlspecialchars($values['campaignconfig']['campaign_time_wait_on_event_false']);
+            $values['campaignconfig']['campaign_time_wait_on_event_false'] = htmlspecialchars((string) $values['campaignconfig']['campaign_time_wait_on_event_false']);
         }
 
         // Set updated values

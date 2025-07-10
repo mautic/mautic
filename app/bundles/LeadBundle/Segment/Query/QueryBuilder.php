@@ -18,7 +18,7 @@ class QueryBuilder extends BaseQueryBuilder
     private array $logicStack = [];
 
     public function __construct(
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
         parent::__construct($connection);
     }
@@ -289,7 +289,7 @@ class QueryBuilder extends BaseQueryBuilder
         foreach ($joins as $join) {
             if ('right' == $join['joinType']) {
                 $matches = null;
-                if (preg_match('/'.$leadTable.'\.id \= ([^\ ]+)/i', $join['joinCondition'], $matches)) {
+                if (preg_match('/'.$leadTable.'\.id \= ([^\ ]+)/i', (string) $join['joinCondition'], $matches)) {
                     return $matches[1];
                 }
             }
@@ -401,7 +401,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function addLogic($expression, $glue): void
     {
         // little setup
-        $glue = strtolower($glue);
+        $glue = strtolower((string) $glue);
 
         //  Different handling
         if ('or' == $glue) {

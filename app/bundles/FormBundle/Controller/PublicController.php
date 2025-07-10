@@ -47,7 +47,7 @@ class PublicController extends CommonFormController
         if (!empty($return)) {
             // remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (!str_contains($return, '?')) ? '?' : '&';
+            $query  = (!str_contains((string) $return, '?')) ? '?' : '&';
         }
 
         $translator = $this->translator;
@@ -201,9 +201,9 @@ class PublicController extends CommonFormController
         } else {
             if (!empty($error)) {
                 if ($return) {
-                    $hash = (null !== $form) ? '#'.strtolower($form->getAlias()) : '';
+                    $hash = (null !== $form) ? '#'.strtolower((string) $form->getAlias()) : '';
 
-                    return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
+                    return $this->redirect($return.$query.'mauticError='.rawurlencode((string) $error).$hash);
                 } else {
                     $msg     = $error;
                     $msgType = 'error';
@@ -213,7 +213,7 @@ class PublicController extends CommonFormController
             } elseif ('return' == $postAction) {
                 if (!empty($return)) {
                     if (!empty($postActionProperty)) {
-                        $return .= $query.'mauticMessage='.rawurlencode($postActionProperty);
+                        $return .= $query.'mauticMessage='.rawurlencode((string) $postActionProperty);
                     }
 
                     return $this->redirect($return);
@@ -433,7 +433,7 @@ class PublicController extends CommonFormController
         // Make it hard to abuse this public endpoint.
         $vagueErrorMessage = ['error' => 'Invalid request param'];
 
-        if (mb_strlen($search) < 3 || !$formId) {
+        if (mb_strlen((string) $search) < 3 || !$formId) {
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 

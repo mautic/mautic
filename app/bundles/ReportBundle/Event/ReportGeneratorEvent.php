@@ -32,7 +32,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         Report $report,
         private array $options,
         private QueryBuilder $queryBuilder,
-        private ChannelListHelper $channelListHelper,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
         $this->report            = $report;
         $this->context           = $report->getSource();

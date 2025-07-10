@@ -65,8 +65,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         protected ChannelListHelper $channelListHelper,
         protected FieldModel $fieldModel,
         protected ReportHelper $reportHelper,
-        private CsvExporter $csvExporter,
-        private ExcelExporter $excelExporter,
+        private readonly CsvExporter $csvExporter,
+        private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -74,7 +74,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 

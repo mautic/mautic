@@ -9,8 +9,8 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 final class UserTokenService implements UserTokenServiceInterface
 {
     public function __construct(
-        private RandomHelperInterface $randomHelper,
-        private UserTokenRepositoryInterface $userTokenRepository,
+        private readonly RandomHelperInterface $randomHelper,
+        private readonly UserTokenRepositoryInterface $userTokenRepository,
     ) {
     }
 

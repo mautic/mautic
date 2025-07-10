@@ -14,11 +14,11 @@ class SchedulerPlanner
     /**
      * @var SchedulerRepository
      */
-    private \Doctrine\ORM\EntityRepository $schedulerRepository;
+    private readonly \Doctrine\ORM\EntityRepository $schedulerRepository;
 
     public function __construct(
-        private DateBuilder $dateBuilder,
-        private EntityManager $entityManager,
+        private readonly DateBuilder $dateBuilder,
+        private readonly EntityManager $entityManager,
     ) {
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }

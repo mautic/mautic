@@ -106,7 +106,7 @@ trait RequestTrait
 
                     // Ensure the value is an array
                     if (!is_array($params[$name])) {
-                        $params[$name] = (str_contains($params[$name], '|')) ? explode('|', $params[$name]) : ($params[$name] ? [$params[$name]] : []);
+                        $params[$name] = (str_contains((string) $params[$name], '|')) ? explode('|', (string) $params[$name]) : ($params[$name] ? [$params[$name]] : []);
                     }
 
                     break;
@@ -122,7 +122,7 @@ trait RequestTrait
                         break;
                     }
 
-                    if (false === ($timestamp = strtotime($params[$name]))) {
+                    if (false === ($timestamp = strtotime((string) $params[$name]))) {
                         $timestamp = null;
                     }
 
@@ -187,7 +187,7 @@ trait RequestTrait
                     // Date placeholder was used so just ignore it to allow import of the field
                     unset($fieldData[$leadField['alias']]);
                 } else {
-                    if (false === ($timestamp = strtotime($fieldData[$leadField['alias']]))) {
+                    if (false === ($timestamp = strtotime((string) $fieldData[$leadField['alias']]))) {
                         $timestamp = null;
                     }
                     if ($timestamp) {
@@ -207,8 +207,8 @@ trait RequestTrait
                 break;
             case 'multiselect':
                 if (!is_array($fieldData[$leadField['alias']])) {
-                    if (str_contains($fieldData[$leadField['alias']], '|')) {
-                        $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
+                    if (str_contains((string) $fieldData[$leadField['alias']], '|')) {
+                        $fieldData[$leadField['alias']] = explode('|', (string) $fieldData[$leadField['alias']]);
                     } else {
                         $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
                     }

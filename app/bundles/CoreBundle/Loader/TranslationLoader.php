@@ -12,8 +12,8 @@ use Symfony\Component\Translation\MessageCatalogue;
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private PathsHelper $pathsHelper,
+        private readonly BundleHelper $bundleHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 
@@ -90,7 +90,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
             return;
         }
 
-        $domain        = substr($file->getFilename(), 0, -4);
+        $domain        = substr((string) $file->getFilename(), 0, -4);
         $thisCatalogue = parent::load($messages, $locale, $domain);
         $catalogue->addCatalogue($thisCatalogue);
     }

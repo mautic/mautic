@@ -104,8 +104,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
             $tables[$table] = [];
         }
 
-        $type   = strtolower($type);
-        $suffix = strtolower(substr($suffix, -4));
+        $type   = strtolower((string) $type);
+        $suffix = strtolower(substr((string) $suffix, -4));
 
         switch ($type) {
             case 'fk':
@@ -152,7 +152,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
                 break;
         }
 
-        return strtoupper($localName);
+        return strtoupper((string) $localName);
     }
 
     /**
@@ -166,7 +166,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $hash        = implode(
             '',
             array_map(
-                fn ($column): string => dechex(crc32($column)),
+                fn ($column): string => dechex(crc32((string) $column)),
                 $columnNames
             )
         );

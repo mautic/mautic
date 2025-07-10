@@ -15,7 +15,7 @@ class PageDisplayEvent extends Event
 
     public function __construct(
         private string $content,
-        private Page $page,
+        private readonly Page $page,
         private array $params = [],
     ) {
     }

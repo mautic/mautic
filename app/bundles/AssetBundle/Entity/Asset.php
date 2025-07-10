@@ -764,7 +764,7 @@ class Asset extends FormEntity implements UuidInterface
 
             if (empty($extension)) {
                 // get it from the original name
-                $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
+                $extension = pathinfo((string) $this->originalFileName, PATHINFO_EXTENSION);
             }
             $this->path = $filename.'.'.$extension;
         } elseif ($this->isRemote() && null !== $this->getRemotePath()) {
@@ -1212,7 +1212,7 @@ class Asset extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
+        $metadata->addConstraint(new Assert\Callback(self::validateFile(...)));
     }
 
     /**

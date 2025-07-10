@@ -23,8 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class DsnType extends AbstractType
 {
     public function __construct(
-        private DsnTransformerFactory $dsnTransformerFactory,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly DsnTransformerFactory $dsnTransformerFactory,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

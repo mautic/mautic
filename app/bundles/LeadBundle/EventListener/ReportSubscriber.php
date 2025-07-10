@@ -64,15 +64,15 @@ class ReportSubscriber implements EventSubscriberInterface
     private ?array $channelActions = null;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private FieldModel $fieldModel,
-        private StageModel $stageModel,
-        private CampaignModel $campaignModel,
-        private EventCollector $eventCollector,
-        private CompanyModel $companyModel,
-        private CompanyReportData $companyReportData,
-        private FieldsBuilder $fieldsBuilder,
-        private Translator $translator,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
+        private readonly StageModel $stageModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly EventCollector $eventCollector,
+        private readonly CompanyModel $companyModel,
+        private readonly CompanyReportData $companyReportData,
+        private readonly FieldsBuilder $fieldsBuilder,
+        private readonly Translator $translator,
     ) {
     }
 
@@ -410,7 +410,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 if (isset($join['l'])) {
                     $where = $queryBuilder->getQueryPart('where');
                     foreach ($join['l'] as $item) {
-                        if (str_contains($where, $item['joinAlias'].'.leadlist_id')) {
+                        if (str_contains((string) $where, $item['joinAlias'].'.leadlist_id')) {
                             $queryBuilder->add('join', ['l' => $item], true);
                         }
                     }
@@ -836,7 +836,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $channels          = [];
         $channelActions    = [];
         foreach ($availableChannels['decision'] as $channel => $decision) {
-            $parts                  = explode('.', $channel);
+            $parts                  = explode('.', (string) $channel);
             $channelName            = $parts[0];
             $channels[$channelName] = $this->translator->hasId('mautic.channel.'.$channelName) ? $this->translator->trans(
                 'mautic.channel.'.$channelName

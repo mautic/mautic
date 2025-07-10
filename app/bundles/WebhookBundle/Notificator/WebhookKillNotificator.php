@@ -15,12 +15,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class WebhookKillNotificator
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private Router $router,
-        private NotificationModel $notificationModel,
-        private EntityManager $entityManager,
-        private MailHelper $mailer,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly Router $router,
+        private readonly NotificationModel $notificationModel,
+        private readonly EntityManager $entityManager,
+        private readonly MailHelper $mailer,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -78,7 +78,7 @@ class WebhookKillNotificator
                 $mailer->setCc([$ccToUser->getEmail() => null]);
             }
         } else {
-            $emailAddresses = array_map('trim', explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));
+            $emailAddresses = array_map('trim', explode(',', (string) $this->coreParametersHelper->get('webhook_notification_email_addresses')));
             $mailer->setTo($emailAddresses);
         }
 

@@ -84,7 +84,7 @@ class LookupHelper
         if ($clearbit = $this->getClearbit(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
-                    $parse                             = parse_url($company->getFieldValue('companywebsite'));
+                    $parse                             = parse_url((string) $company->getFieldValue('companywebsite'));
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
@@ -113,7 +113,7 @@ class LookupHelper
     public function validateRequest($oid, $type)
     {
         // prefix#entityId#hour#userId#nonce
-        [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
+        [$w, $id, $hour, $uid, $nonce]     = explode('#', (string) $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
 
         switch ($type) {

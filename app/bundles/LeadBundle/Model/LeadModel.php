@@ -1300,7 +1300,7 @@ class LeadModel extends FormModel
         unset($fieldData['modifiedByUser']);
 
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
-            $addresses = explode(',', $data[$fields['ip']]);
+            $addresses = explode(',', (string) $data[$fields['ip']]);
             foreach ($addresses as $address) {
                 $address = trim($address);
                 if (!$ipAddress = $this->ipAddressModel->findOneByIpAddress($address)) {
@@ -1401,7 +1401,7 @@ class LeadModel extends FormModel
         unset($fieldData['ownerusername']);
 
         if (!empty($fields['tags']) && !empty($data[$fields['tags']])) {
-            $leadTags = explode('|', $data[$fields['tags']]);
+            $leadTags = explode('|', (string) $data[$fields['tags']]);
             $this->modifyTags($lead, $leadTags, null, false);
         }
         unset($fieldData['tags']);
@@ -1592,7 +1592,7 @@ class LeadModel extends FormModel
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
             // assume it's a query string; convert it to array
-            parse_str($params['query'], $queryResult);
+            parse_str((string) $params['query'], $queryResult);
             if (!empty($queryResult)) {
                 $params['query'] = $queryResult;
             } else {
@@ -2411,7 +2411,7 @@ class LeadModel extends FormModel
                     ? $field['properties']
                     : unserialize($field['properties']);
 
-                $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
+                $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode((string) $item['value'], ENT_QUOTES), $allowedValues['list']);
 
                 $fieldValue = $entity->getFieldValue($field['alias'], $group);
                 if (!empty($allowedValues['list']) && !in_array($fieldValue, $flattenedAllowedValues)) {

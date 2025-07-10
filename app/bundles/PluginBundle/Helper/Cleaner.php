@@ -19,7 +19,7 @@ class Cleaner
      */
     public static function clean($value, $fieldType = self::FIELD_TYPE_STRING)
     {
-        $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
+        $clean = strip_tags(html_entity_decode((string) $value, ENT_QUOTES));
         switch ($fieldType) {
             case self::FIELD_TYPE_BOOL:
                 return (bool) $clean;

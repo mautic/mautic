@@ -67,7 +67,7 @@ class Message
      */
     public function getInternalLinksPlaceholders(): array
     {
-        return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : [];
+        return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', (string) $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : [];
     }
 
     /**
@@ -75,7 +75,7 @@ class Message
      */
     public function replaceInternalLinks($baseUri)
     {
-        $baseUri     = rtrim($baseUri, '\\/').'/';
+        $baseUri     = rtrim((string) $baseUri, '\\/').'/';
         $fetchedHtml = $this->textHtml;
         foreach ($this->getInternalLinksPlaceholders() as $attachmentId => $placeholder) {
             if (isset($this->attachments[$attachmentId])) {

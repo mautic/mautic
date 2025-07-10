@@ -14,8 +14,8 @@ class FormExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('formFieldFormatList', [$this, 'formatList'], ['is_safe' => ['all']]),
-            new TwigFunction('formContainsErrors', [$this, 'containsErrors'], ['is_safe' => ['all']]),
+            new TwigFunction('formFieldFormatList', $this->formatList(...), ['is_safe' => ['all']]),
+            new TwigFunction('formContainsErrors', $this->containsErrors(...), ['is_safe' => ['all']]),
         ];
     }
 

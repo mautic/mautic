@@ -48,31 +48,31 @@ class DynamicContentType extends AbstractType
     /**
      * @var mixed[]
      */
-    private array $countryChoices;
+    private readonly array $countryChoices;
 
     /**
      * @var mixed[]
      */
-    private array $regionChoices;
+    private readonly array $regionChoices;
 
     private $timezoneChoices;
 
     /**
      * @var mixed[]
      */
-    private array $localeChoices;
+    private readonly array $localeChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceTypesChoices;
+    private readonly array $deviceTypesChoices;
 
     private $deviceBrandsChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceOsChoices;
+    private readonly array $deviceOsChoices;
 
     /**
      * @var array<string, string>
@@ -83,10 +83,10 @@ class DynamicContentType extends AbstractType
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManager $em,
         ListModel $listModel,
-        private TranslatorInterface $translator,
-        private LeadModel $leadModel,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadModel $leadModel,
         private TypeList $typeList,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();

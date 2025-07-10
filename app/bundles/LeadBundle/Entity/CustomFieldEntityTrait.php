@@ -36,7 +36,7 @@ trait CustomFieldEntityTrait
      */
     public function __get($name)
     {
-        return $this->getFieldValue(strtolower($name));
+        return $this->getFieldValue(strtolower((string) $name));
     }
 
     /**
@@ -44,7 +44,7 @@ trait CustomFieldEntityTrait
      */
     public function __set($name, $value)
     {
-        return $this->addUpdatedField(strtolower($name), $value);
+        return $this->addUpdatedField(strtolower((string) $name), $value);
     }
 
     /**
@@ -109,7 +109,7 @@ trait CustomFieldEntityTrait
 
         $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
         $field    = $this->getField($alias);
-        $setter   = 'set'.ucfirst($property);
+        $setter   = 'set'.ucfirst((string) $property);
 
         if (null == $oldValue) {
             $oldValue = $this->getFieldValue($alias);

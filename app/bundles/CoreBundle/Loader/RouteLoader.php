@@ -12,8 +12,8 @@ use Symfony\Component\Routing\RouteCollection;
 class RouteLoader extends Loader
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private CoreParametersHelper $coreParameters,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CoreParametersHelper $coreParameters,
     ) {
     }
 
@@ -35,7 +35,7 @@ class RouteLoader extends Loader
         $siteUrl  = $this->coreParameters->get('site_url');
         $forceSSL = false;
         if (!empty($siteUrl)) {
-            $parts    = parse_url($siteUrl);
+            $parts    = parse_url((string) $siteUrl);
             $forceSSL = (!empty($parts['scheme']) && 'https' == $parts['scheme']);
         }
 

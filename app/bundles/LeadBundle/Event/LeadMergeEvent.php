@@ -8,8 +8,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 class LeadMergeEvent extends Event
 {
     public function __construct(
-        private Lead $victor,
-        private Lead $loser,
+        private readonly Lead $victor,
+        private readonly Lead $loser,
     ) {
     }
 

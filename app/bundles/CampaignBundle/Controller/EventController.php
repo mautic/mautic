@@ -37,8 +37,8 @@ class EventController extends CommonFormController
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private EventCollector $eventCollector,
-        private DateHelper $dateHelper,
+        private readonly EventCollector $eventCollector,
+        private readonly DateHelper $dateHelper,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -48,7 +48,7 @@ class EventController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
-        private CampaignModel $campaignModel,
+        private readonly CampaignModel $campaignModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -365,7 +365,7 @@ class EventController extends CommonFormController
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 // If event is new don't add to deleted list
-                if (!str_contains($objectId, 'new')) {
+                if (!str_contains((string) $objectId, 'new')) {
                     $deletedEvents[] = $objectId;
                     $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
                 }

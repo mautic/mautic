@@ -20,7 +20,7 @@ class RouteHelper
     private $dispatcher;
 
     public function __construct(
-        private ObjectProvider $objectProvider,
+        private readonly ObjectProvider $objectProvider,
         EventDispatcherInterface $dispatcher,
     ) {
         $this->dispatcher     = $dispatcher;

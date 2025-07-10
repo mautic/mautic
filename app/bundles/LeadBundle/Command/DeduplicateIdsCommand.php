@@ -17,7 +17,7 @@ class DeduplicateIdsCommand extends Command
     public const NAME = 'mautic:contacts:deduplicate:ids';
 
     public function __construct(
-        private ContactDeduper $contactDeduper,
+        private readonly ContactDeduper $contactDeduper,
     ) {
         parent::__construct();
     }
@@ -51,7 +51,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $newerIntoOlder = (bool) $input->getOption('newer-into-older');
-        $contactIds     = array_filter(explode(',', $input->getOption('contact-ids')));
+        $contactIds     = array_filter(explode(',', (string) $input->getOption('contact-ids')));
         $duplicateCount = count($contactIds);
         $progressBar    = new ProgressBar($output, $duplicateCount);
         $stopwatch      = new Stopwatch();

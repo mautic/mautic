@@ -122,7 +122,7 @@ class WebhookModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         protected SerializerInterface $serializer,
-        private Client $httpClient,
+        private readonly Client $httpClient,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -481,7 +481,7 @@ class WebhookModel extends FormModel
                 $payload[$type] = [];
             }
 
-            $queuePayload              = json_decode($queueItem->getPayload(), true);
+            $queuePayload              = json_decode((string) $queueItem->getPayload(), true);
             $queuePayload['timestamp'] = $queueItem->getDateAdded()->format('c');
 
             // its important to decode the payload form the DB as we re-encode it with the

@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private EmailModel $emailModel,
+        private readonly EmailModel $emailModel,
     ) {
     }
 
@@ -27,9 +27,9 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
             $key = $count + 1;
             foreach ($rows as $col => $val) {
                 if ('NULL' != $val) {
-                    $setter = 'set'.ucfirst($col);
+                    $setter = 'set'.ucfirst((string) $col);
                     if (in_array($col, ['content', 'variantSettings'])) {
-                        $val = Serializer::decode(stripslashes($val));
+                        $val = Serializer::decode(stripslashes((string) $val));
                     }
                     $email->$setter($val);
                 }

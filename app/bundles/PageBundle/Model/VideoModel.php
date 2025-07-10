@@ -124,7 +124,7 @@ class VideoModel extends FormModel
         // get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
-            $languages = explode(',', $browserLanguages);
+            $languages = explode(',', (string) $browserLanguages);
             foreach ($languages as $k => $l) {
                 if (($pos = strpos(';q=', $l)) !== false) {
                     // remove weights

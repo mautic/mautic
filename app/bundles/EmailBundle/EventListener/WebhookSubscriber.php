@@ -14,8 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private WebhookModel $webhookModel,
-        private bool $includeDetails,
+        private readonly WebhookModel $webhookModel,
+        private readonly bool $includeDetails,
     ) {
     }
 
@@ -102,7 +102,7 @@ class WebhookSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $payload = json_decode($webhookQueue->getPayload(), true);
+        $payload = json_decode((string) $webhookQueue->getPayload(), true);
 
         if (!is_array($payload)) {
             return;

@@ -17,21 +17,21 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
-    private ArrayCollection $persistQueue;
+    private readonly ArrayCollection $persistQueue;
 
-    private ArrayCollection $logs;
+    private readonly ArrayCollection $logs;
 
     private array $contactRotations = [];
 
     private int $lastUsedCampaignIdToFetchRotation;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private ContactTracker $contactTracker,
-        private LeadEventLogRepository $leadEventLogRepository,
-        private LeadRepository $leadRepository,
-        private SummaryModel $summaryModel,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly SummaryModel $summaryModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();

@@ -17,7 +17,7 @@ class UnusedIpDeleteCommand extends ModeratedCommand
     private const DEFAULT_LIMIT = 10000;
 
     public function __construct(
-        private IpAddressModel $ipAddressModel,
+        private readonly IpAddressModel $ipAddressModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {

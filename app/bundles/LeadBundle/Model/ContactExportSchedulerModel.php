@@ -33,10 +33,10 @@ class ContactExportSchedulerModel extends AbstractCommonModel
     private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
 
     public function __construct(
-        private RequestStack $requestStack,
-        private LeadModel $leadModel,
-        private ExportHelper $exportHelper,
-        private MailHelper $mailHelper,
+        private readonly RequestStack $requestStack,
+        private readonly LeadModel $leadModel,
+        private readonly ExportHelper $exportHelper,
+        private readonly MailHelper $mailHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -84,11 +84,11 @@ class ContactExportSchedulerModel extends AbstractCommonModel
                 [
                     'column' => 'l.id',
                     'expr'   => 'in',
-                    'value'  => json_decode($ids, true, 512, JSON_THROW_ON_ERROR),
+                    'value'  => json_decode((string) $ids, true, 512, JSON_THROW_ON_ERROR),
                 ],
             ];
         } else {
-            if ('list' !== $indexMode || (!str_contains($search, $anonymous))) {
+            if ('list' !== $indexMode || (!str_contains((string) $search, $anonymous))) {
                 // Remove anonymous leads unless requested to prevent clutter.
                 $filter['force'] = [
                     [

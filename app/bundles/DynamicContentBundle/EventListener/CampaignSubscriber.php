@@ -20,9 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private DynamicContentModel $dynamicContentModel,
+        private readonly DynamicContentModel $dynamicContentModel,
         protected CacheProvider $cache,
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

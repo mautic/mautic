@@ -10,8 +10,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 class DsnTransformerFactory
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EscapeTransformer $escapeTransformer,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EscapeTransformer $escapeTransformer,
     ) {
     }
 

@@ -28,7 +28,7 @@ class Address
 
     public static function parseAddressForStatHash($address): ?string
     {
-        if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $address, $parts)) {
+        if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', (string) $address, $parts)) {
             if (strstr($parts[2], '_')) {
                 // Has an ID hash so use it to find the lead
                 [$ignore, $hashId] = explode('_', $parts[2]);

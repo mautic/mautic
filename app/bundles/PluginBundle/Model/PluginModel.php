@@ -26,9 +26,9 @@ class PluginModel extends FormModel
 {
     public function __construct(
         protected FieldModel $leadFieldModel,
-        private FieldList $fieldList,
+        private readonly FieldList $fieldList,
         CoreParametersHelper $coreParametersHelper,
-        private BundleHelper $bundleHelper,
+        private readonly BundleHelper $bundleHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

@@ -79,7 +79,7 @@ class MessageRepository extends CommonRepository
 
         $channels = [];
         foreach ($results as $result) {
-            $result['properties']         = json_decode($result['properties'], true);
+            $result['properties']         = json_decode((string) $result['properties'], true);
             $channels[$result['channel']] = $result;
         }
 

@@ -23,7 +23,7 @@ class CampaignLeadChangeEvent extends Event
      * @param ?string     $action
      */
     public function __construct(
-        private Campaign $campaign,
+        private readonly Campaign $campaign,
         $leads,
         private $action,
     ) {

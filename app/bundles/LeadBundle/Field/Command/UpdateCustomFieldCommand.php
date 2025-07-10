@@ -20,7 +20,7 @@ class UpdateCustomFieldCommand extends Command
 {
     protected static $defaultDescription = 'Create custom field column in the background';
 
-    public function __construct(private BackgroundService $backgroundService, private TranslatorInterface $translator)
+    public function __construct(private readonly BackgroundService $backgroundService, private readonly TranslatorInterface $translator)
     {
         parent::__construct();
     }

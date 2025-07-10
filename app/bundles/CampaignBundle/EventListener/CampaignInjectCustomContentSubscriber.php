@@ -14,8 +14,8 @@ use Twig\Environment;
 final class CampaignInjectCustomContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AuditLogModel $auditLogModel,
-        private Environment $twig,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly Environment $twig,
     ) {
     }
 

@@ -15,12 +15,12 @@ class RestrictionHelper
     /**
      * @var string[]
      */
-    private array $restrictedFields;
+    private readonly array $restrictedFields;
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
         array $restrictedFields,
-        private string $displayMode,
+        private readonly string $displayMode,
     ) {
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
     }

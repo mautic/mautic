@@ -9,9 +9,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RouterSubscriber implements EventSubscriberInterface
 {
-    private string|int $httpsPort;
+    private readonly string|int $httpsPort;
 
-    private string|int $httpPort;
+    private readonly string|int $httpPort;
 
     /**
      * @param string|null $scheme
@@ -21,7 +21,7 @@ class RouterSubscriber implements EventSubscriberInterface
      * @param string|null $baseUrl
      */
     public function __construct(
-        private RouterInterface $router,
+        private readonly RouterInterface $router,
         private $scheme,
         private $host,
         $httpsPort,

@@ -18,9 +18,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ReplyHelper
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
-        private LoggerInterface $logger,
-        private ContactTracker $contactTracker,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly LoggerInterface $logger,
+        private readonly ContactTracker $contactTracker,
     ) {
     }
 

@@ -20,7 +20,7 @@ use Twig\Error\SyntaxError;
 
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
-    private TokenStorageInterface $tokenStorage;
+    private readonly TokenStorageInterface $tokenStorage;
 
     /**
      * This constructor must be duplicated from the extended class so our custom code could access the properties.
@@ -34,7 +34,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         UrlGeneratorInterface $router,
         ClientManagerInterface $clientManager,
         EventDispatcherInterface $eventDispatcher,
-        private Environment $twig,
+        private readonly Environment $twig,
     ) {
         parent::__construct(
             $requestStack,

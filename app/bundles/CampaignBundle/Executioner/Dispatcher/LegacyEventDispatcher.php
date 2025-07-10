@@ -190,8 +190,8 @@ class LegacyEventDispatcher
         try {
             if (is_array($settings['callback'])) {
                 $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (str_contains($settings['callback'], '::')) {
-                $parts      = explode('::', $settings['callback']);
+            } elseif (str_contains((string) $settings['callback'], '::')) {
+                $parts      = explode('::', (string) $settings['callback']);
                 $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {
                 $reflection = new \ReflectionMethod(null, $settings['callback']);

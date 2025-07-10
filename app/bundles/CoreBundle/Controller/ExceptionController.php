@@ -31,7 +31,7 @@ class ExceptionController extends CommonController
         if (
             (str_contains($request->getUri(), '/oauth') && !str_contains($request->getUri(), 'authorize'))
             || RequestHelper::isApiRequest($request)
-            || (!defined('MAUTIC_AJAX_VIEW') && str_contains($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
+            || (!defined('MAUTIC_AJAX_VIEW') && str_contains((string) $request->server->get('HTTP_ACCEPT', ''), 'application/json'))
         ) {
             $allowRealMessage =
                 'dev' === MAUTIC_ENV

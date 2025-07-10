@@ -11,7 +11,7 @@ class SAMLEnvVars implements EnvVarsInterface
         if ($entityId = $config->get('saml_idp_entity_id')) {
             $samlEntityId = $entityId;
         } elseif ($siteUrl = $config->get('site_url')) {
-            $parts        = parse_url($siteUrl);
+            $parts        = parse_url((string) $siteUrl);
             $scheme       = !empty($parts['scheme']) ? $parts['scheme'] : 'http';
             $samlEntityId = $scheme.'://'.$parts['host'];
         } else {

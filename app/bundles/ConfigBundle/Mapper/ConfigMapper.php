@@ -12,10 +12,10 @@ class ConfigMapper
     /**
      * @var mixed[]
      */
-    private array $restrictedParameters;
+    private readonly array $restrictedParameters;
 
     public function __construct(
-        private CoreParametersHelper $parametersHelper,
+        private readonly CoreParametersHelper $parametersHelper,
         array $restrictedParameters = [],
     ) {
         $this->restrictedParameters = RestrictionHelper::prepareRestrictions($restrictedParameters);

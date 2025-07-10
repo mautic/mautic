@@ -13,7 +13,7 @@ use Ramsey\Uuid\Uuid;
 
 class UUIDListener implements EventSubscriber
 {
-    public function __construct(private EntityManagerInterface $em)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
     }
 

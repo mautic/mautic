@@ -8,7 +8,7 @@ use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
     }
 
@@ -41,7 +41,7 @@ class PointActionHelper
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();
-        $limitToUrl   = html_entity_decode(trim($action['properties']['page_url']));
+        $limitToUrl   = html_entity_decode(trim((string) $action['properties']['page_url']));
 
         if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
             // no points change

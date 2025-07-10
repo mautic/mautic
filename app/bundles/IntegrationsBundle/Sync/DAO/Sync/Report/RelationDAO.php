@@ -9,11 +9,11 @@ class RelationDAO
     private ?int $relObjectInternalId = null;
 
     public function __construct(
-        private string $objectName,
-        private string $relFieldName,
-        private string $relObjectName,
-        private string $objectIntegrationId,
-        private string $relObjectIntegrationId,
+        private readonly string $objectName,
+        private readonly string $relFieldName,
+        private readonly string $relObjectName,
+        private readonly string $objectIntegrationId,
+        private readonly string $relObjectIntegrationId,
     ) {
     }
 

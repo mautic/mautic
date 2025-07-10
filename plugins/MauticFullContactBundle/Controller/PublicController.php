@@ -276,7 +276,7 @@ class PublicController extends FormController
                         foreach ($result['organization']['contactInfo']['phoneNumbers'] as $phoneNumber) {
                             if (array_key_exists('label', $phoneNumber)
                                 && 0 >= strpos(
-                                    strtolower($phoneNumber['label']),
+                                    strtolower((string) $phoneNumber['label']),
                                     'fax'
                                 )
                             ) {

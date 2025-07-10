@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class IframeAvailabilityChecker
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -112,7 +112,7 @@ class IframeAvailabilityChecker
 
         if (array_key_exists($name, $headers)) {
             if (null !== $content) {
-                if (str_starts_with($headers[$name][0], $content)) {
+                if (str_starts_with((string) $headers[$name][0], $content)) {
                     return true;
                 } else {
                     return false;

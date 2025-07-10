@@ -33,8 +33,8 @@ class FormSubscriber implements EventSubscriberInterface
         protected ContactTracker $contactTracker,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadFieldRepository $leadFieldRepository,
-        private PointGroupModel $groupModel,
-        private DoNotContact $doNotContact,
+        private readonly PointGroupModel $groupModel,
+        private readonly DoNotContact $doNotContact,
     ) {
     }
 
@@ -238,9 +238,9 @@ class FormSubscriber implements EventSubscriberInterface
 
         $queryReferer = $queryArray = [];
 
-        parse_str($event->getRequest()->server->get('QUERY_STRING'), $queryArray);
+        parse_str((string) $event->getRequest()->server->get('QUERY_STRING'), $queryArray);
         $refererURL       = $event->getRequest()->server->get('HTTP_REFERER');
-        $refererParsedUrl = parse_url($refererURL);
+        $refererParsedUrl = parse_url((string) $refererURL);
 
         if (isset($refererParsedUrl['query'])) {
             parse_str($refererParsedUrl['query'], $queryReferer);

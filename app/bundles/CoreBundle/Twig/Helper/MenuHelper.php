@@ -12,7 +12,7 @@ use Knp\Menu\Twig\Helper as KnpHelper;
 final class MenuHelper
 {
     public function __construct(
-        private KnpHelper $helper,
+        private readonly KnpHelper $helper,
     ) {
     }
 
@@ -38,7 +38,7 @@ final class MenuHelper
         $string = '';
         foreach ($attributes as $name => $value) {
             $name  = trim($name);
-            $value = trim($value);
+            $value = trim((string) $value);
             if ($name == $value) {
                 $string .= " $name";
             } else {

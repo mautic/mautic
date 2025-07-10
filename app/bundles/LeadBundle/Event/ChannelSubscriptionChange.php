@@ -12,10 +12,10 @@ class ChannelSubscriptionChange extends Event
      * @param string $channel
      */
     public function __construct(
-        private Lead $lead,
+        private readonly Lead $lead,
         private $channel,
-        private int $oldStatus,
-        private int $newStatus,
+        private readonly int $oldStatus,
+        private readonly int $newStatus,
     ) {
     }
 

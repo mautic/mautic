@@ -44,7 +44,7 @@ class UrlHelper
         $path = $host = $scheme = '';
 
         $ssl    = !empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS'];
-        $scheme = strtolower($_SERVER['SERVER_PROTOCOL']);
+        $scheme = strtolower((string) $_SERVER['SERVER_PROTOCOL']);
         $scheme = substr($scheme, 0, strpos($scheme, '/')).($ssl ? 's' : '');
         $port   = $_SERVER['SERVER_PORT'];
         $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
@@ -55,7 +55,7 @@ class UrlHelper
         $base = str_replace('/index.php', '', $base);
 
         /* return if already absolute URL */
-        if ('' != parse_url($rel, PHP_URL_SCHEME)) {
+        if ('' != parse_url((string) $rel, PHP_URL_SCHEME)) {
             return $rel;
         }
 
@@ -92,7 +92,7 @@ class UrlHelper
         /* replace '//' or '/./' or '/foo/../' with '/' */
         $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
         for ($n = 1; $n > 0;) {
-            $abs = preg_replace($re, '/', $abs, -1, $n);
+            $abs = preg_replace($re, '/', (string) $abs, -1, $n);
         }
 
         /* absolute URL is ready! */

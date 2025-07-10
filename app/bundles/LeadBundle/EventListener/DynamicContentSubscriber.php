@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $segmentRepository)
+    public function __construct(private readonly LeadListRepository $segmentRepository)
     {
     }
 

@@ -8,7 +8,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 class Parser
 {
     public function __construct(
-        private Message $message,
+        private readonly Message $message,
     ) {
     }
 
@@ -31,7 +31,7 @@ class Parser
         foreach ($this->message->to as $to => $name) {
             // Some ISPs strip the + email so will still process the content for a bounce
             // even if a +bounce address was not found
-            if (str_contains($to, '+bounce')) {
+            if (str_contains((string) $to, '+bounce')) {
                 $bouncerAddress = $to;
 
                 break;

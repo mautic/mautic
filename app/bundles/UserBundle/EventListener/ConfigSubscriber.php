@@ -97,7 +97,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $valid = true;
 
         libxml_use_internal_errors(true);
-        $doc = simplexml_load_string($content);
+        $doc = simplexml_load_string((string) $content);
         if (false === $doc) {
             $valid = false;
             libxml_clear_errors();

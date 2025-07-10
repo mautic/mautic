@@ -39,13 +39,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     protected ?\DateTime $now = null;
 
     public function __construct(
-        private LeadEventLogRepository $repo,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private EventExecutioner $executioner,
-        private EventScheduler $scheduler,
-        private ScheduledContactFinder $scheduledContactFinder,
-        private ProcessSignalService $processSignalService,
+        private readonly LeadEventLogRepository $repo,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly EventExecutioner $executioner,
+        private readonly EventScheduler $scheduler,
+        private readonly ScheduledContactFinder $scheduledContactFinder,
+        private readonly ProcessSignalService $processSignalService,
     ) {
     }
 

@@ -18,8 +18,8 @@ class InternalObjectOwnerEvent extends Event
      * @param int[] $objectIds
      */
     public function __construct(
-        private ObjectInterface $object,
-        private array $objectIds,
+        private readonly ObjectInterface $object,
+        private readonly array $objectIds,
     ) {
     }
 

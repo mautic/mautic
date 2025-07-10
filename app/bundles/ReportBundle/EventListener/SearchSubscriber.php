@@ -15,9 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private ReportModel $reportModel,
-        private CorePermissions $security,
-        private GlobalSearch $globalSearch,
+        private readonly ReportModel $reportModel,
+        private readonly CorePermissions $security,
+        private readonly GlobalSearch $globalSearch,
     ) {
     }
 

@@ -459,7 +459,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 }
                 if (isset($data['hasMore']) and $data['hasMore']) {
                     $params['offset'] = $data['offset'];
-                    if ($params['offset'] < strtotime($params['start'])) {
+                    if ($params['offset'] < strtotime((string) $params['start'])) {
                         $this->getCompanies($params, $id, $executed);
                     }
                 }

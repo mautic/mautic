@@ -25,7 +25,7 @@ class FromEmailHelper
      */
     private ?array $lastOwner = null;
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private LeadRepository $leadRepository)
+    public function __construct(private readonly CoreParametersHelper $coreParametersHelper, private readonly LeadRepository $leadRepository)
     {
     }
 

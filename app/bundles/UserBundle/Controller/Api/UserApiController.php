@@ -39,7 +39,7 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private UserPasswordHasherInterface $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,

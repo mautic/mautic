@@ -13,10 +13,10 @@ class InputExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('inputUrl', [InputHelper::class, 'url']),
-            new TwigFunction('inputAlphanum', [InputHelper::class, 'alphanum']),
-            new TwigFunction('inputTransliterate', [InputHelper::class, 'transliterate']),
-            new TwigFunction('inputClean', [InputHelper::class, 'clean']),
+            new TwigFunction('inputUrl', InputHelper::url(...)),
+            new TwigFunction('inputAlphanum', InputHelper::alphanum(...)),
+            new TwigFunction('inputTransliterate', InputHelper::transliterate(...)),
+            new TwigFunction('inputClean', InputHelper::clean(...)),
         ];
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class IntegrationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -33,7 +33,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
      */
     public function onRequest(PluginIntegrationRequestEvent $event): void
     {
-        $name     = strtoupper($event->getIntegrationName());
+        $name     = strtoupper((string) $event->getIntegrationName());
         $headers  = var_export($event->getHeaders(), true);
         $params   = var_export($event->getParameters(), true);
         $settings = var_export($event->getSettings(), true);
@@ -71,7 +71,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
     {
         $response = $event->getResponse();
         $headers  = var_export($response->getHeaders(), true);
-        $name     = strtoupper($event->getIntegrationName());
+        $name     = strtoupper((string) $event->getIntegrationName());
         $isJson   = isset($response->getHeaders()['Content-Type']) && preg_grep('/application\/json/', $response->getHeaders()['Content-Type']);
         $json     = $isJson ? str_replace('    ', '  ', json_encode(json_decode($response->getBody()), JSON_PRETTY_PRINT)) : '';
         $xml      = '';

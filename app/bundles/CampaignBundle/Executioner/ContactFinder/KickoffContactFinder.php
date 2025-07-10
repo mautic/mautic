@@ -14,9 +14,9 @@ use Psr\Log\LoggerInterface;
 class KickoffContactFinder
 {
     public function __construct(
-        private LeadRepository $leadRepository,
-        private CampaignRepository $campaignRepository,
-        private LoggerInterface $logger,
+        private readonly LeadRepository $leadRepository,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

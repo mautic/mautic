@@ -366,7 +366,7 @@ class DashboardController extends AbstractFormController
     {
         $file = $request->get('file');
 
-        $parts = explode('.', $file);
+        $parts = explode('.', (string) $file);
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
@@ -391,7 +391,7 @@ class DashboardController extends AbstractFormController
             $file = $request->get('file');
         }
 
-        $parts = explode('.', $file);
+        $parts = explode('.', (string) $file);
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
@@ -453,7 +453,7 @@ class DashboardController extends AbstractFormController
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
-                        $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
+                        $extension = pathinfo((string) $fileData->getClientOriginalName(), PATHINFO_EXTENSION);
                         if ('json' === $extension) {
                             $fileData->move($directories['user'], $fileData->getClientOriginalName());
                         } else {
@@ -509,7 +509,7 @@ class DashboardController extends AbstractFormController
 
             // Sort by name
             uasort($tempDashboard,
-                fn ($a, $b): int => strnatcasecmp($a['name'], $b['name'])
+                fn ($a, $b): int => strnatcasecmp((string) $a['name'], (string) $b['name'])
             );
 
             $dashboards = array_merge(

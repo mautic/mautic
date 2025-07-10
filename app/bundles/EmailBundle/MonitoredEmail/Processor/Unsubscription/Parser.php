@@ -19,7 +19,7 @@ class Parser
     {
         $unsubscriptionEmail = null;
         foreach ($this->message->to as $to => $name) {
-            if (str_contains($to, '+unsubscribe')) {
+            if (str_contains((string) $to, '+unsubscribe')) {
                 $unsubscriptionEmail = $to;
 
                 break;

@@ -7,8 +7,8 @@ namespace Mautic\IntegrationsBundle\Sync\DAO;
 class DateRange
 {
     public function __construct(
-        private ?\DateTimeInterface $fromDate,
-        private ?\DateTimeInterface $toDate,
+        private readonly ?\DateTimeInterface $fromDate,
+        private readonly ?\DateTimeInterface $toDate,
     ) {
     }
 

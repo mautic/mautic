@@ -12,8 +12,8 @@ final class HtmlExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('htmlAttributesStringToArray', [$this, 'convertHtmlAttributesToArray']),
-            new TwigFunction('htmlEntityDecode', [$this, 'htmlEntityDecode']),
+            new TwigFunction('htmlAttributesStringToArray', $this->convertHtmlAttributesToArray(...)),
+            new TwigFunction('htmlEntityDecode', $this->htmlEntityDecode(...)),
         ];
     }
 
@@ -51,7 +51,7 @@ final class HtmlExtension extends AbstractExtension
          * multiple values into an array (ie "one two" becomes ["one", "two"].
          */
         foreach ($attributes as $attr => $value) {
-            $value = trim($value);
+            $value = trim((string) $value);
 
             if (str_contains($value, ' ')) {
                 $dirty = explode(' ', $value);

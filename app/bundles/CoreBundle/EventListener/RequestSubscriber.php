@@ -16,9 +16,9 @@ use Twig\Environment;
 class RequestSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private CsrfTokenManagerInterface $tokenManager,
-        private TranslatorInterface $translator,
-        private Environment $twig,
+        private readonly CsrfTokenManagerInterface $tokenManager,
+        private readonly TranslatorInterface $translator,
+        private readonly Environment $twig,
     ) {
     }
 

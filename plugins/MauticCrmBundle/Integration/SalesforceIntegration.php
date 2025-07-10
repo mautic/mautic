@@ -236,7 +236,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         continue;
                     }
 
-                    $sfObject = trim($sfObject);
+                    $sfObject = trim((string) $sfObject);
                     // Check the cache first
                     $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
                     if ($fields = parent::getAvailableLeadFields($settings)) {
@@ -644,7 +644,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             foreach ($keys as $key) {
-                if (strpos($key, '__'.$obj)) {
+                if (strpos((string) $key, '__'.$obj)) {
                     $newKey = str_replace('__'.$obj, '', $key);
                     if ('Id' === $newKey) {
                         // Don't map Id for push
@@ -1937,7 +1937,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $object         = 'Lead';
                 $internalObject = 'lead';
                 if (!empty($item['referenceId'])) {
-                    $reference = explode('-', $item['referenceId']);
+                    $reference = explode('-', (string) $item['referenceId']);
                     if (3 === count($reference)) {
                         [$contactId, $object, $integrationEntityId] = $reference;
                     } elseif (4 === count($reference)) {
@@ -2600,11 +2600,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             foreach ($lastModifiedDNCDate as $logs) {
                 $leadId = $logs['objectId'];
-                if (strtotime($logs['dateAdded']->format('c')) > strtotime($sfModifiedDNC['CreatedDate'])) {
+                if (strtotime((string) $logs['dateAdded']->format('c')) > strtotime((string) $sfModifiedDNC['CreatedDate'])) {
                     $trackedIds[] = $leadId;
                 }
                 if ((isset($leadIds[$leadId]) && $leadIds[$leadId] == $sfModifiedDNC[$sfObject.'Id'])
-                    && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($logs['dateAdded']->format('c'))) && !in_array($leadId, $trackedIds)) {
+                    && (strtotime((string) $sfModifiedDNC['CreatedDate']) > strtotime((string) $logs['dateAdded']->format('c'))) && !in_array($leadId, $trackedIds)) {
                     // SF was updated last so update Mautic record
                     $key = $this->getSyncKey($leadEmails[$leadId]);
                     unset($sfRecords[$key]['mauticContactIsContactableByEmail']);

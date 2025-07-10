@@ -15,7 +15,7 @@ class ObjectMapping
      */
     private $id;
 
-    private ?\DateTimeInterface $dateCreated;
+    private readonly ?\DateTimeInterface $dateCreated;
 
     /**
      * @var string

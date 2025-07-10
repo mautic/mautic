@@ -19,7 +19,7 @@ class BundleMetadataBuilder
     private array $coreMetadata = [];
 
     public function __construct(
-        private array $symfonyBundles,
+        private readonly array $symfonyBundles,
         private array $paths,
     ) {
         $this->buildMetadata();
@@ -54,14 +54,14 @@ class BundleMetadataBuilder
     {
         foreach ($this->symfonyBundles as $symfonyBundle => $namespace) {
             // Plugin
-            if (str_contains($namespace, 'MauticPlugin\\')) {
+            if (str_contains((string) $namespace, 'MauticPlugin\\')) {
                 $this->pluginMetadata[$symfonyBundle] = $this->buildPluginMetadata($namespace, $symfonyBundle);
 
                 continue;
             }
 
             // Core bundle
-            if (str_contains($namespace, 'Mautic\\')) {
+            if (str_contains((string) $namespace, 'Mautic\\')) {
                 $this->coreMetadata[$symfonyBundle] = $this->buildCoreMetadata($namespace, $symfonyBundle);
 
                 continue;

@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PluginToken extends AbstractToken
 {
-    private ?string $providerKey;
+    private readonly ?string $providerKey;
 
     /**
      * @param UserInterface|string|null $user
@@ -16,11 +16,11 @@ class PluginToken extends AbstractToken
      */
     public function __construct(
         ?string $providerKey,
-        private ?string $authenticatingService = null,
+        private readonly ?string $authenticatingService = null,
         $user = null,
-        private string $credentials = '',
+        private readonly string $credentials = '',
         array $roles = [],
-        private ?Response $response = null,
+        private readonly ?Response $response = null,
     ) {
         parent::__construct($roles);
 

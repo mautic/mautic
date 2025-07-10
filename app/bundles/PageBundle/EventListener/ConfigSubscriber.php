@@ -68,7 +68,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $values = $event->getConfig();
 
         if (!empty($values['pageconfig']['google_analytics'])) {
-            $values['pageconfig']['google_analytics'] = htmlspecialchars($values['pageconfig']['google_analytics']);
+            $values['pageconfig']['google_analytics'] = htmlspecialchars((string) $values['pageconfig']['google_analytics']);
             $event->setConfig($values);
         }
     }

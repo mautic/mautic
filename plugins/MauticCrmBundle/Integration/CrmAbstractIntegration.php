@@ -41,8 +41,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         // make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (isset($keys['url']) && str_ends_with($keys['url'], '/')) {
-            $keys['url'] = substr($keys['url'], 0, -1);
+        if (isset($keys['url']) && str_ends_with((string) $keys['url'], '/')) {
+            $keys['url'] = substr((string) $keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
 
@@ -302,7 +302,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (isset($companyFieldTypes[$companyField]['type'])) {
                 switch ($companyFieldTypes[$companyField]['type']) {
                     case 'text':
-                        $matchedFields[$companyField] = substr($value, 0, 255);
+                        $matchedFields[$companyField] = substr((string) $value, 0, 255);
                         break;
                     case 'date':
                         $date                         = new \DateTime($value);
@@ -649,7 +649,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
         // "False" has to be converted to 0 instead.
         if (('text' == $fieldType) && !is_bool($value)) {
-            return substr($value, 0, 255);
+            return substr((string) $value, 0, 255);
         }
 
         return $value;

@@ -139,7 +139,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false): array|string
     {
         // If cached is not an array, rebuild to support the new format
-        $cached = $focus->getCache() ? json_decode($focus->getCache(), true) : [];
+        $cached = $focus->getCache() ? json_decode((string) $focus->getCache(), true) : [];
         if ($isPreview || $byPassCache || empty($cached) || !isset($cached['js'])) {
             $focusArray = $focus->toArray();
 
@@ -206,7 +206,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         }
 
         if (isset($focus[$htmlMode])) {
-            $focus[$htmlMode] = htmlspecialchars_decode($focus[$htmlMode]);
+            $focus[$htmlMode] = htmlspecialchars_decode((string) $focus[$htmlMode]);
         }
 
         $content = $this->twig->render(

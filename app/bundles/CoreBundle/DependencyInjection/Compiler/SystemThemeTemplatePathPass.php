@@ -88,7 +88,7 @@ class SystemThemeTemplatePathPass implements CompilerPassInterface
             $container->addResource(new FileExistenceResource($defaultOverrideBundlePath));
 
             // The `themes/system` override a path for bundle.
-            $bundleName              = pathinfo($bundle['path'])['filename'];
+            $bundleName              = pathinfo((string) $bundle['path'])['filename'];
             $themeOverrideBundlePath = $systemThemeDir.DIRECTORY_SEPARATOR.$bundleName;
             if (file_exists($dir = $themeOverrideBundlePath.'/Resources/views')) {
                 $bundleHierarchy[$name][] = $dir;

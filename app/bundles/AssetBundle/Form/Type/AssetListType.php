@@ -15,9 +15,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class AssetListType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $corePermissions,
-        private AssetModel $assetModel,
-        private UserHelper $userHelper,
+        private readonly CorePermissions $corePermissions,
+        private readonly AssetModel $assetModel,
+        private readonly UserHelper $userHelper,
     ) {
     }
 

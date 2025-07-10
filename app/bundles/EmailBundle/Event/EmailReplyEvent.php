@@ -8,10 +8,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EmailReplyEvent extends Event
 {
-    private ?Email $email;
+    private readonly ?Email $email;
 
     public function __construct(
-        private Stat $stat,
+        private readonly Stat $stat,
     ) {
         $this->email = $stat->getEmail();
     }

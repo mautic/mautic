@@ -15,13 +15,13 @@ use Symfony\Component\Messenger\Handler\Acknowledger;
 #[AsMessageHandler]
 class EmailHitNotificationHandler
 {
-    private bool $isSyncTransport;
+    private readonly bool $isSyncTransport;
 
     public function __construct(
-        private EmailModel $emailModel,
+        private readonly EmailModel $emailModel,
         CoreParametersHelper $parametersHelper,
     ) {
-        $this->isSyncTransport = str_starts_with($parametersHelper->get('messenger_dsn_hit'), 'sync://');
+        $this->isSyncTransport = str_starts_with((string) $parametersHelper->get('messenger_dsn_hit'), 'sync://');
     }
 
     public function __invoke(EmailHitNotification $message, Acknowledger $ack = null): void

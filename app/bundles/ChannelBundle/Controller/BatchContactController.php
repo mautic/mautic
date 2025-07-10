@@ -22,9 +22,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BatchContactController extends AbstractFormController
 {
     public function __construct(
-        private ChannelActionModel $channelActionModel,
-        private FrequencyActionModel $frequencyActionModel,
-        private LeadModel $contactModel,
+        private readonly ChannelActionModel $channelActionModel,
+        private readonly FrequencyActionModel $frequencyActionModel,
+        private readonly LeadModel $contactModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -44,7 +44,7 @@ class BatchContactController extends AbstractFormController
     public function setAction(Request $request): JsonResponse
     {
         $params = $request->get('contact_channels', []);
-        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $ids    = empty($params['ids']) ? [] : json_decode((string) $params['ids']);
 
         if ($ids && is_array($ids)) {
             $subscribedChannels = $params['subscribed_channels'] ?? [];

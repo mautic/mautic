@@ -11,14 +11,14 @@ use Twig\TwigFunction;
 class ConfigExtension extends AbstractExtension
 {
     public function __construct(
-        private ConfigHelper $configHelper,
+        private readonly ConfigHelper $configHelper,
     ) {
     }
 
     public function getFunctions()
     {
         return [
-            new TwigFunction('configGetParameter', [$this, 'get']),
+            new TwigFunction('configGetParameter', $this->get(...)),
         ];
     }
 

@@ -28,8 +28,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FormType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
-        private LanguageHelper $langHelper,
+        private readonly CorePermissions $security,
+        private readonly LanguageHelper $langHelper,
     ) {
     }
 
@@ -216,10 +216,7 @@ class FormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'        => Form::class,
-            'validation_groups' => [
-                Form::class,
-                'determineValidationGroups',
-            ],
+            'validation_groups' => Form::determineValidationGroups(...),
         ]);
     }
 

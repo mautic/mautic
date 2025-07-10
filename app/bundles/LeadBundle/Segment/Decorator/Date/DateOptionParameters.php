@@ -7,16 +7,16 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 class DateOptionParameters
 {
-    private bool $hasTimePart;
+    private readonly bool $hasTimePart;
 
     /**
      * @var mixed
      */
     private $timeframe;
 
-    private bool $requiresBetween;
+    private readonly bool $requiresBetween;
 
-    private bool $shouldUseLastDayOfRange;
+    private readonly bool $shouldUseLastDayOfRange;
 
     private DateTimeHelper $dateTimeHelper;
 

@@ -256,7 +256,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     public function splitDescriptions(): void
     {
         if ($this->hasSecondaryDescription()) {
-            $parts                      = preg_split(self::DESCRIPTION_DELIMITER_REGEX, $this->description);
+            $parts                      = preg_split(self::DESCRIPTION_DELIMITER_REGEX, (string) $this->description);
             $this->primaryDescription   = trim($parts[0]);
             $this->secondaryDescription = trim($parts[1]);
         }

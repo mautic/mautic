@@ -18,7 +18,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
 
     private float $disableCampaignThreshold = 0.35;
 
-    public function __construct(private EventRepository $eventRepository, private NotificationHelper $notificationHelper, private CampaignRepository $campaignRepository, private LeadEventLogRepository $leadEventLogRepository)
+    public function __construct(private readonly EventRepository $eventRepository, private readonly NotificationHelper $notificationHelper, private readonly CampaignRepository $campaignRepository, private readonly LeadEventLogRepository $leadEventLogRepository)
     {
     }
 

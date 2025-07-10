@@ -25,9 +25,9 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
             $key    = $count + 1;
             foreach ($rows as $col => $val) {
                 if ('NULL' != $val) {
-                    $setter = 'set'.ucfirst($col);
+                    $setter = 'set'.ucfirst((string) $col);
                     if (in_array($col, ['columns', 'filters', 'graphs', 'tableOrder'])) {
-                        $val = Serializer::decode(stripslashes($val));
+                        $val = Serializer::decode(stripslashes((string) $val));
                     }
                     $report->$setter($val);
                 }

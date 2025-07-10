@@ -10,10 +10,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class FieldCollectEvent extends Event
 {
-    private FieldCollection $fields;
+    private readonly FieldCollection $fields;
 
     public function __construct(
-        private string $object,
+        private readonly string $object,
     ) {
         $this->fields = new FieldCollection();
     }

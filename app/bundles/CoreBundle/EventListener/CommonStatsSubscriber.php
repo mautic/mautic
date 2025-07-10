@@ -74,7 +74,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                     ];
 
                     // In case the table alias is defined as an association such as stat.email
-                    $aliasParts = explode('.', $tableAlias);
+                    $aliasParts = explode('.', (string) $tableAlias);
                     $tableAlias = array_pop($aliasParts);
 
                     if ('lead:leads' === $permBase) {

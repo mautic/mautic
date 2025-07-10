@@ -17,8 +17,8 @@ class ActionExecutioner implements EventInterface
     public const TYPE = 'action';
 
     public function __construct(
-        private ActionDispatcher $dispatcher,
-        private EventLogger $eventLogger,
+        private readonly ActionDispatcher $dispatcher,
+        private readonly EventLogger $eventLogger,
     ) {
     }
 

@@ -387,7 +387,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         protected function log($logLevel, $message, $context = [], $debugTrace = null)
         {
-            $message = strip_tags($message);
+            $message = strip_tags((string) $message);
             if ($this->logger) {
                 if (LogLevel::DEBUG === $logLevel) {
                     $this->mainLogger->log($logLevel, $message, $context);
@@ -431,7 +431,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     $error['trace'] = preg_replace_callback(
                         '/^#(\d+)/m',
                         fn ($matches): string => '#'.($matches[1] + 1).'&nbsp;&nbsp;',
-                        $error['trace']
+                        (string) $error['trace']
                     );
                 }
             }
@@ -445,7 +445,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     $error['message'] = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator. System administrators, check server logs for errors.';
                 }
 
-                $error['message']    = strip_tags($error['message']);
+                $error['message']    = strip_tags((string) $error['message']);
                 $dataArray['errors'] = [
                     [
                         'message' => $error['message'],
@@ -503,8 +503,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 $assetPrefix = $paths['asset_prefix'];
                 if (!empty($assetPrefix)) {
-                    if (str_ends_with($assetPrefix, '/')) {
-                        $assetPrefix = substr($assetPrefix, 0, -1);
+                    if (str_ends_with((string) $assetPrefix, '/')) {
+                        $assetPrefix = substr((string) $assetPrefix, 0, -1);
                     }
                 }
                 $mediaBase          = $assetPrefix.$base.$paths['media'];

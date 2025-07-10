@@ -5,13 +5,13 @@ $formatArgs = function ($args) use (&$formatArgs) {
     foreach ($args as $key => $item) {
         if (is_array($item) && isset($item[0]) && is_string($item[0]) && 2 === count($item)) {
             if ('object' === $item[0]) {
-                $parts          = explode('\\', $item[1]);
+                $parts          = explode('\\', (string) $item[1]);
                 $short          = array_pop($parts);
                 $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
-                $formattedValue = sprintf("'%s'", htmlspecialchars($item[1]));
+                $formattedValue = sprintf("'%s'", htmlspecialchars((string) $item[1]));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {

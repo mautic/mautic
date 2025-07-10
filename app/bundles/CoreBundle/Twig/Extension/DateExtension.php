@@ -18,14 +18,14 @@ class DateExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('dateToText', [$this, 'toText'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToFull', [$this, 'toFull'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToFullConcat', [$this, 'toFullConcat'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToDate', [$this, 'toDate'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToTime', [$this, 'toTime'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToShort', [$this, 'toShort'], ['is_safe' => ['all']]),
-            new TwigFunction('dateFormatRange', [$this, 'formatRange'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToHumanized', [$this, 'toHumanized'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToText', $this->toText(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToFull', $this->toFull(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToFullConcat', $this->toFullConcat(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToDate', $this->toDate(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToTime', $this->toTime(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToShort', $this->toShort(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateFormatRange', $this->formatRange(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToHumanized', $this->toHumanized(...), ['is_safe' => ['all']]),
         ];
     }
 

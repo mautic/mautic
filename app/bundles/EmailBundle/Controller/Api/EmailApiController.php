@@ -168,7 +168,7 @@ class EmailApiController extends CommonApiController
 
         foreach ($tokens as $token => $value) {
             $value = InputHelper::html($value);
-            if (!preg_match('/^{.*?}$/', $token)) {
+            if (!preg_match('/^{.*?}$/', (string) $token)) {
                 $token = '{'.$token.'}';
             }
 

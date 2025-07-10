@@ -112,8 +112,8 @@ class BatchIdToEntityHelper
         }
 
         // ['ids' => '1,2,3'] OR ['ids' => '1']
-        if (str_contains($ids, ',') || is_numeric($ids)) {
-            $this->ids           = str_getcsv($ids);
+        if (str_contains((string) $ids, ',') || is_numeric($ids)) {
+            $this->ids           = str_getcsv((string) $ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;
 

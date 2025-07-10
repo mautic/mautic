@@ -14,8 +14,8 @@ class CredentialsStore implements CredentialStoreInterface
     private ?X509Credential $credentials = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private string $entityId,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly string $entityId,
     ) {
     }
 
@@ -49,8 +49,8 @@ class CredentialsStore implements CredentialStoreInterface
 
     private function createOwnCredentials(): X509Credential
     {
-        $certificateContent = base64_decode($this->coreParametersHelper->get('saml_idp_own_certificate'));
-        $privateKeyContent  = base64_decode($this->coreParametersHelper->get('saml_idp_own_private_key'));
+        $certificateContent = base64_decode((string) $this->coreParametersHelper->get('saml_idp_own_certificate'));
+        $privateKeyContent  = base64_decode((string) $this->coreParametersHelper->get('saml_idp_own_private_key'));
         $keyPassword        = (string) $this->coreParametersHelper->get('saml_idp_own_password');
 
         return $this->createCredentials($certificateContent, $privateKeyContent, $keyPassword);

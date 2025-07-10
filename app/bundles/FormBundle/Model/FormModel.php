@@ -53,13 +53,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         protected ActionModel $formActionModel,
         protected FieldModel $formFieldModel,
         protected FormFieldHelper $fieldHelper,
-        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper,
         protected LeadFieldModel $leadFieldModel,
-        private FormUploader $formUploader,
-        private ContactTracker $contactTracker,
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private TableSchemaHelper $tableSchemaHelper,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly FormUploader $formUploader,
+        private readonly ContactTracker $contactTracker,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly TableSchemaHelper $tableSchemaHelper,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -191,7 +191,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                     continue;
                 }
 
-                $func = 'set'.ucfirst($f);
+                $func = 'set'.ucfirst((string) $f);
                 if (method_exists($field, $func)) {
                     $field->$func($v);
                 }
@@ -270,12 +270,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                     continue;
                 }
 
-                $func = 'set'.ucfirst($f);
+                $func = 'set'.ucfirst((string) $f);
 
                 if ('properties' == $f) {
                     if (isset($v['mappedFields'])) {
                         foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (str_contains($pv, 'new')) {
+                            if (str_contains((string) $pv, 'new')) {
                                 $v['mappedFields'][$pk] = $fieldIds[$pv];
                             }
                         }
@@ -874,9 +874,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     private function loadHTML(&$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
-            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $dom->loadHTML(mb_encode_numericentity((string) $html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         } else {
-            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'));
+            $dom->loadHTML(mb_encode_numericentity((string) $html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'));
         }
     }
 
@@ -1065,7 +1065,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             } elseif ($field->getLeadField() && !$field->getMappedField()) {
                 $field->setMappedField($field->getLeadField());
                 $field->setMappedObject(
-                    str_starts_with($field->getLeadField(), 'company') && 'company' !== $field->getLeadField() ? 'company' : 'contact'
+                    str_starts_with((string) $field->getLeadField(), 'company') && 'company' !== $field->getLeadField() ? 'company' : 'contact'
                 );
             }
         }

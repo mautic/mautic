@@ -64,7 +64,7 @@ class EmailValidator
      */
     public function hasValidCharacters($address)
     {
-        $invalidChar = strpbrk($address, '^&*%');
+        $invalidChar = strpbrk((string) $address, '^&*%');
 
         return $invalidChar ? substr($invalidChar, 0, 1) : $invalidChar;
     }
@@ -76,7 +76,7 @@ class EmailValidator
      */
     public function hasValidDomain($address): bool
     {
-        [$user, $domain] = explode('@', $address);
+        [$user, $domain] = explode('@', (string) $address);
 
         return checkdnsrr($domain, 'MX');
     }

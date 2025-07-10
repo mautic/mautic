@@ -190,7 +190,7 @@ class SchemaHelper
          * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
          * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
          */
-        if (str_contains($platform, 'mariadb') || str_contains(strtolower($version), 'mariadb')) {
+        if (str_contains($platform, 'mariadb') || str_contains(strtolower((string) $version), 'mariadb')) {
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
         } elseif (str_contains($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
@@ -319,7 +319,7 @@ class SchemaHelper
      */
     protected function generateBackupName($prefix, $backupPrefix, $name)
     {
-        if (empty($prefix) || !str_contains($name, $prefix)) {
+        if (empty($prefix) || !str_contains((string) $name, (string) $prefix)) {
             return $backupPrefix.$name;
         } else {
             return str_replace($prefix, $backupPrefix, $name);

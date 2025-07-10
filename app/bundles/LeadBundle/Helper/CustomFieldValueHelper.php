@@ -102,7 +102,7 @@ class CustomFieldValueHelper
                     $value = self::setValueFromPropertiesList($properties, $value);
                     break;
                 case self::TYPE_MULTISELECT:
-                    $values = explode('|', $value);
+                    $values = explode('|', (string) $value);
                     foreach ($values as &$val) {
                         $val = self::setValueFromPropertiesList($properties, $val);
                     }

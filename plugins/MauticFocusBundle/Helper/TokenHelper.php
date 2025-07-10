@@ -22,7 +22,7 @@ class TokenHelper
     {
         $regex = '/'.$this->regex.'/i';
 
-        preg_match_all($regex, $content, $matches);
+        preg_match_all($regex, (string) $content, $matches);
 
         $tokens = [];
 

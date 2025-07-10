@@ -18,8 +18,8 @@ class FieldValidationHelper
     private ?ConfigFormSyncInterface $integrationObject = null;
 
     public function __construct(
-        private FieldHelper $fieldHelper,
-        private TranslatorInterface $translator,
+        private readonly FieldHelper $fieldHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

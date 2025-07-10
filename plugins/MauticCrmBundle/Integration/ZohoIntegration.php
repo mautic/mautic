@@ -436,7 +436,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $oparams['fields']   = $fields;
                 $oparams['per_page'] = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
+                    $oparams['lastModifiedTime'] = date('c', strtotime((string) $params['start']));
                 }
 
                 $oparams['page'] = 1;
@@ -505,7 +505,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $oparams['fields']   = $fields;
                 $oparams['per_page'] = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
+                    $oparams['lastModifiedTime'] = date('c', strtotime((string) $params['start']));
                 }
 
                 $oparams['page'] = 1;

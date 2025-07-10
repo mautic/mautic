@@ -18,8 +18,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private WebhookModel $webhookModel,
-        private LeadModel $leadModel,
+        private readonly WebhookModel $webhookModel,
+        private readonly LeadModel $leadModel,
     ) {
     }
 

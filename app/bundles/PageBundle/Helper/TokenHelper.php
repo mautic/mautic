@@ -13,7 +13,7 @@ class TokenHelper
 
     public function findPageTokens($content, $clickthrough = []): array
     {
-        preg_match_all('/{pagelink=(.*?)}/', $content, $matches);
+        preg_match_all('/{pagelink=(.*?)}/', (string) $content, $matches);
 
         $tokens = [];
         if (!empty($matches[1])) {

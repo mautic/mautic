@@ -31,7 +31,7 @@ class PRedisConnectionHelper
             // assume arrays are already in the correct format
             return $configuredUrls;
         } else {
-            $parsed = parse_url($configuredUrls);
+            $parsed = parse_url((string) $configuredUrls);
             if (!$parsed) {
                 return [$configuredUrls];
             }

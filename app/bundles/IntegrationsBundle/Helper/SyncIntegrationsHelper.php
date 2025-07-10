@@ -25,8 +25,8 @@ class SyncIntegrationsHelper
     private ?array $enabled = null;
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
-        private ObjectProvider $objectProvider,
+        private readonly IntegrationsHelper $integrationsHelper,
+        private readonly ObjectProvider $objectProvider,
     ) {
     }
 

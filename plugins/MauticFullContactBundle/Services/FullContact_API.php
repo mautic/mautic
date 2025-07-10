@@ -39,7 +39,7 @@ class FullContact_API extends FullContact_Person
             default   => throw new ApiException("UnsupportedLookupMethodException: Invalid lookup method specified [{$type}]"),
         };
 
-        $result             = json_decode($this->response_json, true);
+        $result             = json_decode((string) $this->response_json, true);
         $result['is_error'] = !in_array($this->response_code, [200, 201, 204], true);
 
         return $result;

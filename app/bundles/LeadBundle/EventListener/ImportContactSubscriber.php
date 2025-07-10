@@ -23,10 +23,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ImportContactSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FieldList $fieldList,
-        private CorePermissions $corePermissions,
-        private LeadModel $contactModel,
-        private TranslatorInterface $translator,
+        private readonly FieldList $fieldList,
+        private readonly CorePermissions $corePermissions,
+        private readonly LeadModel $contactModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

@@ -14,11 +14,11 @@ use Mautic\ReportBundle\Model\ReportModel;
 class TagDependencies
 {
     public function __construct(
-        private CampaignModel $campaignModel,
-        private ListModel $listModel,
-        private ActionModel $actionModel,
-        private TriggerEventModel $triggerEventModel,
-        private ReportModel $reportModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly ListModel $listModel,
+        private readonly ActionModel $actionModel,
+        private readonly TriggerEventModel $triggerEventModel,
+        private readonly ReportModel $reportModel,
     ) {
     }
 

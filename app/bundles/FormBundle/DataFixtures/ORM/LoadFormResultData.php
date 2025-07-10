@@ -13,8 +13,8 @@ use Mautic\PageBundle\Model\PageModel;
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private PageModel $pageModel,
-        private SubmissionModel $submissionModel,
+        private readonly PageModel $pageModel,
+        private readonly SubmissionModel $submissionModel,
     ) {
     }
 

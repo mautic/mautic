@@ -10,10 +10,10 @@ final class Note
 
     public const TYPE_INFO    = 'info';
 
-    private string $type;
+    private readonly string $type;
 
     public function __construct(
-        private string $note,
+        private readonly string $note,
         string $type,
     ) {
         if (!in_array($type, [self::TYPE_INFO, self::TYPE_WARNING])) {

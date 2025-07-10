@@ -14,10 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class UpdateSchemaStep implements StepInterface
 {
-    private object $kernel;
+    private readonly object $kernel;
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
         ContainerInterface $container,
     ) {
         $this->kernel = $container->get('kernel');

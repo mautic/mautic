@@ -18,7 +18,7 @@ class Organizer
     private array $contacts = [];
 
     public function __construct(
-        private array $records,
+        private readonly array $records,
     ) {
         $this->organize();
     }

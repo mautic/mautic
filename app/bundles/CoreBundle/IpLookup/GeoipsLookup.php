@@ -22,7 +22,7 @@ class GeoipsLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response)
     {
-        $data = json_decode($response);
+        $data = json_decode((string) $response);
 
         if ($data && !empty($data->response->location)) {
             foreach ($data->response->location as $key => $value) {

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailOpenEvent extends CommonEvent
 {
-    private ?Email $email;
+    private readonly ?Email $email;
 
     /**
      * @param Request $request

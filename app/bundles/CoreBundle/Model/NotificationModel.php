@@ -41,7 +41,7 @@ class NotificationModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

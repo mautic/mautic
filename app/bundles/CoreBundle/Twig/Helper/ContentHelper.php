@@ -10,8 +10,8 @@ use Twig\Environment;
 final class ContentHelper
 {
     public function __construct(
-        private Environment $twig,
-        private EventDispatcherInterface $dispatcher,
+        private readonly Environment $twig,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -56,7 +56,7 @@ final class ContentHelper
         $tagsToShow = ['script', 'style'];
 
         foreach ($tagsToShow as $tag) {
-            $html = preg_replace('/<'.$tag.'(.*?)>(.*?)<\/'.$tag.'>/s', '['.$tag.'$1]$2[/'.$tag.']', $html);
+            $html = preg_replace('/<'.$tag.'(.*?)>(.*?)<\/'.$tag.'>/s', '['.$tag.'$1]$2[/'.$tag.']', (string) $html);
         }
 
         return $html;

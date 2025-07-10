@@ -679,7 +679,7 @@ return [
             ],
             'mautic.native.connector' => [
                 'class'     => Symfony\Contracts\HttpClient\HttpClientInterface::class,
-                'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
+                'factory'   => Symfony\Component\HttpClient\HttpClient::create(...),
             ],
 
             'twig.controller.exception.class' => Mautic\CoreBundle\Controller\ExceptionController::class,

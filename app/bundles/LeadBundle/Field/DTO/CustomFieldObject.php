@@ -14,7 +14,7 @@ class CustomFieldObject
         'company' => 'companies',
     ];
 
-    private LeadField $leadField;
+    private readonly LeadField $leadField;
 
     /**
      * @throws InvalidObjectTypeException

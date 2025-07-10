@@ -56,7 +56,7 @@ class TrackableModel extends AbstractCommonModel
 
     public function __construct(
         protected RedirectModel $redirectModel,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -310,7 +310,7 @@ class TrackableModel extends AbstractCommonModel
                 $content = preg_replace(
                     '/<(.*?) href=(["\'])'.$search.'(.*?)\\2(.*?)>/i',
                     '<$1 href=$2'.$replace.'$3$2$4>',
-                    $content
+                    (string) $content
                 );
             }
         } else {
@@ -328,7 +328,7 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function extractTrackablesFromContent($content)
     {
-        if (0 !== preg_match('/<[^<]+>/', $content)) {
+        if (0 !== preg_match('/<[^<]+>/', (string) $content)) {
             // Parse as HTML
             $trackableUrls = $this->extractTrackablesFromHtml($content);
         } else {
@@ -477,7 +477,7 @@ class TrackableModel extends AbstractCommonModel
     {
         // Ensure it's not in the do not track list
         foreach ($this->doNotTrack as $notTrackable) {
-            if (preg_match('~'.$notTrackable.'~', $url)) {
+            if (preg_match('~'.$notTrackable.'~', (string) $url)) {
                 return true;
             }
         }
@@ -525,7 +525,7 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function isValidUrl($url, $forceScheme = true): bool
     {
-        $urlParts = (!is_array($url)) ? parse_url($url) : $url;
+        $urlParts = (!is_array($url)) ? parse_url((string) $url) : $url;
 
         // Ensure a applicable URL (rule out URLs as just #)
         if (!isset($urlParts['host']) && !isset($urlParts['path'])) {
@@ -557,7 +557,7 @@ class TrackableModel extends AbstractCommonModel
         $tokenizedParams = false;
 
         // Check for a token with a query appended such as {pagelink=1}&key=value
-        if (isset($urlParts['path']) && preg_match('/([https?|ftps?]?\{.*?\})&(.*?)$/', $urlParts['path'], $match)) {
+        if (isset($urlParts['path']) && preg_match('/([https?|ftps?]?\{.*?\})&(.*?)$/', (string) $urlParts['path'], $match)) {
             $urlParts['path'] = $match[1];
             if (isset($urlParts['query'])) {
                 // Likely won't happen but append if this exists
@@ -590,9 +590,9 @@ class TrackableModel extends AbstractCommonModel
         $untokenizedParams = [];
 
         // Test to see if there are tokens in the query and if so, extract and append them to the end of the tracked link
-        if (preg_match('/(\{\S+?\})/', $query)) {
+        if (preg_match('/(\{\S+?\})/', (string) $query)) {
             // Equal signs in tokens will confuse parse_str so they need to be encoded
-            $query = preg_replace('/\{(\S+?)=(\S+?)\}/', '{$1%3D$2}', $query);
+            $query = preg_replace('/\{(\S+?)=(\S+?)\}/', '{$1%3D$2}', (string) $query);
 
             parse_str($query, $queryParts);
 
@@ -688,12 +688,12 @@ class TrackableModel extends AbstractCommonModel
                         // If the URL doesn't start with a slash, we need to merge
                         if ('/' != $url['path'][0]) {
                             // If the path ends with a slash, store as is
-                            if ('/' == $parts['path'][strlen($parts['path']) - 1]) {
+                            if ('/' == $parts['path'][strlen((string) $parts['path']) - 1]) {
                                 $sBasePath = $parts['path'];
                             } // Else trim off the file
                             else {
                                 // Get just the base directory
-                                $sBasePath = dirname($parts['path']);
+                                $sBasePath = dirname((string) $parts['path']);
                             }
 
                             // If it's empty
@@ -785,7 +785,7 @@ class TrackableModel extends AbstractCommonModel
 
     private function isContactFieldToken($token): bool
     {
-        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
+        return str_contains((string) $token, '{contactfield') || str_contains((string) $token, '{leadfield');
     }
 
     /**
@@ -812,7 +812,7 @@ class TrackableModel extends AbstractCommonModel
         ];
 
         $trackableUrls = $this->extractTrackablesFromContent($content);
-        $contentType   = (preg_match('/<(.*?) href/i', $content)) ? 'html' : 'text';
+        $contentType   = (preg_match('/<(.*?) href/i', (string) $content)) ? 'html' : 'text';
         if (count($trackableUrls)) {
             // Create Trackable/Redirect entities for the URLs
             $entities = $this->getEntitiesFromUrls($trackableUrls, $channel, $channelId);

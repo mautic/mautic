@@ -13,8 +13,8 @@ class IntegrationTokenFactory implements TokenFactoryInterface
      * @param int|null $defaultExpiresIn Default time in seconds that tokens are good for if not given in the response
      */
     public function __construct(
-        private array $extraKeysToStore = [],
-        private ?int $defaultExpiresIn = null,
+        private readonly array $extraKeysToStore = [],
+        private readonly ?int $defaultExpiresIn = null,
     ) {
     }
 

@@ -18,8 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class GroupListType extends AbstractType
 {
     public function __construct(
-        private EntityManager $em,
-        private GroupRepository $repo,
+        private readonly EntityManager $em,
+        private readonly GroupRepository $repo,
     ) {
     }
 

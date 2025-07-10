@@ -16,8 +16,8 @@ class LeadSubscriber implements EventSubscriberInterface
     private const FEATURE_PUSH_LEAD = 'push_lead';
 
     public function __construct(
-        private PluginModel $pluginModel,
-        private IntegrationRepository $integrationRepository,
+        private readonly PluginModel $pluginModel,
+        private readonly IntegrationRepository $integrationRepository,
     ) {
     }
 

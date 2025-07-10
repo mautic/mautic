@@ -12,7 +12,7 @@ class RemoteAssetBrowseEvent extends CommonEvent
     private ?string $failureMessage = null;
 
     public function __construct(
-        private UnifiedIntegrationInterface $integration,
+        private readonly UnifiedIntegrationInterface $integration,
     ) {
     }
 

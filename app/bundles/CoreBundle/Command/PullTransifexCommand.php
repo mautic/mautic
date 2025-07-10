@@ -28,10 +28,10 @@ class PullTransifexCommand extends Command
     public const NAME = 'mautic:transifex:pull';
 
     public function __construct(
-        private TransifexFactory $transifexFactory,
-        private TranslatorInterface $translator,
-        private PathsHelper $pathsHelper,
-        private LanguageHelper $languageHelper,
+        private readonly TransifexFactory $transifexFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly PathsHelper $pathsHelper,
+        private readonly LanguageHelper $languageHelper,
     ) {
         parent::__construct();
     }
@@ -93,7 +93,7 @@ EOT
                     $languageStats = json_decode((string) $response->getBody(), true);
 
                     foreach ($languageStats['data'] as $stats) {
-                        $language = ltrim($stats['relationships']['language']['data']['id'], 'l:');
+                        $language = ltrim((string) $stats['relationships']['language']['data']['id'], 'l:');
                         if ('en' === $language) {
                             continue;
                         }

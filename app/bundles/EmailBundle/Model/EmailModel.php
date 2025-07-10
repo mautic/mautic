@@ -771,7 +771,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             if (empty($result['device'])) {
                 $result['device'] = $this->translator->trans('mautic.core.unknown');
             } else {
-                $result['device'] = mb_substr($result['device'], 0, 12);
+                $result['device'] = mb_substr((string) $result['device'], 0, 12);
             }
             $devices[$result['device']] = $result['device'];
 
@@ -2301,7 +2301,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
-        $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
+        $parts = parse_url((string) $this->coreParametersHelper->get('site_url') ?: '');
 
         $context         = $this->router->getContext();
         $original_host   = $context->getHost();

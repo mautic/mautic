@@ -27,10 +27,10 @@ class CorePermissions implements ResetInterface
 
     public function __construct(
         protected UserHelper $userHelper,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private array $bundles,
-        private array $pluginBundles,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly array $bundles,
+        private readonly array $pluginBundles,
     ) {
         $this->registerPermissionClasses();
     }
@@ -286,7 +286,7 @@ class CorePermissions implements ResetInterface
                 continue;
             }
 
-            $parts = explode(':', $p);
+            $parts = explode(':', (string) $p);
             if (3 != count($parts)) {
                 $result[$p] = false;
             } else {

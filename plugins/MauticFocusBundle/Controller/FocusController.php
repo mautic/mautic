@@ -30,7 +30,7 @@ class FocusController extends AbstractStandardFormController
      * @phpstan-ignore-next-line
      */
     public function __construct(
-        private CacheProviderTagAwareInterface $cacheProvider,
+        private readonly CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,

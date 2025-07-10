@@ -197,7 +197,7 @@ class SearchStringHelper
                         if ('"' !== $c) {
                             // check to see if the nested string needs to be parsed as well
                             foreach ($this->needsParsing as $parseMe) {
-                                if (str_contains($string, $parseMe)) {
+                                if (str_contains($string, (string) $parseMe)) {
                                     $parsed                                    = $this->splitUpSearchString($string, 'parsed', $command);
                                     $filters->{$baseName}[$keyCount]->children = $parsed->parsed;
                                     $neededParsing                             = true;
@@ -234,7 +234,7 @@ class SearchStringHelper
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = ('OR' === $type || 'AND' === $type) ? strtolower($type) : 'and';
         } elseif ($setFilter) {
-            $string = trim($string);
+            $string = trim((string) $string);
 
             // remove operators and empty values
             if (in_array($string, ['', 'OR', 'AND'])) {

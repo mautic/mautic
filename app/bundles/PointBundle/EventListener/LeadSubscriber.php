@@ -17,11 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private TriggerModel $triggerModel,
-        private TranslatorInterface $translator,
-        private PointsChangeLogRepository $pointsChangeLogRepository,
-        private LeadPointLogRepository $leadPointLogRepository,
-        private LeadTriggerLogRepository $leadTriggerLogRepository,
+        private readonly TriggerModel $triggerModel,
+        private readonly TranslatorInterface $translator,
+        private readonly PointsChangeLogRepository $pointsChangeLogRepository,
+        private readonly LeadPointLogRepository $leadPointLogRepository,
+        private readonly LeadTriggerLogRepository $leadTriggerLogRepository,
     ) {
     }
 

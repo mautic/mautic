@@ -14,8 +14,8 @@ use Twilio\Exceptions\ConfigurationException;
 class TwilioCallback implements CallbackInterface
 {
     public function __construct(
-        private ContactHelper $contactHelper,
-        private Configuration $configuration,
+        private readonly ContactHelper $contactHelper,
+        private readonly Configuration $configuration,
     ) {
     }
 
@@ -40,7 +40,7 @@ class TwilioCallback implements CallbackInterface
     {
         $this->validateRequest($request->request);
 
-        return trim($request->get('Body'));
+        return trim((string) $request->get('Body'));
     }
 
     /**

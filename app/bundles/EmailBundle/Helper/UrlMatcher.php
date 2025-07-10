@@ -11,7 +11,7 @@ class UrlMatcher
         foreach ($urlsToCheckAgainst as $url) {
             $url = self::sanitizeUrl($url);
 
-            if (preg_match('/'.preg_quote($url, '/').'/i', $urlToFind)) {
+            if (preg_match('/'.preg_quote((string) $url, '/').'/i', (string) $urlToFind)) {
                 return true;
             }
         }

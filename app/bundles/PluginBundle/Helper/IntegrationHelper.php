@@ -40,7 +40,7 @@ class IntegrationHelper
     private array $byPlugin = [];
 
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
         protected EntityManager $em,
         protected PathsHelper $pathsHelper,
         protected BundleHelper $bundleHelper,
@@ -156,7 +156,7 @@ class IntegrationHelper
             foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
                 if (
                     // Skip plugin bundles
-                    str_contains($coreBundle['relative'], 'app/bundles')
+                    str_contains((string) $coreBundle['relative'], 'app/bundles')
                     // Skip core bundles without an Integration directory
                     && is_dir($coreBundle['directory'].'/Integration')
                 ) {
@@ -553,7 +553,7 @@ class IntegrationHelper
                         }
                     }
                 }
-            } elseif ($identifierField === $f || str_contains($f, $identifierField)) {
+            } elseif ($identifierField === $f || str_contains($f, (string) $identifierField)) {
                 $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }

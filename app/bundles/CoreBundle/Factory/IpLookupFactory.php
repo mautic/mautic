@@ -35,7 +35,7 @@ class IpLookupFactory
             }
 
             $className = $this->lookupServices[$service]['class'];
-            if (!str_starts_with($className, '\\')) {
+            if (!str_starts_with((string) $className, '\\')) {
                 $className = '\\'.$className;
             }
 

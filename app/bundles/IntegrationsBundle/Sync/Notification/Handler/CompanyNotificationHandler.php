@@ -13,9 +13,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 class CompanyNotificationHandler implements HandlerInterface
 {
     public function __construct(
-        private Writer $writer,
-        private UserNotificationHelper $userNotificationHelper,
-        private CompanyHelper $companyHelper,
+        private readonly Writer $writer,
+        private readonly UserNotificationHelper $userNotificationHelper,
+        private readonly CompanyHelper $companyHelper,
     ) {
     }
 

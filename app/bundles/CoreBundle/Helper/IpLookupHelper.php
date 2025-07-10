@@ -35,7 +35,7 @@ class IpLookupHelper
      */
     private $realIp;
 
-    private CoreParametersHelper $coreParametersHelper;
+    private readonly CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -72,7 +72,7 @@ class IpLookupHelper
 
             foreach ($ipHolders as $key) {
                 if ($request->server->get($key)) {
-                    $ip = trim($request->server->get($key));
+                    $ip = trim((string) $request->server->get($key));
 
                     if (str_contains($ip, ',')) {
                         $ip = $this->getClientIpFromProxyList($ip);
@@ -152,7 +152,7 @@ class IpLookupHelper
             if ($ipAddress->isTrackable() && $request) {
                 $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
-                    if (str_contains($userAgent, $bot)) {
+                    if (str_contains((string) $userAgent, (string) $bot)) {
                         $doNotTrack[] = $ip;
                         $ipAddress->setDoNotTrackList($doNotTrack);
                         continue;
@@ -216,7 +216,7 @@ class IpLookupHelper
     protected function getClientIpFromProxyList($ip)
     {
         // Proxies are included
-        $ips = explode(',', $ip);
+        $ips = explode(',', (string) $ip);
         array_walk(
             $ips,
             function (&$val): void {

@@ -7,8 +7,8 @@ namespace Mautic\CoreBundle\Helper;
 final class CommandResponse
 {
     public function __construct(
-        private int $statusCode,
-        private string $message,
+        private readonly int $statusCode,
+        private readonly string $message,
     ) {
     }
 

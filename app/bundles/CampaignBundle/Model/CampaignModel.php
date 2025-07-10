@@ -46,9 +46,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     public function __construct(
         protected ListModel $leadListModel,
         protected FormModel $formModel,
-        private EventCollector $eventCollector,
-        private MembershipBuilder $membershipBuilder,
-        private ContactTracker $contactTracker,
+        private readonly EventCollector $eventCollector,
+        private readonly MembershipBuilder $membershipBuilder,
+        private readonly ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -223,7 +223,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
-                if ('id' == $f && str_starts_with($v, 'new')) {
+                if ('id' == $f && str_starts_with((string) $v, 'new')) {
                     // set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
@@ -232,7 +232,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                     continue;
                 }
 
-                $func = 'set'.ucfirst($f);
+                $func = 'set'.ucfirst((string) $f);
                 if (method_exists($event, $func)) {
                     $event->$func($v);
                 }
@@ -371,7 +371,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         foreach ($settings['nodes'] as &$node) {
-            if (str_contains($node['id'], 'new')) {
+            if (str_contains((string) $node['id'], 'new')) {
                 // Find the real one and update the node
                 $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
             }
@@ -383,13 +383,13 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($settings['connections'] as &$connection) {
             // Check source
-            if (str_contains($connection['sourceId'], 'new')) {
+            if (str_contains((string) $connection['sourceId'], 'new')) {
                 // Find the real one and update the node
                 $connection['sourceId'] = str_replace($connection['sourceId'], $tempIds[$connection['sourceId']], $connection['sourceId']);
             }
 
             // Check target
-            if (str_contains($connection['targetId'], 'new')) {
+            if (str_contains((string) $connection['targetId'], 'new')) {
                 // Find the real one and update the node
                 $connection['targetId'] = str_replace($connection['targetId'], $tempIds[$connection['targetId']], $connection['targetId']);
             }

@@ -85,7 +85,7 @@ class StatsEvent extends Event
         array $where,
         protected User $user,
     ) {
-        $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
+        $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags((string) $table))));
         $this->start = (int) $start;
         $this->limit = (int) $limit;
         $this->where = $where;

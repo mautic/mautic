@@ -653,7 +653,7 @@ class CommonController extends AbstractController implements MauticController
         }
 
         $dateFormat = $this->coreParametersHelper->get('date_format_dateonly');
-        $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
+        $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', (string) $dateFormat));
         $filename   = strtolower($filename.'_'.(new \DateTime())->format($dateFormat).'.'.$type);
         if (empty($toExport)) {
             $toExport[] = [$this->translator->trans('mautic.core.noresults.header')];

@@ -11,8 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ImportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
     ) {
     }
 

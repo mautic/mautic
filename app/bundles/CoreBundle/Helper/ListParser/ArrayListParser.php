@@ -25,7 +25,7 @@ class ArrayListParser implements ListParserInterface
                     continue;
                 }
 
-                $choices[trim(html_entity_decode($value, ENT_QUOTES))] = trim(html_entity_decode($value, ENT_QUOTES));
+                $choices[trim(html_entity_decode((string) $value, ENT_QUOTES))] = trim(html_entity_decode((string) $value, ENT_QUOTES));
             }
 
             return $choices;

@@ -36,9 +36,9 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
     private array $actionEntities = [];
 
     public function __construct(
-        private FormModel $formModel,
-        private FieldModel $formFieldModel,
-        private ActionModel $actionModel,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $formFieldModel,
+        private readonly ActionModel $actionModel,
         EventDispatcherInterface $eventDispatcher,
     ) {
         // this will load the data before fixtures are loaded
@@ -120,12 +120,12 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
             $key  = $count + 1;
             foreach ($rows as $col => $val) {
                 if ('NULL' !== $val) {
-                    $setter = 'set'.ucfirst($col);
+                    $setter = 'set'.ucfirst((string) $col);
 
                     if ('dateAdded' === $col) {
                         $form->setDateAdded(new \DateTime($val));
                     } elseif ('cachedHtml' === $col) {
-                        $val = stripslashes($val);
+                        $val = stripslashes((string) $val);
                         $form->setCachedHtml($val);
                     } else {
                         $form->$setter($val);
@@ -150,14 +150,14 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
             $field = new Field();
             foreach ($rows as $col => $val) {
                 if ('NULL' !== $val) {
-                    $setter = 'set'.ucfirst($col);
+                    $setter = 'set'.ucfirst((string) $col);
 
                     if ('form' === $col) {
                         $form = $this->formEntities[$val];
                         $field->setForm($form);
                         $form->addField($count, $field);
                     } elseif (in_array($col, ['customParameters', 'properties'], true)) {
-                        $val = Serializer::decode(stripslashes($val));
+                        $val = Serializer::decode(stripslashes((string) $val));
                         $field->$setter($val);
                     } else {
                         $field->$setter($val);
@@ -180,12 +180,12 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
             $action = new Action();
             foreach ($rows as $col => $val) {
                 if ('NULL' !== $val) {
-                    $setter = 'set'.ucfirst($col);
+                    $setter = 'set'.ucfirst((string) $col);
 
                     if ('form' === $col) {
                         $action->setForm($this->formEntities[$val]);
                     } elseif ('properties' === $col) {
-                        $val = Serializer::decode(stripslashes($val));
+                        $val = Serializer::decode(stripslashes((string) $val));
                         $action->setProperties($val);
                     } else {
                         $action->$setter($val);

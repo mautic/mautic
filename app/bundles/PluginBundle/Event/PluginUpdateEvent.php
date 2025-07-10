@@ -15,10 +15,10 @@ class PluginUpdateEvent extends Event
      * @param array<class-string, ClassMetadata> $metadata
      */
     public function __construct(
-        private Plugin $plugin,
-        private string $oldVersion,
-        private array $metadata,
-        private ?Schema $installedSchema,
+        private readonly Plugin $plugin,
+        private readonly string $oldVersion,
+        private readonly array $metadata,
+        private readonly ?Schema $installedSchema,
     ) {
     }
 

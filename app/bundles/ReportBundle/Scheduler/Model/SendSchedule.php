@@ -12,13 +12,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendSchedule
 {
-    private MailHelper $mailer;
+    private readonly MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,
-        private MessageSchedule $messageSchedule,
-        private FileHandler $fileHandler,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly MessageSchedule $messageSchedule,
+        private readonly FileHandler $fileHandler,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -36,7 +36,7 @@ class SendSchedule
         try {
             // Try to send the CSV file as an email attachement.
             $this->fileHandler->fileCanBeAttached($csvFilePath);
-            $this->mailer->attachFile($csvFilePath, basename($csvFilePath), 'text/csv');
+            $this->mailer->attachFile($csvFilePath, basename((string) $csvFilePath), 'text/csv');
         } catch (FileTooBigException) {
             $zipFilePath = $this->fileHandler->zipIt($csvFilePath);
             try {

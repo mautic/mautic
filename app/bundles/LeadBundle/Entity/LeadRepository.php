@@ -186,7 +186,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $contacts = $this->getLeadsByFieldValue('email', $email);
 
         // Attempt to search for contacts without a + suffix
-        if (empty($contacts) && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts)) {
+        if (empty($contacts) && preg_match('#^(.*?)\+(.*?)@(.*?)$#', (string) $email, $parts)) {
             $email    = $parts[1].'@'.$parts[3];
             $contacts = $this->getLeadsByFieldValue('email', $email);
         }
@@ -1276,7 +1276,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
 
         $this->useDistinctCount = true;
-        if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
+        if (!preg_match('/"'.preg_quote((string) $primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
             $q->$joinType(
                 $primaryTable['from_alias'],
                 MAUTIC_TABLE_PREFIX.$primaryTable['table'],

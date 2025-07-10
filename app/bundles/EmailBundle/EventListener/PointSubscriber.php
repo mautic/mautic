@@ -20,9 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private PointModel $pointModel,
-        private EntityManager $entityManager,
-        private PointEventHelper $pointEventHelper,
+        private readonly PointModel $pointModel,
+        private readonly EntityManager $entityManager,
+        private readonly PointEventHelper $pointEventHelper,
     ) {
     }
 
@@ -62,7 +62,7 @@ class PointSubscriber implements EventSubscriberInterface
         $sendEvent = [
             'group'           => 'mautic.email.point.trigger',
             'label'           => 'mautic.email.point.trigger.sendemail',
-            'callback'        => [$this->pointEventHelper, 'sendEmail'],
+            'callback'        => $this->pointEventHelper->sendEmail(...),
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
             'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',

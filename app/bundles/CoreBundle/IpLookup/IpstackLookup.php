@@ -24,7 +24,7 @@ class IpstackLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response)
     {
-        $data = json_decode($response);
+        $data = json_decode((string) $response);
 
         if ($data) {
             foreach ($data as $key => $value) {

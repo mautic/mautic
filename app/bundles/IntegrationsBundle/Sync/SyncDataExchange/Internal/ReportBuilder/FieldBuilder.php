@@ -16,16 +16,16 @@ use Symfony\Component\Routing\Router;
 
 class FieldBuilder
 {
-    private ValueNormalizer $valueNormalizer;
+    private readonly ValueNormalizer $valueNormalizer;
 
     private ?array $mauticObject = null;
 
     private ?RequestObjectDAO $requestObject = null;
 
     public function __construct(
-        private Router $router,
-        private FieldHelper $fieldHelper,
-        private ContactObjectHelper $contactObjectHelper,
+        private readonly Router $router,
+        private readonly FieldHelper $fieldHelper,
+        private readonly ContactObjectHelper $contactObjectHelper,
     ) {
         $this->valueNormalizer = new ValueNormalizer();
     }

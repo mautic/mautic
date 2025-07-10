@@ -20,7 +20,7 @@ class MailchimpApi extends EmailMarketingApi
     {
         if (isset($this->keys['password'])) {
             // Extract the dc from the key
-            $parts = explode('-', $this->keys['password']);
+            $parts = explode('-', (string) $this->keys['password']);
             if (2 !== count($parts)) {
                 throw new ApiErrorException('Invalid key');
             }

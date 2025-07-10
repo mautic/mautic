@@ -11,7 +11,7 @@ class EmailAddressHelper
      */
     public function cleanEmail($email): string
     {
-        return strtolower(preg_replace("/[^a-z0-9\+\.@]/i", '', $email));
+        return strtolower((string) preg_replace("/[^a-z0-9\+\.@]/i", '', $email));
     }
 
     /**

@@ -21,8 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BatchContactController extends AbstractFormController
 {
     public function __construct(
-        private ContactActionModel $actionModel,
-        private CategoryModel $categoryModel,
+        private readonly ContactActionModel $actionModel,
+        private readonly CategoryModel $categoryModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -42,12 +42,12 @@ class BatchContactController extends AbstractFormController
     public function execAction(Request $request): JsonResponse
     {
         $params = $request->get('lead_batch');
-        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $ids    = empty($params['ids']) ? [] : json_decode((string) $params['ids']);
 
         if ($ids && is_array($ids)) {
             $categoriesToAdd    = $params['add'] ?? [];
             $categoriesToRemove = $params['remove'] ?? [];
-            $contactIds         = json_decode($params['ids']);
+            $contactIds         = json_decode((string) $params['ids']);
 
             $this->actionModel->addContactsToCategories($contactIds, $categoriesToAdd);
             $this->actionModel->removeContactsFromCategories($contactIds, $categoriesToRemove);

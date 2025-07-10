@@ -32,7 +32,7 @@ class RedirectModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private Shortener $shortener,
+        private readonly Shortener $shortener,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -95,7 +95,7 @@ class RedirectModel extends FormModel
     {
         $utmTags = [];
         foreach ($rawUtmTags as $utmTag => $value) {
-            $utmTags[str_replace('utm', 'utm_', strtolower($utmTag))] = $value;
+            $utmTags[str_replace('utm', 'utm_', strtolower((string) $utmTag))] = $value;
         }
 
         return $utmTags;

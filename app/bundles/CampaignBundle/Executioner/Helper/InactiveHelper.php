@@ -16,12 +16,12 @@ class InactiveHelper
     private ?\DateTimeInterface $earliestInactiveDate = null;
 
     public function __construct(
-        private EventScheduler $scheduler,
-        private InactiveContactFinder $inactiveContactFinder,
-        private LeadEventLogRepository $eventLogRepository,
-        private EventRepository $eventRepository,
-        private LoggerInterface $logger,
-        private DecisionHelper $decisionHelper,
+        private readonly EventScheduler $scheduler,
+        private readonly InactiveContactFinder $inactiveContactFinder,
+        private readonly LeadEventLogRepository $eventLogRepository,
+        private readonly EventRepository $eventRepository,
+        private readonly LoggerInterface $logger,
+        private readonly DecisionHelper $decisionHelper,
     ) {
     }
 

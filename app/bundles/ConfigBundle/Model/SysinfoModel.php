@@ -25,10 +25,10 @@ class SysinfoModel
     public function __construct(
         protected PathsHelper $pathsHelper,
         protected CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
         protected Connection $connection,
-        private InstallService $installService,
-        private CheckStep $checkStep,
+        private readonly InstallService $installService,
+        private readonly CheckStep $checkStep,
     ) {
     }
 
@@ -52,8 +52,8 @@ class SysinfoModel
             ob_end_clean();
             preg_match_all('#<body[^>]*>(.*)</body>#siU', $phpInfo, $output);
             $output        = preg_replace('#<table[^>]*>#', '<table class="table table-striped">', $output[1][0]);
-            $output        = preg_replace('#(\w),(\w)#', '\1, \2', $output);
-            $output        = preg_replace('#<hr />#', '', $output);
+            $output        = preg_replace('#(\w),(\w)#', '\1, \2', (string) $output);
+            $output        = preg_replace('#<hr />#', '', (string) $output);
             $output        = str_replace('<div class="center">', '', $output);
             $output        = preg_replace('#<tr class="h">(.*)<\/tr>#', '<thead><tr class="h">$1</tr></thead><tbody>', $output);
             $output        = str_replace('</table>', '</tbody></table>', $output);

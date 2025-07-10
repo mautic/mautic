@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class SegmentStatCommand extends ModeratedCommand
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {

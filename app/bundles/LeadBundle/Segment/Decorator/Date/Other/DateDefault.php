@@ -13,7 +13,7 @@ class DateDefault implements FilterDecoratorInterface
      * @param string $originalValue
      */
     public function __construct(
-        private DateDecorator $dateDecorator,
+        private readonly DateDecorator $dateDecorator,
         private $originalValue,
     ) {
     }

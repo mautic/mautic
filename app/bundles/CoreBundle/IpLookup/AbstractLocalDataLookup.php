@@ -178,8 +178,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     protected function sizeInByte($size)
     {
-        $data = (int) substr($size, 0, -1);
-        switch (strtoupper(substr($size, -1))) {
+        $data = (int) substr((string) $size, 0, -1);
+        switch (strtoupper(substr((string) $size, -1))) {
             case 'K':
                 return $data * 1024;
             case 'M':

@@ -12,17 +12,17 @@ use Twig\TwigFunction;
 class SecurityExtension extends AbstractExtension
 {
     public function __construct(
-        private SecurityHelper $securityHelper,
+        private readonly SecurityHelper $securityHelper,
     ) {
     }
 
     public function getFunctions()
     {
         return [
-            new TwigFunction('securityGetAuthenticationContext', [$this, 'getContext']),
-            new TwigFunction('securityGetCsrfToken', [$this, 'getCsrfToken']),
-            new TwigFunction('securityHasEntityAccess', [$this, 'hasEntityAccess']),
-            new TwigFunction('securityIsGranted', [$this, 'isGranted']),
+            new TwigFunction('securityGetAuthenticationContext', $this->getContext(...)),
+            new TwigFunction('securityGetCsrfToken', $this->getCsrfToken(...)),
+            new TwigFunction('securityHasEntityAccess', $this->hasEntityAccess(...)),
+            new TwigFunction('securityIsGranted', $this->isGranted(...)),
         ];
     }
 

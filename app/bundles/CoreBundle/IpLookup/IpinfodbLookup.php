@@ -21,7 +21,7 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response)
     {
-        $data = json_decode($response);
+        $data = json_decode((string) $response);
 
         if ($data) {
             foreach ($data as $key => $value) {
@@ -43,7 +43,7 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
                         break;
                 }
 
-                $this->$key = ucfirst($value);
+                $this->$key = ucfirst((string) $value);
             }
         }
     }

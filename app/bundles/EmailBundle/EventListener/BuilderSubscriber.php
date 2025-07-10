@@ -27,12 +27,12 @@ class BuilderSubscriber implements EventSubscriberInterface
     private array $convertedContent = [];
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EmailModel $emailModel,
-        private TrackableModel $pageTrackableModel,
-        private RedirectModel $pageRedirectModel,
-        private TranslatorInterface $translator,
-        private MailHashHelper $mailHash,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EmailModel $emailModel,
+        private readonly TrackableModel $pageTrackableModel,
+        private readonly RedirectModel $pageRedirectModel,
+        private readonly TranslatorInterface $translator,
+        private readonly MailHashHelper $mailHash,
     ) {
     }
 
@@ -132,7 +132,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         // Add the lang attribute to the <html/> tag if it's missing.
         $locale = empty($event->getEmail()->getLanguage()) ? $this->coreParametersHelper->get('locale') : $event->getEmail()->getLanguage();
-        preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", $content, $matches);
+        preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", (string) $content, $matches);
         if (empty($matches[1])) {
             $content = str_replace('<html', '<html lang="'.$locale.'"', $content);
         }

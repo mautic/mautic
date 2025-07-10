@@ -23,11 +23,11 @@ class MembershipManager
     private ?ProgressBar $progressBar = null;
 
     public function __construct(
-        private Adder $adder,
-        private Remover $remover,
-        private EventDispatcher $eventDispatcher,
-        private LeadRepository $leadRepository,
-        private LoggerInterface $logger,
+        private readonly Adder $adder,
+        private readonly Remover $remover,
+        private readonly EventDispatcher $eventDispatcher,
+        private readonly LeadRepository $leadRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

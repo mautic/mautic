@@ -35,7 +35,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 {
     public function __construct(
         protected MailHelper $mailHelper,
-        private UserTokenServiceInterface $userTokenService,
+        private readonly UserTokenServiceInterface $userTokenService,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

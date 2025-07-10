@@ -667,7 +667,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         // get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
-            $languages = explode(',', $browserLanguages);
+            $languages = explode(',', (string) $browserLanguages);
             foreach ($languages as $k => $l) {
                 if (($pos = strpos(';q=', $l)) !== false) {
                     // remove weights
@@ -1122,13 +1122,13 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         // Use the current URL
         $isPageEvent = false;
-        if (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
-                parse_str($request->server->get('QUERY_STRING'), $query);
+                parse_str((string) $request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }
@@ -1150,31 +1150,31 @@ class PageModel extends FormModel implements GlobalSearchInterface
                     if (isset($query['page_url'])) {
                         $pageURL = $query['page_url'];
                         if (!$decoded) {
-                            $pageURL = urldecode($pageURL);
+                            $pageURL = urldecode((string) $pageURL);
                         }
                     }
 
                     if (isset($query['page_referrer'])) {
                         if (!$decoded) {
-                            $query['page_referrer'] = urldecode($query['page_referrer']);
+                            $query['page_referrer'] = urldecode((string) $query['page_referrer']);
                         }
                     }
 
                     if (isset($query['page_language'])) {
                         if (!$decoded) {
-                            $query['page_language'] = urldecode($query['page_language']);
+                            $query['page_language'] = urldecode((string) $query['page_language']);
                         }
                     }
 
                     if (isset($query['page_title'])) {
                         if (!$decoded) {
-                            $query['page_title'] = urldecode($query['page_title']);
+                            $query['page_title'] = urldecode((string) $query['page_title']);
                         }
                     }
 
                     if (isset($query['tags'])) {
                         if (!$decoded) {
-                            $query['tags'] = urldecode($query['tags']);
+                            $query['tags'] = urldecode((string) $query['tags']);
                         }
                     }
                 }

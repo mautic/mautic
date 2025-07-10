@@ -478,14 +478,14 @@ class FieldModel extends FormModel
     ];
 
     public function __construct(
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private ListModel $leadListModel,
-        private CustomFieldColumn $customFieldColumn,
-        private FieldSaveDispatcher $fieldSaveDispatcher,
-        private LeadFieldRepository $leadFieldRepository,
-        private FieldList $fieldList,
-        private LeadFieldSaver $leadFieldSaver,
-        private LeadFieldDeleter $leadFieldDeleter,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly ListModel $leadListModel,
+        private readonly CustomFieldColumn $customFieldColumn,
+        private readonly FieldSaveDispatcher $fieldSaveDispatcher,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly FieldList $fieldList,
+        private readonly LeadFieldSaver $leadFieldSaver,
+        private readonly LeadFieldDeleter $leadFieldDeleter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

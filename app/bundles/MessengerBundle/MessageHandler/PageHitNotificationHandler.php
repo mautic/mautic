@@ -20,12 +20,12 @@ use Symfony\Component\Messenger\Handler\Acknowledger;
 class PageHitNotificationHandler
 {
     public function __construct(
-        private PageRepository $pageRepository,
-        private HitRepository $hitRepository,
-        private LeadRepository $leadRepository,
-        private LoggerInterface $logger,
-        private RedirectRepository $redirectRepository,
-        private PageModel $pageModel,
+        private readonly PageRepository $pageRepository,
+        private readonly HitRepository $hitRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LoggerInterface $logger,
+        private readonly RedirectRepository $redirectRepository,
+        private readonly PageModel $pageModel,
     ) {
     }
 

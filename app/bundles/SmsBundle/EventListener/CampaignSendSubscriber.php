@@ -14,8 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SmsModel $smsModel,
-        private TransportChain $transportChain,
+        private readonly SmsModel $smsModel,
+        private readonly TransportChain $transportChain,
     ) {
     }
 

@@ -18,7 +18,7 @@ class AnalyseCustomFieldCommand extends Command
 {
     protected static $defaultDescription = 'Analyse actual usage of custom columns in leads table.';
 
-    public function __construct(private FieldModel $fieldModel, private LeadModel $leadModel, private TranslatorInterface $translator)
+    public function __construct(private readonly FieldModel $fieldModel, private readonly LeadModel $leadModel, private readonly TranslatorInterface $translator)
     {
         parent::__construct();
     }

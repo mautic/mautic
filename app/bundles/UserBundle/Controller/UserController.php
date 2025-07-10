@@ -42,7 +42,7 @@ class UserController extends FormController
         $orderBy       = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir    = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
         $search        = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
-        $search        = html_entity_decode($search);
+        $search        = html_entity_decode((string) $search);
         $request->getSession()->set('mautic.user.filter', $search);
 
         // do some default filtering
@@ -462,7 +462,7 @@ class UserController extends FormController
         if ('POST' === $request->getMethod()) {
             $contact   = $request->request->all()['contact'] ?? [];
             $formUrl   = $contact['returnUrl'] ?? '';
-            $returnUrl = $formUrl ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
+            $returnUrl = $formUrl ? urldecode((string) $formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -482,8 +482,8 @@ class UserController extends FormController
                         $entityId = $user->getId();
                     } else {
                         $bundle = $object = $reEntity;
-                        if (strpos($reEntity, ':')) {
-                            [$bundle, $object] = explode(':', $reEntity);
+                        if (strpos((string) $reEntity, ':')) {
+                            [$bundle, $object] = explode(':', (string) $reEntity);
                         }
                         $entityId = $form->get('id')->getData();
                     }

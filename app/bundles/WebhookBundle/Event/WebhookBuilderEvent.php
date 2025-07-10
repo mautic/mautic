@@ -11,7 +11,7 @@ class WebhookBuilderEvent extends Event
     private array $events = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -46,7 +46,7 @@ class WebhookBuilderEvent extends Event
 
         if (empty($sorted)) {
             uasort($this->events, fn ($a, $b): int => strnatcasecmp(
-                $a['label'], $b['label']));
+                (string) $a['label'], (string) $b['label']));
             $sorted = true;
         }
 

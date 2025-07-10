@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AjaxController extends CommonAjaxController
 {
     public function __construct(
-        private DateHelper $dateHelper,
+        private readonly DateHelper $dateHelper,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

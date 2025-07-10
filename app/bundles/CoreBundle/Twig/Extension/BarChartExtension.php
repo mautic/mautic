@@ -13,7 +13,7 @@ final class BarChartExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('barChartInitialize', [$this, 'createNewChart']),
+            new TwigFunction('barChartInitialize', $this->createNewChart(...)),
         ];
     }
 

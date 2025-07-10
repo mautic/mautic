@@ -14,8 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private TagModel $model,
-        private GlobalSearch $globalSearch,
+        private readonly TagModel $model,
+        private readonly GlobalSearch $globalSearch,
     ) {
     }
 

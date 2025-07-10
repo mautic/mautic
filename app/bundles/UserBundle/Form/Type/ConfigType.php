@@ -27,9 +27,9 @@ class ConfigType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $samlEntityIdChoices = ['', rtrim($this->parameters->get('mautic.site_url'), '/')];
+        $samlEntityIdChoices = ['', rtrim((string) $this->parameters->get('mautic.site_url'), '/')];
         if (!empty($this->parameters->get('mautic.subdomain_url'))) {
-            $samlEntityIdChoices[] = rtrim($this->parameters->get('mautic.subdomain_url'), '/');
+            $samlEntityIdChoices[] = rtrim((string) $this->parameters->get('mautic.subdomain_url'), '/');
         }
         $builder->add('saml_idp_entity_id', ChoiceType::class,
             [

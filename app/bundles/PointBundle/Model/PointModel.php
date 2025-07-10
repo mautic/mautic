@@ -46,7 +46,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         protected RequestStack $requestStack,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
-        private ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -55,7 +55,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private PointGroupModel $pointGroupModel,
+        private readonly PointGroupModel $pointGroupModel,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -235,7 +235,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
+            $callback = $settings['callback'] ?? \Mautic\PointBundle\Helper\EventHelper::engagePointAction(...);
 
             if (is_callable($callback)) {
                 $object = null;

@@ -51,7 +51,7 @@ class BatchTagController extends AbstractFormController
         $params   = $request->get('batch_tag');
         $tagModel = $this->getModel('tagmanager.tag');
         assert($tagModel instanceof TagModel);
-        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $ids    = empty($params['ids']) ? [] : json_decode((string) $params['ids']);
         if (empty($ids)) {
             $this->addFlashMessage('mautic.core.error.ids.missing');
 

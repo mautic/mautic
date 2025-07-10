@@ -17,7 +17,7 @@ class FieldFilterHelper
     private array $filteredFields = [];
 
     public function __construct(
-        private ConfigFormSyncInterface $integrationObject,
+        private readonly ConfigFormSyncInterface $integrationObject,
     ) {
     }
 
@@ -69,7 +69,7 @@ class FieldFilterHelper
         $found = [];
 
         foreach ($fields as $name => $field) {
-            if (!stristr($field->getLabel(), $keyword)) {
+            if (!stristr((string) $field->getLabel(), $keyword)) {
                 continue;
             }
 
