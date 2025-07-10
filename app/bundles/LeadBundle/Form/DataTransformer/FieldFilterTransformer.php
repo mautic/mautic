@@ -23,10 +23,10 @@ class FieldFilterTransformer implements DataTransformerInterface
         TranslatorInterface $translator,
         private readonly array $default = [],
     ) {
-        $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
-        foreach ($this->relativeDateStrings as &$string) {
-            $string = $translator->trans($string);
-        }
+        $this->relativeDateStrings = array_map(
+            fn(string $key) => $translator->trans($key),
+            LeadListRepository::getRelativeDateTranslationKeys()
+        );
     }
 
     /**
