@@ -238,7 +238,7 @@ ul.tag-cloud li {
 }
 
 .properties-form * {
-    width: min-content;
+    width: auto;
 }
 
 .filter--row select.form-control,
@@ -258,6 +258,7 @@ ul.tag-cloud li {
 
 .filter--panel {
     border-color: var(--border-subtle);
+    width: auto;
 }
 .filter--panel select:focus {
     outline: 2px solid var(--focus);
