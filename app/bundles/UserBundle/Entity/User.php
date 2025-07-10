@@ -380,10 +380,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $roles;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
-        $this->plainPassword   = null;
-        $this->currentPassword = null;
     }
 
     /**
@@ -391,6 +390,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     public function __serialize(): array
     {
+        $this->plainPassword   = null;
+        $this->currentPassword = null;
+
         return [
             $this->id,
             $this->username,

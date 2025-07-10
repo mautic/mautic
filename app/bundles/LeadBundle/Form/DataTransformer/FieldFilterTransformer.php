@@ -31,12 +31,8 @@ class FieldFilterTransformer implements DataTransformerInterface
 
     /**
      * From DB format to form format.
-     *
-     * @param mixed $rawFilters
-     *
-     * @return array|mixed
      */
-    public function transform($rawFilters)
+    public function transform(mixed $rawFilters): mixed
     {
         if (!is_array($rawFilters)) {
             return [];
@@ -64,12 +60,8 @@ class FieldFilterTransformer implements DataTransformerInterface
 
     /**
      * Form format to database format.
-     *
-     * @param mixed $rawFilters
-     *
-     * @return array|mixed
      */
-    public function reverseTransform($rawFilters)
+    public function reverseTransform(mixed $rawFilters): mixed
     {
         if (!is_array($rawFilters)) {
             return [];
