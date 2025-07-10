@@ -234,7 +234,7 @@ class MailHelper
     private array $embedImagesReplaces = [];
 
     public function __construct(
-        private MailerInterface $mailer,
+        private readonly MailerInterface $mailer,
         private readonly FromEmailHelper $fromEmailHelper,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly Mailbox $mailbox,

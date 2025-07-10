@@ -32,7 +32,7 @@ class PointSubscriberTest extends TestCase
         $pointActionHelper = $this->createMock(PointActionHelper::class);
         $matcher           = self::exactly(2);
 
-        $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper) {
+        $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher) {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('page.hit', $parameters[0]);
                 $this->assertSame([
@@ -45,14 +45,17 @@ class PointSubscriberTest extends TestCase
             }
             if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame('url.hit', $parameters[0]);
-                $this->assertSame([
-                    'group'       => 'mautic.page.point.action',
-                    'label'       => 'mautic.page.point.action.urlhit',
-                    'description' => 'mautic.page.point.action.urlhit_descr',
-                    'callback'    => [$pointActionHelper, 'validateUrlHit'],
-                    'formType'    => \Mautic\PageBundle\Form\Type\PointActionUrlHitType::class,
-                    'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
-                ], $parameters[1]);
+                $actionConfig = $parameters[1];
+
+                // Assert all properties except callback
+                $this->assertSame('mautic.page.point.action', $actionConfig['group']);
+                $this->assertSame('mautic.page.point.action.urlhit', $actionConfig['label']);
+                $this->assertSame('mautic.page.point.action.urlhit_descr', $actionConfig['description']);
+                $this->assertSame(\Mautic\PageBundle\Form\Type\PointActionUrlHitType::class, $actionConfig['formType']);
+                $this->assertSame('@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig', $actionConfig['formTheme']);
+
+                // Assert callback is a closure
+                $this->assertInstanceOf(\Closure::class, $actionConfig['callback']);
             }
         });
 

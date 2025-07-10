@@ -251,8 +251,8 @@ class UserType extends AbstractType
             [
                 'data_class'        => User::class,
                 'validation_groups' => User::determineValidationGroups(...),
-                'ignore_formexit' => false,
-                'in_profile'      => false,
+                'ignore_formexit'   => false,
+                'in_profile'        => false,
             ]
         );
     }

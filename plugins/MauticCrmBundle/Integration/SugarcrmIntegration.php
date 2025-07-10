@@ -1220,7 +1220,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         foreach ($leadsToUpdate as $object => $records) {
             foreach ($records as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
-                    $lead                                                       = $this->getCompoundMauticFields($lead);
+                    $lead                                                                = $this->getCompoundMauticFields($lead);
                     $checkEmailsInSugar[$object][mb_strtolower((string) $lead['email'])] = $lead;
                 }
             }
@@ -1235,7 +1235,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Sugarcrm', $fields, $limit, $fromDate, $toDate);
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email'])) {
-                    $lead                                                       = $this->getCompoundMauticFields($lead);
+                    $lead                                                                = $this->getCompoundMauticFields($lead);
                     $checkEmailsInSugar['Leads'][mb_strtolower((string) $lead['email'])] = $lead;
                 }
             }

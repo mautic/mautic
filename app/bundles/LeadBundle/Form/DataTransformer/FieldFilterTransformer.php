@@ -24,7 +24,7 @@ class FieldFilterTransformer implements DataTransformerInterface
         private readonly array $default = [],
     ) {
         $this->relativeDateStrings = array_map(
-            fn(string $key) => $translator->trans($key),
+            fn (string $key) => $translator->trans($key),
             LeadListRepository::getRelativeDateTranslationKeys()
         );
     }
