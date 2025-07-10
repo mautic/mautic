@@ -15,7 +15,7 @@ if (file_exists($configBaseDir.'/config/security_local.php')) {
 
 // Twig Configuration
 $container->loadFromExtension('twig', [
-    'cache'            => false,
+    'cache'            => '%env(resolve:MAUTIC_TWIG_CACHE_DIR)%',
     'debug'            => '%kernel.debug%',
     'strict_variables' => true,
     'paths'            => [

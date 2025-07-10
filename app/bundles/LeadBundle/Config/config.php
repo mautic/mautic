@@ -707,7 +707,19 @@ return [
                     'mautic.security',
                 ],
             ],
-
+            'mautic.lead.data_transformer.field_filter' => [
+                'class'     => Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer::class,
+                'arguments' => [
+                    'service_container',
+                ],
+            ],
+            'mautic.lead.data_transformer.field_filter.default_value_transformer' => [
+                'class'     => Mautic\LeadBundle\Form\DataTransformer\FieldFilter\FieldFilterDefaultValueTransformer::class,
+                'arguments' => [
+                    'mautic.lead.data_transformer.field_filter',
+                    [],
+                ],
+            ],
             'mautic.lead.field.schema_definition' => [
                 'class' => Mautic\LeadBundle\Field\SchemaDefinition::class,
             ],

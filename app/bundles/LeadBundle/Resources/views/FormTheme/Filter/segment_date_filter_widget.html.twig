@@ -1,0 +1,20 @@
+{# segment_date_filter_widget.html.twig#}
+{% block segment_date_filter_widget %}
+<div>
+    {{ form_row(form.dateTypeMode) }}
+    <div{{ 'absolute' != form.dateTypeMode.vars.value ? ' class="absolute-date hide"' : ' class="absolute-date"' }}>
+        {{ form_row(form.absoluteDate) }}
+    </div>
+
+    <div{{ 'relative' != form.dateTypeMode.vars.value ? ' class="relative-date hide"' : ' class="relative-date"' }}>
+        <div class="row">
+            <div class="col-sm-4">
+                {{ form_row(form.relativeDateInterval) }}
+            </div>
+            <div class="col-sm-8">
+                {{ form_row(form.relativeDateIntervalUnit) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

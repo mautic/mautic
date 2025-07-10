@@ -33,7 +33,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<DynamicContent>
@@ -85,7 +84,7 @@ class DynamicContentType extends AbstractType
     public function __construct(
         private EntityManager $em,
         ListModel $listModel,
-        private TranslatorInterface $translator,
+        private FieldFilterTransformer $fieldFilterTransformer,
         private LeadModel $leadModel,
         private TypeList $typeList,
     ) {
@@ -255,7 +254,6 @@ class DynamicContentType extends AbstractType
             );
         }
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
         $builder->add(
             $builder->create(
                 'filters',
@@ -278,7 +276,7 @@ class DynamicContentType extends AbstractType
                     'allow_add'      => true,
                     'allow_delete'   => true,
                 ]
-            )->addModelTransformer($filterModalTransformer)
+            )->addModelTransformer($this->fieldFilterTransformer)
         );
 
         if (!empty($options['action'])) {
