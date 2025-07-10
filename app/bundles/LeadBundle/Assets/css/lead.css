@@ -281,6 +281,9 @@ ul.tag-cloud li {
 .filter--field-operator {
     border-left: 1px solid var(--border-subtle);
     border-right: 1px solid var(--border-subtle);
+}
+
+.filter--field-operator > select {
     width:auto;
 }
 
