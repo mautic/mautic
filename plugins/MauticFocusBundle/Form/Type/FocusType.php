@@ -129,7 +129,10 @@ class FocusType extends AbstractType
 
         $websiteValue = $options['data']->getWebsite();
         if (empty($websiteValue)) {
-            $websiteValue = $this->coreParametersHelper->get('site_url') . $this->router->generate('mautic_focus_index', ['page' => 1]);
+            $websiteValue = $this->router->generate('mautic_focus_index',
+            ['page' => 1],
+            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
+        );
         }
         $builder->add(
             'website',
