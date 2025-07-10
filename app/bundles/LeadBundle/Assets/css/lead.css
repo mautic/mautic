@@ -258,7 +258,6 @@ ul.tag-cloud li {
 
 .filter--panel {
     border-color: var(--border-subtle);
-    width: auto;
 }
 .filter--panel select:focus {
     outline: 2px solid var(--focus);
@@ -282,6 +281,7 @@ ul.tag-cloud li {
 .filter--field-operator {
     border-left: 1px solid var(--border-subtle);
     border-right: 1px solid var(--border-subtle);
+    width:auto;
 }
 
 .filter--field-name {
