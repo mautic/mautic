@@ -576,30 +576,30 @@ final class AssetsHelper
                     $link = $this->escape($match[2] ?: $match[3]);
 
                     return '<'.array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>").'>';
-                }, $text),
+                }, (string) $text),
                 'mail' => preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr): string {
                     $match[1] = $this->escape($match[1]);
 
                     return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
-                }, $text),
+                }, (string) $text),
                 'twitter' => preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr): string {
                     $match[0] = $this->escape($match[0]);
                     $match[1] = $this->escape($match[1]);
 
                     return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".('@' == $match[0][0] ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
-                }, $text),
+                }, (string) $text),
                 default => preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
                     $match[1] = $this->escape($match[1]);
 
                     return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
-                }, $text),
+                }, (string) $text),
             };
         }
 
         // Insert all link
         return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links): string {
             return $links[(int) $match[1] - 1];
-        }, $text);
+        }, (string) $text);
     }
 
     /**

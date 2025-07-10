@@ -285,8 +285,8 @@ class PlainTextHelper
         $this->convertBlockquotes($text);
         $this->convertPre($text);
         $text = preg_replace($this->search, $this->replace, (string) $text);
-        $text = preg_replace_callback($this->callbackSearch, [$this, 'pregCallback'], $text);
-        $text = strip_tags($text);
+        $text = preg_replace_callback($this->callbackSearch, [$this, 'pregCallback'], (string) $text);
+        $text = strip_tags((string) $text);
         $text = preg_replace($this->entSearch, $this->entReplace, $text);
         $text = html_entity_decode((string) $text, ENT_QUOTES, self::ENCODING);
 

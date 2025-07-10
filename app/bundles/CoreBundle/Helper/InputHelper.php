@@ -440,7 +440,7 @@ class InputHelper
             if (!empty($matches[0])) {
                 // Special handling for conditional blocks
                 $value = preg_replace("/<mconditionnonoutlook><mif>(.*?)<\/mif>(.*?)<\/mconditionnonoutlook>/is", '<!--[if$1]>$2<!--<![endif]-->', (string) $value);
-                $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
+                $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', (string) $value);
             }
 
             if ($commentCount) {

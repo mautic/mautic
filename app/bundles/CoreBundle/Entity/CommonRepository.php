@@ -123,7 +123,7 @@ class CommonRepository extends ServiceEntityRepository
 
                     if (in_array($o, $properties)) {
                         $o = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', (string) $o);
-                        $o = strtolower($o);
+                        $o = strtolower((string) $o);
                     }
 
                     $o = (!empty($alias)) ? $alias.'.'.$o : $o;
@@ -1786,7 +1786,7 @@ class CommonRepository extends ServiceEntityRepository
 
             if (in_array($col, $properties)) {
                 $col = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', (string) $col);
-                $col = strtolower($col);
+                $col = strtolower((string) $col);
             }
 
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;

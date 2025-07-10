@@ -594,7 +594,7 @@ class TrackableModel extends AbstractCommonModel
             // Equal signs in tokens will confuse parse_str so they need to be encoded
             $query = preg_replace('/\{(\S+?)=(\S+?)\}/', '{$1%3D$2}', (string) $query);
 
-            parse_str($query, $queryParts);
+            parse_str((string) $query, $queryParts);
 
             foreach ($queryParts as $key => $value) {
                 if (preg_match('/(\{\S+?\})/', $key) || preg_match('/(\{\S+?\})/', $value)) {

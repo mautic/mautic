@@ -82,8 +82,10 @@ return static function (RectorConfig $rectorConfig): void {
             '*/Entity/*',
         ],
 
-        // handle later with full PHP 8.0 upgrade
-        Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
+        Rector\Php81\Rector\Array_\FirstClassCallableRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Config/config.php',
+            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Compiler/TestPass.php',
+        ],
 
         // handle later, case by case as lot of chnaged code
         Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
